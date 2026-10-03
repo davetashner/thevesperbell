@@ -4,19 +4,146 @@ A desktop-first, browser-based fantasy action RPG. Start with [`CONSTITUTION.md`
 for the vision and [`docs/backlog-contract.md`](docs/backlog-contract.md) for how work is planned and tested.
 The backlog is published at https://thevesperbell.com/backlog.html.
 
-## Quickstart
+## Build, launch and play
 
-You need Node 24 LTS, the version pinned in `.node-version`. `engine-strict` makes `pnpm install` fail
-on any other major. pnpm comes through corepack, pinned by `packageManager` in `package.json`.
+### 1. Install the toolchain
+
+You need **Node 24 LTS** (pinned in `.node-version`; `engine-strict` makes `pnpm install` fail on any
+other major) and **pnpm**, which comes through corepack at the version pinned by `packageManager` in
+`package.json`. You also need a desktop browser with WebGL 2 and WebAssembly (current Chrome, Edge,
+Firefox or Safari); the game shows an "unsupported" message otherwise.
 
 ```bash
-# Node 24: any manager that reads .node-version works (fnm, mise, nodenv…), or with Homebrew:
-brew install node@24 && export PATH="$(brew --prefix node@24)/bin:$PATH"
-corepack enable          # Node 25+ no longer bundles corepack: npm i -g corepack first
+# Node 24 — pick one:
+fnm install && fnm use                  # fnm / mise / nodenv / nvm read .node-version
+brew install node@24 && export PATH="$(brew --prefix node@24)/bin:$PATH"   # macOS Homebrew
 
-pnpm install
-pnpm dev                 # Vite dev server
+node -v                                 # must print v24.x
+corepack enable                         # Node 25+ no longer bundles corepack: npm i -g corepack first
 ```
+
+### 2. Install dependencies
+
+```bash
+git clone https://github.com/davetashner/thevesperbell.git
+cd thevesperbell
+pnpm install
+```
+
+### 3. Launch
+
+**Development** (hot reload, debug console always on):
+
+```bash
+pnpm dev                                # http://localhost:5173
+```
+
+**Production build** (what players get; the debug console needs `?debug=1`):
+
+```bash
+pnpm build                              # outputs dist/
+pnpm preview                            # serves dist/ at http://localhost:4173
+```
+
+`dist/` is a static site: any static file server works too (it must serve `.wasm` files).
+
+### 4. Play
+
+There is no title screen or pause menu yet (mw-e01.2, mw-e01.3), so you start a game from the URL.
+The best place to start is the vertical slice as the Knight:
+
+> **http://localhost:5173/?scene=slice&newgame** — pick your class on the class-select screen
+> (only the Knight is playable in m1), or skip it with
+> **http://localhost:5173/?scene=slice&class=knight**.
+
+Then **click the game view** to capture the mouse and play; **Esc** releases it. Use port `4173`
+instead of `5173` under `pnpm preview`.
+
+Without `?class=` or `?newgame` you play a classless character with no starting kit. With no
+`?scene=` you land in the grey-box testbed.
+
+#### Controls
+
+All bindings are remappable (`src/game/input/bindings.ts`); a controller works alongside keyboard and
+mouse with no setup, and the on-screen hints follow whichever device you used last.
+
+| Action                  | Keyboard + mouse          | Controller (Xbox labels) |
+| ----------------------- | ------------------------- | ------------------------ |
+| Move                    | WASD / arrow keys         | Left stick               |
+| Look                    | Mouse                     | Right stick              |
+| Camera zoom             | Mouse wheel               | —                        |
+| Jump / mantle           | Space                     | A                        |
+| Sprint                  | Left Shift (hold)         | LS click (toggle)        |
+| Crouch                  | C                         | D-pad down               |
+| Slow walk               | X                         | Light push on left stick |
+| Dodge roll              | R                         | B                        |
+| Interact (doors, levers, pick up, loot) | E         | X                        |
+| Attack (hold to draw a bow) | Left click            | RT                       |
+| Block / shield          | Right click               | LT                       |
+| Lock on                 | Q or middle click         | RS click                 |
+| Cycle lock-on target    | Tab                       | —                        |
+| Abilities 1–4 (4 = bow) | 1 2 3 4                   | Y/D-pad up, RB/D-pad right, LB, D-pad left |
+| Inventory               | I                         | View                     |
+| Drop / throw item       | G / T                     | —                        |
+| Pause / release mouse   | Esc or P                  | Menu                     |
+
+#### Scenes
+
+Load any scene with `?scene=<id>` (an unknown id lists the available ones):
+
+| Scene id          | What's there |
+| ----------------- | ------------ |
+| `slice`           | The m1 vertical slice: spawn room → wooden door → dim corridor (optional ivy climb) → arena → loot alcove → locked iron exit. Walking into the vestibule behind the exit completes it. |
+| `testbed` (default) | Climbing wall, arrow target, locked closet with its key nearby, a supply chest, a hazard strip and an arena with three training dummies to lock on to. |
+| `combat-sandbox`  | Arena with a training dummy and an attacker dummy for practising block, parry and dodge (see [Combat sandbox](#combat-sandbox)). |
+| `mechanism-room`  | Every mechanism: lever and portcullis, burnable wooden door, locked iron door, timed button door, crank and trapdoor. |
+| `weak-wall-room`  | A cracked wall to smash with a heavy attack and a breakable crate. |
+| `lighting-room`   | Torches, a burning crate and moonlight, with dark corners to hide in. |
+| `kit-gallery`     | Every grey-box kit piece in a row (an art check, not gameplay). |
+
+**What the slice can't do yet:** the Forgotten miner skeleton and the gallery key it drops are not
+placed in the level yet (mw-e01.6), so the arena is empty and the exit door stays locked. Until then,
+use the debug console to play those beats: `spawn forgotten-miner` puts a skeleton in front of you,
+and `noclip` walks you through the exit door into the vestibule.
+
+#### Debug console and URL options
+
+Press **`` ` ``** (backtick) to open the debug console; `help` lists every command and `help <command>`
+shows its usage. It is always on under `pnpm dev` and in the combat sandbox, and on production builds
+with `?debug=1`. Handy commands:
+
+| Command | Does |
+| ------- | ---- |
+| `spawn <id> [count] [at-cursor]` | Spawn a creature or prop (Tab completes ids), e.g. `spawn forgotten-miner` |
+| `give <itemId> [n]` | Add items, e.g. `give healing-draught 3` (ids are the files in `src/content/data/item/`) |
+| `god`, `noclip` | Toggle invulnerability / walking through walls |
+| `tp <x y z \| place>` | Teleport, e.g. `tp player-start` |
+| `timescale <0–n>` | Slow down or freeze the sim |
+| `scene <id>` | Load another scene |
+| `save [slot]` | Save into a slot |
+
+| URL parameter | Does |
+| ------------- | ---- |
+| `?scene=<id>` | Load a scene |
+| `?newgame` | Open class select |
+| `?class=<id>` | Start as `knight` (or `archer`, `sorcerer`, `thief` once unlocked) |
+| `?allclasses` | Unlock every class on the class-select screen (builds with the debug console) |
+| `?debug=1` | Enable the debug console on a production build |
+| `?frames` / `?hitboxes` | Combat frame-data overlay / hit-volume wireframes |
+| `?perf` | Frame-time probe |
+| **F2** (key) | Free-fly debug camera (WASD, Q/E down/up, Shift fast, drag to look) |
+
+Dying plays a death beat, then the death screen lets you reload a save or restart the area.
+
+#### Troubleshooting
+
+- **`pnpm install` fails with an engine error** — you're not on Node 24; check `node -v`.
+- **`pnpm: command not found`** — run `corepack enable` (on Node 25+, `npm i -g corepack` first).
+- **Black screen or "unsupported" message** — the browser lacks WebGL 2 or WebAssembly; enable hardware
+  acceleration or try another browser.
+- **The mouse doesn't turn the camera** — click the game view to capture the pointer.
+
+## Developer scripts
 
 | Script               | What it does                                                     |
 | -------------------- | ---------------------------------------------------------------- |
