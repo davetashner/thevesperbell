@@ -15,6 +15,7 @@ import { RapierPhysics } from '../physics/rapier';
 import { registerWorldProperties } from '../properties/components';
 import { installGameClock } from '../gametime/clock';
 import { DEFAULT_CLOCK_CONFIG } from '../gametime/config';
+import { ScrollRules } from '../magic/scroll';
 import { SpellLearning } from '../magic/learning';
 import { addStudent, installStudy, StudyRules } from '../magic/study';
 import { installStimuli } from '../stimulus/stimulus';
@@ -25,6 +26,7 @@ import {
   quickSlotsOf,
   type ConsumableDef,
 } from './consumables';
+import { giveItemCommand } from './give-command';
 import {
   installInventoryActions,
   inventoryActionCommand,
@@ -60,12 +62,21 @@ const DEFS = [
     },
   } as Partial<ConsumableDef>),
   item('field-primer', 'book'),
+  item('spark-scroll', 'book', { stackable: true, maxStack: 5 }),
   item('gallery-key', 'key', { flags: { unique: true, questItem: true, noDrop: true } }),
 ];
 
 const VIEW = { feet: { x: 0, y: 0, z: 0 }, yaw: 0, pitch: 0 };
 
-function setup(options: { equipment?: boolean; view?: boolean; study?: StudyRules } = {}) {
+function setup(
+  options: {
+    equipment?: boolean;
+    view?: boolean;
+    study?: StudyRules;
+    scrolls?: boolean;
+    giver?: boolean;
+  } = {},
+) {
   const physics = new RapierPhysics(RAPIER);
   const world = installStimuli(registerWorldProperties(new World<unknown>({ seed: 5, physics })));
   const sim = world as unknown as World<never>;
@@ -83,6 +94,16 @@ function setup(options: { equipment?: boolean; view?: boolean; study?: StudyRule
     consumables,
     ...(options.equipment !== false && { equipment }),
     ...(options.study !== undefined && { study: options.study }),
+    ...(options.scrolls === true && {
+      scrolls: new ScrollRules({
+        casts: (id) => (id === 'spark-scroll' ? 'spark' : undefined),
+        pipeline: { cast: () => ({ status: 'cast', delivery: 1 }) },
+        inventory: items.inventory,
+      }),
+    }),
+    ...(options.giver === true && {
+      giver: { inventory: items.inventory, known: (id: string) => id === 'spark-scroll' },
+    }),
     ...(options.view === false ? { view: () => undefined } : { view: () => VIEW }),
   });
   installInventoryActions(world, actions);
@@ -145,6 +166,45 @@ describe('studying from the inventory (mw-e07.2)', () => {
       ok: false,
       reason: 'not-studyable',
     });
+  });
+});
+
+describe('reading a scroll from the inventory (mw-ju8.17)', () => {
+  it('AC-3: casts the scroll’s spell and spends one scroll; other items are not readable', () => {
+    const { sim, actor, give, units, actions } = setup({ scrolls: true });
+    const scroll = give('spark-scroll', 2);
+    const primer = give('field-primer');
+    const read = { op: 'read', instanceId: scroll, aim: { x: 1, y: 0, z: 0 } } as const;
+    expect(actions.apply(sim, actor, read)).toEqual({ ok: true });
+    expect(units('spark-scroll')).toBe(1);
+    expect(actions.apply(sim, actor, { op: 'read', instanceId: primer })).toEqual({
+      ok: false,
+      reason: 'not-readable',
+    });
+    expect(actions.apply(sim, actor, { op: 'read', instanceId: scroll, target: 9 })).toEqual({
+      ok: true,
+    });
+    expect(units('spark-scroll')).toBe(0);
+  });
+
+  it('is refused without scroll rules', () => {
+    const { sim, actor, give, actions } = setup();
+    const scroll = give('spark-scroll');
+    expect(actions.apply(sim, actor, { op: 'read', instanceId: scroll })).toEqual({
+      ok: false,
+      reason: 'not-readable',
+    });
+  });
+});
+
+describe('give-item commands in the action system (mw-ju8.17)', () => {
+  it('are carried out when a giver is installed and ignored without one', () => {
+    const withGiver = setup({ giver: true });
+    withGiver.world.step([giveItemCommand(withGiver.actor, 'spark-scroll', 2)]);
+    expect(withGiver.units('spark-scroll')).toBe(2);
+    const bare = setup();
+    bare.world.step([giveItemCommand(bare.actor, 'spark-scroll', 2)]);
+    expect(bare.units('spark-scroll')).toBe(0);
   });
 });
 

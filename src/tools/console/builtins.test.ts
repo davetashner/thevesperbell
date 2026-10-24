@@ -47,7 +47,9 @@ const HOST_BASE = (world: World) => ({
 });
 
 /** A real sim world behind a console, with a replay recorder in front of it like a session. */
-function session(options: { withPlayer?: boolean; props?: readonly string[] } = {}) {
+function session(
+  options: { withPlayer?: boolean; props?: readonly string[]; items?: readonly string[] } = {},
+) {
   const world = registerSceneComponents(new World<unknown>({ seed: 42 }));
   const spawners = testPropSpawners(options.props ?? PROPS);
   installDebugCommands(world, { spawners });
@@ -67,6 +69,7 @@ function session(options: { withPlayer?: boolean; props?: readonly string[] } = 
     },
     player: () => player,
     spawnables: [...spawners.keys()].sort(),
+    ...(options.items !== undefined && { items: options.items }),
     bookmarks: () => new Map([['player-start', { x: 0, y: 0.5, z: 3 }]]),
     scenes: ['kit-gallery', 'testbed'],
     loadScene,
@@ -153,11 +156,33 @@ describe('built-in console commands', () => {
     expect(s.queue.size).toBe(0);
   });
 
+  it('give completes nothing without an item list', () => {
+    expect(session().registry.complete('give ').options).toEqual([]);
+  });
+
   it('give with valid arguments explains items do not exist yet', () => {
     expect(session().registry.execute('give potion 2')).toEqual({
       ok: false,
       lines: ['no items to give yet: the inventory arrives with e17 (mw-e17.12)'],
     });
+  });
+
+  it('give puts a known item in the player’s pack, and rejects an unknown one', () => {
+    const s = session({ withPlayer: true, items: ['healing-draught', 'scroll-of-ember'] });
+    expect(s.registry.execute('give scroll-of-ember 2')).toEqual({
+      ok: true,
+      lines: ['giving 2 × scroll-of-ember'],
+    });
+    expect(s.registry.execute('give healing-draught').lines).toEqual([
+      'giving 1 × healing-draught',
+    ]);
+    expect(s.queue.size).toBe(2);
+    expect(s.registry.execute('give scroll-of-embers').lines[0]).toMatch(
+      /^unknown item "scroll-of-embers"; closest: scroll-of-ember/,
+    );
+    expect(s.queue.size).toBe(2);
+    expect(s.registry.complete('give scr').line).toBe('give scroll-of-ember ');
+    expect(s.registry.complete('give scroll-of-ember ').options).toEqual([]);
   });
 
   it('spawn defaults to one at the origin without a player, and caps the count', () => {

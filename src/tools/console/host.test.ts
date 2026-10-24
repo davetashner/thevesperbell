@@ -63,6 +63,13 @@ describe('createGameHost', () => {
     expect(host.selectSpell).toBe(select);
   });
 
+  it('mw-ju8.17: passes the item ids through, or leaves them out', () => {
+    const w = world();
+    expect(createGameHost(options(w, () => undefined)).items).toBeUndefined();
+    const host = createGameHost({ ...options(w, () => undefined), items: ['scroll-of-ember'] });
+    expect(host.items).toEqual(['scroll-of-ember']);
+  });
+
   it('reads seed, liveness and cheats from the world', () => {
     const w = world();
     const hero = spawnCharacter(w, { x: 0, y: 0, z: 0 });

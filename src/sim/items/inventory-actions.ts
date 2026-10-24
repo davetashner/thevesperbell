@@ -25,8 +25,11 @@ import {
   type SlotMap,
 } from '../inventory/equipment';
 import { inventoryOf } from '../inventory/inventory';
+import type { ScrollRefusal, ScrollRules } from '../magic/scroll';
 import type { StudyRefusal, StudyRules } from '../magic/study';
+import type { Vec3 } from '../stimulus/shapes';
 import { QUICK_SLOT_COUNT, quickSlotsOf, type Consumables, type UseRefusal } from './consumables';
+import { giveItems, isGiveItemCommand, type GiveItemCommand, type ItemGiver } from './give-command';
 import { handlerView, type DropRefusal, type ItemHandlerView } from './world-items';
 
 /** One action on one item (or one quick slot). */
@@ -39,7 +42,17 @@ export type InventoryAction =
   | { readonly op: 'equip'; readonly instanceId: number }
   | { readonly op: 'unequip'; readonly instanceId: number }
   /** Study a spellbook (mw-e07.2): starts or resumes a study session. */
-  | { readonly op: 'study'; readonly instanceId: number };
+  | { readonly op: 'study'; readonly instanceId: number }
+  /**
+   * Read a spell scroll (mw-ju8.17): casts its spell once, free, at `aim`/`target` (aimed by the
+   * game like a normal cast) and spends the scroll.
+   */
+  | {
+      readonly op: 'read';
+      readonly instanceId: number;
+      readonly aim?: Vec3;
+      readonly target?: EntityId;
+    };
 
 /** The command carrying an inventory action. */
 export const INVENTORY_ACTION_COMMAND = 'item.inventoryAction' as const;
@@ -56,6 +69,7 @@ export type InventoryActionRefusal =
   | DropRefusal
   | EquipRefusal
   | StudyRefusal
+  | ScrollRefusal
   /** Study on an item that teaches no spell, or without study rules installed. */
   | 'not-studyable'
   /** Not something a quick slot can hold (only usable consumables). */
@@ -122,6 +136,10 @@ export interface InventoryActionsOptions {
   readonly equipment?: EquipmentRules;
   /** The study rules (mw-e07.2); without them `study` is refused with `not-studyable`. */
   readonly study?: StudyRules;
+  /** The scroll rules (mw-ju8.17); without them `read` is refused with `not-readable`. */
+  readonly scrolls?: ScrollRules;
+  /** The debug console's `give` (mw-ju8.17); without it give-item commands are ignored. */
+  readonly giver?: ItemGiver;
   /** Where `actor` drops and throws from; defaults to `handlerView` (the player's). */
   readonly view?: (world: World<never>, actor: EntityId) => ItemHandlerView | undefined;
 }
@@ -133,12 +151,16 @@ export class InventoryActions {
   readonly #consumables: Consumables;
   readonly #equipment: EquipmentRules | undefined;
   readonly #study: StudyRules | undefined;
+  readonly #scrolls: ScrollRules | undefined;
+  readonly #giver: ItemGiver | undefined;
   readonly #view: (world: World<never>, actor: EntityId) => ItemHandlerView | undefined;
 
   constructor(options: InventoryActionsOptions) {
     this.#consumables = options.consumables;
     this.#equipment = options.equipment;
     this.#study = options.study;
+    this.#scrolls = options.scrolls;
+    this.#giver = options.giver;
     this.#view = options.view ?? handlerView;
   }
 
@@ -160,6 +182,11 @@ export class InventoryActions {
       ...(result.ok ? { ok: true } : { ok: false, reason: result.reason }),
     });
     return result;
+  }
+
+  /** Carries out a give-item command (a debug cheat), when a giver is installed. */
+  give(world: World<never>, command: GiveItemCommand): void {
+    if (this.#giver !== undefined) giveItems(world, command, this.#giver);
   }
 
   #apply(
@@ -194,6 +221,14 @@ export class InventoryActions {
         }
         const started = this.#study.start(world, actor, defId);
         return started.status === 'refused' ? { ok: false, reason: started.reason } : OK;
+      }
+      case 'read': {
+        const read = this.#scrolls?.read(world, actor, action.instanceId, {
+          ...(action.aim !== undefined && { aim: action.aim }),
+          ...(action.target !== undefined && { target: action.target }),
+        });
+        if (read === undefined) return { ok: false, reason: 'not-readable' };
+        return read.ok ? OK : read;
       }
       case 'unequip': {
         const equipment = this.#equipmentFor(world, actor);
@@ -261,6 +296,10 @@ export function inventoryActionsSystem<TInput>(actions: InventoryActions): Syste
     run({ world, inputs }) {
       const sim = world as unknown as World<never>; // inventory actions never read world inputs
       for (const input of inputs as readonly unknown[]) {
+        if (isGiveItemCommand(input)) {
+          actions.give(sim, input);
+          continue;
+        }
         if (!isInventoryActionCommand(input)) continue;
         if (inventoryOf(sim, input.actor) === undefined) continue;
         if (quickSlotsOf(sim, input.actor) === undefined) continue;

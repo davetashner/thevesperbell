@@ -84,6 +84,7 @@ import {
 } from '@game/mechanisms/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
+import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
 import {
   applyClass,
   classCards,
@@ -697,6 +698,8 @@ function startRenderer(
     let spellHud: SpellHudGlue | undefined;
     let publishSpells: (() => void) | undefined;
     let castSelect: ((id: string) => boolean) | undefined;
+    // Aims a scroll's spell from the current view (mw-ju8.17), once the player can cast.
+    let scrollAim: ((spellId: string | undefined) => ScrollAim | undefined) | undefined;
     // The player's casting (mw-e06.15): turns a gameplay frame into cast commands, once there is a player.
     let castFrame: ((frame: ActionFrame) => readonly SpellCommand[]) | undefined;
     const afterStep: (() => void)[] = [];
@@ -1323,6 +1326,17 @@ function startRenderer(
         });
         castSelect = (id) => caster.select(id);
         const ray = () => viewRay(camera);
+        scrollAim = (id) => {
+          const spell = id === undefined ? undefined : spellbook.spells(id);
+          return spell === undefined
+            ? undefined
+            : aimScroll(spell, ray(), {
+                world,
+                caster: hero,
+                collision,
+                locked: () => player?.readout()?.lock,
+              });
+        };
         castFrame = (frame) => {
           if (replaying) return [];
           const out = caster.commands(frame, ray);
@@ -1431,12 +1445,22 @@ function startRenderer(
         createUnlockBook(content, capabilities),
       );
       installStudy(world, study);
+      // The console's `give <itemId> [n]` puts items in the pack (mw-e17.12 will add the rest).
+      const itemIds = new Set(content.all('item').map((item) => item.id));
+      // Reading a spell scroll (mw-ju8.17): casts its spell once, free, and spends it.
+      const scrolls =
+        magic === undefined
+          ? undefined
+          : createScrollRules(content, magic.pipeline, consumables.items.inventory);
       inventoryUi = startInventoryUi({
         ui,
         world,
         content,
         consumables,
         study,
+        ...(scrolls !== undefined && { scrolls }),
+        giver: { inventory: consumables.items.inventory, known: (id) => itemIds.has(id) },
+        scrollAim: (id) => scrollAim?.(id),
         player: player?.entity,
         submit: (command) => {
           commands.push(command);
@@ -2250,6 +2274,10 @@ function startRenderer(
             // ctl.get / ctl.set / ctl.dump (mw-e02.3) over the player's live controller tuning.
             controller: content.get('controller', PLAYER_CONTROLLER_ID),
             spawnables: [...spawners.keys()].sort(),
+            items: content
+              .all('item')
+              .map((item) => item.id)
+              .sort(),
             spells: magic?.spellIds ?? [],
             selectSpell: (id) => castSelect?.(id) ?? false,
             // Sandbox dummies take options (mw-e04.9: `spawn dummy --poise 60`); props take none.
