@@ -92,13 +92,15 @@ describe('spell HUD glue', () => {
 
   it('a sim fizzle for the player turns the reticle red for NOTE_MS; others do not', () => {
     const { world, reticle, glue } = setup();
-    const fizzle = (caster: number) => { world.events.emit(SpellFizzled, {
+    const fizzle = (caster: number) => {
+      world.events.emit(SpellFizzled, {
         tick: 0,
         caster,
         spell: 'ember',
         reason: 'insufficient-mana',
         stage: 'validate',
-      }); };
+      });
+    };
     fizzle(2);
     world.step([]);
     glue.frame(0);

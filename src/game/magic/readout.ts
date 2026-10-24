@@ -7,6 +7,7 @@ import {
   ManaComponent,
   manaOf,
   readProperty,
+  CastStarted,
   SpellCast,
   SpellFizzled,
   SpellHit,
@@ -29,7 +30,9 @@ export interface SpellReadout {
   readonly selected: string | null;
   readonly learned: readonly string[];
   readonly mana: number | null;
-  /** Casts that started (SpellCast) for the player. */
+  /** Wind-ups and channels that began (CastStarted) for the player: input-to-cast-start's end. */
+  readonly started: number;
+  /** Casts that released (SpellCast) for the player. */
   readonly casts: number;
   readonly hits: readonly SpellHitReadout[];
   /** Reasons the sim refused the player's casts, latest last. */
@@ -63,9 +66,13 @@ export function attachSpellReadout(options: SpellReadoutOptions): {
 } {
   const { world, player, caster, spawnOf } = options;
   let casts = 0;
+  let started = 0;
   const hits: { spell: string; entity: EntityId | null }[] = [];
   const fizzles: string[] = [];
   const offs = [
+    world.events.on(CastStarted, (cast) => {
+      if (cast.caster === player) started += 1;
+    }),
     world.events.on(SpellCast, (cast) => {
       if (cast.caster === player) casts += 1;
     }),
@@ -88,6 +95,7 @@ export function attachSpellReadout(options: SpellReadoutOptions): {
         selected: caster.selected ?? null,
         learned: caster.learned(),
         mana: pool === undefined ? null : Math.round(pool.current * 100) / 100,
+        started,
         casts,
         hits: hits.map(({ spell, entity }) => ({
           spell,

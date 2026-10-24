@@ -25,6 +25,7 @@ interface SpellData {
   selected: string | null;
   learned: string[];
   mana: number | null;
+  started: number;
   casts: number;
   hits: { spell: string; spawn: string | null; burning: boolean }[];
   fizzles: string[];
@@ -127,4 +128,57 @@ test('the reticle and an Ember in flight are drawn (screenshot)', async ({ page 
   await expect.poll(async () => (await spells(page)).casts, { timeout: 60_000 }).toBe(1);
   await page.waitForTimeout(4200); // a few sim ticks of flight at this speed
   await page.screenshot({ path: process.env['E2E_SPELL_SHOT'] ?? '' });
+});
+
+test('AC-5: input to cast start, measured from the key going down to the published wind-up', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(120_000);
+  await start(page);
+  await aimAtCrate(page);
+  // Each sample: dispatch the key and stamp performance.now(); a MutationObserver stamps the first
+  // data-spells readout that counts one more wind-up. Nothing else in the loop, so Playwright round
+  // trips never add to the figure.
+  const samples = await page.evaluate(async (count) => {
+    const app = document.querySelector<HTMLElement>('#app');
+    const started = (): number =>
+      (JSON.parse(app?.dataset['spells'] ?? 'null') as { started: number }).started;
+    const out: number[] = [];
+    for (let i = 0; i < count; i++) {
+      const before = started();
+      const sent = performance.now();
+      const seen = new Promise<number>((resolve) => {
+        const watch = new MutationObserver(() => {
+          if (started() > before) {
+            watch.disconnect();
+            resolve(performance.now() - sent);
+          }
+        });
+        if (app !== null)
+          watch.observe(app, { attributes: true, attributeFilter: ['data-spells'] });
+      });
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyV', key: 'v' }));
+      out.push(await seen);
+      window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyV', key: 'v' }));
+      // Past the release and the cooldown, by the sim's clock: a slow runner draws few frames.
+      const tickOf = (): number =>
+        (JSON.parse(app?.dataset['player'] ?? 'null') as { tick: number }).tick;
+      const until = tickOf() + 120;
+      await new Promise<void>((resolve) => {
+        const poll = (): void => {
+          if (tickOf() >= until) resolve();
+          else setTimeout(poll, 50);
+        };
+        poll();
+      });
+    }
+    return out;
+  }, 4);
+  const sorted = [...samples].sort((a, b) => a - b);
+  const p95 = sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * 0.95) - 1)] ?? Infinity;
+  testInfo.annotations.push({ type: 'input-to-cast-start p95 (ms)', description: p95.toFixed(1) });
+  // The budget is for the reference machine; a software-GL runner draws a few frames a second, so
+  // elsewhere only a loose bound applies.
+  const budget = process.env['E2E_REFERENCE_MACHINE'] === undefined ? 1500 : 100;
+  expect(p95).toBeLessThanOrEqual(budget);
 });

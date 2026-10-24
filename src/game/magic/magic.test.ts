@@ -319,6 +319,7 @@ describe('the spell readout', () => {
     for (let i = 0; i < 120; i++) frame(hold()());
     const read = readout.read();
     expect(read.selected).toBe('fixture-bolt');
+    expect(read.started).toBe(1);
     expect(read.casts).toBe(1);
     expect(read.hits[0]).toMatchObject({ spell: 'fixture-bolt', spawn: 'the-dummy' });
     expect(read.aim).toMatchObject({ mode: 'reticle', valid: true });
