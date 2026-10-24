@@ -3,7 +3,7 @@
 //   request → validate → deliver → effects
 //
 // 1. Validate: the spell exists and the caster knows it (a `free` source — a scroll — skips this and
-//    every gate), each registered CastGate passes (mana, cooldown… arrive as gates in e06.3/e06.4),
+//    every gate), each registered CastGate passes (mana, cooldown… are gates: ADR-0007),
 //    and the spell's delivery and every op have registered handlers. Any failure is a SpellFizzled
 //    and nothing is spent.
 // 2. Deliver: a delivery entity (`magic.delivery`) is created and its kind's handler says what it

@@ -61,7 +61,7 @@ export interface SpellFizzledInfo {
   readonly tick: number;
   readonly caster: EntityId;
   readonly spell: string;
-  /** Why: `unknown-spell`, `unknown-caster`, `unsupported-delivery`, `unsupported-op`, `no-target`, `out-of-reach`, `no-position`, or a gate's reason (`not-enough-mana`…). */
+  /** Why: `unknown-spell`, `unknown-caster`, `unsupported-delivery`, `unsupported-op`, `no-target`, `out-of-reach`, `no-position`, or a gate's reason (`insufficient-mana`…). */
   readonly reason: string;
   readonly stage: FizzleStage;
 }

@@ -66,7 +66,7 @@ export function makeSpell(id: string, overrides: Partial<SpellEntry> = {}): Spel
     tags: [],
     vfxCue: 'vfx-test',
     sfxCue: 'sfx-test',
-    flags: { tooUseful: false, castWhileMoving: false },
+    flags: { tooUseful: false, castWhileMoving: false, allowOvercast: false },
     ...overrides,
   };
 }

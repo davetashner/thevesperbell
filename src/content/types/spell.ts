@@ -448,6 +448,12 @@ export const spellSchema = z
           .boolean()
           .default(false)
           .describe('Moving does not interrupt its wind-up or channel (e06.4).'),
+        allowOvercast: z
+          .boolean()
+          .default(false)
+          .describe(
+            'May be cast with too little mana: spends what is left and requests a miscast (e06.3, e06.13).',
+          ),
       })
       .prefault({})
       .describe('Design flags.'),

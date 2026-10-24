@@ -126,3 +126,4 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `flags` | object | `{}` | Design flags. |
 | `flags.tooUseful` | boolean | `false` | Deliberately powerful: protected from balance nerfs (constitution §4). |
 | `flags.castWhileMoving` | boolean | `false` | Moving does not interrupt its wind-up or channel (e06.4). |
+| `flags.allowOvercast` | boolean | `false` | May be cast with too little mana: spends what is left and requests a miscast (e06.3, e06.13). |

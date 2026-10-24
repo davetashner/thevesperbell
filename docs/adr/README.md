@@ -14,6 +14,7 @@ project-wide decision, the same PR updates the contract row that states it.
 | [0004](0004-progression-model.md) | Progression model — in-world capability unlocks, no XP, no respec | Accepted | `mw-e19.1` |
 | [0005](0005-ai-architecture.md) | AI decision architecture — HFSM alert states with utility inside | Accepted | `mw-e11.1` |
 | [0006](0006-navmesh-and-pathfinding.md) | Navmesh and pathfinding — a pure-TypeScript bake and query in the sim | Proposed | `mw-e11.4` |
+| [0007](0007-spell-pipeline-extension-points.md) | Spell pipeline extension points — gates, registries, pending deliveries, free casts | Accepted | `mw-e06.21` |
 
 ## Writing one
 

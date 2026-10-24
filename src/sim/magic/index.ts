@@ -3,6 +3,7 @@
 export * from './components';
 export * from './deliveries';
 export * from './events';
+export * from './mana';
 export * from './ops';
 export * from './pipeline';
 export * from './registry';
