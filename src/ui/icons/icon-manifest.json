@@ -48,6 +48,10 @@
     "placeholder": true
   },
   {
+    "id": "icon-item-ember-01",
+    "placeholder": true
+  },
+  {
     "id": "icon-item-empty-glass-jar-01",
     "placeholder": true
   },
@@ -353,6 +357,10 @@
   },
   {
     "id": "icon-item-yew-staff-01",
+    "placeholder": true
+  },
+  {
+    "id": "icon-spell-ember",
     "placeholder": true
   }
 ]

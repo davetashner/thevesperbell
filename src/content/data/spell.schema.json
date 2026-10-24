@@ -208,6 +208,11 @@
               "type": "number",
               "minimum": 0
             },
+            "quenchedByWater": {
+              "default": false,
+              "description": "A flame that water puts out: launched underwater, or entering water in flight, it fizzles with no effects and a steam cue (SpellQuenched).",
+              "type": "boolean"
+            },
             "trail": {
               "description": "A stimulus carried along the whole flight path (a heat trail).",
               "type": "object",

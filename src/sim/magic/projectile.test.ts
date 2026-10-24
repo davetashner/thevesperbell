@@ -10,11 +10,18 @@ import { cos, hypot, sin } from '../math';
 import { PhysicsColliderComponent } from '../physics/objects';
 import { addProperties, readProperty, registerWorldProperties } from '../properties/components';
 import { Rng } from '../rng';
-import { placeEntity } from '../stimulus/placement';
+import { PlacementComponent as PlacementComponentRef, placeEntity } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
 import { installStimuli, stimulusResolved, stimulusSystem } from '../stimulus/stimulus';
 import { learnSpell, SpellDeliveryComponent } from './components';
-import { SpellEffectApplied, SpellFizzled, SpellHit, type SpellHitInfo } from './events';
+import {
+  SpellEffectApplied,
+  SpellFizzled,
+  SpellHit,
+  SpellQuenched,
+  type SpellHitInfo,
+  type SpellQuenchedInfo,
+} from './events';
 import { installSpells, type CastCommand } from './pipeline';
 import {
   installSpellProjectiles,
@@ -465,5 +472,74 @@ describe('projectile spells (mw-e06.6)', () => {
     expect(() => {
       t.pipeline.strike(t.world, id, []);
     }).toThrow(/unknown spell/);
+  });
+});
+
+describe('quenched projectiles (mw-e08.2)', () => {
+  // Water fills everything at x >= 5 (a pool), and everything below y = -1 (a submerged caster).
+  const water = (p: Vec3): boolean => p.x >= 5 || p.y < -1;
+  const flame = (id: string, quenched = true) =>
+    bolt(id, { quenchedByWater: quenched, maxRange: 30 }, [stimulusOp('heat', 500, 0.3)]);
+
+  function quenchSetup(quenched = true, withWater = true) {
+    const t = setup([flame('t-flame', quenched)], [], withWater ? { water } : {});
+    const quenches: SpellQuenchedInfo[] = [];
+    t.world.events.on(SpellQuenched, (e) => quenches.push(e));
+    return { ...t, quenches };
+  }
+
+  it('AC-6: a flame flying into water fizzles there with no effects and a steam cue event', () => {
+    const t = quenchSetup();
+    t.cast('t-flame', v3(20, 0, 0));
+    t.runUntilGone();
+    expect(t.quenches).toHaveLength(1);
+    expect(t.quenches[0]).toMatchObject({
+      spell: 't-flame',
+      caster: t.caster,
+      medium: 'water',
+      cue: 'steam',
+      stage: 'flight',
+    });
+    expect(t.quenches[0]?.point.x).toBeGreaterThanOrEqual(5);
+    expect(t.quenches[0]?.point.x).toBeLessThan(5.5);
+    expect(t.fizzled).toEqual(['quenched']);
+    expect(t.hits).toEqual([]);
+    expect(t.applied).toEqual([]);
+  });
+
+  it('AC-6: a flame cast from underwater never launches, spends nothing and emits the steam cue', () => {
+    const t = quenchSetup();
+    t.world.set(t.caster, PlacementComponentRef, { ...v3(0, -3, 0), radius: 0.5 });
+    t.pipeline.cast(t.world, {
+      caster: t.caster,
+      spell: 't-flame',
+      source: 'free',
+      aim: v3(1, -3, 0),
+    });
+    t.world.step();
+    expect(t.fizzled).toEqual(['quenched']);
+    expect(t.flying()).toEqual([]);
+    expect(t.quenches).toHaveLength(1);
+    expect(t.quenches[0]).toMatchObject({ stage: 'launch', cue: 'steam' });
+    expect(t.applied).toEqual([]);
+  });
+
+  it('a spell that is not quenchedByWater, or a world with no water, flies on through it', () => {
+    for (const t of [quenchSetup(false), quenchSetup(true, false)]) {
+      t.world.set(t.caster, PlacementComponentRef, { ...v3(0, 0, 0), radius: 0.5 });
+      t.cast('t-flame', v3(20, 0, 0));
+      t.runUntilGone();
+      expect(t.quenches).toEqual([]);
+      expect(t.fizzled).toEqual(['delivery-ended']);
+    }
+  });
+
+  it('a quenchedByWater spell in dry air is untouched by a water probe that says no', () => {
+    const t = setup([flame('t-dry')], [], { water: () => false });
+    const target = t.spawn(v3(8, 0, 0));
+    t.cast('t-dry', v3(20, 0, 0));
+    t.runUntilGone();
+    expect(t.hits.map((h) => h.target)).toEqual([target]);
+    expect(t.fizzled).toEqual([]);
   });
 });

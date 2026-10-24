@@ -35,6 +35,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `delivery.bounce` | integer 0–8 | `0` | Walls it rebounds off before the next one is its impact (0–8). |
 | `delivery.restitution` | number 0–1 | `0.8` | Fraction of its speed a bounce keeps. |
 | `delivery.impactRadius` | number ≥ 0 | `0` | Impact area: others within this many metres of the impact are hit too. |
+| `delivery.quenchedByWater` | boolean | `false` | A flame that water puts out: launched underwater, or entering water in flight, it fizzles with no effects and a steam cue (SpellQuenched). |
 | `delivery.trail` | object | — | A stimulus carried along the whole flight path (a heat trail). |
 | `delivery.trail.element` | `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"light"` \| `"blunt"` \| `"slash"` \| `"pierce"` | required | Stimulus element the projectile leaves along its path. |
 | `delivery.trail.intensity` | number > 0 | required | Amount per second of flight, in the element’s unit. |

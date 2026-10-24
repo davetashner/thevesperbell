@@ -4,7 +4,7 @@
   "category": "book",
   "name": "Scroll of Ember",
   "description": "The ink is slightly scorched at the edges. That is either craftsmanship or a warning.",
-  "notes": "A scroll of Ember (mw-ju8.4), spell.ember. Book kind scroll (mw-e07.1): reading it casts the spell once, free, for any class, and spends the scroll (owner decision 2026-10-24). That runtime is mw-ju8.17; `book.casts` is added with it, once spell content exists (mw-e08), because a spell reference to a missing spell fails the load. Base value 60 sits in the economy scroll band (40-150).",
+  "notes": "A scroll of Ember (mw-ju8.4), spell.ember. Book kind scroll (mw-e07.1): reading it casts the spell once, free, for any class, and spends the scroll (owner decision 2026-10-24). `book.casts` names the spell (mw-e08.2); the read-and-cast runtime is mw-ju8.17. Base value 60 sits in the economy scroll band (40-150).",
   "icon": "icon-item-scroll-of-ember-01",
   "value": 60,
   "stackable": true,
@@ -14,6 +14,7 @@
     "author": "Hobb Ashby",
     "kind": "scroll",
     "school": "fire",
+    "casts": "ember",
     "pages": [
       {
         "textKey": "book.scroll-of-ember.text"

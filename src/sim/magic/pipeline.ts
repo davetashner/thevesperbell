@@ -253,15 +253,18 @@ export class SpellPipeline {
     this.apply(world, state, delivery, spell, hits, effects ?? spell.effects);
   }
 
-  /** A pending delivery ended without landing (out of range, caster interrupted): removes it. */
-  cancel(world: World<never>, delivery: EntityId): void {
+  /**
+   * A pending delivery ended without landing (out of range, caster interrupted, quenched): removes
+   * it and reports a SpellFizzled with `reason`.
+   */
+  cancel(world: World<never>, delivery: EntityId, reason = 'delivery-ended'): void {
     const state = world.get(delivery, SpellDeliveryComponent);
     if (state === undefined) throw new Error(`entity ${String(delivery)} is not a spell delivery`);
     world.events.emit(SpellFizzled, {
       tick: world.tick,
       caster: state.caster,
       spell: state.spell,
-      reason: 'delivery-ended',
+      reason,
       stage: 'deliver',
     });
     world.destroy(delivery);
