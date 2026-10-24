@@ -40,7 +40,7 @@ describe('fire in the game (mw-e06.15)', () => {
     expect(lit).toContain(crate);
     expect(readProperty(world, crate, 'burning')).toBe(true);
     expect(entitiesWithProperty(world, 'burning')).toContain(crate);
-  });
+  }, 30_000); // loads game content and steps Rapier; overran the 5 s default on CI
 
   it('an authored torch (burning, no temperature) would go out cold; settled, it keeps burning', () => {
     const content = loadGameContent();
@@ -65,5 +65,5 @@ describe('fire in the game (mw-e06.15)', () => {
     expect(readProperty(world, torch, 'burning')).toBe(true);
     expect(readProperty(world, torch, 'temperature')).toBeGreaterThanOrEqual(300);
     expect(readProperty(world, crate, 'burning')).toBe(false);
-  });
+  }, 30_000);
 });

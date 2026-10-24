@@ -25,10 +25,14 @@ describe('Reticle (mw-e06.15)', () => {
     const model = { visible: true, state: 'ready', spell: 'Ember', note: '' } as const;
     reticle.update(model);
     const seen: string[] = [];
-    new MutationObserver((records) => { records.forEach((r) => seen.push(r.type)); }).observe(
-      reticle.element,
-      { attributes: true, childList: true, subtree: true, characterData: true },
-    );
+    new MutationObserver((records) => {
+      records.forEach((r) => seen.push(r.type));
+    }).observe(reticle.element, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
     reticle.update({ ...model });
     expect(seen).toEqual([]);
     reticle.update(NO_RETICLE);
