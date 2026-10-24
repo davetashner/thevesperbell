@@ -14,6 +14,7 @@
 import { z } from 'zod';
 import type { ContentCheck, ContentIssue } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
+import { capabilityId } from './capability.ts';
 import { conditionSchema } from './condition.ts';
 import { ITEM_CATEGORIES, type ItemDef } from './item.ts';
 
@@ -36,8 +37,11 @@ export const STOLEN_FACTOR_BAND: Band = { min: 0.5, max: 0.8, default: 0.6 };
 /** Gold for a night at an inn (mirrors `INN_BED_PRICE_BAND` in src/sim/economy/bands.ts). */
 export const INN_BED_PRICE_BAND = { min: 8, max: 15 } as const;
 
+/** Crowns for one trainer technique (mirrors `TRAINER_PRICE_BAND`; economy doc, "Trainers"). */
+export const TRAINER_PRICE_BAND = { min: 100, max: 400 } as const;
+
 /** Kinds of service a merchant sells. */
-export const SERVICE_KINDS = ['rest'] as const;
+export const SERVICE_KINDS = ['rest', 'train'] as const;
 export type ServiceKind = (typeof SERVICE_KINDS)[number];
 
 /** Whether `value` lies inside `band` (inclusive, with a hair of float slack). */
@@ -105,7 +109,12 @@ const serviceSchema = z.strictObject({
     ),
   kind: z
     .enum(SERVICE_KINDS)
-    .describe('`rest`: sleep until morning, fully healed (the Sleeping Ox room).'),
+    .describe(
+      '`rest`: sleep until morning, fully healed (the Sleeping Ox room). `train`: a lesson that teaches `teaches` (mw-ju8.13).',
+    ),
+  teaches: capabilityId
+    .optional()
+    .describe('The capability a `train` service teaches; required for `train`, absent otherwise.'),
 });
 
 const hoursSchema = z
@@ -221,6 +230,15 @@ export const merchantSchema = z
     }
     const serviceIds = new Set<string>();
     merchant.services.forEach((service, i) => {
+      if (service.kind === 'train' && service.teaches === undefined) {
+        issue(
+          ['services', i, 'teaches'],
+          `lesson "${service.id}" must name the capability it teaches`,
+        );
+      }
+      if (service.kind !== 'train' && service.teaches !== undefined) {
+        issue(['services', i, 'teaches'], `only a train service teaches (service "${service.id}")`);
+      }
       if (serviceIds.has(service.id)) {
         issue(['services', i, 'id'], `service "${service.id}" is listed twice`);
       }
@@ -275,13 +293,17 @@ export const checkMerchants: ContentCheck = (entries) => {
       }
     }
     merchant.services.forEach((service, i) => {
-      if (!inBand(INN_BED_PRICE_BAND, service.price)) {
+      const [band, name] =
+        service.kind === 'train'
+          ? ([TRAINER_PRICE_BAND, 'trainer'] as const)
+          : ([INN_BED_PRICE_BAND, 'inn-bed'] as const);
+      if (!inBand(band, service.price)) {
         issues.push({
           file,
           pointer: `/services/${String(i)}/price`,
           message:
-            `merchant:${merchant.id} service ${service.id} costs ${String(service.price)}, outside the inn-bed band ` +
-            `${bandText(INN_BED_PRICE_BAND)} (docs/design/economy.md)`,
+            `merchant:${merchant.id} service ${service.id} costs ${String(service.price)}, outside the ${name} band ` +
+            `${bandText(band)} (docs/design/economy.md)`,
         });
       }
     });

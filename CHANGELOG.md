@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The Bridgeward College, at the far end of Briar Glen's lane: Sergeant Maud Garrick sells knight techniques (Shoulder Barge, Riposte, Shield Charge, Disarm) and Master Ewan Rooke sells archery trick shots (Pinning, Ricochet, Severing) for 100 to 400 crowns each, one step at a time. Nobody there teaches sorcery. Both instructors have placeholder bodies until you approve their looks.
 - The Forgotten now look their parts: the brute is a bigger, armoured skeleton with a two-handed maul, the archer holds a bow and the shield-bearer carries a battered iron shield (the miner is unchanged). Stand-in models for now; they still move with the miner's animations.
 - Ottilie, Dot the innkeeper and the Bridge Watch guards (one look for day and night) now have bodies instead of grey capsules. Placeholder models, standing still in one pose, until you approve their art; Hollis, Juniper and Oswin are still capsules.
 - Hollis the baker, Juniper the fletcher and Oswin the smith now have bodies instead of grey capsules, finishing the Briar Glen townsfolk. Placeholder models, standing still in one pose, until you approve their looks.

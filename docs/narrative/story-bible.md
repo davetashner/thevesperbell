@@ -268,7 +268,8 @@ to be kept at the town end grew over two centuries into a soldierly training col
 townsfolk and strangers learn **fighting** (knight techniques, mw-e19.8) and **archery** (the archery range,
 mw-e05.14). It does not teach sorcery. The Lantern Court's licence (§3.3) keeps a licensed school out of a
 frontier town, and the college's old soldiers regard casters as unreliable. Instructors, fees and entry terms
-are open.
+are open until the next sentence: the college stands at the far end of the lane's west side, past the Sleeping Ox. Its instructors, lessons
+and fees are settled as greybox decisions in §5.16 and `docs/design/bridgeward-college.md` (mw-ju8.13, owner-reviewable).
 
 **The robed figure under the bridge (unnamed)** — sorcery is learned elsewhere: after dark, beneath the
 Miners' Bridge, a robed figure waits for those who ask the right questions (rumours, Dot, Mirela). Who they
@@ -820,6 +821,21 @@ her brass scales are known to be honest. No voice acting in the MVP (text only).
   for a rumour (§6.2) or a pointer to who has come and gone lately. She is a general merchant for basics.
 - **Art:** `char-ottilie-marsh-base-01`, `portrait-npc-ottilie-marsh-01`, `prop-marsh-store-set-01`.
 
+### 5.16 The Bridgeward College instructors (placeholder decisions, mw-ju8.13)
+**Owner-reviewable greybox decisions** ("make good decisions", 2026-10-24); names, looks and prices may change.
+- **Sergeant Maud Garrick — fighting instructor.** Fifties, stout and broad, close-cropped grey hair, a scarred
+  stern-but-fair face; a retired garrison drill sergeant of the old bridge garrison, in a brick-red tabard
+  over a quilted gambeson and mail sleeves. Gruff ("Make it quick."), a stickler for order: nobody learns the
+  second step before the first. Teaches the knight's techniques for crowns: Shoulder Barge (100), Riposte (175),
+  Shield Charge (250) and Disarm (400, needs Riposte). She was Captain Hale's sergeant; she calls him "the Captain" and thinks he sleeps too little.
+- **Master Ewan Rooke — archery instructor.** Sixties, tall and lean, long grey hair tied back, trimmed beard,
+  keen squinting eyes; a moss-green hooded jerkin and a long dun coat, a leather bracer and shooting glove.
+  Dry and shrewd, keeps the college's butts (the straw targets). Teaches trick shots: Pinning Shot (150), Ricochet
+  Shot (275), Severing Shot (400), each needing the one before.
+- **No sorcery.** Neither will discuss it (the old soldiers' view of casters, §3.5); the robed figure under the bridge is the only teacher.
+- **No XP.** Lessons are bought one technique at a time, for a fixed price, and last for good (ADR-0004).
+- **Art:** `char-maud-garrick-base-01`, `char-ewan-rooke-base-01` (placeholder, awaiting approval); models `model-npc-garrick-01`, `model-npc-rooke-01`.
+
 ---
 
 ## 6. Side quests and rumours
@@ -1239,3 +1255,4 @@ is beyond "a dream that hungers". All three are post-MVP hooks (§10).
 | **CANON v1** | 2026-09-27 | Owner sign-off. Canon counts, ages and deliberately open questions added to §11.3. | owner |
 | v1.1 | 2026-10-04 | Added Marsh's General Store (§3.5) and Ottilie Marsh (§5.15) from owner-approved concept art (mw-ju8.8); names confirmed by the owner the same day. No plot-changing canon. | owner |
 | v1.2 | 2026-10-04 | Owner canon: the Miners' Bridge (built ~200 years ago for miners; guarded day and night by the Bridge Watch), the Bridgeward College (fighting and archery) and the robed sorcery teacher under the bridge at night (§3.5). Supersedes the 'stone bridge' open question from v1.1. | owner |
+| v1.3 | 2026-10-24 | Greybox decisions for the Bridgeward College (§3.5, §5.16, mw-ju8.13): instructors Sergeant Maud Garrick and Master Ewan Rooke, their lessons and fees. Owner-reviewable; no plot-changing canon. | Claude, owner-delegated |

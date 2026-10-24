@@ -5,6 +5,8 @@
 import { loadDevContent } from '@content/dev-content';
 import { loadGameContent, type GameContent } from '@content/index';
 import {
+  addCapabilities,
+  type UnlockBook,
   emptySlots,
   addEquipment,
   addInventory,
@@ -29,6 +31,7 @@ import {
   type EntityId,
   type ShopItemDef,
 } from '@sim/index';
+import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { UiRoot } from '@ui/index';
 import { find, rectFromData } from '@ui/testing/layout';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -40,6 +43,7 @@ import {
   ShopViews,
   startShopUi,
   type ShopContent,
+  lessonRefusalText,
 } from './shop-window';
 
 const content = loadDevContent();
@@ -48,7 +52,12 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
-function setup(source: ShopContent = content, crowns = 200, safety?: () => string | null) {
+function setup(
+  source: ShopContent = content,
+  crowns = 200,
+  safety?: () => string | null,
+  unlocks?: Pick<UnlockBook, 'check' | 'learn'>,
+) {
   const world = new World<unknown>({ seed: 5 });
   world.register(InventoryComponent, EquipmentComponent, PlacementComponent, SceneSpawnComponent);
   const sim = world as unknown as World<never>;
@@ -62,6 +71,7 @@ function setup(source: ShopContent = content, crowns = 200, safety?: () => strin
     content: source,
     player,
     ...(safety !== undefined && { safety }),
+    ...(unlocks !== undefined && { unlocks }),
     publish: (_key, value) => published.push(value),
   });
   const counter = (tags: string[]): EntityId => {
@@ -877,5 +887,112 @@ describe('selling loot at Brand’s Forge (mw-ju8.7)', () => {
     expect(t.crownsNow()).toBe(114);
     expect(t.crownsNow()).toBeGreaterThanOrEqual(90);
     expect(t.crownsNow()).toBeLessThanOrEqual(140);
+  });
+});
+
+describe('lesson refusals (mw-ju8.13)', () => {
+  it('names the technique to learn first, else says the player is not ready', () => {
+    const name = (id: string) => (id === 'technique.riposte' ? 'Riposte' : id);
+    expect(
+      lessonRefusalText(
+        [{ reason: 'missing-prerequisite', capability: 'technique.riposte' }],
+        name,
+      ),
+    ).toBe('Learn Riposte first.');
+    expect(lessonRefusalText([{ reason: 'not-learnable' }], name)).toBe(
+      'You are not ready for that yet.',
+    );
+    expect(lessonRefusalText(undefined, name)).toBe('You are not ready for that yet.');
+  });
+});
+
+describe('the Bridgeward College: lessons on the Services tab (mw-ju8.13, mw-ju8.38)', () => {
+  const game = loadGameContent();
+  const FIGHTING = ['merchant:bridgeward-fighting-hall'];
+
+  /** The fighting hall with a knight who has Parry and Shield Bash and `crowns` to spend. */
+  function hall(crowns: number, withBook = true) {
+    const registry = createCapabilityRegistry(game, true);
+    const book = createUnlockBook(game, registry);
+    const t = setup(game, crowns, undefined, withBook ? book : undefined);
+    addCapabilities(t.sim, t.player);
+    for (const id of ['technique.shield-bash', 'technique.parry']) {
+      registry.grant(t.sim, t.player, id, 'class');
+    }
+    t.talk(t.counter(FIGHTING));
+    tab('services');
+    const lesson = (name: string) =>
+      t.rows('services').find((r) => r.getAttribute('aria-label')?.startsWith(`Learn ${name},`));
+    const toast = () => document.querySelector('.vb-toast')?.textContent;
+    return { ...t, book, lesson, toast };
+  }
+
+  it('AC-1: lists each lesson with a Learn button, its price and what it teaches', () => {
+    const t = hall(1000);
+    expect(t.rows('services').map((r) => r.getAttribute('aria-label'))).toEqual([
+      'Learn Shoulder Barge, 100 crowns',
+      'Learn Riposte, 175 crowns',
+      'Learn Shield Charge, 250 crowns',
+      'Learn Disarm, 400 crowns',
+    ]);
+    const views = new ShopViews(game, t.shop.shops);
+    const model = views.model(t.sim, t.player, 'bridgeward-fighting-hall');
+    expect(model.services?.[1]?.breakdown).toEqual(['Fixed price 175 crowns', 'Teaches Riposte']);
+  });
+
+  it('AC-1: paying for a lesson takes the price, teaches the technique, toasts and reports it', () => {
+    const t = hall(1000);
+    t.lesson('Riposte')?.click();
+    expect(t.crownsNow()).toBe(825);
+    expect(t.book.knows(t.sim, t.player, 'technique.riposte')).toBe(true);
+    expect(t.status()).toBe('You learn Riposte for 175 crowns.');
+    expect(t.toast()).toBe('You learn Riposte.');
+    expect(t.published).toContain(JSON.stringify(['technique.riposte']));
+    expect(t.shop.controller.isOpen).toBe(true);
+  });
+
+  it('a lesson whose earlier step is unknown says which to learn first and charges nothing', () => {
+    const t = hall(2000);
+    t.lesson('Disarm')?.click();
+    expect(t.status()).toBe('Learn Riposte first.');
+    expect(t.crownsNow()).toBe(2000);
+  });
+
+  it('a lesson already learned is not sold twice', () => {
+    const t = hall(1000);
+    t.lesson('Shoulder Barge')?.click();
+    t.lesson('Shoulder Barge')?.click();
+    expect(t.status()).toBe('You already know that.');
+    expect(t.crownsNow()).toBe(900);
+  });
+
+  it('a lesson that costs more than the crowns held is refused', () => {
+    const t = hall(99);
+    t.lesson('Shoulder Barge')?.click();
+    expect(t.status()).toBe('Not enough crowns.');
+    expect(t.crownsNow()).toBe(99);
+  });
+
+  it('without an unlock book no lesson can be bought', () => {
+    const t = hall(1000, false);
+    t.lesson('Shoulder Barge')?.click();
+    expect(t.status()).toBe('That is no longer on offer.');
+    expect(t.crownsNow()).toBe(1000);
+  });
+
+  it('names a capability from content, falling back to its id', () => {
+    const t = setup(game, 100);
+    const views = new ShopViews(game, t.shop.shops);
+    expect(views.capabilityName('technique.disarm')).toBe('Disarm');
+    expect(views.capabilityName('technique.not-declared')).toBe('technique.not-declared');
+  });
+
+  it('a lesson that costs over a quarter of the crowns confirms with the Learn verb', () => {
+    const t = hall(300);
+    t.lesson('Shield Charge')?.click(); // 250 of 300
+    expect(t.ui.top?.id).toBe('confirm');
+    expect(document.querySelector('[data-testid="confirm"]')?.textContent).toContain(
+      'Learn Shield Charge?',
+    );
   });
 });

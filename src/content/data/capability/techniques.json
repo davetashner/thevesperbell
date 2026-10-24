@@ -2,7 +2,7 @@
   "$schema": "../capability.schema.json",
   "id": "techniques",
   "name": "Knight techniques",
-  "notes": "Knight techniques (ADR-0004: learned from trainers; chains Shield Bash → Shield Charge → Shield Vault and Parry → Riposte → Disarm). Seeded with the knight's starting pair from class data (mw-e19.4); the moves themselves are src/content/data/move/shield-bash.json and shield-parry.json (mw-e04). Combat does not check these ids yet.",
+  "notes": "Knight techniques (ADR-0004: learned from trainers; chains Shield Bash → Shield Charge → Shield Vault and Parry → Riposte → Disarm). Seeded with the knight's starting pair from class data (mw-e19.4); the moves themselves are src/content/data/move/shield-bash.json and shield-parry.json (mw-e04). The knight's trainer-taught techniques (mw-ju8.13) are bought from Sergeant Maud Garrick at the Bridgeward College (ADR-0004 chains: shield chain step 2, parry chain steps 2-3, barge chain step 1). Combat does not check these ids yet.",
   "capabilities": [
     {
       "id": "technique.shield-bash",
@@ -14,6 +14,30 @@
       "id": "technique.parry",
       "name": "Parry",
       "description": "Turn a blow aside at the last moment and open the attacker to a riposte (ADR-0004 parry chain, step 1). A knight signature: never shared.",
+      "classAffinity": "knight"
+    },
+    {
+      "id": "technique.riposte",
+      "name": "Riposte",
+      "description": "Answer a parry with a critical counter-blow (ADR-0004 parry chain, step 2).",
+      "classAffinity": "knight"
+    },
+    {
+      "id": "technique.disarm",
+      "name": "Disarm",
+      "description": "Take the weapon from the hand you just parried (ADR-0004 parry chain, step 3).",
+      "classAffinity": "knight"
+    },
+    {
+      "id": "technique.shield-charge",
+      "name": "Shield Charge",
+      "description": "Run shield-first through a line of foes (ADR-0004 shield chain, step 2).",
+      "classAffinity": "knight"
+    },
+    {
+      "id": "technique.shoulder-barge",
+      "name": "Shoulder Barge",
+      "description": "Burst rotten boards and bar-doors with a lowered shoulder (ADR-0004 barge chain, step 1).",
       "classAffinity": "knight"
     }
   ]

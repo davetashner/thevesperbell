@@ -1,0 +1,34 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-rooke",
+  "family": "human",
+  "tags": ["npc", "trainer"],
+  "stats": {
+    "health": 70,
+    "poise": 30,
+    "mass": 70,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "townsfolk",
+  "disposition": {
+    "towardPlayer": "friendly"
+  },
+  "personality": {
+    "bravery": 0.6,
+    "curiosity": 0.5,
+    "aggression": 0,
+    "diligence": 0.9,
+    "sociability": 0.5,
+    "greed": 0.3
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "presentation": {
+    "mesh": "npc-rooke",
+    "sfx": "placeholder"
+  }
+}

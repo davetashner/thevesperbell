@@ -8,6 +8,7 @@ import {
   MARKUP_BAND as CONTENT_MARKUP,
   SPECIALTY_BONUS_BAND as CONTENT_SPECIALTY,
   STOLEN_FACTOR_BAND as CONTENT_STOLEN,
+  TRAINER_PRICE_BAND as CONTENT_TRAINER,
 } from '@content/types/merchant.ts';
 import {
   BUY_RATE_BAND,
@@ -15,6 +16,7 @@ import {
   MARKUP_BAND,
   SPECIALTY_BONUS_BAND,
   STOLEN_FACTOR_BAND,
+  TRAINER_PRICE_BAND,
 } from '@sim/economy/bands';
 
 describe('economy bands', () => {
@@ -24,6 +26,7 @@ describe('economy bands', () => {
     expect(CONTENT_SPECIALTY).toEqual(SPECIALTY_BONUS_BAND);
     expect(CONTENT_STOLEN).toEqual(STOLEN_FACTOR_BAND);
     expect(CONTENT_INN_BED).toEqual(INN_BED_PRICE_BAND);
+    expect(CONTENT_TRAINER).toEqual(TRAINER_PRICE_BAND);
   });
 
   it('the economy doc states the bands the code enforces', () => {
@@ -33,6 +36,7 @@ describe('economy bands', () => {
     expect(doc).toContain('| Specialty bonus | 1.1-1.3 | 1.2 |');
     expect(doc).toContain('| Stolen / fence factor | 0.5-0.8 | 0.6 |');
     expect(doc).toContain('| Inn bed | 8-15 per night |');
+    expect(doc).toContain('| Trainers (one technique) | 100-400 |');
     expect(doc).toContain('**0.6-0.8**');
   });
 });

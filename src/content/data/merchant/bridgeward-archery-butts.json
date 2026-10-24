@@ -1,0 +1,39 @@
+{
+  "$schema": "../merchant.schema.json",
+  "id": "bridgeward-archery-butts",
+  "notes": "The Bridgeward College's archery butts (story bible §3.5, §5.16; mw-ju8.13): Master Ewan Rooke (npc-rooke) teaches the archer's trick-shot chain (ADR-0004: pinning chain) for crowns, priced inside the economy doc's trainer band by tier: Pinning Shot 150, Ricochet Shot 275, Severing Shot 400, each needing the shot before. He sells no goods and holds no till. The range's dummy targets are greybox; mw-e05.14's tuning range stays a dev scene.",
+  "npcId": "npc-rooke",
+  "displayName": "Master Ewan Rooke",
+  "shopName": "Bridgeward College: Archery Butts",
+  "personalityTags": ["shrewd"],
+  "specialties": [],
+  "buysCategories": ["ammo"],
+  "services": [
+    {
+      "id": "pinning-shot",
+      "name": "Pinning Shot",
+      "price": 150,
+      "kind": "train",
+      "teaches": "arrow.pinning-shot"
+    },
+    {
+      "id": "ricochet-shot",
+      "name": "Ricochet Shot",
+      "price": 275,
+      "kind": "train",
+      "teaches": "arrow.ricochet-shot"
+    },
+    {
+      "id": "severing-shot",
+      "name": "Severing Shot",
+      "price": 400,
+      "kind": "train",
+      "teaches": "arrow.severing-shot"
+    }
+  ],
+  "stock": [],
+  "goldReserve": 0,
+  "goldRestockPerDay": 0,
+  "markup": 1.3,
+  "buyRate": 0.4
+}

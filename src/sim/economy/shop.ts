@@ -34,6 +34,7 @@ import {
   type RestOptions,
   type RestResult,
 } from '../rest/rest';
+import type { LearnRefusal, UnlockBook } from '../progression/unlocks';
 import { price, type PriceInput, type PriceRefusal, type PriceResult } from './price';
 import type { Condition } from '../facts/conditions';
 import { DAY_FACT } from '../rest/day-clock';
@@ -65,8 +66,10 @@ export interface ShopServiceDef {
   readonly name: string;
   /** Whole gold, fixed by the merchant: no markup, disposition or haggle applies. */
   readonly price: number;
-  /** `rest`: a room for the night (sleep until morning). */
-  readonly kind: 'rest';
+  /** `rest`: a room for the night (sleep until morning). `train`: a lesson (`teaches` a capability). */
+  readonly kind: 'rest' | 'train';
+  /** The capability a `train` service teaches (mw-ju8.13); absent for a `rest` service. */
+  readonly teaches?: string | undefined;
 }
 
 /** What shops read of a merchant definition (a loaded `MerchantDef` is one). */
@@ -182,6 +185,25 @@ export type ServiceResult =
       readonly rest: Extract<RestResult, { ok: true }>;
     }
   | { readonly ok: false; readonly reason: ServiceFailure; readonly detail?: string };
+
+/** Why a lesson could not be bought. */
+export type TrainFailure =
+  /** The merchant does not offer that service (stale id), or it is not a lesson. */
+  | 'no-such-lesson'
+  /** The player already knows the technique: nothing is charged. */
+  | 'already-known'
+  /** The unlock rules refuse (a missing prerequisite, say): nothing is charged. */
+  | 'refused'
+  | 'cannot-afford';
+
+export type TrainResult =
+  | { readonly ok: true; readonly price: number; readonly capability: string }
+  | {
+      readonly ok: false;
+      readonly reason: TrainFailure;
+      /** Every reason the unlock rules gave, for `refused`. */
+      readonly refusals?: readonly LearnRefusal[];
+    };
 
 /** What a service purchase needs besides the merchant: how and whether it is safe to rest. */
 export type ServiceOptions = Pick<RestOptions, 'clock' | 'safety' | 'pools'>;
@@ -430,7 +452,7 @@ export class Shops {
   ): ServiceResult {
     const state = this.stateOf(world, merchantId);
     const service = this.#merchant(merchantId).services?.find((s) => s.id === serviceId);
-    if (service === undefined) return failure('no-such-service');
+    if (service?.kind !== 'rest') return failure('no-such-service');
     const detail = restBlocked(options);
     if (detail !== null) return { ok: false, reason: 'unsafe', detail };
     if (this.#pack(world, actor).gold < service.price) return failure('cannot-afford');
@@ -451,6 +473,46 @@ export class Shops {
       point: merchantId,
     }) as Extract<RestResult, { ok: true }>;
     return { ok: true, price: service.price, rest };
+  }
+
+  /**
+   * The player pays a trainer for a lesson (mw-ju8.13, ADR-0004 trainer channel): service `serviceId`
+   * of kind `train` teaches its capability through channel `trainer:<merchant id>`. Everything is
+   * checked first (the unlock rules, then the crowns), so a refusal charges nothing and teaches
+   * nothing; on success the merchant keeps the crowns, the capability is learned for good and
+   * `shop.service-bought` is emitted (kind `train`).
+   * @throws RangeError for an unknown merchant or an actor without an inventory.
+   */
+  train(
+    world: World,
+    actor: EntityId,
+    merchantId: string,
+    serviceId: string,
+    unlocks: Pick<UnlockBook, 'check' | 'learn'>,
+  ): TrainResult {
+    const state = this.stateOf(world, merchantId);
+    const service = this.#merchant(merchantId).services?.find((s) => s.id === serviceId);
+    const capability = service?.kind === 'train' ? service.teaches : undefined;
+    if (service === undefined || capability === undefined) return failure('no-such-lesson');
+    const channel = `trainer:${merchantId}`;
+    const check = unlocks.check(world, actor, capability, channel);
+    if (check.status === 'already-known') return failure('already-known');
+    if (check.status === 'refused') {
+      return { ok: false, reason: 'refused', refusals: check.refusals };
+    }
+    if (this.#pack(world, actor).gold < service.price) return failure('cannot-afford');
+    this.#rules.spendGold(world, actor, service.price);
+    merchantStoreOf(world).set(merchantId, { ...state, gold: state.gold + service.price });
+    unlocks.learn(world, actor, capability, channel);
+    world.events.emit(shopServiceBought, {
+      tick: world.tick,
+      actor,
+      merchantId,
+      serviceId,
+      kind: 'train',
+      price: service.price,
+    });
+    return { ok: true, price: service.price, capability };
   }
 
   /**

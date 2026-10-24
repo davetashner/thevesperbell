@@ -168,6 +168,36 @@ describe('merchant checks', () => {
     expect(problems({ ...general, services: [{ ...room, kind: 'bribe' }] })).toHaveLength(1);
   });
 
+  it('AC-1: a train service names its capability and costs 100-400 crowns (mw-ju8.13)', () => {
+    const lesson = {
+      id: 'riposte',
+      name: 'Riposte',
+      price: 150,
+      kind: 'train',
+      teaches: 'technique.riposte',
+    };
+    expect(loadIssues({ ...general, services: [lesson] })).toEqual([]);
+    expect(loadIssues({ ...general, services: [{ ...lesson, price: 100 }] })).toEqual([]);
+    expect(loadIssues({ ...general, services: [{ ...lesson, price: 400 }] })).toEqual([]);
+    expect(loadIssues({ ...general, services: [{ ...lesson, price: 401 }] })).toEqual([
+      '/services/0/price: merchant:test-general service riposte costs 401, outside the trainer band 100-400 (docs/design/economy.md)',
+    ]);
+    expect(loadIssues({ ...general, services: [{ ...lesson, price: 99 }] })).toHaveLength(1);
+    expect(problems({ ...general, services: [{ ...lesson, teaches: undefined }] })).toEqual([
+      'services.0.teaches: merchant "test-general": lesson "riposte" must name the capability it teaches',
+    ]);
+    expect(
+      problems({
+        ...general,
+        services: [
+          { id: 'room', name: 'Room', price: 12, kind: 'rest', teaches: 'technique.parry' },
+        ],
+      }),
+    ).toEqual([
+      'services.0.teaches: merchant "test-general": only a train service teaches (service "room")',
+    ]);
+  });
+
   it('AC-2: a markup just inside or outside the band edge', () => {
     expect(loadIssues({ ...general, markup: 1.1 })).toEqual([]);
     expect(loadIssues({ ...general, markup: 1.0999 })).toHaveLength(1);

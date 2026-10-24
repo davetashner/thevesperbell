@@ -1,0 +1,34 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-garrick",
+  "family": "human",
+  "tags": ["npc", "trainer"],
+  "stats": {
+    "health": 90,
+    "poise": 30,
+    "mass": 85,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "townsfolk",
+  "disposition": {
+    "towardPlayer": "friendly"
+  },
+  "personality": {
+    "bravery": 0.9,
+    "curiosity": 0.3,
+    "aggression": 0,
+    "diligence": 0.95,
+    "sociability": 0.4,
+    "greed": 0.2
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "presentation": {
+    "mesh": "npc-garrick",
+    "sfx": "placeholder"
+  }
+}

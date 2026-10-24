@@ -2,12 +2,30 @@
   "$schema": "../capability.schema.json",
   "id": "arrows",
   "name": "Archer arrows",
-  "notes": "Arrow types an archer can fletch and fire (ADR-0004: learned from fletching schematics; chain Rope Arrow → Line Shot → Haul Shot). Seeded with the archer's signature Rope Arrow (mw-e19.4), whose flight and rope are src/content/data/arrow/rope.json (mw-e05.10).",
+  "notes": "Arrow types an archer can fletch and fire (ADR-0004: learned from fletching schematics; chain Rope Arrow → Line Shot → Haul Shot). Seeded with the archer's signature Rope Arrow (mw-e19.4), whose flight and rope are src/content/data/arrow/rope.json (mw-e05.10). Trick-shot techniques (pinning chain) are taught by Master Ewan Rooke at the Bridgeward College (mw-ju8.13).",
   "capabilities": [
     {
       "id": "arrow.rope",
       "name": "Rope Arrow",
       "description": "Loose an arrow into soft wood or earth that anchors a climbable rope (ADR-0004 rope chain, step 1). An archer signature: never shared.",
+      "classAffinity": "archer"
+    },
+    {
+      "id": "arrow.pinning-shot",
+      "name": "Pinning Shot",
+      "description": "Pin a creature or cloth to a wall with an arrow (ADR-0004 pinning chain, step 1).",
+      "classAffinity": "archer"
+    },
+    {
+      "id": "arrow.ricochet-shot",
+      "name": "Ricochet Shot",
+      "description": "Bank an arrow off stone to reach around cover (ADR-0004 pinning chain, step 2).",
+      "classAffinity": "archer"
+    },
+    {
+      "id": "arrow.severing-shot",
+      "name": "Severing Shot",
+      "description": "Cut a strap with an arrow to drop a shield, a lantern or a cargo net (ADR-0004 pinning chain, step 3).",
       "classAffinity": "archer"
     }
   ]
