@@ -53,13 +53,14 @@ describe('createGameHost', () => {
     const w = world();
     expect(createGameHost(options(w, () => undefined)).spells).toBeUndefined();
     expect(createGameHost(options(w, () => undefined)).selectSpell).toBeUndefined();
+    const select = (id: string): boolean => id === 'ember';
     const host = createGameHost({
       ...options(w, () => undefined),
       spells: ['ember'],
-      selectSpell: (id) => id === 'ember',
+      selectSpell: select,
     });
     expect(host.spells).toEqual(['ember']);
-    expect(host.selectSpell?.('ember')).toBe(true);
+    expect(host.selectSpell).toBe(select);
   });
 
   it('reads seed, liveness and cheats from the world', () => {

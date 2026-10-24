@@ -31,6 +31,8 @@ Defaults: `DEFAULT_BINDINGS` and `DEFAULT_PAD_BINDINGS`.
 | Shield bash (knight) | Hold LT/L2, press RB/R1        | Hold right click, left click |
 | Ability 2        | D-pad Right                        | 2                        |
 | Ability 4        | D-pad Left                         | 4                        |
+| Cast spell       | D-pad Up                           | V                        |
+| Cancel cast      | D-pad Down                         | B                        |
 | Inventory        | View                               | I                        |
 | Drop item        | (inventory screen)                 | G                        |
 | Throw item       | (inventory screen)                 | T                        |
@@ -76,6 +78,20 @@ out the attack button (left click, R1/RB) draws instead of swinging (hold to dra
 and ability 2 (2, D-pad Right) cycles the arrow type. Cycle stays off ability 3, the knight's parry
 (`TESTBED_BOW_BUTTONS`, src/game/combat/testbed-combat.ts). While drawn the camera narrows from 70° to
 the bow's aim field of view; `?frames` shows the selected arrow type and how many are left.
+
+**Casting.** Spells are aimed with a reticle (mw-e06.15): a cross at the centre of the view while the
+player has a learned spell, labelled with its name. The cast button (V, D-pad Up) casts the selected
+spell along the camera's centre ray, which starts where it passes the caster's head so a wall behind
+you never takes the shot; the cast command carries that aim point, in the very tick the button is
+sampled. Held, a channelled spell keeps channelling and stops on the tick the button comes up; the
+cancel button (B, D-pad Down) calls off a wind-up or channel. How a spell is aimed follows its
+delivery (`src/game/magic/aim.ts`): projectiles and beams go to what the reticle meets within range
+(a wall or a creature) or the point at max range; area and summon-point spells show a ground marker
+on the floor under the reticle, brought back to max range, and the cross turns red with the reason
+(no floor there, blocked, not enough mana) when the cast would be refused; touch spells take the
+locked target, else the creature under the reticle; self spells need no aim. The first learned spell
+is selected; `spell select <id>` in the debug console chooses another until the hotbar (mw-e06.16).
+`spell learn <id>` teaches one for testing. A mana bar sits under stamina for anyone with a pool.
 
 **Items.** Interact takes an item lying in reach ("Take <name>"; mw-e17.7). G drops the most
 recently picked-up item that may be dropped (a whole stack, in front of you) and T throws one of it

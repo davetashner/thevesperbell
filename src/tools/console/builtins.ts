@@ -68,7 +68,7 @@ export interface ConsoleHost {
   /** Spell ids `spell` accepts, sorted (empty: no spells in this build). */
   readonly spells?: readonly string[];
   /** Makes `id` the spell the cast button casts; false when the player has not learned it. */
-  selectSpell?(id: string): boolean;
+  readonly selectSpell?: (id: string) => boolean;
   /** Scene ids `scene` accepts, sorted. */
   readonly scenes: readonly string[];
   /** Switches to scene `id` (reloads the page). */

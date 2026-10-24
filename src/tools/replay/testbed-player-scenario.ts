@@ -54,10 +54,13 @@ import { hasContainers, prepareContainers, startContainers } from '@game/items/c
 import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
 import { createGameLight, installGameLight, type GameLight } from '@game/light/index';
+import { installGameFire } from '@game/fire';
+import { givePlayerMana, installGameMagic, type GameMagic } from '@game/magic/index';
 import { installGamePhysics, playerFocus } from '@game/physics-objects';
 import { setupTestbedPlayer, type TransformReader } from '@game/player/index';
 import { SceneLoader } from '@game/scene/index';
 import {
+  invulnerabilityRule,
   LineOfSight,
   physicsBodiesOf,
   DAMAGE_COMPONENTS,
@@ -173,6 +176,8 @@ const headless = (object: object, read: TransformReader): SceneBinding<object> =
 
 /** A scene with the player, headless (see `createGameWorld`). */
 export interface HeadlessGame<TInput> {
+  /** The installed spells (`magic: true` only). */
+  readonly magic: GameMagic | undefined;
   readonly world: World<TInput>;
   readonly player: EntityId;
   readonly combat: TestbedCombat;
@@ -230,6 +235,7 @@ export function createGameWorld<TInput>(
     environment,
     content = loadGameContent(),
     phase,
+    magic: withMagic = false,
   }: {
     seed: number;
     hz: number;
@@ -243,6 +249,12 @@ export function createGameWorld<TInput>(
      * phases of the day are there or not by it. Without it the world has no clock and they all are.
      */
     phase?: string;
+    /**
+     * Spells and fire as src/main.ts installs them (mw-e06.15): the spell pipeline before the
+     * stimulus system, the element field and fire rules after it, the player with a mana pool.
+     * Off by default, so the recorded replays keep their hashes.
+     */
+    magic?: boolean;
   },
 ): HeadlessGame<TInput> {
   const physics = new RapierPhysics(rapier);
@@ -261,7 +273,25 @@ export function createGameWorld<TInput>(
   // The light field (mw-e03.37), as src/main.ts builds it: level geometry feeds physics and the
   // field's occluders through one sink; creatures see the player by it (mw-e11.23).
   const light = createGameLight(physics);
-  installGamePhysics(world, { focus: focus.read, levelColliders: light.colliders });
+  const collisionWorld = new RapierCollisionWorld(physics);
+  let magic: GameMagic | undefined;
+  installGamePhysics(world, {
+    focus: focus.read,
+    levelColliders: light.colliders,
+    ...(withMagic && {
+      beforeStimuli: (sim: World<never>) => {
+        magic = installGameMagic(sim, {
+          spells: content.all('spell'),
+          damage: combat.damage,
+          collision: collisionWorld,
+          invulnerable: invulnerabilityRule(combat.moves),
+        });
+      },
+      afterStimuli: (sim: World<never>) => {
+        installGameFire(sim, content);
+      },
+    }),
+  });
   installGameLight(world, light.field);
   const sync = new RenderSync(world);
   const scenes = new SceneLoader({
@@ -279,7 +309,7 @@ export function createGameWorld<TInput>(
   const noise = startSceneNoise(world, content, scene);
   const navigation = new SceneNavigation();
   navigation.load(world, content, scene);
-  const collision = new RapierCollisionWorld(physics);
+  const collision = collisionWorld;
   const player = setupTestbedPlayer({
     world,
     scene,
@@ -309,6 +339,9 @@ export function createGameWorld<TInput>(
     climb: {},
   }).entity;
   focus.entity = player;
+  if (magic !== undefined) {
+    givePlayerMana(world, player, content.get('class', 'knight').stats.mana);
+  }
   const combatants = startTestbedCombat(world, combat, scene.layout.spawns, player, collision);
   // World items (mw-e17.7): the scene's items, taken with Interact, dropped and thrown.
   const items = prepareWorldItems(content);
@@ -370,6 +403,7 @@ export function createGameWorld<TInput>(
     navigation,
     ai: sceneCreatures.ai,
     aiWatch,
+    magic,
   };
 }
 
