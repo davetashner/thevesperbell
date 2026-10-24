@@ -1,0 +1,125 @@
+name: Slow gates
+
+# The nightly and release tier of the CI gates (mw-e41.5, docs/ci-gates.md): gates that cost minutes of
+# runner time or flake on shared hardware but catch slowly-changing problems. Reusable so one definition
+# serves nightly.yml, the push-to-main perf baseline in ci.yml, and the release gate (mw-e41.12).
+# Jobs here are not branch-protection contexts; pull requests never call this workflow.
+on:
+  workflow_call:
+    inputs:
+      bench:
+        description: Run the vitest benchmark budgets (sim step() mean, mw-e00.15 AC-6).
+        type: boolean
+        default: true
+      audio:
+        description: Run the Firefox and WebKit audio testbed (mw-e28.1 AC-6).
+        type: boolean
+        default: true
+      perf:
+        description: Run the perf budget suite (mw-e32.1) with its wall-clock load budgets (mw-e41.8).
+        type: boolean
+        default: true
+      ref:
+        description: Git ref to test; empty means the calling workflow's own ref.
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    if: inputs.bench
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: ./.github/actions/setup
+      - run: pnpm bench --reporter=verbose
+
+  # Firefox and WebKit run the audio testbed only (mw-e28.1 AC-6; see playwright.config.ts).
+  e2e-audio:
+    if: inputs.audio
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: ./.github/actions/setup
+      - id: playwright
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        id: browsers
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-firefox-webkit
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps firefox webkit
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps firefox webkit
+      # Firefox only runs an AudioContext with a sound server; the runner has no sound card, so give
+      # it PulseAudio with a null sink (mw-e28.1 AC-6).
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends pulseaudio
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=ci_null
+          pactl set-default-sink ci_null
+      - run: pnpm e2e --project=firefox --project=webkit
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-traces-audio
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  # The perf budget suite in CI mode (mw-e32.1; budgets in perf/perf-budgets.json, all from contract
+  # §1): initial transfer and bundle size, load-to-playable and warm reload at 50 Mbps, the wall-clock
+  # load budgets, JS heap after 5 minutes idle, long tasks over 200 ms that are not frame renders
+  # (software-rendered frames are long tasks themselves on these GPU-less runners, so those are only
+  # reported), plus software-rendered frame time in the perf-baseline scene. On a push to main the
+  # perf-report artifact is the baseline for later comparison.
+  perf-budget:
+    if: inputs.perf
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: ./.github/actions/setup
+      # Every budget cites the hardware baseline verbatim (AC-6).
+      - run: pnpm perf:budgets
+      - id: playwright
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        id: browsers
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+      # Writes test-results/perf-report.json and the job summary (e2e/perf/reporter.ts).
+      - run: pnpm perf
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: perf-report
+          path: test-results/perf-report.json
+          if-no-files-found: warn
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: perf-traces
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

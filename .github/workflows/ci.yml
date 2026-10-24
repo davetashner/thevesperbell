@@ -1,9 +1,11 @@
 name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
-# lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard,
-# e2e-audio and e2e-playthrough jobs),
-# build, beads-validate.
+# lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
+# e2e-playthrough jobs), build, beads-validate.
+# Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
+# WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
+# main pushes still run the perf suite here, to publish the baseline.
 on:
   pull_request:
   push:
@@ -34,16 +36,14 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm typecheck
 
-  # The unit suite runs once, in coverage-gate below (mw-e41.2): running it here too doubled the runner
-  # time for one signal. This job keeps the name branch protection requires and runs the sim perf
-  # budgets, which live in vitest benchmark files (mw-e00.15 AC-6: mean step() <= 1 ms).
+  # The unit suite runs once, in coverage-gate below (mw-e41.2). This job keeps the name branch
+  # protection requires; the sim perf budgets (vitest bench, mw-e00.15 AC-6) moved to the nightly tier
+  # (mw-e41.5, slow-gates.yml), so it is a deliberate no-op rather than a second test run.
   unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - run: pnpm bench --reporter=verbose
+      - run: echo "Unit tests run in coverage-gate; vitest bench runs nightly (docs/ci-gates.md)."
 
   # The only job that runs the unit and integration tests (mw-e41.2); a failing test fails it.
   coverage-gate:
@@ -103,7 +103,7 @@ jobs:
       # Falls back to the committed coverage-baseline.json with a warning annotation.
       - run: node scripts/coverage-ratchet-cli.ts
 
-  # The chromium project runs in duration-weighted shards (mw-e41.1): e2e/shards.json holds per-spec
+  # The chromium project runs in duration-weighted shards (mw-e41.1, five since mw-e41.5 freed the runner budget): e2e/shards.json holds per-spec
   # seconds and scripts/e2e-shards-cli.ts hands each shard its spec files, so no shard is much slower
   # than the rest. Playwright's own --shard split left one shard at 600-810 s beside others at 330-670 s,
   # and the slowest shard sets the PR's wall clock. Regenerate the weights with
@@ -115,7 +115,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -132,7 +132,7 @@ jobs:
         run: pnpm exec playwright install-deps chromium
       - name: Run this shard's specs
         run: |
-          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 4)
+          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 5)
           # An empty list would make Playwright run every spec.
           if [ -z "$files" ]; then echo "Shard ${{ matrix.shard }} has no specs."; exit 0; fi
           pnpm e2e --project=chromium $files
@@ -157,43 +157,6 @@ jobs:
         if: failure()
         with:
           name: playwright-traces-${{ matrix.shard }}
-          path: |
-            playwright-report/
-            test-results/
-          retention-days: 14
-
-  # Firefox and WebKit run the audio testbed only (mw-e28.1 AC-6; see playwright.config.ts), so they
-  # get one job of their own instead of taxing every chromium shard with browser installs (mw-e41.1).
-  e2e-audio:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - id: playwright
-        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v6
-        id: browsers
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-firefox-webkit
-      - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps firefox webkit
-      - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps firefox webkit
-      # Firefox only runs an AudioContext with a sound server; the runner has no sound card, so give
-      # it PulseAudio with a null sink (mw-e28.1 AC-6).
-      - run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends pulseaudio
-          pulseaudio --start --exit-idle-time=-1
-          pactl load-module module-null-sink sink_name=ci_null
-          pactl set-default-sink ci_null
-      - run: pnpm e2e --project=firefox --project=webkit
-      - uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: playwright-traces-audio
           path: |
             playwright-report/
             test-results/
@@ -229,7 +192,7 @@ jobs:
           retention-days: 14
 
   e2e-smoke:
-    needs: [e2e-shard, e2e-audio, e2e-playthrough]
+    needs: [e2e-shard, e2e-playthrough]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 2
@@ -237,70 +200,21 @@ jobs:
       - name: Every e2e job passed
         run: |
           test "${{ needs.e2e-shard.result }}" = success \
-            && test "${{ needs.e2e-audio.result }}" = success \
             && test "${{ needs.e2e-playthrough.result }}" = success
 
-  # The perf budget suite in CI mode (mw-e32.1; budgets in perf/perf-budgets.json, all from contract
-  # §1): initial transfer and bundle size, load-to-playable and warm reload at 50 Mbps, JS heap after
-  # 5 minutes idle, long tasks over 200 ms that are not frame renders (software-rendered frames are
-  # long tasks themselves on these GPU-less runners, so those are only reported), plus
-  # software-rendered frame time in the perf-baseline scene, compared with main's last report as a
-  # warning only (AC-5). Not a required check yet.
+  # The perf budget suite is nightly tier (mw-e41.5, slow-gates.yml). On a push to main it still runs
+  # here: its perf-report artifact is the baseline the nightly run and manual comparisons use, and a
+  # push is not on any PR's critical path. Pull requests skip it.
   perf-budget:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/slow-gates.yml
     permissions:
       contents: read
       actions: read
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      # Every budget cites the hardware baseline verbatim (AC-6).
-      - run: pnpm perf:budgets
-      - id: playwright
-        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v6
-        id: browsers
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
-      - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
-      - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
-      # Writes test-results/perf-report.json and the job summary (e2e/perf/reporter.ts).
-      - run: pnpm perf
-      # On main this report is the baseline that PRs compare their frame time with.
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: perf-report
-          path: test-results/perf-report.json
-          if-no-files-found: warn
-          retention-days: 90
-      - name: Download main's latest perf report
-        if: always() && github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main --event push \
-            --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-          if [ -n "$run_id" ]; then
-            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name perf-report --dir perf-baseline \
-              || echo "Could not download the perf report from main run $run_id."
-          fi
-      # Warning annotations only, never a failure: runner hardware varies between runs.
-      - name: Frame time vs main
-        if: always() && github.event_name == 'pull_request'
-        run: node scripts/perf/compare-cli.ts --current test-results/perf-report.json --baseline perf-baseline/perf-report.json
-      - uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: perf-traces
-          path: |
-            playwright-report/
-            test-results/
-          retention-days: 14
+    with:
+      bench: false
+      audio: false
+      perf: true
 
   build:
     runs-on: ubuntu-latest

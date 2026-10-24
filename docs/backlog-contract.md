@@ -83,8 +83,8 @@ Every story/task/spike implicitly includes this DoD; beads only list **additions
 
 1. All acceptance criteria are satisfied and each automatable AC is covered by an automated test that names the AC (e.g. `it('AC-2: guard loses track after 8s out of sight')`).
 2. Coverage thresholds in §3 met; ratchet not decreased; no new unexplained exclusions.
-3. Lint, typecheck, unit, integration and Playwright smoke suites green in CI.
-4. Perf budget suite green (once `e32` budgets exist).
+3. Per-PR tier green in CI (`docs/ci-gates.md`): lint, typecheck, unit and integration (coverage-gate), chromium Playwright smoke, build, and the security and PR hygiene checks.
+4. Nightly tier (vitest bench, cross-browser audio, perf budget suite) green on `main`; a change that can move a budget runs the affected gate by hand (`pnpm perf`, `pnpm bench`) before merge. The release tier runs the nightly set against every release candidate.
 5. Content/data schema validation green.
 6. PR opened from a worktree branch, body contains one `Closes mw-…` line per completed bead, squash-merged.
 7. Bead closed after merge with `--reason "Completed in PR #N"`; `backlog.html` reflects it.
