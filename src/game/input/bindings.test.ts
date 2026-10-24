@@ -212,6 +212,9 @@ describe('gamepad bindings (mw-e02.9)', () => {
       'moveRight',
       'slowWalk',
       'cycleTarget',
+      ...Array.from({ length: 8 }, (_, i) => `spellSlot${String(i + 1)}`),
+      'spellPrev',
+      'spellNext',
       'drop',
       'throw',
     ]);
@@ -225,7 +228,9 @@ describe('gamepad bindings (mw-e02.9)', () => {
     expect(taken).toEqual({ ok: false, conflict: { code: 'PadB', actions: ['jump', 'dodge'] } });
     const global = rebind(DEFAULT_PAD_BINDINGS, 'jump', 'PadMenu');
     expect(global.ok).toBe(false);
-    const cycle = rebound(DEFAULT_PAD_BINDINGS, 'cycleTarget', 'PadGuide');
+    // Guide is the spell wheel's button (mw-e06.16), so it has to be let go of first.
+    expect(rebind(DEFAULT_PAD_BINDINGS, 'cycleTarget', 'PadGuide').ok).toBe(false);
+    const cycle = rebound(unbind(DEFAULT_PAD_BINDINGS, 'spellWheel'), 'cycleTarget', 'PadGuide');
     expect(cycle.cycleTarget).toEqual(['PadGuide']);
   });
 

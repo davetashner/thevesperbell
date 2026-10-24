@@ -33,6 +33,9 @@ Defaults: `DEFAULT_BINDINGS` and `DEFAULT_PAD_BINDINGS`.
 | Ability 4        | D-pad Left                         | 4                        |
 | Cast spell       | D-pad Up                           | V                        |
 | Cancel cast      | D-pad Down                         | B                        |
+| Spell slots 1-8  | (wheel)                            | Numpad 1-8; also 5-8 on the number row |
+| Previous / next spell | (wheel)                       | [ and ]                  |
+| Spell wheel (hold) | Guide (Xbox) / PS button         | Z (hold)                 |
 | Inventory        | View                               | I                        |
 | Drop item        | (inventory screen)                 | G                        |
 | Throw item       | (inventory screen)                 | T                        |
@@ -90,8 +93,40 @@ delivery (`src/game/magic/aim.ts`): projectiles and beams go to what the reticle
 on the floor under the reticle, brought back to max range, and the cross turns red with the reason
 (no floor there, blocked, not enough mana) when the cast would be refused; touch spells take the
 locked target, else the creature under the reticle; self spells need no aim. The first learned spell
-is selected; `spell select <id>` in the debug console chooses another until the hotbar (mw-e06.16).
-`spell learn <id>` teaches one for testing. A mana bar sits under stamina for anyone with a pool.
+is selected; the hotbar below chooses others. `spell learn <id>` teaches one for testing, `spell select <id>`
+chooses a learned one and `spell slot <1-8> <id|none>` fills a slot. A mana bar sits under stamina for
+anyone with a pool.
+
+**Spell hotbar and wheel.** (mw-e06.16; `src/sim/magic/hotbar.ts`, `src/game/magic/hotbar.ts`,
+`src/ui/spell-hotbar.ts`, `src/ui/spell-wheel.ts`.) Eight slots sit in a row above the quick slots,
+shown once a spell is learned. A newly learned spell takes the first empty slot (and is selected when
+nothing is). Each slot shows a placeholder icon (the spell's initial; real art is mw-e37.31), its key,
+its mana cost, a cooldown sweep with the seconds left in tenths, a dimmed icon and red cost when the
+mana is short (unless the spell may be over-cast), a brass rim when selected and a blue one while that
+spell channels. Pressing a slot's key selects it; an empty slot does nothing. Selection is sim state
+(`magic.hotbar`, saved with the world, command `select-spell-slot`, event `SpellSelected`), and a cast
+pressed in the same frame uses the slot just chosen.
+
+*Decision: spell slots do not share the number row with the class abilities.* Keys 1-4 are the
+class abilities (the knight's strong attack, parry and the testbed bow), and the same keys cannot mean
+two things at once, so slots 1-4 sit on the numpad and slots 5-8 on both the numpad and the number
+row; `[` / `]` step to the previous / next filled slot and the wheel reaches every slot without a
+numpad. When the class kits (mw-e02.3) free the number row for casters the defaults can move; all
+the actions (`spellSlot1`-`spellSlot8`, `spellPrev`, `spellNext`, `spellWheel`) are remappable. The
+quick slots (consumables) stay a separate strip below the hotbar: spells and consumables never share
+a slot, and assigning the quick slots' own keys remains mw-e17.17.
+
+*Quick-select wheel.* Hold Z (the Guide button on the pad: every other pad button is taken). While it
+is held, mouse look (or the right stick) moves a pointer instead of turning the view, the slot it
+points at is lit with the spell's name, and letting go selects it; releasing near the centre selects
+nothing. The sim runs at 25% speed while it is open (`accessibility.wheelSlowsTime`, default on, in
+Options); opening a menu closes it. Slots go clockwise from the top.
+
+*Saves.* The bar rides in the world section (the component is registered on first use and listed in
+`ON_DEMAND_COMPONENTS`, so it loads into a world that has not learned anything yet).
+
+*Not yet:* dragging a spell from the grimoire onto a slot (the grimoire is mw-e07.10; until then the
+console's `spell slot` and the sim's `assign-spell-slot` command place spells).
 
 **Items.** Interact takes an item lying in reach ("Take <name>"; mw-e17.7). G drops the most
 recently picked-up item that may be dropped (a whole stack, in front of you) and T throws one of it

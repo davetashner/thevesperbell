@@ -9,6 +9,7 @@ import {
   hashWorld,
   installDebugCommands,
   actCommand,
+  assignSpellSlotCommand,
   learnSpellCommand,
   useQuickSlotCommand,
   blastCommand,
@@ -308,11 +309,31 @@ describe('built-in console commands', () => {
     });
     expect(chosen).toEqual(['ember', 'frost-bolt']);
     expect(registry.execute('spell learn embr').lines[0]).toContain('closest: ember');
+    // mw-e06.16: spell slot puts a spell on the hotbar, or clears the slot.
+    expect(registry.execute('spell slot 3 ember').lines).toEqual(['slot 3: ember']);
+    expect(registry.execute('spell slot 8 none').lines).toEqual(['slot 8 cleared']);
+    expect(registry.execute('spell slot 1').lines).toEqual(['slot 1 cleared']);
+    expect(s.queue.drain()).toEqual([
+      assignSpellSlotCommand(s.hero, 2, 'ember'),
+      assignSpellSlotCommand(s.hero, 7, null),
+      assignSpellSlotCommand(s.hero, 0, null),
+    ]);
+    expect(registry.execute('spell slot 9 ember')).toEqual({
+      ok: false,
+      lines: ['slot must be 1–8, got "9"'],
+    });
+    expect(registry.execute('spell slot two ember').ok).toBe(false);
+    expect(registry.execute('spell slot 2 embr').lines[0]).toContain('closest: ember');
+    expect(registry.complete('spell slot 2 e').line).toBe('spell slot 2 ember ');
+    expect(registry.complete('spell slot 2 n').line).toBe('spell slot 2 none ');
+    expect(registry.complete('spell slot 2 x ').options).toEqual([]);
     expect(registry.complete('spell learn e').line).toBe('spell learn ember ');
     expect(registry.complete('spell learn').options).toEqual([]);
     // A host with no spells knows none, and a build without selection cannot select.
     expect(s.registry.execute('spell learn ember').ok).toBe(false);
     expect(s.registry.complete('spell learn e')).toEqual({ line: 'spell learn e', options: [] });
+    // mw-e06.16: with no spells, a slot can still be cleared (completes to none).
+    expect(s.registry.complete('spell slot 2 n').line).toBe('spell slot 2 none ');
     const bare = new CommandRegistry<ConsoleHost>(
       Object.assign(Object.create(s.host) as ConsoleHost, { spells: ['ember'] }),
     );

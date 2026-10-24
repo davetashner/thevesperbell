@@ -28,6 +28,8 @@ export * from './target-hud';
 export * from './pickup-toasts';
 export * from './quick-slots';
 export * from './reticle';
+export * from './spell-hotbar';
+export * from './spell-wheel';
 export * from './save-menus';
 export * from './screens';
 export * from './shop-window';

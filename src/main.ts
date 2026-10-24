@@ -112,6 +112,7 @@ import {
 import { installFactRegistry } from '@game/facts';
 import { installGameFire } from '@game/fire';
 import {
+  attachSpellBar,
   attachSpellHud,
   attachSpellReadout,
   bindBolts,
@@ -121,6 +122,7 @@ import {
   previewRadius,
   readBoltTransform,
   SpellCaster,
+  SpellWheelControl,
   viewRay,
   type GameMagic,
   type SpellCommand,
@@ -328,6 +330,8 @@ import {
   LockMarker,
   openClassSelect,
   Reticle,
+  SpellHotbar,
+  SpellWheel,
   reducedMotion,
   setTextScale,
   UiRoot,
@@ -702,6 +706,8 @@ function startRenderer(
     let scrollAim: ((spellId: string | undefined) => ScrollAim | undefined) | undefined;
     // The player's casting (mw-e06.15): turns a gameplay frame into cast commands, once there is a player.
     let castFrame: ((frame: ActionFrame) => readonly SpellCommand[]) | undefined;
+    let wheelShape: ((frame: ActionFrame) => ActionFrame) | undefined;
+    let spellBar: { frame(): void } | undefined;
     const afterStep: (() => void)[] = [];
     // Swept hitboxes and region-tagged hurtboxes (mw-e04.2). No faction table is loaded yet, so
     // nobody counts as an ally; ?hitboxes draws what the system tests each tick. The hit-volume
@@ -970,7 +976,10 @@ function startRenderer(
       sampleCommands: commands.sampler((tick) => {
         beforeSample?.(tick);
         const frames = bridge.sampleCommands(tick);
-        return castFrame === undefined ? frames : [...frames, ...frames.flatMap(castFrame)];
+        if (castFrame === undefined) return frames;
+        // With the quick-select wheel open, look moves its pointer instead of the view.
+        const shaped = wheelShape === undefined ? frames : frames.map(wheelShape);
+        return [...shaped, ...shaped.flatMap(castFrame)];
       }),
       simPaused: () =>
         bridge.simPaused() || aiDebug?.held() === true || transitions?.leaving === true,
@@ -1025,6 +1034,7 @@ function startRenderer(
         waterHud?.frame(timeMs);
         targetHud?.frame(timeMs);
         spellHud?.frame(timeMs);
+        spellBar?.frame();
         publishSpells?.();
         lockMarker.update(
           lockMarkerModel(
@@ -1337,9 +1347,37 @@ function startRenderer(
                 locked: () => player?.readout()?.lock,
               });
         };
+        // The hotbar and the quick-select wheel (mw-e06.16): slots above the quick slots, the wheel
+        // over the middle of the view; the wheel's pick selects a slot like a slot key does.
+        const hotbar = new SpellHotbar({ scale: settings.get('accessibility.hudScale') });
+        const wheel = new SpellWheel();
+        const wheelControl = new SpellWheelControl();
+        ui.hud.append(hotbar.element, wheel.element);
+        settings.on('accessibility.hudScale', (scale) => {
+          hotbar.setScale(scale);
+        });
+        wheelShape = (frame) => wheelControl.shape(frame);
+        spellBar = attachSpellBar({
+          world,
+          player: hero,
+          spells: spellbook.spells,
+          hotbar,
+          wheel,
+          control: wheelControl,
+          slowsTime: () => settings.get('accessibility.wheelSlowsTime'),
+          timeScale: () => loop.timeScale,
+          setTimeScale: (scale) => {
+            loop.timeScale = scale;
+          },
+          paused: () => bridge.simPaused(),
+        });
         castFrame = (frame) => {
+          const picks = wheelControl.takePicks();
           if (replaying) return [];
-          const out = caster.commands(frame, ray);
+          const out = [
+            ...caster.commands(frame, ray),
+            ...picks.flatMap((slot) => caster.slotCommands(slot)),
+          ];
           for (const command of out) inputRecorder?.record({ op: 'command', command });
           return out;
         };
@@ -1353,6 +1391,8 @@ function startRenderer(
           player: hero,
           caster,
           aim: () => spellHud?.aim(),
+          wheel: () => ({ open: wheelControl.open, highlight: wheelControl.highlight }),
+          timeScale: () => loop.timeScale,
           spawnOf: (entity) => world.get(entity, SceneSpawnComponent)?.id ?? null,
         });
         let publishedSpells = '';

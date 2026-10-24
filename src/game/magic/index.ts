@@ -1,5 +1,6 @@
 export * from './aim';
 export * from './caster';
+export * from './hotbar';
 export * from './hud';
 export * from './install';
 export * from './readout';

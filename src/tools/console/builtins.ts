@@ -16,6 +16,7 @@ import {
   difficultyCommand,
   killCommand,
   giveItemCommand,
+  assignSpellSlotCommand,
   learnSpellCommand,
   MAX_BLAST_INTENSITY,
   MAX_BLAST_RADIUS,
@@ -32,6 +33,7 @@ import {
   QUICK_SLOT_COUNT,
   useQuickSlotCommand,
   WORLD_PROPERTY_KEYS,
+  SPELL_HOTBAR_SLOTS,
 } from '@sim/index';
 import { MAX_TIME_SCALE } from '@game/loop/fixed-step';
 import { ALL_SLOTS, isSlotId, type SlotId } from '@game/save/slots/ids';
@@ -382,12 +384,25 @@ export function registerBuiltins(registry: CommandRegistry<ConsoleHost>): void {
 
   registry.registerCommand({
     name: 'spell',
-    summary: 'learn a spell, or choose the one the cast button casts (V, D-pad up)',
-    usage: 'learn|select <spellId>',
-    args: z.tuple([z.enum(['learn', 'select']), z.string()]),
-    complete: (index, host) => (index === 1 ? (host.spells ?? []) : []),
-    run: ([action, id], host) => {
+    summary:
+      'learn a spell, choose the one the cast button casts (V, D-pad up), or put one on the hotbar',
+    usage: 'learn|select <spellId> | slot <1–8> <spellId|none>',
+    args: z.tuple([z.enum(['learn', 'select', 'slot']), z.string(), z.string().optional()]),
+    complete: (index, host) =>
+      index === 1 ? (host.spells ?? []) : index === 2 ? [...(host.spells ?? []), 'none'] : [],
+    run: ([action, first, second], host) => {
       const known = host.spells ?? [];
+      if (action === 'slot') {
+        const slot = Number(first);
+        if (!Number.isInteger(slot) || slot < 1 || slot > SPELL_HOTBAR_SLOTS) {
+          throw new ConsoleError([`slot must be 1–${String(SPELL_HOTBAR_SLOTS)}, got "${first}"`]);
+        }
+        const id = second ?? 'none';
+        if (id !== 'none' && !known.includes(id)) throw unknown('spell', id, known);
+        host.submit(assignSpellSlotCommand(player(host), slot - 1, id === 'none' ? null : id));
+        return id === 'none' ? `slot ${first} cleared` : `slot ${first}: ${id}`;
+      }
+      const id = first;
       if (!known.includes(id)) throw unknown('spell', id, known);
       if (action === 'learn') {
         host.submit(learnSpellCommand(player(host), id));
