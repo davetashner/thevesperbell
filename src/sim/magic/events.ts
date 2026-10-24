@@ -67,5 +67,29 @@ export interface SpellFizzledInfo {
 }
 export const SpellFizzled = defineEvent<SpellFizzledInfo>('SpellFizzled');
 
+/** A flame spell was put out by water: the cue is a hiss and a puff of steam. */
+export interface SpellQuenchedInfo {
+  readonly tick: number;
+  readonly caster: EntityId;
+  readonly spell: string;
+  /** The delivery entity (destroyed by the time listeners run for a launch-time quench). */
+  readonly delivery: EntityId;
+  /** Where it went out, metres. */
+  readonly point: Vec3;
+  /** What put it out; `water` today. */
+  readonly medium: 'water';
+  /** The presentation cue this event stands for (render/audio bind to it). */
+  readonly cue: 'steam';
+  /** `launch`: cast while submerged; `flight`: flew into water. */
+  readonly stage: 'launch' | 'flight';
+}
+export const SpellQuenched = defineEvent<SpellQuenchedInfo>('SpellQuenched');
+
 /** Anywhere a spell effect has landed in the world: the one cue render/audio bind to is these events. */
-export const SPELL_EVENTS = [SpellCast, SpellHit, SpellEffectApplied, SpellFizzled] as const;
+export const SPELL_EVENTS = [
+  SpellCast,
+  SpellHit,
+  SpellEffectApplied,
+  SpellFizzled,
+  SpellQuenched,
+] as const;

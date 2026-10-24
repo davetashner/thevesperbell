@@ -374,6 +374,12 @@ const deliverySchema = z
             .nonnegative()
             .default(0)
             .describe('Impact area: others within this many metres of the impact are hit too.'),
+          quenchedByWater: z
+            .boolean()
+            .default(false)
+            .describe(
+              'A flame that water puts out: launched underwater, or entering water in flight, it fizzles with no effects and a steam cue (SpellQuenched).',
+            ),
           trail: z
             .strictObject({
               element: z

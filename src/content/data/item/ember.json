@@ -1,0 +1,28 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "ember",
+  "category": "book",
+  "name": "Ember: A First Flame",
+  "description": "A thin primer, soot-edged and well thumbed. The first lesson is how to light a candle without being in the room.",
+  "notes": "The tome that teaches the Ember spell (mw-e08.2), the book half of the fire chain's first step (ADR-0004: Ember, Firebolt, Flame Jet, Fire Wall). Item id equals the spell id so the cover art id is ui-book-cover-ember (bookCoverArtId); every E08 spell's teaching book follows that pattern. Licensed fire magic, common: the Lamplit Stacks stock it. Study time is 20 minutes; the scroll of the same spell is scroll-of-ember. Base value 120 sits with a first-step spell book in the economy tome band.",
+  "icon": "icon-item-ember-01",
+  "value": 120,
+  "weightClass": "light",
+  "book": {
+    "title": "Ember: A First Flame",
+    "author": "Hobb Ashby",
+    "kind": "tome",
+    "school": "fire",
+    "teaches": { "kind": "spell", "spell": "ember" },
+    "pages": [
+      { "textKey": "book.ember.page-1" },
+      { "textKey": "book.ember.page-2" },
+      { "textKey": "book.ember.page-3" }
+    ],
+    "language": "common",
+    "comprehensionDifficulty": 0.1,
+    "studyMinutes": 20,
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}

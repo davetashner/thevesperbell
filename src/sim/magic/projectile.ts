@@ -25,6 +25,11 @@
 // - Trail: a `trail` leaves a stimulus capsule along every tick's swept path, so a heat trail ignites
 //   whatever flammable thing it passes (stimulus rules decide what that does).
 //
+// - Water: a spell whose delivery is `quenchedByWater` (a flame) fizzles when launched where
+//   `options.water` says there is water at the muzzle, and is put out when its path ends in water
+//   (the level and creatures in that tick's path are not reached). Both emit SpellQuenched (the steam
+//   cue) and reason `quenched`; nothing is spent at launch, and no effect applies.
+//
 // Homing is out of scope (a later spell). The caster cannot be hit by their own bolt for its first
 // half second, so a shot leaves a hand that overlaps its own hurtboxes.
 
@@ -45,6 +50,7 @@ import {
 import { PlacementComponent, placementOf } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
 import { applyStimulus } from '../stimulus/stimulus';
+import { SpellQuenched } from './events';
 import type { SpellPipeline } from './pipeline';
 import type { DeliveryContext, DeliveryHit, DeliveryResult } from './registry';
 
@@ -88,6 +94,8 @@ export interface SpellProjectileOptions {
   readonly invulnerable?: InvulnerabilityRule;
   /** Which entity a level collider belongs to; defaults to the arrows' `physicsSurfaceOf`. */
   readonly surfaceOf?: SurfaceRule;
+  /** Whether a point is under water (a scene's water volumes); omitted, nowhere is. */
+  readonly water?: (point: Vec3) => boolean;
   /** Metres above the caster's placement a shot starts at (chest height); default 1.2. */
   readonly muzzleHeight?: number;
   /** Seconds the caster cannot hit themselves with their own bolt; default 0.5. */
@@ -184,6 +192,19 @@ export function installSpellProjectiles<TInput>(
       const origin = { x: at.x, y: at.y + muzzleHeight, z: at.z };
       const velocity = launchVelocity(origin, request.aim, delivery.speed, delivery.gravity);
       if (velocity === undefined) return { kind: 'fizzle', reason: 'no-aim' };
+      if (delivery.quenchedByWater && options.water?.(origin) === true) {
+        w.events.emit(SpellQuenched, {
+          tick: w.tick,
+          caster: request.caster,
+          spell: spell.id,
+          delivery: entity,
+          point: origin,
+          medium: 'water',
+          cue: 'steam',
+          stage: 'launch',
+        });
+        return { kind: 'fizzle', reason: 'quenched' };
+      }
       const flight: SpellProjectile = {
         spell: spell.id,
         caster: request.caster,
@@ -251,6 +272,21 @@ export function installSpellProjectiles<TInput>(
         }
         const limit = wall === undefined ? Infinity : wall.distance / length;
         const end = wall === undefined ? to : lerp(from, to, limit);
+
+        if (def.quenchedByWater && options.water?.(end) === true) {
+          w.events.emit(SpellQuenched, {
+            tick: w.tick,
+            caster: p.caster,
+            spell: p.spell,
+            delivery: entity,
+            point: end,
+            medium: 'water',
+            cue: 'steam',
+            stage: 'flight',
+          });
+          pipeline.cancel(w, entity, 'quenched');
+          return;
+        }
 
         if (def.trail !== undefined) {
           applyStimulus(w, {

@@ -67,6 +67,7 @@ export function projectileDelivery(
     bounce: 0,
     restitution: 0.8,
     impactRadius: 0,
+    quenchedByWater: false,
     onExpire: [],
     ...overrides,
   };

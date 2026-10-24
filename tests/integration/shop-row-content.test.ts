@@ -16,7 +16,8 @@ const itemIds = new Set(items.map((item) => item.id));
 
 /**
  * What a shop never sells: currency, keys, the slice's worthless oddity, and the salvage skeletons
- * drop (mw-ju8.19), which shops only buy.
+ * drop (mw-ju8.19), which shops only buy, and spell tomes: no bookshop exists yet (the Ember tome
+ * is placed by the world beads, E24-E26).
  */
 const NOT_FOR_SALE = new Set([
   'gold',
@@ -29,6 +30,7 @@ const NOT_FOR_SALE = new Set([
   'rusted-knife',
   'rusted-arming-sword',
   'dented-iron-cap',
+  'ember',
 ]);
 
 /** The owner's shop list, as predicates over an item id and its definition. */

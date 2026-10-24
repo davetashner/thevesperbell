@@ -1,0 +1,47 @@
+{
+  "$schema": "../spell.schema.json",
+  "id": "ember",
+  "name": "Ember",
+  "school": "fire",
+  "tier": 1,
+  "next": [],
+  "cost": { "mana": 4 },
+  "castTime": 0.3,
+  "cooldown": 0.5,
+  "delivery": {
+    "kind": "projectile",
+    "speed": 14,
+    "maxRange": 12,
+    "radius": 0.12,
+    "gravity": 0,
+    "lifetime": 1.2,
+    "quenchedByWater": true
+  },
+  "effects": [
+    {
+      "op": "damage",
+      "amounts": { "fire": 2 },
+      "poiseDamage": 0,
+      "staminaDamage": 0,
+      "impulse": { "x": 0, "y": 0, "z": 0 },
+      "impactForce": 0,
+      "tags": ["spell", "ember"]
+    },
+    {
+      "op": "stimulus",
+      "element": "heat",
+      "intensity": 500,
+      "radius": 0.25,
+      "duration": 0,
+      "falloff": "none"
+    },
+    { "op": "light", "intensity": 25, "radius": 2.5, "duration": 0, "attach": "delivery" },
+    { "op": "noise", "phase": "release", "loudness": 40 },
+    { "op": "noise", "phase": "impact", "loudness": 45 }
+  ],
+  "tags": ["fire", "ignition", "ranged", "starter"],
+  "vfxCue": "vfx-spell-ember-cast",
+  "sfxCue": "sfx-spell-ember-cast",
+  "bookId": "ember",
+  "flags": { "tooUseful": false, "castWhileMoving": false, "allowOvercast": false }
+}
