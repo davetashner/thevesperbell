@@ -13,6 +13,12 @@ const config = (over: Partial<GameConfigInput> = {}): GameConfigInput => ({
   notes: 'Test.',
   playableClasses: ['knight'],
   startScene: 'slice',
+  clock: {
+    dayLengthRealMinutes: 60,
+    start: { day: 1, minute: 360 },
+    phases: [{ id: 'day', startMinute: 0 }],
+    pauseScreens: {},
+  },
   ...over,
 });
 
@@ -87,5 +93,21 @@ describe('game configuration (mw-e01.15)', () => {
     ]);
     expect(gameSchema.safeParse(config({ id: 'other' as never })).success).toBe(false);
     expect(gameSchema.parse(config()).playableClasses.map(({ id }) => id)).toEqual(['knight']);
+  });
+
+  it('mw-e27.12: the clock block needs a phase, a valid start minute and kebab-case phase ids', () => {
+    const clock = config().clock;
+    expect(gameSchema.safeParse(config()).success).toBe(true);
+    expect(gameSchema.safeParse(config({ clock: { ...clock, phases: [] } })).success).toBe(false);
+    expect(
+      gameSchema.safeParse(config({ clock: { ...clock, start: { day: 1, minute: 1440 } } }))
+        .success,
+    ).toBe(false);
+    expect(
+      gameSchema.safeParse(
+        config({ clock: { ...clock, phases: [{ id: 'Noon', startMinute: 0 }] } }),
+      ).success,
+    ).toBe(false);
+    expect(gameSchema.safeParse({ ...config(), clock: undefined }).success).toBe(false);
   });
 });

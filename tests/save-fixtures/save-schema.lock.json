@@ -160,6 +160,41 @@
           "fingerprint": "sha256:fbc6c8a56bb9720b7253c54c07edc39772d5ca787fca646ab167bc8b4eb48b75"
         }
       }
+    },
+    {
+      "revision": 9,
+      "formatVersion": 1,
+      "saveSchemaVersion": 1,
+      "sections": {
+        "creatures": {
+          "version": 2,
+          "fingerprint": "sha256:6788461c76bf67e9771512f034f0344edcf567d09a210c6d789d282576bbfc8f"
+        },
+        "game-clock": {
+          "version": 1,
+          "fingerprint": "sha256:32aa633861f0ba7d0fa285278dab12e4041914ef0733ea8760a3041ead576f3a"
+        },
+        "inventory": {
+          "version": 1,
+          "fingerprint": "sha256:cf95c1be53add37cb3c76b6fff830dae72b1536b8c19ff9aeba8c36a0fd52c79"
+        },
+        "level-deltas": {
+          "version": 1,
+          "fingerprint": "sha256:72e50a37e2977d06a9f89d8f60fabaeaa284584d3e5b07b3d1b0f538cfc017e8"
+        },
+        "merchants": {
+          "version": 2,
+          "fingerprint": "sha256:53055c5e1a10e2054604e099ba1437511721b98fad1a96e08329386a69465218"
+        },
+        "world": {
+          "version": 5,
+          "fingerprint": "sha256:189da40834cb8897c29d12322457a629388f1363536b78601fe6a6f88ca4f1dc"
+        },
+        "world-facts": {
+          "version": 1,
+          "fingerprint": "sha256:fbc6c8a56bb9720b7253c54c07edc39772d5ca787fca646ab167bc8b4eb48b75"
+        }
+      }
     }
   ]
 }

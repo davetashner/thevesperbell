@@ -128,7 +128,27 @@ export interface ActCommand {
   readonly move: string;
 }
 
+/**
+ * Moves the game clock (mw-e27.12: the console's `time set` and `time advance`). `set` puts it at a
+ * day and minute (forward fires the usual events, backward does not); `advance` jumps `minutes`.
+ */
+export type TimeCommand =
+  | {
+      readonly kind: typeof DEBUG_COMMAND;
+      readonly op: 'time';
+      readonly action: 'set';
+      readonly day: number;
+      readonly minute: number;
+    }
+  | {
+      readonly kind: typeof DEBUG_COMMAND;
+      readonly op: 'time';
+      readonly action: 'advance';
+      readonly minutes: number;
+    };
+
 export type DebugCommand =
+  | TimeCommand
   | ActCommand
   | SpawnCommand
   | TuneCommand
@@ -229,6 +249,24 @@ export function blastCommand(at: Vec3, radius: number, intensity: number): Blast
     radius,
     intensity,
   };
+}
+
+/** A clock set. @throws RangeError for a day below 1 or a minute outside 0-1439. */
+export function timeSetCommand(day: number, minute: number): TimeCommand {
+  if (!Number.isInteger(day) || day < 1)
+    throw new RangeError(`day must be 1 or more, got ${String(day)}`);
+  if (!Number.isInteger(minute) || minute < 0 || minute > 1439) {
+    throw new RangeError(`minute must be 0-1439, got ${String(minute)}`);
+  }
+  return { kind: DEBUG_COMMAND, op: 'time', action: 'set', day, minute };
+}
+
+/** A clock advance. @throws RangeError unless `minutes` is a whole number of at least 1. */
+export function timeAdvanceCommand(minutes: number): TimeCommand {
+  if (!Number.isSafeInteger(minutes) || minutes < 1) {
+    throw new RangeError(`minutes must be a whole number of 1 or more, got ${String(minutes)}`);
+  }
+  return { kind: DEBUG_COMMAND, op: 'time', action: 'advance', minutes };
 }
 
 /** A move request. @throws RangeError for an invalid target or an empty move id. */

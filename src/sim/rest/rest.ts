@@ -14,6 +14,7 @@
 import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
+import { gameClockOf, gameDayClock } from '../gametime/clock';
 import { DEFAULT_POOLS, type ItemPool, type PoolRestorer } from '../items/consumables';
 import {
   addMinutes,
@@ -48,7 +49,7 @@ const FULL = 1_000_000;
 export interface RestOptions {
   readonly kind: RestKind;
   readonly point: string;
-  /** The day clock; the world's facts when omitted. */
+  /** The day clock; the world's game clock (else its facts) when omitted. */
   readonly clock?: DayClock;
   /** The safety verdict: null when it is safe to rest, else why not (the autosave veto registry's). */
   readonly safety?: () => string | null;
@@ -83,7 +84,9 @@ export function restUntilMorning(
 ): RestResult {
   const detail = restBlocked(options);
   if (detail !== null) return { ok: false, reason: 'unsafe', detail };
-  const clock = options.clock ?? factDayClock(world.facts);
+  const game = gameClockOf(world);
+  const clock =
+    options.clock ?? (game === undefined ? factDayClock(world.facts) : gameDayClock(game));
   const minutes = minutesUntilMorning(clock.now());
   const wakes = addMinutes(clock.now(), minutes);
   clock.set(wakes);

@@ -25,6 +25,8 @@ import {
 } from '../scene/loader';
 import { ReplayRecorder } from '../replay/recorder';
 import { playReplay } from '../replay/player';
+import { installGameClock } from '../gametime/clock';
+import { DEFAULT_CLOCK_CONFIG } from '../gametime/config';
 import { hashWorld } from '../snapshot';
 import {
   addProperties,
@@ -50,6 +52,8 @@ import {
 import {
   actCommand,
   blastCommand,
+  timeAdvanceCommand,
+  timeSetCommand,
   cheatCommand,
   DEBUG_COMMAND,
   MAX_BLAST_INTENSITY,
@@ -580,5 +584,29 @@ describe('act (mw-e03.11)', () => {
     other.step([]);
     expect(hashWorld(world)).toBe(hashWorld(other));
     expect(before).not.toBe(hashWorld(world));
+  });
+});
+
+describe('time commands (mw-e27.12)', () => {
+  it('validate their values and are debug commands', () => {
+    expect(isDebugCommand(timeSetCommand(2, 90))).toBe(true);
+    expect(() => timeSetCommand(0, 0)).toThrow(/day/);
+    expect(() => timeSetCommand(1, 1440)).toThrow(/minute/);
+    expect(() => timeAdvanceCommand(0)).toThrow(/minutes/);
+    expect(() => timeAdvanceCommand(1.5)).toThrow(RangeError);
+  });
+
+  it('move the game clock inside the tick, and are ignored by a world without one', () => {
+    const world = new World<unknown>({ seed: 1 });
+    const clock = installGameClock(world, DEFAULT_CLOCK_CONFIG);
+    installDebugCommands(world, { spawners: new Map() });
+    world.step([timeAdvanceCommand(120)]);
+    expect(clock.time()).toEqual({ day: 1, minute: 480 });
+    world.step([timeSetCommand(4, 600)]);
+    expect(clock.time()).toEqual({ day: 4, minute: 600 });
+    const bare = new World<unknown>({ seed: 1 });
+    installDebugCommands(bare, { spawners: new Map() });
+    bare.step([timeAdvanceCommand(120)]);
+    expect(bare.tick).toBe(1);
   });
 });

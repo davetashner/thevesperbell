@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { DAMAGE_COMPONENTS, giveCombatant, HealthComponent } from '../combat/damage/components';
 import { giveStamina, StaminaComponent } from '../combat/stamina';
 import { World } from '../core/world';
+import { installGameClock } from '../gametime/clock';
+import { DEFAULT_CLOCK_CONFIG } from '../gametime/config';
 import {
   DAY_CLOCK_FACTS,
   factDayClock,
@@ -126,5 +128,23 @@ describe('resting at an inn (mw-ju8.6)', () => {
     const result = restUntilMorning(s.world, s.actor, { kind: 'inn', point: 'p' });
     expect(result).toMatchObject({ ok: true, restored: { health: 0 } });
     expect(s.world.get(s.actor, HealthComponent)?.current).toBe(0);
+  });
+});
+
+describe('resting with the game clock installed (mw-e27.12)', () => {
+  it('passes the night through the game clock, so its hour and day events fire', () => {
+    const { world, actor, full } = setup();
+    const clock = installGameClock(world, DEFAULT_CLOCK_CONFIG);
+    clock.setTime({ day: 1, minute: 21 * 60 });
+    const hours: number[] = [];
+    const days: number[] = [];
+    clock.subscribe('hourChanged', (e) => hours.push(e.hour));
+    clock.subscribe('dayStarted', (e) => days.push(e.day));
+    const result = restUntilMorning(world, actor, { kind: 'inn', point: 'ox' });
+    expect(result.ok).toBe(true);
+    expect(clock.time()).toEqual({ day: 2, minute: MORNING_MINUTE });
+    expect(hours).toEqual([22, 23, 0, 1, 2, 3, 4, 5, 6]);
+    expect(days).toEqual([2]);
+    expect(world.get(actor, StaminaComponent)?.current).toBe(full);
   });
 });

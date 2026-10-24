@@ -3,5 +3,16 @@
   "id": "game",
   "notes": "The m1 vertical slice supports the Knight only (owner decision 2026-10-02, docs/design/vertical-slice.md §3 beat B1): the other three classes show on the class select screen, locked. m2 unlocks them by adding their ids here. A new game starts in the slice scene (mw-e01.2); E24 moves the start to the mountain road at m3.",
   "playableClasses": ["knight"],
-  "startScene": "slice"
+  "startScene": "slice",
+  "clock": {
+    "dayLengthRealMinutes": 60,
+    "start": { "day": 1, "minute": 360 },
+    "phases": [
+      { "id": "dawn", "startMinute": 300 },
+      { "id": "day", "startMinute": 480 },
+      { "id": "dusk", "startMinute": 1080 },
+      { "id": "night", "startMinute": 1260 }
+    ],
+    "pauseScreens": { "dialogue": true, "shop": true, "inventory": true, "map": false }
+  }
 }

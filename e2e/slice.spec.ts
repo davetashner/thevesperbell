@@ -116,7 +116,14 @@ test('mw-e01.4 AC-3: walking the route into the exit without the key, it stays l
   await openSlice(page);
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-mechanisms', /"exit-door":\{"status":"locked"/);
-  await expect(app).toHaveAttribute('data-facts', '{}');
+  // The game clock's own time.* facts are set from the first game minute; no other fact is set yet.
+  await expect
+    .poll(async () =>
+      Object.keys(JSON.parse((await app.getAttribute('data-facts')) ?? '{}') as object).filter(
+        (key) => !key.startsWith('time.'),
+      ),
+    )
+    .toEqual([]);
   // The miner rests at its post, Unaware of the bot in the spawn room; it falls before the walk.
   expect(await skeleton(page)).toMatchObject({ state: 'unaware', at: [2.5, 0, 32.5] });
   await killSkeleton(page);
@@ -158,7 +165,10 @@ test('mw-e01.4 AC-3: walking the route into the exit without the key, it stays l
   });
   await expect(prompt).toContainText('Locked.');
   // No slice complete: the fact was never written (only the miner's slain fact is).
-  expect(await data<Record<string, unknown>>(page, 'facts')).toEqual({
+  const facts = await data<Record<string, unknown>>(page, 'facts');
+  expect(
+    Object.fromEntries(Object.entries(facts).filter(([key]) => !key.startsWith('time.'))),
+  ).toEqual({
     'entity:slice/skeleton.slain': true,
   });
   expect(problems).toEqual([]);

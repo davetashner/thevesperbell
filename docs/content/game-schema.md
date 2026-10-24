@@ -11,3 +11,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `notes` | string | required | What this build offers and why. |
 | `playableClasses` | list of ref → class (at least 1) | required | The classes the class select screen lets the player confirm; the rest show locked (mw-e01.15). |
 | `startScene` | ref → scene | required | The scene a new game starts in and the title screen shows behind it (mw-e01.2). |
+| `clock` | object | required | The in-game clock (mw-e27.12). |
+| `clock.dayLengthRealMinutes` | number > 0 | required | Real minutes of sim time in one game day; 60 means a day passes in an hour. |
+| `clock.start` | object | required | Where a new world starts. |
+| `clock.start.day` | integer ≥ 1 | required | Day number a new world starts on. |
+| `clock.start.minute` | integer 0–1439 | required | Minute of that day a new world starts at (360 = 06:00). |
+| `clock.phases` | list of object (at least 1) | required | Phases of the day, ascending by startMinute; the last runs past midnight into the first. |
+| `clock.phases[].id` | string | required | Phase id, e.g. "dawn". |
+| `clock.phases[].startMinute` | integer 0–1439 | required | Minute of the day the phase begins. |
+| `clock.pauseScreens` | map of string → boolean | required | Screen id -> whether it holds the clock while open (the sim already stops while a menu pauses it; this is for screens that leave it running). |
