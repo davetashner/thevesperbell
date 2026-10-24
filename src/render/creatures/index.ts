@@ -10,6 +10,9 @@
 // place, scaled to the creature's height, skinned to the animation rig when the caller gives one (miner-rig.ts); if it never loads the capsule stays. Any other mesh id
 // draws the plain capsule.
 //
+// A townsperson's mesh id (npc-model.ts, mw-ju8.34) swaps a static body in the same way, the capsule
+// staying if it never loads.
+//
 // Telegraphs (mw-e04.20): while a creature winds up a telegraphed move its body glows — ember for a
 // swing a parry deflects, pale steel for one only a shield stops, red for an unblockable move or a
 // grab — until the move turns active. `showCreatureTelegraph` only touches the body's material when
@@ -34,6 +37,7 @@ import { loadForgottenMiner } from './forgotten-model';
 import { COLLAPSE_PIVOT } from './death';
 import { setBodyGlow } from './hit-flash';
 import { minerRigAssets, RIG_HEIGHT } from './miner-rig';
+import { loadNpcModel, npcModelUrl } from './npc-model';
 
 const SLATE = 0x6f7f8c;
 const RUST = 0x9c4a32;
@@ -146,6 +150,30 @@ export function createCreatureProxy({
       },
       (error: unknown) => {
         console.warn('The Forgotten miner model did not load; keeping the capsule.', error);
+      },
+    );
+  }
+  const npcUrl = npcModelUrl(mesh);
+  if (npcUrl !== undefined) {
+    void loadNpcModel(npcUrl).then(
+      (model) => {
+        // The townsperson takes the capsule's place, scaled to the creature's height.
+        for (const part of parts) part.visible = false;
+        body.name = 'proxy-body';
+        model.geometry.computeBoundingBox();
+        const scale = height / (model.geometry.boundingBox?.max.y ?? height);
+        const person = new Group();
+        person.name = 'model';
+        person.scale.setScalar(scale);
+        const torso = new Mesh(model.geometry, model.material.clone());
+        torso.name = 'body';
+        torso.castShadow = true;
+        torso.receiveShadow = true;
+        person.add(torso);
+        pivot.add(person);
+      },
+      (error: unknown) => {
+        console.warn(`The ${id} model did not load; keeping the capsule.`, error);
       },
     );
   }

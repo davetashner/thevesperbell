@@ -18,5 +18,5 @@
     "greed": 0.2
   },
   "behaviour": { "profile": "watchman" },
-  "presentation": { "mesh": "placeholder-capsule", "sfx": "placeholder" }
+  "presentation": { "mesh": "npc-watchman", "sfx": "placeholder" }
 }

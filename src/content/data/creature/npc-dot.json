@@ -28,7 +28,7 @@
     "profile": "shopkeeper"
   },
   "presentation": {
-    "mesh": "placeholder-capsule",
+    "mesh": "npc-dot",
     "sfx": "placeholder"
   }
 }

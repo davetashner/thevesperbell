@@ -18,5 +18,5 @@
     "greed": 0.4
   },
   "behaviour": { "profile": "shopkeeper" },
-  "presentation": { "mesh": "placeholder-capsule", "sfx": "placeholder" }
+  "presentation": { "mesh": "npc-ottilie", "sfx": "placeholder" }
 }
