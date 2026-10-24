@@ -1,7 +1,6 @@
 # model-npc-{ottilie,dot,watchman,hollis,juniper,oswin}-01: the Briar Glen townsfolk's placeholder bodies
 
-**Status: placeholder.** None of the flats or turntables is owner-approved yet (the NPC approval bead filed
-with mw-ju8.34), and the Tripo half of the licence is unconfirmed (mw-uuk). Beads: mw-ju8.34 (Ottilie, Dot, watchmen), mw-ju8.37 (Hollis, Juniper, Oswin).
+**Status: owner-approved placeholder** (2026-10-24, "you're approved on all requests"): the flats (Ottilie's earlier, mw-ju8.8) and the six models, recorded under mw-ju8.36 (no approvals.json yet). Still `placeholder: yes` in CREDITS because the models are static and unanimated (miner precedent, mw-0i5). The Tripo half of the licence is confirmed (owner, 2026-10-24, mw-uuk). Beads: mw-ju8.34 (Ottilie, Dot, watchmen), mw-ju8.37 (Hollis, Juniper, Oswin).
 
 Six models cover all seven NPCs: Ottilie, Dot, Hollis, Juniper, Oswin, and the day and night watchmen (one shared
 `model-npc-watchman-01`).
@@ -50,7 +49,7 @@ crop checked by eye to hold exactly one figure before the job ran (2026-10-24, m
 - Weapons and tools (Juniper's bow, Oswin's hammer) are not modelled; hands are empty.
 - No LOD1/LOD2, no KTX2 (mw-e37.8).
 
-## Licence (checked 2026-10-03, mw-qov; open item mw-uuk)
+## Licence (checked 2026-10-03, mw-qov; Tripo terms confirmed by the owner 2026-10-24, mw-uuk)
 
 As for the Forgotten miner (`model-creature-forgotten-miner-01.md`): Higgsfield's Terms of Use bind us
-(§4.4, §8); Tripo's own terms are unconfirmed (mw-uuk). The CREDITS rows stay `placeholder: yes`.
+(§4.4, §8); Tripo's own terms are confirmed by the owner, 2026-10-24 (mw-uuk). The CREDITS rows stay `placeholder: yes`.

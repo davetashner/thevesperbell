@@ -21,7 +21,7 @@ licence is verified on the Higgsfield side only (see Licence). Replace before m3
   `pbr` false, `texture_quality` / `geometry_quality` standard, `quad` false, `auto_size` true.
 - Raw result: 9,456 triangles, one material, one 2048² JPEG base-colour texture, unrigged, facing +x, A-pose.
 
-## Licence (checked 2026-10-03, mw-qov; open item mw-uuk)
+## Licence (checked 2026-10-03, mw-qov; Tripo terms confirmed by the owner 2026-10-24, mw-uuk)
 
 The job ran on Higgsfield (Plus plan), so Higgsfield's terms are the ones that bind us.
 
@@ -35,12 +35,9 @@ The job ran on Higgsfield (Plus plan), so Higgsfield's terms are the ones that b
     its models; no uniqueness or originality warranty (§13.2). Nothing here stops us publishing the GLB.
   - §8: models supplied by a third party (here Tripo) come with that provider's acceptable-use policy.
   - §5.2(iv): do not use Outputs to train a machine-learning model. We do not.
-- **Tripo's own terms: not read.** tripo3d.ai/terms and its help pages return 403 to automated fetches.
-  Secondary sources say free-tier Tripo output is public and non-commercial and paid/API output is
-  commercial. Whether Higgsfield's access counts as a paid tier is not shown by any page we could read.
-  **Open: the owner opens https://www.tripo3d.ai/terms in a browser and confirms there is no clause
-  restricting a customer's use or redistribution of Outputs, or Claude re-checks once the Chrome
-  extension is connected.** Until then the CREDITS row stays `placeholder: yes`.
+- **Tripo's own terms: confirmed by the owner on 2026-10-24 (mw-uuk)** to allow our use of Tripo-generated
+  models (knight, miners, town NPCs, gear). Earlier checks could not read tripo3d.ai (403 to automated fetches).
+  The CREDITS row stays `placeholder: yes` for the other reason: the turntable and rig are not approved.
 
 ## Processing
 

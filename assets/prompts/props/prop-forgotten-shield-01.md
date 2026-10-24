@@ -1,6 +1,6 @@
 # prop-forgotten-shield-01: the Forgotten shield-bearer's shield, single-object flat
 
-**Status: candidates, awaiting owner approval** (mw-ju8.35). Two variants (a, b) were generated; **b (mostly grey iron plate, so it reads as metal, not the knight's wooden shield)** was sent to image-to-3D.
+**Status: owner-approved flat and model** (2026-10-24, "you're approved on all requests"), recorded under mw-ju8.35 (no approvals.json yet). Two variants (a, b) were generated; **b (mostly grey iron plate, so it reads as metal, not the knight's wooden shield)** was sent to image-to-3D.
 
 | Field | Value |
 |---|---|
@@ -25,4 +25,4 @@ PROP: an old battered iron-rimmed heater-shaped shield belonging to a long-dead 
 
 - [x] Preamble pasted verbatim (extracted from the bible, not retyped)
 - [x] Palette from the bible; no text, logos or gore; cold (never red) eye glow where eyes appear
-- [ ] Owner approval
+- [x] Owner approval (2026-10-24, "you're approved on all requests"), mw-ju8.35
