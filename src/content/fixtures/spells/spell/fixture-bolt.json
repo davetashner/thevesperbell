@@ -27,7 +27,7 @@
       "falloff": "linear"
     },
     { "op": "light", "intensity": 80, "radius": 6, "duration": 0, "attach": "delivery" },
-    { "op": "noise", "phase": "impact", "loudness": 15 }
+    { "op": "noise", "phase": "impact", "loudness": 70 }
   ],
   "tags": ["fire", "ranged"],
   "vfxCue": "vfx-spell-fire-fixture-bolt",

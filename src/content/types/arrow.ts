@@ -187,7 +187,7 @@ const payloadSchema = z
       strict({
         op: z.literal('noise'),
         loudness: metres.describe(
-          'NoiseEvent loudness at the impact point (mw-e03.25 scale; e05.11 uses 70).',
+          'NoiseEvent level at the impact point, dB at 1 m (e05.11 uses 70).',
         ),
         duration: seconds.default(0).describe('Seconds the sound lasts; 0 = one instant.'),
       }).describe('Makes a sound at the impact point that stealth and AI hear (e09).'),
