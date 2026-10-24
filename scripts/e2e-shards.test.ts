@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   assignShards,
+  averageDurations,
   durationsFromReport,
   fileIo,
   listShardSpecs,
@@ -108,6 +109,13 @@ describe('mw-e41.1 e2e shard planning', () => {
       ],
     };
     expect(durationsFromReport(report)).toEqual({ 'audio.spec.ts': 2, 'nested.spec.ts': 2.3 });
+  });
+
+  it('AC-2: averages a spec across the reports that contain it', () => {
+    expect(averageDurations([{ 'a.spec.ts': 10, 'b.spec.ts': 3 }, { 'a.spec.ts': 20 }])).toEqual({
+      'a.spec.ts': 15,
+      'b.spec.ts': 3,
+    });
   });
 
   it('tolerates a report with no suites', () => {

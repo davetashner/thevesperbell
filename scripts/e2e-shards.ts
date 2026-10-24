@@ -114,6 +114,26 @@ export function durationsFromReport(report: unknown, project = 'chromium'): Reco
   );
 }
 
+/**
+ * Averages several runs' per-spec seconds (each from durationsFromReport; one run's shard reports
+ * hold disjoint specs, so a spec appears at most once per run). A single noisy CI run then cannot
+ * skew the weights.
+ */
+export function averageDurations(runs: readonly Record<string, number>[]): Record<string, number> {
+  const sums = new Map<string, { total: number; count: number }>();
+  for (const run of runs) {
+    for (const [file, seconds] of Object.entries(run)) {
+      const entry = sums.get(file) ?? { total: 0, count: 0 };
+      sums.set(file, { total: entry.total + seconds, count: entry.count + 1 });
+    }
+  }
+  return Object.fromEntries(
+    [...sums.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([file, { total, count }]) => [file, Math.round((total / count) * 10) / 10]),
+  );
+}
+
 export interface ShardIo {
   e2eDir: string;
   shardsFile: string;
@@ -139,11 +159,11 @@ export const fileIo: ShardIo = {
   },
 };
 
-const USAGE = 'usage: e2e-shards-cli.ts files <shard> <count> | regenerate <report.json>';
+const USAGE = 'usage: e2e-shards-cli.ts files <shard> <count> | regenerate <report.json>...';
 
 /**
  * CLI logic (see e2e-shards-cli.ts): `files <shard> <count>` prints the spec paths for one chromium
- * shard (1-based); `regenerate <report.json>` rewrites e2e/shards.json from a Playwright JSON report.
+ * shard (1-based); `regenerate <report.json>...` rewrites e2e/shards.json from Playwright JSON reports (averaged).
  * Returns the process exit code.
  */
 export function main(args: readonly string[], io: ShardIo = fileIo): number {
@@ -167,7 +187,10 @@ export function main(args: readonly string[], io: ShardIo = fileIo): number {
     return 0;
   }
   if (command === 'regenerate' && first !== undefined) {
-    const durations = durationsFromReport(JSON.parse(io.readText(first)));
+    // One report per shard: merge reports of the same run, and pass several runs' worth to average.
+    // A spec's seconds are averaged over the reports that contain it.
+    const reports = args.slice(1).map((path) => durationsFromReport(JSON.parse(io.readText(path))));
+    const durations = averageDurations(reports);
     const body = {
       note: 'Seconds per spec file in the chromium project, from a Playwright JSON report. Regenerate with pnpm e2e:shards:regenerate <report.json>. Specs missing here get the median weight.',
       durations,

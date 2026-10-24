@@ -115,7 +115,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -132,7 +132,7 @@ jobs:
         run: pnpm exec playwright install-deps chromium
       - name: Run this shard's specs
         run: |
-          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 4)
+          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 5)
           # An empty list would make Playwright run every spec.
           if [ -z "$files" ]; then echo "Shard ${{ matrix.shard }} has no specs."; exit 0; fi
           pnpm e2e --project=chromium $files
