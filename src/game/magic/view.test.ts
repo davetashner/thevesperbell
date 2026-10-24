@@ -3,6 +3,7 @@ import {
   DAMAGE_COMPONENTS,
   HIT_VOLUME_COMPONENTS,
   DamageModel,
+  learnSpell,
   installStimuli,
   registerWorldProperties,
   SpellProjectileComponent,
@@ -31,6 +32,9 @@ function magicWorld(radius: number) {
     damage: new DamageModel(),
     collision: level,
     invulnerable: () => false,
+    learn: (w, a, s) => {
+      learnSpell(w, a, s);
+    },
   });
   return { world, magic };
 }

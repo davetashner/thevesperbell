@@ -1,11 +1,11 @@
-// The learn-spell command (mw-e06.15): the one way outside code teaches a caster a spell while
-// the sim runs. Books, scrolls and trainers (mw-ju8.17, E08) will issue the same command; until
-// then the debug console's `spell learn` does. Like every input it is plain JSON fed to
-// `World.step`, so a recording replays it on the same tick.
+// The learn-spell command (mw-e06.15): the one way outside code teaches a caster a spell while the
+// sim runs. The debug console's `spell learn` sends it; like every input it is plain JSON fed to
+// `World.step`, so a recording replays it on the same tick. What learning means (the known list, the
+// capability, the SpellLearned event) is `SpellLearning`'s (learning.ts); this system only calls the
+// `learn` it is given.
 
 import type { EntityId } from '../core/component';
 import type { System, World } from '../core/world';
-import { KnownSpellsComponent, learnSpell } from './components';
 import type { SpellPipeline } from './pipeline';
 
 /** The `learn-spell` input command: `caster` learns `spell` (a no-op for an unknown spell id). */
@@ -29,32 +29,28 @@ export function isLearnSpellCommand(input: unknown): input is LearnSpellCommand 
   );
 }
 
+/** Teaches `actor` `spell`; called inside a step, so `actor` must already have `magic.known`. */
+export type SpellLearner = (world: World<never>, actor: EntityId, spell: string) => void;
+
 /**
- * Makes `world` act on `learn-spell` commands. A spell `pipeline` does not know, and a caster that
- * is gone, are ignored (a stale command from a recording must not throw). Add it before the
- * casting system so a spell learned in a tick can be cast in the next. Call once at setup, outside
- * a step.
+ * Makes `world` act on `learn-spell` commands through `learn`. A spell `pipeline` does not know, and
+ * a caster that is gone, are ignored (a stale command from a recording must not throw). Call once at
+ * setup, outside a step.
  */
-export function installSpellLearning<TInput>(world: World<TInput>, pipeline: SpellPipeline): void {
+export function installSpellLearning<TInput>(
+  world: World<TInput>,
+  pipeline: SpellPipeline,
+  learn: SpellLearner,
+): void {
   const w: World<never> = world;
   const system: System<TInput> = {
     name: 'spell-learning',
     run: ({ inputs }) => {
-      // A caster with no spells yet gets its component added at the end of the tick (adds are
-      // deferred inside a step), so what several commands teach it in one tick is gathered first.
-      const first = new Map<EntityId, string[]>();
       for (const input of inputs) {
         if (!isLearnSpellCommand(input)) continue;
         if (pipeline.spells(input.spell) === undefined || !w.isAlive(input.caster)) continue;
-        if (w.has(input.caster, KnownSpellsComponent)) {
-          learnSpell(w, input.caster, input.spell);
-          continue;
-        }
-        const spells = first.get(input.caster) ?? [];
-        if (!spells.includes(input.spell)) spells.push(input.spell);
-        first.set(input.caster, spells);
+        learn(w, input.caster, input.spell);
       }
-      for (const [caster, spells] of first) w.add(caster, KnownSpellsComponent, { spells });
     },
   };
   world.addSystem(system);

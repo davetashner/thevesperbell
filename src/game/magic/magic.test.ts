@@ -7,8 +7,12 @@ import {
   actionFrame,
   actionVector,
   CastCancelled,
+  CastStarted,
   castStateOf,
+  addCapabilities,
   DamageModel,
+  KnownSpellsComponent,
+  SpellLearned,
   DAMAGE_COMPONENTS,
   healthOf,
   HIT_VOLUME_COMPONENTS,
@@ -32,7 +36,7 @@ import { makeSpell, projectileDelivery } from '@sim/magic/testing';
 import { spawnTrainingDummy } from '../combat/training-dummy';
 import type { AimRay } from './aim';
 import { SpellCaster, type SpellCommand } from './caster';
-import { givePlayerMana, installGameMagic } from './install';
+import { debugSpellLearner, givePlayerMagic, installGameMagic } from './install';
 import { attachSpellReadout } from './readout';
 
 type Input = ActionFrame | SpellCommand | ReturnType<typeof learnSpellCommand>;
@@ -91,12 +95,13 @@ function game(collision: CollisionWorld = floor, water?: (point: Vec3) => boolea
     damage: new DamageModel(),
     collision: floor,
     invulnerable: () => false,
+    learn: debugSpellLearner(content),
     ...(water !== undefined && { water }),
   });
   world.addSystem(stimulusSystem());
   const player = world.spawn();
   placeEntity(world, player, { x: 0, y: 0, z: 0 }, 0.4);
-  givePlayerMana(world, player, 100);
+  givePlayerMagic(world, player, 100);
   let alive = true;
   const lock: { target: EntityId | null } = { target: null };
   const caster = new SpellCaster({
@@ -172,6 +177,39 @@ describe('installed magic', () => {
     for (let i = 0; i < 5; i++) frame(hold()());
     expect(reasons).toEqual(['quenched']);
     expect(manaOf(world, player)?.current).toBe(100);
+  });
+
+  it('the console learner goes through SpellLearning: known, capability granted, event emitted', () => {
+    const { world, player, caster, learn } = game();
+    addCapabilities(world, player);
+    const learned: string[] = [];
+    world.events.on(SpellLearned, (e) => learned.push(e.spellId));
+    learn('fixture-bolt');
+    world.step([]);
+    expect(caster.learned()).toEqual(['fixture-bolt']);
+    expect(learned).toEqual(['fixture-bolt']);
+  });
+
+  it('a chosen spell that is no longer on the list falls back to the first learned', () => {
+    const { world, player, caster, learn } = game();
+    learn('fixture-bolt', 't-channel');
+    caster.select('t-channel');
+    world.set(player, KnownSpellsComponent, { spells: ['fixture-bolt'] });
+    expect(caster.selected).toBe('fixture-bolt');
+    givePlayerMagic(world, player, 50);
+    expect(caster.learned()).toEqual(['fixture-bolt']);
+  });
+
+  it('an entity with no spell list has learned nothing', () => {
+    const { world, magic } = game();
+    const stranger = new SpellCaster({
+      world,
+      caster: world.spawn(),
+      spells: magic.spells,
+      collision: floor,
+    });
+    expect(stranger.learned()).toEqual([]);
+    expect(stranger.selected).toBeUndefined();
   });
 
   it('gives the player a mana pool of the size asked', () => {
@@ -352,6 +390,13 @@ describe('the spell readout', () => {
       delivery: player,
       target: dummy,
       point: { x: 0, y: 0, z: 0 },
+    });
+    world.events.emit(CastStarted, {
+      tick: 0,
+      caster: player + 100,
+      spell: 'x',
+      phase: 'winding',
+      releaseTick: 1,
     });
     world.events.emit(SpellCast, {
       tick: 0,

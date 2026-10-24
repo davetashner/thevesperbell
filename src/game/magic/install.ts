@@ -12,7 +12,8 @@
 // else: what it can cast is what it has learned (`learn-spell`, from the console until books and
 // scrolls teach, mw-ju8.17).
 
-import type { SpellEntry } from '@content/index';
+import type { GameContent, SpellEntry } from '@content/index';
+import { createCapabilityRegistry } from '../capabilities';
 import {
   DEFAULT_MANA_PROFILE,
   giveMana,
@@ -20,6 +21,9 @@ import {
   installMana,
   installSpellEmission,
   installSpellLearning,
+  KnownSpellsComponent,
+  SpellLearning,
+  type SpellLearner,
   installSpellProjectiles,
   installSpells,
   installSpellVolumes,
@@ -45,6 +49,8 @@ export interface GameMagicOptions {
   readonly invulnerable: InvulnerabilityRule;
   /** Whether a point is under water (the scene's water volumes): flames are quenched there. */
   readonly water?: (point: Vec3) => boolean;
+  /** How the console's `learn-spell` teaches (see `debugSpellLearner`). */
+  readonly learn: SpellLearner;
 }
 
 /** What the game keeps of the installed magic. */
@@ -64,7 +70,7 @@ export function installGameMagic<TInput>(
   const byId = new Map(options.spells.map((spell) => [spell.id, spell] as const));
   const spells: SpellLookup = (id) => byId.get(id);
   const pipeline = installSpells(world, { spells, damage: options.damage });
-  installSpellLearning(world, pipeline);
+  installSpellLearning(world, pipeline, options.learn);
   installMana(world, pipeline);
   const casting = installCasting(world, pipeline);
   installSpellProjectiles(world, pipeline, {
@@ -77,7 +83,23 @@ export function installGameMagic<TInput>(
   return { pipeline, casting, spells, spellIds: [...byId.keys()].sort() };
 }
 
-/** Gives the player a mana pool of `max` points (the sorcerer's regen and delay). Outside a step. */
-export function givePlayerMana<TInput>(world: World<TInput>, player: EntityId, max: number): void {
+/**
+ * The debug console's way to teach a spell: `SpellLearning`, the one door every teacher uses (mw-e07.2),
+ * with no unlock rules (a cheat has no prerequisites), so the capability `spell.<id>` is granted too.
+ */
+export function debugSpellLearner(content: GameContent): SpellLearner {
+  const learning = new SpellLearning({ capabilities: createCapabilityRegistry(content) });
+  return (world, actor, spell) => {
+    learning.learn(world, actor, spell, 'debug');
+  };
+}
+
+/**
+ * Gives the player a mana pool of `max` points (the sorcerer's regen and delay) and an empty spell
+ * list, up front so a lesson or a command can add to it inside a step. Outside a step.
+ */
+export function givePlayerMagic<TInput>(world: World<TInput>, player: EntityId, max: number): void {
   giveMana(world, player, { ...DEFAULT_MANA_PROFILE, max });
+  if (!world.has(player, KnownSpellsComponent))
+    world.add(player, KnownSpellsComponent, { spells: [] });
 }

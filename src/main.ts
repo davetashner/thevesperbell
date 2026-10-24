@@ -114,7 +114,8 @@ import {
   attachSpellHud,
   attachSpellReadout,
   bindBolts,
-  givePlayerMana,
+  debugSpellLearner,
+  givePlayerMagic,
   installGameMagic,
   previewRadius,
   readBoltTransform,
@@ -731,6 +732,7 @@ function startRenderer(
           damage: combat.damage,
           collision: new RapierCollisionWorld(physics),
           invulnerable: invulnerabilityRule(combat.moves),
+          learn: debugSpellLearner(content),
           // Flames are put out in the scene's water (the volumes load with the scene, below).
           water: (point) => waterAt(sceneWater, point) !== undefined,
         });
@@ -1310,7 +1312,7 @@ function startRenderer(
       if (player !== undefined && magic !== undefined) {
         const hero = player.entity;
         const spellbook = magic;
-        givePlayerMana(world, hero, content.get('class', 'knight').stats.mana);
+        givePlayerMagic(world, hero, content.get('class', 'knight').stats.mana);
         const caster = new SpellCaster({
           world,
           caster: hero,

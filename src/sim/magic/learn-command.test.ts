@@ -1,57 +1,47 @@
 import { describe, expect, it } from 'vitest';
-import { knowsSpell } from './components';
-import { installSpellLearning, isLearnSpellCommand, learnSpellCommand } from './learn-command';
-import { makeSpell, spellWorld } from './testing';
-import type { CastCommand } from './pipeline';
 import type { World } from '../core/world';
-import type { LearnSpellCommand } from './learn-command';
+import { knowsSpell, learnSpell } from './components';
+import {
+  installSpellLearning,
+  isLearnSpellCommand,
+  learnSpellCommand,
+  type LearnSpellCommand,
+} from './learn-command';
+import type { CastCommand } from './pipeline';
+import { makeSpell, spellWorld } from './testing';
 
 type Input = CastCommand | LearnSpellCommand;
 
 describe('learn-spell command (mw-e06.15)', () => {
   const setup = () => {
-    const fixture = spellWorld([makeSpell('t-known')]);
+    const fixture = spellWorld([makeSpell('t-known'), makeSpell('t-other')]);
     const world = fixture.world as World<Input>;
-    installSpellLearning(world, fixture.pipeline);
-    return { world, caster: fixture.spawn() };
+    const taught: string[] = [];
+    installSpellLearning(world, fixture.pipeline, (w, actor, spell) => {
+      taught.push(spell);
+      learnSpell(w, actor, spell);
+    });
+    const caster = fixture.spawn();
+    learnSpell(world, caster, 't-other'); // the player's list exists up front
+    return { world, caster, taught };
   };
 
-  it('teaches the caster the spell on the tick the command runs', () => {
-    const { world, caster } = setup();
-    world.step([{ type: 'cast', caster, spell: 'nonsense' }, learnSpellCommand(caster, 't-known')]);
+  it('hands the learner each known spell on the tick the command runs', () => {
+    const { world, caster, taught } = setup();
+    world.step([learnSpellCommand(caster, 't-known'), learnSpellCommand(caster, 't-other')]);
+    expect(taught).toEqual(['t-known', 't-other']);
     expect(knowsSpell(world, caster, 't-known')).toBe(true);
   });
 
-  it('keeps every spell taught in the same tick to a caster who knew none', () => {
-    const fixture = spellWorld([makeSpell('t-a'), makeSpell('t-b')]);
-    const world = fixture.world as World<Input>;
-    installSpellLearning(world, fixture.pipeline);
-    const caster = fixture.spawn();
+  it('ignores a spell the pipeline does not know, a caster that is gone, and other inputs', () => {
+    const { world, caster, taught } = setup();
     world.step([
-      learnSpellCommand(caster, 't-a'),
-      learnSpellCommand(caster, 't-b'),
-      learnSpellCommand(caster, 't-a'),
+      { type: 'cast', caster, spell: 'nonsense' },
+      learnSpellCommand(caster, 'nonsense'),
     ]);
-    expect(knowsSpell(world, caster, 't-a')).toBe(true);
-    expect(knowsSpell(world, caster, 't-b')).toBe(true);
-    world.step([learnSpellCommand(caster, 't-b')]);
-    expect(knowsSpell(world, caster, 't-a')).toBe(true);
-  });
-
-  it('is idempotent and also teaches a caster who already knows another spell', () => {
-    const { world, caster } = setup();
-    world.step([learnSpellCommand(caster, 't-known'), learnSpellCommand(caster, 't-known')]);
-    world.step([learnSpellCommand(caster, 't-known')]);
-    expect(knowsSpell(world, caster, 't-known')).toBe(true);
-  });
-
-  it('ignores a spell the pipeline does not know and a caster that is gone', () => {
-    const { world, caster } = setup();
-    world.step([learnSpellCommand(caster, 'nonsense')]);
-    expect(knowsSpell(world, caster, 'nonsense')).toBe(false);
     world.destroy(caster);
     world.step([learnSpellCommand(caster, 't-known')]);
-    expect(world.isAlive(caster)).toBe(false);
+    expect(taught).toEqual([]);
   });
 
   it('isLearnSpellCommand recognises only its own type', () => {

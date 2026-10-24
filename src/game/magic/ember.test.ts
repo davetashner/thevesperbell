@@ -11,6 +11,7 @@ import {
   addPropPhysics,
   DAMAGE_COMPONENTS,
   DamageModel,
+  learnSpell,
   fireIgnited,
   HIT_VOLUME_COMPONENTS,
   learnSpellCommand,
@@ -25,7 +26,7 @@ import {
 } from '@sim/index';
 import { installGameFire } from '../fire';
 import { installGamePhysics, propBodies } from '../physics-objects';
-import { installGameMagic, givePlayerMana } from './install';
+import { installGameMagic, givePlayerMagic } from './install';
 import { SpellCaster, type SpellCommand } from './caster';
 
 type Input = ActionFrame | SpellCommand | ReturnType<typeof learnSpellCommand>;
@@ -44,6 +45,9 @@ describe('Ember in the game world (mw-e06.15)', () => {
           damage: new DamageModel(),
           collision,
           invulnerable: () => false,
+          learn: (w, a, s) => {
+            learnSpell(w, a, s);
+          },
         });
       },
       afterStimuli: (sim) => {
@@ -71,7 +75,7 @@ describe('Ember in the game world (mw-e06.15)', () => {
     );
     const player = world.spawn();
     placeEntity(world, player, { x: 0, y: 0, z: 0 }, 0.4);
-    givePlayerMana(world, player, 20);
+    givePlayerMagic(world, player, 20);
     world.step([]);
     const pipelineSpells = (id: string) => content.all('spell').find((s) => s.id === id);
     const caster = new SpellCaster({ world, caster: player, spells: pipelineSpells, collision });

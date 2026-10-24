@@ -55,7 +55,12 @@ import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
 import { createGameLight, installGameLight, type GameLight } from '@game/light/index';
 import { installGameFire } from '@game/fire';
-import { givePlayerMana, installGameMagic, type GameMagic } from '@game/magic/index';
+import {
+  debugSpellLearner,
+  givePlayerMagic,
+  installGameMagic,
+  type GameMagic,
+} from '@game/magic/index';
 import { installGamePhysics, playerFocus } from '@game/physics-objects';
 import { setupTestbedPlayer, type TransformReader } from '@game/player/index';
 import { SceneLoader } from '@game/scene/index';
@@ -285,6 +290,7 @@ export function createGameWorld<TInput>(
           damage: combat.damage,
           collision: collisionWorld,
           invulnerable: invulnerabilityRule(combat.moves),
+          learn: debugSpellLearner(content),
         });
       },
       afterStimuli: (sim: World<never>) => {
@@ -340,7 +346,7 @@ export function createGameWorld<TInput>(
   }).entity;
   focus.entity = player;
   if (magic !== undefined) {
-    givePlayerMana(world, player, content.get('class', 'knight').stats.mana);
+    givePlayerMagic(world, player, content.get('class', 'knight').stats.mana);
   }
   const combatants = startTestbedCombat(world, combat, scene.layout.spawns, player, collision);
   // World items (mw-e17.7): the scene's items, taken with Interact, dropped and thrown.
