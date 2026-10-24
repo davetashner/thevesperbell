@@ -3,7 +3,7 @@
   "snapshotEncoding": 1,
   "scenario": "testbed-player",
   "buildSha": "local",
-  "contentHash": "ee31ecb142d212a7",
+  "contentHash": "6dc60bdf739471f7",
   "seed": 1,
   "stepHz": 60,
   "ticks": 784,
@@ -46,21 +46,21 @@
     [39,[{"kind":"input.actions","move":{"x":0,"y":1},"look":{"x":0,"y":0},"lookStick":{"x":0,"y":0},"jump":{"pressed":false,"held":false,"released":false},"sprint":{"pressed":false,"held":false,"released":false},"crouch":{"pressed":false,"held":false,"released":false},"slowWalk":{"pressed":false,"held":false,"released":false},"dodge":{"pressed":false,"held":false,"released":false},"interact":{"pressed":false,"held":false,"released":false},"lockOn":{"pressed":false,"held":false,"released":false},"cycleTarget":{"pressed":false,"held":false,"released":false},"primaryAttack":{"pressed":false,"held":false,"released":false},"secondaryAttack":{"pressed":false,"held":true,"released":false},"ability1":{"pressed":false,"held":false,"released":false},"ability2":{"pressed":false,"held":false,"released":false},"ability3":{"pressed":false,"held":false,"released":false},"ability4":{"pressed":false,"held":false,"released":false},"cast":{"pressed":false,"held":false,"released":false},"cancelCast":{"pressed":false,"held":false,"released":false},"inventory":{"pressed":false,"held":false,"released":false},"drop":{"pressed":false,"held":false,"released":false},"throw":{"pressed":false,"held":false,"released":false},"pause":{"pressed":false,"held":false,"released":false}}]]
   ],
   "checkpoints": [
-    {"tick":0,"hash":"f62a760c"},
-    {"tick":60,"hash":"07fc6957"},
-    {"tick":120,"hash":"8ba84cee"},
-    {"tick":180,"hash":"edae8ced"},
-    {"tick":240,"hash":"b831840d"},
-    {"tick":300,"hash":"adaabdd1"},
-    {"tick":360,"hash":"9fbc92fa"},
-    {"tick":420,"hash":"e77e8f9d"},
-    {"tick":480,"hash":"7b78a701"},
-    {"tick":540,"hash":"db7bcc77"},
-    {"tick":600,"hash":"ca31cec9"},
-    {"tick":660,"hash":"5217c05d"},
-    {"tick":720,"hash":"d6f5f6d0"},
-    {"tick":780,"hash":"e06ece1b"},
-    {"tick":784,"hash":"1029be82"}
+    {"tick":0,"hash":"f82007be"},
+    {"tick":60,"hash":"ec9d4a7d"},
+    {"tick":120,"hash":"77c2a66b"},
+    {"tick":180,"hash":"a22aff3d"},
+    {"tick":240,"hash":"0dca6926"},
+    {"tick":300,"hash":"a679c37e"},
+    {"tick":360,"hash":"d8b0b980"},
+    {"tick":420,"hash":"0a7fb803"},
+    {"tick":480,"hash":"c24bd8c4"},
+    {"tick":540,"hash":"313d6453"},
+    {"tick":600,"hash":"64c7dafe"},
+    {"tick":660,"hash":"923446a4"},
+    {"tick":720,"hash":"26a2373d"},
+    {"tick":780,"hash":"95f566e8"},
+    {"tick":784,"hash":"ae11800a"}
   ],
-  "finalHash": "1029be82"
+  "finalHash": "ae11800a"
 }

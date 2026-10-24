@@ -81,3 +81,24 @@ describe('material presets', () => {
     expect(readProperty(w, id, 'hp')).toBe(WORLD_PROPERTY_SPECS.hp.default);
   });
 });
+
+describe('thermal state of things that can burn (mw-akb)', () => {
+  it('AC-1: a flammable thing without a temperature is born at ambient; its own value wins', () => {
+    expect(applyMaterial(presets, { material: 'wood' }).temperature).toBe(20);
+    expect(applyMaterial(presets, { flammable: true }).temperature).toBe(20);
+    expect(applyMaterial(presets, { material: 'wood', temperature: 5 }).temperature).toBe(5);
+  });
+
+  it('AC-1: a burning thing without a temperature is born at flame temperature', () => {
+    const lit = applyMaterial(presets, { flammable: true, burning: true });
+    expect(lit.temperature).toBeGreaterThanOrEqual(300 + 1);
+    expect(applyMaterial(presets, { material: 'wood', burning: true }).temperature).toBeGreaterThan(
+      300,
+    );
+  });
+
+  it('AC-1: things that cannot burn stay sparse', () => {
+    expect(applyMaterial(presets, { material: 'ice' }).temperature).toBe(-5);
+    expect(applyMaterial(presets, { friction: 0.2 })).toEqual({ friction: 0.2 });
+  });
+});

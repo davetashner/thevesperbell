@@ -9,12 +9,7 @@
 
 import { burntMaterials, materialPresets, type GameContent } from '@content/index';
 import {
-  assignProperty,
   ElementRuleSet,
-  entitiesWithProperty,
-  flameTemperatureOf,
-  readProperty,
-  resolveFireConfig,
   elementFieldSystem,
   elementRulesSystem,
   fireRules,
@@ -38,23 +33,4 @@ export function installGameFire<TInput>(
       ),
     )
     .addSystem(elementFieldSystem());
-}
-
-/**
- * Brings every authored fire to flame temperature (a torch, a lantern or a crate a scene lights from
- * the start): with the fire rules installed, a burning thing cooler than its ignition point goes out
- * as `cold`, and scene data only says `burning: true`. Call once after a scene is loaded, between
- * steps; returns how many it warmed.
- */
-export function settleAuthoredFires(world: World<never>): number {
-  const config = resolveFireConfig();
-  let warmed = 0;
-  for (const entity of entitiesWithProperty(world, 'burning')) {
-    if (!readProperty(world, entity, 'burning')) continue;
-    const ignition = readProperty(world, entity, 'ignitionPoint');
-    if (readProperty(world, entity, 'temperature') >= ignition) continue;
-    assignProperty(world, entity, 'temperature', flameTemperatureOf(config, ignition));
-    warmed += 1;
-  }
-  return warmed;
 }

@@ -109,7 +109,7 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
-import { installGameFire, settleAuthoredFires } from '@game/fire';
+import { installGameFire } from '@game/fire';
 import {
   attachSpellHud,
   attachSpellReadout,
@@ -1846,8 +1846,6 @@ function startRenderer(
           root.dataset['playerClass'] = classId;
         }
       }
-      // Scenes light their torches with `burning: true`; the fire rules need them at flame temperature.
-      settleAuthoredFires(world);
       registerPersistence(world);
       // Creature repopulation (mw-ju8.29): opted-in skeletons killed long enough ago (days pass by
       // resting) stand at their spawns again, so their dead entries leave the stored deltas. Sleeping
