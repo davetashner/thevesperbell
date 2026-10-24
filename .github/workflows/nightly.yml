@@ -1,0 +1,78 @@
+name: Nightly
+
+# The nightly tier of the CI gates (mw-e41.5, docs/ci-gates.md): vitest bench, Firefox and WebKit audio
+# and the perf budget suite with its wall-clock load budgets, on main. A failure opens one GitHub issue
+# labelled `nightly-failure`, or comments on the one that is already open; a green run closes it.
+on:
+  schedule:
+    - cron: '43 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  gates:
+    uses: ./.github/workflows/slow-gates.yml
+    permissions:
+      contents: read
+      actions: read
+
+  report:
+    needs: gates
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/github-script@v8
+        env:
+          GATES_RESULT: ${{ needs.gates.result }}
+        with:
+          script: |
+            const label = 'nightly-failure';
+            const { owner, repo } = context.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const ref = process.env.GITHUB_REF_NAME;
+            const result = process.env.GATES_RESULT;
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', labels: label, per_page: 100,
+            });
+            const existing = open.find((issue) => !issue.pull_request);
+            if (result === 'success') {
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: existing.number,
+                  body: `Nightly gates are green again on \`${ref}\`: ${runUrl}`,
+                });
+                await github.rest.issues.update({
+                  owner, repo, issue_number: existing.number, state: 'closed', state_reason: 'completed',
+                });
+              }
+              return;
+            }
+            if (result === 'skipped') return;
+            const body = `Nightly gates ${result} on \`${ref}\`: ${runUrl}\n\n` +
+              'Gates: vitest bench, Firefox and WebKit audio, perf budget suite (docs/ci-gates.md).';
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+              return;
+            }
+            try {
+              await github.rest.issues.createLabel({
+                owner, repo, name: label, color: 'd73a4a',
+                description: 'A nightly gate failed on main',
+              });
+            } catch (error) {
+              if (error.status !== 422) throw error; // already exists
+            }
+            await github.rest.issues.create({
+              owner, repo, title: 'Nightly gates failing', labels: [label],
+              body: `${body}\n\nThis issue is updated by each failing nightly run and closed by the next green one.`,
+            });

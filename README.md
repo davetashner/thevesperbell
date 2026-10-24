@@ -187,11 +187,11 @@ selection, and confirming starts the run at the start scene's spawn point. Any o
 `docs/backlog-contract.md` §1 (mw-e32.1). The suite (`e2e/perf/`, its own `playwright.perf.config.ts`)
 has two modes:
 
-- **CI mode** (`pnpm perf`, the `perf-budget` CI job): initial transfer and build size ≤ 50 MB,
+- **CI mode** (`pnpm perf`; the `perf-budget` job runs nightly and on pushes to `main`, not on PRs, see `docs/ci-gates.md`): initial transfer and build size ≤ 50 MB,
   load-to-playable ≤ 10 s and warm reload ≤ 3 s at 50 Mbps (CDP throttling), JS heap ≤ 1.5 GB after
   5 minutes idle in the testbed. The runners have no GPU, so every frame is software-rendered and is
-  itself a 100–200 ms main-thread task. That gives frame time no absolute budget: CI compares it with
-  main's last report and only warns when p50 or p95 is more than 15 % slower. For the same reason,
+  itself a 100–200 ms main-thread task. That gives frame time no absolute budget: it is reported, and
+  `pnpm perf:compare` diffs it against main's last `perf-report` artifact (warns above 15 % slower). For the same reason,
   long tasks that are frame renders (they overlap a `requestAnimationFrame` callback) are only
   reported. The budget is on the other long tasks ≥ 200 ms (GC, parsing, timers), of which there must
   be none during play: the `perf-baseline` sampling window and the testbed's idle minutes. Long tasks
