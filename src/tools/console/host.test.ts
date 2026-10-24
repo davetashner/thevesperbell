@@ -49,6 +49,19 @@ describe('createGameHost', () => {
     expect(createGameHost(options(w, () => bare)).spawnPoint()).toEqual({ x: 0, y: 0, z: 0 });
   });
 
+  it('mw-e06.15: passes the spells and the selection hook through, or leaves them out', () => {
+    const w = world();
+    expect(createGameHost(options(w, () => undefined)).spells).toBeUndefined();
+    expect(createGameHost(options(w, () => undefined)).selectSpell).toBeUndefined();
+    const host = createGameHost({
+      ...options(w, () => undefined),
+      spells: ['ember'],
+      selectSpell: (id) => id === 'ember',
+    });
+    expect(host.spells).toEqual(['ember']);
+    expect(host.selectSpell?.('ember')).toBe(true);
+  });
+
   it('reads seed, liveness and cheats from the world', () => {
     const w = world();
     const hero = spawnCharacter(w, { x: 0, y: 0, z: 0 });

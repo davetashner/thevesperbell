@@ -67,7 +67,7 @@ describe('spell projectile views (mw-e06.15)', () => {
     });
     expect(bindBolts(world, sync, magic.spells, create)).toBe(1);
     expect(bindBolts(world, sync, magic.spells, create)).toBe(0);
-    expect(radii).toEqual([0.3]);
+    expect(radii).toEqual([0.3 * 1.5]);
     expect(readBoltTransform(world, bolt)?.position).toEqual({ x: 1, y: 2, z: 3 });
     expect(readBoltTransform(world, world.spawn())).toBeUndefined();
   });

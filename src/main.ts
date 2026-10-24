@@ -109,6 +109,7 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
+import { installGameFire, settleAuthoredFires } from '@game/fire';
 import {
   attachSpellHud,
   attachSpellReadout,
@@ -267,6 +268,9 @@ import {
   RapierCollisionWorld,
   RapierSightWorld,
   invulnerabilityRule,
+  waterAt,
+  waterVolumes,
+  type WaterVolume,
   creaturesInstalled,
   CreatureComponent,
   PlacementComponent,
@@ -686,6 +690,7 @@ function startRenderer(
     installSandboxRules(world, combat);
     const commands = new CommandQueue<GameCommand>();
     let magic: GameMagic | undefined;
+    let sceneWater: readonly WaterVolume[] = [];
     // A replayed input log carries its recorded cast commands; live aiming must not add its own.
     let replaying = false;
     let spellHud: SpellHudGlue | undefined;
@@ -717,12 +722,17 @@ function startRenderer(
       levelColliders: light.colliders,
       // Spells (mw-e06.15): the pipeline and its systems, before the stimulus system so a spell's
       // heat and light resolve in the tick it is cast.
+      afterStimuli: (sim) => {
+        installGameFire(sim, content);
+      },
       beforeStimuli: (sim) => {
         magic = installGameMagic(sim, {
           spells: content.all('spell'),
           damage: combat.damage,
           collision: new RapierCollisionWorld(physics),
           invulnerable: invulnerabilityRule(combat.moves),
+          // Flames are put out in the scene's water (the volumes load with the scene, below).
+          water: (point) => waterAt(sceneWater, point) !== undefined,
         });
       },
     });
@@ -1122,6 +1132,7 @@ function startRenderer(
       camera.position.set(...scene.camera.position);
       camera.lookAt(...scene.camera.target);
       watchedLights = lightSpawns(loaded);
+      sceneWater = waterVolumes(loaded.layout.regions);
       // The perf-baseline stress scene (mw-e32.1): blasts at its perf-agitator markers keep its props
       // moving; scenes without markers have no agitator.
       const agitator = sceneAgitator(loaded.layout.spawns, world.clock.hz);
@@ -1833,6 +1844,8 @@ function startRenderer(
           root.dataset['playerClass'] = classId;
         }
       }
+      // Scenes light their torches with `burning: true`; the fire rules need them at flame temperature.
+      settleAuthoredFires(world);
       registerPersistence(world);
       // Creature repopulation (mw-ju8.29): opted-in skeletons killed long enough ago (days pass by
       // resting) stand at their spawns again, so their dead entries leave the stored deltas. Sleeping

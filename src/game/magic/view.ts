@@ -25,8 +25,8 @@ export function readBoltTransform(view: SimView, entity: EntityId): Transform | 
   return flight === undefined ? undefined : { position: flight.position, rotation: IDENTITY };
 }
 
-/** The visual radius of a bolt: the delivery's collision radius, never smaller than a spark. */
-export const MIN_BOLT_RADIUS = 0.08;
+/** The visual radius of a bolt: 1.5 x the delivery's collision radius, never smaller than a spark. */
+export const MIN_BOLT_RADIUS = 0.15;
 
 /**
  * Binds a sphere to every spell projectile not bound yet (call after each sim step); `create` builds
@@ -44,7 +44,7 @@ export function bindBolts<TObject>(
     if (sync.has(entity)) return;
     const delivery = spells(flight.spell)?.delivery;
     const radius = delivery?.kind === 'projectile' ? delivery.radius : 0;
-    unbound.push({ entity, radius: Math.max(MIN_BOLT_RADIUS, radius) });
+    unbound.push({ entity, radius: Math.max(MIN_BOLT_RADIUS, radius * 1.5) });
   });
   for (const { entity, radius } of unbound) sync.bind(entity, create(entity, radius));
   return unbound.length;

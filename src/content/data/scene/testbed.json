@@ -241,7 +241,8 @@
     {
       "id": "loose-crate",
       "at": [-1, 0, -2],
-      "prop": "crate"
+      "prop": "crate",
+      "properties": { "temperature": 20 }
     },
     {
       "id": "room-lever",

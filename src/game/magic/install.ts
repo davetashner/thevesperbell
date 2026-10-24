@@ -30,6 +30,7 @@ import {
   type InvulnerabilityRule,
   type SpellLookup,
   type SpellPipeline,
+  type Vec3,
   type World,
 } from '@sim/index';
 
@@ -42,6 +43,8 @@ export interface GameMagicOptions {
   readonly collision: CollisionWorld;
   /** Who a bolt flies through this tick (dodge i-frames). */
   readonly invulnerable: InvulnerabilityRule;
+  /** Whether a point is under water (the scene's water volumes): flames are quenched there. */
+  readonly water?: (point: Vec3) => boolean;
 }
 
 /** What the game keeps of the installed magic. */
@@ -67,6 +70,7 @@ export function installGameMagic<TInput>(
   installSpellProjectiles(world, pipeline, {
     collision: options.collision,
     invulnerable: options.invulnerable,
+    ...(options.water !== undefined && { water: options.water }),
   });
   installSpellVolumes(world, pipeline);
   installSpellEmission(world, pipeline);

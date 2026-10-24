@@ -28,7 +28,7 @@ import {
   type EntityId,
   type Vec3,
 } from '@sim/index';
-import { makeSpell } from '@sim/magic/testing';
+import { makeSpell, projectileDelivery } from '@sim/magic/testing';
 import { spawnTrainingDummy } from '../combat/training-dummy';
 import type { AimRay } from './aim';
 import { SpellCaster, type SpellCommand } from './caster';
@@ -73,13 +73,16 @@ const channelSpell = makeSpell('t-channel', {
   channel: { interval: 0.25, manaPerSecond: 4, maxDuration: 6 },
 });
 const touchSpell = makeSpell('t-touch', { delivery: { kind: 'touch', reach: 2 } });
+const flame = makeSpell('t-flame', {
+  delivery: projectileDelivery({ quenchedByWater: true }),
+});
 const groundSpell = makeSpell('t-ground', {
   delivery: { kind: 'summonPoint', range: 4, lineOfSight: false },
 });
 
-function game(collision: CollisionWorld = floor) {
+function game(collision: CollisionWorld = floor, water?: (point: Vec3) => boolean) {
   const content = loadSpellFixtureContent();
-  const spells = [...content.all('spell'), channelSpell, groundSpell, touchSpell];
+  const spells = [...content.all('spell'), channelSpell, groundSpell, touchSpell, flame];
   const world = new World<Input>({ seed: 5 });
   installStimuli(registerWorldProperties(world));
   world.register(...DAMAGE_COMPONENTS, ...HIT_VOLUME_COMPONENTS);
@@ -88,6 +91,7 @@ function game(collision: CollisionWorld = floor) {
     damage: new DamageModel(),
     collision: floor,
     invulnerable: () => false,
+    ...(water !== undefined && { water }),
   });
   world.addSystem(stimulusSystem());
   const player = world.spawn();
@@ -157,6 +161,17 @@ describe('installed magic', () => {
     expect(caster.selected).toBe('t-channel');
     expect(caster.select('fixture-ray')).toBe(false);
     expect(caster.spell()?.id).toBe('t-channel');
+  });
+
+  it('a flame cast under water is quenched, nothing spent', () => {
+    const { world, player, learn, frame } = game(floor, () => true);
+    const reasons: string[] = [];
+    world.events.on(SpellFizzled, (f) => reasons.push(f.reason));
+    learn('t-flame');
+    frame(press('cast'));
+    for (let i = 0; i < 5; i++) frame(hold()());
+    expect(reasons).toEqual(['quenched']);
+    expect(manaOf(world, player)?.current).toBe(100);
   });
 
   it('gives the player a mana pool of the size asked', () => {

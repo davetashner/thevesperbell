@@ -45,6 +45,8 @@ export interface GamePhysicsOptions {
    * place: the spell pipeline (mw-e06.15), whose stimuli resolve in the tick they are cast.
    */
   readonly beforeStimuli?: (world: World<never>) => void;
+  /** Installs systems that read the tick's resolved stimuli: the element field and fire rules. */
+  readonly afterStimuli?: (world: World<never>) => void;
 }
 
 /**
@@ -62,6 +64,7 @@ export function installGamePhysics<T>(world: World<T>, options: GamePhysicsOptio
   });
   options.beforeStimuli?.(sim);
   sim.addSystem(stimulusSystem());
+  options.afterStimuli?.(sim);
   installBreakables(sim, options.breakables);
   if (onBudgetExceeded !== undefined) sim.events.on(physicsBudgetExceeded, onBudgetExceeded);
   return world;
