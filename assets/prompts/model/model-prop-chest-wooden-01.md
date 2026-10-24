@@ -1,6 +1,6 @@
 # model-prop-chest-wooden-01: the loot alcove's chest (placeholder model)
 
-**Status: placeholder.** Flat and turntable not owner-approved (mw-va0 approval bead), Tripo terms unconfirmed (mw-uuk).
+**Status: placeholder.** Flat and turntable not owner-approved (mw-va0 approval bead), Tripo terms confirmed by the owner 2026-10-24 (mw-uuk).
 
 ## Generation
 
@@ -21,9 +21,9 @@
 - Closed only: opening the chest has no animation yet (the lid does not lift).
 - It faces west whatever scene it is in; a chest elsewhere needs a yaw on its spawn.
 
-## Licence (checked 2026-10-03, mw-qov; open item mw-uuk)
+## Licence (checked 2026-10-03, mw-qov; Tripo terms confirmed by the owner 2026-10-24, mw-uuk)
 
 The job ran on Higgsfield (Plus plan), so Higgsfield's Terms of Use bind us (§4.4: the user owns Outputs and
 may use and sublicense them commercially; §8: the third-party provider's policy applies). Tripo's own terms
-are unread (tripo3d.ai returns 403 to automated fetches); the owner confirms them under mw-uuk. See
+were confirmed by the owner on 2026-10-24 (mw-uuk) to allow our use of Tripo-generated models. See
 `assets/prompts/model/model-char-knight-01.md` for the full note. The CREDITS row stays `placeholder: yes`.

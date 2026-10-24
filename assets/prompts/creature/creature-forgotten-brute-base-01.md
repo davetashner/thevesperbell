@@ -1,6 +1,6 @@
 # creature-forgotten-brute-base-01: the Forgotten brute, unarmed A-pose flat
 
-**Status: candidates, awaiting owner approval** (mw-ju8.35). Two variants (a, b) were generated; **b (a cleaner, bigger skull and plainer armour; a hides the skull between huge pauldrons)** was sent to image-to-3D.
+**Status: owner-approved flat and model** (2026-10-24, "you're approved on all requests"), recorded under mw-ju8.35 (no approvals.json yet). Two variants (a, b) were generated; **b (a cleaner, bigger skull and plainer armour; a hides the skull between huge pauldrons)** was sent to image-to-3D.
 
 | Field | Value |
 |---|---|
@@ -25,4 +25,4 @@ CREATURE: a brute-Forgotten, a hulking skeleton of a giant man who walked into t
 
 - [x] Preamble pasted verbatim (extracted from the bible, not retyped)
 - [x] Palette from the bible; no text, logos or gore; cold (never red) eye glow where eyes appear
-- [ ] Owner approval
+- [x] Owner approval (2026-10-24, "you're approved on all requests"), mw-ju8.35

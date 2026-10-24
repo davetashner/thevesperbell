@@ -1,6 +1,6 @@
 # prop-brute-maul-01: the Forgotten brute's two-handed maul, single-object flat
 
-**Status: candidates, awaiting owner approval** (mw-ju8.35). Two variants (a, b) were generated; **b (a plain blocky head with a cleaner silhouette)** was sent to image-to-3D.
+**Status: owner-approved flat and model** (2026-10-24, "you're approved on all requests"), recorded under mw-ju8.35 (no approvals.json yet). Two variants (a, b) were generated; **b (a plain blocky head with a cleaner silhouette)** was sent to image-to-3D.
 
 | Field | Value |
 |---|---|
@@ -25,4 +25,4 @@ PROP: a two-handed iron-banded war maul belonging to a long-dead giant of the Fo
 
 - [x] Preamble pasted verbatim (extracted from the bible, not retyped)
 - [x] Palette from the bible; no text, logos or gore; cold (never red) eye glow where eyes appear
-- [ ] Owner approval
+- [x] Owner approval (2026-10-24, "you're approved on all requests"), mw-ju8.35

@@ -1,6 +1,6 @@
 # char-dot-farrow-base-01: turnaround reference for Odette "Dot" Farrow, the innkeeper. Source for the placeholder town model.
 
-**Status: candidates, awaiting owner approval** (the NPC art approval bead filed with mw-ju8.34). Two variants
+**Status: owner-approved flat** (2026-10-24, "you're approved on all requests"), recorded under mw-ju8.36 (no approvals.json yet). Two variants
 (a, b) were generated; variant **b** was modelled (`model-npc-dot-01`, see
 `assets/prompts/model/model-npc-bodies-01.md`).
 

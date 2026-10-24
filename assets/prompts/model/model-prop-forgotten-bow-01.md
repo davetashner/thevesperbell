@@ -1,7 +1,6 @@
 # model-prop-forgotten-bow-01: the archer's bow (placeholder model)
 
-**Status: placeholder.** The flat (`prop-forgotten-bow-01 variant a`) and the turntable are not owner-approved (mw-ju8.35), and the
-Tripo half of the licence is unconfirmed (mw-uuk). Animation clips for the Forgotten variants stay in mw-ju8.23, mw-ju8.24 and mw-ju8.25.
+**Status: owner-approved placeholder** (2026-10-24, "you're approved on all requests"): the flat (`prop-forgotten-bow-01 variant a`) and the model, recorded under mw-ju8.35 (no approvals.json yet). Still `placeholder: yes` in CREDITS because the model is unanimated (miner precedent, mw-0i5). The Tripo half of the licence is confirmed (owner, 2026-10-24, mw-uuk). Animation clips for the Forgotten variants stay in mw-ju8.23, mw-ju8.24 and mw-ju8.25.
 
 ## Generation
 
@@ -20,9 +19,9 @@ Tripo half of the licence is unconfirmed (mw-uuk). Animation clips for the Forgo
 
 - Static rigid mesh; no LOD1/LOD2, no KTX2 (mw-e37.8). Placement is by eye against the rig's idle pose.
 
-## Licence (checked 2026-10-03, mw-qov; open item mw-uuk)
+## Licence (checked 2026-10-03, mw-qov; Tripo terms confirmed by the owner 2026-10-24, mw-uuk)
 
 The jobs ran on Higgsfield (Plus plan), so Higgsfield's Terms of Use bind us (§4.4: the user owns Outputs and
 may use and sublicense them commercially; §8: the third-party provider's policy applies). Tripo's own terms
-are unread (tripo3d.ai returns 403 to automated fetches); the owner confirms them under mw-uuk. See
+were confirmed by the owner on 2026-10-24 (mw-uuk) to allow our use of Tripo-generated models. See
 `assets/prompts/model/model-char-knight-01.md` for the full note. The CREDITS row stays `placeholder: yes`.

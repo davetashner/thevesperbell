@@ -1,6 +1,6 @@
 # char-watchman-base-01: turnaround reference for a Watch guardsman (day and night). Source for the placeholder town model.
 
-**Status: candidates, awaiting owner approval** (the NPC art approval bead filed with mw-ju8.34). Two variants
+**Status: owner-approved flat** (2026-10-24, "you're approved on all requests"), recorded under mw-ju8.36 (no approvals.json yet). Two variants
 (a, b) were generated; variant **a** was modelled (`model-npc-watchman-01`, see
 `assets/prompts/model/model-npc-bodies-01.md`).
 
