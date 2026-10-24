@@ -267,6 +267,7 @@ export class ShopViews {
       unitPrice: service.price,
       specialty: false,
       stolen: false,
+      ...(service.kind === 'train' && { verb: 'Learn' }),
       breakdown: [
         `Fixed price ${crownsText(service.price)}`,
         ...(service.teaches === undefined

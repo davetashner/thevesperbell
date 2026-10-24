@@ -80,6 +80,8 @@ export interface ShopRowModel {
   readonly refusal?: string;
   /** The tooltip's price steps, one per line. */
   readonly breakdown: readonly string[];
+  /** The button's verb when it is not the tab's (a lesson says "Learn", mw-ju8.38). */
+  readonly verb?: string;
   /** How it compares with what the player has equipped, when it is equipment. */
   readonly comparison?: string;
 }
@@ -147,7 +149,7 @@ const VERB: Readonly<Record<ShopDealTab, string>> = Object.freeze({
 export function dealLabel(tab: ShopDealTab, row: ShopRowModel, count: number): string {
   const units = count > 1 ? ` ×${String(count)}` : '';
   const price = row.unitPrice === undefined ? '' : `, ${crownsText(row.unitPrice * count)}`;
-  return `${VERB[tab]} ${row.name}${units}${price}`;
+  return `${row.verb ?? VERB[tab]} ${row.name}${units}${price}`;
 }
 
 /** Opens the shop screen on `ui`. */
@@ -246,9 +248,9 @@ export function openShopWindow(ui: UiRoot, options: ShopWindowOptions): ShopWind
       return;
     }
     void confirmDialog(ui, {
-      title: `${VERB[tab]} ${row.name}?`,
+      title: `${row.verb ?? VERB[tab]} ${row.name}?`,
       body: `${dealLabel(tab, row, count)}. You have ${crownsText(model.crowns)}.`,
-      confirmLabel: VERB[tab],
+      confirmLabel: row.verb ?? VERB[tab],
       cancelLabel: 'Not now',
       pausesSim: true,
     }).then((yes) => {

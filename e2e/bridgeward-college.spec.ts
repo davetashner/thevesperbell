@@ -95,7 +95,7 @@ for (const table of TABLES) {
       merchant: table.merchant,
     });
     await page.locator('[data-screen="shop"] [data-tab="services"]').dispatchEvent('click');
-    const rows = page.locator('[data-screen="shop"] [aria-label^="Book "]');
+    const rows = page.locator('[data-screen="shop"] [aria-label^="Learn "]');
     await expect(rows.first()).toBeVisible();
     const labels = await rows.evaluateAll((els) =>
       els.map((e) => e.getAttribute('aria-label') ?? ''),
@@ -120,7 +120,7 @@ test('paying Sergeant Garrick for Shoulder Barge takes 100 crowns and teaches it
   await expect(page.locator('#app')).toHaveAttribute('data-shop', /"open":true/);
   const before = (await data<{ crowns: number }>(page, 'shop'))?.crowns ?? 0;
   await page.locator('[data-screen="shop"] [data-tab="services"]').dispatchEvent('click');
-  await page.locator('[data-screen="shop"] [aria-label^="Book Shoulder Barge"]').first().focus();
+  await page.locator('[data-screen="shop"] [aria-label^="Learn Shoulder Barge"]').first().focus();
   await page.keyboard.press('Enter');
   await expect.poll(() => data<string[]>(page, 'learned')).toEqual(['technique.shoulder-barge']);
   await expect
