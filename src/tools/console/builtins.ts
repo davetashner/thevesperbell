@@ -334,10 +334,10 @@ export function registerBuiltins(registry: CommandRegistry<ConsoleHost>): void {
         if (match === null) throw new RangeError(`set needs <day> <HH:MM>, got "${second ?? ''}"`);
         const minute = Number(match[1]) * 60 + Number(match[2]);
         host.submit(timeSetCommand(Number(first), minute));
-        return `time set to day ${first} ${second ?? ''}`;
+        return `time set to day ${first} ${match[0]}`;
       } catch (error) {
-        if (error instanceof RangeError) throw new ConsoleError([error.message]);
-        throw error;
+        // Only RangeErrors from the command builders and the parsing above reach here.
+        throw new ConsoleError([(error as Error).message]);
       }
     },
   });
