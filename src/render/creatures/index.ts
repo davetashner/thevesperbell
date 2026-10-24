@@ -103,7 +103,7 @@ export function createCreatureProxy({
     pivot.add(part);
   }
   if (mesh === CAPSULE_BONES_MESH) {
-    void loadForgottenMiner(variant).then(
+    void loadForgottenMiner(variant, id).then(
       (assets) => {
         // The model takes the capsule's place; its body is the one the telegraph glow finds.
         for (const part of parts) part.visible = false;
@@ -131,12 +131,16 @@ export function createCreatureProxy({
         skeleton.castShadow = true;
         skeleton.receiveShadow = true;
         model.add(skeleton);
-        if (assets.pick !== undefined) {
-          const pick = new Mesh(assets.pick.geometry, assets.pick.material);
-          pick.name = 'pick';
-          pick.castShadow = true;
-          pick.receiveShadow = true;
-          model.add(pick);
+        for (const [held, name] of [
+          [assets.pick, 'pick'],
+          [assets.offhand, 'offhand'],
+        ] as const) {
+          if (held === undefined) continue;
+          const prop = new Mesh(held.geometry, held.material);
+          prop.name = name;
+          prop.castShadow = true;
+          prop.receiveShadow = true;
+          model.add(prop);
         }
         pivot.add(model);
       },

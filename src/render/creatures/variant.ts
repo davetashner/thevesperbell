@@ -74,3 +74,19 @@ export function rightHandPoint(
   }
   return sum.divideScalar(count).add(new Vector3(inset, 0, 0));
 }
+
+/**
+ * Where a miner's left hand is, in its own space: `rightHandPoint` on the mirror image of the mesh
+ * (x → −x), mirrored back, so it is the mean of the outermost left-side vertices in the same band.
+ */
+export function leftHandPoint(
+  positions: ArrayLike<number>,
+  height: number,
+  options?: { reach?: number; inset?: number },
+): Vector3 | undefined {
+  const mirrored = new Float32Array(positions.length);
+  for (let i = 0; i < positions.length; i++)
+    mirrored[i] = i % 3 === 0 ? -(positions[i] ?? 0) : (positions[i] ?? 0);
+  const hand = rightHandPoint(mirrored, height, options);
+  return hand === undefined ? undefined : new Vector3(-hand.x, hand.y, hand.z);
+}

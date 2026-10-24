@@ -18,6 +18,9 @@ export const RIG_HEIGHT = 1.8;
 /** The rig bone the pick is fixed to. */
 export const PICK_BONE = 'sword';
 
+/** The rig bone the bow and the shield are fixed to (the left forearm). */
+export const OFFHAND_BONE = 'forearm-l';
+
 /** Where `bone` rests in rig space: its offsets summed up its parents. */
 export function boneRest(rig: Rig, bone: string): Vector3 {
   const at = new Vector3();
@@ -46,12 +49,16 @@ export function minerRigAssets(rig: Rig, assets: ForgottenAssets): KnightAssets 
   body.computeBoundingBox();
   body.computeBoundingSphere();
   const props: KnightAssets['props'][number][] = [];
-  if (assets.pick !== undefined) {
-    const pick = assets.pick.geometry.clone();
-    pick.applyMatrix4(toRig);
-    const rest = boneRest(rig, PICK_BONE);
-    pick.translate(-rest.x, -rest.y, -rest.z);
-    props.push({ geometry: pick, material: assets.pick.material, bone: PICK_BONE });
+  for (const [held, bone] of [
+    [assets.pick, PICK_BONE],
+    [assets.offhand, OFFHAND_BONE],
+  ] as const) {
+    if (held === undefined) continue;
+    const geometry = held.geometry.clone();
+    geometry.applyMatrix4(toRig);
+    const rest = boneRest(rig, bone);
+    geometry.translate(-rest.x, -rest.y, -rest.z);
+    props.push({ geometry, material: held.material, bone });
   }
   return { body: { geometry: body, material: assets.body.material.clone() }, props };
 }
