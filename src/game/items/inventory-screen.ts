@@ -26,12 +26,16 @@ import {
   inventoryOf,
   QUICK_SLOT_COUNT,
   quickSlotsOf,
+  SpellLearned,
+  StudyEnded,
+  StudyStarted,
   type Consumables,
   type EntityId,
   type EquipmentSlot,
   type InventoryAction,
   type InventoryActionCommand,
   type InventoryActionRefusal,
+  type StudyRules,
   type World,
 } from '@sim/index';
 import {
@@ -161,7 +165,7 @@ export function itemVerbs(item: ItemEntry, names: VerbNames): string[] {
     case 'book':
       verbs.push('Read');
       if (item.book.teaches.kind === 'spell') {
-        verbs.push(`Learn ${names.capability(`spell.${item.book.teaches.spell.id}`)}`);
+        verbs.push(`Study to learn ${names.capability(`spell.${item.book.teaches.spell.id}`)}`);
       } else if (item.book.teaches.kind === 'insight') {
         verbs.push(`Learn ${names.capability(item.book.teaches.capability)}`);
       }
@@ -201,6 +205,19 @@ const REFUSALS: Readonly<Partial<Record<InventoryActionRefusal, string>>> = Obje
   'not-assignable': 'Only things you can use go in a quick slot.',
   'not-equippable': 'That isn’t something you can equip.',
   'no-equipment': 'You can’t equip anything yet.',
+  class: 'The runes swim before your eyes.',
+  prerequisite: 'You don’t yet know enough to follow it.',
+  unsafe: 'Not with danger so close.',
+});
+
+/** Why a study session broke off (`StudyEnded.reason`), as the status line says it. */
+export const STUDY_INTERRUPTIONS: Readonly<Record<string, string>> = Object.freeze({
+  threat: 'Something close by is stirring. You break off your studies.',
+  hurt: 'Pain breaks your concentration.',
+  moved: 'You lose your place when you move.',
+  'book-gone': 'The book is gone.',
+  prerequisite: 'The pages no longer make sense to you.',
+  'no-clock': 'You cannot settle to it.',
 });
 
 /** The status line for a refused action on `name`. */
@@ -254,6 +271,11 @@ export class InventoryViews {
     return item;
   }
 
+  /** A capability's display name (a spell's, for `spell.<id>`). */
+  capabilityName(id: string): string {
+    return this.#names.capability(id);
+  }
+
   /** A stolen item's owner, by name when content knows them. */
   owner(ownerId: string): string {
     return this.#owners.get(ownerId) ?? itemLabel(ownerId);
@@ -279,6 +301,7 @@ export class InventoryViews {
         (('equip' in item && item.equip !== undefined) || item.category === 'ammo');
       const actions: InventoryActionId[] = [];
       if (usable) actions.push('use', 'assign');
+      if (item.category === 'book' && item.book.teaches.kind === 'spell') actions.push('study');
       if (slot !== -1) actions.push('unassign');
       if (equippable) actions.push(equippedSlot === undefined ? 'equip' : 'unequip');
       if (!item.flags.noDrop) actions.push('drop', 'throw');
@@ -340,6 +363,7 @@ export class InventoryScreenController {
   #screen: Inventory | undefined;
   #shown = '';
   readonly #off: () => void;
+  readonly #offStudy: readonly (() => void)[];
 
   constructor(options: InventoryScreenOptions) {
     this.#options = options;
@@ -348,6 +372,39 @@ export class InventoryScreenController {
       const name = done.defId === null ? 'That' : itemName(options.views.item(done.defId));
       this.#screen?.say(refusalText(done.reason, name));
     });
+    // Studying runs in the sim while the screen stays open; its status line follows the session.
+    const events = options.world.events;
+    const book = (id: string): string => {
+      const item = options.views.item(id);
+      return item.category === 'book' ? item.book.title : itemName(item);
+    };
+    this.#offStudy = [
+      events.on(StudyStarted, (e) => {
+        if (e.actor !== options.player) return;
+        const name = book(e.book);
+        this.#screen?.say(
+          e.progress > 0
+            ? `You pick up ${name} where you left off.`
+            : `You settle down to study ${name}.`,
+        );
+      }),
+      events.on(StudyEnded, (e) => {
+        if (e.actor !== options.player || e.outcome === 'learned' || e.outcome === 'cancelled') {
+          return;
+        }
+        this.#screen?.say(
+          e.outcome === 'known'
+            ? `You already know what ${book(e.book)} teaches.`
+            : (STUDY_INTERRUPTIONS[e.reason ?? ''] ?? 'You stop studying.'),
+        );
+      }),
+      events.on(SpellLearned, (e) => {
+        if (e.actor !== options.player) return;
+        this.#screen?.say(
+          `You have learned ${options.views.capabilityName(`spell.${e.spellId}`)}.`,
+        );
+      }),
+    ];
   }
 
   /** The open screen, if any. */
@@ -404,6 +461,7 @@ export class InventoryScreenController {
   /** Stops listening and closes the screen. */
   dispose(): void {
     this.#off();
+    for (const off of this.#offStudy) off();
     this.close();
   }
 }
@@ -413,6 +471,8 @@ export interface InventoryUiOptions<T> {
   readonly world: World<T>;
   readonly content: InventoryContent;
   readonly consumables: Consumables;
+  /** The study rules (mw-e07.2): without them the Study action is refused. */
+  readonly study?: StudyRules;
   /** The player; without one only the action system is installed. */
   readonly player: EntityId | undefined;
   /** Queues a sim command for the next step. */
@@ -451,7 +511,14 @@ export function startInventoryUi<T>(options: InventoryUiOptions<T>): InventoryUi
   const { ui, content, consumables, player, submit, publish } = options;
   const world = options.world as unknown as World<never>;
   const equipment = new EquipmentRules(content.all('item'), content.all('class'));
-  installInventoryActions(options.world, new InventoryActions({ consumables, equipment }));
+  installInventoryActions(
+    options.world,
+    new InventoryActions({
+      consumables,
+      equipment,
+      ...(options.study !== undefined && { study: options.study }),
+    }),
+  );
   if (player === undefined) {
     return {
       controller: undefined,

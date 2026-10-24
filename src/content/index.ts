@@ -325,6 +325,7 @@ export {
   itemSchema,
   MAX_ARMOR_PIECE_KG,
   MAX_PENALTY_MULTIPLIER,
+  SCHOOL_LEGALITY,
   WEIGHT_CLASSES,
   type EquipSlot,
   type ItemCategory,

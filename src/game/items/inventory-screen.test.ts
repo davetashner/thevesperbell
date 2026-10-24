@@ -7,6 +7,15 @@ import type { ItemEntry } from '@content/index';
 import { loadItemFixtureContent } from '@content/test-fixtures';
 import {
   addEquipment,
+  addStudent,
+  DEFAULT_CLOCK_CONFIG,
+  installGameClock,
+  installStudy,
+  knowsSpell,
+  SpellLearned,
+  StudyEnded,
+  StudyStarted,
+  type StudyRules,
   CharacterController,
   DAMAGE_COMPONENTS,
   giveCombatant,
@@ -26,7 +35,9 @@ import {
 import { place, rectFromData } from '@ui/testing/layout';
 import { UiRoot, type UiPadLike } from '@ui/index';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { createCapabilityRegistry, createUnlockBook } from '../capabilities';
 import { installGamePhysics } from '../physics-objects';
+import { createStudyRules } from './book-study';
 import { prepareConsumables, prepareWorldItems, startConsumables, startWorldItems } from './index';
 import {
   CATEGORY_LABELS,
@@ -37,6 +48,7 @@ import {
   refusalText,
   requestAction,
   slotLabel,
+  STUDY_INTERRUPTIONS,
   startInventoryUi,
   type VerbNames,
 } from './inventory-screen';
@@ -76,7 +88,9 @@ beforeEach(() => {
 });
 
 /** A world with physics, world items, consumables and the inventory UI, and a player at the origin. */
-function game(options: { player?: boolean; closeKeys?: readonly string[] } = {}) {
+function game(
+  options: { player?: boolean; closeKeys?: readonly string[]; study?: StudyRules } = {},
+) {
   const physics = new RapierPhysics(RAPIER);
   const world = installGamePhysics(registerSceneComponents(new World<never>({ seed: 7, physics })));
   for (const type of [CharacterController, PlayerLook, ...DAMAGE_COMPONENTS]) {
@@ -100,6 +114,7 @@ function game(options: { player?: boolean; closeKeys?: readonly string[] } = {})
     world,
     content,
     consumables,
+    ...(options.study !== undefined && { study: options.study }),
     player,
     submit: (command) => queue.push(command),
     hudScale: 1.25,
@@ -205,7 +220,7 @@ describe('inventory view models', () => {
     expect(itemVerbs(def('standard-arrow'), NAMES)).toEqual(['Shoot from a bow']);
     expect(itemVerbs(def('fixture-primer'), NAMES)).toEqual([
       'Read',
-      'Learn cap:spell.fixture-bolt',
+      'Study to learn cap:spell.fixture-bolt',
     ]);
     const primer = def('fixture-primer');
     if (primer.category !== 'book') throw new Error('fixture-primer is a book');
@@ -435,6 +450,99 @@ describe('inventory view models', () => {
     inventoryUi.toggle();
     expect(ui.top?.id).toBe('other');
     expect(inventoryUi.controller?.open()).toBe(false);
+  });
+
+  it('Study on a spellbook runs a session in the sim, and the status line follows it (mw-e07.2)', () => {
+    const registry = createCapabilityRegistry(content, true);
+    const rules = createStudyRules(content, registry, createUnlockBook(content, registry));
+    const { give, world, player, ui, inventoryUi, step } = game({ study: rules });
+    const hero = must(player);
+    installGameClock(world, DEFAULT_CLOCK_CONFIG);
+    installStudy(world, rules);
+    addStudent(world, hero);
+    world.step([]);
+    give('fixture-primer');
+    give('testbed-closet-key');
+    const views = new InventoryViews(
+      content,
+      prepareConsumables(content, prepareWorldItems(content)),
+    );
+    const [key, primer] = views.model(world, hero).items;
+    expect(key?.actions).not.toContain('study');
+    expect(primer?.actions).toEqual(['study', 'drop', 'throw']);
+    inventoryUi.toggle();
+    ui.top?.element.querySelector<HTMLElement>(`[data-item="${String(primer?.id)}"]`)?.click();
+    ui.top?.element.querySelector<HTMLElement>('[data-action="study"]')?.click();
+    step();
+    const status = (): string | null | undefined =>
+      ui.top?.element.querySelector('[data-testid="inventory-status"]')?.textContent;
+    expect(status()).toBe('You settle down to study A Primer of Bolts.');
+    for (let i = 0; i < 200; i++) step();
+    expect(knowsSpell(world, hero, 'fixture-bolt')).toBe(true);
+    expect(status()).toMatch(/^You have learned /);
+    // Again: nothing to learn, and the screen says so.
+    ui.top?.element.querySelector<HTMLElement>(`[data-item="${String(primer?.id)}"]`)?.click();
+    ui.top?.element.querySelector<HTMLElement>('[data-action="study"]')?.click();
+    step();
+    step();
+    expect(status()).toBe('You already know what A Primer of Bolts teaches.');
+    // Someone else's study and learning is not the player's business.
+    const other = world.spawn();
+    world.events.emit(StudyStarted, { tick: 0, actor: other, book: 'fixture-primer', progress: 0 });
+    world.events.emit(StudyEnded, {
+      tick: 0,
+      actor: other,
+      book: 'fixture-primer',
+      outcome: 'known',
+      progress: 1,
+    });
+    world.events.emit(SpellLearned, { tick: 0, actor: other, spellId: 'x', source: 'y' });
+    step();
+    expect(status()).toBe('You already know what A Primer of Bolts teaches.');
+  });
+
+  it('says where a study session broke off, and words study refusals', () => {
+    const registry = createCapabilityRegistry(content, true);
+    const rules = createStudyRules(content, registry, createUnlockBook(content, registry));
+    const { give, world, player, ui, inventoryUi, step } = game({ study: rules });
+    const hero = must(player);
+    installGameClock(world, DEFAULT_CLOCK_CONFIG);
+    installStudy(world, rules);
+    addStudent(world, hero);
+    world.step([]);
+    give('fixture-primer');
+    inventoryUi.toggle();
+    const primer = inventoryOf(world, hero)?.items[0]?.instanceId;
+    const study = (): void => {
+      ui.top?.element.querySelector<HTMLElement>(`[data-item="${String(primer)}"]`)?.click();
+      ui.top?.element.querySelector<HTMLElement>('[data-action="study"]')?.click();
+      step();
+    };
+    const status = (): string | null | undefined =>
+      ui.top?.element.querySelector('[data-testid="inventory-status"]')?.textContent;
+    study();
+    for (let i = 0; i < 40; i++) step();
+    rules.hurt(world, hero);
+    step();
+    expect(status()).toBe(STUDY_INTERRUPTIONS['hurt']);
+    study();
+    expect(status()).toBe('You pick up A Primer of Bolts where you left off.');
+    rules.cancel(world, hero);
+    step();
+    expect(status()).toBe('You pick up A Primer of Bolts where you left off.'); // cancelling says nothing
+    // An unlisted reason falls back to a plain line.
+    world.events.emit(StudyEnded, {
+      tick: 0,
+      actor: hero,
+      book: 'fixture-primer',
+      outcome: 'interrupted',
+      progress: 0.1,
+    });
+    step();
+    expect(status()).toBe('You stop studying.');
+    expect(refusalText('class', 'It')).toBe('The runes swim before your eyes.');
+    expect(refusalText('prerequisite', 'It')).toMatch(/know enough/);
+    expect(refusalText('unsafe', 'It')).toMatch(/danger/);
   });
 
   it('closes the open screen on an Inventory key (keyboard input is not sampled while it is open)', () => {
