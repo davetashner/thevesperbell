@@ -21,7 +21,7 @@
 // What ADR-0004 (progression) fixes: equipment grants capabilities (`grants`), each a capability id
 // from the registry (src/content/data/capability/) that the player has while the item is equipped
 // (an `equipment:<id>` source) or, for tools on the belt, while it is carried. Books list what they
-// can teach. Every capability id an item names is checked against the registry at load
+// can teach (the book block, mw-e07.1, below). Every capability id an item names is checked against the registry at load
 // (`checkItems`). `use` effects are a minimal union until the shared effect vocabulary
 // (mw-e22 condition-effect DSL) lands and they migrate to it: restore a pool, raise one, learn, put
 // on a status, coat the weapon with world properties, or throw the item (it flies carrying its own
@@ -38,6 +38,7 @@ import { contentId, ref } from '../schema.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
 import { capabilityId, capabilityIds, localisationKey } from './capability.ts';
 import type { LockDef } from './lock.ts';
+import { SPELL_SCHOOLS, type SpellDefinition, type SpellSchool } from './spell.ts';
 
 /** Item categories (inventory tabs group them, mw-e17.10). */
 export const ITEM_CATEGORIES = [
@@ -306,6 +307,216 @@ const base = {
   flags: flagsSchema.optional(),
 };
 
+/** Spell schools by the Lantern Court's licence (story bible §3.3, mw-e07.1). */
+export const BOOK_LEGALITIES = ['licensed', 'restricted', 'forbidden'] as const;
+export type BookLegality = (typeof BOOK_LEGALITIES)[number];
+
+/**
+ * The legality of a school's books: licensed books carry the Lantern Court's pressed seal, a
+ * restricted school's sale needs a writ, a forbidden one's is burned at the port (story bible §3.3,
+ * the Wendmouth notice). A book may be stricter than its school (a confiscated, unbound or plot
+ * book) but never looser.
+ */
+export const SCHOOL_LEGALITY: Readonly<Record<SpellSchool, BookLegality>> = {
+  fire: 'licensed',
+  frost: 'licensed',
+  storm: 'licensed',
+  light: 'licensed',
+  nature: 'licensed',
+  alteration: 'licensed',
+  arcane: 'licensed',
+  illusion: 'restricted',
+  conjuration: 'restricted',
+  gravity: 'restricted',
+  shadow: 'restricted',
+  necromancy: 'forbidden',
+  time: 'forbidden',
+  somnomancy: 'forbidden',
+};
+
+/** What a book is: a bound tome, a loose note, or a scroll that casts its spell once when read. */
+export const BOOK_KINDS = ['tome', 'note', 'scroll'] as const;
+export type BookKind = (typeof BOOK_KINDS)[number];
+
+/**
+ * Languages books are written in (story bible §3.3: magic is language). `common` is read by
+ * everyone; the rest need the reader to have learned them (comprehension and translation: mw-e07.3
+ * and later, not modelled here). `hornfolk` is carved inscription, `vesperine` the monks' script,
+ * `dreamtongue` the language dreams are written in (Somnomancy).
+ */
+export const BOOK_LANGUAGES = ['common', 'vesperine', 'hornfolk', 'dreamtongue'] as const;
+export type BookLanguage = (typeof BOOK_LANGUAGES)[number];
+
+/** How scarce a book is (shop pools and loot weights read it: mw-e21, mw-e07.11). */
+export const BOOK_RARITIES = ['common', 'uncommon', 'rare', 'unique'] as const;
+export type BookRarity = (typeof BOOK_RARITIES)[number];
+
+/** Most pages one book may have. */
+export const MAX_BOOK_PAGES = 64;
+/** Longest in-game study time a book may ask, minutes (a day). */
+export const MAX_STUDY_MINUTES = 1440;
+
+/** UI asset id of a book's cover: `ui-book-cover-<bookId>`, the bookId being the item id. */
+export function bookCoverArtId(id: string): string {
+  return `ui-book-cover-${id}`;
+}
+
+const bookTeachesSchema = z
+  .discriminatedUnion('kind', [
+    z
+      .strictObject({
+        kind: z.literal('spell'),
+        spell: ref('spell').describe('The spell studying it teaches (spell content, mw-e06.1).'),
+      })
+      .describe(
+        'Teaches a spell. Several books may teach the same spell (multiple sources per spell). ' +
+          'The capability it grants is "spell.<spell id>" (ADR-0004). Room is left here for ' +
+          'comprehension-gated unstable first versions (mw-e07.3).',
+      ),
+    z
+      .strictObject({
+        kind: z.literal('insight'),
+        capability: capabilityId.describe('The non-spell capability it teaches (a technique).'),
+      })
+      .describe('Teaches a capability that is not a spell, e.g. a lockwork technique.'),
+    z
+      .strictObject({ kind: z.literal('lore') })
+      .describe('Teaches nothing: lore, quest text, flavour.'),
+  ])
+  .describe('What studying it teaches: a spell, an insight (capability) or nothing (lore only).');
+
+const bookConditionSchema = z
+  .discriminatedUnion('state', [
+    z.strictObject({ state: z.literal('intact') }).describe('Every page is there.'),
+    z
+      .strictObject({
+        state: z.literal('damaged'),
+        missingPages: z
+          .array(z.int().nonnegative())
+          .min(1)
+          .describe('Zero-based indices into `pages` that are torn out or unreadable.'),
+      })
+      .describe('Missing pages teach a damaged spell that misfires (story bible §3.3).'),
+  ])
+  .describe('Whether the book is whole.');
+
+const bookSchema = z
+  .strictObject({
+    title: z.string().min(1).max(MAX_ITEM_NAME_LENGTH).describe('Title on the cover and spine.'),
+    author: z.string().min(1).max(MAX_ITEM_NAME_LENGTH).describe('Who wrote it, in the world.'),
+    kind: z
+      .enum(BOOK_KINDS)
+      .default('tome')
+      .describe('Tome, note or scroll (a scroll casts once).'),
+    school: z
+      .enum(SPELL_SCHOOLS)
+      .optional()
+      .describe(
+        'School of magic it belongs to; absent for non-magical books. Sets the minimum legality.',
+      ),
+    teaches: bookTeachesSchema.default({ kind: 'lore' }),
+    casts: ref('spell')
+      .optional()
+      .describe(
+        'Scrolls only: the spell reading it casts once, free, for any class, spending the scroll ' +
+          '(owner decision 2026-10-24, mw-ju8.17). Optional until spell content (mw-e08) exists.',
+      ),
+    pages: z
+      .array(
+        z.strictObject({ textKey: localisationKey.describe('Localisation key of the page text.') }),
+      )
+      .min(1)
+      .max(MAX_BOOK_PAGES)
+      .describe('Page text blocks, in order.'),
+    language: z.enum(BOOK_LANGUAGES).default('common').describe('Language it is written in.'),
+    comprehensionDifficulty: z
+      .number()
+      .min(0)
+      .max(1)
+      .default(0)
+      .describe('How hard it is to understand, 0 (plain) to 1 (nearly opaque); mw-e07.3 reads it.'),
+    studyMinutes: z
+      .int()
+      .min(0)
+      .max(MAX_STUDY_MINUTES)
+      .default(0)
+      .describe('In-game minutes of study to learn from it; 0 for lore and scrolls.'),
+    condition: bookConditionSchema.default({ state: 'intact' }),
+    legality: z
+      .enum(BOOK_LEGALITIES)
+      .describe(
+        'Licensed, restricted or forbidden by the Lantern Court; never looser than its school.',
+      ),
+    rarity: z.enum(BOOK_RARITIES).describe('How scarce it is; unique exactly when flags.unique.'),
+    coverArtId: z
+      .string()
+      .optional()
+      .describe('Cover art asset id; absent = "ui-book-cover-<item id>", the only value allowed.'),
+    cursedWhispers: z
+      .boolean()
+      .default(false)
+      .describe('Whispers from the pages while it is carried or read.'),
+  })
+  .describe('Book data (mw-e07.1).');
+
+type BookBlock = z.output<typeof bookSchema>;
+
+const LEGALITY_RANK: Readonly<Record<BookLegality, number>> = {
+  licensed: 0,
+  restricted: 1,
+  forbidden: 2,
+};
+
+/** Rules across a book's fields (page indices, kind, legality, rarity). */
+function checkBook(item: ParsedItem, issue: (path: PropertyKey[], message: string) => void): void {
+  if (item.category !== 'book') return;
+  const book: BookBlock = item.book;
+  if (book.condition.state === 'damaged') {
+    const missing = book.condition.missingPages;
+    missing.forEach((page, i) => {
+      if (page >= book.pages.length) {
+        issue(
+          ['book', 'condition', 'missingPages', i],
+          `missing page ${String(page)} is past the book's ${String(book.pages.length)} pages`,
+        );
+      }
+    });
+    if (new Set(missing).size !== missing.length) {
+      issue(['book', 'condition', 'missingPages'], 'lists a missing page twice');
+    } else if (missing.length >= book.pages.length) {
+      issue(['book', 'condition', 'missingPages'], 'cannot be missing every page');
+    }
+  }
+  if (book.kind === 'scroll') {
+    if (book.pages.length !== 1) issue(['book', 'pages'], 'a scroll has exactly one page');
+    if (book.teaches.kind !== 'lore')
+      issue(['book', 'teaches'], 'a scroll casts, it does not teach');
+    if (book.condition.state !== 'intact')
+      issue(['book', 'condition'], 'a scroll cannot be damaged');
+  } else {
+    if (book.casts !== undefined) issue(['book', 'casts'], 'only a scroll casts a spell when read');
+    if (item.stackable) issue(['stackable'], 'only scrolls stack; a tome or note is one object');
+  }
+  if (book.teaches.kind === 'spell' && book.studyMinutes === 0) {
+    issue(['book', 'studyMinutes'], 'a book that teaches a spell needs studyMinutes above 0');
+  }
+  if (book.school !== undefined) {
+    const floor = SCHOOL_LEGALITY[book.school];
+    if (LEGALITY_RANK[book.legality] < LEGALITY_RANK[floor]) {
+      issue(
+        ['book', 'legality'],
+        `${book.legality} is looser than the ${book.school} school's ${floor} (story bible §3.3)`,
+      );
+    }
+  }
+  if (book.coverArtId !== undefined && book.coverArtId !== bookCoverArtId(item.id)) {
+    issue(['book', 'coverArtId'], `must be "${bookCoverArtId(item.id)}" (asset convention)`);
+  }
+  if ((item.flags?.unique === true) !== (book.rarity === 'unique')) {
+    issue(['book', 'rarity'], 'rarity is "unique" exactly when flags.unique is true');
+  }
+}
+
 const itemOptions = [
   z
     .strictObject({
@@ -358,17 +569,9 @@ const itemOptions = [
     .strictObject({
       ...base,
       category: z.literal('book'),
-      book: z
-        .strictObject({
-          textKey: localisationKey.describe('Localisation key of the readable text.'),
-          teaches: z
-            .array(capabilityId)
-            .default([])
-            .describe('Capabilities studying it can teach, as a learned book source (ADR-0004).'),
-        })
-        .describe('Book data.'),
+      book: bookSchema,
     })
-    .describe('A book, note or scroll the player reads.'),
+    .describe('A book, note or scroll the player reads (mw-e07.1).'),
   z
     .strictObject({
       ...base,
@@ -419,6 +622,7 @@ function checkItem(item: ParsedItem, ctx: z.core.$RefinementCtx<ParsedItem>): vo
   const issue = (path: PropertyKey[], message: string) => {
     ctx.addIssue({ code: 'custom', path, message: `${at}: ${message}` });
   };
+  checkBook(item, issue);
   const equip = 'equip' in item ? item.equip : undefined;
   if (item.stackable) {
     if (item.maxStack === undefined) issue(['maxStack'], 'a stackable item needs maxStack');
@@ -505,7 +709,9 @@ export function itemCapabilityUsages(item: ItemDef): { pointer: string; id: stri
       id: capability,
     })),
     ...(item.category === 'book'
-      ? item.book.teaches.map((id, i) => ({ pointer: `/book/teaches/${String(i)}`, id }))
+      ? item.book.teaches.kind === 'insight'
+        ? [{ pointer: '/book/teaches/capability', id: item.book.teaches.capability }]
+        : []
       : []),
     ...(item.use ?? []).flatMap((effect, i) =>
       effect.op === 'learn'
@@ -515,10 +721,17 @@ export function itemCapabilityUsages(item: ItemDef): { pointer: string; id: stri
   ];
 }
 
+/** Whether a book teaches `spellId`. */
+function teachesSpell(book: ItemOf<'book'>, spellId: string): boolean {
+  return book.book.teaches.kind === 'spell' && book.book.teaches.spell.id === spellId;
+}
+
 /**
  * The load check for items: every capability an item names is in the registry (AC-4), and every lock
  * a key opens is declared lock content (mw-e03.18): each `key.opens` id is a lock, and a master key's
- * `opensTag` is carried by at least one lock.
+ * `opensTag` is carried by at least one lock. Books: a spell a book teaches or casts must share its
+ * school, and a spell's `bookId` must name a book that teaches it (mw-e07.1; the spell references
+ * themselves are checked by the loader).
  */
 export const checkItems: ContentCheck = (entries) => {
   const capabilities = capabilityIds(entries);
@@ -529,13 +742,52 @@ export const checkItems: ContentCheck = (entries) => {
     locks.add(value.id);
     for (const tag of (value as LockDef).tags) lockTags.add(tag);
   }
+  const spells = new Map<string, SpellDefinition>();
+  const books = new Map<string, ItemOf<'book'>>();
+  for (const { type, value } of entries) {
+    if (type === 'spell') spells.set(value.id, value as SpellDefinition);
+    if (type === 'item' && (value as ItemDef).category === 'book') {
+      books.set(value.id, value as ItemOf<'book'>);
+    }
+  }
   const issues: ContentIssue[] = [];
   for (const { type, file, value } of entries) {
+    if (type === 'spell') {
+      // A spell's bookId (mw-e06.1) must name a book that teaches it (mw-e07.1).
+      const spell = value as SpellDefinition;
+      const book = spell.bookId === undefined ? undefined : books.get(spell.bookId);
+      if (spell.bookId !== undefined && (book === undefined || !teachesSpell(book, spell.id))) {
+        issues.push({
+          file,
+          pointer: '/bookId',
+          message:
+            book === undefined
+              ? `spell:${spell.id} names bookId "${spell.bookId}", which is not a book item`
+              : `spell:${spell.id} names bookId "${spell.bookId}", which does not teach it`,
+        });
+      }
+      continue;
+    }
     if (type !== 'item') continue;
     const item = value as ItemDef;
     const report = (pointer: string, message: string) => {
       issues.push({ file, pointer, message: `item:${item.id} ${message}` });
     };
+    if (item.category === 'book') {
+      const spellId =
+        item.book.teaches.kind === 'spell' ? item.book.teaches.spell.id : item.book.casts?.id;
+      const spell = spellId === undefined ? undefined : spells.get(spellId);
+      if (
+        spell !== undefined &&
+        item.book.school !== undefined &&
+        spell.school !== item.book.school
+      ) {
+        report(
+          '/book/school',
+          `is ${item.book.school} but its spell "${spell.id}" is ${spell.school}`,
+        );
+      }
+    }
     for (const { pointer, id } of itemCapabilityUsages(item)) {
       if (!capabilities.has(id)) {
         report(

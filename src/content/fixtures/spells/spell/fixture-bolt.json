@@ -32,6 +32,5 @@
   "tags": ["fire", "ranged"],
   "vfxCue": "vfx-spell-fire-fixture-bolt",
   "sfxCue": "sfx-spell-fire-fixture-bolt-cast",
-  "bookId": "fixture-book-of-embers",
   "flags": { "tooUseful": false, "castWhileMoving": false }
 }

@@ -212,14 +212,36 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `ammo` | object | required | Ammunition data. |
 | `ammo.arrow` | ref → arrow | required | The arrow it fires as (mw-e05). |
 
-## 5. A book, note or scroll the player reads.
+## 5. A book, note or scroll the player reads (mw-e07.1).
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `category` | `"book"` | required |  |
-| `book` | object | required | Book data. |
-| `book.textKey` | string | required | Localisation key of the readable text. |
-| `book.teaches` | list of string | `[]` | Capabilities studying it can teach, as a learned book source (ADR-0004). |
+| `book` | object | required | Book data (mw-e07.1). |
+| `book.title` | string | required | Title on the cover and spine. |
+| `book.author` | string | required | Who wrote it, in the world. |
+| `book.kind` | `"tome"` \| `"note"` \| `"scroll"` | `"tome"` | Tome, note or scroll (a scroll casts once). |
+| `book.school` | `"fire"` \| `"frost"` \| `"storm"` \| `"arcane"` \| `"illusion"` \| `"alteration"` \| `"conjuration"` \| `"necromancy"` \| `"nature"` \| `"light"` \| `"shadow"` \| `"gravity"` \| `"time"` \| `"somnomancy"` | — | School of magic it belongs to; absent for non-magical books. Sets the minimum legality. |
+| `book.teaches` | object | — | What studying it teaches: a spell, an insight (capability) or nothing (lore only). |
+| `book.teaches.kind` | `"spell"` | required |  |
+| `book.teaches.spell` | ref → spell | required | The spell studying it teaches (spell content, mw-e06.1). |
+| `book.teaches.kind` | `"insight"` | required |  |
+| `book.teaches.capability` | string | required | The non-spell capability it teaches (a technique). |
+| `book.teaches.kind` | `"lore"` | required |  |
+| `book.casts` | ref → spell | — | Scrolls only: the spell reading it casts once, free, for any class, spending the scroll (owner decision 2026-10-24, mw-ju8.17). Optional until spell content (mw-e08) exists. |
+| `book.pages` | list of object (at least 1) | required | Page text blocks, in order. |
+| `book.pages[].textKey` | string | required | Localisation key of the page text. |
+| `book.language` | `"common"` \| `"vesperine"` \| `"hornfolk"` \| `"dreamtongue"` | `"common"` | Language it is written in. |
+| `book.comprehensionDifficulty` | number 0–1 | `0` | How hard it is to understand, 0 (plain) to 1 (nearly opaque); mw-e07.3 reads it. |
+| `book.studyMinutes` | integer 0–1440 | `0` | In-game minutes of study to learn from it; 0 for lore and scrolls. |
+| `book.condition` | object | `{"state":"intact"}` | Whether the book is whole. |
+| `book.condition.state` | `"intact"` | required |  |
+| `book.condition.state` | `"damaged"` | required |  |
+| `book.condition.missingPages` | list of integer ≥ 0 (at least 1) | required | Zero-based indices into `pages` that are torn out or unreadable. |
+| `book.legality` | `"licensed"` \| `"restricted"` \| `"forbidden"` | required | Licensed, restricted or forbidden by the Lantern Court; never looser than its school. |
+| `book.rarity` | `"common"` \| `"uncommon"` \| `"rare"` \| `"unique"` | required | How scarce it is; unique exactly when flags.unique. |
+| `book.coverArtId` | string | — | Cover art asset id; absent = "ui-book-cover-<item id>", the only value allowed. |
+| `book.cursedWhispers` | boolean | `false` | Whispers from the pages while it is carried or read. |
 
 ## 6. A key. Lives on the keyring (mw-e17.5).
 

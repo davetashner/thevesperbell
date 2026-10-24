@@ -123,13 +123,18 @@ export function itemFixtureSources(): ContentSource[] {
 }
 
 /**
- * The game's content and the fixture items (which name its moves, arrows, shields, materials and
- * capabilities), loaded and validated together. Throws a ContentLoadError listing every problem.
+ * The game's content, the fixture creatures and spells (which fixture books teach) and the fixture
+ * items (which name its moves, arrows, shields, materials and capabilities), loaded and validated together. Throws a ContentLoadError listing every problem.
  */
 export function loadItemFixtureContent(): GameContent {
   return loadContent(
     contentTypes,
-    [...gameContentSources(), ...itemFixtureSources()],
+    [
+      ...gameContentSources(),
+      ...fixtureContentSources(),
+      ...itemFixtureSources(),
+      ...spellFixtureSources(),
+    ],
     contentChecks,
   );
 }

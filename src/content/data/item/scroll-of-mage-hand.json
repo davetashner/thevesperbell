@@ -4,13 +4,22 @@
   "category": "book",
   "name": "Scroll of Mage Hand",
   "description": "A strip of vellum, one line of cramped script and a smell of cold hearths. Read it aloud and the hand is borrowed, once.",
-  "notes": "A scroll of Mage Hand (mw-ju8.4), spell.mage-hand. Intended to cast that spell once when read and be consumed. That read-and-cast path does not exist yet (no spell content or cast pipeline: mw-e06.2), so for now it is a stock item with no effect and teaches nothing; a follow-up bead wires it. Base value 50 sits in the economy scroll band (40-150).",
+  "notes": "A scroll of Mage Hand (mw-ju8.4), spell.mage-hand. Book kind scroll (mw-e07.1): reading it casts the spell once, free, for any class, and spends the scroll (owner decision 2026-10-24). That runtime is mw-ju8.17; `book.casts` is added with it, once spell content exists (mw-e08), because a spell reference to a missing spell fails the load. Base value 50 sits in the economy scroll band (40-150).",
   "icon": "icon-item-scroll-of-mage-hand-01",
   "value": 50,
   "stackable": true,
   "maxStack": 5,
   "book": {
-    "textKey": "book.scroll-of-mage-hand.text",
-    "teaches": []
+    "title": "Scroll of Mage Hand",
+    "author": "A. Pell",
+    "kind": "scroll",
+    "school": "arcane",
+    "pages": [
+      {
+        "textKey": "book.scroll-of-mage-hand.text"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
   }
 }

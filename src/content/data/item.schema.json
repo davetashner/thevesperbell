@@ -758,27 +758,244 @@
         "book": {
           "type": "object",
           "properties": {
-            "textKey": {
+            "title": {
               "type": "string",
-              "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
-              "description": "Localisation key of the readable text."
+              "minLength": 1,
+              "maxLength": 40,
+              "description": "Title on the cover and spine."
+            },
+            "author": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40,
+              "description": "Who wrote it, in the world."
+            },
+            "kind": {
+              "default": "tome",
+              "description": "Tome, note or scroll (a scroll casts once).",
+              "type": "string",
+              "enum": [
+                "tome",
+                "note",
+                "scroll"
+              ]
+            },
+            "school": {
+              "description": "School of magic it belongs to; absent for non-magical books. Sets the minimum legality.",
+              "type": "string",
+              "enum": [
+                "fire",
+                "frost",
+                "storm",
+                "arcane",
+                "illusion",
+                "alteration",
+                "conjuration",
+                "necromancy",
+                "nature",
+                "light",
+                "shadow",
+                "gravity",
+                "time",
+                "somnomancy"
+              ]
             },
             "teaches": {
-              "default": [],
-              "description": "Capabilities studying it can teach, as a learned book source (ADR-0004).",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "spell"
+                    },
+                    "spell": {
+                      "description": "The spell studying it teaches (spell content, mw-e06.1).",
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "x-contentRef": "spell"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "spell"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Teaches a spell. Several books may teach the same spell (multiple sources per spell). The capability it grants is \"spell.<spell id>\" (ADR-0004). Room is left here for comprehension-gated unstable first versions (mw-e07.3)."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "insight"
+                    },
+                    "capability": {
+                      "type": "string",
+                      "pattern": "^(verb|spell|arrow|tool|trick|technique|sense)\\.[a-z0-9.-]+$",
+                      "description": "The non-spell capability it teaches (a technique)."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "capability"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Teaches a capability that is not a spell, e.g. a lockwork technique."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "lore"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Teaches nothing: lore, quest text, flavour."
+                }
+              ],
+              "description": "What studying it teaches: a spell, an insight (capability) or nothing (lore only)."
+            },
+            "casts": {
+              "description": "Scrolls only: the spell reading it casts once, free, for any class, spending the scroll (owner decision 2026-10-24, mw-ju8.17). Optional until spell content (mw-e08) exists.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell"
+            },
+            "pages": {
+              "minItems": 1,
+              "maxItems": 64,
               "type": "array",
               "items": {
-                "type": "string",
-                "pattern": "^(verb|spell|arrow|tool|trick|technique|sense)\\.[a-z0-9.-]+$",
-                "description": "Capability id declared in src/content/data/capability/, e.g. \"spell.mage-hand\"."
-              }
+                "type": "object",
+                "properties": {
+                  "textKey": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+                    "description": "Localisation key of the page text."
+                  }
+                },
+                "required": [
+                  "textKey"
+                ],
+                "additionalProperties": false
+              },
+              "description": "Page text blocks, in order."
+            },
+            "language": {
+              "default": "common",
+              "description": "Language it is written in.",
+              "type": "string",
+              "enum": [
+                "common",
+                "vesperine",
+                "hornfolk",
+                "dreamtongue"
+              ]
+            },
+            "comprehensionDifficulty": {
+              "default": 0,
+              "description": "How hard it is to understand, 0 (plain) to 1 (nearly opaque); mw-e07.3 reads it.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "studyMinutes": {
+              "default": 0,
+              "description": "In-game minutes of study to learn from it; 0 for lore and scrolls.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1440
+            },
+            "condition": {
+              "default": {
+                "state": "intact"
+              },
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "const": "intact"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Every page is there."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "const": "damaged"
+                    },
+                    "missingPages": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "description": "Zero-based indices into `pages` that are torn out or unreadable."
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "missingPages"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Missing pages teach a damaged spell that misfires (story bible §3.3)."
+                }
+              ],
+              "description": "Whether the book is whole."
+            },
+            "legality": {
+              "type": "string",
+              "enum": [
+                "licensed",
+                "restricted",
+                "forbidden"
+              ],
+              "description": "Licensed, restricted or forbidden by the Lantern Court; never looser than its school."
+            },
+            "rarity": {
+              "type": "string",
+              "enum": [
+                "common",
+                "uncommon",
+                "rare",
+                "unique"
+              ],
+              "description": "How scarce it is; unique exactly when flags.unique."
+            },
+            "coverArtId": {
+              "description": "Cover art asset id; absent = \"ui-book-cover-<item id>\", the only value allowed.",
+              "type": "string"
+            },
+            "cursedWhispers": {
+              "default": false,
+              "description": "Whispers from the pages while it is carried or read.",
+              "type": "boolean"
             }
           },
           "required": [
-            "textKey"
+            "title",
+            "author",
+            "pages",
+            "legality",
+            "rarity"
           ],
           "additionalProperties": false,
-          "description": "Book data."
+          "description": "Book data (mw-e07.1)."
         }
       },
       "required": [
@@ -790,7 +1007,7 @@
         "book"
       ],
       "additionalProperties": false,
-      "description": "A book, note or scroll the player reads."
+      "description": "A book, note or scroll the player reads (mw-e07.1)."
     },
     {
       "type": "object",

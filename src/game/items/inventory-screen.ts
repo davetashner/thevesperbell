@@ -159,7 +159,12 @@ export function itemVerbs(item: ItemEntry, names: VerbNames): string[] {
       verbs.push('Shoot from a bow');
       break;
     case 'book':
-      verbs.push('Read', ...item.book.teaches.map((id) => `Learn ${names.capability(id)}`));
+      verbs.push('Read');
+      if (item.book.teaches.kind === 'spell') {
+        verbs.push(`Learn ${names.capability(`spell.${item.book.teaches.spell.id}`)}`);
+      } else if (item.book.teaches.kind === 'insight') {
+        verbs.push(`Learn ${names.capability(item.book.teaches.capability)}`);
+      }
       break;
     case 'key':
       verbs.push(
