@@ -3,12 +3,7 @@
 // The spell is pure data: nothing in src/sim names it (tests/integration/spell-pipeline-content.test.ts
 // and spell-stimuli.test.ts grep the sim for every shipped spell id).
 import { describe, expect, it } from 'vitest';
-import {
-  burntMaterials,
-  loadGameContent,
-  materialPresets,
-  type ItemDef,
-} from '@content/index';
+import { burntMaterials, loadGameContent, materialPresets, type ItemDef } from '@content/index';
 import { markExercised } from '@content/testing';
 import {
   addMaterialProperties,
