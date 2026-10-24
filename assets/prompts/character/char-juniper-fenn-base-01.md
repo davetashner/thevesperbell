@@ -1,0 +1,32 @@
+# char-juniper-fenn-base-01: turnaround reference for Juniper Fenn, the fletcher and herbalist. Source for the placeholder town model.
+
+**Status: candidates, awaiting owner approval** (the NPC art approval bead filed with mw-ju8.34). Two variants
+(a, b) were generated; variant **a** was modelled (`model-npc-juniper-01`, see
+`assets/prompts/model/model-npc-bodies-01.md`).
+
+| Field | Value |
+|---|---|
+| Asset id | `char-juniper-fenn-base-01` |
+| Category | character (turnaround sheet; the front view is cropped for image-to-3D, see the model note) |
+| Template | `_templates/character-reference-sheet.md` v1 |
+| Tool | Higgsfield `gpt_image_2_5`, text only, 16:9, 2 variants, 2026-10-24, about 0.25 credits each |
+| Variant jobs | a `b32a4bd1-ae0c-4e4f-b240-e7ced8460a40`, b `73bc69d1-d3b8-45b2-a2c8-f3203a610bee` |
+| Local files | `assets/_incoming/char-juniper-fenn-base-01/{a,b}.png` (gitignored) |
+| Canon | story bible 5.6 |
+| Consuming bead | mw-ju8.34 |
+
+## Prompt (preamble verbatim from docs/art/style-bible.md §14, add-on from §14.1)
+
+```text
+STYLE: Stylized hand-painted fantasy art for "The Vesper Bell", a 3D third-person action RPG. Chunky low-poly forms with soft bevelled edges and slightly exaggerated, heavy proportions, painted with broad confident brush strokes and gentle colour gradients instead of fine photographic detail. Mood: souls-like weight and ancient mystery, but warm and hopeful — golden hearth light pushing back cool violet-blue shadow. Palette: deep ink-violet shadows (#1E1B2E, never pure black), moss green (#2F4A3A), weathered stone (#8C8A80), bark brown (#5A3E2B), parchment cream (#EFE2C4) and hearth amber (#E8A24A); strong saturated colour only for magic, fire and points of interest. Clear, readable silhouettes: one big shape, a few medium shapes, small detail used sparingly. Soft warm key light from the upper left with a cool fill and a gentle rim light. No photorealism, no photo textures, no text, letters or numbers, no logos, no watermark, no signature, no modern objects, no gore.
+
+Character turnaround sheet: front, three-quarter, side and back views of the same character in a neutral A-pose, full body, identical proportions and colours in every view, evenly lit, plain flat parchment (#EFE2C4) background, no cast shadows, orthographic feel, no perspective distortion.
+
+SUBJECT: Juniper Fenn, a lean, sunburnt, laconic woman in her thirties, fletcher and herbalist who knows the forest, braided dark hair, weathered tanned face, a green-brown hooded jerkin and leather bracers, a belt with small herb pouches and vials, a quiver of arrows on her back, sturdy tall boots; arms empty, hands open, no bow in hand.
+```
+
+## Consistency checklist
+
+- [x] Preamble and character-sheet add-on pasted verbatim (extracted from the bible, not retyped)
+- [x] Palette from the bible; plain parchment background; A-pose; hands empty
+- [x] No text, logos, gore
