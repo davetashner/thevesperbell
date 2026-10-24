@@ -76,6 +76,7 @@ export * from './items';
 export * from './progression';
 export * from './properties';
 export * from './respawn';
+export * from './gametime';
 export * from './rest';
 export * from './scene';
 export * from './sight';

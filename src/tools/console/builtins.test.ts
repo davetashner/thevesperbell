@@ -11,6 +11,8 @@ import {
   actCommand,
   useQuickSlotCommand,
   blastCommand,
+  timeAdvanceCommand,
+  timeSetCommand,
   killCommand,
   PlayerLook,
   propertyCommand,
@@ -338,6 +340,24 @@ describe('built-in console commands', () => {
     expect(s.registry.execute('blast 100 99').ok).toBe(false);
   });
 
+  it('mw-e27.12: time set and time advance send clock commands, rejecting bad values', () => {
+    const s = session();
+    expect(s.registry.execute('time advance 8h').lines).toEqual(['time advances 480 game minutes']);
+    expect(s.registry.execute('time advance 90m').ok).toBe(true);
+    expect(s.registry.execute('time set 3 14:30').lines).toEqual(['time set to day 3 14:30']);
+    expect(s.queue.drain()).toEqual([
+      timeAdvanceCommand(480),
+      timeAdvanceCommand(90),
+      timeSetCommand(3, 14 * 60 + 30),
+    ]);
+    expect(s.registry.execute('time advance soon').ok).toBe(false);
+    expect(s.registry.execute('time advance 0h').ok).toBe(false);
+    expect(s.registry.execute('time set 3').ok).toBe(false);
+    expect(s.registry.execute('time set 0 10:00').ok).toBe(false);
+    expect(s.registry.execute('time set 1 25:00').ok).toBe(false);
+    expect(s.queue.drain()).toEqual([]);
+  });
+
   it('timescale shows and sets the loop speed within range', () => {
     const s = session();
     expect(s.registry.execute('timescale').lines).toEqual(['timescale 1']);
@@ -458,6 +478,7 @@ describe('built-in console commands', () => {
       'seed',
       'set',
       'spawn',
+      'time',
       'timescale',
       'tp',
     ]);
@@ -485,6 +506,6 @@ describe('built-in console commands', () => {
     expect(s.registry.complete('set damage').options).toEqual(['damageDealt', 'damageTaken']);
     expect(s.registry.complete('set damageTaken ').options).toEqual([]);
     expect(s.registry.complete('god o').options).toEqual(['on', 'off']);
-    expect(s.registry.complete('help ti').line).toBe('help timescale ');
+    expect(s.registry.complete('help times').line).toBe('help timescale ');
   });
 });

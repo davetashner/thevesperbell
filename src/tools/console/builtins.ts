@@ -21,6 +21,8 @@ import {
   propertyCommand,
   spawnCommand,
   teleportCommand,
+  timeAdvanceCommand,
+  timeSetCommand,
   type DebugCheat,
   type DifficultyKey,
   type EntityId,
@@ -311,6 +313,32 @@ export function registerBuiltins(registry: CommandRegistry<ConsoleHost>): void {
       const at = host.spawnPoint();
       host.submit(blastCommand(at, radius, intensity));
       return `blast of ${String(intensity)} N·s, radius ${String(radius)} m at ${String(at.x)} ${String(at.y)} ${String(at.z)}`;
+    },
+  });
+
+  registry.registerCommand({
+    name: 'time',
+    summary: 'move the in-game clock (mw-e27.12): time set <day> <HH:MM>, time advance <N>h|<N>m',
+    usage: 'set <day> <HH:MM> | advance <N>h|<N>m',
+    args: z.tuple([z.enum(['set', 'advance']), z.string(), z.string().optional()]),
+    run: ([action, first, second], host) => {
+      try {
+        if (action === 'advance') {
+          const match = /^(\d+)([hm])$/.exec(first);
+          if (match === null) throw new RangeError(`bad duration "${first}": use 8h or 90m`);
+          const amount = Number(match[1]) * (match[2] === 'h' ? 60 : 1);
+          host.submit(timeAdvanceCommand(amount));
+          return `time advances ${String(amount)} game minutes`;
+        }
+        const match = /^(\d{1,2}):(\d{2})$/.exec(second ?? '');
+        if (match === null) throw new RangeError(`set needs <day> <HH:MM>, got "${second ?? ''}"`);
+        const minute = Number(match[1]) * 60 + Number(match[2]);
+        host.submit(timeSetCommand(Number(first), minute));
+        return `time set to day ${first} ${match[0]}`;
+      } catch (error) {
+        // Only RangeErrors from the command builders and the parsing above reach here.
+        throw new ConsoleError([(error as Error).message]);
+      }
     },
   });
 

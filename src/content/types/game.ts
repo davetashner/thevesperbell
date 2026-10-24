@@ -12,6 +12,11 @@
 //   mountain road at m3 by editing this field, with no code change. An id with no scene file fails the
 //   load's reference check, naming the missing id.
 //
+// - `clock` (mw-e27.12): the in-game clock's data (docs/design/game-clock.md): the length of a game day
+//   in real minutes, where a new world starts, the phases of the day and which screens hold the clock
+//   while open. The sim's `GameClockConfig` has the same shape; the validity checks that need the tick
+//   rate (a whole number of ticks per game minute) run when the clock is installed.
+//
 // Debug builds can widen the class list with `?allclasses` (src/game/classes.ts) so per-class tests
 // still run.
 
@@ -21,6 +26,43 @@ import { ref } from '../schema.ts';
 
 /** The id (and file name) of the one game configuration entry. */
 export const GAME_CONFIG_ID = 'game';
+
+const minuteOfDay = z.int().min(0).max(1439);
+
+/** Schema of the clock block. */
+export const clockSchema = z
+  .strictObject({
+    dayLengthRealMinutes: z
+      .number()
+      .positive()
+      .describe('Real minutes of sim time in one game day; 60 means a day passes in an hour.'),
+    start: z
+      .strictObject({
+        day: z.int().min(1).describe('Day number a new world starts on.'),
+        minute: minuteOfDay.describe('Minute of that day a new world starts at (360 = 06:00).'),
+      })
+      .describe('Where a new world starts.'),
+    phases: z
+      .array(
+        z.strictObject({
+          id: z
+            .string()
+            .regex(/^[a-z][a-z0-9-]*$/)
+            .describe('Phase id, e.g. "dawn".'),
+          startMinute: minuteOfDay.describe('Minute of the day the phase begins.'),
+        }),
+      )
+      .min(1)
+      .describe(
+        'Phases of the day, ascending by startMinute; the last runs past midnight into the first.',
+      ),
+    pauseScreens: z
+      .record(z.string().min(1), z.boolean())
+      .describe(
+        'Screen id -> whether it holds the clock while open (the sim already stops while a menu pauses it; this is for screens that leave it running).',
+      ),
+  })
+  .describe('The in-game clock (mw-e27.12).');
 
 /** Schema of the game configuration, `src/content/data/game/game.json`. */
 export const gameSchema = z.strictObject({
@@ -44,6 +86,7 @@ export const gameSchema = z.strictObject({
   startScene: ref('scene').describe(
     'The scene a new game starts in and the title screen shows behind it (mw-e01.2).',
   ),
+  clock: clockSchema,
 });
 
 /** The game configuration as written in JSON. */

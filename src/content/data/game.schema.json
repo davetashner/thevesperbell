@@ -32,13 +32,92 @@
       "type": "string",
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
       "x-contentRef": "scene"
+    },
+    "clock": {
+      "type": "object",
+      "properties": {
+        "dayLengthRealMinutes": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Real minutes of sim time in one game day; 60 means a day passes in an hour."
+        },
+        "start": {
+          "type": "object",
+          "properties": {
+            "day": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991,
+              "description": "Day number a new world starts on."
+            },
+            "minute": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1439,
+              "description": "Minute of that day a new world starts at (360 = 06:00)."
+            }
+          },
+          "required": [
+            "day",
+            "minute"
+          ],
+          "additionalProperties": false,
+          "description": "Where a new world starts."
+        },
+        "phases": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$",
+                "description": "Phase id, e.g. \"dawn\"."
+              },
+              "startMinute": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1439,
+                "description": "Minute of the day the phase begins."
+              }
+            },
+            "required": [
+              "id",
+              "startMinute"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Phases of the day, ascending by startMinute; the last runs past midnight into the first."
+        },
+        "pauseScreens": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "description": "Screen id -> whether it holds the clock while open (the sim already stops while a menu pauses it; this is for screens that leave it running)."
+        }
+      },
+      "required": [
+        "dayLengthRealMinutes",
+        "start",
+        "phases",
+        "pauseScreens"
+      ],
+      "additionalProperties": false,
+      "description": "The in-game clock (mw-e27.12)."
     }
   },
   "required": [
     "id",
     "notes",
     "playableClasses",
-    "startScene"
+    "startScene",
+    "clock"
   ],
   "additionalProperties": false
 }

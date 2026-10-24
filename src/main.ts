@@ -235,6 +235,7 @@ import {
   DAMAGE_COMPONENTS,
   HIT_VOLUME_COMPONENTS,
   installDebugCommands,
+  installGameClock,
   installPlayerDeath,
   isPlayerDead,
   LineOfSight,
@@ -638,6 +639,8 @@ function startRenderer(
     // The fact registry (mw-e27.2) on the world's facts: typed declarations, and the former keys
     // that let a save's renamed facts load under their current keys (mw-e27.4).
     installFactRegistry(world.facts, content);
+    // The in-game clock (mw-e27.12), first so every system sees the tick's time; its data is game.json.
+    installGameClock(world, content.get('game', GAME_CONFIG_ID).clock);
     // The knight's sword and shield (mw-e04.6): moves, socket tracks, the wood shield and the
     // damage model with the shield rule; and the combat sandbox's tuning (mw-e04.9).
     const combat = prepareTestbedCombat(content);

@@ -2,21 +2,42 @@
   "$schema": "../fact.schema.json",
   "id": "time",
   "name": "World time facts",
-  "notes": "The minimum world day clock (mw-ju8.6), until the real in-game clock lands (mw-e27.12). It never advances with sim ticks: only resting at an inn moves it (to 06:00 the next morning). mw-e27.12 takes these keys over.",
+  "notes": "The world clock's facts (mw-ju8.6, mw-e27.12). The game clock (src/sim/gametime) is their only writer in a running game: it counts sim ticks into game minutes and advances them with advanceTime (rest, study, jail, travel). Rest at an inn passes time to 06:00 the next morning through it. Defaults match game.json's clock block (tests/integration/game-clock.test.ts).",
   "facts": [
     {
       "key": "time.day",
       "type": "int",
       "default": 1,
-      "description": "The in-world day number, 1 on the first day. Increases each time the player sleeps through a midnight (rest at an inn).",
-      "owner": "rest"
+      "description": "The in-world day number, 1 on the first day. Increases at each midnight the game clock crosses.",
+      "owner": "game-clock"
     },
     {
       "key": "time.minute",
       "type": "int",
-      "default": 480,
-      "description": "The minute of the in-world day, 0-1439 (480 = 08:00, a new world's start). Resting at an inn sets it to 360 (06:00).",
-      "owner": "rest"
+      "default": 360,
+      "description": "The minute of the in-world day, 0-1439 (360 = 06:00, a new world's start). Advances with sim ticks (150 ticks per game minute at 60 Hz and a 60-minute day) and with advanceTime.",
+      "owner": "game-clock"
+    },
+    {
+      "key": "time.minute-origin",
+      "type": "int",
+      "default": 0,
+      "description": "The sim tick the current game minute is counted from; the running clock's remainder is the current tick minus this. Written once per game minute, so a save resumes mid-minute without a fact change every tick.",
+      "owner": "game-clock"
+    },
+    {
+      "key": "time.held-at",
+      "type": "int",
+      "default": -1,
+      "description": "The sim tick a screen first held the clock at (dialogue, shop, inventory), or -1 while the clock runs. On release the held ticks are added to time.minute-origin so they do not count.",
+      "owner": "game-clock"
+    },
+    {
+      "key": "time.phase",
+      "type": "id",
+      "default": "dawn",
+      "description": "Id of the current phase of the day (dawn, day, dusk, night by default; phases are data in game.json). Written by the game clock whenever the phase changes, so conditions can test it.",
+      "owner": "game-clock"
     }
   ]
 }

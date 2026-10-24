@@ -10,6 +10,7 @@
 // has, or for an entity that is gone, so such commands are skipped rather than failing the tick. The
 // console checks the same things up front and tells the developer instead.
 
+import { gameClockOf } from '../gametime/clock';
 import { initialCharacterState } from '../character/controller';
 import { CharacterController, CharacterTuning } from '../character/system';
 import { HealthComponent } from '../combat/damage/components';
@@ -212,6 +213,13 @@ export function debugCommandSystem<TInput>(options: DebugCommandOptions): System
             element: 'force',
             intensity,
           });
+          continue;
+        }
+        if (command.op === 'time') {
+          const clock = gameClockOf(world);
+          if (clock === undefined) continue; // a world without the game clock has no time to move
+          if (command.action === 'set') clock.setTime({ day: command.day, minute: command.minute });
+          else clock.advanceTime(command.minutes, 'debug');
           continue;
         }
         if (command.op === 'despawn') {

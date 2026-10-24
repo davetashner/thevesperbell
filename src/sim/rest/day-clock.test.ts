@@ -20,13 +20,13 @@ function clockWorld(): World<never> {
 }
 
 describe('the minimum day clock (mw-ju8.6)', () => {
-  it('a new world starts on day 1 at 08:00', () => {
+  it('a new world starts on day 1 at 06:00', () => {
     const clock = factDayClock(clockWorld().facts);
     expect(clock.now()).toEqual({ day: 1, minute: START_MINUTE });
-    expect(clockText(clock.now())).toBe('08:00');
+    expect(clockText(clock.now())).toBe('06:00');
   });
 
-  it('falls back to day 1 at 08:00 when the facts are not declared and the build ignores that', () => {
+  it('falls back to day 1 at 06:00 when the facts are not declared and the build ignores that', () => {
     const world = new World<never>({ seed: 1 });
     world.facts.setUndeclaredPolicy({ mode: 'ignore', warn: () => undefined });
     const clock = factDayClock(world.facts);

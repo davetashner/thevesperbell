@@ -1,12 +1,8 @@
-// The minimum world day clock (mw-ju8.6). THIN SLICE, flagged: the real in-game clock (mw-e27.12:
-// tick-derived time, phases, schedules, pause rules, `advanceTime(duration, reason)`) does not exist
-// yet, but resting at an inn has to pass time "to morning". So the day and the minute of the day are
-// two world facts (`time.day`, `time.minute`; declared in src/content/data/fact/time.json), which
-// makes them deterministic, snapshot-hashed and saved with the world-facts section for free.
-//
-// What this is NOT: it never advances with sim ticks, has no phases, no events and no schedules.
-// Time moves only through `advanceClock`, which today only resting calls. mw-e27.12 replaces the
-// facts' writer with the real clock and keeps these keys (or migrates them with `renamedFrom`).
+// The world day clock's facts and time arithmetic (mw-ju8.6). The day and the minute of the day are
+// world facts (`time.day`, `time.minute`; declared in src/content/data/fact/time.json), which makes
+// them deterministic, snapshot-hashed and saved with the world-facts section. The writer is the game
+// clock (../gametime, mw-e27.12), which advances them with sim ticks and `advanceTime`; a world
+// without it keeps this bare facts clock, which only `rest` moves.
 
 import type { FactSpec, FactStore } from '../facts/store';
 
@@ -14,18 +10,31 @@ import type { FactSpec, FactStore } from '../facts/store';
 export const MINUTES_PER_DAY = 24 * 60;
 /** The minute of the day a rested player wakes: 06:00. */
 export const MORNING_MINUTE = 6 * 60;
-/** The minute of the day a new world starts: 08:00. */
-export const START_MINUTE = 8 * 60;
+/** The minute of the day a new world starts: 06:00 (the game clock's default start). */
+export const START_MINUTE = 6 * 60;
 
 /** Fact key of the day number (1 on the first day). */
 export const DAY_FACT = 'time.day';
 /** Fact key of the minute of the day, 0-1439. */
 export const MINUTE_FACT = 'time.minute';
 
+/**
+ * Fact key of the sim tick the current game minute is counted from: the running clock's remainder is
+ * `tick - origin`. Written once per game minute, not per tick.
+ */
+export const MINUTE_ORIGIN_FACT = 'time.minute-origin';
+/** Fact key of the sim tick a screen first held the clock at, or -1 while it runs. */
+export const HELD_AT_FACT = 'time.held-at';
+/** Fact key of the current phase of the day (`dawn`, `day`, `dusk`, `night` by default). */
+export const PHASE_FACT = 'time.phase';
+
 /** The facts the clock keeps, as the fact registry declares them (src/content/data/fact/time.json). */
 export const DAY_CLOCK_FACTS: Readonly<Record<string, FactSpec>> = Object.freeze({
   [DAY_FACT]: { type: 'int', default: 1 },
   [MINUTE_FACT]: { type: 'int', default: START_MINUTE },
+  [MINUTE_ORIGIN_FACT]: { type: 'int', default: 0 },
+  [HELD_AT_FACT]: { type: 'int', default: -1 },
+  [PHASE_FACT]: { type: 'id', default: 'dawn' },
 });
 
 /** A moment: the day number and the minute of that day. */
