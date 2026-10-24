@@ -1,0 +1,41 @@
+{
+  "$schema": "../unlock.schema.json",
+  "id": "college-trainers",
+  "name": "Bridgeward College lessons",
+  "notes": "What the Bridgeward College's two instructors teach for crowns (mw-ju8.13, ADR-0004 trainer channel): Sergeant Garrick the knight's chains, Master Rooke the archer's pinning chain. Each step needs the one before it. Nothing here is a spell: the college does not teach sorcery.",
+  "unlocks": [
+    {
+      "capability": "technique.shoulder-barge",
+      "channels": ["trainer"]
+    },
+    {
+      "capability": "technique.riposte",
+      "prerequisites": ["technique.parry"],
+      "channels": ["trainer"]
+    },
+    {
+      "capability": "technique.shield-charge",
+      "prerequisites": ["technique.shield-bash"],
+      "channels": ["trainer"]
+    },
+    {
+      "capability": "technique.disarm",
+      "prerequisites": ["technique.riposte"],
+      "channels": ["trainer"]
+    },
+    {
+      "capability": "arrow.pinning-shot",
+      "channels": ["trainer"]
+    },
+    {
+      "capability": "arrow.ricochet-shot",
+      "prerequisites": ["arrow.pinning-shot"],
+      "channels": ["trainer"]
+    },
+    {
+      "capability": "arrow.severing-shot",
+      "prerequisites": ["arrow.ricochet-shot"],
+      "channels": ["trainer"]
+    }
+  ]
+}

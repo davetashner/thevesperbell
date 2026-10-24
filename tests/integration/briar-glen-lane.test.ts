@@ -100,6 +100,7 @@ describe('the Briar Glen shop lane, headless (mw-ju8.5)', () => {
       ['bridge-gate', 'valley-03'],
       ['marsh-store-door', 'marsh-store'],
       ['sleeping-ox-door', 'sleeping-ox'],
+      ['bridgeward-college-door', 'bridgeward-college'],
     ]);
     expect(bridge.position.z).toBeLessThan(t.marker('marsh-store-door').position.z);
     const door = t.marker('marsh-store-door');
@@ -119,6 +120,18 @@ describe('the Briar Glen shop lane, headless (mw-ju8.5)', () => {
     const arrival = t.marker('arrive-from-sleeping-ox').position;
     expect(arrival.x).toBeGreaterThan(-6);
     expect(Math.abs(arrival.z - inn.position.z)).toBeLessThan(2);
+    // The Bridgeward College (mw-ju8.13) stands further up the west side still, with its sign and lantern.
+    const college = t.marker('bridgeward-college-door');
+    expect(college.tags).toContain('building');
+    expect(college.position.x).toBeCloseTo(door.position.x, 5);
+    expect(college.position.z).toBeGreaterThan(inn.position.z + 5);
+    expect(t.marker('sign-bridgeward-college').tags).toContain('sign');
+    expect(t.marker('lantern-bridgeward-college').tags).toContain('lantern');
+    expect(
+      content
+        .get('scene', 'briar-glen-lane')
+        .transitions.find((x) => x.id === 'bridgeward-college-door')?.spawn,
+    ).toBe('arrive-from-briar-glen-lane');
     // The lane's far end is no further than ~40 m from the bridge.
     expect(t.marker('street-lantern-4').position.z).toBeGreaterThan(30);
   });
@@ -273,6 +286,7 @@ function game_arrivals(t: { marker: (id: string) => { position: Vec3 } }): Vec3[
     'arrive-from-valley-03',
     'arrive-from-marsh-store',
     'arrive-from-sleeping-ox',
+    'arrive-from-bridgeward-college',
     'player-start',
   ].map((id) => t.marker(id).position);
 }

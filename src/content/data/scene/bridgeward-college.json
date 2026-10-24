@@ -1,0 +1,283 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "bridgeward-college",
+  "name": "The Bridgeward College",
+  "description": "Bead mw-ju8.13: the Bridgeward College in grey box, built from the e00 kit only. A 16 x 8 m training hall (street door in the south wall, reached by a short entry from briar-glen-lane): the fighting hall in the west half, where Sergeant Maud Garrick (npc-garrick) sells knight-technique lessons from behind her lesson table (garrick-lessons, merchant bridgeward-fighting-hall) with three practice dummies behind her, and the archery butts in the east half, where Master Ewan Rooke (npc-rooke) sells trick-shot lessons (rooke-lessons, merchant bridgeward-archery-butts) with three straw targets behind him. Each table opens the shop screen on its Services tab: a lesson takes its price in crowns and teaches the technique (story bible §5.16). Nobody here teaches sorcery. dev-crowns:600 tops the player up on first opening so the dev scene can pay. Props are kit stand-ins with named marker spawns for art. Reach it with ?scene=bridgeward-college; street-exit leads out to briar-glen-lane (arrive-from-bridgeward-college), and the lane's bridgeward-college-door leads in.",
+  "grid": 1,
+  "camera": {
+    "position": [-12, 12, -12],
+    "target": [0, 1, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [8, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, -5.5],
+      "scale": [3, 1, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-4.5, 0, -4],
+      "scale": [3.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0, 0, -4]
+    },
+    {
+      "piece": "wall",
+      "at": [4.5, 0, -4],
+      "scale": [3.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 4],
+      "scale": [8, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-8, 0, 0],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [8, 0, 0],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [-4.5, 0, 0.5],
+      "scale": [2, 0.5, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [4.5, 0, 0.5],
+      "scale": [2, 0.5, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-6.5, 0, 3.0],
+      "scale": [0.3, 1.5, 0.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-4.5, 0, 3.0],
+      "scale": [0.3, 1.5, 0.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-2.5, 0, 3.0],
+      "scale": [0.3, 1.5, 0.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [2.5, 0, 3.5],
+      "scale": [0.9, 1.2, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [4.5, 0, 3.5],
+      "scale": [0.9, 1.2, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [6.5, 0, 3.5],
+      "scale": [0.9, 1.2, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "crate",
+      "at": [-7.25, 0, -2.5],
+      "scale": [0.8, 1, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [7.25, 0, -2.5],
+      "scale": [0.8, 1, 0.8]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -3],
+      "tags": ["player-start", "entrance"]
+    },
+    {
+      "id": "front-door",
+      "at": [0, 0, -4],
+      "door": {
+        "profile": "wooden-door"
+      }
+    },
+    {
+      "id": "arrive-from-briar-glen-lane",
+      "at": [0, 0, -2.25],
+      "yaw": 0,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "street-exit",
+      "at": [0, 0, -6.5],
+      "tags": ["street"]
+    },
+    {
+      "id": "garrick-lessons",
+      "at": [-4.5, 0, -0.25],
+      "tags": ["counter", "shop", "merchant:bridgeward-fighting-hall", "dev-crowns:600"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Fighting lessons"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-garrick",
+      "at": [-4.5, 0, 2.0],
+      "tags": ["trainer", "instructor:fighting"],
+      "yaw": 180,
+      "creature": "npc-garrick",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "rooke-lessons",
+      "at": [4.5, 0, -0.25],
+      "tags": ["counter", "shop", "merchant:bridgeward-archery-butts", "dev-crowns:600"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Archery lessons"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-rooke",
+      "at": [4.5, 0, 2.0],
+      "tags": ["trainer", "instructor:archery"],
+      "yaw": 180,
+      "creature": "npc-rooke",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "practice-dummy-1",
+      "at": [-6.5, 0.75, 3.0],
+      "tags": ["dummy", "prop"]
+    },
+    {
+      "id": "practice-dummy-2",
+      "at": [-4.5, 0.75, 3.0],
+      "tags": ["dummy", "prop"]
+    },
+    {
+      "id": "practice-dummy-3",
+      "at": [-2.5, 0.75, 3.0],
+      "tags": ["dummy", "prop"]
+    },
+    {
+      "id": "butt-target-1",
+      "at": [2.5, 0.75, 3.5],
+      "tags": ["target", "prop"]
+    },
+    {
+      "id": "butt-target-2",
+      "at": [4.5, 0.75, 3.5],
+      "tags": ["target", "prop"]
+    },
+    {
+      "id": "butt-target-3",
+      "at": [6.5, 0.75, 3.5],
+      "tags": ["target", "prop"]
+    },
+    {
+      "id": "weapon-rack",
+      "at": [-7.5, 1.5, -0.5],
+      "tags": ["rack", "prop"]
+    },
+    {
+      "id": "arrow-rack",
+      "at": [7.5, 1.5, -0.5],
+      "tags": ["rack", "prop"]
+    },
+    {
+      "id": "sign-bridgeward-college",
+      "at": [0, 3.25, -4.25],
+      "tags": ["sign"]
+    },
+    {
+      "id": "lantern-door",
+      "at": [0, 2.5, -3.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lantern-fighting",
+      "at": [-3, 2, 0.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lantern-archery",
+      "at": [3, 2, 0.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.26,
+    "directional": [
+      {
+        "id": "window",
+        "direction": [0.3, -1, 0.4],
+        "level": 0.2,
+        "reach": 30
+      }
+    ]
+  },
+  "environment": {
+    "sky": "#1E1B2E"
+  },
+  "transitions": [
+    {
+      "id": "street-exit",
+      "min": [-2, -1, -7.25],
+      "max": [2, 3, -6.75],
+      "scene": "briar-glen-lane",
+      "spawn": "arrive-from-bridgeward-college"
+    }
+  ]
+}

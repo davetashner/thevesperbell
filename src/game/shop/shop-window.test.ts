@@ -40,6 +40,7 @@ import {
   ShopViews,
   startShopUi,
   type ShopContent,
+  lessonRefusalText,
 } from './shop-window';
 
 const content = loadDevContent();
@@ -877,5 +878,21 @@ describe('selling loot at Brand’s Forge (mw-ju8.7)', () => {
     expect(t.crownsNow()).toBe(114);
     expect(t.crownsNow()).toBeGreaterThanOrEqual(90);
     expect(t.crownsNow()).toBeLessThanOrEqual(140);
+  });
+});
+
+describe('lesson refusals (mw-ju8.13)', () => {
+  it('names the technique to learn first, else says the player is not ready', () => {
+    const name = (id: string) => (id === 'technique.riposte' ? 'Riposte' : id);
+    expect(
+      lessonRefusalText(
+        [{ reason: 'missing-prerequisite', capability: 'technique.riposte' }],
+        name,
+      ),
+    ).toBe('Learn Riposte first.');
+    expect(lessonRefusalText([{ reason: 'not-learnable' }], name)).toBe(
+      'You are not ready for that yet.',
+    );
+    expect(lessonRefusalText(undefined, name)).toBe('You are not ready for that yet.');
   });
 });

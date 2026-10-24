@@ -81,7 +81,7 @@ import {
   sceneCheckpoints,
   startMechanisms,
 } from '@game/mechanisms/index';
-import { createCapabilityRegistry } from '@game/capabilities';
+import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import {
   applyClass,
   classCards,
@@ -1366,6 +1366,8 @@ function startRenderer(
           world,
           content,
           player: player.entity,
+          // Trainers teach through the unlock book (mw-ju8.13).
+          unlocks: createUnlockBook(content, capabilities),
           // Sleeping is refused while any autosave safety veto objects (mw-ju8.6).
           safety: () => safety.active()[0]?.reason ?? null,
           publish: (key, value) => {

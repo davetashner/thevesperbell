@@ -13,6 +13,8 @@ import { DAMAGE_COMPONENTS, giveCombatant, HealthComponent } from '../combat/dam
 import { giveStamina, StaminaComponent } from '../combat/stamina';
 import { DAY_CLOCK_FACTS, factDayClock, MORNING_MINUTE } from '../rest/day-clock';
 import { restCompleted, type RestCompleted } from '../rest/rest';
+import { addCapabilities, CapabilityRegistry } from '../progression/capabilities';
+import { UnlockBook } from '../progression/unlocks';
 import { BUYBACK_LIMIT } from './shop-state';
 import {
   shopBought,
@@ -642,5 +644,120 @@ describe('merchant services: a room for the night (mw-ju8.6)', () => {
       reason: 'no-such-service',
     });
     expect(s.state()).toBe(before);
+  });
+});
+
+describe('merchant services: a trainer sells lessons (mw-ju8.13)', () => {
+  const trainer: ShopMerchantDef = {
+    id: 'college',
+    buysCategories: [],
+    goldReserve: 0,
+    markup: 1,
+    buyRate: 0.5,
+    stock: [],
+    services: [
+      { id: 'riposte', name: 'Riposte', price: 150, kind: 'train', teaches: 'technique.riposte' },
+      { id: 'disarm', name: 'Disarm', price: 400, kind: 'train', teaches: 'technique.disarm' },
+      { id: 'bed', name: 'A bed', price: 10, kind: 'rest' },
+      { id: 'bad', name: 'No capability', price: 10, kind: 'train' },
+    ],
+  };
+
+  function school(gold: number) {
+    const world = new World({ seed: 7 });
+    const actor = world.spawn();
+    addInventory(world, actor, gold);
+    const registry = new CapabilityRegistry([
+      'technique.parry',
+      'technique.riposte',
+      'technique.disarm',
+    ]);
+    addCapabilities(world, actor);
+    registry.grant(world, actor, 'technique.parry', 'class');
+    const book = new UnlockBook(registry, [
+      {
+        capability: 'technique.riposte',
+        prerequisites: ['technique.parry'],
+        channels: ['trainer'],
+      },
+      {
+        capability: 'technique.disarm',
+        prerequisites: ['technique.riposte'],
+        channels: ['trainer'],
+      },
+    ]);
+    const shops = new Shops([trainer], ITEMS, new InventoryRules(ITEMS));
+    const bought: ServiceTransaction[] = [];
+    world.events.on(shopServiceBought, (e) => bought.push(e));
+    return { world, actor, book, shops, bought, registry };
+  }
+
+  it('AC-1: with enough crowns the lesson teaches the technique and takes its price', () => {
+    const s = school(200);
+    expect(s.shops.train(s.world, s.actor, 'college', 'riposte', s.book)).toEqual({
+      ok: true,
+      price: 150,
+      capability: 'technique.riposte',
+    });
+    expect(inventoryOf(s.world, s.actor)?.gold).toBe(50);
+    expect(s.shops.stateOf(s.world, 'college').gold).toBe(150);
+    expect(s.book.knows(s.world, s.actor, 'technique.riposte')).toBe(true);
+    s.world.events.flush();
+    expect(s.bought).toEqual([
+      {
+        tick: 0,
+        actor: s.actor,
+        merchantId: 'college',
+        serviceId: 'riposte',
+        kind: 'train',
+        price: 150,
+      },
+    ]);
+  });
+
+  it('too few crowns refuses the lesson and teaches nothing', () => {
+    const s = school(149);
+    expect(s.shops.train(s.world, s.actor, 'college', 'riposte', s.book)).toEqual({
+      ok: false,
+      reason: 'cannot-afford',
+    });
+    expect(inventoryOf(s.world, s.actor)?.gold).toBe(149);
+    expect(s.book.knows(s.world, s.actor, 'technique.riposte')).toBe(false);
+  });
+
+  it('a technique whose prerequisite is unknown is refused with the reasons and charges nothing', () => {
+    const s = school(1000);
+    const result = s.shops.train(s.world, s.actor, 'college', 'disarm', s.book);
+    expect(result).toEqual({
+      ok: false,
+      reason: 'refused',
+      refusals: [{ reason: 'missing-prerequisite', capability: 'technique.riposte' }],
+    });
+    expect(inventoryOf(s.world, s.actor)?.gold).toBe(1000);
+  });
+
+  it('a technique already known is not sold twice', () => {
+    const s = school(1000);
+    s.shops.train(s.world, s.actor, 'college', 'riposte', s.book);
+    expect(s.shops.train(s.world, s.actor, 'college', 'riposte', s.book)).toEqual({
+      ok: false,
+      reason: 'already-known',
+    });
+    expect(inventoryOf(s.world, s.actor)?.gold).toBe(850);
+  });
+
+  it('only train services with a capability are lessons, and a lesson is not a room', () => {
+    const s = school(1000);
+    for (const id of ['bed', 'bad', 'nope']) {
+      expect(s.shops.train(s.world, s.actor, 'college', id, s.book)).toEqual({
+        ok: false,
+        reason: 'no-such-lesson',
+      });
+    }
+    expect(s.shops.buyService(s.world, s.actor, 'college', 'riposte')).toEqual({
+      ok: false,
+      reason: 'no-such-service',
+    });
+    expect(inventoryOf(s.world, s.actor)?.gold).toBe(1000);
   });
 });

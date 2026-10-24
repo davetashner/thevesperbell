@@ -177,9 +177,15 @@
           "kind": {
             "type": "string",
             "enum": [
-              "rest"
+              "rest",
+              "train"
             ],
-            "description": "`rest`: sleep until morning, fully healed (the Sleeping Ox room)."
+            "description": "`rest`: sleep until morning, fully healed (the Sleeping Ox room). `train`: a lesson that teaches `teaches` (mw-ju8.13)."
+          },
+          "teaches": {
+            "description": "The capability a `train` service teaches; required for `train`, absent otherwise.",
+            "type": "string",
+            "pattern": "^(verb|spell|arrow|tool|trick|technique|sense)\\.[a-z0-9.-]+$"
           }
         },
         "required": [

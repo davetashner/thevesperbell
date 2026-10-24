@@ -38,9 +38,12 @@ import {
   type MerchantState,
   type PriceRefusal,
   type PriceResult,
+  type LearnRefusal,
+  type UnlockBook,
   type PriceStep,
   type SellFailure,
   type ServiceFailure,
+  type TrainFailure,
   type ShopServiceDef,
   type World,
 } from '@sim/index';
@@ -102,6 +105,25 @@ const SERVICE_FAILURES: Readonly<Record<ServiceFailure, string>> = Object.freeze
   'cannot-afford': 'Not enough crowns.',
   unsafe: 'You cannot sleep with danger about.',
 });
+
+/** Why a lesson could not be bought, in the instructor's terms (mw-ju8.13). */
+const TRAIN_FAILURES: Readonly<Record<TrainFailure, string>> = Object.freeze({
+  'no-such-lesson': 'That is no longer on offer.',
+  'already-known': 'You already know that.',
+  refused: 'You are not ready for that yet.',
+  'cannot-afford': 'Not enough crowns.',
+});
+
+/** The line for a lesson refused for lack of an earlier technique, else the generic one. */
+export function lessonRefusalText(
+  refusals: readonly LearnRefusal[] | undefined,
+  nameOf: (capability: string) => string,
+): string {
+  const missing = refusals?.find((r) => r.reason === 'missing-prerequisite');
+  return missing === undefined
+    ? TRAIN_FAILURES.refused
+    : `Learn ${nameOf(missing.capability)} first.`;
+}
 
 /** The toast after a night's rest. */
 export const SLEEP_TOAST = 'You sleep until morning.';
@@ -170,8 +192,10 @@ export class ShopViews {
   readonly #items: ReadonlyMap<string, ItemEntry>;
   readonly #merchants: ReadonlyMap<string, MerchantEntry>;
   readonly #shops: Shops;
+  readonly #content: ShopContent;
 
   constructor(content: ShopContent, shops: Shops) {
+    this.#content = content;
     this.#items = new Map(content.all('item').map((item) => [item.id, item]));
     this.#merchants = new Map(content.all('merchant').map((merchant) => [merchant.id, merchant]));
     this.#shops = shops;
@@ -225,6 +249,15 @@ export class ShopViews {
     return service;
   }
 
+  /** The display name of a capability the content declares (the id when it does not). */
+  capabilityName(id: string): string {
+    for (const group of this.#content.all('capability')) {
+      const found = group.capabilities.find((c) => c.id === id);
+      if (found !== undefined) return found.name;
+    }
+    return id;
+  }
+
   #serviceRows(merchant: MerchantEntry): ShopRowModel[] {
     return (merchant.services ?? []).map((service, index) => ({
       id: index,
@@ -234,7 +267,12 @@ export class ShopViews {
       unitPrice: service.price,
       specialty: false,
       stolen: false,
-      breakdown: [`Fixed price ${crownsText(service.price)}`],
+      breakdown: [
+        `Fixed price ${crownsText(service.price)}`,
+        ...(service.teaches === undefined
+          ? []
+          : [`Teaches ${this.capabilityName(service.teaches)}`]),
+      ],
     }));
   }
 
@@ -376,6 +414,10 @@ export interface ShopControllerOptions {
   readonly rules: InventoryRules;
   /** Null when it is safe to sleep, else why not (the autosave veto registry's verdict). */
   readonly safety?: () => string | null;
+  /** The learn API trainers teach through (mw-ju8.13); absent = lessons cannot be bought. */
+  readonly unlocks?: Pick<UnlockBook, 'check' | 'learn'>;
+  /** A lesson was bought: the capability it taught (the e2e's readout). */
+  readonly onLearned?: (capability: string) => void;
   /** Shows a toast (the night's "You sleep until morning."). */
   readonly toast?: (text: string) => void;
   /** The shop opened or closed (or its crowns changed): what the e2e reads. */
@@ -501,6 +543,10 @@ export class ShopController {
   #book(merchantId: string, window: ShopWindow, index: number): void {
     const { world, player, shops, views, safety, toast } = this.#options;
     const service = views.serviceAt(merchantId, index);
+    if (service.kind === 'train') {
+      this.#learn(merchantId, window, service);
+      return;
+    }
     const result = shops.buyService(world, player, merchantId, service.id, {
       ...(safety !== undefined && { safety }),
     });
@@ -510,6 +556,27 @@ export class ShopController {
     }
     this.close();
     toast?.(SLEEP_TOAST);
+  }
+
+  #learn(merchantId: string, window: ShopWindow, service: ShopServiceDef): void {
+    const { world, player, shops, views, unlocks, toast } = this.#options;
+    if (unlocks === undefined) {
+      window.say(TRAIN_FAILURES['no-such-lesson']);
+      return;
+    }
+    const result = shops.train(world, player, merchantId, service.id, unlocks);
+    if (!result.ok) {
+      window.say(
+        result.reason === 'refused'
+          ? lessonRefusalText(result.refusals, (id) => views.capabilityName(id))
+          : TRAIN_FAILURES[result.reason],
+      );
+      return;
+    }
+    this.#options.onLearned?.(result.capability);
+    window.say(`You learn ${service.name} for ${crownsText(result.price)}.`);
+    toast?.(`You learn ${service.name}.`);
+    this.#refresh();
   }
 
   #deal({ tab, id, count }: ShopDeal): void {
@@ -555,7 +622,9 @@ export interface ShopUiOptions {
   readonly content: ShopContent;
   readonly player: EntityId;
   /** Publishes a readout for the e2e: `shop` (JSON of a `ShopReading`), `rest` (a night's sleep). */
-  readonly publish?: (key: 'shop' | 'rest', value: string) => void;
+  readonly publish?: (key: 'shop' | 'rest' | 'learned', value: string) => void;
+  /** The learn API trainers teach through (mw-ju8.13). */
+  readonly unlocks?: Pick<UnlockBook, 'check' | 'learn'>;
   /** Null when it is safe to sleep, else why not (the autosave veto registry's verdict). */
   readonly safety?: () => string | null;
 }
@@ -570,7 +639,7 @@ export interface ShopUi {
 
 /** Builds the shops engine over content and readies the shop screen for the player. */
 export function startShopUi(options: ShopUiOptions): ShopUi {
-  const { ui, world, content, player, publish, safety } = options;
+  const { ui, world, content, player, publish, safety, unlocks } = options;
   const items = content.all('item');
   const rules = new InventoryRules(items);
   const shops = new Shops(
@@ -586,6 +655,7 @@ export function startShopUi(options: ShopUiOptions): ShopUi {
   world.events.on(restCompleted, ({ kind, hours, point, wakes }) => {
     publish?.('rest', JSON.stringify({ kind, hours, point, day: wakes.day, minute: wakes.minute }));
   });
+  const learned: string[] = [];
   const controller = new ShopController({
     ui,
     world,
@@ -594,6 +664,11 @@ export function startShopUi(options: ShopUiOptions): ShopUi {
     shops,
     rules,
     ...(safety !== undefined && { safety }),
+    ...(unlocks !== undefined && { unlocks }),
+    onLearned: (capability) => {
+      learned.push(capability);
+      publish?.('learned', JSON.stringify(learned));
+    },
     toast: (text) => {
       toasts.show(text, { durationMs: 6000 });
     },

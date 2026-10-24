@@ -34,6 +34,8 @@ export const WORLD_PRICE_BAND = { min: 0.8, max: 1.25 } as const;
 export const OBTAINABLE_SINK_RATIO_BAND = { min: 0.6, max: 0.8 } as const;
 /** Gold for a night at an inn (economy doc, "Inn bed"): a service price fixed by the innkeeper. */
 export const INN_BED_PRICE_BAND = { min: 8, max: 15 } as const;
+/** Crowns for one trainer technique (economy doc, "Sinks"): rises with the technique's tier. */
+export const TRAINER_PRICE_BAND = { min: 100, max: 400 } as const;
 /** The price floor in gold. */
 export const MIN_PRICE = 1;
 

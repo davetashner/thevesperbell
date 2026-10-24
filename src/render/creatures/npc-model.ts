@@ -16,6 +16,8 @@ export const NPC_MODEL_URLS: Readonly<Record<string, string>> = {
   'npc-hollis': '/assets/model/model-npc-hollis-01.glb',
   'npc-juniper': '/assets/model/model-npc-juniper-01.glb',
   'npc-oswin': '/assets/model/model-npc-oswin-01.glb',
+  'npc-garrick': '/assets/model/model-npc-garrick-01.glb',
+  'npc-rooke': '/assets/model/model-npc-rooke-01.glb',
   // Day and night watchmen are one model for now.
   'npc-watchman': '/assets/model/model-npc-watchman-01.glb',
 };

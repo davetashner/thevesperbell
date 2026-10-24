@@ -27,7 +27,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `services[].id` | id | required | Service id, unique within the merchant, e.g. "room-for-the-night". |
 | `services[].name` | string | required | What the shop window lists, e.g. "Room for the night". |
 | `services[].price` | integer 1–100000 | required | Crowns, fixed by the merchant: no markup, disposition or haggle applies. A `rest` service sits in the inn-bed band 8-15. |
-| `services[].kind` | `"rest"` | required | `rest`: sleep until morning, fully healed (the Sleeping Ox room). |
+| `services[].kind` | `"rest"` \| `"train"` | required | `rest`: sleep until morning, fully healed (the Sleeping Ox room). `train`: a lesson that teaches `teaches` (mw-ju8.13). |
+| `services[].teaches` | string | — | The capability a `train` service teaches; required for `train`, absent otherwise. |
 | `goldReserve` | integer ≥ 0 | required | Gold the merchant starts with to pay the player for sales. |
 | `goldRestockPerDay` | integer ≥ 0 | `0` | Gold the reserve refills by each in-world day, up to `goldReserve`. |
 | `markup` | number > 0 | required | Multiplier on item value when the player buys (economy band 1.1-1.5). |

@@ -7,7 +7,10 @@ import { loadGameContent } from '@content/index';
 import { markExercised } from '@content/testing';
 
 const content = loadGameContent();
-const merchants = content.all('merchant');
+// The college's instructors sell lessons, not goods (tests/integration/bridgeward-college.test.ts).
+const merchants = content
+  .all('merchant')
+  .filter((merchant) => !merchant.services.some((service) => service.kind === 'train'));
 const items = content.all('item');
 const itemIds = new Set(items.map((item) => item.id));
 

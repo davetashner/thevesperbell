@@ -1,0 +1,46 @@
+{
+  "$schema": "../merchant.schema.json",
+  "id": "bridgeward-fighting-hall",
+  "notes": "The Bridgeward College's fighting hall (story bible §3.5, §5.16; mw-ju8.13): Sergeant Maud Garrick (npc-garrick) sells lessons, not goods. Four knight techniques from the ADR-0004 chains, priced inside the economy doc's trainer band (100-400 crowns) by tier: Shoulder Barge 100 (a chain's first step), Riposte 175 and Shield Charge 250 (second steps), Disarm 400 (a third step, after Riposte). Every lesson needs its earlier step (no pure-number unlocks, ADR-0004 P1); there are no spells on the list. She holds no stock and no till.",
+  "npcId": "npc-garrick",
+  "displayName": "Sergeant Maud Garrick",
+  "shopName": "Bridgeward College: Fighting Hall",
+  "personalityTags": ["gruff"],
+  "specialties": [],
+  "buysCategories": ["weapon"],
+  "services": [
+    {
+      "id": "shoulder-barge",
+      "name": "Shoulder Barge",
+      "price": 100,
+      "kind": "train",
+      "teaches": "technique.shoulder-barge"
+    },
+    {
+      "id": "riposte",
+      "name": "Riposte",
+      "price": 175,
+      "kind": "train",
+      "teaches": "technique.riposte"
+    },
+    {
+      "id": "shield-charge",
+      "name": "Shield Charge",
+      "price": 250,
+      "kind": "train",
+      "teaches": "technique.shield-charge"
+    },
+    {
+      "id": "disarm",
+      "name": "Disarm",
+      "price": 400,
+      "kind": "train",
+      "teaches": "technique.disarm"
+    }
+  ],
+  "stock": [],
+  "goldReserve": 0,
+  "goldRestockPerDay": 0,
+  "markup": 1.3,
+  "buyRate": 0.4
+}
