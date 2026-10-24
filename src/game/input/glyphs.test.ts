@@ -22,7 +22,7 @@ describe('input glyphs (mw-e02.9)', () => {
   });
 
   it('AC-5: glyphs follow remapped bindings, and say when an action is unbound', () => {
-    const remapped = rebind(DEFAULT_PAD_BINDINGS, 'cycleTarget', 'PadGuide');
+    const remapped = rebind(unbind(DEFAULT_PAD_BINDINGS, 'spellWheel'), 'cycleTarget', 'PadGuide');
     if (!remapped.ok) throw new Error('conflict');
     const bindings = { ...defaults, gamepad: remapped.bindings };
     expect(inputGlyph('cycleTarget', 'gamepad', bindings)).toBe('Xbox');

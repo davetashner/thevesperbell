@@ -4,7 +4,9 @@
 // rounded; nothing here feeds back into the sim.
 
 import {
+  hotbarOf,
   ManaComponent,
+  SPELL_HOTBAR_SLOTS,
   manaOf,
   readProperty,
   CastStarted,
@@ -40,6 +42,12 @@ export interface SpellReadout {
   /** Casts the controller itself would not send (invalid aim), and the latest reason. */
   readonly refusals: number;
   readonly lastRefusal: string | null;
+  /** The hotbar: a spell id (or null) per slot, and the selected slot. */
+  readonly hotbar: readonly (string | null)[];
+  readonly slot: number | null;
+  /** The quick-select wheel, and the sim speed the game runs at. */
+  readonly wheel: { readonly open: boolean; readonly highlight: number | null };
+  readonly timeScale: number;
   readonly aim: {
     readonly valid: boolean;
     readonly clamped: boolean;
@@ -55,6 +63,9 @@ export interface SpellReadoutOptions {
   readonly aim: () => AimResult | undefined;
   /** The scene spawn id of an entity. */
   readonly spawnOf: (entity: EntityId) => string | null;
+  /** The quick-select wheel's state and the loop's time scale. */
+  readonly wheel?: () => { readonly open: boolean; readonly highlight: number | null };
+  readonly timeScale?: () => number;
 }
 
 const MAX_KEPT = 8;
@@ -107,6 +118,11 @@ export function attachSpellReadout(options: SpellReadoutOptions): {
         fizzles: [...fizzles],
         refusals: caster.refusals,
         lastRefusal: caster.lastRefusal ?? null,
+        hotbar:
+          hotbarOf(world, player)?.slots ?? Array.from({ length: SPELL_HOTBAR_SLOTS }, () => null),
+        slot: hotbarOf(world, player)?.selected ?? null,
+        wheel: options.wheel?.() ?? { open: false, highlight: null },
+        timeScale: options.timeScale?.() ?? 1,
         aim: aim === undefined ? null : { valid: aim.valid, clamped: aim.clamped, mode: aim.mode },
       };
     },

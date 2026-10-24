@@ -40,6 +40,18 @@ export const ACTIONS = {
   // The selected spell (mw-e06.15): press to cast, hold to channel; cancel calls a cast off.
   cast: { kind: 'button', label: 'Cast spell', context: 'gameplay' },
   cancelCast: { kind: 'button', label: 'Cancel cast', context: 'gameplay' },
+  // The spell hotbar (mw-e06.16): a key per slot, previous/next spell, and the hold-to-open wheel.
+  spellSlot1: { kind: 'button', label: 'Spell slot 1', context: 'gameplay' },
+  spellSlot2: { kind: 'button', label: 'Spell slot 2', context: 'gameplay' },
+  spellSlot3: { kind: 'button', label: 'Spell slot 3', context: 'gameplay' },
+  spellSlot4: { kind: 'button', label: 'Spell slot 4', context: 'gameplay' },
+  spellSlot5: { kind: 'button', label: 'Spell slot 5', context: 'gameplay' },
+  spellSlot6: { kind: 'button', label: 'Spell slot 6', context: 'gameplay' },
+  spellSlot7: { kind: 'button', label: 'Spell slot 7', context: 'gameplay' },
+  spellSlot8: { kind: 'button', label: 'Spell slot 8', context: 'gameplay' },
+  spellPrev: { kind: 'button', label: 'Previous spell', context: 'gameplay' },
+  spellNext: { kind: 'button', label: 'Next spell', context: 'gameplay' },
+  spellWheel: { kind: 'button', label: 'Spell wheel (hold)', context: 'gameplay' },
   inventory: { kind: 'button', label: 'Inventory', context: 'gameplay' },
   // The selected item (mw-e17.7): drop its stack in front of you, or throw one along your look.
   drop: { kind: 'button', label: 'Drop item', context: 'gameplay' },

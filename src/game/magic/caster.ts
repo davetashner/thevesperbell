@@ -9,24 +9,45 @@
 //                        within the tick of the release
 //   cancelCast pressed   calls off whatever the caster is winding up or channelling
 //
-// The selected spell is presentation state kept here until the hotbar (mw-e06.16) owns selection;
-// with none chosen the first spell the caster has learned is used. Nothing here changes the sim:
-// the sim decides whether the cast may start (mana, cooldown, learned) and says why not through
-// SpellFizzled.
+// The selected spell is the hotbar's (mw-e06.16, src/sim/magic/hotbar.ts): the spell in the selected
+// slot, else the first spell the caster has learned. The slot keys, previous/next and the wheel's
+// pick become `select-spell-slot` commands in the same frame; a cast pressed in that frame already
+// uses the newly selected spell. Nothing here changes the sim itself: the sim decides whether the
+// cast may start (mana, cooldown, learned) and says why not through SpellFizzled.
 
 import type { SpellEntry } from '@content/index';
 import {
+  assignSpellSlot,
+  hotbarOf,
   KnownSpellsComponent,
+  selectedHotbarSpell,
+  selectSpellSlot,
+  selectSpellSlotCommand,
+  SPELL_HOTBAR_SLOTS,
   type ActionFrame,
+  type ButtonAction,
   type CancelCastCommand,
   type CastCommand,
+  type SelectSpellSlotCommand,
   type SpellLookup,
   type World,
 } from '@sim/index';
 import { resolveAim, type AimContext, type AimInvalid, type AimRay, type AimResult } from './aim';
 
 /** What the controller adds to a frame's commands. */
-export type SpellCommand = CastCommand | CancelCastCommand;
+export type SpellCommand = CastCommand | CancelCastCommand | SelectSpellSlotCommand;
+
+/** The action that selects each hotbar slot. */
+export const SLOT_ACTIONS: readonly ButtonAction[] = Object.freeze([
+  'spellSlot1',
+  'spellSlot2',
+  'spellSlot3',
+  'spellSlot4',
+  'spellSlot5',
+  'spellSlot6',
+  'spellSlot7',
+  'spellSlot8',
+]);
 
 export interface SpellCasterOptions extends AimContext {
   readonly spells: SpellLookup;
@@ -40,7 +61,6 @@ export type Refusal = AimInvalid | 'no-spell';
 export class SpellCaster {
   readonly #options: SpellCasterOptions;
   readonly #world: World<never>;
-  #chosen: string | undefined;
   #channelling = false;
   #refusals = 0;
   #lastRefusal: Refusal | undefined;
@@ -55,17 +75,49 @@ export class SpellCaster {
     return this.#world.get(this.#options.caster, KnownSpellsComponent)?.spells ?? [];
   }
 
-  /** The spell the cast button casts: the chosen one, else the first learned; undefined for none. */
+  /** The spell the cast button casts: the hotbar's selected one, else the first learned. */
   get selected(): string | undefined {
     const known = this.learned();
-    return this.#chosen !== undefined && known.includes(this.#chosen) ? this.#chosen : known[0];
+    const slotted = selectedHotbarSpell(this.#world, this.#options.caster);
+    return slotted !== undefined && known.includes(slotted) ? slotted : known[0];
   }
 
-  /** Chooses `id`; false (and no change) when the caster has not learned it. */
+  /**
+   * Chooses `id` now (outside a step; the console's way): its slot is selected, and a spell that is
+   * not on the bar yet takes the first empty slot, or the selected one when the bar is full. False
+   * (and no change) when the caster has not learned it.
+   */
   select(id: string): boolean {
+    const { caster } = this.#options;
     if (!this.learned().includes(id)) return false;
-    this.#chosen = id;
-    return true;
+    const bar = hotbarOf(this.#world, caster) ?? { slots: [], selected: null };
+    let slot = bar.slots.indexOf(id);
+    if (slot < 0) {
+      slot = bar.slots.indexOf(null);
+      if (slot < 0) slot = bar.selected ?? 0;
+      assignSpellSlot(this.#world, caster, slot, id);
+    }
+    return selectSpellSlot(this.#world, caster, slot);
+  }
+
+  /** The command that selects hotbar slot `slot`; none for an empty or selected slot or a dead caster. */
+  slotCommands(slot: number): readonly SpellCommand[] {
+    const bar = hotbarOf(this.#world, this.#options.caster);
+    if (this.#options.canCast?.() === false || bar === undefined) return [];
+    if (bar.slots[slot] == null || bar.selected === slot) return [];
+    return [selectSpellSlotCommand(this.#options.caster, slot)];
+  }
+
+  /** The slot after (or before) the selected one that holds a spell, wrapping; undefined if none. */
+  #step(direction: 1 | -1): number | undefined {
+    const bar = hotbarOf(this.#world, this.#options.caster);
+    if (bar === undefined) return undefined;
+    const from = bar.selected ?? (direction === 1 ? -1 : SPELL_HOTBAR_SLOTS);
+    for (let i = 1; i <= SPELL_HOTBAR_SLOTS; i++) {
+      const slot = (from + direction * i + SPELL_HOTBAR_SLOTS * 2) % SPELL_HOTBAR_SLOTS;
+      if (bar.slots[slot] !== null && slot !== bar.selected) return slot;
+    }
+    return undefined;
   }
 
   /** The selected spell's definition, if there is one. */
@@ -108,7 +160,23 @@ export class SpellCaster {
       cancel();
       return out;
     }
-    const spell = this.spell();
+    // Selection first: a cast pressed in the same frame uses the spell just chosen.
+    let spell = this.spell();
+    const bar = hotbarOf(this.#world, caster);
+    const wanted = SLOT_ACTIONS.findIndex((action) => frame[action].pressed);
+    const slot =
+      wanted >= 0
+        ? wanted
+        : frame.spellNext.pressed
+          ? this.#step(1)
+          : frame.spellPrev.pressed
+            ? this.#step(-1)
+            : undefined;
+    const slotted = slot === undefined ? undefined : bar?.slots[slot];
+    if (slot !== undefined && slotted != null) {
+      if (slot !== bar?.selected) out.push(selectSpellSlotCommand(caster, slot));
+      spell = this.#options.spells(slotted);
+    }
     if (frame.cast.pressed && spell === undefined) this.#refuse('no-spell');
     if (frame.cast.pressed && spell !== undefined) {
       const aim = resolveAim(spell, ray(), this.#options);

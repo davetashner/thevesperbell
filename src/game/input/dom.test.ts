@@ -63,7 +63,7 @@ describe('attachDomInput', () => {
 
     const space = b.key('keydown', 'Space');
     expect(space.defaultPrevented).toBe(true);
-    expect(b.key('keydown', 'KeyZ').defaultPrevented).toBe(false);
+    expect(b.key('keydown', 'KeyJ').defaultPrevented).toBe(false);
     b.key('keydown', 'KeyW');
     b.mouse('mousedown', 2);
     b.move(4, 3);

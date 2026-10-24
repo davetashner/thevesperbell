@@ -4,7 +4,7 @@
 //
 // Order (all before the stimulus system, so a spell's stimuli resolve in the tick it is cast; the
 // caller installs this from `installGamePhysics`'s `beforeStimuli` hook):
-//   spells (the pipeline and its `cast` command) → learning → mana → casting (cast phase, cooldowns,
+//   spells (the pipeline and its `cast` command) → learning → hotbar (mw-e06.16) → mana → casting (cast phase, cooldowns,
 //   `cancel-cast`) → projectiles → volumes → emission (light and noise; after projectiles so a light
 //   reads this tick's position).
 //
@@ -20,6 +20,7 @@ import {
   installCasting,
   installMana,
   installSpellEmission,
+  installSpellHotbar,
   installSpellLearning,
   KnownSpellsComponent,
   SpellLearning,
@@ -71,6 +72,7 @@ export function installGameMagic<TInput>(
   const spells: SpellLookup = (id) => byId.get(id);
   const pipeline = installSpells(world, { spells, damage: options.damage });
   installSpellLearning(world, pipeline, options.learn);
+  installSpellHotbar(world);
   installMana(world, pipeline);
   const casting = installCasting(world, pipeline);
   installSpellProjectiles(world, pipeline, {

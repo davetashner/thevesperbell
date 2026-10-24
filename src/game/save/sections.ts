@@ -8,6 +8,7 @@ import {
   CapabilitiesComponent,
   NavRouteComponent,
   PlayerClassComponent,
+  SpellHotbarComponent,
   StatsComponent,
 } from '@sim/index';
 import { creaturesSaveSection } from './creatures';
@@ -30,6 +31,7 @@ export const ON_DEMAND_COMPONENTS = Object.freeze([
   StatsComponent,
   CapabilitiesComponent,
   NavRouteComponent,
+  SpellHotbarComponent,
 ]);
 
 /** What the game's sections need from the running build. */

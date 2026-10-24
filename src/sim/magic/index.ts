@@ -5,6 +5,7 @@ export * from './components';
 export * from './cooldown';
 export * from './deliveries';
 export * from './emission';
+export * from './hotbar';
 export * from './events';
 export * from './learning';
 export * from './learn-command';

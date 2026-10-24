@@ -202,6 +202,11 @@ export const SETTINGS_SCHEMA = {
         help: 'Shows spoken lines as text.',
         default: true,
       }),
+      wheelSlowsTime: toggle({
+        label: 'Slow time in the spell wheel',
+        help: 'Slows the game to a quarter speed while the spell wheel is held open.',
+        default: true,
+      }),
     },
   },
   gameplay: {
