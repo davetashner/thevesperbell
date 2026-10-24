@@ -26,7 +26,7 @@ import {
   type ItemInstanceFlags,
 } from '../inventory/inventory';
 import type { LootTables } from '../loot/tables';
-import { KnownSpellsComponent, learnSpell } from '../magic/components';
+import { SpellLearning } from '../magic/learning';
 import { Rng } from '../rng';
 import {
   restBlocked,
@@ -492,7 +492,7 @@ export class Shops {
     actor: EntityId,
     merchantId: string,
     serviceId: string,
-    unlocks: Pick<UnlockBook, 'check' | 'learn'>,
+    unlocks: UnlockBook,
   ): TrainResult {
     const state = this.stateOf(world, merchantId);
     const service = this.#merchant(merchantId).services?.find((s) => s.id === serviceId);
@@ -507,14 +507,18 @@ export class Shops {
     if (this.#pack(world, actor).gold < service.price) return failure('cannot-afford');
     this.#rules.spendGold(world, actor, service.price);
     merchantStoreOf(world).set(merchantId, { ...state, gold: state.gold + service.price });
-    unlocks.learn(world, actor, capability, channel);
-    // A spell lesson also puts the spell on the player's spell list (mw-ju8.14), the list the spell
-    // pipeline casts from (src/sim/magic).
-    if (
-      capability.startsWith(SPELL_CAPABILITY_PREFIX) &&
-      world.isRegistered(KnownSpellsComponent)
-    ) {
-      learnSpell(world, actor, capability.slice(SPELL_CAPABILITY_PREFIX.length));
+    if (capability.startsWith(SPELL_CAPABILITY_PREFIX)) {
+      // A spell lesson goes through the one door every teacher uses (mw-e07.13): the spell becomes
+      // known, `spell.<id>` is granted through the unlock book and `SpellLearned {source: trainer}` fires.
+      new SpellLearning({ unlocks }).learn(
+        world,
+        actor,
+        capability.slice(SPELL_CAPABILITY_PREFIX.length),
+        channel,
+        channel,
+      );
+    } else {
+      unlocks.learn(world, actor, capability, channel);
     }
     world.events.emit(shopServiceBought, {
       tick: world.tick,

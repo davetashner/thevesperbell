@@ -416,7 +416,7 @@ export interface ShopControllerOptions {
   /** Null when it is safe to sleep, else why not (the autosave veto registry's verdict). */
   readonly safety?: () => string | null;
   /** The learn API trainers teach through (mw-ju8.13); absent = lessons cannot be bought. */
-  readonly unlocks?: Pick<UnlockBook, 'check' | 'learn'>;
+  readonly unlocks?: UnlockBook;
   /** A lesson was bought: the capability it taught (the e2e's readout). */
   readonly onLearned?: (capability: string) => void;
   /** Shows a toast (the night's "You sleep until morning."). */
@@ -625,7 +625,7 @@ export interface ShopUiOptions {
   /** Publishes a readout for the e2e: `shop` (JSON of a `ShopReading`), `rest` (a night's sleep). */
   readonly publish?: (key: 'shop' | 'rest' | 'learned', value: string) => void;
   /** The learn API trainers teach through (mw-ju8.13). */
-  readonly unlocks?: Pick<UnlockBook, 'check' | 'learn'>;
+  readonly unlocks?: UnlockBook;
   /** Null when it is safe to sleep, else why not (the autosave veto registry's verdict). */
   readonly safety?: () => string | null;
 }
