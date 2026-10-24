@@ -22,7 +22,13 @@ describe('spell stimulus elements (mw-e06.1)', () => {
         castTime: 0,
         delivery: { kind: 'self' },
         effects: [
-          { op: 'stimulus', element, intensity: 1, ...(element === 'gas' ? { gas: 'smoke' } : {}) },
+          {
+            op: 'stimulus',
+            element,
+            intensity: 1,
+            radius: 1,
+            ...(element === 'gas' ? { gas: 'smoke' } : {}),
+          },
         ],
         vfxCue: 'vfx-contract',
         sfxCue: 'sfx-contract',

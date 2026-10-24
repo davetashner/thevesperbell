@@ -9,3 +9,4 @@ export * from './ops';
 export * from './pipeline';
 export * from './projectile';
 export * from './registry';
+export * from './volumes';

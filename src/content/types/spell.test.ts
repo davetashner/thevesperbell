@@ -220,15 +220,39 @@ describe('spell schema (mw-e06.1)', () => {
   it('requires a gas id exactly for gas stimuli and gas volumes', () => {
     const shape = { kind: 'sphere', radius: 2 };
     const volume = { op: 'spawnVolume', shape, intensity: 1, duration: 5 };
-    expect(issues(withEffect({ op: 'stimulus', element: 'gas', intensity: 1 }))).toEqual([
-      'effects.0.gas: spell "test-spell": a gas stimulus needs a gas type id',
-    ]);
+    expect(issues(withEffect({ op: 'stimulus', element: 'gas', intensity: 1, radius: 1 }))).toEqual(
+      ['effects.0.gas: spell "test-spell": a gas stimulus needs a gas type id'],
+    );
     expect(issues(withEffect({ ...volume, element: 'heat', gas: 'smoke' }))).toEqual([
       'effects.0.gas: spell "test-spell": only gas stimuli name a gas (element is "heat")',
     ]);
     expect(issues(withEffect({ ...volume, element: 'gas', gas: 'smoke' }))).toEqual([]);
     expect(issues(withEffect({ op: 'stimulus', element: 'lava', intensity: 1 }))).toEqual([
       expect.stringMatching(/^effects\.0\.element: Invalid option/),
+    ]);
+  });
+
+  it('AC-4 (mw-e06.5): a stimulus needs a radius, a ray or contact, else it fails validation', () => {
+    const base = { op: 'stimulus', element: 'heat', intensity: 100 };
+    const failure =
+      'effects.0.radius: spell "test-spell": stimulus needs point radius, ray or volume (set a radius above 0, a ray, or contact)';
+    expect(issues(withEffect(base))).toEqual([failure]);
+    expect(issues(withEffect({ ...base, radius: 0 }))).toEqual([failure]);
+    expect(issues(withEffect({ ...base, radius: 1.5 }))).toEqual([]);
+    expect(issues(withEffect({ ...base, ray: {} }))).toEqual([]);
+    expect(issues(withEffect({ ...base, ray: { width: 0.5 } }))).toEqual([]);
+    expect(issues(withEffect({ ...base, contact: true }))).toEqual([]);
+    const bolt = {
+      kind: 'projectile',
+      speed: 20,
+      maxRange: 30,
+      radius: 0.2,
+      onExpire: [base],
+    };
+    expect(issues({ ...minimal, delivery: bolt })).toEqual([
+      failure
+        .replace('effects.0', 'delivery.onExpire.0')
+        .replace('spell "test-spell": ', 'spell "test-spell": '),
     ]);
   });
 

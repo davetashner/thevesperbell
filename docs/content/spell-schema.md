@@ -53,7 +53,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `delivery.onExpire[].op` | `"stimulus"` | required |  |
 | `delivery.onExpire[].element` | `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"gas"` \| `"light"` \| `"blunt"` \| `"slash"` \| `"pierce"` | required | Stimulus element (stimulus API). |
 | `delivery.onExpire[].intensity` | number ≥ 0 | required | Total amount at full falloff, in the element’s unit (°C, wetness, N·s, J…). |
-| `delivery.onExpire[].radius` | number ≥ 0 | `0` | Sphere radius around each hit point, metres; 0 = the delivery’s own contact/shape. |
+| `delivery.onExpire[].radius` | number ≥ 0 | `0` | Sphere radius around each hit point, metres; 0 needs `ray` or `contact`. |
+| `delivery.onExpire[].ray` | object | — | A ray from the caster to each hit point instead of a sphere (a lance, a jet). |
+| `delivery.onExpire[].ray.width` | number > 0 | `0.25` | Radius of the ray, metres. |
+| `delivery.onExpire[].contact` | boolean | `false` | Radius 0 only: act on the entity struck (or the bare hit point), nothing near. |
 | `delivery.onExpire[].duration` | number ≥ 0 | `0` | Seconds to spread the intensity over; 0 = at once. |
 | `delivery.onExpire[].falloff` | `"linear"` \| `"none"` | `"linear"` | Intensity falloff inside the shape (stimulus API): linear to the rim, or none. |
 | `delivery.onExpire[].gas` | id | — | Gas type id; required for (and only for) element "gas". |
@@ -142,7 +145,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `effects[].op` | `"stimulus"` | required |  |
 | `effects[].element` | `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"gas"` \| `"light"` \| `"blunt"` \| `"slash"` \| `"pierce"` | required | Stimulus element (stimulus API). |
 | `effects[].intensity` | number ≥ 0 | required | Total amount at full falloff, in the element’s unit (°C, wetness, N·s, J…). |
-| `effects[].radius` | number ≥ 0 | `0` | Sphere radius around each hit point, metres; 0 = the delivery’s own contact/shape. |
+| `effects[].radius` | number ≥ 0 | `0` | Sphere radius around each hit point, metres; 0 needs `ray` or `contact`. |
+| `effects[].ray` | object | — | A ray from the caster to each hit point instead of a sphere (a lance, a jet). |
+| `effects[].ray.width` | number > 0 | `0.25` | Radius of the ray, metres. |
+| `effects[].contact` | boolean | `false` | Radius 0 only: act on the entity struck (or the bare hit point), nothing near. |
 | `effects[].duration` | number ≥ 0 | `0` | Seconds to spread the intensity over; 0 = at once. |
 | `effects[].falloff` | `"linear"` \| `"none"` | `"linear"` | Intensity falloff inside the shape (stimulus API): linear to the rim, or none. |
 | `effects[].gas` | id | — | Gas type id; required for (and only for) element "gas". |

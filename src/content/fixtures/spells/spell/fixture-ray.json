@@ -15,6 +15,7 @@
       "element": "light",
       "intensity": 150,
       "radius": 0,
+      "ray": { "width": 0.25 },
       "duration": 0,
       "falloff": "none"
     },
