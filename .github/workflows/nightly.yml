@@ -7,9 +7,6 @@ on:
   schedule:
     - cron: '43 3 * * *'
   workflow_dispatch:
-  push: # TEMPORARY: prove the workflow before it exists on main
-    branches: [feat/ci-tiers]
-    paths: ['.github/workflows/nightly.yml']
 
 permissions:
   contents: read
