@@ -438,6 +438,9 @@ ${tokens}
 .vb-item-icon { width: 1.75em; height: 1.75em; grid-row: span 2; }
 .vb-item-name { overflow-wrap: anywhere; line-height: 1.2; }
 .vb-item-count { font-variant-numeric: tabular-nums; font-weight: 700; }
+/* Badge and count glyphs are drawn from data-glyph, not DOM text: the card's aria-label already names
+   them ("equipped", "3"), and axe's label-content-name-mismatch requires visible text to appear in it. */
+.vb-item-count::before, .vb-item-badge[data-glyph]::before { content: attr(data-glyph); }
 .vb-item-badges { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: var(--ui-space-1); }
 .vb-item-badges:empty { display: none; }
 .vb-item-badge {

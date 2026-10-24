@@ -345,8 +345,7 @@ export function openInventory(ui: UiRoot, options: InventoryOptions): Inventory 
       badges.append(
         h('span', {
           className: 'vb-item-badge',
-          text: 'E',
-          data: { part: 'equipped' },
+          data: { part: 'equipped', glyph: 'E' },
           attrs: { 'aria-hidden': 'true' },
         }),
       );
@@ -355,8 +354,7 @@ export function openInventory(ui: UiRoot, options: InventoryOptions): Inventory 
       badges.append(
         h('span', {
           className: 'vb-item-badge',
-          text: String(item.quickSlot + 1),
-          data: { part: 'slot' },
+          data: { part: 'slot', glyph: String(item.quickSlot + 1) },
           attrs: { 'aria-hidden': 'true' },
         }),
       );
@@ -374,7 +372,7 @@ export function openInventory(ui: UiRoot, options: InventoryOptions): Inventory 
         ? [
             h('span', {
               className: 'vb-item-count',
-              text: `×${String(item.count)}`,
+              data: { glyph: `×${String(item.count)}` },
               attrs: { 'aria-hidden': 'true' },
             }),
           ]
