@@ -88,6 +88,18 @@ export const SPELL_STIMULUS_ELEMENTS = [
   'pierce',
 ] as const;
 
+type TrailElements = [
+  'heat',
+  'cold',
+  'water',
+  'charge',
+  'force',
+  'light',
+  'blunt',
+  'slash',
+  'pierce',
+];
+
 /** Where an area of effect is centred. */
 export const AOE_ORIGINS = ['caster', 'aim'] as const;
 /** Force op modes (e06.8): push away, pull toward, a directed impulse, or a sustained lift. */
@@ -157,77 +169,6 @@ const areaShapeSchema = z
     }),
   ])
   .describe('Area shape: sphere, cone, line (wall) or ground decal.');
-
-const deliverySchema = z
-  .discriminatedUnion(
-    'kind',
-    [
-      z.strictObject({ kind: z.literal('self') }).describe('Affects the caster only.'),
-      z
-        .strictObject({
-          kind: z.literal('touch'),
-          reach: metres.default(1.5).describe('How far from the caster it can touch, metres.'),
-        })
-        .describe('Affects what the caster touches in front of them.'),
-      z
-        .strictObject({
-          kind: z.literal('projectile'),
-          speed: metres.describe('Flight speed, metres per second.'),
-          maxRange: metres.describe('Distance after which it fizzles, metres.'),
-          radius: metres.describe('Collision radius, metres.'),
-          gravity: z
-            .number()
-            .nonnegative()
-            .default(0)
-            .describe('Downward acceleration, m/s²; 0 flies straight, 9.81 arcs like a stone.'),
-        })
-        .describe('A physical projectile that flies and hits (e06.6).'),
-      z
-        .strictObject({
-          kind: z.literal('aoe'),
-          shape: areaShapeSchema,
-          origin: z
-            .enum(AOE_ORIGINS)
-            .default('caster')
-            .describe('Centred on the caster or the aim point.'),
-          range: z
-            .number()
-            .nonnegative()
-            .default(0)
-            .describe('Farthest aim point from the caster, metres (0 for caster-centred areas).'),
-          lineOfSight: z
-            .boolean()
-            .default(false)
-            .describe('Only targets with line of sight to the centre are affected.'),
-        })
-        .describe('An instant area of effect (e06.7); persistent areas are spawnVolume ops.'),
-      z
-        .strictObject({
-          kind: z.literal('beam'),
-          length: metres.describe('Beam reach, metres.'),
-          width: metres.describe('Beam width, metres.'),
-          maxBounces: z
-            .int()
-            .min(0)
-            .max(8)
-            .default(0)
-            .describe('Reflections off reflective surfaces before it stops (0–8).'),
-        })
-        .describe('A continuous ray that may reflect off reflective surfaces (e06.7).'),
-      z
-        .strictObject({
-          kind: z.literal('summonPoint'),
-          range: metres.describe('Farthest point from the caster it can be placed at, metres.'),
-          lineOfSight: z
-            .boolean()
-            .default(true)
-            .describe('The point must be visible from the caster.'),
-        })
-        .describe('A chosen point on the ground where summons and volumes appear.'),
-    ],
-    { error: unknownOption('delivery kind', 'kind', SPELL_DELIVERIES) },
-  )
-  .describe('How the spell reaches its targets; effect ops apply to what it reaches.');
 
 const PROPERTY_KEYS: readonly string[] = Object.keys(worldPropertiesSchema.shape);
 
@@ -370,6 +311,120 @@ const effectSchema = z
   })
   .describe('One effect op; ops apply in list order.');
 
+const deliverySchema = z
+  .discriminatedUnion(
+    'kind',
+    [
+      z.strictObject({ kind: z.literal('self') }).describe('Affects the caster only.'),
+      z
+        .strictObject({
+          kind: z.literal('touch'),
+          reach: metres.default(1.5).describe('How far from the caster it can touch, metres.'),
+        })
+        .describe('Affects what the caster touches in front of them.'),
+      z
+        .strictObject({
+          kind: z.literal('projectile'),
+          speed: metres.describe('Flight speed, metres per second.'),
+          maxRange: metres.describe('Distance after which it fizzles, metres.'),
+          radius: metres.describe('Collision radius, metres.'),
+          gravity: z
+            .number()
+            .nonnegative()
+            .default(0)
+            .describe('Downward acceleration, m/s²; 0 flies straight, 9.81 arcs like a stone.'),
+          lifetime: positiveSeconds
+            .default(10)
+            .describe('Seconds in flight before it expires (onExpire ops apply there).'),
+          pierce: z
+            .int()
+            .min(0)
+            .max(8)
+            .default(0)
+            .describe('Creatures it passes through, applying the effects to each (0–8).'),
+          bounce: z
+            .int()
+            .min(0)
+            .max(8)
+            .default(0)
+            .describe('Walls it rebounds off before the next one is its impact (0–8).'),
+          restitution: z
+            .number()
+            .min(0)
+            .max(1)
+            .default(0.8)
+            .describe('Fraction of its speed a bounce keeps.'),
+          impactRadius: z
+            .number()
+            .nonnegative()
+            .default(0)
+            .describe('Impact area: others within this many metres of the impact are hit too.'),
+          trail: z
+            .strictObject({
+              element: z
+                .enum(SPELL_STIMULUS_ELEMENTS.filter((e) => e !== 'gas') as TrailElements)
+                .describe('Stimulus element the projectile leaves along its path.'),
+              intensity: z
+                .number()
+                .positive()
+                .describe('Amount per second of flight, in the element’s unit.'),
+              radius: metres.default(0.5).describe('How close to its path things are reached.'),
+            })
+            .optional()
+            .describe('A stimulus carried along the whole flight path (a heat trail).'),
+          onExpire: z
+            .array(effectSchema)
+            .prefault([])
+            .describe('Ops applied at its position when it expires (lifetime or range ends).'),
+        })
+        .describe('A physical projectile that flies and hits (e06.6).'),
+      z
+        .strictObject({
+          kind: z.literal('aoe'),
+          shape: areaShapeSchema,
+          origin: z
+            .enum(AOE_ORIGINS)
+            .default('caster')
+            .describe('Centred on the caster or the aim point.'),
+          range: z
+            .number()
+            .nonnegative()
+            .default(0)
+            .describe('Farthest aim point from the caster, metres (0 for caster-centred areas).'),
+          lineOfSight: z
+            .boolean()
+            .default(false)
+            .describe('Only targets with line of sight to the centre are affected.'),
+        })
+        .describe('An instant area of effect (e06.7); persistent areas are spawnVolume ops.'),
+      z
+        .strictObject({
+          kind: z.literal('beam'),
+          length: metres.describe('Beam reach, metres.'),
+          width: metres.describe('Beam width, metres.'),
+          maxBounces: z
+            .int()
+            .min(0)
+            .max(8)
+            .default(0)
+            .describe('Reflections off reflective surfaces before it stops (0–8).'),
+        })
+        .describe('A continuous ray that may reflect off reflective surfaces (e06.7).'),
+      z
+        .strictObject({
+          kind: z.literal('summonPoint'),
+          range: metres.describe('Farthest point from the caster it can be placed at, metres.'),
+          lineOfSight: z
+            .boolean()
+            .default(true)
+            .describe('The point must be visible from the caster.'),
+        })
+        .describe('A chosen point on the ground where summons and volumes appear.'),
+    ],
+    { error: unknownOption('delivery kind', 'kind', SPELL_DELIVERIES) },
+  )
+  .describe('How the spell reaches its targets; effect ops apply to what it reaches.');
+
 const cueSchema = (pattern: RegExp, example: string, doc: string) =>
   z
     .string({
@@ -476,15 +531,20 @@ export const spellSchema = z
     if (delivery.kind === 'aoe' && delivery.origin === 'caster' && delivery.range > 0) {
       fail(['delivery', 'range'], 'a caster-centred area has no aim range (use origin "aim")');
     }
-    spell.effects.forEach((effect, i) => {
-      if (effect.op !== 'stimulus' && effect.op !== 'spawnVolume') return;
-      if (effect.element === 'gas' && effect.gas === undefined) {
-        fail(['effects', i, 'gas'], 'a gas stimulus needs a gas type id');
-      }
-      if (effect.element !== 'gas' && effect.gas !== undefined) {
-        fail(['effects', i, 'gas'], `only gas stimuli name a gas (element is "${effect.element}")`);
-      }
-    });
+    const checkGas = (list: readonly SpellEffect[], field: string) => {
+      list.forEach((effect, i) => {
+        if (effect.op !== 'stimulus' && effect.op !== 'spawnVolume') return;
+        const path = field.split('.').concat(String(i), 'gas');
+        if (effect.element === 'gas' && effect.gas === undefined) {
+          fail(path, 'a gas stimulus needs a gas type id');
+        }
+        if (effect.element !== 'gas' && effect.gas !== undefined) {
+          fail(path, `only gas stimuli name a gas (element is "${effect.element}")`);
+        }
+      });
+    };
+    checkGas(spell.effects, 'effects');
+    if (delivery.kind === 'projectile') checkGas(delivery.onExpire, 'delivery.onExpire');
   });
 
 /** A SpellDefinition as written in JSON (optional sections may be omitted). */

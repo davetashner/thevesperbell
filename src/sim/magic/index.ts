@@ -6,4 +6,5 @@ export * from './events';
 export * from './mana';
 export * from './ops';
 export * from './pipeline';
+export * from './projectile';
 export * from './registry';

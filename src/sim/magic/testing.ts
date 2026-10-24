@@ -49,6 +49,28 @@ export const stimulusOp = (
   ...(gas === undefined ? {} : { gas }),
 });
 
+type Delivery = SpellEntry['delivery'];
+
+/** A projectile delivery section with every default filled (a straight, short-lived bolt). */
+export function projectileDelivery(
+  overrides: Partial<Extract<Delivery, { kind: 'projectile' }>> = {},
+): Extract<Delivery, { kind: 'projectile' }> {
+  return {
+    kind: 'projectile',
+    speed: 20,
+    maxRange: 50,
+    radius: 0.2,
+    gravity: 0,
+    lifetime: 10,
+    pierce: 0,
+    bounce: 0,
+    restitution: 0.8,
+    impactRadius: 0,
+    onExpire: [],
+    ...overrides,
+  };
+}
+
 /** A valid spell (a self-cast "warded" status unless `overrides` say otherwise). */
 export function makeSpell(id: string, overrides: Partial<SpellEntry> = {}): SpellEntry {
   return {

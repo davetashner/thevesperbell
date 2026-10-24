@@ -84,7 +84,8 @@ export class SpellPipeline {
   readonly ops: OpRegistry;
   readonly deliveries: DeliveryRegistry;
   readonly damage: DamageModel;
-  private readonly spells: SpellLookup;
+  /** Looks a spell up by id (delivery systems read their delivery's section through it). */
+  readonly spells: SpellLookup;
   private gates: readonly CastGate[] = [];
 
   constructor(options: SpellPipelineOptions) {
@@ -188,6 +189,24 @@ export class SpellPipeline {
     world.destroy(delivery);
   }
 
+  /**
+   * A pending delivery reached `hits` but carries on (a projectile piercing a creature, one that
+   * expires): applies `effects` (default: the spell's own) there and leaves the delivery alive. Throws
+   * for an entity that is not a live spell delivery.
+   */
+  strike(
+    world: World<never>,
+    delivery: EntityId,
+    hits: readonly DeliveryHit[],
+    effects?: SpellEntry['effects'],
+  ): void {
+    const state = world.get(delivery, SpellDeliveryComponent);
+    if (state === undefined) throw new Error(`entity ${String(delivery)} is not a spell delivery`);
+    const spell = this.spells(state.spell);
+    if (spell === undefined) throw new Error(`delivery ${String(delivery)} names an unknown spell`);
+    this.apply(world, state, delivery, spell, hits, effects ?? spell.effects);
+  }
+
   /** A pending delivery ended without landing (out of range, caster interrupted): removes it. */
   cancel(world: World<never>, delivery: EntityId): void {
     const state = world.get(delivery, SpellDeliveryComponent);
@@ -208,6 +227,7 @@ export class SpellPipeline {
     delivery: EntityId,
     spell: SpellEntry,
     hits: readonly DeliveryHit[],
+    effects: SpellEntry['effects'] = spell.effects,
   ): void {
     const base = { tick: world.tick, caster: state.caster, spell: spell.id, delivery };
     for (const hit of hits) {
@@ -220,7 +240,7 @@ export class SpellPipeline {
         delivery,
         damage: this.damage,
       };
-      spell.effects.forEach((op, index) => {
+      effects.forEach((op, index) => {
         const detail = this.ops.require(op.op)(ctx, op);
         if (detail === undefined) return;
         world.events.emit(SpellEffectApplied, {

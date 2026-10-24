@@ -30,6 +30,81 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `delivery.maxRange` | number > 0 | required | Distance after which it fizzles, metres. |
 | `delivery.radius` | number > 0 | required | Collision radius, metres. |
 | `delivery.gravity` | number ≥ 0 | `0` | Downward acceleration, m/s²; 0 flies straight, 9.81 arcs like a stone. |
+| `delivery.lifetime` | number > 0 | `10` | Seconds in flight before it expires (onExpire ops apply there). |
+| `delivery.pierce` | integer 0–8 | `0` | Creatures it passes through, applying the effects to each (0–8). |
+| `delivery.bounce` | integer 0–8 | `0` | Walls it rebounds off before the next one is its impact (0–8). |
+| `delivery.restitution` | number 0–1 | `0.8` | Fraction of its speed a bounce keeps. |
+| `delivery.impactRadius` | number ≥ 0 | `0` | Impact area: others within this many metres of the impact are hit too. |
+| `delivery.trail` | object | — | A stimulus carried along the whole flight path (a heat trail). |
+| `delivery.trail.element` | `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"light"` \| `"blunt"` \| `"slash"` \| `"pierce"` | required | Stimulus element the projectile leaves along its path. |
+| `delivery.trail.intensity` | number > 0 | required | Amount per second of flight, in the element’s unit. |
+| `delivery.trail.radius` | number > 0 | `0.5` | How close to its path things are reached. |
+| `delivery.onExpire` | list of object | `[]` | Ops applied at its position when it expires (lifetime or range ends). |
+| `delivery.onExpire[].amounts` | map of `"slash"` \| `"pierce"` \| `"blunt"` \| `"fire"` \| `"frost"` \| `"shock"` \| `"arcane"` \| `"poison"` → number ≥ 0 | required | Damage points per damage type (before resistances); unlisted types deal 0. |
+| `delivery.onExpire[].poiseDamage` | number ≥ 0 | `0` | Poise damage in points. |
+| `delivery.onExpire[].staminaDamage` | number ≥ 0 | `0` | Stamina drained from a blocker, in points (before shield stability). |
+| `delivery.onExpire[].impulse` | object | `{"x":0,"y":0,"z":0}` | Knockback impulse, N·s, in the attacker’s frame (+z forward, +y up). |
+| `delivery.onExpire[].impulse.x` | number | required |  |
+| `delivery.onExpire[].impulse.y` | number | required |  |
+| `delivery.onExpire[].impulse.z` | number | required |  |
+| `delivery.onExpire[].impactForce` | number ≥ 0 | `0` | Peak impact force, N (breakables, knockdown). |
+| `delivery.onExpire[].tags` | list of id | `[]` | Damage-packet tags every hit carries, e.g. "critical" (damage model tags). |
+| `delivery.onExpire[].op` | `"damage"` | required |  |
+| `delivery.onExpire[].op` | `"stimulus"` | required |  |
+| `delivery.onExpire[].element` | `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"gas"` \| `"light"` \| `"blunt"` \| `"slash"` \| `"pierce"` | required | Stimulus element (stimulus API). |
+| `delivery.onExpire[].intensity` | number ≥ 0 | required | Total amount at full falloff, in the element’s unit (°C, wetness, N·s, J…). |
+| `delivery.onExpire[].radius` | number ≥ 0 | `0` | Sphere radius around each hit point, metres; 0 = the delivery’s own contact/shape. |
+| `delivery.onExpire[].duration` | number ≥ 0 | `0` | Seconds to spread the intensity over; 0 = at once. |
+| `delivery.onExpire[].falloff` | `"linear"` \| `"none"` | `"linear"` | Intensity falloff inside the shape (stimulus API): linear to the rim, or none. |
+| `delivery.onExpire[].gas` | id | — | Gas type id; required for (and only for) element "gas". |
+| `delivery.onExpire[].op` | `"force"` | required |  |
+| `delivery.onExpire[].mode` | `"push"` \| `"pull"` \| `"impulse"` \| `"lift"` | required | push away, pull toward, directed impulse or sustained lift. |
+| `delivery.onExpire[].impulse` | number > 0 | required | Impulse, N·s (per second for a sustained lift). |
+| `delivery.onExpire[].duration` | number ≥ 0 | `0` | Seconds a sustained force lasts; 0 = one impulse. |
+| `delivery.onExpire[].op` | `"status"` | required |  |
+| `delivery.onExpire[].status` | id | required | Status id, e.g. "rooted" (status definitions: e06.9). |
+| `delivery.onExpire[].duration` | number > 0 | required | Seconds the status lasts. |
+| `delivery.onExpire[].stacks` | integer 1–99 | `1` | Stacks applied. |
+| `delivery.onExpire[].op` | `"summon"` | required |  |
+| `delivery.onExpire[].creature` | ref → creature | required | Creature summoned. |
+| `delivery.onExpire[].duration` | number > 0 | required | Seconds before it is dismissed. |
+| `delivery.onExpire[].count` | integer 1–10 | `1` | How many one cast summons. |
+| `delivery.onExpire[].maxActive` | integer 1–20 | `1` | Most alive per caster; summoning more dismisses the oldest. |
+| `delivery.onExpire[].consumes` | object | — | World material the summon needs and uses up (e.g. property "remains"). |
+| `delivery.onExpire[].consumes.property` | string | required | A canonical world property key (docs/design/world-properties.md). |
+| `delivery.onExpire[].consumes.radius` | number > 0 | required | Search radius around the summon point, metres. |
+| `delivery.onExpire[].consumes.count` | integer 1–10 | `1` | Entities with the property consumed. |
+| `delivery.onExpire[].op` | `"transform"` | required |  |
+| `delivery.onExpire[].into` | ref → creature | required | Creature form the target takes. |
+| `delivery.onExpire[].duration` | number > 0 | required | Seconds before it changes back. |
+| `delivery.onExpire[].op` | `"displace"` | required |  |
+| `delivery.onExpire[].mode` | `"teleport"` \| `"swap"` \| `"dash"` | required | teleport to the aim point, swap with the target, or dash. |
+| `delivery.onExpire[].distance` | number > 0 | required | Farthest displacement, metres. |
+| `delivery.onExpire[].lineOfSight` | boolean | `true` | The destination must be visible. |
+| `delivery.onExpire[].op` | `"spawnVolume"` | required |  |
+| `delivery.onExpire[].shape` | object | required | Area shape: sphere, cone, line (wall) or ground decal. |
+| `delivery.onExpire[].shape.kind` | `"sphere"` | required |  |
+| `delivery.onExpire[].shape.radius` | number > 0 | required | Radius, metres. |
+| `delivery.onExpire[].shape.kind` | `"cone"` | required |  |
+| `delivery.onExpire[].shape.length` | number > 0 | required | Reach along the aim direction, metres. |
+| `delivery.onExpire[].shape.angle` | number > 0 ≤ 180 | required | Full opening angle, degrees (at most 180). |
+| `delivery.onExpire[].shape.kind` | `"line"` | required |  |
+| `delivery.onExpire[].shape.length` | number > 0 | required | Length along the aim direction, metres. |
+| `delivery.onExpire[].shape.width` | number > 0 | required | Width, metres. |
+| `delivery.onExpire[].shape.height` | number > 0 | required | Height, metres (a wall of fire is tall; a trail of frost is not). |
+| `delivery.onExpire[].shape.kind` | `"decal"` | required |  |
+| `delivery.onExpire[].shape.radius` | number > 0 | required | Radius of the ground patch, metres. |
+| `delivery.onExpire[].element` | `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"gas"` \| `"light"` \| `"blunt"` \| `"slash"` \| `"pierce"` | required | Stimulus element the volume emits while it lasts. |
+| `delivery.onExpire[].intensity` | number ≥ 0 | required | Amount per second at full falloff, in the element’s unit. |
+| `delivery.onExpire[].duration` | number > 0 | required | Seconds the volume lasts. |
+| `delivery.onExpire[].op` | `"light"` | required |  |
+| `delivery.onExpire[].intensity` | number > 0 | required | Light output (a torch is about 100). |
+| `delivery.onExpire[].radius` | number > 0 | required | Reach, metres. |
+| `delivery.onExpire[].duration` | number ≥ 0 | `0` | Seconds it shines; 0 = a flash. |
+| `delivery.onExpire[].attach` | `"caster"` \| `"delivery"` \| `"point"` | `"delivery"` | Follows the caster, the delivery (projectile, beam) or stays at the hit point. |
+| `delivery.onExpire[].op` | `"noise"` | required |  |
+| `delivery.onExpire[].phase` | `"windup"` \| `"release"` \| `"impact"` | required | Cast phase it sounds in. |
+| `delivery.onExpire[].loudness` | number > 0 | required | Hearing radius, metres, before sound propagation attenuates it. |
 | `delivery.kind` | `"aoe"` | required |  |
 | `delivery.shape` | object | required | Area shape: sphere, cone, line (wall) or ground decal. |
 | `delivery.shape.kind` | `"sphere"` | required |  |

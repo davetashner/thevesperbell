@@ -26,7 +26,14 @@ import {
   type EntityId,
   type SpellEffectAppliedInfo,
 } from '@sim/index';
-import { damageOp, makeSpell, spellWorld, statusOp, stimulusOp } from './testing';
+import {
+  damageOp,
+  makeSpell,
+  projectileDelivery,
+  spellWorld,
+  statusOp,
+  stimulusOp,
+} from './testing';
 
 /** Names of the events a world emits, in delivery order, with their payloads. */
 function record(world: ReturnType<typeof spellWorld>['world']) {
@@ -142,7 +149,7 @@ describe('spell pipeline: cast → deliver → effect (mw-e06.2)', () => {
 describe('spell pipeline: validation and fizzles', () => {
   it('refuses a dead or missing caster, a failing gate, and spells needing unregistered deliveries or ops', () => {
     const projectile = makeSpell('t-bolt', {
-      delivery: { kind: 'projectile', speed: 10, maxRange: 20, radius: 0.2, gravity: 0 },
+      delivery: projectileDelivery({ speed: 10, maxRange: 20 }),
     });
     const forceful = makeSpell('t-shove', {
       effects: [{ op: 'force', mode: 'push', impulse: 5, duration: 0 }],
@@ -354,7 +361,7 @@ describe('spell pipeline: extension points', () => {
     const ops = builtInOps();
     const deliveries = builtInDeliveries().register('projectile', () => ({ kind: 'pending' }));
     const bolt = makeSpell('t-bolt', {
-      delivery: { kind: 'projectile', speed: 10, maxRange: 20, radius: 0.2, gravity: 0 },
+      delivery: projectileDelivery({ speed: 10, maxRange: 20 }),
       effects: [damageOp({ fire: 7 })],
     });
     const { world, spawn } = spellWorld([bolt]);
