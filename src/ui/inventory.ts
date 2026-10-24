@@ -47,11 +47,12 @@ export type InventoryTabId = (typeof INVENTORY_TABS)[number]['id'];
 
 /** What can be done to an item from its context menu. */
 export type InventoryActionId =
-  'use' | 'assign' | 'unassign' | 'equip' | 'unequip' | 'drop' | 'throw';
+  'use' | 'study' | 'assign' | 'unassign' | 'equip' | 'unequip' | 'drop' | 'throw';
 
 /** Each action's menu label. */
 export const INVENTORY_ACTION_LABELS: Readonly<Record<InventoryActionId, string>> = Object.freeze({
   use: 'Use',
+  study: 'Study',
   assign: 'Assign to quick slot',
   unassign: 'Remove from quick slot',
   equip: 'Equip',

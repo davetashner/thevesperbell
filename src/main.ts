@@ -83,6 +83,7 @@ import {
   startMechanisms,
 } from '@game/mechanisms/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
+import { createStudyRules } from '@game/items/book-study';
 import {
   applyClass,
   classCards,
@@ -221,6 +222,7 @@ import { createVfxRenderer } from '@render/vfx/index';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
   addCapabilities,
+  installStudy,
   announceRespawn,
   installSceneTransitions,
   AttackerDummyComponent,
@@ -1312,11 +1314,20 @@ function startRenderer(
       // The inventory screen and the quick-slot strip (mw-e17.10): I or View opens the screen; its
       // actions reach the sim as commands. The e2e reads #app[data-inventory] (open/closed) and
       // #app[data-quick-slots].
+      // Studying a spellbook (mw-e07.2): the inventory's Study action starts a session that the
+      // study system plays out as game time passes, learning the spell through the unlock book.
+      const study = createStudyRules(
+        content,
+        capabilities,
+        createUnlockBook(content, capabilities),
+      );
+      installStudy(world, study);
       inventoryUi = startInventoryUi({
         ui,
         world,
         content,
         consumables,
+        study,
         player: player?.entity,
         submit: (command) => {
           commands.push(command);

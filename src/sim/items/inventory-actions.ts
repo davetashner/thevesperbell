@@ -25,6 +25,7 @@ import {
   type SlotMap,
 } from '../inventory/equipment';
 import { inventoryOf } from '../inventory/inventory';
+import type { StudyRefusal, StudyRules } from '../magic/study';
 import { QUICK_SLOT_COUNT, quickSlotsOf, type Consumables, type UseRefusal } from './consumables';
 import { handlerView, type DropRefusal, type ItemHandlerView } from './world-items';
 
@@ -36,7 +37,9 @@ export type InventoryAction =
   | { readonly op: 'drop'; readonly instanceId: number }
   | { readonly op: 'throw'; readonly instanceId: number }
   | { readonly op: 'equip'; readonly instanceId: number }
-  | { readonly op: 'unequip'; readonly instanceId: number };
+  | { readonly op: 'unequip'; readonly instanceId: number }
+  /** Study a spellbook (mw-e07.2): starts or resumes a study session. */
+  | { readonly op: 'study'; readonly instanceId: number };
 
 /** The command carrying an inventory action. */
 export const INVENTORY_ACTION_COMMAND = 'item.inventoryAction' as const;
@@ -52,6 +55,9 @@ export type InventoryActionRefusal =
   | UseRefusal
   | DropRefusal
   | EquipRefusal
+  | StudyRefusal
+  /** Study on an item that teaches no spell, or without study rules installed. */
+  | 'not-studyable'
   /** Not something a quick slot can hold (only usable consumables). */
   | 'not-assignable'
   /** Equip or unequip for an actor without equipment slots (no class yet). */
@@ -114,6 +120,8 @@ export interface InventoryActionsOptions {
   readonly consumables: Consumables;
   /** The equipment rules; without them equip and unequip are refused with `no-equipment`. */
   readonly equipment?: EquipmentRules;
+  /** The study rules (mw-e07.2); without them `study` is refused with `not-studyable`. */
+  readonly study?: StudyRules;
   /** Where `actor` drops and throws from; defaults to `handlerView` (the player's). */
   readonly view?: (world: World<never>, actor: EntityId) => ItemHandlerView | undefined;
 }
@@ -124,11 +132,13 @@ const OK: InventoryActionResult = Object.freeze({ ok: true });
 export class InventoryActions {
   readonly #consumables: Consumables;
   readonly #equipment: EquipmentRules | undefined;
+  readonly #study: StudyRules | undefined;
   readonly #view: (world: World<never>, actor: EntityId) => ItemHandlerView | undefined;
 
   constructor(options: InventoryActionsOptions) {
     this.#consumables = options.consumables;
     this.#equipment = options.equipment;
+    this.#study = options.study;
     this.#view = options.view ?? handlerView;
   }
 
@@ -177,6 +187,13 @@ export class InventoryActions {
         if (equipment === undefined) return { ok: false, reason: 'no-equipment' };
         const equipped = equipment.rules.equip(world, actor, action.instanceId);
         return equipped.ok ? OK : equipped;
+      }
+      case 'study': {
+        if (this.#study === undefined || defId === undefined) {
+          return { ok: false, reason: 'not-studyable' };
+        }
+        const started = this.#study.start(world, actor, defId);
+        return started.status === 'refused' ? { ok: false, reason: started.reason } : OK;
       }
       case 'unequip': {
         const equipment = this.#equipmentFor(world, actor);

@@ -58,6 +58,7 @@ export const MAGIC_COMPONENTS = [
 
 /** Makes `caster` know `spell` (idempotent). Outside a step, or on a caster that already knows spells. */
 export function learnSpell(world: World<never>, caster: EntityId, spell: string): void {
+  if (!world.isRegistered(KnownSpellsComponent)) world.register(KnownSpellsComponent);
   const known = world.get(caster, KnownSpellsComponent);
   if (known === undefined) {
     world.add(caster, KnownSpellsComponent, { spells: [spell] });
@@ -68,7 +69,10 @@ export function learnSpell(world: World<never>, caster: EntityId, spell: string)
 
 /** Whether `caster` has learned `spell`. */
 export function knowsSpell(world: World<never>, caster: EntityId, spell: string): boolean {
-  return world.get(caster, KnownSpellsComponent)?.spells.includes(spell) ?? false;
+  return (
+    world.isRegistered(KnownSpellsComponent) &&
+    (world.get(caster, KnownSpellsComponent)?.spells.includes(spell) ?? false)
+  );
 }
 
 /** The ledger's entity and value; throws when the spell pipeline is not installed. */

@@ -13,6 +13,10 @@ import { addInventory, inventoryOf } from '../inventory/inventory';
 import { installPhysicsObjects } from '../physics/objects';
 import { RapierPhysics } from '../physics/rapier';
 import { registerWorldProperties } from '../properties/components';
+import { installGameClock } from '../gametime/clock';
+import { DEFAULT_CLOCK_CONFIG } from '../gametime/config';
+import { SpellLearning } from '../magic/learning';
+import { addStudent, installStudy, StudyRules } from '../magic/study';
 import { installStimuli } from '../stimulus/stimulus';
 import {
   addQuickSlots,
@@ -55,12 +59,13 @@ const DEFS = [
       nonProficient: { drawTimeMultiplier: 1, staminaCostMultiplier: 1, noiseMultiplier: 1 },
     },
   } as Partial<ConsumableDef>),
+  item('field-primer', 'book'),
   item('gallery-key', 'key', { flags: { unique: true, questItem: true, noDrop: true } }),
 ];
 
 const VIEW = { feet: { x: 0, y: 0, z: 0 }, yaw: 0, pitch: 0 };
 
-function setup(options: { equipment?: boolean; view?: boolean } = {}) {
+function setup(options: { equipment?: boolean; view?: boolean; study?: StudyRules } = {}) {
   const physics = new RapierPhysics(RAPIER);
   const world = installStimuli(registerWorldProperties(new World<unknown>({ seed: 5, physics })));
   const sim = world as unknown as World<never>;
@@ -77,6 +82,7 @@ function setup(options: { equipment?: boolean; view?: boolean } = {}) {
   const actions = new InventoryActions({
     consumables,
     ...(options.equipment !== false && { equipment }),
+    ...(options.study !== undefined && { study: options.study }),
     ...(options.view === false ? { view: () => undefined } : { view: () => VIEW }),
   });
   installInventoryActions(world, actions);
@@ -95,6 +101,52 @@ function setup(options: { equipment?: boolean; view?: boolean } = {}) {
   const units = (defId: string): number => items.inventory.count(sim, actor, { defId });
   return { world, sim, actor, done, give, units, actions, equipment };
 }
+
+describe('studying from the inventory (mw-e07.2)', () => {
+  const studyRules = (): StudyRules =>
+    new StudyRules({
+      books: (id) =>
+        id === 'field-primer'
+          ? { id, spell: 'spark', studyMinutes: 10, learners: 'any' }
+          : undefined,
+      learning: new SpellLearning(),
+    });
+
+  it('starts a study session for a spellbook and passes the rules’ refusals through', () => {
+    const rules = studyRules();
+    const { world, sim, actor, give, actions } = setup({ study: rules });
+    installGameClock(world, DEFAULT_CLOCK_CONFIG);
+    installStudy(world, rules);
+    addStudent(sim, actor);
+    world.step();
+    const primer = give('field-primer');
+    const draught = give('healing-draught');
+    expect(actions.apply(sim, actor, { op: 'study', instanceId: draught })).toEqual({
+      ok: false,
+      reason: 'unknown-book',
+    });
+    expect(actions.apply(sim, actor, { op: 'study', instanceId: primer })).toEqual({ ok: true });
+    expect(rules.studying(sim, actor)).toBe('field-primer');
+    expect(actions.apply(sim, actor, { op: 'study', instanceId: primer })).toEqual({
+      ok: false,
+      reason: 'busy',
+    });
+  });
+
+  it('is refused without study rules, or for an instance that is not there', () => {
+    const bare = setup();
+    const primer = bare.give('field-primer');
+    expect(bare.actions.apply(bare.sim, bare.actor, { op: 'study', instanceId: primer })).toEqual({
+      ok: false,
+      reason: 'not-studyable',
+    });
+    const ruled = setup({ study: studyRules() });
+    expect(ruled.actions.apply(ruled.sim, ruled.actor, { op: 'study', instanceId: 99 })).toEqual({
+      ok: false,
+      reason: 'not-studyable',
+    });
+  });
+});
 
 describe('inventory action commands', () => {
   it('builds and recognises commands, rejecting bad instance ids and slots', () => {
