@@ -63,6 +63,7 @@ export * from './input';
 export * from './interaction';
 export * from './light';
 export * from './loot';
+export * from './magic';
 export * from './mechanisms';
 export * from './nav';
 export * as simMath from './math';
