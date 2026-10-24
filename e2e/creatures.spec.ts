@@ -108,3 +108,34 @@ for (const look of [1, 2, 3, 4]) {
     expect(problems).toEqual([]);
   });
 }
+
+// mw-ju8.35 AC-1: the brute, archer and shield-bearer each load their own model files (a bigger
+// skeleton and a maul; a bow; a shield) beside the miner's, with no console errors.
+const VARIANT_FILES: Record<string, string[]> = {
+  'forgotten-brute': ['model-creature-forgotten-brute-01', 'model-prop-brute-maul-01'],
+  'forgotten-archer': ['model-prop-forgotten-bow-01'],
+  'forgotten-shield-bearer': ['model-prop-forgotten-shield-01'],
+};
+for (const [kind, files] of Object.entries(VARIANT_FILES)) {
+  test(`AC-1 (mw-ju8.35): ${kind} loads ${files.join(' and ')}`, async ({ page }) => {
+    test.setTimeout(60_000);
+    const problems = collectProblems(page);
+    const loaded = files.map((file) =>
+      page.waitForResponse(
+        (response) => response.url().includes(`/assets/model/${file}.glb`) && response.ok(),
+      ),
+    );
+    await page.goto('/?scene=testbed&debug=1&miner=1');
+    await expect(page.locator('#app')).toHaveAttribute('data-debug-console', 'closed', {
+      timeout: 10_000,
+    });
+    await page.keyboard.press('Backquote');
+    await expect(page.getByTestId('debug-console-input')).toBeFocused();
+    await page.keyboard.type(`spawn ${kind} 1`);
+    await page.keyboard.press('Enter');
+    await expect.poll(() => creatures(page)).toMatchObject({ count: 1, drawn: 1 });
+    await Promise.all(loaded);
+    await page.waitForTimeout(1_500);
+    expect(problems).toEqual([]);
+  });
+}

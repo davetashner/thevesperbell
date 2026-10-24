@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  leftHandPoint,
   MINER_VARIANTS,
   pickVariant,
   randomSalt,
@@ -92,5 +93,18 @@ describe('rightHandPoint', () => {
   it('is undefined when nothing sits on the right side in the band', () => {
     expect(rightHandPoint([0.3, 1.0, 0, 0.5, 0.9, 0], 2)).toBeUndefined();
     expect(rightHandPoint([], 2)).toBeUndefined();
+  });
+});
+
+describe('leftHandPoint', () => {
+  it('AC-1: is the right-hand finder on the mirror image (a left arm out to x = +0.6)', () => {
+    const points = [0, 1.8, 0, 0.1, 1.0, 0, 0.6, 0.9, 0.05, 0.55, 0.95, -0.05, 0.9, 0.2, 0];
+    const hand = leftHandPoint(points, 2);
+    expect(hand?.x).toBeCloseTo((0.6 + 0.55) / 2 - 0.04, 6);
+    expect(hand?.y).toBeCloseTo((0.9 + 0.95) / 2, 6);
+  });
+
+  it('is undefined when nothing sits on the left side in the band', () => {
+    expect(leftHandPoint([-0.3, 1.0, 0], 2)).toBeUndefined();
   });
 });
