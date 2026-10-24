@@ -15,6 +15,7 @@ import { DAY_CLOCK_FACTS, factDayClock, MORNING_MINUTE } from '../rest/day-clock
 import { restCompleted, type RestCompleted } from '../rest/rest';
 import { addCapabilities, CapabilityRegistry } from '../progression/capabilities';
 import { UnlockBook } from '../progression/unlocks';
+import { KnownSpellsComponent, knowsSpell, MAGIC_COMPONENTS } from '../magic/components';
 import { BUYBACK_LIMIT } from './shop-state';
 import {
   shopBought,
@@ -759,5 +760,50 @@ describe('merchant services: a trainer sells lessons (mw-ju8.13)', () => {
       reason: 'no-such-service',
     });
     expect(inventoryOf(s.world, s.actor)?.gold).toBe(1000);
+  });
+});
+
+describe('merchant services: a spell lesson (mw-ju8.14)', () => {
+  const teacher: ShopMerchantDef = {
+    id: 'bridge',
+    buysCategories: [],
+    goldReserve: 0,
+    markup: 1,
+    buyRate: 0.5,
+    stock: [],
+    services: [{ id: 'ember', name: 'Ember', price: 200, kind: 'train', teaches: 'spell.ember' }],
+  };
+
+  function lesson(withMagic: boolean) {
+    const world = new World({ seed: 7 });
+    if (withMagic) world.register(...MAGIC_COMPONENTS);
+    const actor = world.spawn();
+    addInventory(world, actor, 250);
+    const registry = new CapabilityRegistry(['spell.ember']);
+    addCapabilities(world, actor);
+    const book = new UnlockBook(registry, [
+      { capability: 'spell.ember', prerequisites: [], channels: ['trainer'] },
+    ]);
+    const shops = new Shops([teacher], ITEMS, new InventoryRules(ITEMS));
+    return { world, actor, book, shops };
+  }
+
+  it('AC-2: paying for Ember teaches the capability and puts the spell on the known list', () => {
+    const s = lesson(true);
+    expect(s.shops.train(s.world, s.actor, 'bridge', 'ember', s.book)).toEqual({
+      ok: true,
+      price: 200,
+      capability: 'spell.ember',
+    });
+    expect(s.book.knows(s.world, s.actor, 'spell.ember')).toBe(true);
+    expect(knowsSpell(s.world, s.actor, 'ember')).toBe(true);
+    expect(inventoryOf(s.world, s.actor)?.gold).toBe(50);
+  });
+
+  it('AC-2: a world without the spell pipeline still learns the capability', () => {
+    const s = lesson(false);
+    expect(s.shops.train(s.world, s.actor, 'bridge', 'ember', s.book).ok).toBe(true);
+    expect(s.book.knows(s.world, s.actor, 'spell.ember')).toBe(true);
+    expect(s.world.isRegistered(KnownSpellsComponent)).toBe(false);
   });
 });

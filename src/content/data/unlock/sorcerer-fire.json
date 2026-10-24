@@ -2,9 +2,9 @@
   "$schema": "../unlock.schema.json",
   "id": "sorcerer-fire",
   "name": "Sorcerer fire chain",
-  "notes": "ADR-0004's first sorcerer chain: Ember (ignite candles, ropes, oil) → Firebolt (a burning projectile) → Flame Jet (a held cone) → Fire Wall (a burning barrier). Each step is a new verb, learned from books; a deed can also teach Ember. Which books teach them, and the comprehension and mastery requirements, are mw-e07.7, mw-e07.8 and mw-e08.",
+  "notes": "ADR-0004's first sorcerer chain: Ember (ignite candles, ropes, oil) → Firebolt (a burning projectile) → Flame Jet (a held cone) → Fire Wall (a burning barrier). Each step is a new verb, learned from books; a deed can also teach Ember, and so can Idris Quillon, the unlicensed teacher under the Miners' Bridge (trainer channel, mw-ju8.14). Which books teach them, and the comprehension and mastery requirements, are mw-e07.7, mw-e07.8 and mw-e08.",
   "unlocks": [
-    { "capability": "spell.ember", "channels": ["book", "deed"] },
+    { "capability": "spell.ember", "channels": ["book", "deed", "trainer"] },
     { "capability": "spell.firebolt", "prerequisites": ["spell.ember"], "channels": ["book"] },
     { "capability": "spell.flame-jet", "prerequisites": ["spell.firebolt"], "channels": ["book"] },
     { "capability": "spell.fire-wall", "prerequisites": ["spell.flame-jet"], "channels": ["book"] }

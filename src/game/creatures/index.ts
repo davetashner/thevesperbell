@@ -57,6 +57,7 @@ import {
   type CreatureSpawnOptions,
   type EntityId,
   type RapierPhysics,
+  PHASE_FACT,
   type SceneCreatures,
   type SceneSpawnPlacement,
   type Spawner,
@@ -69,6 +70,7 @@ import type { RenderSync, SceneBinding } from '../loop/render-sync';
 
 export * from './ai';
 export * from './drops';
+export * from './presence';
 export * from './save-veto';
 
 /** The first half of the creature wiring (see the file header). */
@@ -126,7 +128,15 @@ export function startCreatures<TInput>(
     damage: combat.damage,
     invulnerable: invulnerabilityRule(combat.moves),
   });
-  return { ...spawnSceneCreatures(w, creatures.spawn, spawns), ai: installed };
+  // A creature that keeps to some phases of the day is spawned only in those (mw-ju8.14).
+  const phase = world.facts.get(PHASE_FACT);
+  const scene = spawnSceneCreatures(
+    w,
+    creatures.spawn,
+    spawns,
+    typeof phase === 'string' ? phase : undefined,
+  );
+  return { ...scene, ai: installed };
 }
 
 /** What `startCreatures` spawned, and the creature AI it installed (undefined without `ai`). */

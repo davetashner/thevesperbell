@@ -117,6 +117,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].leash.post` | list of any (at least 3) | — | The post, grid cells; absent = the spawn point. |
 | `spawns[].repopulate` | object | — | Opts the spawned creature in to returning after it is killed (mw-ju8.29): it is spawned fresh at its origin when the scene next loads, or at once when the player is out of sight and far away. Not for bosses or gatekeepers (needs creature). |
 | `spawns[].repopulate.afterDays` | integer 1–365 | required | World days after the kill before the creature returns; 1 = once the player has slept through a night. |
+| `spawns[].presence` | object | — | The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene. |
+| `spawns[].presence.phases` | list of id (at least 1) | required | Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for. |
 | `spawns[].carries` | list of object (at least 1) | — | What the spawned creature carries and drops where it dies, as world items (mw-e01.5), e.g. the slice skeleton’s key (needs creature). |
 | `spawns[].carries[].item` | ref → item | required | An item the creature carries. |
 | `spawns[].carries[].count` | integer 1–9999 | `1` | Units of it; default 1. |

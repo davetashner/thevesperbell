@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "briar-glen-lane",
   "name": "Briar Glen: the shop lane",
-  "description": "Bead mw-ju8.5: a greybox cobbled lane, about 40 m long and 16 m wide, built from the e00 kit only. It runs north from the town end of the Miners' Bridge (the bridge-town-end marker; the bridge-gate transition just south of it leads back to valley-03). Marsh's General Store is the first building past the bridge, on the west side: its front door (marsh-store-door) is a transition into the shop (mw-e01.11). Arrival spawns arrive-from-valley-03, arrive-from-marsh-store and arrive-from-sleeping-ox are where the player stands when coming from those scenes; the Sleeping Ox stands further up the west side (mw-ju8.22): a facade with a doorway, a hanging sign stand-in (sign-sleeping-ox; the art, a peaceful ox asleep under a moon, comes later), a lantern and the sleeping-ox-door transition into the inn, with arrive-from-sleeping-ox just outside it. On the east side three open-fronted shops stand side by side, each with a six metre counter and its keeper behind it: Brand's Forge (Oswin Brand; anvil, forge fire, weapon rack, quench barrel), Fenn's Fletchery & Simples (Juniper Fenn; bow rack, herb bench, arrow barrel) and Pell's Bakery (Hollis Pell; bread shelf, oven, flour sacks). Each counter is a spawn tagged merchant:<id> with the Trade verb and dev-crowns:400 so the dev scene can trade. The Bridge Watch post stands at the bridge end (mw-ju8.12): two pillars with the guard-post, a banner (watch-banner), a lamp (watch-lamp) and a brazier on a crate (watch-brazier), with two day guards and one night guard (npc-watchman-day/-night, faction bridge-watch) standing just inside the lane. The Bridgeward College (mw-ju8.13) stands at the far end of the west side: its front door (bridgeward-college-door) is a transition into the college, arriving back at arrive-from-bridgeward-college. Props are kit stand-ins with named marker spawns so art can dress them later; street and shop lanterns are warm. Reach it with ?scene=briar-glen-lane.",
+  "description": "Bead mw-ju8.5: a greybox cobbled lane, about 40 m long and 16 m wide, built from the e00 kit only. It runs north from the town end of the Miners' Bridge (the bridge-town-end marker; the bridge-gate transition just south of it leads back to valley-03). Marsh's General Store is the first building past the bridge, on the west side: its front door (marsh-store-door) is a transition into the shop (mw-e01.11). Arrival spawns arrive-from-valley-03, arrive-from-marsh-store and arrive-from-sleeping-ox are where the player stands when coming from those scenes; the Sleeping Ox stands further up the west side (mw-ju8.22): a facade with a doorway, a hanging sign stand-in (sign-sleeping-ox; the art, a peaceful ox asleep under a moon, comes later), a lantern and the sleeping-ox-door transition into the inn, with arrive-from-sleeping-ox just outside it. On the east side three open-fronted shops stand side by side, each with a six metre counter and its keeper behind it: Brand's Forge (Oswin Brand; anvil, forge fire, weapon rack, quench barrel), Fenn's Fletchery & Simples (Juniper Fenn; bow rack, herb bench, arrow barrel) and Pell's Bakery (Hollis Pell; bread shelf, oven, flour sacks). Each counter is a spawn tagged merchant:<id> with the Trade verb and dev-crowns:400 so the dev scene can trade. The Bridge Watch post stands at the bridge end (mw-ju8.12): two pillars with the guard-post, a banner (watch-banner), a lamp (watch-lamp) and a brazier on a crate (watch-brazier), with two day guards and one night guard (npc-watchman-day/-night, faction bridge-watch) standing just inside the lane. The Bridgeward College (mw-ju8.13) stands at the far end of the west side: its front door (bridgeward-college-door) is a transition into the college, arriving back at arrive-from-bridgeward-college. Props are kit stand-ins with named marker spawns so art can dress them later; street and shop lanterns are warm. Reach it with ?scene=briar-glen-lane. The riverbank path (mw-ju8.14): a gap in the east wall just past the Bridge Watch post (z 5.5 to 9) opens on a short lit alley whose end is the riverbank-path transition down to under-the-bridge (arrive-from-under-the-bridge brings the player back). The Bridge Watch keep shifts by the game clock (docs/design/bridge-watch.md): the day guards stand dawn to dusk, the night guard dusk to dawn.",
   "grid": 1,
   "camera": {
     "position": [-12, 16, 4],
@@ -31,9 +31,36 @@
     },
     {
       "piece": "wall",
-      "at": [9.0, 0.0, 20.0],
+      "at": [9.0, 0.0, 2.75],
       "yaw": 90,
-      "scale": [20, 1, 1]
+      "scale": [2.75, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [9.0, 0.0, 24.5],
+      "yaw": 90,
+      "scale": [15.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [10.5, 0.0, 7.25],
+      "scale": [1.5, 1, 1.75]
+    },
+    {
+      "piece": "wall",
+      "at": [10.5, 0.0, 5.5],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [10.5, 0.0, 9.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [12.0, 0.0, 7.25],
+      "yaw": 90,
+      "scale": [1.75, 1, 1]
     },
     {
       "piece": "wall",
@@ -603,6 +630,9 @@
       "creature": "npc-watchman-day",
       "leash": {
         "radius": 1.5
+      },
+      "presence": {
+        "phases": ["dawn", "day", "dusk"]
       }
     },
     {
@@ -613,6 +643,9 @@
       "creature": "npc-watchman-day",
       "leash": {
         "radius": 1.5
+      },
+      "presence": {
+        "phases": ["dawn", "day", "dusk"]
       }
     },
     {
@@ -623,7 +656,31 @@
       "creature": "npc-watchman-night",
       "leash": {
         "radius": 1.5
+      },
+      "presence": {
+        "phases": ["dusk", "night"]
       }
+    },
+    {
+      "id": "riverbank-path",
+      "at": [10.5, 0.0, 7.25],
+      "tags": ["path", "riverbank"]
+    },
+    {
+      "id": "lantern-riverbank-path",
+      "at": [9.5, 2.5, 7.25],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "arrive-from-under-the-bridge",
+      "at": [9.25, 0.0, 7.25],
+      "yaw": 270,
+      "tags": ["arrival"]
     }
   ],
   "light": {
@@ -667,6 +724,13 @@
       "min": [-8.5, -1, 35.4],
       "max": [-7.5, 3, 36.6],
       "scene": "bridgeward-college",
+      "spawn": "arrive-from-briar-glen-lane"
+    },
+    {
+      "id": "riverbank-path",
+      "min": [11.0, -1, 6.25],
+      "max": [11.8, 3, 8.25],
+      "scene": "under-the-bridge",
       "spawn": "arrive-from-briar-glen-lane"
     }
   ]

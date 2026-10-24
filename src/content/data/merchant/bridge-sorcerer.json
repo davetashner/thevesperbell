@@ -1,0 +1,25 @@
+{
+  "$schema": "../merchant.schema.json",
+  "id": "bridge-sorcerer",
+  "notes": "The robed teacher under the Miners' Bridge (story bible §3.5, §5.17; mw-ju8.14): Idris Quillon (npc-quillon), a scholar the Lantern Court struck off the register, teaches Ember, the first step of the Fire school's chain (ADR-0004), for 200 crowns, inside the economy doc's trainer band (100-400). He is only there between dusk and dawn (the counter and the creature carry presence {dusk, night} in the under-the-bridge scene). He sells no goods and holds no till. Favours instead of crowns wait on the favour system.",
+  "npcId": "npc-quillon",
+  "displayName": "Idris Quillon",
+  "shopName": "Under the Bridge: Sorcery Lessons",
+  "personalityTags": ["shrewd"],
+  "specialties": [],
+  "buysCategories": ["book"],
+  "services": [
+    {
+      "id": "ember",
+      "name": "Ember",
+      "price": 200,
+      "kind": "train",
+      "teaches": "spell.ember"
+    }
+  ],
+  "stock": [],
+  "goldReserve": 0,
+  "goldRestockPerDay": 0,
+  "markup": 1.3,
+  "buyRate": 0.4
+}

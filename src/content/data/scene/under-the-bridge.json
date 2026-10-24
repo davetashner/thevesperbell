@@ -1,0 +1,195 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "under-the-bridge",
+  "name": "Under the Miners' Bridge",
+  "description": "Bead mw-ju8.14: the riverbank under the Miners' Bridge in grey box, built from the e00 kit only. A 14 x 8 m shingle bank between two bridge piers (bridge-pier-west/east; the arch itself is art to come), reached by a short walled path from briar-glen-lane's riverbank-path transition (path-up leads back, arrive-from-briar-glen-lane arrives). Idris Quillon (npc-quillon), the robed teacher the Lantern Court has struck off, waits here between dusk and dawn only: his creature spawn and his lesson table (quillon-lessons, merchant bridge-sorcerer) carry presence {dusk, night}, so by day the bank is empty and the table does not answer. He sells the Ember lesson through the shop screen's Services tab. dev-crowns:600 tops the player up on first opening so the dev scene can pay. A shuttered blue lantern and a brazier mark the spot. Reach it with ?scene=under-the-bridge.",
+  "grid": 1,
+  "camera": {
+    "position": [-12, 12, -12],
+    "target": [0, 1, 0]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [7, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, -6],
+      "scale": [1.5, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [-4.25, 0, -4],
+      "scale": [2.75, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [4.25, 0, -4],
+      "scale": [2.75, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-1.5, 0, -6],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1.5, 0, -6],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -8],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 4],
+      "scale": [7, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-7, 0, 0],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [7, 0, 0],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [-4.75, 0, 2],
+      "scale": [1.2, 4, 1.2],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [4.75, 0, 2],
+      "scale": [1.2, 4, 1.2],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "crate",
+      "at": [-2.5, 0, 2.75],
+      "scale": [0.7, 0.6, 0.7]
+    },
+    {
+      "piece": "crate",
+      "at": [3, 0, 2.5],
+      "scale": [0.8, 0.8, 0.8]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -5],
+      "tags": ["player-start", "entrance"]
+    },
+    {
+      "id": "arrive-from-briar-glen-lane",
+      "at": [0, 0, -5.25],
+      "yaw": 0,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "bridge-pier-west",
+      "at": [-4.75, 4, 2],
+      "tags": ["pier", "prop"]
+    },
+    {
+      "id": "bridge-pier-east",
+      "at": [4.75, 4, 2],
+      "tags": ["pier", "prop"]
+    },
+    {
+      "id": "quillon-lessons",
+      "at": [0, 0, -0.25],
+      "tags": ["counter", "shop", "merchant:bridge-sorcerer", "dev-crowns:600"],
+      "presence": {
+        "phases": ["dusk", "night"]
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Sorcery lessons"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-quillon",
+      "at": [0, 0, 2.0],
+      "yaw": 180,
+      "tags": ["trainer", "instructor:sorcery"],
+      "creature": "npc-quillon",
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "phases": ["dusk", "night"]
+      }
+    },
+    {
+      "id": "quillon-brazier",
+      "at": [1.75, 0.5, 1.0],
+      "tags": ["brazier", "hearth"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 86400
+      }
+    },
+    {
+      "id": "quillon-lantern",
+      "at": [-1.5, 1.5, 1.25],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lantern-path",
+      "at": [0, 2.5, -5.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.18,
+    "directional": [
+      {
+        "id": "moon",
+        "direction": [0.3, -1, 0.4],
+        "level": 0.16,
+        "reach": 40
+      }
+    ]
+  },
+  "environment": {
+    "sky": "#1A1830"
+  },
+  "transitions": [
+    {
+      "id": "path-up",
+      "min": [-1, -1, -7.9],
+      "max": [1, 3, -7.3],
+      "scene": "briar-glen-lane",
+      "spawn": "arrive-from-under-the-bridge"
+    }
+  ]
+}

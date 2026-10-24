@@ -53,6 +53,7 @@ import {
   startSceneNoise,
   viewCentrePoint,
   watchCreatureAi,
+  watchPresence,
   type GameCreatures,
 } from '@game/creatures/index';
 import { bindBreakLeftovers, BreakWatch, hasBreakables } from '@game/breakables/index';
@@ -1550,6 +1551,8 @@ function startRenderer(
         navigation,
       });
       for (const line of sceneCreatureErrors(sceneCreatures)) console.error(line);
+      // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
+      watchPresence(world, creatures.spawn, loaded.layout.spawns);
       // A placed creature's death sets its slain fact (mw-e01.7), e.g. entity:slice/skeleton.slain.
       installSlainFacts(world, scene.id, loaded.layout.spawns);
       // A dying creature drops what it carries and rolls its loot table (mw-e01.5): the slice's

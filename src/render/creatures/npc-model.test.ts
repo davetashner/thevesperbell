@@ -34,7 +34,7 @@ function glbJson(path: string): GlbJson {
 describe('NPC models', () => {
   it('AC-1: every NPC mesh id that names a model has a file of at most 6k triangles and one texture', () => {
     const meshes = npcMeshes().filter((mesh) => mesh !== 'placeholder-capsule');
-    expect(meshes.length).toBe(9);
+    expect(meshes.length).toBe(10);
     for (const mesh of meshes) {
       const url = npcModelUrl(mesh);
       expect(url, mesh).toBeDefined();
@@ -50,7 +50,7 @@ describe('NPC models', () => {
 
   it('AC-1: the watchmen share one model', () => {
     expect(NPC_MODEL_URLS['npc-watchman']).toBeDefined();
-    expect(Object.values(NPC_MODEL_URLS).length).toBe(8);
+    expect(Object.values(NPC_MODEL_URLS).length).toBe(9);
   });
 
   it('AC-1: Hollis, Juniper and Oswin each have their own model, and no NPC is a capsule any more', () => {

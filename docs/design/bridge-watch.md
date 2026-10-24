@@ -20,9 +20,11 @@ guard post at the town end of the bridge by day and night and turns away hooliga
 
 ## Settled decisions (modest, owner may change)
 
-- **Shift model.** No schedule. The day and night watch are two sets of guards who are both always
-  at the post; real shifts wait for the day/night schedule system (mw-e27.12). The difference between
-  them is a tag now and tabard/lantern art later.
+- **Shift model.** By the game clock (mw-e27.12, mw-ju8.14): the two day guards carry `presence` {dawn, day,
+  dusk} and the night guard {dusk, night}, so the day watch stands from 05:00 to 21:00 and the night guard
+  from 18:00 to 05:00, with all three at the post through dusk (the handover). A guard not on shift is not
+  spawned when the lane loads, and arrives or leaves as the clock crosses a phase boundary while the player is
+  there (`src/sim/creatures/presence.ts`).
 - **Names.** Guards are unnamed members of the Watch for now. Named guards come with dialogue.
 - **Monsters.** Nothing that is not a person on business crosses. This holds structurally: creatures
   never travel through a scene transition and no monster is placed in the lane scenes (asserted in
@@ -37,4 +39,4 @@ guard post at the town end of the bridge by day and night and turns away hooliga
 
 ## Not built
 
-Guard dialogue and barks, a shift schedule, guards fighting monsters, retaliation, bounty.
+Guard dialogue and barks, guards fighting monsters, retaliation, bounty.

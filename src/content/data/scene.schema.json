@@ -860,6 +860,25 @@
             ],
             "additionalProperties": false
           },
+          "presence": {
+            "description": "The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene.",
+            "type": "object",
+            "properties": {
+              "phases": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "description": "Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for."
+              }
+            },
+            "required": [
+              "phases"
+            ],
+            "additionalProperties": false
+          },
           "carries": {
             "description": "What the spawned creature carries and drops where it dies, as world items (mw-e01.5), e.g. the slice skeleton’s key (needs creature).",
             "minItems": 1,

@@ -94,6 +94,7 @@ describe('scene loader glue (mw-e00.21)', () => {
       'sleeping-ox',
       'slice',
       'testbed',
+      'under-the-bridge',
       'valley-01',
       'valley-02',
       'valley-03',
@@ -167,7 +168,7 @@ describe('scene loader glue (mw-e00.21)', () => {
     const current = loader.load('testbed');
     expect(() => loader.load('does-not-exist')).toThrow(UnknownSceneError);
     expect(() => loader.load('does-not-exist')).toThrow(
-      'unknown scene "does-not-exist"; available scenes: briar-glen-lane, bridgeward-college, combat-sandbox, kit-gallery, lighting-room, marsh-store, mechanism-room, perf-baseline, skeleton-pen, sleeping-ox, slice, testbed, valley-01, valley-02, valley-03, weak-wall-room',
+      'unknown scene "does-not-exist"; available scenes: briar-glen-lane, bridgeward-college, combat-sandbox, kit-gallery, lighting-room, marsh-store, mechanism-room, perf-baseline, skeleton-pen, sleeping-ox, slice, testbed, under-the-bridge, valley-01, valley-02, valley-03, weak-wall-room',
     );
     expect(loader.current).toBe(current);
   });
