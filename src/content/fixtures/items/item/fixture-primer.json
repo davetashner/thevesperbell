@@ -2,7 +2,7 @@
   "$schema": "../../../data/item.schema.json",
   "id": "fixture-primer",
   "category": "book",
-  "notes": "A primer that can teach Mage Hand to whoever studies it.",
+  "notes": "A primer that teaches Bolt to whoever studies it (the book schema's valid fixture, mw-e07.1).",
   "icon": "icon-item-fixture-primer-01",
   "value": 25,
   "worldProperties": {
@@ -10,7 +10,23 @@
     "flammable": true
   },
   "book": {
-    "textKey": "item.fixture-primer.text",
-    "teaches": ["spell.mage-hand"]
+    "title": "A Primer of Bolts",
+    "author": "Tamsin Reed",
+    "school": "fire",
+    "teaches": {
+      "kind": "spell",
+      "spell": "fixture-bolt"
+    },
+    "pages": [
+      {
+        "textKey": "item.fixture-primer.text"
+      },
+      {
+        "textKey": "item.fixture-primer.text2"
+      }
+    ],
+    "studyMinutes": 30,
+    "legality": "licensed",
+    "rarity": "common"
   }
 }

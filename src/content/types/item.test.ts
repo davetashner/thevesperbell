@@ -88,7 +88,9 @@ describe('item fixtures (mw-e17.2)', () => {
     expectTypeOf<ItemOf<'armor'>['armor']['weightKg']>().toEqualTypeOf<number>();
     expectTypeOf<ItemOf<'shield'>['shield']['weightKg']>().toEqualTypeOf<number>();
     expectTypeOf<ItemOf<'key'>['key']['opens']>().toEqualTypeOf<string[]>();
-    expectTypeOf<ItemOf<'book'>['book']['teaches']>().toEqualTypeOf<string[]>();
+    expectTypeOf<ItemOf<'book'>['book']['teaches']['kind']>().toEqualTypeOf<
+      'spell' | 'insight' | 'lore'
+    >();
     expectTypeOf<ItemOf<'misc'>>().not.toHaveProperty('armor');
     expectTypeOf<ItemOf<'currency'>>().not.toHaveProperty('equip');
 
@@ -103,7 +105,7 @@ describe('item fixtures (mw-e17.2)', () => {
         case 'ammo':
           return item.ammo.arrow.id;
         case 'book':
-          return item.book.teaches.join(',');
+          return item.book.teaches.kind;
         case 'key':
           return `${item.key.opens.join(',')} single-use ${String(item.key.singleUse)}`;
         default:
@@ -120,7 +122,7 @@ describe('item fixtures (mw-e17.2)', () => {
       'body 8 kg',
       'consumable',
       'misc',
-      'spell.mage-hand',
+      'spell',
       'sword-light-1,sword-light-2,sword-light-3',
       'fixture-tower-door single-use true',
       'wood-shield 3 kg',
@@ -374,7 +376,14 @@ describe('item loading (mw-e17.2)', () => {
         ...misc,
         id: 'book',
         category: 'book',
-        book: { textKey: 'item.book.text', teaches: ['spell.unknown-lore'] },
+        book: {
+          title: 'Book',
+          author: 'Anon',
+          pages: [{ textKey: 'item.book.text' }],
+          teaches: { kind: 'insight', capability: 'spell.unknown-lore' },
+          legality: 'licensed',
+          rarity: 'common',
+        },
       }),
       file('src/content/data/item/scroll.json', {
         ...misc,
@@ -387,7 +396,7 @@ describe('item loading (mw-e17.2)', () => {
       }),
     ]);
     expect(issues).toEqual([
-      'src/content/data/item/book.json#/book/teaches/0: item:book names unknown capability "spell.unknown-lore": declare it in src/content/data/capability/',
+      'src/content/data/item/book.json#/book/teaches/capability: item:book names unknown capability "spell.unknown-lore": declare it in src/content/data/capability/',
       'src/content/data/item/scroll.json#/use/1/capability: item:scroll names unknown capability "trick.unknown-trick": declare it in src/content/data/capability/',
     ]);
   });

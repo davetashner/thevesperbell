@@ -76,7 +76,6 @@ describe('spell fixtures (mw-e06.1)', () => {
       school: 'fire',
       cost: { mana: 15 },
       delivery: { kind: 'projectile', speed: 25 },
-      bookId: 'fixture-book-of-embers',
     });
     expect(bolt.next).toEqual([new ContentRef('spell', 'fixture-fire-wall')]);
     expect(bolt.effects.map((e) => e.op)).toEqual(['damage', 'stimulus', 'light', 'noise']);

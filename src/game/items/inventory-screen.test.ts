@@ -203,7 +203,22 @@ describe('inventory view models', () => {
     expect(itemVerbs(def('shortbow'), NAMES)).toEqual(['Wield in both hands']);
     expect(itemVerbs(def('wooden-shield'), NAMES)).toEqual(['Block']);
     expect(itemVerbs(def('standard-arrow'), NAMES)).toEqual(['Shoot from a bow']);
-    expect(itemVerbs(def('fixture-primer'), NAMES)).toEqual(['Read', 'Learn cap:spell.mage-hand']);
+    expect(itemVerbs(def('fixture-primer'), NAMES)).toEqual([
+      'Read',
+      'Learn cap:spell.fixture-bolt',
+    ]);
+    const primer = def('fixture-primer');
+    if (primer.category !== 'book') throw new Error('fixture-primer is a book');
+    const withTeaching = (
+      teaches: Extract<ItemEntry, { category: 'book' }>['book']['teaches'],
+    ): ItemEntry => ({
+      ...primer,
+      book: { ...primer.book, teaches },
+    });
+    expect(
+      itemVerbs(withTeaching({ kind: 'insight', capability: 'tool.lockpick' }), NAMES),
+    ).toEqual(['Read', 'Learn cap:tool.lockpick']);
+    expect(itemVerbs(withTeaching({ kind: 'lore' }), NAMES)).toEqual(['Read']);
     expect(itemVerbs(def('testbed-closet-key'), NAMES)).toEqual(['Unlock: lock:testbed-closet']);
     expect(itemVerbs(def('fixture-gold'), NAMES)).toEqual([]);
     const base = def('healing-draught');
