@@ -10,7 +10,7 @@ const docs = read('docs/ci-gates.md');
 /** Top-level job ids of a workflow file. */
 function jobsOf(yaml: string): string[] {
   const body = yaml.slice(yaml.search(/^jobs:/m));
-  return [...body.matchAll(/^ {2}([a-z][a-z0-9-]*):\s*$/gm)].map((m) => m[1]!);
+  return [...body.matchAll(/^ {2}([a-z][a-z0-9-]*):\s*$/gm)].map((m) => String(m[1]));
 }
 
 /** The text of one job in a workflow file. */
