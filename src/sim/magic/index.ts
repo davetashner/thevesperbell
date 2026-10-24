@@ -2,6 +2,7 @@
 // registries, the state it keeps, and the events render/audio subscribe to.
 export * from './components';
 export * from './deliveries';
+export * from './emission';
 export * from './events';
 export * from './mana';
 export * from './ops';

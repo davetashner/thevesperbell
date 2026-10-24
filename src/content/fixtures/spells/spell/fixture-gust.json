@@ -24,7 +24,7 @@
       "duration": 0,
       "falloff": "linear"
     },
-    { "op": "noise", "phase": "release", "loudness": 20 }
+    { "op": "noise", "phase": "release", "loudness": 60 }
   ],
   "tags": ["storm", "control"],
   "vfxCue": "vfx-spell-storm-fixture-gust",

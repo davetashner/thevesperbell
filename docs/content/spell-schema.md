@@ -104,7 +104,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `delivery.onExpire[].attach` | `"caster"` \| `"delivery"` \| `"point"` | `"delivery"` | Follows the caster, the delivery (projectile, beam) or stays at the hit point. |
 | `delivery.onExpire[].op` | `"noise"` | required |  |
 | `delivery.onExpire[].phase` | `"windup"` \| `"release"` \| `"impact"` | required | Cast phase it sounds in. |
-| `delivery.onExpire[].loudness` | number > 0 | required | Hearing radius, metres, before sound propagation attenuates it. |
+| `delivery.onExpire[].loudness` | number ≥ 0 | required | NoiseEvent level 1 m from the source, dB (a door slam is about 85); sound propagation attenuates it. 0 = silent. |
 | `delivery.kind` | `"aoe"` | required |  |
 | `delivery.shape` | object | required | Area shape: sphere, cone, line (wall) or ground decal. |
 | `delivery.shape.kind` | `"sphere"` | required |  |
@@ -193,7 +193,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `effects[].attach` | `"caster"` \| `"delivery"` \| `"point"` | `"delivery"` | Follows the caster, the delivery (projectile, beam) or stays at the hit point. |
 | `effects[].op` | `"noise"` | required |  |
 | `effects[].phase` | `"windup"` \| `"release"` \| `"impact"` | required | Cast phase it sounds in. |
-| `effects[].loudness` | number > 0 | required | Hearing radius, metres, before sound propagation attenuates it. |
+| `effects[].loudness` | number ≥ 0 | required | NoiseEvent level 1 m from the source, dB (a door slam is about 85); sound propagation attenuates it. 0 = silent. |
 | `tags` | list of id | `[]` | Free tags for queries and dispel rules, e.g. "fire", "control". |
 | `vfxCue` | string | required | VFX cue id (style bible §15.1). |
 | `sfxCue` | string | required | Audio cue id (audio bible §6), without the round-robin number. |

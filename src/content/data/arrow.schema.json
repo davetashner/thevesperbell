@@ -603,7 +603,7 @@
               "loudness": {
                 "type": "number",
                 "exclusiveMinimum": 0,
-                "description": "NoiseEvent loudness at the impact point (mw-e03.25 scale; e05.11 uses 70)."
+                "description": "NoiseEvent level at the impact point, dB at 1 m (e05.11 uses 70)."
               },
               "duration": {
                 "default": 0,

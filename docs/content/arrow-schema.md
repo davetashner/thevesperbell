@@ -98,7 +98,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `payload[].length` | number > 0 | — | Length of a spawned line (rope), metres. |
 | `payload[].anchor` | string | — | Flag property the struck surface must have to anchor the spawn (e.g. "softAnchor"); without it the arrow bounces and nothing spawns. |
 | `payload[].op` | `"noise"` | required |  |
-| `payload[].loudness` | number > 0 | required | NoiseEvent loudness at the impact point (mw-e03.25 scale; e05.11 uses 70). |
+| `payload[].loudness` | number > 0 | required | NoiseEvent level at the impact point, dB at 1 m (e05.11 uses 70). |
 | `payload[].duration` | number ≥ 0 | `0` | Seconds the sound lasts; 0 = one instant. |
 | `payload[].op` | `"impactForceMul"` | required |  |
 | `payload[].factor` | number > 0 ≤ 10 | required | Multiplier on the hit’s impact force and knock impulse (0–10). |

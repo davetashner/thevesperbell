@@ -300,9 +300,16 @@ const opSchemas = [
     .strictObject({
       op: z.literal('noise'),
       phase: z.enum(NOISE_PHASES).describe('Cast phase it sounds in.'),
-      loudness: metres.describe('Hearing radius, metres, before sound propagation attenuates it.'),
+      loudness: z
+        .number()
+        .nonnegative()
+        .describe(
+          'NoiseEvent level 1 m from the source, dB (a door slam is about 85); sound propagation attenuates it. 0 = silent.',
+        ),
     })
-    .describe('Makes a sound that stealth and AI hear (e06.14).'),
+    .describe(
+      'Makes a sound that stealth and AI hear (e06.14). A spell with no noise op sounds at its school’s default loudness.',
+    ),
 ] as const;
 
 const effectSchema = z

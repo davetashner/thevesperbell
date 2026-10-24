@@ -821,8 +821,8 @@
                       },
                       "loudness": {
                         "type": "number",
-                        "exclusiveMinimum": 0,
-                        "description": "Hearing radius, metres, before sound propagation attenuates it."
+                        "minimum": 0,
+                        "description": "NoiseEvent level 1 m from the source, dB (a door slam is about 85); sound propagation attenuates it. 0 = silent."
                       }
                     },
                     "required": [
@@ -831,7 +831,7 @@
                       "loudness"
                     ],
                     "additionalProperties": false,
-                    "description": "Makes a sound that stealth and AI hear (e06.14)."
+                    "description": "Makes a sound that stealth and AI hear (e06.14). A spell with no noise op sounds at its school’s default loudness."
                   }
                 ],
                 "description": "One effect op; ops apply in list order."
@@ -1618,8 +1618,8 @@
               },
               "loudness": {
                 "type": "number",
-                "exclusiveMinimum": 0,
-                "description": "Hearing radius, metres, before sound propagation attenuates it."
+                "minimum": 0,
+                "description": "NoiseEvent level 1 m from the source, dB (a door slam is about 85); sound propagation attenuates it. 0 = silent."
               }
             },
             "required": [
@@ -1628,7 +1628,7 @@
               "loudness"
             ],
             "additionalProperties": false,
-            "description": "Makes a sound that stealth and AI hear (e06.14)."
+            "description": "Makes a sound that stealth and AI hear (e06.14). A spell with no noise op sounds at its school’s default loudness."
           }
         ],
         "description": "One effect op; ops apply in list order."
