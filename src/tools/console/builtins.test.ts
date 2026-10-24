@@ -332,6 +332,8 @@ describe('built-in console commands', () => {
     // A host with no spells knows none, and a build without selection cannot select.
     expect(s.registry.execute('spell learn ember').ok).toBe(false);
     expect(s.registry.complete('spell learn e')).toEqual({ line: 'spell learn e', options: [] });
+    // mw-e06.16: with no spells, a slot can still be cleared (completes to none).
+    expect(s.registry.complete('spell slot 2 n').line).toBe('spell slot 2 none ');
     const bare = new CommandRegistry<ConsoleHost>(
       Object.assign(Object.create(s.host) as ConsoleHost, { spells: ['ember'] }),
     );
