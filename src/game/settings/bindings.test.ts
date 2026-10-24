@@ -35,7 +35,7 @@ describe('saving and loading bindings', () => {
     const first = createSettingsStore({ storage: () => storage });
     first.set('audio.music', 0.5);
     const keyboard = rebound(DEFAULT_BINDINGS, 'jump', 'KeyF');
-    const pad = rebound(DEFAULT_PAD_BINDINGS, 'jump', 'PadUp');
+    const pad = rebound(DEFAULT_PAD_BINDINGS, 'jump', 'PadGuide');
     saveBindings(first, keyboard, pad);
 
     const reloaded = createSettingsStore({ storage: () => storage });

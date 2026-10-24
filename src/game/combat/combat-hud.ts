@@ -16,6 +16,8 @@ import {
   ActionRejected,
   DamageApplied,
   healthOf,
+  ManaComponent,
+  manaOf,
   PlacementComponent,
   staminaOf,
   type DamageResult,
@@ -82,9 +84,11 @@ export function combatHudModel(world: World<never>, player: EntityId): CombatHud
   const health = healthOf(world, player);
   if (health === undefined) return null;
   const stamina = staminaOf(world, player);
+  const mana = world.isRegistered(ManaComponent) ? manaOf(world, player) : undefined;
   return {
     health: { value: health.current, max: health.max },
     stamina: stamina === undefined ? EMPTY : { value: stamina.current, max: stamina.profile.max },
+    ...(mana !== undefined && { mana: { value: mana.current, max: mana.profile.max } }),
   };
 }
 

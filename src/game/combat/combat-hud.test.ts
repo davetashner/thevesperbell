@@ -5,7 +5,10 @@ import {
   DAMAGE_COMPONENTS,
   DamageApplied,
   DamageModel,
+  DEFAULT_MANA_PROFILE,
   giveCombatant,
+  giveMana,
+  ManaComponent,
   giveStamina,
   PlacementComponent,
   StaminaComponent,
@@ -175,7 +178,11 @@ describe('combat HUD glue (mw-e04.10)', () => {
   });
 
   it('hides while the player is not a combatant and stops listening on dispose', () => {
-    const world = new World<never>({ seed: 1 }).register(...DAMAGE_COMPONENTS, StaminaComponent);
+    const world = new World<never>({ seed: 1 }).register(
+      ...DAMAGE_COMPONENTS,
+      StaminaComponent,
+      ManaComponent,
+    );
     const player = world.spawn();
     const hud = new CombatHud();
     const glue = attachCombatHud({ world, player, hud, view: () => AHEAD });
@@ -187,6 +194,8 @@ describe('combat HUD glue (mw-e04.10)', () => {
       health: { value: 40, max: 40 },
       stamina: { value: 0, max: 0 },
     });
+    giveMana(world, player, { ...DEFAULT_MANA_PROFILE, max: 20 });
+    expect(combatHudModel(world, player)?.mana).toEqual({ value: 20, max: 20 });
     glue.frame(16);
     expect(hud.element.hidden).toBe(false);
     glue.dispose();

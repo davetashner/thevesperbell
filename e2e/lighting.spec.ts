@@ -147,7 +147,12 @@ test('AC-3: a torch that stops burning goes dark on screen on the same tick its 
   await page.getByTestId('game-canvas').click();
   await page.keyboard.press('Backquote');
   await expect(app).toHaveAttribute('data-debug-console', 'open');
-  await page.getByTestId('debug-console-input').fill(`prop ${String(torch?.entity)} burning false`);
+  // With the fire rules in the game a hot flammable thing relights itself, so the torch is cooled as
+  // well as put out (both commands apply on the same tick).
+  const input = page.getByTestId('debug-console-input');
+  await input.fill(`prop ${String(torch?.entity)} temperature 20`);
+  await page.keyboard.press('Enter');
+  await input.fill(`prop ${String(torch?.entity)} burning false`);
   await page.keyboard.press('Enter');
 
   // The first published readout where the sim level has dropped already has the light off: both come

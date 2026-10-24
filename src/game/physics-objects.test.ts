@@ -20,6 +20,21 @@ import {
 } from './physics-objects';
 
 describe('game physics objects (mw-e03.39)', () => {
+  it('mw-e06.15: beforeStimuli and afterStimuli install around the stimulus system', () => {
+    const world = new World<string>({ seed: 2, physics: new RapierPhysics(RAPIER) });
+    const order: string[] = [];
+    installGamePhysics(world, {
+      beforeStimuli: (sim) => {
+        sim.addSystem({ name: 'before', run: () => void order.push('before') });
+      },
+      afterStimuli: (sim) => {
+        sim.addSystem({ name: 'after', run: () => void order.push('after') });
+      },
+    });
+    world.step(['x']);
+    expect(order).toEqual(['before', 'after']);
+  });
+
   it('AC-4: budget warnings reach the log hook, asking the focus where the player is', () => {
     const world = new World<string>({ seed: 2, physics: new RapierPhysics(RAPIER) });
     const warnings: PhysicsBudgetExceeded[] = [];

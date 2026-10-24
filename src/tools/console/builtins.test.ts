@@ -9,6 +9,7 @@ import {
   hashWorld,
   installDebugCommands,
   actCommand,
+  learnSpellCommand,
   useQuickSlotCommand,
   blastCommand,
   timeAdvanceCommand,
@@ -261,6 +262,39 @@ describe('built-in console commands', () => {
     });
   });
 
+  it('mw-e06.15: spell learn teaches the player a known spell, spell select chooses it', () => {
+    const s = session({ withPlayer: true });
+    const chosen: string[] = [];
+    const host: ConsoleHost = Object.assign(Object.create(s.host) as ConsoleHost, {
+      spells: ['ember', 'frost-bolt'],
+      selectSpell: (id: string) => {
+        chosen.push(id);
+        return id === 'ember';
+      },
+    });
+    const registry = new CommandRegistry<ConsoleHost>(host);
+    registerBuiltins(registry);
+    expect(registry.execute('spell learn ember').ok).toBe(true);
+    expect(s.queue.drain()).toEqual([learnSpellCommand(s.hero, 'ember')]);
+    expect(registry.execute('spell select ember').lines).toEqual(['ember selected']);
+    expect(registry.execute('spell select frost-bolt')).toEqual({
+      ok: false,
+      lines: ['frost-bolt is not learned yet; try: spell learn frost-bolt'],
+    });
+    expect(chosen).toEqual(['ember', 'frost-bolt']);
+    expect(registry.execute('spell learn embr').lines[0]).toContain('closest: ember');
+    expect(registry.complete('spell learn e').line).toBe('spell learn ember ');
+    expect(registry.complete('spell learn').options).toEqual([]);
+    // A host with no spells knows none, and a build without selection cannot select.
+    expect(s.registry.execute('spell learn ember').ok).toBe(false);
+    expect(s.registry.complete('spell learn e')).toEqual({ line: 'spell learn e', options: [] });
+    const bare = new CommandRegistry<ConsoleHost>(
+      Object.assign(Object.create(s.host) as ConsoleHost, { spells: ['ember'] }),
+    );
+    registerBuiltins(bare);
+    expect(bare.execute('spell select ember').ok).toBe(false);
+  });
+
   it('mw-e03.37: prop sets a world property of a live entity, parsing the value', () => {
     const s = session();
     const torch = s.world.spawn();
@@ -478,6 +512,7 @@ describe('built-in console commands', () => {
       'seed',
       'set',
       'spawn',
+      'spell',
       'time',
       'timescale',
       'tp',

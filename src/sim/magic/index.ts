@@ -7,6 +7,7 @@ export * from './deliveries';
 export * from './emission';
 export * from './events';
 export * from './learning';
+export * from './learn-command';
 export * from './mana';
 export * from './ops';
 export * from './pipeline';

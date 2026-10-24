@@ -222,4 +222,16 @@ describe('DamageIndicator', () => {
     ring.update(16);
     expect(arc.style.transform).toBe('sentinel');
   });
+
+  it('mw-e06.15: a caster gets a mana bar, hidden for everyone else', () => {
+    const hud = new CombatHud();
+    hud.update(model(100), 0);
+    expect(hud.mana.element.hidden).toBe(true);
+    hud.update({ ...model(100), mana: { value: 10, max: 20 } }, 16);
+    expect(hud.mana.element.hidden).toBe(false);
+    expect(hud.mana.element.dataset['kind']).toBe('mana');
+    expect(hud.mana.element.style.width).toBe(`${String(hud.layout.mana.width)}px`);
+    hud.update({ ...model(100), mana: { value: 0, max: 0 } }, 32);
+    expect(hud.mana.element.hidden).toBe(true);
+  });
 });

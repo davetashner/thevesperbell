@@ -37,6 +37,9 @@ export const ACTIONS = {
   ability2: { kind: 'button', label: 'Ability 2', context: 'gameplay' },
   ability3: { kind: 'button', label: 'Ability 3', context: 'gameplay' },
   ability4: { kind: 'button', label: 'Ability 4', context: 'gameplay' },
+  // The selected spell (mw-e06.15): press to cast, hold to channel; cancel calls a cast off.
+  cast: { kind: 'button', label: 'Cast spell', context: 'gameplay' },
+  cancelCast: { kind: 'button', label: 'Cancel cast', context: 'gameplay' },
   inventory: { kind: 'button', label: 'Inventory', context: 'gameplay' },
   // The selected item (mw-e17.7): drop its stack in front of you, or throw one along your look.
   drop: { kind: 'button', label: 'Drop item', context: 'gameplay' },

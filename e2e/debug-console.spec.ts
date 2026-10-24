@@ -109,14 +109,14 @@ test('AC-4: backtick opens the console, which captures the keyboard (the player 
   expect(problems).toEqual([]);
 });
 
-test('AC-6: typing sp + Tab completes to spawn, and a spawn runs', async ({ page }) => {
+test('AC-6: typing spa + Tab completes to spawn, and a spawn runs', async ({ page }) => {
   test.setTimeout(60_000);
   const problems = collectProblems(page);
   await play(page, '&debug=1');
   await page.keyboard.press('Backquote');
   const input = page.getByTestId('debug-console-input');
   await expect(input).toBeFocused();
-  await page.keyboard.type('sp');
+  await page.keyboard.type('spa');
   await page.keyboard.press('Tab');
   await expect(input).toHaveValue('spawn ');
   await expect(input).toBeFocused(); // Tab completed instead of moving focus
