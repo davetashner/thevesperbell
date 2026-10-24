@@ -40,6 +40,7 @@ export const UI_TOKENS: Readonly<Record<string, string>> = Object.freeze({
   'ui-color-health': PALETTE.ember,
   'ui-color-stamina': PALETTE.leaf,
   'ui-color-breath': PALETTE.sky,
+  'ui-color-mana': PALETTE.sky,
   'ui-color-bar-trail': PALETTE.hearth,
   'ui-color-lock': PALETTE.wayfinder,
   'ui-color-flash': PALETTE.cream,
@@ -241,6 +242,7 @@ ${tokens}
 .vb-meter-fill { background: var(--ui-color-health); }
 .vb-meter[data-kind='stamina'] .vb-meter-fill { background: var(--ui-color-stamina); }
 .vb-meter[data-kind='breath'] .vb-meter-fill { background: var(--ui-color-breath); }
+.vb-meter[data-kind='mana'] .vb-meter-fill { background: var(--ui-color-mana); }
 .vb-water-hud {
   position: absolute;
   left: 50%;
@@ -372,6 +374,43 @@ ${tokens}
   background: var(--ui-color-lock);
 }
 .vb-lock-marker[hidden] { display: none; }
+.vb-reticle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  font-family: var(--ui-font-body);
+  color: var(--ui-color-hud-text);
+}
+.vb-reticle[hidden] { display: none; }
+.vb-reticle-cross {
+  position: absolute;
+  left: -0.7em;
+  top: -0.7em;
+  width: 1.4em;
+  height: 1.4em;
+  --reticle-color: var(--ui-color-hud-text);
+  background:
+    linear-gradient(var(--reticle-color), var(--reticle-color)) center / 2px 100% no-repeat,
+    linear-gradient(var(--reticle-color), var(--reticle-color)) center / 100% 2px no-repeat;
+  filter: drop-shadow(0 0 1px var(--ui-color-hud-shadow)) drop-shadow(0 0 1px var(--ui-color-hud-shadow));
+  transition: opacity ${MOTION};
+}
+.vb-reticle[data-state='far'] .vb-reticle-cross { opacity: 0.55; }
+.vb-reticle[data-state='invalid'] .vb-reticle-cross { --reticle-color: var(--ui-color-warning); }
+.vb-reticle-spell, .vb-reticle-note {
+  position: absolute;
+  left: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  text-shadow: 0 0 2px var(--ui-color-hud-shadow), 0 0 2px var(--ui-color-hud-shadow);
+}
+.vb-reticle-spell { top: 1.1em; }
+.vb-reticle-note { top: 2.2em; color: var(--ui-color-warning); }
+.vb-reticle-note:empty { display: none; }
 .vb-slot {
   position: relative;
   width: 3em;

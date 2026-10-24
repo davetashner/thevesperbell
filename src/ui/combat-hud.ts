@@ -42,6 +42,8 @@ export const COMBAT_HUD_BASE = Object.freeze({
   gap: 6,
   health: Object.freeze({ width: 240, height: 14 }),
   stamina: Object.freeze({ width: 180, height: 10 }),
+  /** The mana bar, shown only for a caster (mw-e06.15); below the stamina bar. */
+  mana: Object.freeze({ width: 140, height: 8 }),
   /** Diameter of the damage-direction ring. */
   ring: 240,
 });
@@ -50,6 +52,8 @@ export const COMBAT_HUD_BASE = Object.freeze({
 export interface CombatHudModel {
   readonly health: MeterModel;
   readonly stamina: MeterModel;
+  /** The caster's mana (mw-e06.15); absent or empty max hides the bar. */
+  readonly mana?: MeterModel;
 }
 
 export interface Size {
@@ -64,6 +68,7 @@ export interface CombatHudLayout {
   readonly gap: number;
   readonly health: Size;
   readonly stamina: Size;
+  readonly mana: Size;
   /** The bars' block: as wide as the widest bar, both bars and the gap tall. */
   readonly block: Size;
   readonly ring: number;
@@ -86,6 +91,7 @@ export function combatHudLayout(scale: number): CombatHudLayout {
   });
   const health = size(COMBAT_HUD_BASE.health);
   const stamina = size(COMBAT_HUD_BASE.stamina);
+  const mana = size(COMBAT_HUD_BASE.mana);
   const gap = px(COMBAT_HUD_BASE.gap * s);
   return {
     scale: s,
@@ -93,6 +99,7 @@ export function combatHudLayout(scale: number): CombatHudLayout {
     gap,
     health,
     stamina,
+    mana,
     block: {
       width: Math.max(health.width, stamina.width),
       height: px(health.height + gap + stamina.height),
@@ -202,6 +209,7 @@ export class CombatHud implements HudWidget<CombatHudModel> {
   readonly element: HTMLElement;
   readonly health: Meter;
   readonly stamina: Meter;
+  readonly mana: Meter;
   readonly indicator: DamageIndicator;
   readonly #bars: HTMLElement;
   readonly #cache = new WriteCache();
@@ -225,12 +233,15 @@ export class CombatHud implements HudWidget<CombatHudModel> {
       flashMs: STAMINA_FLASH_MS,
       ...reduced,
     });
+    this.mana = new Meter({ label: 'Mana', kind: 'mana', trailHoldMs: CHIP_HOLD_MS, ...reduced });
+    this.mana.element.hidden = true;
     this.indicator = new DamageIndicator();
     this.#bars = h(
       'div',
       { className: 'vb-combat-bars' },
       this.health.element,
       this.stamina.element,
+      this.mana.element,
     );
     this.element = h(
       'div',
@@ -266,11 +277,16 @@ export class CombatHud implements HudWidget<CombatHudModel> {
   update(model: CombatHudModel, nowMs: number): void {
     this.health.update(model.health, nowMs);
     this.stamina.update(model.stamina, nowMs);
+    const mana = model.mana !== undefined && model.mana.max > 0 ? model.mana : undefined;
+    this.#cache.set('mana', String(mana !== undefined), () => {
+      this.mana.element.hidden = mana === undefined;
+    });
+    if (mana !== undefined) this.mana.update(mana, nowMs);
     this.indicator.update(nowMs);
   }
 
   #applyLayout(): void {
-    const { margin, gap, health, stamina, ring } = this.#layout;
+    const { margin, gap, health, stamina, mana, ring } = this.#layout;
     const c = this.#cache;
     const sizeOf = (key: string, el: HTMLElement, size: Size): void => {
       c.set(key, `${String(size.width)}x${String(size.height)}`, () => {
@@ -280,6 +296,7 @@ export class CombatHud implements HudWidget<CombatHudModel> {
     };
     sizeOf('health', this.health.element, health);
     sizeOf('stamina', this.stamina.element, stamina);
+    sizeOf('mana', this.mana.element, mana);
     c.set('place', `${String(margin)} ${String(gap)}`, () => {
       this.#bars.style.right = `${String(margin)}px`;
       this.#bars.style.top = `${String(margin)}px`;

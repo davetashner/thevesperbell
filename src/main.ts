@@ -109,6 +109,20 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
+import {
+  attachSpellHud,
+  attachSpellReadout,
+  bindBolts,
+  givePlayerMana,
+  installGameMagic,
+  previewRadius,
+  readBoltTransform,
+  SpellCaster,
+  viewRay,
+  type GameMagic,
+  type SpellCommand,
+  type SpellHudGlue,
+} from '@game/magic/index';
 import { bootPhysics } from '@game/physics-loader';
 import {
   formatBudgetWarning,
@@ -191,6 +205,7 @@ import { SaveSlots } from '@game/save/slots/index';
 import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
 import { vfxTextureManifest, vfxTextureUrls, VfxSystem } from '@game/vfx/index';
+import { createBolt, createGroundMarker, disposeBolt } from '@render/magic/index';
 import { createRenderBootstrap } from '@render/bootstrap/index';
 import { createLeftover, disposeLeftover } from '@render/breakables/index';
 import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
@@ -251,6 +266,7 @@ import {
   playerStart,
   RapierCollisionWorld,
   RapierSightWorld,
+  invulnerabilityRule,
   creaturesInstalled,
   CreatureComponent,
   PlacementComponent,
@@ -276,6 +292,7 @@ import {
   type DifficultyCommand,
   type ContainerActionCommand,
   type InventoryActionCommand,
+  type LearnSpellCommand,
   type SandboxCommand,
   type UseQuickSlotCommand,
   type EntityId,
@@ -304,6 +321,7 @@ import {
   KitPanel,
   LockMarker,
   openClassSelect,
+  Reticle,
   reducedMotion,
   setTextScale,
   UiRoot,
@@ -356,6 +374,8 @@ type GameCommand =
   | DebugCommand
   | DifficultyCommand
   | InventoryActionCommand
+  | LearnSpellCommand
+  | SpellCommand
   | SandboxCommand
   | UseQuickSlotCommand;
 
@@ -665,6 +685,14 @@ function startRenderer(
     // action timeline, so a swing starts on its beat) and infinite-health refills.
     installSandboxRules(world, combat);
     const commands = new CommandQueue<GameCommand>();
+    let magic: GameMagic | undefined;
+    // A replayed input log carries its recorded cast commands; live aiming must not add its own.
+    let replaying = false;
+    let spellHud: SpellHudGlue | undefined;
+    let publishSpells: (() => void) | undefined;
+    let castSelect: ((id: string) => boolean) | undefined;
+    // The player's casting (mw-e06.15): turns a gameplay frame into cast commands, once there is a player.
+    let castFrame: ((frame: ActionFrame) => readonly SpellCommand[]) | undefined;
     const afterStep: (() => void)[] = [];
     // Swept hitboxes and region-tagged hurtboxes (mw-e04.2). No faction table is loaded yet, so
     // nobody counts as an ally; ?hitboxes draws what the system tests each tick. The hit-volume
@@ -687,6 +715,16 @@ function startRenderer(
         root.dataset['physicsBudget'] = JSON.stringify(warning);
       },
       levelColliders: light.colliders,
+      // Spells (mw-e06.15): the pipeline and its systems, before the stimulus system so a spell's
+      // heat and light resolve in the tick it is cast.
+      beforeStimuli: (sim) => {
+        magic = installGameMagic(sim, {
+          spells: content.all('spell'),
+          damage: combat.damage,
+          collision: new RapierCollisionWorld(physics),
+          invulnerable: invulnerabilityRule(combat.moves),
+        });
+      },
     });
     installGameLight(world, light.field);
     const hitOverlay = createHitVolumeOverlay();
@@ -916,7 +954,8 @@ function startRenderer(
       // Queued debug-console commands pass even while a UI screen withholds gameplay frames.
       sampleCommands: commands.sampler((tick) => {
         beforeSample?.(tick);
-        return bridge.sampleCommands(tick);
+        const frames = bridge.sampleCommands(tick);
+        return castFrame === undefined ? frames : [...frames, ...frames.flatMap(castFrame)];
       }),
       simPaused: () =>
         bridge.simPaused() || aiDebug?.held() === true || transitions?.leaving === true,
@@ -970,6 +1009,8 @@ function startRenderer(
         combatHud?.frame(timeMs);
         waterHud?.frame(timeMs);
         targetHud?.frame(timeMs);
+        spellHud?.frame(timeMs);
+        publishSpells?.();
         lockMarker.update(
           lockMarkerModel(
             player?.lockTarget(),
@@ -1251,6 +1292,61 @@ function startRenderer(
       );
       drawArrows();
       afterStep.push(drawArrows);
+      // Casting (mw-e06.15): the player gets a mana pool, the reticle, the selected spell's aim and
+      // placeholder visuals. What it can cast is what it has learned (console `spell learn`, a
+      // trainer's lesson); the cast button (V, D-pad up) casts it along the reticle, a held channel
+      // ends on release, and B / D-pad down calls a cast off.
+      if (player !== undefined && magic !== undefined) {
+        const hero = player.entity;
+        const spellbook = magic;
+        givePlayerMana(world, hero, content.get('class', 'knight').stats.mana);
+        const caster = new SpellCaster({
+          world,
+          caster: hero,
+          spells: spellbook.spells,
+          collision,
+          locked: () => player?.readout()?.lock,
+          canCast: () => !isPlayerDead(world, hero),
+        });
+        castSelect = (id) => caster.select(id);
+        const ray = () => viewRay(camera);
+        castFrame = (frame) => {
+          if (replaying) return [];
+          const out = caster.commands(frame, ray);
+          for (const command of out) inputRecorder?.record({ op: 'command', command });
+          return out;
+        };
+        const reticle = new Reticle();
+        ui.hud.append(reticle.element);
+        spellHud = attachSpellHud({ world, player: hero, caster, reticle, ray });
+        const marker = createGroundMarker();
+        view.scene.add(marker.object);
+        const readout = attachSpellReadout({
+          world,
+          player: hero,
+          caster,
+          aim: () => spellHud?.aim(),
+          spawnOf: (entity) => world.get(entity, SceneSpawnComponent)?.id ?? null,
+        });
+        let publishedSpells = '';
+        publishSpells = () => {
+          const aim = spellHud?.aim();
+          const spell = caster.spell();
+          if (spell !== undefined && aim?.mode === 'ground') {
+            marker.show(aim.point, previewRadius(spell), aim.valid);
+          } else marker.show(null, 0, true);
+          const json = JSON.stringify(readout.read());
+          if (json !== publishedSpells) root.dataset['spells'] = publishedSpells = json;
+        };
+        const drawBolts = (): void => {
+          bindBolts(world, sync, spellbook.spells, (_entity, radius) => {
+            const bolt = createBolt(radius);
+            view.scene.add(bolt);
+            return { ...object3DBinding(bolt, readBoltTransform), dispose: disposeBolt };
+          });
+        };
+        afterStep.push(drawBolts);
+      }
       // The combat HUD (mw-e04.10): bars top-right, sized by the HUD scale setting, fed by the
       // player's sim state and events; arcs point at off-screen attackers relative to the camera.
       if (player !== undefined) {
@@ -2086,6 +2182,7 @@ function startRenderer(
       (window as unknown as { mwInputRecording: () => unknown }).mwInputRecording = () =>
         inputRecorder.segment();
       const replay = (window as unknown as { mwInputReplay?: InputLogSegment }).mwInputReplay;
+      replaying = replay !== undefined;
       const player =
         replay === undefined
           ? undefined
@@ -2140,6 +2237,8 @@ function startRenderer(
             // ctl.get / ctl.set / ctl.dump (mw-e02.3) over the player's live controller tuning.
             controller: content.get('controller', PLAYER_CONTROLLER_ID),
             spawnables: [...spawners.keys()].sort(),
+            spells: magic?.spellIds ?? [],
+            selectSpell: (id) => castSelect?.(id) ?? false,
             // Sandbox dummies take options (mw-e04.9: `spawn dummy --poise 60`); props take none.
             // Creatures take a route (mw-e11.21: `spawn fixture-guard --patrol 0,0,12;0,0,20`).
             checkSpawn: (content, options) =>

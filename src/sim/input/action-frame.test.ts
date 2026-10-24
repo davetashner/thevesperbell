@@ -32,6 +32,8 @@ describe('action registry', () => {
       'ability2',
       'ability3',
       'ability4',
+      'cast',
+      'cancelCast',
       'inventory',
       'drop',
       'throw',

@@ -15,6 +15,7 @@ import {
   DIFFICULTY_RANGES,
   difficultyCommand,
   killCommand,
+  learnSpellCommand,
   MAX_BLAST_INTENSITY,
   MAX_BLAST_RADIUS,
   MAX_SPAWN_COUNT,
@@ -64,6 +65,10 @@ export interface ConsoleHost {
   checkSpawn?(content: string, options: Readonly<Record<string, string>>): string | undefined;
   /** Named places `tp` accepts (the loaded scene's spawns). */
   bookmarks(): ReadonlyMap<string, Vec3>;
+  /** Spell ids `spell` accepts, sorted (empty: no spells in this build). */
+  readonly spells?: readonly string[];
+  /** Makes `id` the spell the cast button casts; false when the player has not learned it. */
+  selectSpell?(id: string): boolean;
   /** Scene ids `scene` accepts, sorted. */
   readonly scenes: readonly string[];
   /** Switches to scene `id` (reloads the page). */
@@ -361,6 +366,26 @@ export function registerBuiltins(registry: CommandRegistry<ConsoleHost>): void {
     run: ([slot], host) => {
       host.submit(useQuickSlotCommand(player(host), slot - 1));
       return `using quick slot ${String(slot)}`;
+    },
+  });
+
+  registry.registerCommand({
+    name: 'spell',
+    summary: 'learn a spell, or choose the one the cast button casts (V, D-pad up)',
+    usage: 'learn|select <spellId>',
+    args: z.tuple([z.enum(['learn', 'select']), z.string()]),
+    complete: (index, host) => (index === 1 ? (host.spells ?? []) : []),
+    run: ([action, id], host) => {
+      const known = host.spells ?? [];
+      if (!known.includes(id)) throw unknown('spell', id, known);
+      if (action === 'learn') {
+        host.submit(learnSpellCommand(player(host), id));
+        return `learning ${id} (select it with: spell select ${id})`;
+      }
+      if (host.selectSpell?.(id) !== true) {
+        throw new ConsoleError([`${id} is not learned yet; try: spell learn ${id}`]);
+      }
+      return `${id} selected`;
     },
   });
 

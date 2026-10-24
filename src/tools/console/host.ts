@@ -38,6 +38,10 @@ export interface GameHostOptions {
   readonly bookmarks: () => ReadonlyMap<string, Vec3>;
   /** The point under the cursor (ConsoleHost.cursorPoint); without it `at-cursor` is unavailable. */
   readonly cursorPoint?: () => Vec3 | undefined;
+  /** Spell ids (ConsoleHost.spells); without them `spell` knows none. */
+  readonly spells?: readonly string[];
+  /** Chooses the cast button's spell (ConsoleHost.selectSpell). */
+  readonly selectSpell?: (id: string) => boolean;
   readonly scenes: readonly string[];
   readonly loadScene: (id: string) => void;
   /** Saves the game into a slot (ConsoleHost.save); without it `save` is unavailable. */
@@ -78,6 +82,8 @@ export function createGameHost(options: GameHostOptions): ConsoleHost {
         return point === undefined ? undefined : { x: mm(point.x), y: mm(point.y), z: mm(point.z) };
       },
     }),
+    ...(options.spells !== undefined && { spells: options.spells }),
+    ...(options.selectSpell !== undefined && { selectSpell: options.selectSpell }),
     bookmarks: options.bookmarks,
     scenes: options.scenes,
     loadScene: options.loadScene,

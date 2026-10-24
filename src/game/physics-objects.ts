@@ -40,12 +40,17 @@ export interface GamePhysicsOptions {
   readonly levelColliders?: StaticColliderSink;
   /** Breakables' options (mw-e03.11): the props they spill, the debris budget. */
   readonly breakables?: BreakablesOptions;
+  /**
+   * Installs systems that must run before the stimulus system, with stimuli and physics objects in
+   * place: the spell pipeline (mw-e06.15), whose stimuli resolve in the tick they are cast.
+   */
+  readonly beforeStimuli?: (world: World<never>) => void;
 }
 
 /**
  * Registers world properties on `world`, whose physics must be a rigid-body port, installs stimuli
  * (placements and the queue) and physics objects, adds the stimulus system after the physics-object
- * system, and installs breakables. Call once at setup, before loading a scene.
+ * system (and after `beforeStimuli`'s), and installs breakables. Call once at setup, before loading a scene.
  */
 export function installGamePhysics<T>(world: World<T>, options: GamePhysicsOptions = {}): World<T> {
   const sim = world as unknown as World<never>; // the physics layer never reads inputs
@@ -55,6 +60,7 @@ export function installGamePhysics<T>(world: World<T>, options: GamePhysicsOptio
     ...(focus !== undefined && { focus: () => focus() }),
     ...(levelColliders !== undefined && { levelColliders }),
   });
+  options.beforeStimuli?.(sim);
   sim.addSystem(stimulusSystem());
   installBreakables(sim, options.breakables);
   if (onBudgetExceeded !== undefined) sim.events.on(physicsBudgetExceeded, onBudgetExceeded);

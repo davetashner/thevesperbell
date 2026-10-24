@@ -59,8 +59,8 @@ export class WriteCache {
 export interface MeterOptions {
   /** Accessible name, e.g. "Health". */
   readonly label: string;
-  /** Colour set: `health` (ember), `stamina` (leaf) or `breath` (sky). */
-  readonly kind?: 'health' | 'stamina' | 'breath';
+  /** Colour set: `health` (ember), `stamina` (leaf), `breath` or `mana` (sky). */
+  readonly kind?: 'health' | 'stamina' | 'breath' | 'mana';
   readonly trailHoldMs?: number;
   readonly trailDrainPerSec?: number;
   /** Drain the whole trail in this many ms after the hold, whatever its size (overrides the rate). */
