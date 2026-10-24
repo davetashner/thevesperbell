@@ -104,5 +104,5 @@ describe('stress scene agitator (mw-e32.1)', () => {
       expect(y).toBeGreaterThan(0);
     }
     expect(hashWorld(run().world)).toBe(hashWorld(world));
-  });
+  }, 30_000); // loads content and steps Rapier twice; overran the 5 s default on loaded runners
 });

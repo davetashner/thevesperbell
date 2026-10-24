@@ -70,7 +70,7 @@ describe('the alert machine on content (mw-e11.7)', () => {
         expect(ALERT_STATES).toContain(state);
         expect(Object.keys(def.states)).toContain(state);
       }
-    });
+    }, 30_000); // 10,000 fuzz sequences per behaviour; overran the 5 s default on loaded CI runners
   }
 
   it('AC-5: the fixture guard shot in the back by an unseen archer is Alerted, hunts toward the shot, searches and stands down on edge', ({
