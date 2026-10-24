@@ -44,6 +44,7 @@ export const stimulusOp = (
   element,
   intensity,
   radius,
+  contact: radius === 0,
   duration: 0,
   falloff: 'linear',
   ...(gas === undefined ? {} : { gas }),

@@ -21,6 +21,7 @@
       "element": "force",
       "intensity": 400,
       "radius": 0,
+      "contact": true,
       "duration": 0,
       "falloff": "linear"
     },

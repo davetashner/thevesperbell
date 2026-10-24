@@ -370,9 +370,27 @@
                       },
                       "radius": {
                         "default": 0,
-                        "description": "Sphere radius around each hit point, metres; 0 = the delivery’s own contact/shape.",
+                        "description": "Sphere radius around each hit point, metres; 0 needs `ray` or `contact`.",
                         "type": "number",
                         "minimum": 0
+                      },
+                      "ray": {
+                        "description": "A ray from the caster to each hit point instead of a sphere (a lance, a jet).",
+                        "type": "object",
+                        "properties": {
+                          "width": {
+                            "default": 0.25,
+                            "description": "Radius of the ray, metres.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "contact": {
+                        "default": false,
+                        "description": "Radius 0 only: act on the entity struck (or the bare hit point), nothing near.",
+                        "type": "boolean"
                       },
                       "duration": {
                         "default": 0,
@@ -1167,9 +1185,27 @@
               },
               "radius": {
                 "default": 0,
-                "description": "Sphere radius around each hit point, metres; 0 = the delivery’s own contact/shape.",
+                "description": "Sphere radius around each hit point, metres; 0 needs `ray` or `contact`.",
                 "type": "number",
                 "minimum": 0
+              },
+              "ray": {
+                "description": "A ray from the caster to each hit point instead of a sphere (a lance, a jet).",
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "default": 0.25,
+                    "description": "Radius of the ray, metres.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "additionalProperties": false
+              },
+              "contact": {
+                "default": false,
+                "description": "Radius 0 only: act on the entity struck (or the bare hit point), nothing near.",
+                "type": "boolean"
               },
               "duration": {
                 "default": 0,

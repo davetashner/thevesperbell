@@ -203,9 +203,17 @@ const opSchemas = [
         .number()
         .nonnegative()
         .default(0)
-        .describe(
-          'Sphere radius around each hit point, metres; 0 = the delivery’s own contact/shape.',
-        ),
+        .describe('Sphere radius around each hit point, metres; 0 needs `ray` or `contact`.'),
+      ray: z
+        .strictObject({
+          width: metres.default(0.25).describe('Radius of the ray, metres.'),
+        })
+        .optional()
+        .describe('A ray from the caster to each hit point instead of a sphere (a lance, a jet).'),
+      contact: z
+        .boolean()
+        .default(false)
+        .describe('Radius 0 only: act on the entity struck (or the bare hit point), nothing near.'),
       duration: seconds.default(0).describe('Seconds to spread the intensity over; 0 = at once.'),
       falloff,
       gas: contentId.optional().describe('Gas type id; required for (and only for) element "gas".'),
@@ -550,8 +558,23 @@ export const spellSchema = z
         }
       });
     };
+    const checkReach = (list: readonly SpellEffect[], field: string) => {
+      list.forEach((effect, i) => {
+        if (effect.op !== 'stimulus') return;
+        if (effect.radius === 0 && effect.ray === undefined && !effect.contact) {
+          fail(
+            field.split('.').concat(String(i), 'radius'),
+            'stimulus needs point radius, ray or volume (set a radius above 0, a ray, or contact)',
+          );
+        }
+      });
+    };
     checkGas(spell.effects, 'effects');
-    if (delivery.kind === 'projectile') checkGas(delivery.onExpire, 'delivery.onExpire');
+    checkReach(spell.effects, 'effects');
+    if (delivery.kind === 'projectile') {
+      checkGas(delivery.onExpire, 'delivery.onExpire');
+      checkReach(delivery.onExpire, 'delivery.onExpire');
+    }
   });
 
 /** A SpellDefinition as written in JSON (optional sections may be omitted). */
