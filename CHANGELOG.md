@@ -15,6 +15,7 @@ check enforces this).
 
 - The Forgotten now look their parts: the brute is a bigger, armoured skeleton with a two-handed maul, the archer holds a bow and the shield-bearer carries a battered iron shield (the miner is unchanged). Stand-in models for now; they still move with the miner's animations.
 - Ottilie, Dot the innkeeper and the Bridge Watch guards (one look for day and night) now have bodies instead of grey capsules. Placeholder models, standing still in one pose, until you approve their art; Hollis, Juniper and Oswin are still capsules.
+- Hollis the baker, Juniper the fletcher and Oswin the smith now have bodies instead of grey capsules, finishing the Briar Glen townsfolk. Placeholder models, standing still in one pose, until you approve their looks.
 - The Bridge Watch post at the town end of the Miners' Bridge: pillars, banner, lamp and brazier, with two day guards and one night guard standing watch (they greet nobody and fight nobody yet; the Watch is declared hostile to monsters, who do not cross anyway).
 
 - The valley's skeletons return after you sleep: kill the 20 ordinary Forgotten, rest at the Sleeping Ox, walk back and they stand at their posts again with fresh loot, while the brute at the bridge stays dead and what you left on the ground stays put.

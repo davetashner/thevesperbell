@@ -1,5 +1,5 @@
 // The Briar Glen townsfolk's placeholder bodies (mw-ju8.34): one Tripo image-to-3D model per NPC (the
-// two Watch guards share one; Hollis, Juniper and Oswin are still capsules, see the model note), keyed on the creature's `presentation.mesh` so the capsule stays the
+// two Watch guards share one), keyed on the creature's `presentation.mesh` so the capsule stays the
 // fallback for any mesh id without a model here. Each is loaded once and shared by every creature
 // wearing it. Creatures face +z (see index.ts) and the mesh arrives facing +x, so the body is turned
 // −90° about y and stood on the ground.
@@ -13,6 +13,9 @@ import { readGlbMesh, turnAndGround, type GlbModel } from '../models/glb';
 export const NPC_MODEL_URLS: Readonly<Record<string, string>> = {
   'npc-ottilie': '/assets/model/model-npc-ottilie-01.glb',
   'npc-dot': '/assets/model/model-npc-dot-01.glb',
+  'npc-hollis': '/assets/model/model-npc-hollis-01.glb',
+  'npc-juniper': '/assets/model/model-npc-juniper-01.glb',
+  'npc-oswin': '/assets/model/model-npc-oswin-01.glb',
   // Day and night watchmen are one model for now.
   'npc-watchman': '/assets/model/model-npc-watchman-01.glb',
 };
