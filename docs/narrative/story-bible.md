@@ -271,10 +271,11 @@ frontier town, and the college's old soldiers regard casters as unreliable. Inst
 are open until the next sentence: the college stands at the far end of the lane's west side, past the Sleeping Ox. Its instructors, lessons
 and fees are settled as greybox decisions in §5.16 and `docs/design/bridgeward-college.md` (mw-ju8.13, owner-reviewable).
 
-**The robed figure under the bridge (unnamed)** — sorcery is learned elsewhere: after dark, beneath the
-Miners' Bridge, a robed figure waits for those who ask the right questions (rumours, Dot, Mirela). Who they
-are, what they charge and what they teach are open. They are not licensed by the Lantern Court. They appear
-only at night.
+**The robed figure under the bridge (Idris Quillon)** — sorcery is learned elsewhere: after dark, beneath the
+Miners' Bridge, a robed figure waits for those who ask the right questions (rumours, Dot, Mirela). He is
+**Idris Quillon** (§5.17), a scholar the Lantern Court struck off its register, and he is not licensed by the
+Court. He is there only between dusk and dawn. A short lit path leads down to the riverbank from the lane,
+just past the Bridge Watch's post (greybox decisions in §5.17, mw-ju8.14).
 
 **Marsh's General Store (Briar Glen)** — the first building a traveller reaches after crossing the
 stone bridge into town. A crooked three-storey timber-framed shop with a slate roof: the ground floor is the
@@ -836,6 +837,27 @@ her brass scales are known to be honest. No voice acting in the MVP (text only).
 - **No XP.** Lessons are bought one technique at a time, for a fixed price, and last for good (ADR-0004).
 - **Art:** `char-maud-garrick-base-01`, `char-ewan-rooke-base-01` (placeholder, awaiting approval); models `model-npc-garrick-01`, `model-npc-rooke-01`.
 
+### 5.17 Idris Quillon — the sorcery teacher under the bridge (placeholder decisions, mw-ju8.14)
+**Owner-reviewable greybox decisions** ("make good decisions", 2026-10-24); the name, look, price and syllabus may change.
+- **Who.** A tall, thin man in his forties with short untidy dark hair, a narrow clean-shaven face, tired watchful
+  eyes and ink-stained fingers, in a long indigo-violet robe with a rope belt, its hem stained with river mud. A
+  scholar the Lantern Court struck off its register for teaching without a licence; he teaches anyway, quietly,
+  to anyone who finds him and can pay. Dry and wary ("Keep your voice down; the stones carry."), curious about
+  every spell and what it does to the world around it. Not a villain; the Court is his natural antagonist.
+- **When and where.** Between dusk (18:00) and dawn (05:00) only, on the shingle under the bridge's west arch,
+  at a brazier and a shuttered lantern. By day the bank is empty. Reached by a short lit path from the lane,
+  just past the Bridge Watch's post.
+- **What he teaches.** The Fire school's first spell, **Ember**, for **200 crowns** (inside the 100-400 trainer
+  band; the cheapest first step, priced a little above the college's 100-150 for the secrecy). Fire is a
+  *licensed* school (§3.3): what the Court forbids is teaching it outside the register, not the spell. The
+  rest of the fire chain (Firebolt, Flame Jet, Fire Wall) comes from books (ADR-0004). He will not teach
+  Somnomancy: "I won't touch that, and nor should you." (a hook for the forbidden school; no lesson exists).
+- **Favours.** The bead allows "crowns or favours". Only crowns are built; favours need the favour and quest
+  systems and are a follow-up, so he asks for crowns only today.
+- **Rumours (§6.2, 19-20).** Dot trades the first, Mirela the second; both point at the bridge at night. No
+  dialogue system exists yet, so the lines are canon text until E22.
+- **Art:** `char-idris-quillon-base-01` (placeholder, awaiting approval); model `model-npc-quillon-01`.
+
 ---
 
 ## 6. Side quests and rumours
@@ -973,6 +995,12 @@ Harbour and river rumours (Mags, Nell, Old Reed, Tidemarket gossip):
     *(True.)*
 18. "There's a sea serpent under the breakwater. Big as a barge. Eyes like lanterns." → the sunken
     figurehead and the smugglers' sea-door. *(False — debunked by diving, or by Mags laughing at you.)*
+19. (Dot) "If you want to learn the old fire tricks, don't ask the college. Walk down to the water after dark,
+    past the Watch. Somebody under the bridge keeps a lantern lit and takes coin. I never said so." → Idris
+    Quillon, the unlicensed teacher (§5.17). *(True.)*
+20. (Mirela) "The Court's list of teachers is very short, and the best one isn't on it. He's under the Miners'
+    Bridge from dusk, if you can bear the damp. Buy a book first; he hates teaching people who can't read." →
+    Idris Quillon. *(True.)*
 
 ---
 
@@ -1256,3 +1284,4 @@ is beyond "a dream that hungers". All three are post-MVP hooks (§10).
 | v1.1 | 2026-10-04 | Added Marsh's General Store (§3.5) and Ottilie Marsh (§5.15) from owner-approved concept art (mw-ju8.8); names confirmed by the owner the same day. No plot-changing canon. | owner |
 | v1.2 | 2026-10-04 | Owner canon: the Miners' Bridge (built ~200 years ago for miners; guarded day and night by the Bridge Watch), the Bridgeward College (fighting and archery) and the robed sorcery teacher under the bridge at night (§3.5). Supersedes the 'stone bridge' open question from v1.1. | owner |
 | v1.3 | 2026-10-24 | Greybox decisions for the Bridgeward College (§3.5, §5.16, mw-ju8.13): instructors Sergeant Maud Garrick and Master Ewan Rooke, their lessons and fees. Owner-reviewable; no plot-changing canon. | Claude, owner-delegated |
+| v1.4 | 2026-10-24 | Greybox decisions for the sorcery teacher (§3.5, §5.17, §6.2 rumours 19-20, mw-ju8.14): Idris Quillon, his look, schedule (dusk to dawn), Ember for 200 crowns. Owner-reviewable; no plot-changing canon. | Claude, owner-delegated |

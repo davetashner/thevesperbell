@@ -101,6 +101,7 @@ describe('the Briar Glen shop lane, headless (mw-ju8.5)', () => {
       ['marsh-store-door', 'marsh-store'],
       ['sleeping-ox-door', 'sleeping-ox'],
       ['bridgeward-college-door', 'bridgeward-college'],
+      ['riverbank-path', 'under-the-bridge'],
     ]);
     expect(bridge.position.z).toBeLessThan(t.marker('marsh-store-door').position.z);
     const door = t.marker('marsh-store-door');

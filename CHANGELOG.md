@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- A robed teacher waits under the Miners' Bridge from dusk to dawn: a lit path past the Bridge Watch's post leads down to the riverbank, where Idris Quillon, struck off the Lantern Court's register, teaches Ember for 200 crowns. By day the bank is empty. The Bridge Watch now keep day and night shifts by the clock.
 - The Bridgeward College, at the far end of Briar Glen's lane: Sergeant Maud Garrick sells knight techniques (Shoulder Barge, Riposte, Shield Charge, Disarm) and Master Ewan Rooke sells archery trick shots (Pinning, Ricochet, Severing) for 100 to 400 crowns each, one step at a time. Nobody there teaches sorcery. Both instructors have placeholder bodies until you approve their looks.
 - The world now has a clock: a game day passes in an hour of play, starting at 06:00 on day 1, with dawn, day, dusk and night. Time stands still in menus, dialogue and shops, and sleeping at the Sleeping Ox now passes the night hour by hour. Nothing on screen shows the time or changes with it yet.
 - The Forgotten now look their parts: the brute is a bigger, armoured skeleton with a two-handed maul, the archer holds a bow and the shield-bearer carries a battered iron shield (the miner is unchanged). Stand-in models for now; they still move with the miner's animations.

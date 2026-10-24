@@ -26,6 +26,7 @@ import {
   type ItemInstanceFlags,
 } from '../inventory/inventory';
 import type { LootTables } from '../loot/tables';
+import { KnownSpellsComponent, learnSpell } from '../magic/components';
 import { Rng } from '../rng';
 import {
   restBlocked,
@@ -59,6 +60,9 @@ export interface ShopItemDef extends InventoryItemDef {
   readonly value: number;
   readonly flags: InventoryItemDef['flags'] & { readonly noSell?: boolean | undefined };
 }
+
+/** Capabilities that mean a spell are `spell.<id>` (src/content/data/capability/spells.json). */
+const SPELL_CAPABILITY_PREFIX = 'spell.';
 
 /** A service a merchant sells at a fixed price (mw-ju8.6; trainers and more follow in mw-e20.9). */
 export interface ShopServiceDef {
@@ -504,6 +508,14 @@ export class Shops {
     this.#rules.spendGold(world, actor, service.price);
     merchantStoreOf(world).set(merchantId, { ...state, gold: state.gold + service.price });
     unlocks.learn(world, actor, capability, channel);
+    // A spell lesson also puts the spell on the player's spell list (mw-ju8.14), the list the spell
+    // pipeline casts from (src/sim/magic).
+    if (
+      capability.startsWith(SPELL_CAPABILITY_PREFIX) &&
+      world.isRegistered(KnownSpellsComponent)
+    ) {
+      learnSpell(world, actor, capability.slice(SPELL_CAPABILITY_PREFIX.length));
+    }
     world.events.emit(shopServiceBought, {
       tick: world.tick,
       actor,

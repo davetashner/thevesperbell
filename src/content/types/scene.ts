@@ -368,6 +368,19 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Opts the spawned creature in to returning after it is killed (mw-ju8.29): it is spawned fresh at its origin when the scene next loads, or at once when the player is out of sight and far away. Not for bosses or gatekeepers (needs creature).',
     ),
+  presence: z
+    .strictObject({
+      phases: z
+        .array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/))
+        .min(1)
+        .describe(
+          'Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for.',
+        ),
+    })
+    .optional()
+    .describe(
+      'The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene.',
+    ),
   carries: z
     .array(
       z.strictObject({

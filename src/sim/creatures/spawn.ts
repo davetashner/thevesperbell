@@ -295,6 +295,11 @@ export function spawnCreature(
   return { ok: true, entity };
 }
 
+/** Whether the spawn's creature belongs in the scene in `phase` (always, when it sets no presence). */
+export function presentIn(spawn: SceneSpawnPlacement, phase: string): boolean {
+  return spawn.presence === undefined || spawn.presence.phases.includes(phase);
+}
+
 /** Whether `entity` is a living creature. */
 export function isCreature(world: World<never>, entity: EntityId): boolean {
   return creaturesInstalled(world) && world.isAlive(entity) && world.has(entity, CreatureComponent);
@@ -359,17 +364,21 @@ export interface SceneCreatures {
 
 /**
  * Spawns the creature of every scene spawn that names one, facing the spawn's yaw, with its faction
- * override, patrol route, routine and leash. A failed spawn is reported, not thrown; the rest still spawn.
+ * override, patrol route, routine and leash. With `phase` (the clock's `time.phase`), a spawn whose
+ * `presence` leaves that phase out is skipped (mw-ju8.14). A failed spawn is reported, not thrown; the rest still spawn.
  */
 export function spawnSceneCreatures(
   world: World<never>,
   options: CreatureSpawnOptions,
   spawns: readonly SceneSpawnPlacement[],
+  phase?: string,
 ): SceneCreatures {
   const entities: EntityId[] = [];
   const errors: { point: string; error: SpawnError }[] = [];
   for (const spawn of spawns) {
     if (spawn.creature === undefined) continue;
+    // A creature that keeps to some phases of the day is not there in the others (mw-ju8.14).
+    if (phase !== undefined && !presentIn(spawn, phase)) continue;
     const result = spawnCreature(world, options, originOfSpawn(spawn, spawn.creature));
     if (result.ok) entities.push(result.entity);
     else errors.push({ point: spawn.id, error: result.error });

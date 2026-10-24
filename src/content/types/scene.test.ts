@@ -638,6 +638,7 @@ describe('scene content', () => {
       'sleeping-ox',
       'slice',
       'testbed',
+      'under-the-bridge',
       'valley-01',
       'valley-02',
       'valley-03',

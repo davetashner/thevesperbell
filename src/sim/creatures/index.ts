@@ -6,3 +6,4 @@ export * from './spawn';
 export * from './target-sharing';
 export * from './slain';
 export * from './repopulation';
+export * from './presence';

@@ -41,6 +41,7 @@ import {
   type GameCreatures,
   type SceneNoise,
   watchCreatureAi,
+  watchPresence,
 } from '@game/creatures/index';
 import { ActionSampler } from '@game/input/index';
 import {
@@ -62,6 +63,8 @@ import {
   DAMAGE_COMPONENTS,
   HIT_VOLUME_COMPONENTS,
   installDebugCommands,
+  DAY_CLOCK_FACTS,
+  PHASE_FACT,
   installSlainFacts,
   LEDGE_HANG_CAPABILITY,
   testPropSpawners,
@@ -226,6 +229,7 @@ export function createGameWorld<TInput>(
     scene: sceneId = 'testbed',
     environment,
     content = loadGameContent(),
+    phase,
   }: {
     seed: number;
     hz: number;
@@ -234,6 +238,11 @@ export function createGameWorld<TInput>(
     environment?: Frozen<EnvironmentDamageTuning>;
     /** Content in place of the game's (debug-build content with the fixture creatures). */
     content?: GameContent;
+    /**
+     * The clock phase the scene loads in (`time.phase`; mw-ju8.14): scene spawns that keep to some
+     * phases of the day are there or not by it. Without it the world has no clock and they all are.
+     */
+    phase?: string;
   },
 ): HeadlessGame<TInput> {
   const physics = new RapierPhysics(rapier);
@@ -325,6 +334,10 @@ export function createGameWorld<TInput>(
     : [];
   // Creatures (mw-e12.4) with senses and AI (mw-e11.21, mw-e11.23): perception sees the player by
   // the light field over the sim's Rapier world; AI walks the scene's navmesh.
+  if (phase !== undefined) {
+    for (const [key, spec] of Object.entries(DAY_CLOCK_FACTS)) world.facts.declare(key, spec);
+    world.facts.set(PHASE_FACT, phase);
+  }
   const sceneCreatures = startCreatures(world, creatures, combat, scene.layout.spawns, {
     content,
     player,
@@ -337,6 +350,8 @@ export function createGameWorld<TInput>(
   // A dying creature drops what it carries and rolls its loot table (mw-e01.5).
   startCreatureDrops(world, content, items, scene.id, scene.layout.spawns);
   const aiWatch = watchCreatureAi(world, sceneCreatures.ai, navigation);
+  // Spawns that keep to some phases of the day come and go with the clock (mw-ju8.14).
+  watchPresence(world, creatures.spawn, scene.layout.spawns);
   return {
     world,
     player,

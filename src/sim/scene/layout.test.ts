@@ -288,6 +288,27 @@ describe('scene layout (mw-e00.21)', () => {
     expect(brute?.repopulate).toBeUndefined();
   });
 
+  it('mw-ju8.14: lays out the phases a spawn is there for, and none for a spawn without any', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        {
+          id: 'teacher',
+          at: [0, 0, 0],
+          yaw: 0,
+          tags: [],
+          creature: { id: 'npc-quillon' },
+          presence: { phases: ['dusk', 'night'] },
+        },
+        { id: 'always', at: [1, 0, 0], yaw: 0, tags: [], creature: { id: 'npc-ottilie' } },
+      ],
+    };
+    const [teacher, always] = layoutScene(scene, testKit).spawns;
+    expect(teacher?.presence).toEqual({ phases: ['dusk', 'night'] });
+    expect(Object.isFrozen(teacher?.presence?.phases)).toBe(true);
+    expect(always?.presence).toBeUndefined();
+  });
+
   it('mw-e01.5: lays out what a creature carries as plain item ids, in order', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,

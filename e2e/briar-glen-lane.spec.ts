@@ -60,10 +60,10 @@ test('AC-2: the three keepers and the Bridge Watch are loaded and drawn', async 
         'npc-oswin': 1,
         'npc-juniper': 1,
         'npc-hollis': 1,
+        // The game starts at 06:00 (dawn): the day watch is on shift, the night guard is not (mw-ju8.14).
         'npc-watchman-day': 2,
-        'npc-watchman-night': 1,
       },
-      drawn: 6,
+      drawn: 5,
     });
   // Each stands east of her counter (x > 5.5), in her own shop.
   const ai = await data<{ agents: { at: number[] }[] }>(page, 'ai');
