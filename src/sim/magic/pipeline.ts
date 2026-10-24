@@ -75,6 +75,9 @@ export interface SpellPipelineOptions {
   readonly deliveries?: DeliveryRegistry;
 }
 
+/** Handles a `cast` input command (see `SpellPipeline.handleCommands`). */
+export type CastCommandHandler = (world: World<never>, request: CastRequest) => void;
+
 /** The outcome of a cast request. */
 export type CastResult =
   | { readonly status: 'cast'; readonly delivery: EntityId }
@@ -87,6 +90,7 @@ export class SpellPipeline {
   /** Looks a spell up by id (delivery systems read their delivery's section through it). */
   readonly spells: SpellLookup;
   private gates: readonly CastGate[] = [];
+  private commandHandler: CastCommandHandler | undefined;
 
   constructor(options: SpellPipelineOptions) {
     this.spells = options.spells;
@@ -102,6 +106,48 @@ export class SpellPipeline {
     }
     this.gates = [...this.gates, gate];
     return this;
+  }
+
+  /**
+   * Routes `cast` input commands to `handler` instead of casting at once (the cast phase, e06.4,
+   * starts a wind-up). Throws when a handler is already set.
+   */
+  handleCommands(handler: CastCommandHandler): this {
+    if (this.commandHandler !== undefined) throw new Error('cast commands already have a handler');
+    this.commandHandler = handler;
+    return this;
+  }
+
+  /** Handles a `cast` command: the registered handler, or an immediate `cast`. */
+  command(world: World<never>, request: CastRequest): void {
+    if (this.commandHandler === undefined) this.cast(world, request);
+    else this.commandHandler(world, request);
+  }
+
+  /**
+   * Why a learned-spell cast would be refused right now (unknown spell, not learned, a gate), or
+   * undefined. Changes nothing and emits nothing; the cast phase uses it to reject a wind-up early.
+   */
+  check(world: World<never>, request: CastRequest): string | undefined {
+    const spell = this.spells(request.spell);
+    if (spell === undefined) return 'unknown-spell';
+    if (!world.isAlive(request.caster)) return 'unknown-caster';
+    if (!knowsSpell(world, request.caster, request.spell)) return 'unknown-spell';
+    for (const gate of this.gates) {
+      const reason = gate.check({ world, request, spell });
+      if (reason !== undefined) return reason;
+    }
+    return undefined;
+  }
+
+  /**
+   * Charges every gate for `request` without delivering (a channel starting: its effects arrive tick
+   * by tick). Call only after `check` passed. Throws for an unknown spell.
+   */
+  spend(world: World<never>, request: CastRequest): void {
+    const spell = this.spells(request.spell);
+    if (spell === undefined) throw new Error(`unknown spell "${request.spell}"`);
+    for (const gate of this.gates) gate.spend?.({ world, request, spell });
   }
 
   /**
@@ -298,7 +344,7 @@ export function installSpells<TInput>(
       }
       for (const input of inputs) {
         if (!isCastCommand(input)) continue;
-        pipeline.cast(w, {
+        pipeline.command(w, {
           caster: input.caster,
           spell: input.spell,
           ...(input.target === undefined ? {} : { target: input.target }),

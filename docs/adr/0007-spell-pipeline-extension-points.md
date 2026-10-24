@@ -83,6 +83,34 @@ reasons a gate returns are stable strings that tests and the HUD match on.
 | Events | `ManaChanged{entity, current, max, delta, reason}` for the HUD on every change. |
 | Numbers | Sorcerer profile: 100 max, 5/s, 90 ticks (1.5 s) delay, 50 % interrupt refund (ADR-0004: other classes start at 20-30; max grows by +10 shrine steps, rates never grow). |
 
+### Worked example: the cast phase (mw-e06.4)
+
+`src/sim/magic/casting.ts` and `cooldown.ts`; `installCasting(world, pipeline)` needs the mana component
+registered. It adds three small things to `pipeline.ts`, none of which change the cast flow:
+
+| Addition | Why |
+|---|---|
+| `pipeline.check(world, request)` | The gates' verdict without casting, so a wind-up can be refused at once. |
+| `pipeline.spend(world, request)` | Charges every gate without delivering: a channel pays `cost.mana` and starts its cooldown once, at channel start. |
+| `pipeline.handleCommands(handler)` / `command(...)` | Routes the `cast` command to the cast phase. Without a handler it casts at once, as before. Set once. |
+
+- **Wind-up.** `castTime` is `round(s × hz)` ticks; release is `pipeline.cast` on that tick, so every
+  gate (mana, cooldown, silence) is checked again at release. Mana is held with `reserveMana` from the
+  start and freed just before release; the mana gate then charges as usual. State lives on one ledger
+  entity (`magic.casts`, `magic.cooldowns`) because component add/remove is deferred inside a tick.
+- **Gates.** `cooldown` (reason `cooldown`; spend starts it) and `cast-state` (`already-casting`,
+  `silenced`, `grappled`, `restrained`). Status names are the spell-status ledger's; `mw-e06.9` owns
+  producing them.
+- **Channel.** Each `interval` the delivery and effects run as a `free` pipeline cast (a `SpellCast`
+  with source `free` per tick) and `manaPerSecond × interval` is spent; a tick that cannot be paid ends
+  the channel. Its cooldown restarts when it ends.
+- **Interruption.** `PoiseBroken` on the caster, a blocking status, `Died`; moving over 0.5 m unless
+  `castWhileMoving` (a cancel). Interrupted wind-up: pays, then `refundInterrupted` (50 %); in the last
+  20 % it is miscast eligible: pays in full and emits `MiscastRequested{cause: "interrupted"}` (deficit
+  0, severity = wind-up progress). Player cancel and movement cancel free the mana in full.
+- **Not done.** A separate recovery state (the cooldown is the recovery); the player-input binding
+  (`mw-e06.15`); `free` (scroll) casts have no wind-up.
+
 ## Consequences
 
 - `mw-e06.4` adds a cooldown gate and cast-phase state in its own module; `mw-e06.6` registers
