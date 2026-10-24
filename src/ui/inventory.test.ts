@@ -143,9 +143,22 @@ describe('inventory screen', () => {
     expect(cardOf(4).tabIndex).toBe(0);
     expect(cardOf(3).tabIndex).toBe(-1);
     expect(cardOf(4).getAttribute('aria-selected')).toBe('true');
-    expect(texts('[data-part="slot"]', cardOf(4))).toEqual(['2']);
-    expect(texts('[data-part="equipped"]', cardOf(3))).toEqual(['E']);
-    expect(texts('.vb-item-count', cardOf(4))).toEqual(['×3']);
+    const glyphs = (selector: string, root: HTMLElement): (string | undefined)[] =>
+      [...root.querySelectorAll<HTMLElement>(selector)].map((el) => el.dataset['glyph']);
+    expect(glyphs('[data-part="slot"]', cardOf(4))).toEqual(['2']);
+    expect(glyphs('[data-part="equipped"]', cardOf(3))).toEqual(['E']);
+    expect(glyphs('.vb-item-count', cardOf(4))).toEqual(['×3']);
+  });
+
+  it('AC-axe: given a card, when labelled, its visible text is only the item name so the aria-label contains it (label-content-name-mismatch)', () => {
+    open();
+    const visible = (card: HTMLElement): string =>
+      [...card.querySelectorAll('.vb-item-name, .vb-item-count, .vb-item-badge')]
+        .map((el) => el.textContent)
+        .join('');
+    expect(visible(cardOf(3))).toBe('Arming sword');
+    expect(visible(cardOf(4))).toBe('Healing draught');
+    expect(cardOf(3).getAttribute('aria-label')?.startsWith('Arming sword')).toBe(true);
     expect(cardLabel(item(9, { count: 2, stolen: true }))).toBe('Item 9, 2, stolen');
   });
 
