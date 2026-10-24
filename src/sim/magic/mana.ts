@@ -128,8 +128,10 @@ export interface MiscastRequestedInfo {
   readonly spell: string;
   /** Mana the cast was short by. */
   readonly deficit: number;
-  /** deficit / cost, in (0, 1]. */
+  /** deficit / cost, in (0, 1]; for an interrupted cast, how far the wind-up had got. */
   readonly severity: number;
+  /** Absent: the cast went past the available mana. `interrupted`: hit in the last 20 % of wind-up (e06.4, deficit 0). */
+  readonly cause?: 'interrupted';
 }
 export const MiscastRequested = defineEvent<MiscastRequestedInfo>('MiscastRequested');
 
