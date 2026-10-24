@@ -7,6 +7,7 @@
 
 import type { EntityId } from '../core/component';
 import type { World } from '../core/world';
+import { flameTemperatureOf, resolveFireConfig } from '../elements/fire';
 import { addProperties, type WorldPropertyInit } from './components';
 import {
   assertProperty,
@@ -28,13 +29,31 @@ export function applyMaterial(
   init: WorldPropertyInit,
 ): WorldPropertyInit {
   const id = init.material;
-  if (id === undefined) return { ...init };
+  if (id === undefined) return withThermalState({ ...init });
   const preset = presets.get(id);
   if (preset === undefined) {
     const known = [...presets.keys()].sort().join(', ');
     throw new RangeError(`unknown material "${id}"; known materials: ${known}`);
   }
-  return { ...preset, ...init };
+  return withThermalState({ ...preset, ...init });
+}
+
+/**
+ * Heat only reaches things that have a `temperature`, so anything that can burn is given one when
+ * it has none of its own (mw-akb): ambient for a flammable thing, flame temperature for one that is
+ * already burning (a torch a scene lights from the start; the fire rules put a burning thing cooler
+ * than its ignition point out as cold). Everything else stays sparse.
+ */
+function withThermalState(values: WorldPropertyInit): WorldPropertyInit {
+  if (values.temperature !== undefined) return values;
+  if (values.burning === true) {
+    const ignition = values.ignitionPoint ?? WORLD_PROPERTY_SPECS.ignitionPoint.default;
+    return { ...values, temperature: flameTemperatureOf(resolveFireConfig(), ignition) };
+  }
+  if (values.flammable === true) {
+    return { ...values, temperature: WORLD_PROPERTY_SPECS.temperature.default };
+  }
+  return values;
 }
 
 /**
