@@ -15,6 +15,9 @@ import {
   SpellLearned,
   StudyEnded,
   StudyStarted,
+  ScrollRead,
+  ScrollRules,
+  type ItemGiver,
   type StudyRules,
   CharacterController,
   DAMAGE_COMPONENTS,
@@ -22,6 +25,8 @@ import {
   HealthComponent,
   initialCharacterState,
   inventoryOf,
+  giveItemCommand,
+  inventoryActionDone,
   isInventoryActionCommand,
   PlayerLook,
   quickSlotsOf,
@@ -38,6 +43,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createCapabilityRegistry, createUnlockBook } from '../capabilities';
 import { installGamePhysics } from '../physics-objects';
 import { createStudyRules } from './book-study';
+import type { ScrollAim } from './scroll-read';
 import { prepareConsumables, prepareWorldItems, startConsumables, startWorldItems } from './index';
 import {
   CATEGORY_LABELS,
@@ -89,7 +95,14 @@ beforeEach(() => {
 
 /** A world with physics, world items, consumables and the inventory UI, and a player at the origin. */
 function game(
-  options: { player?: boolean; closeKeys?: readonly string[]; study?: StudyRules } = {},
+  options: {
+    player?: boolean;
+    closeKeys?: readonly string[];
+    study?: StudyRules;
+    scrolls?: ScrollRules;
+    scrollAim?: (spellId: string | undefined) => ScrollAim | undefined;
+    giver?: ItemGiver;
+  } = {},
 ) {
   const physics = new RapierPhysics(RAPIER);
   const world = installGamePhysics(registerSceneComponents(new World<never>({ seed: 7, physics })));
@@ -115,6 +128,9 @@ function game(
     content,
     consumables,
     ...(options.study !== undefined && { study: options.study }),
+    ...(options.scrolls !== undefined && { scrolls: options.scrolls }),
+    ...(options.scrollAim !== undefined && { scrollAim: options.scrollAim }),
+    ...(options.giver !== undefined && { giver: options.giver }),
     player,
     submit: (command) => queue.push(command),
     hudScale: 1.25,
@@ -499,6 +515,152 @@ describe('inventory view models', () => {
     world.events.emit(SpellLearned, { tick: 0, actor: other, spellId: 'x', source: 'y' });
     step();
     expect(status()).toBe('You already know what A Primer of Bolts teaches.');
+  });
+
+  describe('Read on a spell scroll (mw-ju8.17)', () => {
+    const setup = (
+      aim: ((id: string | undefined) => ScrollAim | undefined) | undefined,
+      cast: () =>
+        | { status: 'cast'; delivery: number }
+        | { status: 'fizzled'; reason: string; stage: 'validate' },
+    ) => {
+      const requests: unknown[] = [];
+      const scrolls = new ScrollRules({
+        casts: (id) => (id === 'scroll-of-ember' ? 'ember' : undefined),
+        pipeline: {
+          cast: (_w, request) => {
+            requests.push(request);
+            return cast();
+          },
+        },
+        inventory: {
+          remove: (w, actor, request) =>
+            prepareWorldItems(content).inventory.remove(w, actor, request),
+        },
+      });
+      const g = game({ scrolls, ...(aim !== undefined && { scrollAim: aim }) });
+      g.give('scroll-of-ember', 2);
+      g.give('scroll-of-mage-hand');
+      g.inventoryUi.toggle();
+      const read = (name: string): void => {
+        const item = g.ui.top?.element.querySelector<HTMLElement>(
+          `[data-item="${String(inventoryOf(g.world, must(g.player))?.items.find((i) => i.defId === name)?.instanceId)}"]`,
+        );
+        item?.click();
+        g.ui.top?.element.querySelector<HTMLElement>('[data-action="read"]')?.click();
+        g.step();
+      };
+      const status = (): string | null | undefined =>
+        g.ui.top?.element.querySelector('[data-testid="inventory-status"]')?.textContent;
+      return { ...g, requests, read, status };
+    };
+    const ok = { status: 'cast', delivery: 1 } as const;
+
+    it('offers Read only on a scroll that names a spell, aims it, casts it and spends it', () => {
+      const aims: (string | undefined)[] = [];
+      const t = setup(
+        (id) => {
+          aims.push(id);
+          return { valid: true, aim: { x: 1, y: 0, z: 2 }, target: 5 };
+        },
+        () => ok,
+      );
+      const model = new InventoryViews(
+        content,
+        prepareConsumables(content, prepareWorldItems(content)),
+      ).model(t.world, must(t.player));
+      const byName = (n: string) => model.items.find((i) => i.name === n);
+      expect(byName('Scroll of Ember')?.actions).toContain('read');
+      expect(byName('Scroll of Mage Hand')?.actions).not.toContain('read');
+      t.read('scroll-of-ember');
+      expect(aims).toEqual(['ember']);
+      expect(t.requests).toEqual([
+        { caster: t.player, spell: 'ember', source: 'free', aim: { x: 1, y: 0, z: 2 }, target: 5 },
+      ]);
+      expect(t.status()).toBe('The Scroll of Ember flares and crumbles to ash.');
+      expect(
+        inventoryOf(t.world, must(t.player))?.items.find((i) => i.defId === 'scroll-of-ember')
+          ?.count,
+      ).toBe(1);
+      // Someone else's read is not the player's business.
+      t.world.events.emit(ScrollRead, { tick: 0, actor: t.world.spawn(), scroll: 'x', spell: 'y' });
+      t.step();
+      expect(t.status()).toBe('The Scroll of Ember flares and crumbles to ash.');
+    });
+
+    it('scrollSpell names the spell of a scroll and nothing for other items', () => {
+      const t = setup(undefined, () => ok);
+      const views = new InventoryViews(
+        content,
+        prepareConsumables(content, prepareWorldItems(content)),
+      );
+      const pack = inventoryOf(t.world, must(t.player))?.items ?? [];
+      const idOf = (def: string): number => pack.find((i) => i.defId === def)?.instanceId ?? 0;
+      expect(views.scrollSpell(t.world, must(t.player), idOf('scroll-of-ember'))).toBe('ember');
+      expect(
+        views.scrollSpell(t.world, must(t.player), idOf('scroll-of-mage-hand')),
+      ).toBeUndefined();
+      expect(views.scrollSpell(t.world, must(t.player), 999)).toBeUndefined();
+      t.give('healing-draught');
+      const draught = inventoryOf(t.world, must(t.player))?.items.find(
+        (i) => i.defId === 'healing-draught',
+      );
+      expect(views.scrollSpell(t.world, must(t.player), draught?.instanceId ?? 0)).toBeUndefined();
+    });
+
+    it('says why a read could not be aimed, and sends nothing', () => {
+      const t = setup(
+        () => ({ valid: false, text: 'There is no floor there to aim at.' }),
+        () => ok,
+      );
+      t.read('scroll-of-ember');
+      expect(t.status()).toBe('There is no floor there to aim at.');
+      expect(t.requests).toEqual([]);
+    });
+
+    it('is refused without an aimer, and the sim keeps a fizzled scroll or refuses without rules', () => {
+      const bare = setup(undefined, () => ok);
+      bare.read('scroll-of-ember');
+      expect(bare.status()).toBe('You cannot read that now.');
+      expect(bare.requests).toEqual([]);
+      const g = game({ scrollAim: () => ({ valid: true, aim: { x: 0, y: 0, z: 0 } }) });
+      g.give('scroll-of-ember');
+      g.world.events.emit(inventoryActionDone, {
+        tick: 0,
+        actor: must(g.player),
+        action: { op: 'read', instanceId: 1 },
+        defId: 'scroll-of-ember',
+        ok: false,
+        reason: 'not-readable',
+      });
+      g.inventoryUi.toggle();
+      g.step();
+      expect(g.ui.top?.element.querySelector('[data-testid="inventory-status"]')?.textContent).toBe(
+        'There is nothing here you can read aloud.',
+      );
+      const fizzle = setup(
+        () => ({ valid: true, aim: { x: 0, y: 0, z: 0 } }),
+        () => ({ status: 'fizzled', reason: 'x', stage: 'validate' }),
+      );
+      fizzle.read('scroll-of-ember');
+      expect(fizzle.status()).toBe('The scroll’s magic fizzles. It is not used up.');
+      expect(
+        inventoryOf(fizzle.world, must(fizzle.player))?.items.find(
+          (i) => i.defId === 'scroll-of-ember',
+        )?.count,
+      ).toBe(2);
+    });
+  });
+
+  it('the console’s give reaches the pack through the installed giver', () => {
+    const { world, player, queue, step } = game({
+      giver: { inventory: prepareWorldItems(content).inventory, known: () => true },
+    });
+    queue.push(giveItemCommand(must(player), 'scroll-of-ember', 2) as never);
+    step();
+    expect(inventoryOf(world, must(player))?.items.map((i) => i.defId)).toEqual([
+      'scroll-of-ember',
+    ]);
   });
 
   it('says where a study session broke off, and words study refusals', () => {

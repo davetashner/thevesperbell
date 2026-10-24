@@ -15,6 +15,7 @@ import {
   DIFFICULTY_RANGES,
   difficultyCommand,
   killCommand,
+  giveItemCommand,
   learnSpellCommand,
   MAX_BLAST_INTENSITY,
   MAX_BLAST_RADIUS,
@@ -65,6 +66,8 @@ export interface ConsoleHost {
   checkSpawn?(content: string, options: Readonly<Record<string, string>>): string | undefined;
   /** Named places `tp` accepts (the loaded scene's spawns). */
   bookmarks(): ReadonlyMap<string, Vec3>;
+  /** Item ids `give` accepts, sorted. Absent: `give` is unavailable. */
+  readonly items?: readonly string[];
   /** Spell ids `spell` accepts, sorted (empty: no spells in this build). */
   readonly spells?: readonly string[];
   /** Makes `id` the spell the cast button casts; false when the player has not learned it. */
@@ -240,8 +243,16 @@ export function registerBuiltins(registry: CommandRegistry<ConsoleHost>): void {
     summary: 'give the player items',
     usage: '<itemId> [n]',
     args: z.tuple([z.string(), count(999).optional()]),
-    run: () => {
-      throw new ConsoleError(['no items to give yet: the inventory arrives with e17 (mw-e17.12)']);
+    complete: (index, host) => (index === 0 ? (host.items ?? []) : []),
+    run: ([id, n = 1], host) => {
+      if (host.items === undefined) {
+        throw new ConsoleError([
+          'no items to give yet: the inventory arrives with e17 (mw-e17.12)',
+        ]);
+      }
+      if (!host.items.includes(id)) throw unknown('item', id, host.items);
+      host.submit(giveItemCommand(player(host), id, n));
+      return `giving ${String(n)} × ${id}`;
     },
   });
 

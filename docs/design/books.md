@@ -48,3 +48,19 @@ means), `src/game/items/book-study.ts` (content to study data, who may learn). D
 | UI | The status line of the open inventory says it ("You settle down to study...", "You have learned Fixture Bolt.", why it broke off). A refusal for class reads "The runes swim before your eyes." | The reader UI is mw-e07.9. |
 | Persistence | The ledger is the `magic.study` component, so world snapshots and state hashes carry it. Saves of known spells and progress are mw-e07.12. | Out of scope. |
 | Not in the running game yet | Casting is not wired into the shipping game (aim, hotbar: mw-e06.15, mw-e06.16), so AC-6 is proven in `tests/integration/book-study.test.ts` (fixture book picked up, studied, spell cast through the real pipeline) and not as a browser spec. | An e2e needs a way to cast in the game (mw-55i). |
+
+## Reading a scroll (mw-ju8.17)
+
+Code: `src/sim/magic/scroll.ts` (`ScrollRules`, `ScrollRead`), the `read` inventory action
+(`src/sim/items/inventory-actions.ts`), `src/game/items/scroll-read.ts` (which scroll casts what, and the
+aim). Decisions, made 2026-10-24 under the owner's "make good decisions":
+
+| Call | Decision | Why |
+| --- | --- | --- |
+| Rules | Reading casts `book.casts` as a `source: 'free'` cast (ADR-0007): no mana, no cooldown, no wind-up, no learning, any class. One scroll of the stack is spent. | Owner decision 2026-10-24 and the pipeline's free-cast seam; nothing names a spell. |
+| Aim | **Read fires at once, at the reticle.** The inventory screen aims the scroll's spell through the same `resolveAim` a normal cast uses, from the current view, when the player chooses Read, and the command carries the aim point and target. | The inventory is opened from the view the player aimed, so the reticle still points where they meant; "arming" a scroll for a later cast press would add a second state (which scroll is armed, when it expires, what cancels it) for no gain. Carrying the aim in the command keeps replays exact. |
+| Unaimable | A ground spell with no floor, or a touch spell with no target, is refused on the status line ("There is no floor there to aim at.") before anything is sent; the scroll is kept. | Same rules as a normal cast's red marker. |
+| Fizzle | If the pipeline fizzles the cast the scroll is not spent ("The scroll's magic fizzles. It is not used up."). | A scroll is never wasted on nothing. |
+| Which scrolls | Only scrolls whose book has `casts` offer Read. `scroll-of-ember` casts `ember`; `scroll-of-mage-hand` and `scroll-of-firebolt` have no spell content, so they offer no Read action until their spells ship (E08). | `casts` must name real content. |
+| Feedback | On success the status line says "The Scroll of Ember flares and crumbles to ash."; the spell's own cue plays as for any cast. | Reads as the scroll being used up. |
+| Proof | `tests/integration/scroll-read.test.ts` (real content, real pipeline, a character who has learned nothing) and `e2e/spell-cast.spec.ts` (read at the testbed loose-crate, it ignites, the scroll is gone). | AC-3. |

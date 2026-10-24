@@ -117,6 +117,60 @@ test('AC-4: learns Ember, aims at the loose crate with the reticle, casts it and
   expect(problems).toEqual([]);
 });
 
+test('mw-ju8.17 AC-3: reading a scroll of Ember at the loose crate casts it free, ignites the crate and uses the scroll up', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const problems = await start(page);
+  // Nothing learned: only the scroll casts.
+  await runConsole(page, 'give scroll-of-ember');
+  await runConsole(page, `tp ${String(CRATE.x)} 0 1.5`);
+  await turnTo(page, { x: CRATE.x, z: CRATE.z });
+  const want = -0.25;
+  for (let i = 0; i < 6; i++) {
+    const { pitch } = await playerState(page);
+    if (Math.abs(pitch - want) < 0.03) break;
+    await page.evaluate(
+      (movementY) => {
+        window.dispatchEvent(new MouseEvent('mousemove', { movementX: 0, movementY }));
+      },
+      Math.round((pitch - want) / LOOK_SENSITIVITY),
+    );
+    await expect
+      .poll(async () => (await playerState(page)).pitch, { timeout: 5_000 })
+      .not.toBe(pitch);
+  }
+  const app = page.locator('#app');
+  const scroll = page.locator(
+    '[data-screen="inventory"] [data-item][aria-label^="Scroll of Ember"]',
+  );
+  await page.keyboard.press('KeyI');
+  await expect(app).toHaveAttribute('data-inventory', 'open');
+  await scroll.click();
+  await page.locator('[data-action="read"]').click();
+  await expect(page.getByTestId('inventory-status')).toHaveText(
+    'The Scroll of Ember flares and crumbles to ash.',
+  );
+  await page.keyboard.press('KeyI');
+  await expect(app).toHaveAttribute('data-inventory', 'closed');
+  await expect
+    .poll(
+      async () =>
+        (await spells(page)).hits.some((hit) => hit.spawn === 'loose-crate' && hit.burning),
+      { timeout: 20_000 },
+    )
+    .toBe(true);
+  const after = await spells(page);
+  expect(after.learned).toEqual([]);
+  expect(after.fizzles).toEqual([]);
+  // The scroll is gone from the pack: the screen lists no scroll.
+  await takeControl(page);
+  await page.keyboard.press('KeyI');
+  await expect(app).toHaveAttribute('data-inventory', 'open');
+  await expect(scroll).toHaveCount(0);
+  expect(problems).toEqual([]);
+});
+
 test('the reticle and an Ember in flight are drawn (screenshot)', async ({ page }) => {
   test.skip(process.env['E2E_SPELL_SHOT'] === undefined, 'set E2E_SPELL_SHOT to a file path');
   test.setTimeout(180_000);

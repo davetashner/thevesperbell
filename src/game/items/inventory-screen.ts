@@ -27,14 +27,17 @@ import {
   QUICK_SLOT_COUNT,
   quickSlotsOf,
   SpellLearned,
+  ScrollRead,
   StudyEnded,
   StudyStarted,
   type Consumables,
   type EntityId,
   type EquipmentSlot,
   type InventoryAction,
+  type ItemGiver,
   type InventoryActionCommand,
   type InventoryActionRefusal,
+  type ScrollRules,
   type StudyRules,
   type World,
 } from '@sim/index';
@@ -52,6 +55,7 @@ import {
   type UiRoot,
 } from '@ui/index';
 import { itemLabel } from '../classes';
+import type { ScrollAim } from './scroll-read';
 
 /** The content an inventory view reads. */
 export type InventoryContent = Pick<GameContent, 'all'>;
@@ -202,6 +206,8 @@ const REFUSALS: Readonly<Partial<Record<InventoryActionRefusal, string>>> = Obje
   busy: 'Not now: your hands are busy.',
   'no-weapon': 'You need a weapon in hand to coat.',
   'not-usable': 'That isn’t something you can use.',
+  'not-readable': 'There is nothing here you can read aloud.',
+  fizzled: 'The scroll’s magic fizzles. It is not used up.',
   'not-assignable': 'Only things you can use go in a quick slot.',
   'not-equippable': 'That isn’t something you can equip.',
   'no-equipment': 'You can’t equip anything yet.',
@@ -282,6 +288,15 @@ export class InventoryViews {
   }
 
   /** The inventory screen's model for `actor` (empty without an inventory). */
+  /** The spell the scroll `instanceId` in `actor`'s pack casts, or undefined for anything else. */
+  scrollSpell(world: World<never>, actor: EntityId, instanceId: number): string | undefined {
+    const defId = inventoryOf(world, actor)?.items.find(
+      (item) => item.instanceId === instanceId,
+    )?.defId;
+    const item = defId === undefined ? undefined : this.item(defId);
+    return item?.category === 'book' ? item.book.casts?.id : undefined;
+  }
+
   model(world: World<never>, actor: EntityId): InventoryModel {
     const pack = inventoryOf(world, actor);
     const slots = quickSlotsOf(world, actor)?.slots ?? [];
@@ -302,6 +317,13 @@ export class InventoryViews {
       const actions: InventoryActionId[] = [];
       if (usable) actions.push('use', 'assign');
       if (item.category === 'book' && item.book.teaches.kind === 'spell') actions.push('study');
+      if (
+        item.category === 'book' &&
+        item.book.kind === 'scroll' &&
+        item.book.casts !== undefined
+      ) {
+        actions.push('read');
+      }
       if (slot !== -1) actions.push('unassign');
       if (equippable) actions.push(equippedSlot === undefined ? 'equip' : 'unequip');
       if (!item.flags.noDrop) actions.push('drop', 'throw');
@@ -352,6 +374,8 @@ export interface InventoryScreenOptions {
   readonly submit: (command: InventoryActionCommand) => void;
   /** The screen opened or closed. */
   readonly onChange?: (open: boolean) => void;
+  /** Aims a scroll's spell from the current view (mw-ju8.17); without it a scroll cannot be read. */
+  readonly scrollAim?: (spellId: string | undefined) => ScrollAim | undefined;
 }
 
 /**
@@ -398,6 +422,12 @@ export class InventoryScreenController {
             : (STUDY_INTERRUPTIONS[e.reason ?? ''] ?? 'You stop studying.'),
         );
       }),
+      events.on(ScrollRead, (e) => {
+        if (e.actor !== options.player) return;
+        this.#screen?.say(
+          `The ${itemName(options.views.item(e.scroll))} flares and crumbles to ash.`,
+        );
+      }),
       events.on(SpellLearned, (e) => {
         if (e.actor !== options.player) return;
         this.#screen?.say(
@@ -425,7 +455,14 @@ export class InventoryScreenController {
     this.#screen = openInventory(ui, {
       model,
       onAction: (request) => {
-        submit(inventoryActionCommand(player, requestAction(request)));
+        const action = requestAction(request);
+        if (action.op === 'read') {
+          const read = this.#aimRead(action);
+          if (read === undefined) return;
+          submit(inventoryActionCommand(player, read));
+          return;
+        }
+        submit(inventoryActionCommand(player, action));
       },
       onClose: () => {
         this.#screen = undefined;
@@ -434,6 +471,18 @@ export class InventoryScreenController {
     });
     this.#options.onChange?.(true);
     return true;
+  }
+
+  /** A read action with its aim, or undefined (and a word on the status line) when it cannot be aimed. */
+  #aimRead(action: InventoryAction & { readonly op: 'read' }): InventoryAction | undefined {
+    const { world, player, views, scrollAim } = this.#options;
+    const spell = views.scrollSpell(world, player, action.instanceId);
+    const aim = scrollAim?.(spell);
+    if (aim?.valid !== true) {
+      this.#screen?.say(aim === undefined ? 'You cannot read that now.' : aim.text);
+      return undefined;
+    }
+    return { ...action, aim: aim.aim, ...(aim.target !== undefined && { target: aim.target }) };
   }
 
   /** Closes the screen (and its menus). */
@@ -473,6 +522,12 @@ export interface InventoryUiOptions<T> {
   readonly consumables: Consumables;
   /** The study rules (mw-e07.2): without them the Study action is refused. */
   readonly study?: StudyRules;
+  /** The scroll rules (mw-ju8.17): without them Read is refused. */
+  readonly scrolls?: ScrollRules;
+  /** The console's `give` (item catalogue and pack rules). */
+  readonly giver?: ItemGiver;
+  /** Aims a scroll's spell from the current view; without it a scroll cannot be read. */
+  readonly scrollAim?: (spellId: string | undefined) => ScrollAim | undefined;
   /** The player; without one only the action system is installed. */
   readonly player: EntityId | undefined;
   /** Queues a sim command for the next step. */
@@ -517,6 +572,8 @@ export function startInventoryUi<T>(options: InventoryUiOptions<T>): InventoryUi
       consumables,
       equipment,
       ...(options.study !== undefined && { study: options.study }),
+      ...(options.scrolls !== undefined && { scrolls: options.scrolls }),
+      ...(options.giver !== undefined && { giver: options.giver }),
     }),
   );
   if (player === undefined) {
@@ -536,6 +593,7 @@ export function startInventoryUi<T>(options: InventoryUiOptions<T>): InventoryUi
     player,
     views,
     submit,
+    ...(options.scrollAim !== undefined && { scrollAim: options.scrollAim }),
     onChange: (open) => publish?.('inventory', open ? 'open' : 'closed'),
   });
   const hud = new QuickSlotHud({ scale: options.hudScale });
