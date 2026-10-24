@@ -2,7 +2,7 @@
 // in-game time, and the spell it taught is cast through the real pipeline. src/sim tests cannot load
 // content at runtime, so the content-backed path lives here.
 import { describe, expect, it } from 'vitest';
-import { loadItemFixtureContent } from '@content/test-fixtures';
+import { loadGameContent } from '@content/index';
 import { bookStudyDefs, createStudyRules, learnersOf } from '@game/items/book-study';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import {
@@ -34,11 +34,11 @@ import {
 } from '@sim/index';
 import { PlayerClassComponent } from '@sim/index';
 
-const content = loadItemFixtureContent();
-const PRIMER = 'fixture-primer';
+const content = loadGameContent();
+const PRIMER = 'ember';
 
 function game(classId: string) {
-  // The light and noise ops of the fixture spell need the emission systems, which this test is not
+  // The light and noise ops of Ember need the emission systems, which this test is not
   // about; its damage and stimulus effects are enough to prove the cast goes through.
   const spells = new Map(
     content
@@ -89,23 +89,19 @@ describe('learning a spell from a book (mw-e07.2)', () => {
     world.events.on(SpellFizzled, (e) => fizzled.push(e.reason));
 
     // Not yet: the cast is refused.
-    world.step([
-      { type: 'cast', caster: player, spell: 'fixture-bolt', aim: { x: 1, y: 0, z: 0 } },
-    ]);
+    world.step([{ type: 'cast', caster: player, spell: 'ember', aim: { x: 1, y: 0, z: 0 } }]);
     expect(fizzled).toEqual(['unknown-spell']);
     expect(inventory.add(world, player, PRIMER, 1)).toMatchObject({ ok: true });
     expect(rules.start(world, player, PRIMER)).toMatchObject({
       status: 'started',
-      minutesLeft: 30,
+      minutesLeft: 20,
     });
     for (let i = 0; i < 400; i++) world.step();
-    expect(knowsSpell(world, player, 'fixture-bolt')).toBe(true);
-    expect(learned).toEqual([`fixture-bolt<${PRIMER}`]);
-    world.step([
-      { type: 'cast', caster: player, spell: 'fixture-bolt', aim: { x: 1, y: 0, z: 0 } },
-    ]);
+    expect(knowsSpell(world, player, 'ember')).toBe(true);
+    expect(learned).toEqual([`ember<${PRIMER}`]);
+    world.step([{ type: 'cast', caster: player, spell: 'ember', aim: { x: 1, y: 0, z: 0 } }]);
     for (let i = 0; i < 5; i++) world.step();
-    expect(cast).toEqual(['fixture-bolt']);
+    expect(cast).toEqual(['ember']);
     expect(fizzled).toEqual(['unknown-spell']);
   });
 
@@ -119,10 +115,10 @@ describe('learning a spell from a book (mw-e07.2)', () => {
 
   it('a knight can study an easy first-step book but not a deeper or harder one', () => {
     const defs = bookStudyDefs(content);
-    expect(defs.get(PRIMER)).toMatchObject({ spell: 'fixture-bolt', studyMinutes: 30 });
-    const bolt = content.all('spell').find((s) => s.id === 'fixture-bolt');
-    if (bolt === undefined) throw new Error('fixture-bolt');
-    // fixture-bolt: tier 1, fire (licensed), but 15 mana is within the 20-mana bound.
+    expect(defs.get(PRIMER)).toMatchObject({ spell: 'ember', studyMinutes: 20 });
+    const bolt = content.all('spell').find((s) => s.id === 'ember');
+    if (bolt === undefined) throw new Error('ember');
+    // ember: tier 1, fire (licensed), but 15 mana is within the 20-mana bound.
     expect(learnersOf(bolt, 0)).toBe('any');
     expect(learnersOf(bolt, 0.31)).toEqual(['sorcerer']);
     expect(learnersOf({ ...bolt, tier: 2 }, 0)).toEqual(['sorcerer']);

@@ -540,6 +540,10 @@ describe('inventory view models', () => {
     });
     step();
     expect(status()).toBe('You stop studying.');
+    // Anything that is not a book is named by its item name.
+    world.events.emit(StudyStarted, { tick: 0, actor: hero, book: 'healing-draught', progress: 0 });
+    step();
+    expect(status()).toMatch(/^You settle down to study .*raught/i);
     expect(refusalText('class', 'It')).toBe('The runes swim before your eyes.');
     expect(refusalText('prerequisite', 'It')).toMatch(/know enough/);
     expect(refusalText('unsafe', 'It')).toMatch(/danger/);

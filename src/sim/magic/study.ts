@@ -22,7 +22,7 @@
 // Bonuses: an entity tagged `desk` within `deskRangeM` of the reader multiplies study speed by
 // `deskBonus`. A resting or seated bonus is left for when seats exist (mw-e27.13).
 //
-// Rejections, in order: `not-a-student` (no `addStudent`), `unknown-book`, `not-carried`, `busy` (a
+// Rejections, in order: `unknown-book`, `not-carried`, `busy` (a
 // session is running), `class` (the book's `learners` exclude the reader's class; its lore stays
 // readable, which is the reader's concern), then `already-known` (the book is flagged known, nothing is
 // learned twice), `prerequisite` (the unlock book refused), `no-clock` and `unsafe` (a threat is
@@ -133,14 +133,7 @@ export interface StudyEndedInfo {
 export const StudyEnded = defineEvent<StudyEndedInfo>('StudyEnded');
 
 export type StudyRefusal =
-  | 'not-a-student'
-  | 'unknown-book'
-  | 'not-carried'
-  | 'busy'
-  | 'class'
-  | 'prerequisite'
-  | 'no-clock'
-  | 'unsafe';
+  'unknown-book' | 'not-carried' | 'busy' | 'class' | 'prerequisite' | 'no-clock' | 'unsafe';
 
 export type StartStudyResult =
   | { readonly status: 'started'; readonly minutesLeft: number }
@@ -172,13 +165,15 @@ function registerStudy(world: World<never>): void {
   }
 }
 
-/** Gives `actor` a study ledger and known spells. Once, at setup, outside a step (structural). */
+/** Gives `actor` a study ledger and known spells up front. Optional: the ledger is otherwise added on first study. */
 export function addStudent(world: World<never>, actor: EntityId): void {
   registerStudy(world);
   world.add(actor, StudyStateComponent, { progress: {}, knownBooks: [], session: null });
   if (!world.has(actor, KnownSpellsComponent))
     world.add(actor, KnownSpellsComponent, { spells: [] });
 }
+
+const NO_STUDY: StudyState = Object.freeze({ progress: {}, knownBooks: [], session: null });
 
 /** `actor`'s study ledger, or undefined for a non-student. */
 export function studyOf(world: World<never>, actor: EntityId): StudyState | undefined {
@@ -234,8 +229,7 @@ export class StudyRules {
       reason,
       ...(refusals !== undefined && { refusals }),
     });
-    const state = studyOf(world, actor);
-    if (state === undefined) return refuse('not-a-student');
+    const state = studyOf(world, actor) ?? NO_STUDY;
     const def = this.#options.books(bookId);
     if (def === undefined) return refuse('unknown-book');
     if (this.#options.carries?.(world, actor, bookId) === false) return refuse('not-carried');
@@ -262,7 +256,7 @@ export class StudyRules {
     if (gameClockOf(world) === undefined) return refuse('no-clock');
     if (this.#threatNear(world, actor)) return refuse('unsafe');
     const here = world.get(actor, PlacementComponent);
-    world.set(actor, StudyStateComponent, {
+    this.#put(world, actor, {
       ...state,
       session: {
         book: bookId,
@@ -395,10 +389,18 @@ export class StudyRules {
 
   #flagKnown(world: World<never>, actor: EntityId, state: StudyState, bookId: string): void {
     if (state.knownBooks.includes(bookId)) return;
-    world.set(actor, StudyStateComponent, {
-      ...state,
-      knownBooks: sortedList([...state.knownBooks, bookId]),
-    });
+    this.#put(world, actor, { ...state, knownBooks: sortedList([...state.knownBooks, bookId]) });
+  }
+
+  /**
+   * Writes the ledger, adding it on first use. An actor that never studies carries no ledger, so
+   * worlds that never open a book (and their state hashes) are unchanged. A first add is structural:
+   * during a step it lands at the end of the tick.
+   */
+  #put(world: World<never>, actor: EntityId, state: StudyState): void {
+    registerStudy(world);
+    if (world.has(actor, StudyStateComponent)) world.set(actor, StudyStateComponent, state);
+    else world.add(actor, StudyStateComponent, state);
   }
 
   /** Study speed in thousandths: x1 plus the desk bonus when sitting at one. */
@@ -442,16 +444,18 @@ const within = (a: Vec3, b: Vec3, metres: number): boolean =>
   (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 <= metres * metres;
 
 /**
- * Makes `world` run study sessions: registers the study ledger, adds the `study` system and ends the
+ * Makes `world` run study sessions: adds the `study` system and ends the
  * reader's session when they are hurt. Once per world, at setup, outside a step. Returns the function
  * that uninstalls the damage listener.
  */
 export function installStudy<TInput>(world: World<TInput>, rules: StudyRules): () => void {
   const sim: World<never> = world;
-  registerStudy(sim);
+  // Nothing is registered here: a world that never studies keeps its components, and so its state
+  // hash, exactly as they were. The ledger registers itself on first use (`#put`).
   world.addSystem({
     name: 'study',
     run: () => {
+      if (!sim.isRegistered(StudyStateComponent)) return;
       const sessions: [EntityId, StudyState, StudySession][] = [];
       sim.query(StudyStateComponent).forEach((actor, state) => {
         if (state.session !== null) sessions.push([actor, state, state.session]);

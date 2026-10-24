@@ -23,6 +23,16 @@ function setup(learning: SpellLearning, capabilities = true) {
 }
 
 describe('learning a spell (mw-e07.2)', () => {
+  it('a world that has no known-spells component yet knows nothing, and registers it on the first lesson', () => {
+    const world = new World<never>({ seed: 1 });
+    const actor = world.spawn();
+    expect(world.isRegistered(KnownSpellsComponent)).toBe(false);
+    expect(knowsSpell(world, actor, 'bolt')).toBe(false);
+    new SpellLearning().learn(world, actor, 'bolt', 'primer');
+    world.step();
+    expect(knowsSpell(world, actor, 'bolt')).toBe(true);
+  });
+
   it('a bare learner just knows the spell and says so once', () => {
     const { world, actor, learned, learning } = setup(new SpellLearning(), false);
     expect(learning.learn(world, actor, 'bolt', 'primer')).toEqual({ status: 'learned' });

@@ -24,6 +24,7 @@ import {
   StudyRules,
   StudyStarted,
   studyOf,
+  StudyStateComponent,
   type BookStudyDef,
   type StudyEndedInfo,
   type StudyRulesOptions,
@@ -358,14 +359,35 @@ describe('studying a book (mw-e07.2)', () => {
     expect(knowsSpell(r.world, r.player, 'spark')).toBe(true);
   });
 
-  it('refuses a non-student, an unknown or uncarried book, and a second session', () => {
+  it('an actor carries no ledger until it studies, then gets one (so untouched worlds hash the same)', () => {
     const none = rig({ student: false });
-    expect(none.rules.start(none.world, none.player, PRIMER.id)).toMatchObject({
-      reason: 'not-a-student',
-    });
+    expect(studyOf(none.world, none.player)).toBeUndefined();
+    expect(none.world.isRegistered(StudyStateComponent)).toBe(false);
+    expect(none.world.isRegistered(KnownSpellsComponent)).toBe(false);
+    expect(knowsSpell(none.world, none.player, 'spark')).toBe(false);
     expect(none.rules.progressOf(none.world, none.player, PRIMER.id)).toBe(0);
     expect(none.rules.isKnownBook(none.world, none.player, PRIMER.id)).toBe(false);
     expect(none.rules.studying(none.world, none.player)).toBeUndefined();
+    none.step(5);
+    expect(studyOf(none.world, none.player)).toBeUndefined();
+    expect(none.rules.start(none.world, none.player, PRIMER.id)).toMatchObject({
+      status: 'started',
+    });
+    none.step(slices(4));
+    expect(knowsSpell(none.world, none.player, 'spark')).toBe(true);
+    // A book of a known spell flags itself on a fresh actor too.
+    const known = rig({ student: false });
+    known.world.register(KnownSpellsComponent);
+    known.world.add(known.player, KnownSpellsComponent, { spells: ['spark'] });
+    known.step(1);
+    expect(known.rules.start(known.world, known.player, PRIMER.id)).toEqual({
+      status: 'already-known',
+    });
+    known.step(1);
+    expect(known.rules.isKnownBook(known.world, known.player, PRIMER.id)).toBe(true);
+  });
+
+  it('refuses an unknown or uncarried book, and a second session', () => {
     const r = rig({ carries: (_w, _a, id) => id !== 'primer' });
     expect(r.rules.start(r.world, r.player, 'nope')).toMatchObject({ reason: 'unknown-book' });
     expect(r.rules.progressOf(r.world, r.player, 'nope')).toBe(0);
@@ -380,7 +402,7 @@ describe('studying a book (mw-e07.2)', () => {
 
   it('a session loaded into a world without a clock ends instead of crediting time', () => {
     const r = rig({ clock: false });
-    r.world.set(r.player, studyComponent(), {
+    r.world.set(r.player, StudyStateComponent, {
       progress: {},
       knownBooks: [],
       session: { book: PRIMER.id, nextSliceTick: 0 },
@@ -483,6 +505,3 @@ describe('studying a book (mw-e07.2)', () => {
     expect(run()).toEqual(run());
   });
 });
-
-import { StudyStateComponent } from './study';
-const studyComponent = (): typeof StudyStateComponent => StudyStateComponent;

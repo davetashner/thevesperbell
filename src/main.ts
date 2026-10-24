@@ -222,7 +222,6 @@ import { createVfxRenderer } from '@render/vfx/index';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
   addCapabilities,
-  addStudent,
   installStudy,
   announceRespawn,
   installSceneTransitions,
@@ -1200,8 +1199,6 @@ function startRenderer(
         // below), as does one started from the title; a scene booted straight from its URL has no
         // class, so ledge hangs come as a class grant.
         addCapabilities(world, player.entity);
-        // Spellbook study (mw-e07.2): the player has a study ledger and known spells.
-        addStudent(world, player.entity);
         if (newGame.kind === 'none' && !titleFirst) {
           capabilities.grant(world, player.entity, LEDGE_HANG_CAPABILITY, 'class');
         }
