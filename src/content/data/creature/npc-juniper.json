@@ -18,5 +18,5 @@
     "greed": 0.5
   },
   "behaviour": { "profile": "shopkeeper" },
-  "presentation": { "mesh": "placeholder-capsule", "sfx": "placeholder" }
+  "presentation": { "mesh": "npc-juniper", "sfx": "placeholder" }
 }
