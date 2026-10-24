@@ -56,7 +56,7 @@ function setup(
   source: ShopContent = content,
   crowns = 200,
   safety?: () => string | null,
-  unlocks?: Pick<UnlockBook, 'check' | 'learn'>,
+  unlocks?: UnlockBook,
 ) {
   const world = new World<unknown>({ seed: 5 });
   world.register(InventoryComponent, EquipmentComponent, PlacementComponent, SceneSpawnComponent);

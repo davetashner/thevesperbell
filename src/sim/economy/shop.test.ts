@@ -16,6 +16,7 @@ import { restCompleted, type RestCompleted } from '../rest/rest';
 import { addCapabilities, CapabilityRegistry } from '../progression/capabilities';
 import { UnlockBook } from '../progression/unlocks';
 import { KnownSpellsComponent, knowsSpell, MAGIC_COMPONENTS } from '../magic/components';
+import { SpellLearned } from '../magic/learning';
 import { BUYBACK_LIMIT } from './shop-state';
 import {
   shopBought,
@@ -800,10 +801,20 @@ describe('merchant services: a spell lesson (mw-ju8.14)', () => {
     expect(inventoryOf(s.world, s.actor)?.gold).toBe(50);
   });
 
-  it('AC-2: a world without the spell pipeline still learns the capability', () => {
+  it('AC-2: a world without the spell pipeline still learns the capability, registering the list lazily', () => {
     const s = lesson(false);
+    expect(s.world.isRegistered(KnownSpellsComponent)).toBe(false);
     expect(s.shops.train(s.world, s.actor, 'bridge', 'ember', s.book).ok).toBe(true);
     expect(s.book.knows(s.world, s.actor, 'spell.ember')).toBe(true);
-    expect(s.world.isRegistered(KnownSpellsComponent)).toBe(false);
+    expect(knowsSpell(s.world, s.actor, 'ember')).toBe(true);
+  });
+
+  it('AC-1: a spell lesson fires SpellLearned with the trainer as source', () => {
+    const s = lesson(true);
+    const got: string[] = [];
+    s.world.events.on(SpellLearned, (e) => got.push(`${e.spellId}<${e.source}`));
+    s.shops.train(s.world, s.actor, 'bridge', 'ember', s.book);
+    s.world.step();
+    expect(got).toEqual(['ember<trainer:bridge']);
   });
 });
