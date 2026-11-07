@@ -34,6 +34,9 @@ asset, and download only the keeper (downloads are capped monthly).
 | `music-marsh-general-store-upstairs` | A | 3:33 | Cover of the kept store take, Audio Influence 49% | https://suno.com/song/a9908052-381a-48b8-8707-3080449f23a8 |
 | `music-marsh-general-store-upstairs` | B | 3:23 | Cover of the kept store take, Audio Influence 49% | https://suno.com/song/ffcc391d-4f2b-495f-9bc7-5b1020926909 |
 | `music-ottilie-hum` | A | 2:45 | Suno's rewrite asked for a "full-voice belt": reject if belted or worded | https://suno.com/song/b1fa5646-9df4-43cf-ba0e-efc40feb2aab |
-| `music-ottilie-hum` | B | 3:00 | Suno's rewrite added layered backing hums | https://suno.com/song/8778266c-5aac-4f81-a2a3-bf21ee30d6b4 |
+| `music-ottilie-hum` | B | 3:00 | Owner's favourite hum (best from 0:10) but has instruments under it | https://suno.com/song/8778266c-5aac-4f81-a2a3-bf21ee30d6b4 |
+| `music-ottilie-hum` | B, vocal stem | 3:00 | Auto-split vocal stem of take B: the hum without the instruments. Likely keeper; download this, not the full mix; import trims from 0:10 | https://suno.com/song/831a0ed6-f6a9-4f98-9db9-aff36ef2040b |
+| `music-ottilie-hum` | owner cover 1 | 3:34 | "Ottilie Hum" cover the owner made | https://suno.com/song/f8958ae3-1593-4977-9ae3-c4024bcac574 |
+| `music-ottilie-hum` | owner cover 2 | 3:25 | "Ottilie Hum" cover the owner made | https://suno.com/song/baa8edbc-8d45-4442-9f39-c51fece6e880 |
 | `music-stinger-marsh-bundle` | A | 1:13 | Three cues (greeting, sale, farewell); trimmed on import | https://suno.com/song/feac0be9-2708-490c-b565-abde0a8b69ba |
 | `music-stinger-marsh-bundle` | B | 1:10 | Three cues (greeting, sale, farewell); trimmed on import | https://suno.com/song/b05f4816-c8a6-4d5a-a171-6a608590a9e0 |
