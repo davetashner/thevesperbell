@@ -30,4 +30,14 @@ Some Suno titles differ from the asset id because Suno named them; the link is w
 
 ## Awaiting a pick
 
-None.
+Generated 2026-11-07 for `mw-ju8.10` (Suno v6, Pro annual): the Marsh stinger bundle came out as one continuous
+piece, so each cue was generated on its own. Every take runs long; the import keeps the opening cue and fades it.
+
+| Asset id | Take | Length | Link |
+| --- | --- | --- | --- |
+| `music-stinger-marsh-greeting` | A | 0:27 | https://suno.com/song/c9264fc2-7eac-484d-97f3-6614fbd23841 |
+| `music-stinger-marsh-greeting` | B | 0:31 | https://suno.com/song/c71345f2-4cd3-446e-86a9-89fa4394f1b6 |
+| `music-stinger-marsh-sale` | A | 0:47 | https://suno.com/song/6d39b288-4c7e-4741-a2d3-8649ea2aa934 |
+| `music-stinger-marsh-sale` | B | 0:43 | https://suno.com/song/f1516705-c1ac-4ef7-b504-e3ed2ded7d8f |
+| `music-stinger-marsh-farewell` | A | 0:57 | https://suno.com/song/a9b7f99a-6d02-4dfb-a45a-d51796eda9c9 |
+| `music-stinger-marsh-farewell` | B | 0:22 | https://suno.com/song/ad9497b6-ed1b-4f5b-81d0-cbaf46c7dc75 |
