@@ -8,7 +8,8 @@ alternatives' rows. When a new batch is generated: add a row per take under "Awa
 
 ## Kept takes
 
-Each row is the take the owner picked and downloaded to `assets/_incoming/music/<asset id>.wav`.
+Each row is the take the owner picked; it is downloaded to `assets/_incoming/music/<asset id>.wav`
+(picks from 2026-11-07 wait for the monthly download reset).
 Some Suno titles differ from the asset id because Suno named them; the link is what matters.
 
 | Asset id | Suno title | Length | Picked | Link |
@@ -23,20 +24,10 @@ Some Suno titles differ from the asset id because Suno named them; the link is w
 | `music-stinger-bundle` | Stinger Bundle | 1:14 | 2026-10-03 | https://suno.com/song/f38df2e5-a264-44d0-aada-7b4108c4ce4a |
 | `mine-ambience-bed` | Field Recording Ambience, Stone Mine Gallery… (Sounds) | 0:20 | 2026-10-03 | https://suno.com/song/eaca4662-79eb-4550-9466-fc3039adf36f |
 | `music-marsh-general-store` | Marsh General Store | 3:28 | 2026-10-04 | https://suno.com/song/b5f07ca1-6aff-4aec-87b1-99aec430c716 |
+| `music-marsh-general-store-upstairs` | music-marsh-general-store-upstairs (take B, cover of the store take) | 3:23 | 2026-11-07 | https://suno.com/song/ffcc391d-4f2b-495f-9bc7-5b1020926909 |
+| `music-ottilie-hum` | music-ottilie-hum (Vocals) stem of take B; the first 9 s are silent and are cut on import | 3:00 | 2026-11-07 | https://suno.com/song/831a0ed6-f6a9-4f98-9db9-aff36ef2040b |
+| `music-stinger-marsh-bundle` | music-stinger-marsh-bundle (take B) | 1:10 | 2026-11-07 | https://suno.com/song/b05f4816-c8a6-4d5a-a171-6a608590a9e0 |
 
 ## Awaiting a pick
 
-Generated 2026-11-07 for `mw-ju8.10` (Suno v6, Pro annual), two takes each. Audition, keep one per
-asset, and download only the keeper (downloads are capped monthly).
-
-| Asset id | Take | Length | Notes | Link |
-| --- | --- | --- | --- | --- |
-| `music-marsh-general-store-upstairs` | A | 3:33 | Cover of the kept store take, Audio Influence 49% | https://suno.com/song/a9908052-381a-48b8-8707-3080449f23a8 |
-| `music-marsh-general-store-upstairs` | B | 3:23 | Cover of the kept store take, Audio Influence 49% | https://suno.com/song/ffcc391d-4f2b-495f-9bc7-5b1020926909 |
-| `music-ottilie-hum` | A | 2:45 | Suno's rewrite asked for a "full-voice belt": reject if belted or worded | https://suno.com/song/b1fa5646-9df4-43cf-ba0e-efc40feb2aab |
-| `music-ottilie-hum` | B | 3:00 | Owner's favourite hum (best from 0:10) but has instruments under it | https://suno.com/song/8778266c-5aac-4f81-a2a3-bf21ee30d6b4 |
-| `music-ottilie-hum` | B, vocal stem | 3:00 | Auto-split vocal stem of take B: the hum without the instruments. Likely keeper; download this, not the full mix; import trims from 0:10 | https://suno.com/song/831a0ed6-f6a9-4f98-9db9-aff36ef2040b |
-| `music-ottilie-hum` | owner cover 1 | 3:34 | "Ottilie Hum" cover the owner made | https://suno.com/song/f8958ae3-1593-4977-9ae3-c4024bcac574 |
-| `music-ottilie-hum` | owner cover 2 | 3:25 | "Ottilie Hum" cover the owner made | https://suno.com/song/baa8edbc-8d45-4442-9f39-c51fece6e880 |
-| `music-stinger-marsh-bundle` | A | 1:13 | Three cues (greeting, sale, farewell); trimmed on import | https://suno.com/song/feac0be9-2708-490c-b565-abde0a8b69ba |
-| `music-stinger-marsh-bundle` | B | 1:10 | Three cues (greeting, sale, farewell); trimmed on import | https://suno.com/song/b05f4816-c8a6-4d5a-a171-6a608590a9e0 |
+None.
