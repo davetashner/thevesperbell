@@ -100,6 +100,7 @@ non-commercial use are **placeholders only** and must be flagged `placeholder: y
 | music-title-main-theme | music | generated:suno/v6 | Suno Pro (annual) | 2026-09-27 | GEN-OWNED | https://suno.com/terms | owner | `assets/prompts/music/music-title-main-theme.md` | no |
 | music-open-world | music | generated:suno/v6 | Suno Pro (annual) | 2026-10-03 | GEN-OWNED | https://suno.com/terms | owner | `assets/prompts/music/music-open-world.md` | yes |
 | music-skeleton-arena-combat-music | music | generated:suno/v6 | Suno Pro (annual) | 2026-10-03 | GEN-OWNED | https://suno.com/terms | owner | `assets/prompts/music/music-skeleton-arena-combat-music.md` | yes |
+| music-ottilie-hum (vocal stem of the Suno take, recorded via macOS Voice Memos) | music | generated:suno/v6 | Suno Pro (annual) | 2026-11-07 | GEN-OWNED | https://suno.com/terms | owner | `assets/prompts/music/music-ottilie-hum.md` | no |
 
 ## Sound effects & ambience
 

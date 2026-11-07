@@ -10,6 +10,16 @@
     "priority": 30
   },
   {
+    "id": "hum-ottilie",
+    "variants": [
+      "music-ottilie-hum"
+    ],
+    "bus": "music",
+    "spatial": true,
+    "loop": true,
+    "priority": 45
+  },
+  {
     "id": "music-slice-combat",
     "variants": [
       "music-skeleton-arena-combat-music"

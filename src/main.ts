@@ -95,7 +95,7 @@ import {
   playableClasses,
 } from '@game/classes';
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
-import { bindVolumes, SliceMusic } from '@game/music/index';
+import { bindVolumes, SceneHums, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
 import { debugConsoleEnabled } from '@game/debug-console-gate';
@@ -1136,9 +1136,14 @@ function startRenderer(
         scene.id === 'slice'
           ? new SliceMusic({ world, engine: audio, now: () => performance.now() })
           : undefined;
+      // Diegetic hums follow their creature: Ottilie hums at her counter in Marsh's General Store
+      // (mw-ju8.40). The scene's creatures spawn later in this setup, and the hum finds hers by spawn
+      // point, so it starts on the first frame after they exist.
+      const hums = new SceneHums({ world, engine: audio, scene: scene.id });
       afterStep.push(() => {
         volumes.update();
         music?.update();
+        hums.update();
       });
       // Noise propagation through the scene's rooms and doors (mw-e09.22): footsteps, breaks and
       // creatures' noises reach listeners muffled by shut doors and walls.

@@ -36,7 +36,16 @@ measured="$(ffmpeg -nostats -i "$tmp/seg.wav" -af ebur128=peak=true -f null - 2>
   awk '/^ +I:/ { i = $2 } END { print i }')"
 gain="$(awk -v t="$lufs" -v m="$measured" 'BEGIN { printf "%.2f", t - m }')"
 chain="volume=${gain}dB,alimiter=limit=$(awk -v t="$tp" 'BEGIN { printf "%.4f", 10 ^ ((t - 0.5) / 20) }'):level=disabled:attack=5:release=60"
-ffmpeg -v error -y -i "$tmp/seg.wav" -af "$chain" -ar 48000 -c:a pcm_s16le "$tmp/norm.wav"
+if [[ -n "$start" ]]; then
+  # The limiter delays its output by its attack time, which would put a gap at the loop seam. Limit
+  # three copies back to back and keep the middle one, so its start and end are already in the loop.
+  n="$(ffprobe -v error -select_streams a:0 -show_entries stream=duration_ts -of csv=p=0 "$tmp/seg.wav")"
+  ffmpeg -v error -y -i "$tmp/seg.wav" -af \
+    "aloop=loop=2:size=${n}:start=0,${chain},atrim=start_sample=${n}:end_sample=$((2 * n)),asetpts=PTS-STARTPTS" \
+    -ar 48000 -c:a pcm_s16le "$tmp/norm.wav"
+else
+  ffmpeg -v error -y -i "$tmp/seg.wav" -af "$chain" -ar 48000 -c:a pcm_s16le "$tmp/norm.wav"
+fi
 ffmpeg -v error -y -i "$tmp/norm.wav" -map_metadata -1 -c:a libopus -b:a "${opus_k}k" -vbr on "$out/$id.ogg"
 ffmpeg -v error -y -i "$tmp/norm.wav" -map_metadata -1 -c:a aac -b:a "${aac_k}k" -movflags +faststart "$out/$id.m4a"
 
