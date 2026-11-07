@@ -52,7 +52,7 @@ test('mw-e07.2 AC-6: study a spellbook in the pack, then cast its spell', async 
 
   // Nothing learned yet; the book goes into the pack.
   expect((await spells(page)).learned).toEqual([]);
-  await runConsole(page, 'give ember');
+  await runConsole(page, 'item.give ember');
   await runConsole(page, 'timescale 8');
 
   const book = page.locator('[data-screen="inventory"] [data-item][aria-label^="Ember"]');
