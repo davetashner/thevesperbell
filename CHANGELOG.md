@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The debug console can now manage your pack: `item.give <id> [count] [--stolen owner]`, `item.remove`, `item.list [category]`, `equip <id>` and `gold <n>` (a dev-console command set), with item ids completing on Tab and the three closest ids suggested for a typo.
 - The Forgotten brute swings its maul properly: a slow two-handed lift that hangs at the top before a crushing slam (and stays bent over the stuck maul, open to a punish), and a wide, low sweep it winds all the way round for and overextends on.
 - The Forgotten archer now draws its bow properly: it raises the bow, pulls the string back to its cheek, holds an aimed beat and looses (the arrow leaves on the snap back), and shoves with the bow's stave when you close in, instead of reusing the miner's thrust.
 - The Forgotten shield-bearer now moves like one: it hauls its rotted board shield up squarely in front of its chest when it guards (and lowers it again), rams you with it after drawing it back, and cocks its free arm back for the slow counter-swing while the shield stays up. The new poses are hand-keyed; in development builds, fight it in `?scene=skeleton-pen`.
