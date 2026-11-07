@@ -1,7 +1,7 @@
 {
   "$schema": "../anim-graph.schema.json",
   "id": "greybox-humanoid",
-  "notes": "Grey-box humanoid placeholder rig (mw-e02.20): box limbs on a 14-bone skeleton, feet at the origin, facing -z. The knight and every humanoid NPC use this graph until the e37 animation pipeline supplies real rigs. The base layer follows the sim's locomotion state (mw-e02.6): idle, move (a speed blend of walk, run and sprint), crouch, jump while rising, fall, land, dodge (the running dodge move's clip, full body), mantle and hang (mw-e02.12 placeholders); the other traversal states (climb, swim) keep the pose they had until their clips exist.",
+  "notes": "Grey-box humanoid placeholder rig (mw-e02.20): box limbs on a 14-bone skeleton, feet at the origin, facing -z. The knight and every humanoid NPC use this graph until the e37 animation pipeline supplies real rigs. The base layer follows the sim's locomotion state (mw-e02.6): idle, move (a speed blend of walk, run and sprint), crouch, jump while rising, fall, land, dodge (the running dodge move's clip, full body), mantle and hang (mw-e02.12 placeholders); the other traversal states (climb, swim) keep the pose they had until their clips exist. The guard layer (mw-ju8.24) sits under the action layer: a creature reader that publishes `guard` (from its GuardComponent) raises, holds and lowers the shield with the Forgotten shield-bearer's clips, upper body only; a move's clip still overrides it. The knight does not publish `guard`, so it is unaffected.",
   "skeleton": [
     {
       "bone": "pelvis",
@@ -409,6 +409,90 @@
               "param": "actionVerb",
               "op": "!=",
               "value": "dodge"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guard",
+      "mask": "upper-body",
+      "initial": "none",
+      "states": [
+        {
+          "id": "none",
+          "motion": {
+            "kind": "none"
+          }
+        },
+        {
+          "id": "raise",
+          "motion": {
+            "kind": "clip",
+            "clip": "anim-forgotten-shield-raise"
+          }
+        },
+        {
+          "id": "hold",
+          "motion": {
+            "kind": "clip",
+            "clip": "anim-forgotten-shield-hold"
+          }
+        },
+        {
+          "id": "lower",
+          "motion": {
+            "kind": "clip",
+            "clip": "anim-forgotten-shield-lower"
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "from": "*",
+          "to": "raise",
+          "duration": 0.05,
+          "when": [
+            {
+              "param": "guard",
+              "op": "==",
+              "value": "raising"
+            }
+          ]
+        },
+        {
+          "from": "*",
+          "to": "hold",
+          "duration": 0.05,
+          "when": [
+            {
+              "param": "guard",
+              "op": "==",
+              "value": "held"
+            }
+          ]
+        },
+        {
+          "from": "*",
+          "to": "lower",
+          "duration": 0.05,
+          "when": [
+            {
+              "param": "guard",
+              "op": "==",
+              "value": "lowering"
+            }
+          ]
+        },
+        {
+          "from": "*",
+          "to": "none",
+          "duration": 0.1,
+          "when": [
+            {
+              "param": "guard",
+              "op": "==",
+              "value": "none"
             }
           ]
         }

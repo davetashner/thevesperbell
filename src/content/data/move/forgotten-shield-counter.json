@@ -1,7 +1,7 @@
 {
   "$schema": "../move.schema.json",
   "id": "forgotten-shield-counter",
-  "notes": "The Forgotten shield-bearer's counter-swing (mw-ju8.19): slow and committed, 38 ticks of windup (633 ms) from tick 0, 5 active, 36 recovery, so every one is a punish window. 16 slash, 24 poise, 22 stamina on a block. Parryable and blockable; the strike a player who mashes at the shield walks into. Its clip is the miner's slash retimed (placeholder).",
+  "notes": "The Forgotten shield-bearer's counter-swing (mw-ju8.19): slow and committed, 38 ticks of windup (633 ms) from tick 0, 5 active, 36 recovery, so every one is a punish window. 16 slash, 24 poise, 22 stamina on a block. Parryable and blockable; the strike a player who mashes at the shield walks into. Its clip (anim-forgotten-shield-counter, mw-ju8.24) is hand-keyed: shield up, right arm cocked back, snapped down on tick 38.",
   "verb": "attack",
   "frames": {
     "startup": 38,
