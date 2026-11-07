@@ -31,7 +31,7 @@ describe('mw-ju8.23: the archer’s bespoke clips', () => {
       expect(move.presentation.anim).toBe(clipId);
       const clip = content.get('anim-clip', clipId);
       expect(clip.notes).not.toMatch(/placeholder|retimed/i);
-      expect(clip.rig).toBe('greybox-humanoid');
+      expect(clip.rig.id).toBe('greybox-humanoid');
       const hits = clip.markers.filter((m) => m.kind === 'hit');
       expect(hits).toHaveLength(1);
       expect(Math.abs((hits[0]?.t ?? 0) - move.frames.startup * TICK)).toBeLessThanOrEqual(TICK);
