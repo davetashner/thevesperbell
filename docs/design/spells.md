@@ -45,3 +45,24 @@ below the soaked threshold by the third Ember and lit by a later one. A damp fla
 the `flammable` property.
 
 Not too useful: no `tooUseful` flag. Ember is deliberately weak in combat and strong at puzzles.
+
+## Mage Hand (arcane, tier 1)
+
+Telekinesis (`mw-e08.10`): hold a distant object, carry it with the aim point and use it from afar.
+The generic `tether` delivery (`src/sim/magic/tether.ts`) does the work; the spell file only sets numbers.
+
+| Field | Value | Why |
+|---|---|---|
+| Mana | 6 to start, then 2 a second (channel) | Sustained: cheap to grab, a real drain to hold a long time |
+| Cast time / cooldown | 0.4 s / 1.5 s | A short reach-out; the cooldown starts when the hold ends, so it cannot be flicked on and off |
+| Range | 15 m, line of sight | Beyond a thrown bolt, short enough to need the caster in the room |
+| Weight limit | 25 kg (`weight` property) | Lifts crates, jars, keys and stools (1-10 kg); not barrels, statues or people. Above it: `ForceResisted`, the cast fizzles |
+| Follow speed | 12 m/s, stopped by solid geometry | The object trails the aim by well under 0.3 m at walking-to-running aim speeds; it never passes through a wall |
+| Sight | 0.5 s grace, then it drops | Lets go of what it can no longer see; the object holds still meanwhile |
+| Use | `tether-use` command | Performs the held object's primary affordance through `interactRemotely`, the same door as a hand interaction, so levers, switches, doors and pick-ups behave identically |
+| Hold | at most 60 s | A scroll's free cast has no channel to end it |
+
+Too useful, on purpose (`tooUseful`): there are no per-object exceptions. A held object is moved by teleporting its
+body each tick, so it carries no speed and cannot be used as a weapon (throwing is `mw-e08.11`). A held crate
+set down on a pressure plate weighs on it like any crate.
+

@@ -31,6 +31,7 @@ const NOT_FOR_SALE = new Set([
   'rusted-arming-sword',
   'dented-iron-cap',
   'ember',
+  'mage-hand',
 ]);
 
 /** The owner's shop list, as predicates over an item id and its definition. */

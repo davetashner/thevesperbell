@@ -292,6 +292,7 @@ export function createGameWorld<TInput>(
           collision: collisionWorld,
           invulnerable: invulnerabilityRule(combat.moves),
           learn: debugSpellLearner(content),
+          sight: new RapierSightWorld(physics),
         });
       },
       afterStimuli: (sim: World<never>) => {

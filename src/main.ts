@@ -744,6 +744,7 @@ function startRenderer(
           collision: new RapierCollisionWorld(physics),
           invulnerable: invulnerabilityRule(combat.moves),
           learn: debugSpellLearner(content),
+          sight: new RapierSightWorld(physics),
           // Flames are put out in the scene's water (the volumes load with the scene, below).
           water: (point) => waterAt(sceneWater, point) !== undefined,
         });

@@ -22,6 +22,7 @@ import {
   affordancesOf,
   holdTicks,
   interactableOf,
+  interactRemotely,
   InteractableComponent,
   interacted,
   InteractionFocusComponent,
@@ -455,5 +456,44 @@ describe('interaction system (mw-e02.5)', () => {
     expect(physicsBodiesOf(world, wall)).toEqual([3, 4]);
     expect(physicsBodiesOf(world, both)).toEqual([8, 9]);
     expect(physicsBodiesOf(world, world.spawn())).toEqual([]);
+  });
+});
+
+describe('interactRemotely (mw-e08.10)', () => {
+  it('fires the primary usable affordance exactly as a direct interaction does', () => {
+    const { world, actor, events } = setup();
+    const lever = place(world, 12, 0, {
+      affordances: [{ verb: 'unlock', requires: [{ item: 'key' }] }, { verb: 'pull' }],
+    });
+    expect(interactRemotely(world, actor, lever)).toEqual({
+      actor,
+      target: lever,
+      verb: 'pull',
+      affordance: 1,
+    });
+    world.step([IDLE]);
+    expect(events).toEqual([{ actor, target: lever, verb: 'pull', affordance: 1 }]);
+  });
+
+  it('the actor kit and the gates still apply', () => {
+    const { world, actor, events } = setup({}, { items: ['key'] });
+    const door = place(world, 5, 0, {
+      affordances: [{ verb: 'unlock', requires: [{ item: 'key' }] }],
+    });
+    addAffordanceGate(world, () => 'jammed');
+    expect(interactRemotely(world, actor, door)).toBeUndefined();
+    world.step([IDLE]);
+    expect(events).toEqual([]);
+  });
+
+  it('does nothing for a hidden object, and an actor with no kit has the empty one', () => {
+    const { world, events } = setup();
+    const stranger = world.spawn();
+    const lever = place(world, 5, 0);
+    expect(interactRemotely(world, stranger, lever)?.verb).toBe('pull');
+    addProperties(world, lever, { hidden: true });
+    expect(interactRemotely(world, stranger, lever)).toBeUndefined();
+    world.step([IDLE]);
+    expect(events).toHaveLength(1);
   });
 });

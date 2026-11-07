@@ -92,6 +92,9 @@ describe('reading a spell scroll (mw-ju8.17)', () => {
   }, 30_000);
 
   it('only scrolls with spell content cast; the other shipped scrolls wait for their spells', () => {
-    expect([...scrollCasts(content)]).toEqual([['scroll-of-ember', 'ember']]);
+    expect([...scrollCasts(content)]).toEqual([
+      ['scroll-of-ember', 'ember'],
+      ['scroll-of-mage-hand', 'mage-hand'],
+    ]);
   });
 });
