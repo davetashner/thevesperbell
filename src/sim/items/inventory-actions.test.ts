@@ -26,6 +26,7 @@ import {
   quickSlotsOf,
   type ConsumableDef,
 } from './consumables';
+import { giveGoldCommand, removeItemCommand } from './debug-commands';
 import { giveItemCommand } from './give-command';
 import {
   installInventoryActions,
@@ -205,6 +206,20 @@ describe('give-item commands in the action system (mw-ju8.17)', () => {
     const bare = setup();
     bare.world.step([giveItemCommand(bare.actor, 'spark-scroll', 2)]);
     expect(bare.units('spark-scroll')).toBe(0);
+  });
+
+  it('carries out item debug commands (remove, gold) with a giver and ignores them without', () => {
+    const withGiver = setup({ giver: true });
+    withGiver.world.step([giveItemCommand(withGiver.actor, 'spark-scroll', 3)]);
+    withGiver.world.step([
+      removeItemCommand(withGiver.actor, 'spark-scroll', 2),
+      giveGoldCommand(withGiver.actor, 7),
+    ]);
+    expect(withGiver.units('spark-scroll')).toBe(1);
+    expect(inventoryOf(withGiver.sim, withGiver.actor)?.gold).toBe(7);
+    const bare = setup();
+    bare.world.step([giveGoldCommand(bare.actor, 7)]);
+    expect(inventoryOf(bare.sim, bare.actor)?.gold).toBe(0);
   });
 });
 
