@@ -1494,7 +1494,7 @@ function startRenderer(
         createUnlockBook(content, capabilities),
       );
       installStudy(world, study);
-      // The console's `give <itemId> [n]` puts items in the pack (mw-e17.12 will add the rest).
+      // The console's `give`/`item.give`, `item.remove`, `equip` and `gold` change the pack (mw-e17.12).
       const itemIds = new Set(content.all('item').map((item) => item.id));
       // Reading a spell scroll (mw-ju8.17): casts its spell once, free, and spends it.
       const scrolls =
@@ -2333,6 +2333,9 @@ function startRenderer(
               .all('item')
               .map((item) => item.id)
               .sort(),
+            itemCategories: Object.fromEntries(
+              content.all('item').map((item) => [item.id, item.category]),
+            ),
             spells: magic?.spellIds ?? [],
             selectSpell: (id) => castSelect?.(id) ?? false,
             // Sandbox dummies take options (mw-e04.9: `spawn dummy --poise 60`); props take none.

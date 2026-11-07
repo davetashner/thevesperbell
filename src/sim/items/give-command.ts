@@ -12,11 +12,32 @@ export interface GiveItemCommand {
   readonly actor: EntityId;
   readonly item: string;
   readonly count: number;
+  /** Debug: the units are stolen goods (mw-e17.12), taken from `ownerId` if given. */
+  readonly stolen?: boolean;
+  readonly ownerId?: string;
+}
+
+/** Flags a give-item command may carry. */
+export interface GiveItemFlags {
+  readonly stolen?: boolean;
+  readonly ownerId?: string;
 }
 
 /** Builds the command that gives `actor` `count` of `item`. */
-export function giveItemCommand(actor: EntityId, item: string, count = 1): GiveItemCommand {
-  return { type: 'give-item', actor, item, count };
+export function giveItemCommand(
+  actor: EntityId,
+  item: string,
+  count = 1,
+  flags: GiveItemFlags = {},
+): GiveItemCommand {
+  return {
+    type: 'give-item',
+    actor,
+    item,
+    count,
+    ...(flags.stolen === true && { stolen: true }),
+    ...(flags.ownerId !== undefined && { ownerId: flags.ownerId }),
+  };
 }
 
 /** Whether an input command is a give-item command. */
@@ -30,7 +51,7 @@ export function isGiveItemCommand(input: unknown): input is GiveItemCommand {
 
 /** The pack rules and item catalogue a give-item command works through. */
 export interface ItemGiver {
-  readonly inventory: Pick<InventoryRules, 'add'>;
+  readonly inventory: Pick<InventoryRules, 'add' | 'remove' | 'addGold' | 'spendGold'>;
   /** Whether `item` is a defined item. */
   readonly known: (item: string) => boolean;
 }
@@ -44,5 +65,8 @@ export function giveItems(world: World<never>, command: GiveItemCommand, giver: 
   if (!giver.known(command.item)) return;
   if (!Number.isSafeInteger(command.count) || command.count < 1) return;
   if (!world.isAlive(command.actor) || inventoryOf(world, command.actor) === undefined) return;
-  giver.inventory.add(world, command.actor, command.item, command.count);
+  giver.inventory.add(world, command.actor, command.item, command.count, {
+    ...(command.stolen === true && { stolen: true }),
+    ...(command.ownerId !== undefined && { ownerId: command.ownerId }),
+  });
 }

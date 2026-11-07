@@ -6,6 +6,7 @@ import type { ControllerTuning, Frozen } from '@content/index';
 import {
   CharacterController,
   CharacterTuning,
+  inventoryOf,
   DEBUG_SPAWN_TAG,
   hasCheat,
   PlayerLook,
@@ -40,6 +41,8 @@ export interface GameHostOptions {
   readonly cursorPoint?: () => Vec3 | undefined;
   /** Item ids (ConsoleHost.items); without them `give` is unavailable. */
   readonly items?: readonly string[];
+  /** Item id → category (ConsoleHost.itemCategories), for `item.list <category>`. */
+  readonly itemCategories?: Readonly<Record<string, string>>;
   /** Spell ids (ConsoleHost.spells); without them `spell` knows none. */
   readonly spells?: readonly string[];
   /** Chooses the cast button's spell (ConsoleHost.selectSpell). */
@@ -85,6 +88,23 @@ export function createGameHost(options: GameHostOptions): ConsoleHost {
       },
     }),
     ...(options.items !== undefined && { items: options.items }),
+    ...(options.itemCategories !== undefined && { itemCategories: options.itemCategories }),
+    pack: () => {
+      const id = options.player();
+      const pack = id === undefined ? undefined : inventoryOf(world, id);
+      return (
+        pack && {
+          gold: pack.gold,
+          items: pack.items.map((item) => ({
+            instanceId: item.instanceId,
+            defId: item.defId,
+            count: item.count,
+            ...(item.flags.stolen === true && { stolen: true }),
+            ...(item.flags.ownerId !== undefined && { ownerId: item.flags.ownerId }),
+          })),
+        }
+      );
+    },
     ...(options.spells !== undefined && { spells: options.spells }),
     ...(options.selectSpell !== undefined && { selectSpell: options.selectSpell }),
     bookmarks: options.bookmarks,
