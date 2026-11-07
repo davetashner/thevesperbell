@@ -1,7 +1,7 @@
 {
   "$schema": "../move.schema.json",
   "id": "forgotten-brute-overhead",
-  "notes": "The Forgotten brute's two-handed overhead (mw-ju8.19): a 56-tick windup (930 ms) telegraphed from tick 0, 6 active and a 64-tick recovery (over a second to punish it). 40 blunt, 70 poise and 50 stamina on a block (20 through the knight's wood shield): two blocks leave the knight guard-broken, so the answer is to parry it or step out of the line. Parryable and blockable. Long reach (about 2 m). Its clip is the miner's chop retimed to 56 ticks (placeholder until a heavy two-handed overhead clip exists).",
+  "notes": "The Forgotten brute's two-handed overhead (mw-ju8.19): a 56-tick windup (930 ms) telegraphed from tick 0, 6 active and a 64-tick recovery (over a second to punish it). 40 blunt, 70 poise and 50 stamina on a block (20 through the knight's wood shield): two blocks leave the knight guard-broken, so the answer is to parry it or step out of the line. Parryable and blockable. Long reach (about 2 m). Its clip anim-forgotten-brute-overhead is hand-keyed (mw-ju8.25): lift, hold and slam, then it stays bent over the maul.",
   "verb": "attack",
   "frames": {
     "startup": 56,

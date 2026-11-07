@@ -95,7 +95,7 @@ import {
   playableClasses,
 } from '@game/classes';
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
-import { bindVolumes, SliceMusic } from '@game/music/index';
+import { bindVolumes, SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
 import { debugConsoleEnabled } from '@game/debug-console-gate';
@@ -1136,9 +1136,18 @@ function startRenderer(
         scene.id === 'slice'
           ? new SliceMusic({ world, engine: audio, now: () => performance.now() })
           : undefined;
+      // Diegetic hums follow their creature: Ottilie hums at her counter in Marsh's General Store
+      // (mw-ju8.40). The scene's creatures spawn later in this setup, and the hum finds hers by spawn
+      // point, so it starts on the first frame after they exist.
+      const hums = new SceneHums({ world, engine: audio, scene: scene.id });
+      // Marsh's General Store plays one music bed, its shop theme, on both floors (mw-ju8.11).
+      const beds = new SceneBeds({ engine: audio, scene: scene.id });
+      const shopStingers = new ShopStingers({ engine: audio, now: () => performance.now() });
       afterStep.push(() => {
         volumes.update();
         music?.update();
+        hums.update();
+        beds.update();
       });
       // Noise propagation through the scene's rooms and doors (mw-e09.22): footsteps, breaks and
       // creatures' noises reach listeners muffled by shut doors and walls.
@@ -1558,6 +1567,10 @@ function startRenderer(
           unlocks: createUnlockBook(content, capabilities),
           // Sleeping is refused while any autosave safety veto objects (mw-ju8.6).
           safety: () => safety.active()[0]?.reason ?? null,
+          // Greeting, sale and farewell stingers for merchants that have them (mw-ju8.11).
+          onEvent: (event) => {
+            shopStingers.handle(event);
+          },
           publish: (key, value) => {
             root.dataset[key] = value;
           },
@@ -1776,6 +1789,8 @@ function startRenderer(
       const creatureRead = simAnimReader({
         moves: combat.moves,
         locomotion: creatureLocomotion(),
+        // The shield-bearer's raise, hold and lower follow its guard component (mw-ju8.24).
+        guard: true,
       });
       const minerDriver = new AnimationDriver(world);
       creatureAnimation = minerDriver;

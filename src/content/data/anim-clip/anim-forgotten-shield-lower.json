@@ -1,0 +1,93 @@
+{
+  "$schema": "../anim-clip.schema.json",
+  "id": "anim-forgotten-shield-lower",
+  "rig": "greybox-humanoid",
+  "notes": "The Forgotten shield-bearer drops its shield (mw-ju8.24): the board sags and the arm swings back down to the side over a quarter second, the torso straightening. Plays once and holds, upper body only. Hand-keyed on greybox-humanoid.",
+  "duration": 0.25,
+  "tracks": {
+    "upper-arm-l": [
+      {
+        "t": 0.0,
+        "rot": [60.0, 0.0, 38.0]
+      },
+      {
+        "t": 0.1,
+        "rot": [24.0, 0.0, 11.6]
+      },
+      {
+        "t": 0.25,
+        "rot": [0.0, 0.0, -6.0]
+      }
+    ],
+    "forearm-l": [
+      {
+        "t": 0.0,
+        "rot": [-62.0, 34.0, 0.0]
+      },
+      {
+        "t": 0.1,
+        "rot": [-24.8, 13.6, 0.0]
+      },
+      {
+        "t": 0.25,
+        "rot": [0.0, 0.0, 0.0]
+      }
+    ],
+    "upper-arm-r": [
+      {
+        "t": 0.0,
+        "rot": [10.0, 0.0, 8.0]
+      },
+      {
+        "t": 0.1,
+        "rot": [4.0, 0.0, 6.8]
+      },
+      {
+        "t": 0.25,
+        "rot": [0.0, 0.0, 6.0]
+      }
+    ],
+    "forearm-r": [
+      {
+        "t": 0.0,
+        "rot": [30.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.1,
+        "rot": [16.8, 0.0, 0.0]
+      },
+      {
+        "t": 0.25,
+        "rot": [8.0, 0.0, 0.0]
+      }
+    ],
+    "spine": [
+      {
+        "t": 0.0,
+        "rot": [-2.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.1,
+        "rot": [-0.8, 0.0, 0.0]
+      },
+      {
+        "t": 0.25,
+        "rot": [0.0, 0.0, 0.0]
+      }
+    ],
+    "chest": [
+      {
+        "t": 0.0,
+        "rot": [-4.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.1,
+        "rot": [-1.6, 0.0, 0.0]
+      },
+      {
+        "t": 0.25,
+        "rot": [0.0, 0.0, 0.0]
+      }
+    ]
+  }
+}

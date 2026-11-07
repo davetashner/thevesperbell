@@ -6,10 +6,12 @@
 // sim publishes one, the locomotion state and vertical speed (the player's CharacterLocomotion,
 // mw-e02.6, via `characterLocomotion`; a creature's mover; or the testbed's demo rigs).
 
-import type { AnimParameterName, MoveTable, MoveVerb } from '@content/index';
+import type { ANIM_GUARD_PHASES, AnimParameterName, MoveTable, MoveVerb } from '@content/index';
 import {
   ActionTimelineComponent,
+  GuardComponent,
   HitReactionComponent,
+  isBlocking,
   locomotionOf,
   phaseAt,
   type ActionPhase,
@@ -18,6 +20,8 @@ import {
 } from '@sim/index';
 import type { AnimParamValue } from '@render/animation/index';
 import type { SimView } from '../loop/render-sync';
+
+type GuardPhase = (typeof ANIM_GUARD_PHASES)[number];
 
 /** What a locomotion reader reports for one entity. */
 export interface LocomotionSample {
@@ -86,7 +90,16 @@ export interface SimAnimSource {
    * world without it (a movement-only player) reads as never acting, at time scale 1.
    */
   readonly timeline?: boolean;
+  /**
+   * Read the shield's phase from the entity's GuardComponent into `guard` (raising while the shield
+   * comes up, held once it blocks, lowering for LOWERING_TICKS after it drops); without it `guard`
+   * reads none. The world must register GuardComponent. Read only: animation never touches the guard.
+   */
+  readonly guard?: boolean;
 }
+
+/** How long, in ticks (0.25 s), the `guard` parameter reads lowering after a shield drops. */
+export const LOWERING_TICKS = 15;
 
 /**
  * A reader of the sim-published parameters (the world must register the action timeline
@@ -96,6 +109,20 @@ export interface SimAnimSource {
  * reaction when `reactions` is set (none otherwise). Undefined when the entity is gone.
  */
 export function simAnimReader(source: SimAnimSource): SimAnimReader {
+  // The tick each entity's shield was last seen up, for the lowering window.
+  const lastUp = new Map<EntityId, number>();
+  const guardPhase = (view: SimView, entity: EntityId): GuardPhase => {
+    if (source.guard !== true || !view.isRegistered(GuardComponent)) return 'none';
+    const guard = view.get(entity, GuardComponent);
+    if (guard?.raisedAt != null) {
+      lastUp.set(entity, view.tick);
+      return isBlocking(guard, view.tick) ? 'held' : 'raising';
+    }
+    const was = lastUp.get(entity);
+    if (was !== undefined && view.tick - was <= LOWERING_TICKS) return 'lowering';
+    lastUp.delete(entity);
+    return 'none';
+  };
   return (view, entity) => {
     if (!view.isAlive(entity)) return undefined;
     const motion = source.locomotion?.(view, entity);
@@ -130,6 +157,7 @@ export function simAnimReader(source: SimAnimSource): SimAnimReader {
       hitReact: current === null && (timeline?.lockTicks ?? 0) > 0,
       hitReaction: reaction?.kind ?? 'none',
       hitDirection: reaction?.direction ?? 'none',
+      guard: guardPhase(view, entity),
     };
     return { values, timeScale: timeline?.timeScale ?? 1, action };
   };

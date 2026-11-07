@@ -1,0 +1,94 @@
+{
+  "$schema": "../anim-clip.schema.json",
+  "id": "anim-forgotten-shield-hold",
+  "rig": "greybox-humanoid",
+  "notes": "The Forgotten shield-bearer's held guard (mw-ju8.24): the rotted board shield squarely up in front of the torso, face to the front, the right hand ready, hunkered slightly forward. A slow breathing sway of about 3 degrees keeps it alive without moving the board off the 110 degree guard arc. Loops, upper body only. Hand-keyed on greybox-humanoid.",
+  "duration": 1.2,
+  "loop": true,
+  "tracks": {
+    "upper-arm-l": [
+      {
+        "t": 0.0,
+        "rot": [60.0, 0.0, 38.0]
+      },
+      {
+        "t": 0.6,
+        "rot": [63.0, 0.0, 38.0]
+      },
+      {
+        "t": 1.2,
+        "rot": [60.0, 0.0, 38.0]
+      }
+    ],
+    "forearm-l": [
+      {
+        "t": 0.0,
+        "rot": [-62.0, 34.0, 0.0]
+      },
+      {
+        "t": 0.6,
+        "rot": [-65.0, 34.0, 0.0]
+      },
+      {
+        "t": 1.2,
+        "rot": [-62.0, 34.0, 0.0]
+      }
+    ],
+    "upper-arm-r": [
+      {
+        "t": 0.0,
+        "rot": [10.0, 0.0, 8.0]
+      },
+      {
+        "t": 0.6,
+        "rot": [10.0, 0.0, 8.0]
+      },
+      {
+        "t": 1.2,
+        "rot": [10.0, 0.0, 8.0]
+      }
+    ],
+    "forearm-r": [
+      {
+        "t": 0.0,
+        "rot": [30.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.6,
+        "rot": [30.0, 0.0, 0.0]
+      },
+      {
+        "t": 1.2,
+        "rot": [30.0, 0.0, 0.0]
+      }
+    ],
+    "spine": [
+      {
+        "t": 0.0,
+        "rot": [-2.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.6,
+        "rot": [-2.0, 0.0, 0.0]
+      },
+      {
+        "t": 1.2,
+        "rot": [-2.0, 0.0, 0.0]
+      }
+    ],
+    "chest": [
+      {
+        "t": 0.0,
+        "rot": [-4.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.6,
+        "rot": [-5.0, 0.0, 0.0]
+      },
+      {
+        "t": 1.2,
+        "rot": [-4.0, 0.0, 0.0]
+      }
+    ]
+  }
+}

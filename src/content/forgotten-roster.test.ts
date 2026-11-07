@@ -195,15 +195,45 @@ describe('the Forgotten roster’s data (mw-ju8.19)', () => {
     expect(swing('forgotten-archer-shot').startup).toBeGreaterThanOrEqual(36); // a visible draw
   });
 
-  it('every placeholder clip the new moves play hits on its move’s first active tick (retimed from the miner’s)', () => {
-    for (const id of VARIANTS.slice(1).flatMap((v) => v.attacks)) {
-      const move = content.get('move', content.get('attack', id).move.id);
+  it('mw-ju8.25 AC-1: the brute’s overhead and sweep are bespoke clips that hit within one tick of the move’s first active tick', () => {
+    for (const id of ['forgotten-brute-overhead', 'forgotten-brute-sweep']) {
+      const move = content.get('move', id);
       const clip = content.get('anim-clip', move.presentation.anim);
-      expect(clip.id, id).not.toMatch(/^anim-forgotten-(overhead-chop|slash|lunging)/);
-      expect(clip.markers.find((m) => m.kind === 'hit')?.t, id).toBeCloseTo(
-        move.frames.startup / 60,
-        2,
-      );
+      expect(clip.id).toBe(`anim-${id}`);
+      expect(clip.notes).not.toMatch(/placeholder|retimed/i);
+      const hits = clip.markers.filter((m) => m.kind === 'hit');
+      expect(hits, id).toHaveLength(1);
+      expect(Math.abs((hits[0]?.t ?? NaN) * 60 - move.frames.startup), id).toBeLessThanOrEqual(1);
+      // The clip spans the whole move, and is keyed on the legs as well as the arms (a stance, not a retimed arm swing).
+      const ticks = move.frames.startup + move.frames.active + move.frames.recovery;
+      expect(clip.duration * 60, id).toBeCloseTo(ticks, 0);
+      for (const bone of ['spine', 'chest', 'upper-arm-r', 'upper-arm-l', 'thigh-r', 'shin-l']) {
+        expect(Object.keys(clip.tracks), id).toContain(bone);
+      }
     }
+  });
+
+  it('mw-ju8.25 AC-1: the overhead lifts above the head, holds at the top, then slams down and stays down through the recovery', () => {
+    const clip = content.get('anim-clip', 'anim-forgotten-brute-overhead');
+    const arm = clip.tracks['upper-arm-r'] ?? expect.fail('no right arm track');
+    const hit = clip.markers.find((m) => m.kind === 'hit')?.t ?? NaN;
+    const top = Math.max(...arm.map((k) => k.rot[0]));
+    expect(top).toBeGreaterThan(150); // past vertical
+    const held = arm.filter((k) => k.rot[0] >= top - 15 && k.t < hit);
+    const hold = Math.max(...held.map((k) => k.t)) - Math.min(...held.map((k) => k.t));
+    expect(hold).toBeGreaterThanOrEqual(0.15); // a visible pause at the top
+    expect(Math.min(...held.map((k) => k.t))).toBeGreaterThanOrEqual(0.5); // after a long lift
+    const slam = arm.find((k) => k.t === hit);
+    expect(slam?.rot[0]).toBeLessThan(90);
+    const after = arm.filter((k) => k.t > hit && k.t <= hit + 0.3);
+    expect(after.length).toBeGreaterThan(0);
+    for (const k of after) expect(k.rot[0]).toBeLessThan(90); // still down on the maul
+  });
+
+  it('mw-ju8.25 AC-1: the sweep winds far round to the right and finishes far round to the left', () => {
+    const clip = content.get('anim-clip', 'anim-forgotten-brute-sweep');
+    const chest = clip.tracks['chest'] ?? expect.fail('no chest track');
+    expect(Math.min(...chest.map((k) => k.rot[1]))).toBeLessThanOrEqual(-50);
+    expect(Math.max(...chest.map((k) => k.rot[1]))).toBeGreaterThanOrEqual(50);
   });
 });
