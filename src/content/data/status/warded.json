@@ -1,0 +1,9 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "warded",
+  "name": "Warded",
+  "description": "A protective ward blunts incoming harm.",
+  "stack": { "rule": "refresh" },
+  "tags": ["magical", "buff"],
+  "modifiers": [{ "stat": "damageTaken", "mode": "multiply", "value": 0.7 }]
+}

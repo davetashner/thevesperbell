@@ -1,0 +1,13 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "frozen-solid",
+  "name": "Frozen solid",
+  "description": "Encased in ice: cannot move or act, and takes more from blows.",
+  "stack": { "rule": "keep" },
+  "tags": ["cold", "debuff"],
+  "modifiers": [
+    { "stat": "moveSpeed", "mode": "multiply", "value": 0 },
+    { "stat": "damageTaken", "mode": "multiply", "value": 1.5 }
+  ],
+  "breakWhen": [{ "entity": "target", "property": "frozen", "is": "eq", "value": false }]
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "slowed",
+  "name": "Slowed",
+  "description": "Moves more slowly; each stack slows further.",
+  "stack": { "rule": "stack", "max": 3 },
+  "tags": ["magical", "debuff"],
+  "modifiers": [{ "stat": "moveSpeed", "mode": "multiply", "value": 0.75 }]
+}

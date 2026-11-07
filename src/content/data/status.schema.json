@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique status id (a spell’s status op names it)."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Player-facing name."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Player-facing one-line description."
+    },
+    "stack": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "type": "string",
+          "enum": [
+            "refresh",
+            "stack",
+            "keep"
+          ],
+          "description": "refresh, stack or keep."
+        },
+        "max": {
+          "description": "Most stacks; required for (and only for) rule \"stack\".",
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 99
+        }
+      },
+      "required": [
+        "rule"
+      ],
+      "additionalProperties": false,
+      "description": "What reapplying the status does."
+    },
+    "tags": {
+      "default": [],
+      "description": "Dispel tags: \"magical\", \"curse\", \"mundane\"…",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "modifiers": {
+      "default": [],
+      "description": "Stat modifiers while the status lasts.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stat": {
+            "type": "string",
+            "enum": [
+              "moveSpeed",
+              "castSpeed",
+              "gravityScale",
+              "damageDealt",
+              "damageTaken",
+              "visibility"
+            ],
+            "description": "Stat changed."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "add",
+              "multiply"
+            ],
+            "description": "Added, or multiplied, per stack."
+          },
+          "value": {
+            "type": "number",
+            "description": "Amount per stack (multiply: 0.5 halves it, 0 stops it)."
+          }
+        },
+        "required": [
+          "stat",
+          "mode",
+          "value"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "tick": {
+      "description": "Ops applied to the target every `interval` seconds while the status lasts.",
+      "type": "object",
+      "properties": {
+        "interval": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 60,
+          "description": "Seconds between ticks."
+        },
+        "ops": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amounts": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "slash",
+                    "pierce",
+                    "blunt",
+                    "fire",
+                    "frost",
+                    "shock",
+                    "arcane",
+                    "poison"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": "Damage points per damage type (before resistances); unlisted types deal 0."
+              },
+              "poiseDamage": {
+                "default": 0,
+                "description": "Poise damage in points.",
+                "type": "number",
+                "minimum": 0
+              },
+              "staminaDamage": {
+                "default": 0,
+                "description": "Stamina drained from a blocker, in points (before shield stability).",
+                "type": "number",
+                "minimum": 0
+              },
+              "impulse": {
+                "description": "Knockback impulse, N·s, in the attacker’s frame (+z forward, +y up).",
+                "default": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  },
+                  "z": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "z"
+                ],
+                "additionalProperties": false
+              },
+              "impactForce": {
+                "default": 0,
+                "description": "Peak impact force, N (breakables, knockdown).",
+                "type": "number",
+                "minimum": 0
+              },
+              "tags": {
+                "description": "Damage-packet tags every hit carries, e.g. \"critical\" (damage model tags).",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                }
+              },
+              "op": {
+                "type": "string",
+                "const": "damage"
+              }
+            },
+            "required": [
+              "amounts",
+              "op"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Damage dealt to the target each tick (instigator: the status source)."
+        }
+      },
+      "required": [
+        "interval",
+        "ops"
+      ],
+      "additionalProperties": false
+    },
+    "sourceBound": {
+      "default": false,
+      "description": "Ends in the tick its source entity is destroyed (vines, a tether, an aura).",
+      "type": "boolean"
+    },
+    "breakWhen": {
+      "default": [],
+      "description": "Property tests that end the status early; any one holding ends it.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "enum": [
+              "source",
+              "target"
+            ],
+            "description": "Whose property is tested."
+          },
+          "property": {
+            "type": "string",
+            "description": "World property read from that entity (e.g. \"burning\")."
+          },
+          "is": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "ne",
+              "gte",
+              "lte"
+            ],
+            "description": "How it is compared: eq, ne, gte or lte."
+          },
+          "value": {
+            "description": "Value compared against; the status ends when the test holds.",
+            "type": [
+              "boolean",
+              "number",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "entity",
+          "property",
+          "is",
+          "value"
+        ],
+        "additionalProperties": false,
+        "description": "Ends the status when the property test holds (gte and lte need a number)."
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "stack"
+  ],
+  "additionalProperties": false
+}

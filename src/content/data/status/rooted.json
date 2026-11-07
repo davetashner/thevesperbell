@@ -1,0 +1,14 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "rooted",
+  "name": "Rooted",
+  "description": "Held fast: cannot move until the hold breaks.",
+  "stack": { "rule": "refresh" },
+  "tags": ["magical", "restraint"],
+  "modifiers": [{ "stat": "moveSpeed", "mode": "multiply", "value": 0 }],
+  "sourceBound": true,
+  "breakWhen": [
+    { "entity": "source", "property": "burning", "is": "eq", "value": true },
+    { "entity": "source", "property": "frozen", "is": "eq", "value": true }
+  ]
+}

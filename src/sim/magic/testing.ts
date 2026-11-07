@@ -2,7 +2,7 @@
 // installed, and builders that write spells as data (src/sim may import content only as types, so
 // these build fully-defaulted SpellEntry values by hand). Used by tests only.
 
-import type { SpellEntry } from '@content/index';
+import type { SpellEntry, StatusEntry } from '@content/index';
 import { DAMAGE_COMPONENTS, giveCombatant } from '../combat/damage';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
@@ -103,11 +103,20 @@ export interface SpellTestWorld {
 }
 
 /** A world with properties, stimuli, damage components and spells (looked up in `spells`). */
-export function spellWorld(spells: readonly SpellEntry[], seed = 3): SpellTestWorld {
+export function spellWorld(
+  spells: readonly SpellEntry[],
+  seed = 3,
+  statuses?: readonly StatusEntry[],
+): SpellTestWorld {
   const world = installStimuli(registerWorldProperties(new World<CastCommand>({ seed })));
   world.register(...DAMAGE_COMPONENTS);
   const byId = new Map(spells.map((spell) => [spell.id, spell]));
-  const pipeline = installSpells(world, { spells: (id) => byId.get(id) });
+  const pipeline = installSpells(world, {
+    spells: (id) => byId.get(id),
+    ...(statuses === undefined
+      ? {}
+      : { statuses: (id) => statuses.find((status) => status.id === id) }),
+  });
   world.addSystem(stimulusSystem());
   const spawn = (x = 0): EntityId => {
     const entity = world.spawn();
