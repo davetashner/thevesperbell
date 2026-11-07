@@ -60,6 +60,7 @@ export const SPELL_FIXTURE_ROOT = 'src/content/fixtures/spells';
 export const FIXTURE_SPELL_IDS = [
   'fixture-bolt',
   'fixture-fire-wall',
+  'fixture-grip',
   'fixture-gust',
   'fixture-raise',
   'fixture-ray',

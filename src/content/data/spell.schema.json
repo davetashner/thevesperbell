@@ -1062,6 +1062,56 @@
           ],
           "additionalProperties": false,
           "description": "A chosen point on the ground where summons and volumes appear."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "tether"
+            },
+            "range": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Farthest the tethered object can be from the caster, metres."
+            },
+            "maxWeight": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Heaviest movable object it lifts, kg (the weight property)."
+            },
+            "speed": {
+              "default": 12,
+              "description": "Fastest a held object follows the aim point, metres per second.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "lineOfSightGrace": {
+              "default": 0.5,
+              "description": "Seconds line of sight may stay broken before the tether lets go.",
+              "type": "number",
+              "minimum": 0
+            },
+            "maxHold": {
+              "default": 60,
+              "description": "Longest one tether holds, seconds (a free cast has no channel to end it).",
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "pickRadius": {
+              "default": 0.75,
+              "description": "With no chosen target: how near the aim point an object must be, metres.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "kind",
+            "range",
+            "maxWeight"
+          ],
+          "additionalProperties": false,
+          "description": "A sustained link to one object: carry it, use it, let go (mw-e08.10)."
         }
       ],
       "description": "How the spell reaches its targets; effect ops apply to what it reaches."

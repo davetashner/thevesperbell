@@ -223,6 +223,30 @@ function primaryIndex(
   );
 }
 
+/**
+ * Performs `target`'s primary affordance for `actor` without the actor's focus, reach or Interact
+ * button (remote use: Mage Hand's tether, mw-e08.10). It is the same door a direct interaction goes
+ * through: the first affordance the actor can use (its kit and every affordance gate apply) fires
+ * `interacted`, so the owning system cannot tell the difference. A hold affordance fires at once
+ * (the caller is already paying for the use). Returns the interaction, or undefined when the target
+ * is hidden or nothing on it is usable (nothing is dispatched).
+ */
+export function interactRemotely(
+  world: World<never>,
+  actor: EntityId,
+  target: EntityId,
+): Interaction | undefined {
+  if (!isRevealed(world, target)) return undefined;
+  const kit = world.get(actor, InteractorComponent) ?? NO_KIT;
+  const affordances = affordancesOf(world, target);
+  const index = primaryIndex(world, actor, kit, target, affordances);
+  const chosen = affordances[index];
+  if (chosen === undefined) return undefined;
+  const interaction: Interaction = { actor, target, verb: chosen.verb, affordance: index };
+  world.events.emit(interacted, interaction);
+  return interaction;
+}
+
 export interface InteractionOptions<TInput> {
   /** Solid colliders that block reach (RapierSightWorld in the game). Omitted: no reach test. */
   readonly sight?: SightWorld;

@@ -36,6 +36,15 @@ const aoe = (origin: 'aim' | 'caster', range = 10): SpellEntry =>
 const summon = (lineOfSight: boolean): SpellEntry =>
   spell({ kind: 'summonPoint', range: 8, lineOfSight });
 const touch = spell({ kind: 'touch', reach: 2 });
+const tether = spell({
+  kind: 'tether',
+  range: 15,
+  maxWeight: 25,
+  speed: 12,
+  lineOfSightGrace: 0.5,
+  maxHold: 60,
+  pickRadius: 0.75,
+});
 
 /** A level: a floor at y = 0 (unless `floor` is false) and optionally a wall across z = `wall`. */
 function level(options: { floor?: boolean; wall?: number; floorEndsAt?: number } = {}) {
@@ -87,6 +96,8 @@ describe('targeting modes follow the delivery (mw-e06.15)', () => {
     expect(targetingMode(aoe('caster'))).toBe('self');
     expect(targetingMode(summon(true))).toBe('ground');
     expect(targetingMode(touch)).toBe('target');
+    expect(targetingMode(tether)).toBe('reticle');
+    expect(spellRange(tether)).toBe(15);
     expect(targetingMode(spell({ kind: 'self' }))).toBe('self');
     expect(spellRange(bolt)).toBe(20);
     expect(spellRange(spell({ kind: 'beam', length: 9, width: 1, maxBounces: 0 }))).toBe(9);

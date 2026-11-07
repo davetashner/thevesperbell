@@ -1,0 +1,27 @@
+{
+  "$schema": "../spell.schema.json",
+  "id": "mage-hand",
+  "name": "Mage Hand",
+  "school": "arcane",
+  "tier": 1,
+  "next": [],
+  "cost": { "mana": 6 },
+  "castTime": 0.4,
+  "channel": { "interval": 0.1, "manaPerSecond": 2, "maxDuration": 60 },
+  "cooldown": 1.5,
+  "delivery": {
+    "kind": "tether",
+    "range": 15,
+    "maxWeight": 25,
+    "speed": 12,
+    "lineOfSightGrace": 0.5,
+    "maxHold": 60,
+    "pickRadius": 0.75
+  },
+  "effects": [{ "op": "noise", "phase": "release", "loudness": 25 }],
+  "tags": ["arcane", "telekinesis", "control", "utility"],
+  "vfxCue": "vfx-spell-mage-hand-tether",
+  "sfxCue": "sfx-spell-mage-hand-grab",
+  "bookId": "mage-hand",
+  "flags": { "tooUseful": true, "castWhileMoving": true, "allowOvercast": false }
+}

@@ -17,4 +17,5 @@ export * from './registry';
 export * from './scroll';
 export * from './statuses';
 export * from './study';
+export * from './tether';
 export * from './volumes';
