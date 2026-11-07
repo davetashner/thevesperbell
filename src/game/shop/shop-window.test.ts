@@ -43,6 +43,7 @@ import {
   ShopViews,
   startShopUi,
   type ShopContent,
+  type ShopEvent,
   lessonRefusalText,
 } from './shop-window';
 
@@ -65,6 +66,7 @@ function setup(
   addInventory(sim, player, crowns);
   const ui = new UiRoot(document.body, { unstyled: true, focus: { rectOf: rectFromData } });
   const published: string[] = [];
+  const events: ShopEvent[] = [];
   const shop = startShopUi({
     ui,
     world: sim,
@@ -73,6 +75,7 @@ function setup(
     ...(safety !== undefined && { safety }),
     ...(unlocks !== undefined && { unlocks }),
     publish: (_key, value) => published.push(value),
+    onEvent: (event) => events.push(event),
   });
   const counter = (tags: string[]): EntityId => {
     const entity = world.spawn();
@@ -105,6 +108,7 @@ function setup(
     pack,
     crownsNow,
     published,
+    events,
   };
 }
 
@@ -291,6 +295,29 @@ describe('the shop controller', () => {
     t.ui.intent('back', 'keyboard');
     expect(t.ui.top).toBeUndefined();
     expect(JSON.parse(t.published.at(-1) ?? '{}')).toMatchObject({ open: false, merchant: null });
+  });
+
+  it('mw-ju8.11 AC-4: the window reports opening, each deal that goes through, and closing', () => {
+    const t = setup(content, 400);
+    t.talk(t.counter(GENERAL));
+    expect(t.events).toEqual([{ kind: 'opened', merchantId: 'fixture-general-goods' }]);
+    (t.rows('buy').find((r) => r.textContent.includes('Arming sword')) as HTMLElement).click();
+    tab('sell');
+    (t.rows('sell')[0] as HTMLElement).click();
+    tab('buyback');
+    (t.rows('buyback')[0] as HTMLElement).click();
+    const deal = { kind: 'deal', merchantId: 'fixture-general-goods' };
+    expect(t.events).toHaveLength(4);
+    expect(t.events.slice(1)).toEqual([deal, deal, deal]);
+    t.ui.intent('back', 'keyboard');
+    expect(t.events.at(-1)).toEqual({ kind: 'closed', merchantId: 'fixture-general-goods' });
+  });
+
+  it('mw-ju8.11 AC-4: a deal the engine refuses reports nothing', () => {
+    const t = setup(content, 1);
+    t.talk(t.counter(GENERAL));
+    (t.rows('buy').find((r) => r.textContent.includes('Arming sword')) as HTMLElement).click();
+    expect(t.events.map((e) => e.kind)).toEqual(['opened']);
   });
 
   it('ignores other verbs, untagged counters, unknown merchants and other actors', () => {
@@ -949,6 +976,7 @@ describe('the Bridgeward College: lessons on the Services tab (mw-ju8.13, mw-ju8
     expect(t.toast()).toBe('You learn Riposte.');
     expect(t.published).toContain(JSON.stringify(['technique.riposte']));
     expect(t.shop.controller.isOpen).toBe(true);
+    expect(t.events.map((e) => e.kind)).toEqual(['opened', 'deal']);
   });
 
   it('a lesson whose earlier step is unknown says which to learn first and charges nothing', () => {
