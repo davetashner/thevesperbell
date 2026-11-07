@@ -20,3 +20,11 @@ export {
   type VolumeKey,
   type VolumeSettings,
 } from './volumes.ts';
+export {
+  HUM_FADE_OUT_S,
+  SCENE_HUMS,
+  SceneHums,
+  type HumEngine,
+  type SceneHum,
+  type SceneHumsOptions,
+} from './scene-hums.ts';

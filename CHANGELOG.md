@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Ottilie hums at her counter in Marsh's General Store: a soft, wordless hum that loops from where she stands, clear near the counter and fading as you walk away. It follows the Music volume slider.
 - Fire works everywhere now: anything that can burn (wooden crates, doors, furniture, ivy, cloth) can be set alight by Ember or by a neighbouring flame in every scene, not just the testbed, and anything burning hurts whoever stands within its reach (2 fire damage every quarter second). The debug frame-data overlay shows it as "hazard".
 - You can read a Scroll of Ember: open it in your pack and choose Read. Ember flies from you along the cross at the centre of the view, costs no mana, needs no lesson and works for any class, and the scroll is used up. (The Scrolls of Mage Hand and Firebolt cannot be read yet: their spells are not in the game.)
 - A spell hotbar and quick-select wheel: once you know a spell it takes the first free slot of eight above the quick slots, showing its mana cost, a recharge sweep with the seconds left (in tenths) and a dimmed red cost when you lack the mana. Number keys 5-8 and the numpad 1-8 pick a slot, [ and ] step through them, and holding Z (the Guide button on a pad) opens a wheel: point with the mouse or right stick and let go to choose. The game slows to a quarter speed while the wheel is open (switch it off in Options, Accessibility). The bar is saved with the game. Dev console: `spell slot 3 ember` places a spell. The number row's 1-4 stay the class abilities for now.
