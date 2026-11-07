@@ -66,7 +66,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `delivery.onExpire[].impulse` | number > 0 | required | Impulse, N·s (per second for a sustained lift). |
 | `delivery.onExpire[].duration` | number ≥ 0 | `0` | Seconds a sustained force lasts; 0 = one impulse. |
 | `delivery.onExpire[].op` | `"status"` | required |  |
-| `delivery.onExpire[].status` | id | required | Status id, e.g. "rooted" (status definitions: e06.9). |
+| `delivery.onExpire[].status` | id | required | Status id, e.g. "rooted" (a status content entry; checked at load, e06.9). |
 | `delivery.onExpire[].duration` | number > 0 | required | Seconds the status lasts. |
 | `delivery.onExpire[].stacks` | integer 1–99 | `1` | Stacks applied. |
 | `delivery.onExpire[].op` | `"summon"` | required |  |
@@ -165,7 +165,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `effects[].impulse` | number > 0 | required | Impulse, N·s (per second for a sustained lift). |
 | `effects[].duration` | number ≥ 0 | `0` | Seconds a sustained force lasts; 0 = one impulse. |
 | `effects[].op` | `"status"` | required |  |
-| `effects[].status` | id | required | Status id, e.g. "rooted" (status definitions: e06.9). |
+| `effects[].status` | id | required | Status id, e.g. "rooted" (a status content entry; checked at load, e06.9). |
 | `effects[].duration` | number > 0 | required | Seconds the status lasts. |
 | `effects[].stacks` | integer 1–99 | `1` | Stacks applied. |
 | `effects[].op` | `"summon"` | required |  |

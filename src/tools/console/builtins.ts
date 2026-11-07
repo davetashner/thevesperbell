@@ -39,7 +39,20 @@ import { MAX_TIME_SCALE } from '@game/loop/fixed-step';
 import { ALL_SLOTS, isSlotId, type SlotId } from '@game/save/slots/ids';
 import { z } from 'zod';
 import { ConsoleError, type CommandRegistry, type CommandSpec } from './registry';
+import { registerItemCommands } from './items';
 import { closest, splitOptions } from './text';
+
+/** What the console reads of the player's pack. */
+export interface PackView {
+  readonly gold: number;
+  readonly items: readonly {
+    readonly instanceId: number;
+    readonly defId: string;
+    readonly count: number;
+    readonly stolen?: boolean;
+    readonly ownerId?: string;
+  }[];
+}
 
 /** What the built-ins need from the running game. */
 export interface ConsoleHost {
@@ -70,6 +83,10 @@ export interface ConsoleHost {
   bookmarks(): ReadonlyMap<string, Vec3>;
   /** Item ids `give` accepts, sorted. Absent: `give` is unavailable. */
   readonly items?: readonly string[];
+  /** The player's pack, read-only (item.list, and the counts item.give prints). Absent: no pack. */
+  pack?(): PackView | undefined;
+  /** Item id → category, for `item.list <category>`. */
+  readonly itemCategories?: Readonly<Record<string, string>>;
   /** Spell ids `spell` accepts, sorted (empty: no spells in this build). */
   readonly spells?: readonly string[];
   /** Makes `id` the spell the cast button casts; false when the player has not learned it. */
@@ -476,4 +493,6 @@ export function registerBuiltins(registry: CommandRegistry<ConsoleHost>): void {
     args: z.tuple([]),
     run: (_args, host) => `seed ${String(host.seed)}`,
   });
+
+  registerItemCommands(registry);
 }

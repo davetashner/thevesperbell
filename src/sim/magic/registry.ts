@@ -13,6 +13,7 @@ import type { World } from '../core/world';
 import type { DamageModel } from '../combat/damage';
 import type { Vec3 } from '../stimulus/shapes';
 import type { CastSource, OpDetail } from './events';
+import type { StatusLookup } from './statuses';
 
 /** One effect op of a spell, narrowed to the op named `N`. */
 export type OpOf<N extends SpellEffectOpName> = Extract<SpellEntry['effects'][number], { op: N }>;
@@ -29,6 +30,8 @@ export interface OpContext {
   /** The delivery entity carrying the spell (a damage packet's `source`). */
   readonly delivery: EntityId;
   readonly damage: DamageModel;
+  /** Status definitions (the status op follows their stack rules). */
+  readonly statuses?: StatusLookup;
 }
 
 /**

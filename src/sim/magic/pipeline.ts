@@ -26,7 +26,6 @@ import {
   MAGIC_COMPONENTS,
   knowsSpell,
   SpellDeliveryComponent,
-  statusLedger,
   StatusLedgerComponent,
   type SpellDeliveryState,
 } from './components';
@@ -40,6 +39,7 @@ import {
   type FizzleStage,
 } from './events';
 import { builtInOps } from './ops';
+import { updateStatuses, type StatusLookup } from './statuses';
 import type { CastRequest, DeliveryHit, DeliveryRegistry, OpContext, OpRegistry } from './registry';
 
 /** Spell id → loaded spell, or undefined. */
@@ -73,6 +73,8 @@ export interface SpellPipelineOptions {
   readonly ops?: OpRegistry;
   /** Delivery handlers; the built-in self and touch by default. */
   readonly deliveries?: DeliveryRegistry;
+  /** Status definitions by id (mw-e06.9); none by default (statuses refresh and add stacks). */
+  readonly statuses?: StatusLookup;
 }
 
 /** Handles a `cast` input command (see `SpellPipeline.handleCommands`). */
@@ -87,6 +89,8 @@ export class SpellPipeline {
   readonly ops: OpRegistry;
   readonly deliveries: DeliveryRegistry;
   readonly damage: DamageModel;
+  /** Looks a status definition up by id. */
+  readonly statuses: StatusLookup;
   /** Looks a spell up by id (delivery systems read their delivery's section through it). */
   readonly spells: SpellLookup;
   private gates: readonly CastGate[] = [];
@@ -94,6 +98,7 @@ export class SpellPipeline {
 
   constructor(options: SpellPipelineOptions) {
     this.spells = options.spells;
+    this.statuses = options.statuses ?? (() => undefined);
     this.damage = options.damage ?? new DamageModel();
     this.ops = options.ops ?? builtInOps();
     this.deliveries = options.deliveries ?? builtInDeliveries();
@@ -288,6 +293,7 @@ export class SpellPipeline {
         point: hit.point,
         delivery,
         damage: this.damage,
+        statuses: this.statuses,
       };
       effects.forEach((op, index) => {
         const detail = this.ops.require(op.op)(ctx, op);
@@ -338,13 +344,8 @@ export function installSpells<TInput>(
   const pipeline = new SpellPipeline(options);
   const system: System<TInput> = {
     name: 'spells',
-    run: ({ inputs, tick }) => {
-      const [id, ledger] = statusLedger(w);
-      if (ledger.entries.some((entry) => entry.expiresTick <= tick)) {
-        w.set(id, StatusLedgerComponent, {
-          entries: ledger.entries.filter((entry) => entry.expiresTick > tick),
-        });
-      }
+    run: ({ inputs }) => {
+      updateStatuses(w, { lookup: pipeline.statuses, ops: pipeline.ops, damage: pipeline.damage });
       for (const input of inputs) {
         if (!isCastCommand(input)) continue;
         pipeline.command(w, {

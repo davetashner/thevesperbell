@@ -1,0 +1,8 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "silenced",
+  "name": "Silenced",
+  "description": "Cannot cast spells.",
+  "stack": { "rule": "refresh" },
+  "tags": ["magical", "debuff"]
+}

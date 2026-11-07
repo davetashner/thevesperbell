@@ -473,7 +473,7 @@
                       "status": {
                         "type": "string",
                         "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                        "description": "Status id, e.g. \"rooted\" (status definitions: e06.9)."
+                        "description": "Status id, e.g. \"rooted\" (a status content entry; checked at load, e06.9)."
                       },
                       "duration": {
                         "type": "number",
@@ -1338,7 +1338,7 @@
               "status": {
                 "type": "string",
                 "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                "description": "Status id, e.g. \"rooted\" (status definitions: e06.9)."
+                "description": "Status id, e.g. \"rooted\" (a status content entry; checked at load, e06.9)."
               },
               "duration": {
                 "type": "number",
