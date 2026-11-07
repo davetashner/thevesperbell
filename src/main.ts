@@ -1789,6 +1789,8 @@ function startRenderer(
       const creatureRead = simAnimReader({
         moves: combat.moves,
         locomotion: creatureLocomotion(),
+        // The shield-bearer's raise, hold and lower follow its guard component (mw-ju8.24).
+        guard: true,
       });
       const minerDriver = new AnimationDriver(world);
       creatureAnimation = minerDriver;

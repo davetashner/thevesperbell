@@ -28,13 +28,13 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `layers[].states[].motion.kind` | `"clip"` | required |  |
 | `layers[].states[].motion.clip` | ref → anim-clip | required | Clip id (the clip manifest, content type anim-clip). |
 | `layers[].states[].motion.kind` | `"blend1d"` | required |  |
-| `layers[].states[].motion.param` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` | required | Number parameter the blend follows, e.g. "speed". |
+| `layers[].states[].motion.param` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` \| `"guard"` | required | Number parameter the blend follows, e.g. "speed". |
 | `layers[].states[].motion.points` | list of object (at least 1) | required | Clips by parameter value, ascending; weights are linear between neighbours. |
 | `layers[].states[].motion.points[].at` | number | required | Parameter value at which this clip has full weight. |
 | `layers[].states[].motion.points[].clip` | ref → anim-clip | required | Clip id. |
 | `layers[].states[].motion.kind` | `"blend2d"` | required |  |
-| `layers[].states[].motion.x` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` | required | Number parameter on the x axis, e.g. "speed". |
-| `layers[].states[].motion.y` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` | required | Number parameter on the y axis, e.g. "turnRate". |
+| `layers[].states[].motion.x` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` \| `"guard"` | required | Number parameter on the x axis, e.g. "speed". |
+| `layers[].states[].motion.y` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` \| `"guard"` | required | Number parameter on the y axis, e.g. "turnRate". |
 | `layers[].states[].motion.points` | list of object (at least 1) | required | Clips by [x, y]; weights are inverse-distance, exact on a point. |
 | `layers[].states[].motion.points[].at` | list of any (at least 2) | required | [x, y] parameter values at which this clip has full weight. |
 | `layers[].states[].motion.kind` | `"action"` | required |  |
@@ -45,6 +45,6 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `layers[].transitions[].to` | id | required | Target state id. |
 | `layers[].transitions[].duration` | number 0–5 | `0.2` | Crossfade duration, seconds. |
 | `layers[].transitions[].when` | list of object | `[]` | Conditions on sim parameters, all of which must hold; empty = always. |
-| `layers[].transitions[].when[].param` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` | required | A sim-published parameter (ANIM_PARAMETERS). |
+| `layers[].transitions[].when[].param` | `"speed"` \| `"turnRate"` \| `"grounded"` \| `"locomotion"` \| `"verticalSpeed"` \| `"acting"` \| `"actionPhase"` \| `"actionVerb"` \| `"hitReact"` \| `"hitReaction"` \| `"hitDirection"` \| `"guard"` | required | A sim-published parameter (ANIM_PARAMETERS). |
 | `layers[].transitions[].when[].op` | `"=="` \| `"!="` \| `"<"` \| `"<="` \| `">"` \| `">="` | required | Comparison; flags and strings allow == and != only. |
 | `layers[].transitions[].when[].value` | number or boolean or string | required | Value compared against; must match the parameter’s kind. |

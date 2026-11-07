@@ -31,6 +31,7 @@ export {
 } from './types/anim-clip.ts';
 export {
   ANIM_ACTION_PHASES,
+  ANIM_GUARD_PHASES,
   ANIM_ACTION_VERBS,
   ANIM_HIT_DIRECTIONS,
   ANIM_CONDITION_OPS,

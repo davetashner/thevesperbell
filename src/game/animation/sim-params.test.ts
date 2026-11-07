@@ -1,5 +1,7 @@
 import {
   ACTION_TIMELINE_COMPONENTS,
+  GuardComponent,
+  MELEE_COMPONENTS,
   applyHitReaction,
   giveHitReactions,
   HitReactionComponent,
@@ -9,10 +11,60 @@ import {
   requestMove,
   setTimeScale,
   World,
+  type EntityId,
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
-import { characterLocomotion, simAnimReader } from './sim-params';
+import { characterLocomotion, LOWERING_TICKS, simAnimReader } from './sim-params';
 import { timelineWorld } from './testing';
+
+describe('simAnimReader guard phase (mw-ju8.24)', () => {
+  const shield = Object.freeze({
+    id: 'board',
+    kind: 'weapon' as const,
+    absorption: Object.freeze({}),
+    stability: 100,
+    raiseTicks: 12,
+    arcDegrees: 110,
+    moveSpeedScale: 0.5,
+  });
+  const guardPhase = (read: ReturnType<typeof simAnimReader>, w: World<never>, e: EntityId) =>
+    read(w, e)?.values.guard;
+
+  it('AC-2: reads raising, held and lowering from the guard component, and none once it is long down', () => {
+    const world = new World({ seed: 1 }).register(
+      ...ACTION_TIMELINE_COMPONENTS,
+      ...MELEE_COMPONENTS,
+    );
+    const entity = world.spawn();
+    world.add(entity, GuardComponent, { shield, held: false, raisedAt: null });
+    const read = simAnimReader({ moves: new Map(), guard: true });
+    expect(guardPhase(read, world, entity)).toBe('none');
+    world.set(entity, GuardComponent, { shield, held: true, raisedAt: world.tick });
+    expect(guardPhase(read, world, entity)).toBe('raising');
+    for (let i = 0; i < 12; i++) world.step();
+    expect(guardPhase(read, world, entity)).toBe('held');
+    world.set(entity, GuardComponent, { shield, held: false, raisedAt: null });
+    expect(guardPhase(read, world, entity)).toBe('lowering');
+    for (let i = 0; i < LOWERING_TICKS + 1; i++) world.step();
+    expect(guardPhase(read, world, entity)).toBe('none');
+    expect(guardPhase(read, world, entity)).toBe('none');
+  });
+
+  it('AC-2: reads none without the opt-in, a guard component or a registered one', () => {
+    const world = new World({ seed: 1 }).register(
+      ...ACTION_TIMELINE_COMPONENTS,
+      ...MELEE_COMPONENTS,
+    );
+    const entity = world.spawn();
+    world.add(entity, GuardComponent, { shield, held: true, raisedAt: world.tick });
+    expect(guardPhase(simAnimReader({ moves: new Map() }), world, entity)).toBe('none');
+    const bare = world.spawn();
+    expect(guardPhase(simAnimReader({ moves: new Map(), guard: true }), world, bare)).toBe('none');
+    const plain = new World({ seed: 1 }).register(...ACTION_TIMELINE_COMPONENTS);
+    const other = plain.spawn();
+    expect(guardPhase(simAnimReader({ moves: new Map(), guard: true }), plain, other)).toBe('none');
+  });
+});
 
 describe('simAnimReader', () => {
   it('reads an idle entity without a timeline or locomotion as standing still at normal speed', () => {
@@ -32,6 +84,7 @@ describe('simAnimReader', () => {
         hitReact: false,
         hitReaction: 'none',
         hitDirection: 'none',
+        guard: 'none',
       },
       timeScale: 1,
       action: null,
@@ -62,6 +115,7 @@ describe('simAnimReader', () => {
         hitReact: false,
         hitReaction: 'none',
         hitDirection: 'none',
+        guard: 'none',
       },
       timeScale: 0,
       action: {
@@ -130,6 +184,7 @@ describe('simAnimReader', () => {
         hitReact: false,
         hitReaction: 'none',
         hitDirection: 'none',
+        guard: 'none',
       },
       timeScale: 1,
       action: null,
