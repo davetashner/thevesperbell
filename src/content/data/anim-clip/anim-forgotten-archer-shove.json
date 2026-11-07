@@ -2,8 +2,8 @@
   "$schema": "../anim-clip.schema.json",
   "id": "anim-forgotten-archer-shove",
   "rig": "greybox-humanoid",
-  "notes": "The Forgotten archer's stave shove (move forgotten-archer-shove, 20/4/26 ticks). PLACEHOLDER (mw-ju8.19): the miner's lunging-thrust clip retimed x0.667 so its hit marker lands on the move's first active tick (20); a bespoke clip is a follow-up.",
-  "duration": 0.6445,
+  "notes": "The Forgotten archer's stave shove (move forgotten-archer-shove, 20/4/26 ticks, mw-ju8.23): it hauls the bow back at its left hip, then punches the bow's stave straight forward with the left arm, the right hand steadying the grip; the hit marker lands on tick 20, the first active tick. Hand-keyed on the greybox humanoid rig; not a copy of the miner's thrust.",
+  "duration": 0.8333,
   "markers": [
     {
       "kind": "hit",
@@ -13,92 +13,130 @@
   "tracks": {
     "spine": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0,
+        "rot": [0, 0, 0]
       },
       {
-        "t": 0.1751,
-        "rot": [3.0, -10.0, 0.0]
+        "t": 0.2,
+        "rot": [3, -8, 0]
       },
       {
         "t": 0.3333,
-        "rot": [-8.0, 10.0, 0.0]
+        "rot": [-6, 10, 0]
       },
       {
-        "t": 0.6445,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0.5,
+        "rot": [-4, 8, 0]
+      },
+      {
+        "t": 0.8333,
+        "rot": [0, 0, 0]
       }
     ],
     "chest": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0,
+        "rot": [0, 0, 0]
       },
       {
-        "t": 0.1751,
-        "rot": [4.0, -20.0, 0.0]
-      },
-      {
-        "t": 0.3333,
-        "rot": [-10.0, 22.0, 0.0]
-      },
-      {
-        "t": 0.6445,
-        "rot": [0.0, 0.0, 0.0]
-      }
-    ],
-    "upper-arm-r": [
-      {
-        "t": 0.0,
-        "rot": [0.0, 0.0, 6.0]
-      },
-      {
-        "t": 0.1751,
-        "rot": [-25.0, 0.0, 14.0]
+        "t": 0.2,
+        "rot": [4, -16, 0]
       },
       {
         "t": 0.3333,
-        "rot": [88.0, 0.0, 6.0]
+        "rot": [-8, 22, 0]
       },
       {
-        "t": 0.4445,
-        "rot": [60.0, 0.0, 6.0]
+        "t": 0.5,
+        "rot": [-6, 16, 0]
       },
       {
-        "t": 0.6445,
-        "rot": [0.0, 0.0, 6.0]
-      }
-    ],
-    "forearm-r": [
-      {
-        "t": 0.0,
-        "rot": [8.0, 0.0, 0.0]
-      },
-      {
-        "t": 0.1751,
-        "rot": [95.0, 0.0, 0.0]
-      },
-      {
-        "t": 0.3333,
-        "rot": [5.0, 0.0, 0.0]
-      },
-      {
-        "t": 0.6445,
-        "rot": [8.0, 0.0, 0.0]
+        "t": 0.8333,
+        "rot": [0, 0, 0]
       }
     ],
     "upper-arm-l": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, -6.0]
+        "t": 0,
+        "rot": [0, 0, -6]
+      },
+      {
+        "t": 0.2,
+        "rot": [-20, 0, -14]
       },
       {
         "t": 0.3333,
-        "rot": [-20.0, 0.0, -20.0]
+        "rot": [86, 0, -8]
       },
       {
-        "t": 0.6445,
-        "rot": [0.0, 0.0, -6.0]
+        "t": 0.5,
+        "rot": [70, 0, -8]
+      },
+      {
+        "t": 0.8333,
+        "rot": [0, 0, -6]
+      }
+    ],
+    "forearm-l": [
+      {
+        "t": 0,
+        "rot": [8, 0, 0]
+      },
+      {
+        "t": 0.2,
+        "rot": [100, 0, 0]
+      },
+      {
+        "t": 0.3333,
+        "rot": [6, 0, 0]
+      },
+      {
+        "t": 0.5,
+        "rot": [20, 0, 0]
+      },
+      {
+        "t": 0.8333,
+        "rot": [8, 0, 0]
+      }
+    ],
+    "upper-arm-r": [
+      {
+        "t": 0,
+        "rot": [0, 0, 6]
+      },
+      {
+        "t": 0.2,
+        "rot": [40, 0, 20]
+      },
+      {
+        "t": 0.3333,
+        "rot": [70, 0, 12]
+      },
+      {
+        "t": 0.5,
+        "rot": [56, 0, 10]
+      },
+      {
+        "t": 0.8333,
+        "rot": [0, 0, 6]
+      }
+    ],
+    "forearm-r": [
+      {
+        "t": 0,
+        "rot": [8, 0, 0]
+      },
+      {
+        "t": 0.2,
+        "rot": [80, 0, 0]
+      },
+      {
+        "t": 0.3333,
+        "rot": [40, 0, 0]
+      },
+      {
+        "t": 0.8333,
+        "rot": [8, 0, 0]
       }
     ]
   }

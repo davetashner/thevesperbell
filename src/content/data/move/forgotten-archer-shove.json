@@ -1,7 +1,7 @@
 {
   "$schema": "../move.schema.json",
   "id": "forgotten-archer-shove",
-  "notes": "The Forgotten archer's melee fallback (mw-ju8.19): when closed on it shoves with the bow stave, 20 ticks of windup (above the 18-tick minimum), 4 active, 26 recovery. 7 blunt, 20 poise, 14 stamina on a block: it buys room to back off and draw again, it is not a threat on its own. Parryable and blockable. Its clip is the miner's thrust retimed (placeholder).",
+  "notes": "The Forgotten archer's melee fallback (mw-ju8.19): when closed on it shoves with the bow stave, 20 ticks of windup (above the 18-tick minimum), 4 active, 26 recovery. 7 blunt, 20 poise, 14 stamina on a block: it buys room to back off and draw again, it is not a threat on its own. Parryable and blockable. Its clip, anim-forgotten-archer-shove (mw-ju8.23), is a hand-keyed stave punch, its hit marker on tick 20.",
   "verb": "attack",
   "frames": {
     "startup": 20,

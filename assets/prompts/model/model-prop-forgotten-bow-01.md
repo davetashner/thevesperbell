@@ -1,6 +1,6 @@
 # model-prop-forgotten-bow-01: the archer's bow (placeholder model)
 
-**Status: owner-approved placeholder** (2026-10-24, "you're approved on all requests"): the flat (`prop-forgotten-bow-01 variant a`) and the model, recorded under mw-ju8.35 (no approvals.json yet). Still `placeholder: yes` in CREDITS because the model is unanimated (miner precedent, mw-0i5). The Tripo half of the licence is confirmed (owner, 2026-10-24, mw-uuk). Animation clips for the Forgotten variants stay in mw-ju8.23, mw-ju8.24 and mw-ju8.25.
+**Status: owner-approved placeholder** (2026-10-24, "you're approved on all requests"): the flat (`prop-forgotten-bow-01 variant a`) and the model, recorded under mw-ju8.35 (no approvals.json yet). Still `placeholder: yes` in CREDITS because the model is unanimated (miner precedent, mw-0i5). The Tripo half of the licence is confirmed (owner, 2026-10-24, mw-uuk). The archer's bespoke draw, hold, loose and stave-shove clips (hand-keyed, no paid API) landed in mw-ju8.23, approved as "Claude, delegated by owner 2026-11-07"; the shield-bearer and brute clips are mw-ju8.24 and mw-ju8.25.
 
 ## Generation
 
@@ -13,7 +13,7 @@
 
 1. `gltf-transform optimize … --compress meshopt --texture-compress webp --texture-size 512` →
    `public/assets/model/model-prop-forgotten-bow-01.glb` (held weapon budget 300 to 1.5 k triangles).
-2. At load: `bowPlacement`: +90° about y turns the belly outward (the creature's left) with the string toward the body so it reads as a bow from the front, scaled to 1.15 m, centred on the left hand (`leftHandPoint`). Fixed to the `forearm-l` bone. The arm is not posed to draw it; no arrow is modelled (animation: mw-ju8.24).
+2. At load: `bowPlacement`: +90° about y turns the belly outward (the creature's left) with the string toward the body so it reads as a bow from the front, scaled to 1.15 m, centred on the left hand (`leftHandPoint`). Fixed to the `forearm-l` bone. Since mw-ju8.23 the bow arm is posed to draw it (`anim-forgotten-archer-shot`: the bow rides the forearm up to shoulder height and stays steady through the loose); no arrow is modelled (the arrow is the attack's projectile).
 
 ## Known gaps
 
