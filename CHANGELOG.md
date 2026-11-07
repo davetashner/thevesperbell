@@ -14,6 +14,7 @@ check enforces this).
 ### Added
 
 - The Forgotten brute swings its maul properly: a slow two-handed lift that hangs at the top before a crushing slam (and stays bent over the stuck maul, open to a punish), and a wide, low sweep it winds all the way round for and overextends on.
+- The Forgotten archer now draws its bow properly: it raises the bow, pulls the string back to its cheek, holds an aimed beat and looses (the arrow leaves on the snap back), and shoves with the bow's stave when you close in, instead of reusing the miner's thrust.
 - Marsh's General Store has its own music: a cosy shop theme plays throughout the store, upstairs and down. Opening Ottilie's shop window rings a short greeting, a deal (buying, selling or buying back) plays a warm cadence (at most once every 1.5 seconds), and closing the window plays a farewell. All of it follows the Music volume slider.
 - Ottilie hums at her counter in Marsh's General Store: a soft, wordless hum that loops from where she stands, clear near the counter and fading as you walk away. It follows the Music volume slider.
 - Fire works everywhere now: anything that can burn (wooden crates, doors, furniture, ivy, cloth) can be set alight by Ember or by a neighbouring flame in every scene, not just the testbed, and anything burning hurts whoever stands within its reach (2 fire damage every quarter second). The debug frame-data overlay shows it as "hazard".
