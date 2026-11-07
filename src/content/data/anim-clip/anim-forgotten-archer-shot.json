@@ -2,8 +2,8 @@
   "$schema": "../anim-clip.schema.json",
   "id": "anim-forgotten-archer-shot",
   "rig": "greybox-humanoid",
-  "notes": "The Forgotten archer's draw and loose (move forgotten-archer-shot, 42/2/40 ticks): the arms drawn back and driven forward. PLACEHOLDER (mw-ju8.19): the miner's lunging-thrust clip retimed x1.400 so its hit marker lands on the move's first active tick (42); a bespoke clip is a follow-up.",
-  "duration": 1.3534,
+  "notes": "The Forgotten archer's draw and loose (move forgotten-archer-shot, 42/2/40 ticks, mw-ju8.23): side-on stance, the bow arm (left, carrying the bow) rises to shoulder height and stays steady, the string arm reaches out, draws elbow-out back to the cheek, holds an aimed beat, and on the hit marker (tick 42, the first active tick) the string hand snaps back past the cheek while the bow arm stays put. Hand-keyed on the greybox humanoid rig; not a copy of the miner's thrust.",
+  "duration": 1.4,
   "markers": [
     {
       "kind": "hit",
@@ -13,92 +13,192 @@
   "tracks": {
     "spine": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0,
+        "rot": [0, 0, 0]
       },
       {
-        "t": 0.3676,
-        "rot": [3.0, -10.0, 0.0]
+        "t": 0.2,
+        "rot": [2, -6, 0]
+      },
+      {
+        "t": 0.55,
+        "rot": [3, -12, 0]
       },
       {
         "t": 0.7,
-        "rot": [-8.0, 10.0, 0.0]
+        "rot": [3, -12, 0]
       },
       {
-        "t": 1.3534,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0.74,
+        "rot": [2, -9, 0]
+      },
+      {
+        "t": 1.4,
+        "rot": [0, 0, 0]
       }
     ],
     "chest": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0,
+        "rot": [0, 0, 0]
       },
       {
-        "t": 0.3676,
-        "rot": [4.0, -20.0, 0.0]
+        "t": 0.2,
+        "rot": [3, -12, 0]
+      },
+      {
+        "t": 0.55,
+        "rot": [4, -26, 0]
       },
       {
         "t": 0.7,
-        "rot": [-10.0, 22.0, 0.0]
+        "rot": [4, -26, 0]
       },
       {
-        "t": 1.3534,
-        "rot": [0.0, 0.0, 0.0]
+        "t": 0.74,
+        "rot": [3, -20, 0]
+      },
+      {
+        "t": 1.4,
+        "rot": [0, 0, 0]
       }
     ],
-    "upper-arm-r": [
+    "head": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, 6.0]
+        "t": 0,
+        "rot": [0, 0, 0]
       },
       {
-        "t": 0.3676,
-        "rot": [-25.0, 0.0, 14.0]
+        "t": 0.2,
+        "rot": [0, 10, 0]
       },
       {
-        "t": 0.7,
-        "rot": [88.0, 0.0, 6.0]
-      },
-      {
-        "t": 0.9334,
-        "rot": [60.0, 0.0, 6.0]
-      },
-      {
-        "t": 1.3534,
-        "rot": [0.0, 0.0, 6.0]
-      }
-    ],
-    "forearm-r": [
-      {
-        "t": 0.0,
-        "rot": [8.0, 0.0, 0.0]
-      },
-      {
-        "t": 0.3676,
-        "rot": [95.0, 0.0, 0.0]
+        "t": 0.55,
+        "rot": [-2, 30, 0]
       },
       {
         "t": 0.7,
-        "rot": [5.0, 0.0, 0.0]
+        "rot": [-2, 30, 0]
       },
       {
-        "t": 1.3534,
-        "rot": [8.0, 0.0, 0.0]
+        "t": 0.9,
+        "rot": [0, 16, 0]
+      },
+      {
+        "t": 1.4,
+        "rot": [0, 0, 0]
       }
     ],
     "upper-arm-l": [
       {
-        "t": 0.0,
-        "rot": [0.0, 0.0, -6.0]
+        "t": 0,
+        "rot": [0, 0, -6]
+      },
+      {
+        "t": 0.2,
+        "rot": [80, 0, -10]
+      },
+      {
+        "t": 0.55,
+        "rot": [88, 0, -8]
       },
       {
         "t": 0.7,
-        "rot": [-20.0, 0.0, -20.0]
+        "rot": [88, 0, -8]
       },
       {
-        "t": 1.3534,
-        "rot": [0.0, 0.0, -6.0]
+        "t": 0.76,
+        "rot": [84, 0, -8]
+      },
+      {
+        "t": 1.0,
+        "rot": [60, 0, -7]
+      },
+      {
+        "t": 1.4,
+        "rot": [0, 0, -6]
+      }
+    ],
+    "forearm-l": [
+      {
+        "t": 0,
+        "rot": [8, 0, 0]
+      },
+      {
+        "t": 0.2,
+        "rot": [10, 0, 0]
+      },
+      {
+        "t": 0.7,
+        "rot": [4, 0, 0]
+      },
+      {
+        "t": 0.76,
+        "rot": [8, 0, 0]
+      },
+      {
+        "t": 1.4,
+        "rot": [8, 0, 0]
+      }
+    ],
+    "upper-arm-r": [
+      {
+        "t": 0,
+        "rot": [0, 0, 6]
+      },
+      {
+        "t": 0.2,
+        "rot": [78, 0, 12]
+      },
+      {
+        "t": 0.55,
+        "rot": [34, 0, 62]
+      },
+      {
+        "t": 0.7,
+        "rot": [34, 0, 62]
+      },
+      {
+        "t": 0.74,
+        "rot": [24, 0, 70]
+      },
+      {
+        "t": 0.9,
+        "rot": [40, 0, 50]
+      },
+      {
+        "t": 1.4,
+        "rot": [0, 0, 6]
+      }
+    ],
+    "forearm-r": [
+      {
+        "t": 0,
+        "rot": [8, 0, 0]
+      },
+      {
+        "t": 0.2,
+        "rot": [30, 0, 0]
+      },
+      {
+        "t": 0.55,
+        "rot": [135, 0, 0]
+      },
+      {
+        "t": 0.7,
+        "rot": [140, 0, 0]
+      },
+      {
+        "t": 0.74,
+        "rot": [120, 0, 0]
+      },
+      {
+        "t": 0.9,
+        "rot": [90, 0, 0]
+      },
+      {
+        "t": 1.4,
+        "rot": [8, 0, 0]
       }
     ]
   }

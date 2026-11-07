@@ -423,6 +423,14 @@ export interface ShopControllerOptions {
   readonly toast?: (text: string) => void;
   /** The shop opened or closed (or its crowns changed): what the e2e reads. */
   readonly onChange?: (reading: ShopReading) => void;
+  /** The window opened or closed, or a deal went through (the shop's stingers, mw-ju8.11). */
+  readonly onEvent?: (event: ShopEvent) => void;
+}
+
+/** What happened at a shop: its window opened or closed, or a deal went through (a purchase, a sale to the merchant, a buy-back or a lesson). */
+export interface ShopEvent {
+  readonly kind: 'opened' | 'closed' | 'deal';
+  readonly merchantId: string;
 }
 
 /** What the e2e reads of the shop. */
@@ -504,10 +512,12 @@ export class ShopController {
       onClose: () => {
         this.#session = undefined;
         this.#report(false, null);
+        this.#options.onEvent?.({ kind: 'closed', merchantId });
       },
     });
     this.#session = { merchantId, window };
     this.#report(true, merchantId);
+    this.#options.onEvent?.({ kind: 'opened', merchantId });
     return true;
   }
 
@@ -575,6 +585,7 @@ export class ShopController {
       return;
     }
     this.#options.onLearned?.(result.capability);
+    this.#options.onEvent?.({ kind: 'deal', merchantId });
     window.say(`You learn ${service.name} for ${crownsText(result.price)}.`);
     toast?.(`You learn ${service.name}.`);
     this.#refresh();
@@ -602,6 +613,7 @@ export class ShopController {
         : tab === 'sell'
           ? shops.sell(world, player, merchantId, id, count)
           : shops.buyBack(world, player, merchantId, id, count);
+    if (result.ok) this.#options.onEvent?.({ kind: 'deal', merchantId });
     const units = count > 1 ? ` ×${String(count)}` : '';
     window.say(
       result.ok
@@ -628,6 +640,8 @@ export interface ShopUiOptions {
   readonly unlocks?: UnlockBook;
   /** Null when it is safe to sleep, else why not (the autosave veto registry's verdict). */
   readonly safety?: () => string | null;
+  /** The window opened or closed, or a deal went through (the shop's stingers, mw-ju8.11). */
+  readonly onEvent?: (event: ShopEvent) => void;
 }
 
 /** The shop in a running game. */
@@ -640,7 +654,7 @@ export interface ShopUi {
 
 /** Builds the shops engine over content and readies the shop screen for the player. */
 export function startShopUi(options: ShopUiOptions): ShopUi {
-  const { ui, world, content, player, publish, safety, unlocks } = options;
+  const { ui, world, content, player, publish, safety, unlocks, onEvent } = options;
   const items = content.all('item');
   const rules = new InventoryRules(items);
   const shops = new Shops(
@@ -666,6 +680,7 @@ export function startShopUi(options: ShopUiOptions): ShopUi {
     rules,
     ...(safety !== undefined && { safety }),
     ...(unlocks !== undefined && { unlocks }),
+    ...(onEvent !== undefined && { onEvent }),
     onLearned: (capability) => {
       learned.push(capability);
       publish?.('learned', JSON.stringify(learned));

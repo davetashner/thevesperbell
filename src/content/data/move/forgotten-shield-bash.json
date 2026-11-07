@@ -1,7 +1,7 @@
 {
   "$schema": "../move.schema.json",
   "id": "forgotten-shield-bash",
-  "notes": "The Forgotten shield-bearer's bash (mw-ju8.19): 26 ticks of windup from tick 0 (the shield drops and draws back), 4 active, 32 recovery. 8 blunt, 35 poise and 55 stamina on a block (22 through the knight's wood shield, stability 60): two bashes empty a knight's stamina bar, opening its guard for the counter-swing. A 140 N.s shove. Parryable and blockable. Its clip is the miner's thrust retimed (placeholder until a shield raise and bash clip exists).",
+  "notes": "The Forgotten shield-bearer's bash (mw-ju8.19): 26 ticks of windup from tick 0 (the shield drops and draws back), 4 active, 32 recovery. 8 blunt, 35 poise and 55 stamina on a block (22 through the knight's wood shield, stability 60): two bashes empty a knight's stamina bar, opening its guard for the counter-swing. A 140 N.s shove. Parryable and blockable. Its clip (anim-forgotten-shield-bash, mw-ju8.24) is hand-keyed: the board hauled back, then rammed forward on tick 26.",
   "verb": "attack",
   "frames": {
     "startup": 26,

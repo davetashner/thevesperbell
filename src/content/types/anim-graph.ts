@@ -43,6 +43,12 @@ export const ANIM_LOCOMOTION_STATES = [
   'swim',
 ] as const;
 
+/**
+ * Phases the `guard` parameter reports: no shield up, rising (the shield's raise ticks), up and
+ * blocking, and just lowered (a short window for the lowering pose).
+ */
+export const ANIM_GUARD_PHASES = ['none', 'raising', 'held', 'lowering'] as const;
+
 /** Directions the hit parameters report (the sim's hit quadrant, plus none when not reacting). */
 export const ANIM_HIT_DIRECTIONS = ['none', ...HIT_DIRECTIONS] as const;
 
@@ -92,6 +98,13 @@ export const ANIM_PARAMETERS = {
     kind: 'string',
     values: ANIM_HIT_DIRECTIONS,
     description: 'Side of the entity the reacting hit came from, or none when not reacting.',
+  },
+  guard: {
+    kind: 'string',
+    values: ANIM_GUARD_PHASES,
+    description:
+      'Phase of the entity’s raised shield (its guard component: raisedAt), or none; published ' +
+      'only for readers that opt in (creatures), none otherwise.',
   },
 } as const satisfies Record<string, AnimParameterSpec>;
 

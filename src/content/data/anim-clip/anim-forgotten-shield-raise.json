@@ -1,0 +1,93 @@
+{
+  "$schema": "../anim-clip.schema.json",
+  "id": "anim-forgotten-shield-raise",
+  "rig": "greybox-humanoid",
+  "notes": "The Forgotten shield-bearer hauls its rotted board shield up (shield forgotten-board-shield, 12 raise ticks = 0.2 s, mw-ju8.24): the left arm swings forward and in across the chest while the forearm counter-rotates so the board stays flat to the front, ending squarely over the torso (the hold pose); the torso hunkers a little behind it. Plays once and holds the last pose, upper body only. Hand-keyed on greybox-humanoid.",
+  "duration": 0.2,
+  "tracks": {
+    "upper-arm-l": [
+      {
+        "t": 0.0,
+        "rot": [0.0, 0.0, -6.0]
+      },
+      {
+        "t": 0.08,
+        "rot": [30.0, 0.0, 16.0]
+      },
+      {
+        "t": 0.2,
+        "rot": [60.0, 0.0, 38.0]
+      }
+    ],
+    "forearm-l": [
+      {
+        "t": 0.0,
+        "rot": [0.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.08,
+        "rot": [-31.0, 17.0, 0.0]
+      },
+      {
+        "t": 0.2,
+        "rot": [-62.0, 34.0, 0.0]
+      }
+    ],
+    "upper-arm-r": [
+      {
+        "t": 0.0,
+        "rot": [0.0, 0.0, 6.0]
+      },
+      {
+        "t": 0.08,
+        "rot": [5.0, 0.0, 7.0]
+      },
+      {
+        "t": 0.2,
+        "rot": [10.0, 0.0, 8.0]
+      }
+    ],
+    "forearm-r": [
+      {
+        "t": 0.0,
+        "rot": [8.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.08,
+        "rot": [19.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.2,
+        "rot": [30.0, 0.0, 0.0]
+      }
+    ],
+    "spine": [
+      {
+        "t": 0.0,
+        "rot": [0.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.08,
+        "rot": [-1.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.2,
+        "rot": [-2.0, 0.0, 0.0]
+      }
+    ],
+    "chest": [
+      {
+        "t": 0.0,
+        "rot": [0.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.08,
+        "rot": [-2.0, 0.0, 0.0]
+      },
+      {
+        "t": 0.2,
+        "rot": [-4.0, 0.0, 0.0]
+      }
+    ]
+  }
+}
