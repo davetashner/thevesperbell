@@ -20,6 +20,26 @@
     "priority": 45
   },
   {
+    "id": "music-marsh-home",
+    "variants": [
+      "music-marsh-general-store-upstairs"
+    ],
+    "bus": "music",
+    "spatial": false,
+    "loop": true,
+    "priority": 40
+  },
+  {
+    "id": "music-marsh-store",
+    "variants": [
+      "music-marsh-general-store"
+    ],
+    "bus": "music",
+    "spatial": false,
+    "loop": true,
+    "priority": 40
+  },
+  {
     "id": "music-slice-combat",
     "variants": [
       "music-skeleton-arena-combat-music"
@@ -1171,5 +1191,35 @@
     "bus": "ui",
     "spatial": false,
     "placeholder": true
+  },
+  {
+    "id": "stinger-marsh-farewell",
+    "variants": [
+      "music-stinger-marsh-farewell"
+    ],
+    "bus": "music",
+    "spatial": false,
+    "loop": false,
+    "priority": 55
+  },
+  {
+    "id": "stinger-marsh-greeting",
+    "variants": [
+      "music-stinger-marsh-greeting"
+    ],
+    "bus": "music",
+    "spatial": false,
+    "loop": false,
+    "priority": 55
+  },
+  {
+    "id": "stinger-marsh-sale",
+    "variants": [
+      "music-stinger-marsh-sale"
+    ],
+    "bus": "music",
+    "spatial": false,
+    "loop": false,
+    "priority": 55
   }
 ]

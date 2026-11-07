@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Marsh's General Store has its own music: a cosy shop theme plays downstairs and a slower, quieter version of the same tune plays in Ottilie's home upstairs, crossfading as you climb the stairs or come back down. Opening her shop window rings a short greeting, a deal (buying, selling or buying back) plays a warm cadence (at most once every 1.5 seconds), and closing the window plays a farewell. All of it follows the Music volume slider.
 - Ottilie hums at her counter in Marsh's General Store: a soft, wordless hum that loops from where she stands, clear near the counter and fading as you walk away. It follows the Music volume slider.
 - Fire works everywhere now: anything that can burn (wooden crates, doors, furniture, ivy, cloth) can be set alight by Ember or by a neighbouring flame in every scene, not just the testbed, and anything burning hurts whoever stands within its reach (2 fire damage every quarter second). The debug frame-data overlay shows it as "hazard".
 - You can read a Scroll of Ember: open it in your pack and choose Read. Ember flies from you along the cross at the centre of the view, costs no mana, needs no lesson and works for any class, and the scroll is used up. (The Scrolls of Mage Hand and Firebolt cannot be read yet: their spells are not in the game.)

@@ -95,7 +95,7 @@ import {
   playableClasses,
 } from '@game/classes';
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
-import { bindVolumes, SceneHums, SliceMusic } from '@game/music/index';
+import { bindVolumes, SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
 import { debugConsoleEnabled } from '@game/debug-console-gate';
@@ -1140,10 +1140,20 @@ function startRenderer(
       // (mw-ju8.40). The scene's creatures spawn later in this setup, and the hum finds hers by spawn
       // point, so it starts on the first frame after they exist.
       const hums = new SceneHums({ world, engine: audio, scene: scene.id });
+      // Marsh's General Store plays its shop theme downstairs and her home's variant upstairs,
+      // crossfading when the player changes floor (mw-ju8.11). The player is created further on.
+      const beds = new SceneBeds({
+        world,
+        engine: audio,
+        scene: scene.id,
+        player: () => player?.entity,
+      });
+      const shopStingers = new ShopStingers({ engine: audio, now: () => performance.now() });
       afterStep.push(() => {
         volumes.update();
         music?.update();
         hums.update();
+        beds.update();
       });
       // Noise propagation through the scene's rooms and doors (mw-e09.22): footsteps, breaks and
       // creatures' noises reach listeners muffled by shut doors and walls.
@@ -1563,6 +1573,10 @@ function startRenderer(
           unlocks: createUnlockBook(content, capabilities),
           // Sleeping is refused while any autosave safety veto objects (mw-ju8.6).
           safety: () => safety.active()[0]?.reason ?? null,
+          // Greeting, sale and farewell stingers for merchants that have them (mw-ju8.11).
+          onEvent: (event) => {
+            shopStingers.handle(event);
+          },
           publish: (key, value) => {
             root.dataset[key] = value;
           },

@@ -26,18 +26,10 @@ Some Suno titles differ from the asset id because Suno named them; the link is w
 | `music-marsh-general-store` | Marsh General Store | 3:28 | 2026-10-04 | https://suno.com/song/b5f07ca1-6aff-4aec-87b1-99aec430c716 |
 | `music-marsh-general-store-upstairs` | music-marsh-general-store-upstairs (take B, cover of the store take) | 3:23 | 2026-11-07 | https://suno.com/song/ffcc391d-4f2b-495f-9bc7-5b1020926909 |
 | `music-ottilie-hum` | music-ottilie-hum (Vocals) stem of take B; owner trimmed the silent first ~10 s and supplied it via Voice Memos (2:50, mono AAC) on 2026-11-07, so no Suno download was used | 3:00 | 2026-11-07 | https://suno.com/song/831a0ed6-f6a9-4f98-9db9-aff36ef2040b |
-| `music-stinger-marsh-bundle` | music-stinger-marsh-bundle (take B) | 1:10 | 2026-11-07 | https://suno.com/song/b05f4816-c8a6-4d5a-a171-6a608590a9e0 |
+| `music-stinger-marsh-greeting` | music-stinger-marsh-greeting (take B) | 0:31 | 2026-11-07 | https://suno.com/song/c71345f2-4cd3-446e-86a9-89fa4394f1b6 |
+| `music-stinger-marsh-sale` | music-stinger-marsh-sale (take B) | 0:43 | 2026-11-07 | https://suno.com/song/f1516705-c1ac-4ef7-b504-e3ed2ded7d8f |
+| `music-stinger-marsh-farewell` | music-stinger-marsh-farewell (take B) | 0:22 | 2026-11-07 | https://suno.com/song/ad9497b6-ed1b-4f5b-81d0-cbaf46c7dc75 |
 
 ## Awaiting a pick
 
-Generated 2026-11-07 for `mw-ju8.10` (Suno v6, Pro annual): the Marsh stinger bundle came out as one continuous
-piece, so each cue was generated on its own. Every take runs long; the import keeps the opening cue and fades it.
-
-| Asset id | Take | Length | Link |
-| --- | --- | --- | --- |
-| `music-stinger-marsh-greeting` | A | 0:27 | https://suno.com/song/c9264fc2-7eac-484d-97f3-6614fbd23841 |
-| `music-stinger-marsh-greeting` | B | 0:31 | https://suno.com/song/c71345f2-4cd3-446e-86a9-89fa4394f1b6 |
-| `music-stinger-marsh-sale` | A | 0:47 | https://suno.com/song/6d39b288-4c7e-4741-a2d3-8649ea2aa934 |
-| `music-stinger-marsh-sale` | B | 0:43 | https://suno.com/song/f1516705-c1ac-4ef7-b504-e3ed2ded7d8f |
-| `music-stinger-marsh-farewell` | A | 0:57 | https://suno.com/song/a9b7f99a-6d02-4dfb-a45a-d51796eda9c9 |
-| `music-stinger-marsh-farewell` | B | 0:22 | https://suno.com/song/ad9497b6-ed1b-4f5b-81d0-cbaf46c7dc75 |
+None.
