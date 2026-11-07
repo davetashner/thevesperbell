@@ -7,13 +7,8 @@ import { applyStimulus } from '../stimulus/stimulus';
 import type { StimulusInput } from '../stimulus/stimulus';
 import type { StimulusShape } from '../stimulus/shapes';
 import { placementOf } from '../stimulus/placement';
-import {
-  MAX_STATUS_STACKS,
-  statusLedger,
-  StatusLedgerComponent,
-  type AppliedStatus,
-} from './components';
 import { OpRegistry, type OpContext } from './registry';
+import { applyStatus } from './statuses';
 
 /**
  * The shape a stimulus op acts through: a ray (capsule) from the caster to the hit point, else a
@@ -70,24 +65,13 @@ export function builtInOps(): OpRegistry {
     })
     .register('status', (ctx, op) => {
       if (ctx.target === null) return undefined;
-      const [id, ledger] = statusLedger(ctx.world);
-      const expiresTick =
-        ctx.world.tick + Math.max(1, Math.round(op.duration * ctx.world.clock.hz));
-      const held = ledger.entries.find(
-        (entry) => entry.target === ctx.target && entry.status === op.status,
-      );
-      const next: AppliedStatus = {
+      const applied = applyStatus(ctx.world, ctx.statuses?.(op.status), {
         target: ctx.target,
         status: op.status,
-        stacks: Math.min(MAX_STATUS_STACKS, (held?.stacks ?? 0) + op.stacks),
-        expiresTick: Math.max(held?.expiresTick ?? 0, expiresTick),
         source: ctx.caster,
-      };
-      const entries =
-        held === undefined
-          ? [...ledger.entries, next]
-          : ledger.entries.map((entry) => (entry === held ? next : entry));
-      ctx.world.set(id, StatusLedgerComponent, { entries });
-      return { status: op.status, stacks: next.stacks };
+        seconds: op.duration,
+        stacks: op.stacks,
+      });
+      return { status: op.status, stacks: applied.stacks };
     });
 }

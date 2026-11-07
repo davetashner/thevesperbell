@@ -1,0 +1,23 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "burning",
+  "name": "Burning",
+  "description": "On fire: takes fire damage every second until it goes out.",
+  "stack": { "rule": "stack", "max": 3 },
+  "tags": ["fire", "debuff"],
+  "tick": {
+    "interval": 1,
+    "ops": [
+      {
+        "op": "damage",
+        "amounts": { "fire": 2 },
+        "poiseDamage": 0,
+        "staminaDamage": 0,
+        "impulse": { "x": 0, "y": 0, "z": 0 },
+        "impactForce": 0,
+        "tags": ["status", "burning"]
+      }
+    ]
+  },
+  "breakWhen": [{ "entity": "target", "property": "wetness", "is": "gte", "value": 0.5 }]
+}

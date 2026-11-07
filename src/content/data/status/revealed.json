@@ -1,0 +1,9 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "revealed",
+  "name": "Revealed",
+  "description": "Cannot hide: easily seen and noticed.",
+  "stack": { "rule": "refresh" },
+  "tags": ["magical", "debuff"],
+  "modifiers": [{ "stat": "visibility", "mode": "add", "value": 1 }]
+}
