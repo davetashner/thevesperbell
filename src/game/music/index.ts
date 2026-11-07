@@ -29,11 +29,10 @@ export {
   type SceneHumsOptions,
 } from './scene-hums.ts';
 export {
-  BED_CROSSFADE_S,
+  BED_FADE_OUT_S,
   SCENE_BEDS,
   SceneBeds,
   type BedEngine,
-  type BedFloor,
   type SceneBed,
   type SceneBedsOptions,
 } from './scene-beds.ts';

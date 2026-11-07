@@ -1140,14 +1140,8 @@ function startRenderer(
       // (mw-ju8.40). The scene's creatures spawn later in this setup, and the hum finds hers by spawn
       // point, so it starts on the first frame after they exist.
       const hums = new SceneHums({ world, engine: audio, scene: scene.id });
-      // Marsh's General Store plays its shop theme downstairs and her home's variant upstairs,
-      // crossfading when the player changes floor (mw-ju8.11). The player is created further on.
-      const beds = new SceneBeds({
-        world,
-        engine: audio,
-        scene: scene.id,
-        player: () => player?.entity,
-      });
+      // Marsh's General Store plays one music bed, its shop theme, on both floors (mw-ju8.11).
+      const beds = new SceneBeds({ engine: audio, scene: scene.id });
       const shopStingers = new ShopStingers({ engine: audio, now: () => performance.now() });
       afterStep.push(() => {
         volumes.update();

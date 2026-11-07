@@ -24,7 +24,6 @@ Some Suno titles differ from the asset id because Suno named them; the link is w
 | `music-stinger-bundle` | Stinger Bundle | 1:14 | 2026-10-03 | https://suno.com/song/f38df2e5-a264-44d0-aada-7b4108c4ce4a |
 | `mine-ambience-bed` | Field Recording Ambience, Stone Mine Gallery… (Sounds) | 0:20 | 2026-10-03 | https://suno.com/song/eaca4662-79eb-4550-9466-fc3039adf36f |
 | `music-marsh-general-store` | Marsh General Store | 3:28 | 2026-10-04 | https://suno.com/song/b5f07ca1-6aff-4aec-87b1-99aec430c716 |
-| `music-marsh-general-store-upstairs` | music-marsh-general-store-upstairs (take B, cover of the store take) | 3:23 | 2026-11-07 | https://suno.com/song/ffcc391d-4f2b-495f-9bc7-5b1020926909 |
 | `music-ottilie-hum` | music-ottilie-hum (Vocals) stem of take B; owner trimmed the silent first ~10 s and supplied it via Voice Memos (2:50, mono AAC) on 2026-11-07, so no Suno download was used | 3:00 | 2026-11-07 | https://suno.com/song/831a0ed6-f6a9-4f98-9db9-aff36ef2040b |
 | `music-stinger-marsh-greeting` | music-stinger-marsh-greeting (take B) | 0:31 | 2026-11-07 | https://suno.com/song/c71345f2-4cd3-446e-86a9-89fa4394f1b6 |
 | `music-stinger-marsh-sale` | music-stinger-marsh-sale (take B) | 0:43 | 2026-11-07 | https://suno.com/song/f1516705-c1ac-4ef7-b504-e3ed2ded7d8f |

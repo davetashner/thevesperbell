@@ -20,16 +20,6 @@
     "priority": 45
   },
   {
-    "id": "music-marsh-home",
-    "variants": [
-      "music-marsh-general-store-upstairs"
-    ],
-    "bus": "music",
-    "spatial": false,
-    "loop": true,
-    "priority": 40
-  },
-  {
     "id": "music-marsh-store",
     "variants": [
       "music-marsh-general-store"
