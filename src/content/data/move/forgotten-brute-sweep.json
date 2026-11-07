@@ -1,7 +1,7 @@
 {
   "$schema": "../move.schema.json",
   "id": "forgotten-brute-sweep",
-  "notes": "The Forgotten brute's sweep (mw-ju8.19): a wide flat arc, 44 ticks of windup (730 ms) telegraphed from tick 0, 8 active, 52 recovery. 28 slash, 45 poise, 35 stamina on a block; reach about 2 m across 140 degrees, so the answer is to back off, roll through or block, not to side-step. Parryable and blockable. Its clip is the miner's slash retimed (placeholder).",
+  "notes": "The Forgotten brute's sweep (mw-ju8.19): a wide flat arc, 44 ticks of windup (730 ms) telegraphed from tick 0, 8 active, 52 recovery. 28 slash, 45 poise, 35 stamina on a block; reach about 2 m across 140 degrees, so the answer is to back off, roll through or block, not to side-step. Parryable and blockable. Its clip anim-forgotten-brute-sweep is hand-keyed (mw-ju8.25): a wide, low coil and swing.",
   "verb": "attack",
   "frames": {
     "startup": 44,
