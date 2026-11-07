@@ -192,6 +192,10 @@
     "placeholder": true
   },
   {
+    "id": "icon-item-mage-hand-01",
+    "placeholder": true
+  },
+  {
     "id": "icon-item-mail-gauntlets-01",
     "placeholder": true
   },
@@ -361,6 +365,10 @@
   },
   {
     "id": "icon-spell-ember",
+    "placeholder": true
+  },
+  {
+    "id": "icon-spell-mage-hand",
     "placeholder": true
   }
 ]

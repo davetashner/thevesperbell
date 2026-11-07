@@ -55,6 +55,7 @@ export const SPELL_DELIVERIES = [
   'aoe',
   'beam',
   'summonPoint',
+  'tether',
 ] as const;
 
 /** Effect op names, in the order the pipeline's op registry (e06.2) documents them. */
@@ -443,6 +444,28 @@ const deliverySchema = z
             .describe('The point must be visible from the caster.'),
         })
         .describe('A chosen point on the ground where summons and volumes appear.'),
+      z
+        .strictObject({
+          kind: z.literal('tether'),
+          range: metres.describe('Farthest the tethered object can be from the caster, metres.'),
+          maxWeight: z
+            .number()
+            .positive()
+            .describe('Heaviest movable object it lifts, kg (the weight property).'),
+          speed: metres
+            .default(12)
+            .describe('Fastest a held object follows the aim point, metres per second.'),
+          lineOfSightGrace: seconds
+            .default(0.5)
+            .describe('Seconds line of sight may stay broken before the tether lets go.'),
+          maxHold: positiveSeconds
+            .default(60)
+            .describe('Longest one tether holds, seconds (a free cast has no channel to end it).'),
+          pickRadius: metres
+            .default(0.75)
+            .describe('With no chosen target: how near the aim point an object must be, metres.'),
+        })
+        .describe('A sustained link to one object: carry it, use it, let go (mw-e08.10).'),
     ],
     { error: unknownOption('delivery kind', 'kind', SPELL_DELIVERIES) },
   )
