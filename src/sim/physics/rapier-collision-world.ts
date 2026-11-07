@@ -45,10 +45,13 @@ export class RapierCollisionWorld implements CollisionWorld {
     feet: Vec3,
     direction: Vec3,
     maxDistance: number,
+    ignore?: BodyId,
   ): CollisionHit | undefined {
     const { rapier, rapierWorld } = this.physics;
     const { centre, half } = placeCapsule(capsule, feet);
     const core = new rapier.Segment({ x: 0, y: -half, z: 0 }, { x: 0, y: half, z: 0 });
+    const skipped =
+      ignore === undefined ? undefined : this.physics.rapierHandleOf(ignore as ColliderHandle);
     const hit = rapierWorld.castShape(
       centre,
       IDENTITY,
@@ -57,6 +60,11 @@ export class RapierCollisionWorld implements CollisionWorld {
       capsule.radius,
       maxDistance,
       false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      skipped === undefined ? undefined : (collider) => collider.handle !== skipped,
     );
     return hit === null
       ? undefined

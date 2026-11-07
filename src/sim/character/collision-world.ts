@@ -40,12 +40,15 @@ export interface CollisionWorld {
    * metres and returns the first contact, or undefined when the path is clear. A capsule that starts
    * touching or overlapping a collider reports it at distance 0 only while moving further into it;
    * moving away (or sliding along it) is not blocked, so a controller can always separate.
+   * `ignore` names one collider the sweep never sees (the crate an actor is carrying, which starts
+   * inside the capsule that carries it).
    */
   sweepCapsule(
     capsule: Capsule,
     feet: Vec3,
     direction: Vec3,
     maxDistance: number,
+    ignore?: BodyId,
   ): CollisionHit | undefined;
 
   /** Casts a ray from `origin` along unit `direction`; the nearest hit within `maxDistance`, if any. */

@@ -5,6 +5,9 @@ import {
   addPhysicsObject,
   addQuickSlots,
   inventoryOf,
+  PlayerClassComponent,
+  RapierCollisionWorld,
+  addProperties,
   quickSlotsOf,
   RapierPhysics,
   registerSceneComponents,
@@ -22,6 +25,7 @@ import {
   ItemWatch,
   prepareConsumables,
   prepareWorldItems,
+  startCarry,
   startConsumables,
   startWorldItems,
   worldItemDef,
@@ -198,5 +202,50 @@ describe('consumables in the game (mw-e17.6)', () => {
     const alone = testbed(false);
     startConsumables(alone.world, prepareConsumables(content, alone.items), undefined);
     expect(alone.world.query(WorldItemComponent).ids()).toHaveLength(1);
+  });
+});
+
+describe('carrying in the game (mw-e02.17)', () => {
+  it('lifts by the player class carry limit from content, 25 kg before a class is chosen', () => {
+    const { world, player, content } = testbed();
+    const physics = world.physics as RapierPhysics;
+    const strong = {
+      has: (_kind: string, id: string) => id === 'brute',
+      get: () => ({ carryLimitKg: 40 }),
+    };
+    const carry = startCarry(world, strong as never, new RapierCollisionWorld(physics));
+    const who = must(player);
+    const crate = world.spawn();
+    addProperties(world, crate, { liftable: true, weight: 30 });
+    addPhysicsObject(world, crate, {
+      shape: { kind: 'box', halfExtents: { x: 0.2, y: 0.2, z: 0.2 } },
+      position: { x: 0, y: 0.2, z: -1 },
+    });
+    world.step();
+    expect(carry.pickUp(who, crate)).toEqual({ ok: false, reason: 'too-heavy' });
+    world.register(PlayerClassComponent);
+    world.add(who, PlayerClassComponent, { classId: 'brute' });
+    world.step();
+    expect(carry.pickUp(who, crate)).toEqual({ ok: true });
+    for (const id of ['knight', 'archer', 'sorcerer', 'thief'] as const) {
+      expect(content.get('class', id).carryLimitKg).toBe(25);
+    }
+  });
+
+  it('a class the content does not know falls back to the default limit', () => {
+    const { world, player, content } = testbed();
+    const physics = world.physics as RapierPhysics;
+    const carry = startCarry(world, content, new RapierCollisionWorld(physics));
+    const who = must(player);
+    world.register(PlayerClassComponent);
+    world.add(who, PlayerClassComponent, { classId: 'nobody' });
+    const crate = world.spawn();
+    addProperties(world, crate, { liftable: true, weight: 10 });
+    addPhysicsObject(world, crate, {
+      shape: { kind: 'box', halfExtents: { x: 0.2, y: 0.2, z: 0.2 } },
+      position: { x: 0, y: 0.2, z: -1 },
+    });
+    world.step();
+    expect(carry.pickUp(who, crate)).toEqual({ ok: true });
   });
 });

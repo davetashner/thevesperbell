@@ -274,6 +274,29 @@ export function teleportPhysicsObject(
 }
 
 /**
+ * Gives physics object `entity` the linear velocity `velocity` (m/s) at once, keeping its spin: the
+ * impulse that changes its current velocity into it, so a thrown crate leaves at exactly the throw's
+ * speed whatever its mass. The body wakes.
+ * @throws Error when `entity` is not a physics object.
+ */
+export function setPhysicsObjectVelocity(
+  world: World<never>,
+  entity: EntityId,
+  velocity: Vec3,
+): void {
+  const object = world.get(entity, PhysicsObjectComponent);
+  if (object === undefined) throw new Error(`entity ${String(entity)} is not a physics object`);
+  const port = rigidBodiesOf(world);
+  const body = object.body as ColliderHandle;
+  const { linvel, mass } = port.motionOf(body);
+  port.applyImpulse(body, {
+    x: (velocity.x - linvel.x) * mass,
+    y: (velocity.y - linvel.y) * mass,
+    z: (velocity.z - linvel.z) * mass,
+  });
+}
+
+/**
  * Makes static collider `collider` (e.g. from `loadScene`) part of `entity`: impacts name the entity
  * and its material, and the collider takes the entity's friction and bounciness, now and whenever
  * they change. An entity may own several colliders; bind them between steps (during a step the

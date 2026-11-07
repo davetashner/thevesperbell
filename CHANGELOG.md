@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- You can pick up crates, bottles and other liftable objects with Interact, carry them in front of you (slower, and bodies slower still with no jumping), drop or set them down, or hold Throw to charge a throw with a preview arc; thrown objects hit, break and make noise.
 - The debug console can now manage your pack: `item.give <id> [count] [--stolen owner]`, `item.remove`, `item.list [category]`, `equip <id>` and `gold <n>` (a dev-console command set), with item ids completing on Tab and the three closest ids suggested for a typo.
 - The Forgotten brute swings its maul properly: a slow two-handed lift that hangs at the top before a crushing slam (and stays bent over the stuck maul, open to a punish), and a wide, low sweep it winds all the way round for and overextends on.
 - The Forgotten archer now draws its bow properly: it raises the bow, pulls the string back to its cheek, holds an aimed beat and looses (the arrow leaves on the snap back), and shoves with the bow's stave when you close in, instead of reusing the miner's thrust.

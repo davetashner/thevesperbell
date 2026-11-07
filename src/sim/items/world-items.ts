@@ -543,6 +543,11 @@ export interface WorldItemsInstallOptions<TInput> {
   readonly view?: (world: World<TInput>, actor: EntityId) => ItemHandlerView | undefined;
   /** This tick's drop and throw buttons for `actor`; defaults to the tick's ActionFrame's. */
   readonly input?: (inputs: readonly TInput[], actor: EntityId) => ItemButtons | undefined;
+  /**
+   * Whether `actor`'s hands are busy with something else this tick (a carried crate: its Drop and
+   * Throw buttons are the crate's, mw-e02.17), so the pack's drop and throw do nothing.
+   */
+  readonly busy?: (world: World<never>, actor: EntityId) => boolean;
 }
 
 /**
@@ -564,6 +569,7 @@ export function worldItemsSystem<TInput>(
     run({ world, inputs }) {
       const sim = world as unknown as World<never>; // world items never read inputs from the world
       world.query(InventoryComponent).forEach((actor) => {
+        if (options.busy?.(sim, actor) === true) return;
         const buttons = inputOf(inputs, actor);
         const thrown = buttons?.throw?.pressed === true;
         if (!thrown && buttons?.drop?.pressed !== true) return;

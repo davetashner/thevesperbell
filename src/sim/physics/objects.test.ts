@@ -32,6 +32,7 @@ import {
   PhysicsObjectComponent,
   removePhysicsObject,
   rigidBodiesOf,
+  setPhysicsObjectVelocity,
   teleportPhysicsObject,
   type PhysicsBudgetExceeded,
   type PhysicsImpact,
@@ -507,6 +508,22 @@ describe('bound colliders go with their entity (mw-e03.42)', () => {
     bindCollider(world, wall, level.add(box(v(0, 0, 0), v(1, 2, 1))));
     world.destroy(wall);
     expect([physics.count(), light.count(), level.count()]).toEqual([0, 0, 0]);
+  });
+});
+
+describe('launching a physics object (mw-e02.17)', () => {
+  it('gives the body exactly the velocity asked for, whatever its mass or current motion', () => {
+    const { world, physics } = setup();
+    const crate = spawnObject(world, v(0, 3, 0));
+    world.step();
+    setPhysicsObjectVelocity(world, crate, v(3, 4, 12));
+    const { linvel } = physics.motionOf(objectOf(world, crate).body as ColliderHandle);
+    expect(linvel.x).toBeCloseTo(3, 4);
+    expect(linvel.y).toBeCloseTo(4, 4);
+    expect(linvel.z).toBeCloseTo(12, 4);
+    expect(() => {
+      setPhysicsObjectVelocity(world, world.spawn(), v(1, 0, 0));
+    }).toThrow(Error);
   });
 });
 

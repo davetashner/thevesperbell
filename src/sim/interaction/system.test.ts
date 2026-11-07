@@ -15,6 +15,7 @@ import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import type { InteractableSpec, InteractorKit } from './affordance';
 import {
   addAffordanceGate,
+  addFocusFilter,
   addInteractable,
   addInteractor,
   addSceneInteractables,
@@ -252,6 +253,20 @@ describe('interaction system (mw-e02.5)', () => {
     expect(events.map((e) => e.verb)).toEqual(['search']);
     offA();
     expect(interactionPrompt(world, actor)).toMatchObject({ verb: 'unlock', available: true });
+  });
+
+  it('takes filtered objects out of focus until the filter is removed', () => {
+    const { world, actor } = setup();
+    const near = place(world, 1, 0);
+    const far = place(world, 2, 0);
+    const off = addFocusFilter(world, (_w, who, what) => who === actor && what === near);
+    addFocusFilter(world, () => false); // a second filter that excludes nothing
+    world.step([IDLE]);
+    expect(focusOf(world, actor)?.target).toBe(far);
+    off();
+    off(); // removing twice is harmless
+    world.step([IDLE]);
+    expect(focusOf(world, actor)?.target).toBe(near);
   });
 
   it('AC-5: releasing a 1.0 s hold at 0.8 s cancels it and fires nothing', () => {
