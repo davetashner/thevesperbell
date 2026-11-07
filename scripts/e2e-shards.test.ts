@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   assignShards,
+  averageDurations,
   durationsFromReport,
   fileIo,
   listShardSpecs,
@@ -197,6 +198,35 @@ describe('mw-e41.1 e2e shard CLI', () => {
     });
     expect(files['shards.json']).toMatch(/\n$/);
     expect(io.out).toEqual(['Wrote shards.json (1 specs).']);
+  });
+
+  it('AC-1: averages each spec over every report that ran it, across shards and runs', () => {
+    const report = (entries: [string, number][]): string =>
+      JSON.stringify({
+        suites: entries.map(([file, ms]) => ({
+          specs: [{ file, tests: [{ results: [{ duration: ms }] }] }],
+        })),
+      });
+    const files: Record<string, string> = {
+      'run1-shard1.json': report([['a.spec.ts', 10_000]]),
+      'run1-shard2.json': report([['b.spec.ts', 40_000]]),
+      'run2-shard1.json': report([
+        ['a.spec.ts', 20_000],
+        ['b.spec.ts', 60_000],
+      ]),
+    };
+    const io = fakeIo(files);
+    expect(
+      main(['regenerate', 'run1-shard1.json', 'run1-shard2.json', 'run2-shard1.json'], io),
+    ).toBe(0);
+    expect(JSON.parse(files['shards.json'] ?? '{}')).toMatchObject({
+      durations: { 'a.spec.ts': 15, 'b.spec.ts': 50 },
+    });
+    expect(io.out).toEqual(['Wrote shards.json (2 specs).']);
+  });
+
+  it('averageDurations returns nothing for no reports', () => {
+    expect(averageDurations([])).toEqual({});
   });
 
   it('prints usage for a missing report path or an unknown command', () => {
