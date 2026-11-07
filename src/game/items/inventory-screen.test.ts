@@ -540,7 +540,7 @@ describe('inventory view models', () => {
       });
       const g = game({ scrolls, ...(aim !== undefined && { scrollAim: aim }) });
       g.give('scroll-of-ember', 2);
-      g.give('scroll-of-mage-hand');
+      g.give('scroll-of-firebolt');
       g.inventoryUi.toggle();
       const read = (name: string): void => {
         const item = g.ui.top?.element.querySelector<HTMLElement>(
@@ -571,7 +571,7 @@ describe('inventory view models', () => {
       ).model(t.world, must(t.player));
       const byName = (n: string) => model.items.find((i) => i.name === n);
       expect(byName('Scroll of Ember')?.actions).toContain('read');
-      expect(byName('Scroll of Mage Hand')?.actions).not.toContain('read');
+      expect(byName('Scroll of Firebolt')?.actions).not.toContain('read');
       t.read('scroll-of-ember');
       expect(aims).toEqual(['ember']);
       expect(t.requests).toEqual([
@@ -598,7 +598,7 @@ describe('inventory view models', () => {
       const idOf = (def: string): number => pack.find((i) => i.defId === def)?.instanceId ?? 0;
       expect(views.scrollSpell(t.world, must(t.player), idOf('scroll-of-ember'))).toBe('ember');
       expect(
-        views.scrollSpell(t.world, must(t.player), idOf('scroll-of-mage-hand')),
+        views.scrollSpell(t.world, must(t.player), idOf('scroll-of-firebolt')),
       ).toBeUndefined();
       expect(views.scrollSpell(t.world, must(t.player), 999)).toBeUndefined();
       t.give('healing-draught');

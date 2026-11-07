@@ -1,0 +1,17 @@
+{
+  "id": "fixture-grip",
+  "name": "Fixture Grip",
+  "school": "arcane",
+  "tier": 1,
+  "next": [],
+  "cost": { "mana": 6 },
+  "castTime": 0.4,
+  "channel": { "interval": 0.1, "manaPerSecond": 2, "maxDuration": 60 },
+  "cooldown": 1.5,
+  "delivery": { "kind": "tether", "range": 15, "maxWeight": 25 },
+  "effects": [{ "op": "noise", "phase": "release", "loudness": 25 }],
+  "tags": ["control"],
+  "vfxCue": "vfx-spell-arcane-fixture-grip",
+  "sfxCue": "sfx-spell-arcane-fixture-grip-cast",
+  "flags": { "tooUseful": false, "castWhileMoving": true }
+}

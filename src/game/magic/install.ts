@@ -6,7 +6,7 @@
 // caller installs this from `installGamePhysics`'s `beforeStimuli` hook):
 //   spells (the pipeline and its `cast` command) → learning → hotbar (mw-e06.16) → mana → casting (cast phase, cooldowns,
 //   `cancel-cast`) → projectiles → volumes → emission (light and noise; after projectiles so a light
-//   reads this tick's position).
+//   reads this tick's position) → tether (Mage Hand, mw-e08.10).
 //
 // Spells are the game content's (`spell`), looked up by id. The player gets a mana pool and nothing
 // else: what it can cast is what it has learned (`learn-spell`, from the console until books and
@@ -27,6 +27,7 @@ import {
   type SpellLearner,
   installSpellProjectiles,
   installSpells,
+  installSpellTether,
   installSpellVolumes,
   type CastController,
   type CollisionWorld,
@@ -34,7 +35,9 @@ import {
   type EntityId,
   type InvulnerabilityRule,
   type SpellLookup,
+  type SightWorld,
   type SpellPipeline,
+  type TetherController,
   type Vec3,
   type World,
 } from '@sim/index';
@@ -52,12 +55,16 @@ export interface GameMagicOptions {
   readonly water?: (point: Vec3) => boolean;
   /** How the console's `learn-spell` teaches (see `debugSpellLearner`). */
   readonly learn: SpellLearner;
+  /** Solid colliders that block a tether's line of sight (RapierSightWorld); omitted: none block. */
+  readonly sight?: SightWorld;
 }
 
 /** What the game keeps of the installed magic. */
 export interface GameMagic {
   readonly pipeline: SpellPipeline;
   readonly casting: CastController;
+  /** Mage Hand's tether: what the caster holds, use and release (mw-e08.10). */
+  readonly tether: TetherController;
   readonly spells: SpellLookup;
   /** Every spell id, sorted (the console completes from it). */
   readonly spellIds: readonly string[];
@@ -82,7 +89,11 @@ export function installGameMagic<TInput>(
   });
   installSpellVolumes(world, pipeline);
   installSpellEmission(world, pipeline);
-  return { pipeline, casting, spells, spellIds: [...byId.keys()].sort() };
+  const tether = installSpellTether(world, pipeline, {
+    casting,
+    ...(options.sight !== undefined && { sight: options.sight }),
+  });
+  return { pipeline, casting, tether, spells, spellIds: [...byId.keys()].sort() };
 }
 
 /**

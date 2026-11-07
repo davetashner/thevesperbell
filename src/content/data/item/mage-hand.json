@@ -1,0 +1,28 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "mage-hand",
+  "category": "book",
+  "name": "Mage Hand: The Borrowed Reach",
+  "description": "A narrow handbook with a glove-shaped stain on the cover. The first exercise is to lift a teacup from across the room, and the second is to do it without anyone noticing.",
+  "notes": "The tome that teaches the Mage Hand spell (mw-e08.10). Item id equals the spell id so the cover art id is ui-book-cover-mage-hand. Licensed arcane magic, common. Study time is 30 minutes; the scroll of the same spell is scroll-of-mage-hand. Base value 140 sits in the economy tome band, a little above Ember: it is the more useful of the two first-step spells (tooUseful, constitution section 4).",
+  "icon": "icon-item-mage-hand-01",
+  "value": 140,
+  "weightClass": "light",
+  "book": {
+    "title": "Mage Hand: The Borrowed Reach",
+    "author": "A. Pell",
+    "kind": "tome",
+    "school": "arcane",
+    "teaches": { "kind": "spell", "spell": "mage-hand" },
+    "pages": [
+      { "textKey": "book.mage-hand.page-1" },
+      { "textKey": "book.mage-hand.page-2" },
+      { "textKey": "book.mage-hand.page-3" }
+    ],
+    "language": "common",
+    "comprehensionDifficulty": 0.15,
+    "studyMinutes": 30,
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}
