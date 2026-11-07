@@ -143,6 +143,7 @@ const DELIVERY_KINDS: readonly string[] = [
   'aoe',
   'beam',
   'summonPoint',
+  'tether',
 ];
 
 /** The registered delivery handlers, by delivery kind. */

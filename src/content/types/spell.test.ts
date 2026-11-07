@@ -133,7 +133,7 @@ describe('spell schema (mw-e06.1)', () => {
       expect.stringMatching(/^effects\.0\.op: missing effect op; known: damage/),
     ]);
     expect(issues({ ...minimal, delivery: { kind: 'nope' } })).toEqual([
-      'delivery.kind: unknown delivery kind "nope"; known: self, touch, projectile, aoe, beam, summonPoint',
+      'delivery.kind: unknown delivery kind "nope"; known: self, touch, projectile, aoe, beam, summonPoint, tether',
     ]);
     expect(issues(withEffect('status'))).toEqual([
       'effects.0: Invalid input: expected object, received string',

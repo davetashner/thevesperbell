@@ -81,6 +81,7 @@ export function targetingMode(spell: SpellEntry): TargetingMode {
   switch (delivery.kind) {
     case 'projectile':
     case 'beam':
+    case 'tether':
       return 'reticle';
     case 'summonPoint':
       return 'ground';
@@ -97,6 +98,8 @@ export function targetingMode(spell: SpellEntry): TargetingMode {
 export function spellRange(spell: SpellEntry): number {
   const { delivery } = spell;
   switch (delivery.kind) {
+    case 'tether':
+      return delivery.range;
     case 'projectile':
       return delivery.maxRange;
     case 'beam':

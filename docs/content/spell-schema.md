@@ -132,6 +132,13 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `delivery.kind` | `"summonPoint"` | required |  |
 | `delivery.range` | number > 0 | required | Farthest point from the caster it can be placed at, metres. |
 | `delivery.lineOfSight` | boolean | `true` | The point must be visible from the caster. |
+| `delivery.kind` | `"tether"` | required |  |
+| `delivery.range` | number > 0 | required | Farthest the tethered object can be from the caster, metres. |
+| `delivery.maxWeight` | number > 0 | required | Heaviest movable object it lifts, kg (the weight property). |
+| `delivery.speed` | number > 0 | `12` | Fastest a held object follows the aim point, metres per second. |
+| `delivery.lineOfSightGrace` | number ≥ 0 | `0.5` | Seconds line of sight may stay broken before the tether lets go. |
+| `delivery.maxHold` | number > 0 | `60` | Longest one tether holds, seconds (a free cast has no channel to end it). |
+| `delivery.pickRadius` | number > 0 | `0.75` | With no chosen target: how near the aim point an object must be, metres. |
 | `effects` | list of object (at least 1) | required | Effect ops, applied in order to what it reaches. |
 | `effects[].amounts` | map of `"slash"` \| `"pierce"` \| `"blunt"` \| `"fire"` \| `"frost"` \| `"shock"` \| `"arcane"` \| `"poison"` → number ≥ 0 | required | Damage points per damage type (before resistances); unlisted types deal 0. |
 | `effects[].poiseDamage` | number ≥ 0 | `0` | Poise damage in points. |
