@@ -485,6 +485,18 @@ export {
   type MaterialProperties,
 } from './types/material.ts';
 export {
+  MAX_STATUS_STACK_CAP,
+  STATUS_BREAK_COMPARISONS,
+  STATUS_MODIFIER_STATS,
+  STATUS_STACK_RULES,
+  statusSchema,
+  type StatusDef,
+  type StatusDefInput,
+  type StatusEntry,
+  type StatusModifierStat,
+  type StatusStackRule,
+} from './types/status.ts';
+export {
   HIT_STOP_ID,
   HIT_STOP_TIERS,
   MAX_HIT_STOP_TICKS,

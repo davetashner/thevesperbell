@@ -1,0 +1,9 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "levitating",
+  "name": "Levitating",
+  "description": "Lifted off the ground; gravity does not hold you.",
+  "stack": { "rule": "refresh" },
+  "tags": ["magical", "buff"],
+  "modifiers": [{ "stat": "gravityScale", "mode": "multiply", "value": 0 }]
+}

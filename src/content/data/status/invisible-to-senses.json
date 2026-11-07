@@ -1,0 +1,9 @@
+{
+  "$schema": "../status.schema.json",
+  "id": "invisible-to-senses",
+  "name": "Unseen",
+  "description": "Hidden from sight; the AI perception hook reads this status.",
+  "stack": { "rule": "refresh" },
+  "tags": ["magical", "buff"],
+  "modifiers": [{ "stat": "visibility", "mode": "multiply", "value": 0 }]
+}

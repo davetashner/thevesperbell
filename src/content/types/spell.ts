@@ -172,7 +172,7 @@ const areaShapeSchema = z
 
 const PROPERTY_KEYS: readonly string[] = Object.keys(worldPropertiesSchema.shape);
 
-const propertyKey = z
+export const propertyKey = z
   .string()
   .superRefine((key, ctx) => {
     if (PROPERTY_KEYS.includes(key)) return;
@@ -232,7 +232,9 @@ const opSchemas = [
   z
     .strictObject({
       op: z.literal('status'),
-      status: contentId.describe('Status id, e.g. "rooted" (status definitions: e06.9).'),
+      status: contentId.describe(
+        'Status id, e.g. "rooted" (a status content entry; checked at load, e06.9).',
+      ),
       duration: positiveSeconds.describe('Seconds the status lasts.'),
       stacks: z.int().min(1).max(99).default(1).describe('Stacks applied.'),
     })

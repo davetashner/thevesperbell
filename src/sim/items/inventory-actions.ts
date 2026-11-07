@@ -29,6 +29,7 @@ import type { ScrollRefusal, ScrollRules } from '../magic/scroll';
 import type { StudyRefusal, StudyRules } from '../magic/study';
 import type { Vec3 } from '../stimulus/shapes';
 import { QUICK_SLOT_COUNT, quickSlotsOf, type Consumables, type UseRefusal } from './consumables';
+import { isItemDebugCommand, runItemDebugCommand, type ItemDebugCommand } from './debug-commands';
 import { giveItems, isGiveItemCommand, type GiveItemCommand, type ItemGiver } from './give-command';
 import { handlerView, type DropRefusal, type ItemHandlerView } from './world-items';
 
@@ -189,6 +190,12 @@ export class InventoryActions {
     if (this.#giver !== undefined) giveItems(world, command, this.#giver);
   }
 
+  /** Carries out an item debug command (remove, equip, gold), when a giver is installed. */
+  debug(world: World<never>, command: ItemDebugCommand): void {
+    if (this.#giver !== undefined)
+      runItemDebugCommand(world, command, this.#giver, this.#equipment);
+  }
+
   #apply(
     world: World<never>,
     actor: EntityId,
@@ -298,6 +305,10 @@ export function inventoryActionsSystem<TInput>(actions: InventoryActions): Syste
       for (const input of inputs as readonly unknown[]) {
         if (isGiveItemCommand(input)) {
           actions.give(sim, input);
+          continue;
+        }
+        if (isItemDebugCommand(input)) {
+          actions.debug(sim, input);
           continue;
         }
         if (!isInventoryActionCommand(input)) continue;

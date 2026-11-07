@@ -33,6 +33,8 @@ export interface AppliedStatus {
   /** First tick the status is gone. */
   readonly expiresTick: number;
   readonly source: EntityId;
+  /** Tick the next tick op is due; present only for a status whose definition ticks. */
+  readonly nextTickAt?: number;
 }
 
 /**
