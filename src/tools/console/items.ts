@@ -66,10 +66,9 @@ function give([id, ...rest]: [string, ...string[]], host: ConsoleHost): string {
   const unexpected = Object.keys(options).filter((name) => name !== 'stolen');
   const counted = z.tuple([count.optional()]).safeParse(words);
   if (unexpected.length > 0 || !counted.success) {
-    const problem =
-      unexpected.length > 0
-        ? `unknown option --${unexpected.join(', --')}`
-        : `arg 2: ${(counted.error?.issues ?? []).map((i) => i.message).join('; ')}`;
+    const problem = counted.success
+      ? `unknown option --${unexpected.join(', --')}`
+      : `arg 2: ${counted.error.issues.map((i) => i.message).join('; ')}`;
     throw new ConsoleError([
       `item.give: invalid arguments: ${problem}`,
       `usage: item.give ${GIVE_USAGE}`,

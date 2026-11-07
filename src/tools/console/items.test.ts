@@ -24,7 +24,9 @@ const DEFS = [
 const IDS = ['healing-draught', 'healing-tonic', 'iron-sword', 'silver-ring'];
 
 /** A console over a real inventory, with queued commands applied by `tick`. */
-function session(options: { withPlayer?: boolean; catalogue?: boolean } = {}) {
+function session(
+  options: { withPlayer?: boolean; catalogue?: boolean; categories?: boolean; ids?: string[] } = {},
+) {
   const world = new World<never>({ seed: 1 });
   const rules = new InventoryRules(DEFS);
   const giver = { inventory: rules, known: (id: string) => IDS.includes(id) };
@@ -39,10 +41,12 @@ function session(options: { withPlayer?: boolean; catalogue?: boolean } = {}) {
     submit: (command) => queue.push(command),
     player: () => player,
     spawnables: [],
-    ...(options.catalogue !== false && { items: IDS }),
-    itemCategories: Object.fromEntries(
-      DEFS.map((d: { id: string; category: string }) => [d.id, d.category]),
-    ),
+    ...(options.catalogue !== false && { items: options.ids ?? IDS }),
+    ...(options.categories !== false && {
+      itemCategories: Object.fromEntries(
+        DEFS.map((d: { id: string; category: string }) => [d.id, d.category]),
+      ),
+    }),
     bookmarks: () => new Map(),
     scenes: [],
     loadScene: () => undefined,
@@ -201,5 +205,34 @@ describe('item console commands', () => {
     expect(session({ withPlayer: false }).registry.execute('item.list').lines).toEqual([
       'no player in this scene',
     ]);
+  });
+
+  it('covers hosts without a catalogue, categories, a player or a pack', () => {
+    const empty = session({ ids: [] });
+    expect(empty.registry.execute('item.give anything').lines).toEqual(['unknown item "anything"']);
+    const bare = session({ catalogue: false, categories: false });
+    expect(bare.registry.complete('item.give ').options).toEqual([]);
+    expect(bare.registry.complete('item.remove ').options).toEqual([]);
+    expect(bare.registry.complete('equip ').options).toEqual([]);
+    expect(bare.registry.complete('item.list ').options).toEqual([]);
+    expect(bare.registry.execute('item.list sword').lines[0]).toBe(
+      'unknown category "sword"; none known',
+    );
+    const noPlayer = session({ withPlayer: false });
+    expect(noPlayer.registry.execute('gold 5').lines).toEqual(['no player in this scene']);
+    const host = (noPlayer.registry as unknown as { host: ConsoleHost }).host;
+    expect(host.pack?.()).toBeUndefined();
+  });
+
+  it('counts only the named item when several are held, and gold prints no count without a pack', () => {
+    const s = session();
+    s.registry.execute('item.give healing-draught 2');
+    s.registry.execute('item.give healing-tonic 5');
+    s.tick();
+    expect(s.registry.execute('item.remove healing-draught').lines).toEqual([
+      'removing 1 × healing-draught (now 1)',
+    ]);
+    (s.registry as unknown as { host: { pack?: unknown } }).host.pack = undefined;
+    expect(s.registry.execute('gold 5').lines).toEqual(['adding 5 gold']);
   });
 });
