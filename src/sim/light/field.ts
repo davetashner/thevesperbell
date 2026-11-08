@@ -36,7 +36,7 @@ import type { LightEmission } from '../properties/spec';
 import { PlacementComponent, type Placement } from '../stimulus/placement';
 import { normalize, type Vec3 } from '../stimulus/shapes';
 import type { StimulusResolution } from '../stimulus/stimulus';
-import { LightConeComponent, LightOccluderComponent } from './components';
+import { LightConeComponent, LightOccluderComponent, LightSourceComponent } from './components';
 import {
   boxOccluder,
   segmentHits,
@@ -824,11 +824,20 @@ export class LightField {
 
     const lit = new Map<EntityId, { at: Placement; intensity: number; radius: number }>();
     world.query(PlacementComponent, WorldProperties.lightEmitter).forEach((entity, at, light) => {
+      // A light source prefab (mw-e03.16) shines only while it burns: handled below.
+      if (world.has(entity, LightSourceComponent)) return;
       lit.set(entity, { at, intensity: light.intensity, radius: light.radius });
     });
     const fire = this.config.fireLight;
     world.query(PlacementComponent, WorldProperties.burning).forEach((entity, at, burning) => {
       if (!burning) return;
+      if (world.has(entity, LightSourceComponent)) {
+        const emission = world.get(entity, WorldProperties.lightEmitter);
+        if (emission !== undefined) {
+          lit.set(entity, { at, intensity: emission.intensity, radius: emission.radius });
+          return;
+        }
+      }
       const own = lit.get(entity);
       lit.set(entity, {
         at,

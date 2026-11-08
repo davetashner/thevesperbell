@@ -17,6 +17,7 @@ import {
   World,
   type EntityId,
   type KitLookup,
+  lightComponents,
 } from '@sim/index';
 import {
   doorLeafLooks,
@@ -42,7 +43,7 @@ function room(
   const world = installStimuli(
     registerWorldProperties(registerSceneComponents(new World<never>({ seed: 9 }))),
   );
-  world.register(...INTERACTION_COMPONENTS);
+  world.register(...INTERACTION_COMPONENTS, ...lightComponents);
   world.addSystem(stimulusSystem());
   if (preSignals) {
     installSignals(world);
@@ -165,6 +166,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
           plates: [],
           impactSwitches: [],
           ropes: [],
+          lights: [],
           graphs: [],
         },
         {
@@ -182,6 +184,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
       plates: [],
       impactSwitches: [],
       ropes: [],
+      lights: [],
       graphs: [],
     });
     expect(watch.readout().switches).toEqual({ [String(spawn('east-button'))]: 0 });

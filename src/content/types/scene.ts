@@ -188,6 +188,23 @@ export const sceneRopeSchema = z.strictObject({
   radius: z.number().positive().optional().describe('Half its thickness, metres (default 0.05).'),
 });
 
+/**
+ * Makes a spawn a light source (mw-e03.16): flammable fuel plus a light that shines only while it
+ * burns, which water, wind, a hand smother or running out of fuel put out and heat relights. The
+ * prefab sets fuel, ignition point, light and wind resistance; the spawn's own `properties` do not
+ * override them.
+ */
+export const sceneLightSourceSchema = z.strictObject({
+  variant: z
+    .enum(['candle', 'torch', 'sconce', 'brazier', 'lantern', 'fireplace'])
+    .describe('Prefab: its fuel, light, ignition point and how much wind it takes to blow it out.'),
+  unlit: z.boolean().optional().describe('Starts dark; heat lights it (default false).'),
+  infiniteFuel: z
+    .boolean()
+    .optional()
+    .describe('Never runs out of fuel while lit (default false).'),
+});
+
 export const sceneImpactSwitchSchema = z.strictObject({
   variant: z
     .enum(['bullseye', 'bell', 'crystal', 'counterweight', 'target'])
@@ -523,6 +540,9 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls.',
     ),
+  lightSource: sceneLightSourceSchema
+    .optional()
+    .describe('Makes the spawned entity a light source that can be put out and relit (mw-e03.16).'),
   impactSwitch: sceneImpactSwitchSchema
     .optional()
     .describe(
@@ -1047,6 +1067,7 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
       ['switch', 'a switch'],
       ['plate', 'a plate'],
       ['impactSwitch', 'an impact switch'],
+      ['lightSource', 'a light source'],
       ['item', 'an item'],
       ['creature', 'a creature'],
     ] as const;

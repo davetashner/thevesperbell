@@ -7,6 +7,7 @@ import {
   InteractableComponent,
   INTERACTION_COMPONENTS,
 } from '../interaction/system';
+import { LightSourceComponent, lightComponents } from '../light/components';
 import { InMemoryColliderSink } from '../physics/static-colliders';
 import { readProperty, registerWorldProperties } from '../properties/components';
 import type { MaterialPresets } from '../properties/materials';
@@ -135,6 +136,20 @@ const SCENE = {
         loudness: null,
       },
     },
+    {
+      id: 'wall-torch',
+      at: [3, 1.5, 8],
+      yaw: 0,
+      tags: [],
+      lightSource: { variant: 'torch', unlit: true },
+    },
+    {
+      id: 'hearth',
+      at: [-3, 0.5, 8],
+      yaw: 0,
+      tags: [],
+      lightSource: { variant: 'brazier', infiniteFuel: true },
+    },
   ],
   signals: [{ graph: { id: 'gate' }, bindings: { 'gate-lever': 'lever' } }],
 } as unknown as SceneSpec;
@@ -151,6 +166,7 @@ function setup(interaction = true) {
   const world = installSignals(
     installStimuli(registerWorldProperties(registerSceneComponents(new World<never>({ seed: 4 })))),
   );
+  world.register(...lightComponents);
   if (interaction) world.register(...INTERACTION_COMPONENTS);
   world.addSystem(stimulusSystem()).addSystem(signalSystem());
   installMechanisms(world);
@@ -231,6 +247,22 @@ describe('scene mechanisms (mw-e03.18)', () => {
       minWeight: 10,
       origin: { x: 7, y: 0, z: 5 },
     });
+  });
+
+  it('makes light source spawns from their prefab with the designer flags (mw-e03.16)', () => {
+    const { world, loaded } = setup();
+    const made = addSceneMechanisms(world, loaded, OPTIONS);
+    const [torch, hearth] = loaded.spawns
+      .filter(({ spawn }) => spawn.lightSource !== undefined)
+      .map(({ entity }) => entity);
+    expect(made.lights).toEqual([torch, hearth]);
+    expect(readProperty(world, torch as number, 'burning')).toBe(false);
+    expect(world.get(torch as number, LightSourceComponent)?.infiniteFuel).toBe(false);
+    expect(readProperty(world, hearth as number, 'burning')).toBe(true);
+    expect(world.get(hearth as number, LightSourceComponent)?.infiniteFuel).toBe(true);
+    expect(world.get(hearth as number, InteractableComponent)?.affordances[0]?.verb).toBe(
+      'extinguish',
+    );
   });
 
   it('makes impact switch spawns from their prefab with the scene overrides (mw-e03.20)', () => {

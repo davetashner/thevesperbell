@@ -11,7 +11,7 @@ import {
 describe('world property spec', () => {
   it('is a closed, versioned set: changing the keys means bumping the version', () => {
     // Update both together; a save migration (e30) keys off WORLD_PROPERTIES_VERSION.
-    expect(WORLD_PROPERTIES_VERSION).toBe(4);
+    expect(WORLD_PROPERTIES_VERSION).toBe(5);
     expect(WORLD_PROPERTY_KEYS).toEqual([
       'bashable',
       'breakable',
@@ -63,6 +63,7 @@ describe('world property spec', () => {
       'waterSurface',
       'weight',
       'wetness',
+      'windResistance',
     ]);
     expect(Object.isFrozen(WORLD_PROPERTY_KEYS)).toBe(true);
   });
@@ -165,6 +166,7 @@ describe('world property spec', () => {
       'shootable',
       'chargeActivated',
       'lightActivated',
+      'windResistance',
     ] as const) {
       const spec = WORLD_PROPERTY_SPECS[key];
       expect([key, spec.default]).toEqual([key, spec.max]);

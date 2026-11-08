@@ -13,6 +13,7 @@ import type { RampRise } from '../character/greybox';
 import type { CreatureLeash } from '../creatures/components';
 import type { InteractableSpec } from '../interaction/affordance';
 import type { LightEnvironment } from '../light/field';
+import type { LightSourceVariant } from '../light/sources';
 import type { DoorHinge, DoorSwing, SwitchKind } from '../mechanisms/components';
 import type {
   ImpactDamageType,
@@ -127,6 +128,13 @@ export interface ScenePlateSpec {
   readonly width?: number | undefined;
   readonly depth?: number | undefined;
   readonly hidden?: boolean | undefined;
+}
+
+/** A light source spawn (mw-e03.16): its prefab and the designer flags. */
+export interface SceneLightSourceSpec {
+  readonly variant: LightSourceVariant;
+  readonly unlit?: boolean | undefined;
+  readonly infiniteFuel?: boolean | undefined;
 }
 
 /** An impact switch spawn (mw-e03.20): its prefab and what it overrides. */
@@ -280,6 +288,8 @@ export interface SceneSpawnSpec {
   readonly switch?: SceneSwitchSpec | undefined;
   /** Makes the spawned entity a pressure plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec | undefined;
+  /** Makes the spawned entity a light source (mw-e03.16). */
+  readonly lightSource?: SceneLightSourceSpec | undefined;
   /** Makes the spawned entity an impact switch (mw-e03.20). */
   readonly impactSwitch?: SceneImpactSwitchSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
@@ -443,6 +453,8 @@ export interface SceneSpawnPlacement {
   readonly switch?: SceneSwitchSpec;
   /** Its pressure plate data, when it is a plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec;
+  /** Its light source data, when it is one (mw-e03.16). */
+  readonly lightSource?: SceneLightSourceSpec;
   /** Its impact switch data, when it is one (mw-e03.20). */
   readonly impactSwitch?: SceneImpactSwitchSpec;
   /** Its container data, when it is a container (mw-e18.3). */
@@ -790,6 +802,9 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
       ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
       ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
       ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
+      ...(spawn.lightSource !== undefined && {
+        lightSource: Object.freeze({ ...spawn.lightSource }),
+      }),
       ...(spawn.impactSwitch !== undefined && { impactSwitch: impactSwitchOf(spawn.impactSwitch) }),
       ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
       ...(spawn.rope !== undefined && {

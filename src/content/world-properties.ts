@@ -117,6 +117,10 @@ export const worldPropertiesSchema = z
       liquid: flag('A liquid: it pours, puddles and can have a water surface.'),
       flammableGas: flag('A gas that ignites (flares or explodes) when fire reaches it.'),
       extinguishable: flag('A fire or light source that water, force or an interaction puts out.'),
+      windResistance: threshold(
+        1_000_000,
+        'Force of one gust, blast or kick that blows its flame out, N·s.',
+      ),
       waterSurface: flag(
         'Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material).',
       ),

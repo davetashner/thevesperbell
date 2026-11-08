@@ -52,6 +52,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `worldProperties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
 | `worldProperties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `worldProperties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
+| `worldProperties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
 | `worldProperties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `worldProperties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `worldProperties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
@@ -125,6 +126,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `use[].properties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
 | `use[].properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `use[].properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
+| `use[].properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
 | `use[].properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `use[].properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `use[].properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |

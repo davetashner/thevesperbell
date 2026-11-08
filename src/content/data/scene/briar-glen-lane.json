@@ -601,11 +601,7 @@
       "id": "watch-brazier",
       "at": [-5.5, 0.5, 2.25],
       "tags": ["brazier", "hearth"],
-      "properties": {
-        "flammable": true,
-        "burning": true,
-        "fuel": 86400
-      }
+      "lightSource": { "variant": "brazier", "infiniteFuel": true }
     },
     {
       "id": "watch-banner",

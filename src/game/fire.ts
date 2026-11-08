@@ -14,6 +14,7 @@ import {
   elementRulesSystem,
   fireRules,
   installElementField,
+  LightSourceComponent,
   type World,
 } from '@sim/index';
 
@@ -28,7 +29,11 @@ export function installGameFire<TInput>(
     .addSystem(
       elementRulesSystem(
         new ElementRuleSet(
-          fireRules({ presets: materialPresets(materials), burnt: burntMaterials(materials) }),
+          fireRules({
+            presets: materialPresets(materials),
+            burnt: burntMaterials(materials),
+            keepWhenSpent: (world, entity) => world.has(entity, LightSourceComponent),
+          }),
         ),
       ),
     )
