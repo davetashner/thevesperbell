@@ -1,0 +1,28 @@
+{
+  "id": "vfx-charge-burst",
+  "notes": "Charge-ready burst (mw-e29.6): a ring of bright motes thrown out from the weapon socket the tick a held heavy reaches full charge. Spawned by the trail controller (src/game/vfx/trail-controller.ts) on ChargeReady; skipped under reduced motion.",
+  "priority": 60,
+  "duration": 0.45,
+  "emitters": [
+    {
+      "id": "burst",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "bursts": [{ "at": 0, "count": 22 }],
+      "lifetime": { "min": 0.25, "max": 0.45 },
+      "speed": { "min": 1.5, "max": 3.5 },
+      "coneDeg": 180,
+      "gravity": 0,
+      "drag": 3,
+      "size": [
+        { "t": 0, "v": 0.09 },
+        { "t": 1, "v": 0.01 }
+      ],
+      "color": [
+        { "t": 0, "color": "#FFFFFF" },
+        { "t": 0.4, "color": "#FFE08A" },
+        { "t": 1, "color": "#FF9A3C" }
+      ]
+    }
+  ]
+}

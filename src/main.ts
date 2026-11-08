@@ -222,7 +222,14 @@ import { createGameSaveRegistry } from '@game/save/sections';
 import { SaveSlots } from '@game/save/slots/index';
 import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
-import { DamageVignette, vfxTextureManifest, vfxTextureUrls, VfxSystem } from '@game/vfx/index';
+import {
+  DamageVignette,
+  SwingTrails,
+  trailTints,
+  vfxTextureManifest,
+  vfxTextureUrls,
+  VfxSystem,
+} from '@game/vfx/index';
 import { createBolt, createGroundMarker, disposeBolt } from '@render/magic/index';
 import { createRenderBootstrap } from '@render/bootstrap/index';
 import { createLeftover, disposeLeftover } from '@render/breakables/index';
@@ -253,6 +260,7 @@ import { AnimationController, compileGraph } from '@render/animation/index';
 import { createPlayerBody, loadKnight, OcclusionFade, projectToNdc } from '@render/player/index';
 import { anyHiddenByBody, CameraShake } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
+import { createTrailRenderer } from '@render/vfx/trails';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
   addCapabilities,
@@ -839,6 +847,12 @@ function startRenderer(
     const vfxView = createVfxRenderer(view.scene, {
       textureUrl: vfxTextureUrls(vfxTextureManifest()),
     });
+    // Weapon swing trails and the charge glow (mw-e29.6): ribbons along the swept hit volume during
+    // a move's active frames, tinted by its dominant damage type, and a glow that steps up while a
+    // heavy is held. Created with the player; focused arrows get trails once the focus rule
+    // (mw-e05.4) can say which are focused.
+    let swingTrails: SwingTrails | undefined;
+    const trailView = createTrailRenderer(view.scene);
 
     // Audio (mw-e28.2): the cue sheets turn sim events (hits, stagger, deaths, physics impacts) into
     // sounds from the sound manifest — the synthesised placeholder pack until final SFX land. The
@@ -1141,6 +1155,10 @@ function startRenderer(
         vfxDemo?.update(elapsedMs / 1000);
         vfx.update(elapsedMs / 1000, camera.position);
         vfxView.draw(vfx.batches, vfx.markers);
+        if (swingTrails !== undefined) {
+          swingTrails.frame();
+          trailView.draw(swingTrails);
+        }
         showVfxStats(elapsedMs);
         audio.update(listenerPose(camera.position, camera.quaternion));
         publishAudio();
@@ -1363,6 +1381,17 @@ function startRenderer(
           },
         });
         focus.entity = player.entity; // bodies near the player never get forced to sleep
+        swingTrails = new SwingTrails(
+          {
+            world,
+            moves: combat.moves,
+            tracks: combat.tracks,
+            tints: trailTints(),
+            vfx,
+            reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+          },
+          [player.entity],
+        );
         // The player's capabilities (mw-e19.2). A new game grants the chosen class's own (mw-e19.5,
         // below), as does one started from the title; a scene booted straight from its URL has no
         // class, so ledge hangs come as a class grant.
