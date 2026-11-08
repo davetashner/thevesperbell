@@ -301,6 +301,28 @@ describe('AdaptiveMusic (mw-e28.11)', () => {
     expect(t.music.state.layer).toBe('combat');
   });
 
+  it('mw-03t AC-1, AC-3: a layer with a start offset begins there every time and still loops from the loop start', async () => {
+    const combat = { cue: 'music-t-combat', loop: true, startOffsetS: 1.75 };
+    const t = setup({
+      set: { ...SEPARATE, layers: { ...SEPARATE.layers, combat } },
+      sidecar: (url) =>
+        url.includes('music-t-combat')
+          ? '{ "bpm": 90, "beatsPerBar": 4, "loopStartSample": 0, "loopEndSample": 3072000 }'
+          : undefined,
+    });
+    await t.loaded();
+    t.alert(t.creature, 'combat');
+    await t.runTo(3);
+    t.alert(t.creature, 'unaware');
+    await t.runTo(25);
+    t.alert(t.creature, 'combat');
+    await t.runTo(30);
+    const fights = t.ctx.sources.filter((s) => s.loop && s.startedAt !== undefined);
+    expect(fights.map((s) => s.startOffset)).toEqual([1.75, 1.75]);
+    expect(fights.map((s) => s.loopStart)).toEqual([0, 0]);
+    expect(t.sourceFor(0).startOffset).toBe(0);
+  });
+
   it('the shorter bar of a 1:2 tempo pair sets the grid, counted from the playing track', async () => {
     const t = setup({
       set: {
@@ -640,6 +662,8 @@ describe('music sets', () => {
     expect(set?.lockstep).toBe(false);
     expect(Object.keys(set?.layers ?? {})).toEqual(['explore', 'combat']);
     expect(set?.layers.combat?.bpm).toBe(128);
+    expect(set?.layers.combat?.startOffsetS).toBe(1.75); // mw-03t AC-2
+    expect(set?.layers.explore?.startOffsetS).toBeUndefined();
     expect(musicSetFor('nowhere')).toBeUndefined();
   });
 

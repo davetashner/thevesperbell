@@ -13,6 +13,11 @@ export interface LayerSpec {
   readonly cue: string;
   /** Repeats until the layer fades out; false plays once (the explore bed: audio bible §2.1). */
   readonly loop: boolean;
+  /**
+   * Seconds into the file to begin from each time the layer comes in; default 0. A loop still wraps
+   * to the file's own loop start. Bar lines count from this point, so put it on a beat.
+   */
+  readonly startOffsetS?: number;
   /** Tempo of this track when its loop sidecar has none; defaults to the set's. */
   readonly bpm?: number;
   readonly beatsPerBar?: number;
@@ -87,7 +92,14 @@ export const MUSIC_SETS: readonly MusicSet[] = [
     lockstep: false,
     layers: {
       explore: { cue: SLICE_MUSIC_CUES.explore, loop: false, bpm: 64, beatsPerBar: 6 },
-      combat: { cue: SLICE_MUSIC_CUES.combat, loop: true, bpm: 128, beatsPerBar: 6 },
+      // Owner's ear (mw-03t): begin between 0:01 and 0:02; 1.75 s is the strongest hit in that window.
+      combat: {
+        cue: SLICE_MUSIC_CUES.combat,
+        loop: true,
+        startOffsetS: 1.75,
+        bpm: 128,
+        beatsPerBar: 6,
+      },
     },
   },
 ];
