@@ -24,6 +24,8 @@ import { makeLightSource } from '../light/sources';
 import { makeCuttable, suspendFrom } from './ropes';
 import { makeImpactSwitch, syncImpactSwitchNodes } from './impacts';
 import { makePlate, syncPlateNodes } from './plates';
+import { makeBeamEmitter, makeLightReceiver, makeOptic } from '../light/beams';
+import { syncLightReceiverNodes } from './receivers';
 import { makeDoor, makeSwitch, refreshAffordances, syncSwitchNodes } from './system';
 
 /** What `addSceneMechanisms` reads: profiles, locks and graphs by id. */
@@ -50,6 +52,8 @@ export interface SceneMechanisms {
   readonly ropes: readonly EntityId[];
   /** Light sources (mw-e03.16). */
   readonly lights: readonly EntityId[];
+  /** Light receivers (mw-e03.17). */
+  readonly receivers: readonly EntityId[];
   /** The placed graphs' entities. */
   readonly graphs: readonly EntityId[];
 }
@@ -85,6 +89,7 @@ export function addSceneMechanisms<T>(
   const impactSwitches: EntityId[] = [];
   const ropes: EntityId[] = [];
   const lights: EntityId[] = [];
+  const receivers: EntityId[] = [];
   const interactive = sim.isRegistered(InteractableComponent);
   for (const { entity, spawn } of loaded.spawns) {
     const { door } = spawn;
@@ -140,6 +145,36 @@ export function addSceneMechanisms<T>(
         infiniteFuel: light.infiniteFuel === true,
       });
       lights.push(entity);
+    }
+    const { beamEmitter: beam, optic, lightReceiver: receiver } = spawn;
+    const [px, py, pz] = [spawn.position.x, spawn.position.y, spawn.position.z];
+    const at = { x: px, y: py, z: pz };
+    const vec = ([x, y, z]: readonly [number, number, number]) => ({ x, y, z });
+    if (beam !== undefined) {
+      makeBeamEmitter(sim, entity, beam.kind, at, vec(beam.direction), {
+        ...(beam.intensity !== undefined && { intensity: beam.intensity }),
+        ...(beam.colour !== undefined && { colour: vec(beam.colour) }),
+        ...(beam.range !== undefined && { range: beam.range }),
+        ...(beam.maxBounces !== undefined && { maxBounces: beam.maxBounces }),
+        ...(beam.active !== undefined && { active: beam.active }),
+      });
+    }
+    if (optic !== undefined) {
+      makeOptic(sim, entity, optic.kind, at, vec(optic.normal), {
+        ...(optic.radius !== undefined && { radius: optic.radius }),
+        ...(optic.focus !== undefined && { focus: optic.focus }),
+        ...(optic.tint !== undefined && { tint: vec(optic.tint) }),
+      });
+    }
+    if (receiver !== undefined) {
+      makeLightReceiver(sim, entity, at, {
+        ...(receiver.threshold !== undefined && { threshold: receiver.threshold }),
+        ...(receiver.dwellSeconds !== undefined && { dwellSeconds: receiver.dwellSeconds }),
+        ...(receiver.filter !== undefined && { filter: vec(receiver.filter) }),
+        ...(receiver.mode !== undefined && { mode: receiver.mode }),
+        ...(receiver.radius !== undefined && { radius: receiver.radius }),
+      });
+      receivers.push(entity);
     }
     const { impactSwitch: impact } = spawn;
     // A spawn with the `shootable` property is a target even when the scene says no more
@@ -204,6 +239,7 @@ export function addSceneMechanisms<T>(
   for (const entity of switches) syncSwitchNodes(sim, entity);
   for (const entity of plates) syncPlateNodes(sim, entity);
   for (const entity of impactSwitches) syncImpactSwitchNodes(sim, entity);
+  for (const entity of receivers) syncLightReceiverNodes(sim, entity);
   return Object.freeze({
     doors: Object.freeze(doors),
     switches: Object.freeze(switches),
@@ -211,6 +247,7 @@ export function addSceneMechanisms<T>(
     impactSwitches: Object.freeze(impactSwitches),
     ropes: Object.freeze(ropes),
     lights: Object.freeze(lights),
+    receivers: Object.freeze(receivers),
     graphs: Object.freeze(graphs),
   });
 }

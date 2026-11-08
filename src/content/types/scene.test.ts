@@ -280,6 +280,42 @@ describe('scene impact switches (mw-e03.20)', () => {
   });
 });
 
+describe('scene light beams (mw-e03.17)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
+
+  it('takes emitters, optics and receivers with their defaults', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('sun', { beamEmitter: { kind: 'sunlight', direction: [1, 0, 0] } }),
+        spawn('glass', {
+          optic: { kind: 'lens', normal: [0, 1, 0], focus: 3, tint: [1, 0.5, 0] },
+        }),
+        spawn('eye', { lightReceiver: { filter: [1, 0, 0], dwellSeconds: 1 } }),
+      ],
+    });
+    expect(scene.spawns[0]?.beamEmitter).toEqual({
+      kind: 'sunlight',
+      direction: [1, 0, 0],
+      active: true,
+    });
+    expect(scene.spawns[1]?.optic).toMatchObject({ focus: 3, tint: [1, 0.5, 0] });
+    expect(scene.spawns[2]?.lightReceiver).toEqual({
+      threshold: 0.5,
+      dwellSeconds: 1,
+      filter: [1, 0, 0],
+      mode: 'momentary',
+      radius: 0.3,
+    });
+  });
+
+  it('rejects a black colour and a colour channel above 1', () => {
+    const bad = (extra: object) => problems({ ...room, spawns: [spawn('x', extra)] });
+    expect(bad({ lightReceiver: { filter: [0, 0, 0] } })).not.toEqual([]);
+    expect(bad({ optic: { kind: 'pane', normal: [0, 1, 0], tint: [2, 0, 0] } })).not.toEqual([]);
+  });
+});
+
 describe('scene checkpoints (mw-e01.4)', () => {
   it('marks volume nodes of a placed graph as checkpoints, each once', () => {
     const scene = sceneSchema.parse({

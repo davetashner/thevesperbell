@@ -96,6 +96,15 @@ import {
 } from './impacts';
 import { CuttableComponent, ropeFeeds, ropesSystem, SuspendedComponent } from './ropes';
 import { PlateComponent, platesSystem, resetPlate, type PlateOptions } from './plates';
+import {
+  BeamEmitterComponent,
+  beamsSystem,
+  BeamTracer,
+  LightReceiverComponent,
+  OpticComponent,
+} from '../light/beams';
+import type { StaticOccluders } from '../light/occluders';
+import { lightReceiversSystem, resetLightReceiver } from './receivers';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
 export const SLAM_SPEED = 4;
@@ -127,6 +136,8 @@ export interface MechanismsOptions {
   readonly pick?: LockPick;
   /** What pressure plates read beyond properties: gravity felt and worn gear (plates.ts). */
   readonly plates?: PlateOptions;
+  /** Traces light beams (light/beams.ts); none: one is made, blocked by `occluders` when that is the light field's statics. */
+  readonly beams?: BeamTracer;
 }
 
 /** How a door is placed (a scene spawn's door data). */
@@ -813,10 +824,23 @@ export function installMechanisms<TInput>(
     ImpactSwitchComponent,
     CuttableComponent,
     SuspendedComponent,
+    BeamEmitterComponent,
+    OpticComponent,
+    LightReceiverComponent,
   );
+  const occluders = options.occluders as Partial<StaticOccluders> | undefined;
+  const tracer =
+    options.beams ??
+    new BeamTracer(
+      occluders?.along === undefined
+        ? {}
+        : { statics: occluders as Pick<StaticOccluders, 'along'> },
+    );
   world.addSystem(mechanismsSystem(rules));
   world.addSystem(platesSystem(options.plates));
   world.addSystem(impactSwitchesSystem());
+  world.addSystem(beamsSystem(tracer));
+  world.addSystem(lightReceiversSystem(tracer));
   world.addSystem(ropesSystem());
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
@@ -865,6 +889,8 @@ export function installMechanisms<TInput>(
       if (w.has(entity, PlateComponent)) {
         // A signal on resets a plate (a latching one's way off); off does nothing.
         if (value) resetPlate(w, entity, graph);
+      } else if (w.has(entity, LightReceiverComponent)) {
+        if (value) resetLightReceiver(w, entity, graph);
       } else if (w.has(entity, ImpactSwitchComponent)) {
         // Likewise an impact switch: on resets it (a latching one's way off).
         if (value) resetImpactSwitch(w, entity, graph);
