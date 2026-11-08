@@ -1218,6 +1218,28 @@
             },
             "additionalProperties": false
           },
+          "questCritical": {
+            "description": "The quest needs this world object (a statue part, a counterweight; mw-e17.14): it must name a `recovery` anchor, because it is carried physically and can be dropped, thrown or lost (ADR-0003).",
+            "type": "boolean"
+          },
+          "recovery": {
+            "description": "Where the object returns to, grid cells (the middle of its base), if it ends up below the scene or out of bounds; `object.recovered` is emitted (mw-e17.14).",
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3
+          },
           "breakable": {
             "description": "Makes the spawned entity breakable, e.g. a pot that spills its contents (mw-e03.11).",
             "type": "object",

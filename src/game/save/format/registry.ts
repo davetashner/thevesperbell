@@ -118,6 +118,12 @@ export interface SaveRegistryOptions {
    * restored, so the save loads into a freshly built world that has not used it yet (mw-e01.7).
    */
   readonly onDemand?: readonly ComponentType<unknown>[];
+  /**
+   * Runs on the world just before a save is written, so state that must not be saved as it is (a
+   * carried object, mw-e17.14) is settled first and the save and the running game agree. Must be
+   * deterministic and leave the world valid.
+   */
+  readonly beforeWrite?: (world: World) => void;
 }
 
 /** Sections that make up a save, in apply order (the world section first). */
@@ -129,8 +135,11 @@ export class SaveRegistry {
   /** Id of the section that saves the world's facts, if any. */
   private factsOwner: string | undefined;
 
+  private readonly beforeWrite: ((world: World) => void) | undefined;
+
   constructor(options: SaveRegistryOptions = {}) {
     const onDemand = options.onDemand ?? [];
+    this.beforeWrite = options.beforeWrite;
     this.ordered = [
       defineSaveSection<WorldSnapshot>({
         id: WORLD_SECTION_ID,
@@ -195,6 +204,7 @@ export class SaveRegistry {
    *   CanonicalEncodingError for values with no canonical form (functions, Maps, undefined…).
    */
   write(world: World, options: WriteSaveOptions): Uint8Array {
+    this.beforeWrite?.(world);
     const sections: Record<string, SectionRecord> = {};
     for (const [id, record] of Object.entries(options.preserve ?? {})) {
       if (!this.ids.has(id)) sections[id] = record;

@@ -8,6 +8,8 @@ import {
   CapabilitiesComponent,
   NavRouteComponent,
   PlayerClassComponent,
+  RecoveryAnchorComponent,
+  settleHeldObjects,
   SpellHotbarComponent,
   StatsComponent,
 } from '@sim/index';
@@ -32,6 +34,7 @@ export const ON_DEMAND_COMPONENTS = Object.freeze([
   CapabilitiesComponent,
   NavRouteComponent,
   SpellHotbarComponent,
+  RecoveryAnchorComponent,
 ]);
 
 /** What the game's sections need from the running build. */
@@ -45,7 +48,13 @@ export type GameSaveOptions = InventorySectionOptions;
  */
 export function createGameSaveRegistry(options: GameSaveOptions = {}): SaveRegistry {
   const { warn } = options;
-  return new SaveRegistry({ onDemand: ON_DEMAND_COMPONENTS })
+  return new SaveRegistry({
+    onDemand: ON_DEMAND_COMPONENTS,
+    // A save never stores a carried object's hold: it is set down at the carrier's feet (mw-e17.14).
+    beforeWrite: (world) => {
+      settleHeldObjects(world);
+    },
+  })
     .register(inventorySaveSection(options))
     .register(creaturesSaveSection())
     .register(worldFactsSaveSection({ ...(warn && { warn }) }))

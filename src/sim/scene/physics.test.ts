@@ -19,6 +19,7 @@ import { climbabilityOfCollider } from '../climb/surfaces';
 import type { MaterialPresets } from '../properties/materials';
 import { hashWorld } from '../snapshot';
 import { PlacementComponent } from '../stimulus/placement';
+import { RecoveryAnchorComponent } from '../carry/recovery';
 import { TEST_SCENE, testKit } from './fixtures';
 import { loadScene, registerSceneComponents, unloadScene, type LoadedScene } from './loader';
 import type { SceneSpec } from './layout';
@@ -208,5 +209,34 @@ describe('scene placement properties (mw-e03.22)', () => {
     addScenePhysics(world, loaded, { props: () => undefined, materials: MATERIALS });
     expect(hasProperty(world, at(loaded.pieces, 3), 'material')).toBe(false);
     expect(placementProperties(undefined)).toEqual({});
+  });
+
+  it('mw-e17.14: a prop spawn with a recovery anchor gets it, in metres, and one without gets none', () => {
+    const physics = new RapierPhysics(RAPIER);
+    const world = registerWorldProperties(
+      registerSceneComponents(new World<never>({ seed: 5, physics })),
+    );
+    world.register(PlacementComponent);
+    installPhysicsObjects(world);
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      grid: 2,
+      spawns: [
+        {
+          id: 'statue',
+          at: [1, 0, 2],
+          yaw: 0,
+          prop: { id: 'crate' },
+          tags: [],
+          recovery: [3, 0, 1],
+        },
+        { id: 'plain', at: [2, 0, 2], yaw: 0, prop: { id: 'crate' }, tags: [] },
+      ],
+    };
+    const loaded = loadScene(world, scene, testKit, physics);
+    addScenePhysics(world, loaded, { props: () => CRATE, materials: MATERIALS });
+    const [statue, plain] = loaded.spawns.map((s) => s.entity);
+    expect(world.get(statue ?? -1, RecoveryAnchorComponent)).toEqual({ at: { x: 6, y: 0, z: 2 } });
+    expect(world.has(plain ?? -1, RecoveryAnchorComponent)).toBe(false);
   });
 });
