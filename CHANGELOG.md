@@ -13,7 +13,6 @@ check enforces this).
 
 ### Added
 
-- Briar Glen lane now has a real day and night: the light, sky and shadows follow the game clock, fading through dusk to a dark, moonlit night at 22:00 where the street lanterns' pools of warm light stand out, and back through dawn. Lights can now carry their own colour tint (mw-ju8.43).
 - The music now changes on the beat: going into a fight, the explore music crossfades into the battle music on the next bar line over one bar (equal-power, no abrupt cut or volume jump), and out of it over two bars once nothing has been fighting for 8 seconds. The adaptive music controller also supports tension and stealth layers and plays alert stingers on the next beat.
 - The battle music now begins on the first strong hit, 1.75 seconds into the track, instead of from its very start (mw-03t).
 - The music now changes on the beat: going into a fight, the explore music crossfades into the battle music on the next bar line over one bar (equal-power, no abrupt cut or volume jump), and out of it over two bars once nothing has been fighting for 4 seconds. The adaptive music controller also supports tension and stealth layers and plays alert stingers on the next beat.
