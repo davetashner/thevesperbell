@@ -98,9 +98,13 @@ describe('the slice grey-box level (mw-e01.4)', () => {
     const used = [...new Set(raw.map((p) => p.piece))].sort();
     expect(used.every((piece) => kit.includes(piece))).toBe(true);
     expect(used).toEqual(['doorway', 'floor', 'pillar', 'platform', 'wall']);
-    // Its one prop is the kit's loose crate (the step to the loot alcove's sill).
+    // Its props are the kit's loose crate (the step to the loot alcove's sill) and the liftable
+    // bottle, barrel and clay pot (mw-e02.38).
     expect(scene.spawns.flatMap((s) => (s.prop === undefined ? [] : [s.prop.id]))).toEqual([
       'crate',
+      'bottle',
+      'barrel',
+      'clay-pot',
     ]);
   });
 

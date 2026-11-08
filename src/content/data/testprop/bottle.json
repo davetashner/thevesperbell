@@ -1,0 +1,9 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "bottle",
+  "name": "Glass bottle",
+  "mass": 0.5,
+  "flammable": false,
+  "tags": ["fragile", "throwable"],
+  "body": { "size": [0.1, 0.28, 0.1], "material": "glass" }
+}

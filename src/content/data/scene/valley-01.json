@@ -185,6 +185,20 @@
         "radius": 18
       },
       "tags": ["encounter", "group-gate", "habit-props-up-the-wall"]
+    },
+    {
+      "id": "valley-01-bottle",
+      "at": [1.0, 0, 8.0],
+      "prop": "bottle",
+      "properties": { "liftable": true },
+      "breakable": { "profile": "glass-bottle" }
+    },
+    {
+      "id": "valley-01-bend-pot",
+      "at": [1.0, 0, 12.5],
+      "prop": "clay-pot",
+      "properties": { "liftable": true, "fragile": 15 },
+      "breakable": { "profile": "pottery" }
     }
   ],
   "light": {

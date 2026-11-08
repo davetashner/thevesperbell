@@ -296,6 +296,19 @@
         "post": [-2.0, 0, 24.0]
       },
       "tags": ["encounter", "group-gate", "habit-bars-the-bridge", "gatekeeper"]
+    },
+    {
+      "id": "valley-03-plateau-pot",
+      "at": [-4.5, 0, 12.5],
+      "prop": "clay-pot",
+      "properties": { "liftable": true, "fragile": 15 },
+      "breakable": { "profile": "pottery" }
+    },
+    {
+      "id": "valley-03-barrel",
+      "at": [1.0, 0, 6.0],
+      "prop": "barrel",
+      "properties": { "liftable": true }
     }
   ],
   "light": {

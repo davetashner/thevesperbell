@@ -44,10 +44,11 @@ describe('interaction reach with physics objects (mw-e02.26)', () => {
   });
 
   it('AC-2: the same crate behind a wall is not focused', () => {
-    const { world, player } = facingCrate();
+    const { world, crate, player } = facingCrate();
     const physics = world.physics as RapierPhysics;
     physics.add(box({ x: -0.6, y: 0, z: -1.6 }, { x: -0.3, y: 2, z: -1.3 }));
     for (let i = 0; i < 5; i++) world.step([]);
-    expect(world.get(player, InteractionFocusComponent)?.target).toBeNull();
+    // The testbed's bottle (mw-e02.38) stands in the same view cone, so only the crate is ruled out.
+    expect(world.get(player, InteractionFocusComponent)?.target).not.toBe(crate);
   });
 });

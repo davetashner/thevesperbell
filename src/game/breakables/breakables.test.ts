@@ -126,13 +126,14 @@ describe('breakables in the game (mw-e03.11)', () => {
     expect(bindBreakLeftovers(world, new RenderSync(world), create)).toBe(0);
   });
 
-  it('the watch reports breaks, opened passages and live debris until disposed', () => {
+  it('the watch reports breaks, noises, opened passages and live debris until disposed', () => {
     const { loaded, watch, smash } = room();
-    expect(watch.readout()).toEqual({ broken: [], passages: [], debris: 0 });
+    expect(watch.readout()).toEqual({ broken: [], noises: [], passages: [], debris: 0 });
     const wall = loaded.pieces[6] ?? -1;
     smash(wall, 150);
     expect(watch.readout()).toEqual({
       broken: [{ tick: 0, profile: 'old-wall', cause: 'structure', by: 'blunt' }],
+      noises: [{ tick: 0, kind: 'break', loudness: 85 }],
       passages: ['weak-wall-passage'],
       debris: 6,
     });
@@ -140,6 +141,7 @@ describe('breakables in the game (mw-e03.11)', () => {
     const crate = loaded.spawns.find((s) => s.spawn.id === 'loot-crate')?.entity ?? -1;
     smash(crate);
     expect(watch.readout().broken).toHaveLength(1);
+    expect(watch.readout().noises).toHaveLength(1);
     expect(watch.readout().debris).toBe(10);
   });
 });
