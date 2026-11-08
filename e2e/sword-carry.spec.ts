@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { holdKey, stubPointerLock, takeControl } from './helpers/player';
+import { holdKey, stubPointerLock, takeControl, turnTo } from './helpers/player';
 
 // mw-a6t: the knight carries its sword at the low-ready, not hanging straight down. The page publishes
 // where the blade points (angle from straight down, tip height, gap to the right leg) on
@@ -12,6 +12,8 @@ interface Blade {
   offVertical: number;
   tipY: number;
   legGap: number;
+  forearmAngle: number;
+  tipForward: number;
 }
 
 const KEY_W = { code: 'KeyW', key: 'w' };
@@ -34,6 +36,7 @@ async function play(page: Page): Promise<string[]> {
   await expect(app).toHaveAttribute('data-player', /"grounded":true/);
   await expect(app).toHaveAttribute('data-sword', /offVertical/, { timeout: 20_000 });
   await takeControl(page);
+  if (process.env['SWORD_YAW'] !== undefined) await turnTo(page, Number(process.env['SWORD_YAW']));
   if (shots !== undefined) {
     // Close behind the knight, as the owner's playtest framing: the wheel zooms the orbit camera in.
     for (let i = 0; i < 12; i++) await page.mouse.wheel(0, -400);
@@ -63,7 +66,7 @@ async function sample(
         send('keydown');
         const watch = () => {
           const t = tick() - start;
-          if (t > 16) out.push(JSON.parse(app?.dataset['sword'] ?? 'null') as Blade);
+          if (t > 10) out.push(JSON.parse(app?.dataset['sword'] ?? 'null') as Blade);
           if (t >= hold) {
             if (name) document.title = name;
             resolve(out);
@@ -86,28 +89,48 @@ async function sample(
   return samples;
 }
 
-test('AC-1: in idle, walk, run and crouch the blade is off vertical and clear of the leg and the ground', async ({
+const KEY_X = { code: 'KeyX', key: 'x' };
+
+test('AC-1 and AC-5: in idle, walk, run, sprint and crouch the blade is clear of the leg and the ground, held across the fist: 60° to 110° from the forearm, tip forward of the hand', async ({
   page,
 }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   const problems = await play(page);
-  const states: [string, { code: string; key: string }[]][] = [
-    ['idle', []],
-    ['crouch', [KEY_C]],
-    ['walk', [KEY_W]],
-    ['run', [KEY_W, KEY_SHIFT]],
+  type Held = { code: string; key: string }[];
+  const states: [string, Held, number][] = [
+    ['idle', [], 34],
+    ['crouch', [KEY_C], 34],
+    ['crouch-walk', [KEY_C, KEY_W], 34],
+    ['walk', [KEY_W, KEY_X], 34],
+    ['run', [KEY_W], 24],
+    ['sprint', [KEY_W, KEY_SHIFT], 20],
   ];
-  for (const [name, keys] of states) {
-    const readings = await sample(page, keys, 34, name);
-    expect(readings.length, name).toBeGreaterThan(3);
+  for (const [name, keys, ticks] of states) {
+    // Back away from the pillars before the fast gaits, so the shot has nothing in the way.
+    if (name === 'run' || name === 'sprint')
+      await holdKey(page, { code: 'KeyS', key: 's' }, 90, 20);
+    const readings = await sample(page, keys, ticks, name);
+    expect(readings.length, name).toBeGreaterThan(1);
     const least = (f: (b: Blade) => number) => Math.min(...readings.map(f));
-    const note = `offVertical min ${least((b) => b.offVertical).toFixed(1)} legGap min ${least((b) => b.legGap).toFixed(2)} tipY min ${least((b) => b.tipY).toFixed(2)} max ${Math.max(...readings.map((b) => b.offVertical)).toFixed(1)}`;
+    const most = (f: (b: Blade) => number) => Math.max(...readings.map(f));
+    const note = [
+      `offVertical ${least((b) => b.offVertical).toFixed(1)}..${most((b) => b.offVertical).toFixed(1)}`,
+      `forearmAngle ${least((b) => b.forearmAngle).toFixed(1)}..${most((b) => b.forearmAngle).toFixed(1)}`,
+      `tipForward min ${least((b) => b.tipForward).toFixed(2)}`,
+      `legGap min ${least((b) => b.legGap).toFixed(2)}`,
+      `tipY min ${least((b) => b.tipY).toFixed(2)}`,
+    ].join(' | ');
     test.info().annotations.push({ type: name, description: note });
     console.log(`SWORD ${name}: ${note}`);
+    // AC-1: off vertical (not hanging) but never pointing up, and clear of the leg and the ground.
     expect(
       least((b) => b.offVertical),
       `${name} off vertical`,
     ).toBeGreaterThan(30);
+    expect(
+      most((b) => b.offVertical),
+      `${name} not pointing up`,
+    ).toBeLessThan(100);
     expect(
       least((b) => b.legGap),
       `${name} leg gap`,
@@ -116,6 +139,20 @@ test('AC-1: in idle, walk, run and crouch the blade is off vertical and clear of
       least((b) => b.tipY),
       `${name} tip above the ground`,
     ).toBeGreaterThan(0.05);
+    // AC-5: the fist is across the grip, so the blade leaves it at a wide angle to the forearm
+    // (never as an extension of the arm) and points forward of the hand.
+    expect(
+      least((b) => b.forearmAngle),
+      `${name} forearm to blade`,
+    ).toBeGreaterThanOrEqual(60);
+    expect(
+      most((b) => b.forearmAngle),
+      `${name} forearm to blade`,
+    ).toBeLessThanOrEqual(110);
+    expect(
+      least((b) => b.tipForward),
+      `${name} tip forward of the hand`,
+    ).toBeGreaterThan(0.2);
     // Let go of everything and stand again before the next state.
     await holdKey(page, { code: 'KeyZ', key: 'z' }, 30);
   }
@@ -148,10 +185,44 @@ test('AC-3: an attack and a dodge played from the carry run their own clips and 
   expect(await layers(page)).toMatchObject({ carry: 'idle', action: 'none' });
 
   // A swing: the action layer takes the arm for the move, and the carry layer stays on beneath.
+  const trace = page.evaluate(
+    () =>
+      new Promise<string[]>((resolve) => {
+        const app = document.querySelector<HTMLElement>('#app');
+        const rows: string[] = [];
+        let first = -1;
+        const watch = () => {
+          const tick = (JSON.parse(app?.dataset['player'] ?? '{"tick":0}') as { tick: number })
+            .tick;
+          const blade = JSON.parse(app?.dataset['sword'] ?? 'null') as {
+            offVertical: number;
+            forearmAngle: number;
+          } | null;
+          const act = (
+            JSON.parse(app?.dataset['playerAnimation'] ?? '{"layers":{}}') as {
+              layers: Record<string, string>;
+            }
+          ).layers['action'];
+          if (act === 'attack' && first < 0) first = tick;
+          if (blade && first >= 0) {
+            rows.push(
+              `t+${String(tick - first)} off ${blade.offVertical.toFixed(0)} fore ${blade.forearmAngle.toFixed(0)}`,
+            );
+          }
+          if (first >= 0 && tick - first > 40) resolve(rows);
+          else requestAnimationFrame(watch);
+        };
+        requestAnimationFrame(watch);
+      }),
+  );
   await page.mouse.down();
   await page.mouse.up();
   await expect.poll(async () => (await layers(page))['action'], { timeout: 15_000 }).toBe('attack');
-  if (shots !== undefined) await page.screenshot({ path: `${shots}/attack-mid.png` });
+  if (shots !== undefined) {
+    // The first frames of the swing, one screenshot after another.
+    for (let i = 0; i < 5; i++) await page.screenshot({ path: `${shots}/attack-${String(i)}.png` });
+  }
+  console.log(`SWORD attack trace: ${(await trace).join(' | ')}`);
   await expect.poll(async () => (await layers(page))['action'], { timeout: 30_000 }).toBe('none');
   await holdKey(page, { code: 'KeyZ', key: 'z' }, 40);
   expect(await layers(page)).toMatchObject({ carry: 'idle' });

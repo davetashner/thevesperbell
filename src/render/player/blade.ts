@@ -13,6 +13,14 @@ export interface BladeReadout {
   readonly tipY: number;
   /** The least distance from the blade to the right leg's centreline, metres. */
   readonly legGap: number;
+  /**
+   * The angle between the forearm (elbow to wrist) and the blade (grip to tip), degrees: 0 would be
+   * the blade running on from the arm, as a hand cannot hold it; a fist across the grip makes it
+   * large (mw-a6t).
+   */
+  readonly forearmAngle: number;
+  /** How far the tip is in front of the grip (the body faces −z), metres; negative = behind it. */
+  readonly tipForward: number;
 }
 
 const sub = (a: Point3, b: Point3): Point3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -39,11 +47,21 @@ export function segmentGap(p0: Point3, p1: Point3, q0: Point3, q1: Point3): numb
   return best;
 }
 
-/** The blade from `grip` to `tip`, against a leg given as its hip, knee and ankle. */
+/** The angle between vectors a and b, degrees. */
+function angleBetween(a: Point3, b: Point3): number {
+  const c = dot(a, b) / (length(a) * length(b));
+  return (Math.acos(Math.min(1, Math.max(-1, c))) * 180) / Math.PI;
+}
+
+/**
+ * The blade from `grip` to `tip`, against a leg given as its hip, knee and ankle and the forearm
+ * given as its elbow and wrist.
+ */
 export function readBlade(
   grip: Point3,
   tip: Point3,
   leg: readonly [Point3, Point3, Point3],
+  forearm: readonly [Point3, Point3],
 ): BladeReadout {
   const axis = sub(tip, grip);
   const len = length(axis);
@@ -51,6 +69,8 @@ export function readBlade(
   return {
     offVertical,
     tipY: tip[1],
+    forearmAngle: angleBetween(sub(forearm[1], forearm[0]), axis),
+    tipForward: grip[2] - tip[2],
     legGap: Math.min(segmentGap(grip, tip, leg[0], leg[1]), segmentGap(grip, tip, leg[1], leg[2])),
   };
 }

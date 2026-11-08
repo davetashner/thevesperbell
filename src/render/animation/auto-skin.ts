@@ -147,3 +147,48 @@ export function autoSkin(
   }
   return { indices, weights };
 }
+
+/**
+ * Binds part of a skinned mesh to `bone` (mw-a6t: a knight's hand follows its wrist bone, so the hand
+ * and the sword it holds turn together). `share(x, y, z)` gives how much of a vertex, 0 to 1, moves
+ * with `bone`: its other weights shrink by that, and `bone` takes the share, in place of the vertex's
+ * lightest influence when all four are in use. Changes `skin` in place; weights still sum to 1.
+ */
+export function bindRegion(
+  skin: SkinWeights,
+  positions: ArrayLike<number>,
+  bone: number,
+  share: (x: number, y: number, z: number) => number,
+): void {
+  const count = Math.floor(positions.length / 3);
+  for (let v = 0; v < count; v++) {
+    const t = Math.min(
+      1,
+      Math.max(
+        0,
+        share(positions[v * 3] ?? 0, positions[v * 3 + 1] ?? 0, positions[v * 3 + 2] ?? 0),
+      ),
+    );
+    if (t <= 0) continue;
+    const o = v * SKIN_INFLUENCES;
+    let slot = -1;
+    let lightest = 0;
+    for (let i = 0; i < SKIN_INFLUENCES; i++) {
+      const weight = skin.weights[o + i] ?? 0;
+      if (skin.indices[o + i] === bone && weight > 0) slot = i;
+      if (weight < (skin.weights[o + lightest] ?? 0)) lightest = i;
+    }
+    if (slot < 0) slot = lightest;
+    // Scale every other influence so that, with `bone` at its new weight, they still sum to 1.
+    let others = 0;
+    for (let i = 0; i < SKIN_INFLUENCES; i++) if (i !== slot) others += skin.weights[o + i] ?? 0;
+    const own = skin.indices[o + slot] === bone ? (skin.weights[o + slot] ?? 0) : 0;
+    const target = own + (1 - own) * t;
+    const scale = others > 0 ? (1 - target) / others : 0;
+    for (let i = 0; i < SKIN_INFLUENCES; i++) {
+      if (i !== slot) skin.weights[o + i] = (skin.weights[o + i] ?? 0) * scale;
+    }
+    skin.indices[o + slot] = bone;
+    skin.weights[o + slot] = target;
+  }
+}

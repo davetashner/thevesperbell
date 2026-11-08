@@ -29,6 +29,7 @@ import {
 } from '../models/glb';
 import {
   autoSkin,
+  bindRegion,
   fitSegments,
   restSegments,
   type GreyboxRig,
@@ -71,10 +72,28 @@ export const SWORD_PLACEMENT: PropPlacement = {
   length: 0.85,
   anchor: 'top',
   // The grip, not the pommel, sits in the hand: the body mesh's hand is 0.18 m outboard of the rig's
-  // wrist and 0.08 m forward of it (the fitted forearm of KNIGHT_SEGMENT_FITS), so the sword is moved
-  // to it, or it floats beside the fist.
-  offset: [0.18, 0.1, -0.08],
+  // wrist and 0.08 m forward of it (the fitted forearm of KNIGHT_SEGMENT_FITS). The knight's sword bone
+  // sits at that wrist (KNIGHT_WRIST), so only what is left of the offset is baked in here.
+  offset: [0, 0.1, -0.01],
 };
+
+/**
+ * Where the body mesh's wrist is, relative to the rig's: the sword bone is moved there for the knight
+ * (mw-a6t), so turning it bends the wrist of the mesh's hand, not the rig's joint beside it. Added to
+ * the bone's rest offset; SWORD_PLACEMENT bakes in the rest of the grip's offset, so at rest the sword
+ * stays exactly where it was and every move's clip (none turns this bone) is unchanged.
+ */
+export const KNIGHT_WRIST: readonly [number, number, number] = [0.18, 0, -0.07];
+
+/**
+ * How much of the body mesh's right hand follows the sword bone: the fist (below y 0.90 and within
+ * 0.14 m of the grip's axis) wholly, blending out to the forearm by y 0.98, so the hand and the sword
+ * turn together at the wrist.
+ */
+export function knightHandShare(x: number, y: number, z: number): number {
+  if (Math.hypot(x - 0.45, z + 0.07) > 0.14 || x < 0.34) return 0;
+  return Math.min(1, Math.max(0, (0.98 - y) / 0.08));
+}
 
 /** The shield, on the left forearm. */
 export const SHIELD_PLACEMENT: PropPlacement = {
@@ -163,6 +182,14 @@ export interface RigOptions {
   readonly meshName?: string;
   /** Where the body's limbs lie, per bone (default the knight's). */
   readonly fits?: Readonly<Record<string, SegmentFit>>;
+  /**
+   * A wrist at the sword bone (the knight's): its rest offset is moved by `pivot`, and the vertices
+   * `hand` gives a share of (0 to 1, see bindRegion) turn with it.
+   */
+  readonly wrist?: {
+    readonly pivot: readonly [number, number, number];
+    readonly hand: (x: number, y: number, z: number) => number;
+  };
 }
 
 /**
@@ -181,7 +208,12 @@ export function createKnightRig(
   rig.defs.forEach((def, i) => {
     const bone = new Bone();
     bone.name = def.bone;
-    bone.position.set(def.offset[0], def.offset[1], def.offset[2]);
+    const wrist = def.bone === 'sword' ? options.wrist?.pivot : undefined;
+    bone.position.set(
+      def.offset[0] + (wrist?.[0] ?? 0),
+      def.offset[1] + (wrist?.[1] ?? 0),
+      def.offset[2] + (wrist?.[2] ?? 0),
+    );
     const parent = rig.parents[i] ?? -1;
     (parent < 0 ? root : (bones[parent] ?? root)).add(bone);
     bones.push(bone);
@@ -195,6 +227,10 @@ export function createKnightRig(
     fitSegments(restSegments(rig), rig.index, options.fits ?? KNIGHT_SEGMENT_FITS),
     held,
   );
+  const sword = rig.index.get('sword');
+  if (options.wrist !== undefined && sword !== undefined) {
+    bindRegion(skin, position.array, sword, options.wrist.hand);
+  }
   geometry.setAttribute('skinIndex', new Uint16BufferAttribute(skin.indices, 4));
   geometry.setAttribute('skinWeight', new Float32BufferAttribute(skin.weights, 4));
   const mesh = new SkinnedMesh(geometry, assets.body.material);
@@ -245,7 +281,9 @@ export function readPlayerBlade(body: Object3D): BladeReadout | undefined {
   const prop = body.getObjectByName('knight-sword-prop');
   const hip = body.getObjectByName('thigh-r');
   const knee = body.getObjectByName('shin-r');
-  if (!(prop instanceof Mesh) || hip === undefined || knee === undefined) return undefined;
+  const elbow = body.getObjectByName('forearm-r');
+  if (!(prop instanceof Mesh) || hip === undefined || knee === undefined || elbow === undefined)
+    return undefined;
   const geometry = prop.geometry as BufferGeometry;
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
@@ -257,9 +295,10 @@ export function readPlayerBlade(body: Object3D): BladeReadout | undefined {
   };
   const cx = (box.min.x + box.max.x) / 2;
   const cz = (box.min.z + box.max.z) / 2;
-  return readBlade(local(prop, cx, box.max.y, cz), local(prop, cx, box.min.y, cz), [
-    local(hip, 0, 0, 0),
-    local(knee, 0, 0, 0),
-    local(knee, 0, -0.44, 0),
-  ]);
+  return readBlade(
+    local(prop, cx, box.max.y, cz),
+    local(prop, cx, box.min.y, cz),
+    [local(hip, 0, 0, 0), local(knee, 0, 0, 0), local(knee, 0, -0.44, 0)],
+    [local(elbow, 0, 0, 0), local(elbow, 0, -0.28, 0)],
+  );
 }
