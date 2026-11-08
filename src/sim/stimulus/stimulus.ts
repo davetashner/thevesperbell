@@ -16,7 +16,7 @@
 // - heat / cold [°C]: raise / lower `temperature` of entities that have one (clamped to its range).
 // - water [wetness 0–1]: raise `wetness` of entities that have one (clamped at 1, or at the entity's
 //   `absorbency` when that is lower: iron takes a film of water, mw-e03.6).
-// - charge [charge]: raise `charge` of entities that have one.
+// - charge [charge]: raise `charge` of entities that have one or that conduct (conductive, or soaked).
 // - force [N·s]: an impulse on pushable, liftable, breakable or bashable entities with weight > 0,
 //   delivered through `impulseApplied` (velocity change = impulse / weight) for the physics layer to
 //   integrate; a breakable's structure takes the shove too (mw-e03.11: a blast brings an old wall
@@ -34,7 +34,8 @@ import type { EntityId } from '../core/component';
 import { defineComponent } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
-import { hasProperty, readProperty, setProperty } from '../properties/components';
+import { assignProperty, hasProperty, readProperty } from '../properties/components';
+import { conductsNow } from '../properties/derived';
 import { PROPERTY_ID_PATTERN, WORLD_PROPERTY_SPECS } from '../properties/spec';
 import { encodeCanonical } from '../snapshot';
 import { boundingSphereOf, PlacementCentreComponent, PlacementComponent } from './placement';
@@ -342,7 +343,11 @@ export function pendingStimuli(world: World<never>): readonly PendingStimulus[] 
 function isTarget(world: World<never>, effect: TargetEffect, entity: EntityId): boolean {
   switch (effect.kind) {
     case 'property':
-      return hasProperty(world, entity, effect.key);
+      // Charge also reaches whatever conducts, though it has no charge yet (mw-e03.8).
+      return (
+        hasProperty(world, entity, effect.key) ||
+        (effect.key === 'charge' && conductsNow(world, entity))
+      );
     case 'impulse':
       return (
         (readProperty(world, entity, 'pushable') ||
@@ -397,7 +402,7 @@ function applyProperty(
   const ceiling =
     key === 'wetness' ? Math.max(old, readProperty(world, entity, 'absorbency')) : spec.max;
   const value = Math.min(ceiling, Math.max(spec.min, old + sign * amount));
-  setProperty(world, entity, key, value, source === null ? {} : { source });
+  assignProperty(world, entity, key, value, source === null ? {} : { source });
 }
 
 /** The push on `entity`, or false when there is no direction to push it in or it resists. */
