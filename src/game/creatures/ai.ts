@@ -62,7 +62,10 @@ import {
   type TravelRequest,
   type Vec3,
   type World,
+  StatusLedgerComponent,
+  statusScaledNavigation,
 } from '@sim/index';
+import { statusLookup } from '../magic/install';
 
 /** A scene's noise propagation (see the file header). */
 export interface SceneNoise {
@@ -204,7 +207,11 @@ export function installCreatureAi<TInput>(
     target: playerTarget(player),
   });
   const behaviours = compileBehaviours(content.all('behaviour'));
-  installAi(world, { behaviours, navigation: options.navigation, attacks });
+  // Slowed and rooted creatures travel slower or not at all (mw-e06.24; magic, when installed).
+  const navigation = world.isRegistered(StatusLedgerComponent)
+    ? statusScaledNavigation(options.navigation, statusLookup(content.all('status')))
+    : options.navigation;
+  installAi(world, { behaviours, navigation, attacks });
   return { perception, behaviours };
 }
 

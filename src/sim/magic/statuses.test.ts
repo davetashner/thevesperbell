@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { StatusEntry } from '@content/index';
+import type { AiNavigation, TravelRequest } from '../ai/navigation';
+import { World } from '../core/world';
 import { healthOf } from '../combat/damage';
 import type { EntityId } from '../core/component';
 import { addProperties, setProperty } from '../properties/components';
@@ -13,6 +15,8 @@ import {
   hasStatusTag,
   modifiedStat,
   StatusEnded,
+  statusMoveScale,
+  statusScaledNavigation,
   StatusTicked,
   type StatusEndReason,
   type StatusLookup,
@@ -341,5 +345,43 @@ describe('statuses (mw-e06.9)', () => {
     expect(names(s, caster)).toEqual([]);
     s.world.step([{ type: 'cast', caster, spell: 't-bolt' }]);
     expect(reasons).toEqual(['silenced']);
+  });
+
+  describe('movement scale (mw-e06.24)', () => {
+    it('statusMoveScale reads moveSpeed, never below 0, and is 1 with no spells installed', () => {
+      const s = setup();
+      const a = s.spawn();
+      expect(statusMoveScale(s.world, s.lookup, a)).toBe(1);
+      s.apply(slowed, a, a, 5, 2);
+      expect(statusMoveScale(s.world, s.lookup, a)).toBe(0.25);
+      const negative = def('t-negative', {
+        modifiers: [{ stat: 'moveSpeed', mode: 'add', value: -3 }],
+      });
+      applyStatus(s.world, negative, { target: a, status: 't-negative', source: a, seconds: 5 });
+      expect(statusMoveScale(s.world, (id) => (id === 't-negative' ? negative : slowed), a)).toBe(
+        0,
+      );
+      expect(statusMoveScale(new World<never>({ seed: 1 }), s.lookup, 0)).toBe(1);
+    });
+
+    it('statusScaledNavigation scales travel and approach speed by the agent’s statuses', () => {
+      const s = setup();
+      const a = s.spawn();
+      const b = s.spawn();
+      s.apply(slowed, a, a, 5, 1);
+      const seen: number[] = [];
+      const request: TravelRequest = { goal: { x: 9, y: 0, z: 0 }, within: 1, speed: 4, dt: 1 };
+      const full: AiNavigation = {
+        travel: (_w, _e, r) => (seen.push(r.speed), 'running'),
+        approach: (_w, _e, r) => (seen.push(r.speed), 'running'),
+      };
+      const scaled = statusScaledNavigation(full, s.lookup);
+      scaled.travel(s.world, a, request);
+      scaled.approach?.(s.world, a, request);
+      scaled.travel(s.world, b, request);
+      expect(seen).toEqual([2, 2, 4]);
+      const travelOnly = statusScaledNavigation({ travel: () => 'running' }, s.lookup);
+      expect(travelOnly.approach).toBeUndefined();
+    });
   });
 });

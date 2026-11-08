@@ -91,6 +91,7 @@ import {
   type TargetLocator,
   type TraversalMode,
   type World,
+  type StatusLookup,
 } from '@sim/index';
 import type { TestbedBow } from '../combat/testbed-combat';
 import {
@@ -302,6 +303,8 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
    * arrow system (startTestbedCombat) flies what it looses. Absent = none.
    */
   readonly bow?: TestbedBow;
+  /** Status definitions: slowed and rooted scale the player's speed (mw-e06.24). */
+  readonly statuses?: StatusLookup;
 }
 
 /** The player's climbing (mw-e02.13). */
@@ -444,6 +447,7 @@ export function setupTestbedPlayer<TObject, TCommand>(
       ledges: { index: sceneLedges(scene), ...options.ledges },
     }),
     ...(options.climb !== undefined && { climb: options.climb }),
+    ...(options.statuses !== undefined && { statuses: options.statuses }),
     ...(options.water !== undefined && {
       water: { volumes: waterVolumes(scene.layout.regions), ...options.water },
     }),
