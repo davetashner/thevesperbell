@@ -27,6 +27,7 @@ import { checkSceneTransitions } from './transition-checks.ts';
 import { checkPuzzles } from './puzzle-checks.ts';
 import type { Catalogue, ContentCheck, EntryOf } from './loader.ts';
 import { animClipSchema } from './types/anim-clip.ts';
+import { ambienceSchema } from './types/ambience.ts';
 import { animGraphSchema } from './types/anim-graph.ts';
 import { arrowSchema } from './types/arrow.ts';
 import { attackSchema } from './types/attack.ts';
@@ -75,6 +76,7 @@ import { vfxEffectSchema } from './types/vfx-effect.ts';
 
 /** Content type name → schema of one entry. */
 export const contentTypes = {
+  ambience: ambienceSchema,
   'anim-clip': animClipSchema,
   'anim-graph': animGraphSchema,
   arrow: arrowSchema,

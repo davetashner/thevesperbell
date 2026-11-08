@@ -498,6 +498,7 @@ describe('scene schema (mw-e00.21)', () => {
       ],
       spawns: [],
       signals: [],
+      ambience: [],
       waypoints: [],
       routes: [],
       regions: [],

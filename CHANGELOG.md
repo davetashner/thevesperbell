@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Scenes have ambience zones: a looping bed per zone that crossfades over 2 s as you move between zones, plus randomised positional one-shots (drips, gusts, birds, creaks) at random gaps and distances around you, all on the ambience volume slider. Only the mine gallery's existing drip bed is audible so far; the one-shot sounds wait on the ambience assets.
 - Pressure plates weigh whatever rests on them, crates, bodies, actors and what they carry or wear, and switch on inside a weight window (too heavy fails) after an optional delay, momentary or latching until a signal resets them; a floating or spell-held object weighs nothing, and hidden plates drive trap signals.
 - Key bindings in Settings > Controls: remap any keyboard or mouse action with a press-a-key capture (Esc cancels), swap or cancel when a key is already in use, clear or reset a binding, and keep Pause always bound. Your layout is saved in the browser.
 - The knight can kick (K, or block and attack with no shield): it shoves crates and barrels up to 40 kg, tips a burning brazier into whatever can burn, slams an unlocked door open onto whoever stands behind it, bounces off a locked one with a thud, and knocks small creatures back, even over a ledge.

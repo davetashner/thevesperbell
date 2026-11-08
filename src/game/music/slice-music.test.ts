@@ -83,12 +83,9 @@ describe('SliceMusic (mw-0j5)', () => {
     expect(t.music.state.started).toBe(false);
     t.setState('running');
     t.music.update();
-    expect(t.played.map((p) => p.cue)).toEqual([
-      SLICE_MUSIC_CUES.ambience,
-      SLICE_MUSIC_CUES.explore,
-    ]);
+    expect(t.played.map((p) => p.cue)).toEqual([SLICE_MUSIC_CUES.explore]);
     t.music.update();
-    expect(t.played).toHaveLength(2);
+    expect(t.played).toHaveLength(1);
   });
 
   it('AC-1: with no context at all it stays quiet', () => {
@@ -103,10 +100,10 @@ describe('SliceMusic (mw-0j5)', () => {
     t.alert(t.creature, 'unaware', 'combat');
     t.music.update();
     expect(t.music.state.inCombat).toBe(true);
-    const explore = t.handle(1);
+    const explore = t.handle(0);
     expect(explore.fade).toHaveBeenCalledWith(0, EXPLORE_DUCK_S);
-    expect(t.played[2]).toEqual({ cue: SLICE_MUSIC_CUES.combat, options: { volume: 0 } });
-    expect(t.handle(2).fade).toHaveBeenCalledWith(1, COMBAT_FADE_IN_S);
+    expect(t.played[1]).toEqual({ cue: SLICE_MUSIC_CUES.combat, options: { volume: 0 } });
+    expect(t.handle(1).fade).toHaveBeenCalledWith(1, COMBAT_FADE_IN_S);
   });
 
   it('AC-3: leaving combat waits 4 s of no combat, then fades out and restores the explore bed', () => {
@@ -122,8 +119,8 @@ describe('SliceMusic (mw-0j5)', () => {
     t.advance(1);
     t.music.update();
     expect(t.music.state.inCombat).toBe(false);
-    expect(t.handle(2).stop).toHaveBeenCalledWith(COMBAT_FADE_OUT_S);
-    expect(t.handle(1).fade).toHaveBeenLastCalledWith(1, EXPLORE_RESTORE_S);
+    expect(t.handle(1).stop).toHaveBeenCalledWith(COMBAT_FADE_OUT_S);
+    expect(t.handle(0).fade).toHaveBeenLastCalledWith(1, EXPLORE_RESTORE_S);
   });
 
   it('AC-3: going back into combat inside the delay keeps the same loop playing', () => {
@@ -206,6 +203,6 @@ describe('SliceMusic (mw-0j5)', () => {
     t.alert(t.creature, 'unaware', 'unaware');
     t.music.update();
     expect(t.music.state.inCombat).toBe(false);
-    expect(t.played).toHaveLength(2);
+    expect(t.played).toHaveLength(1);
   });
 });

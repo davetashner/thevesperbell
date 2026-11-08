@@ -104,6 +104,7 @@ import {
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
 import { attachSoundCaptions, type SoundCaptionsGlue } from '@game/captions/sound-captions';
 import { bindMix, type MixBindings } from '@game/music/mix-bindings';
+import { AmbienceController, placeZones } from '@game/ambience/index';
 import { SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
@@ -300,6 +301,7 @@ import {
   testPropSpawners,
   tuneCommand,
   volumeEntered,
+  Rng,
   World,
   WorldPersistence,
   worldItemSpawner,
@@ -1220,10 +1222,19 @@ function startRenderer(
       // Marsh's General Store plays one music bed, its shop theme, on both floors (mw-ju8.11).
       const beds = new SceneBeds({ engine: audio, scene: scene.id });
       const shopStingers = new ShopStingers({ engine: audio, now: () => performance.now() });
+      // Ambience zones (mw-e28.13): the scene's zone beds and randomised one-shots, seeded from the
+      // world so a run sounds the same twice.
+      const ambienceRng = Rng.create(world.seed).stream('ambience');
+      const ambience = new AmbienceController({
+        engine: audio,
+        zones: placeZones(scene, loaded.layout.regions, (id) => content.get('ambience', id)),
+        random: () => ambienceRng.float(),
+      });
       afterStep.push(() => {
         music?.update();
         hums.update();
         beds.update();
+        ambience.update(camera.position, performance.now() / 1000);
       });
       // Noise propagation through the scene's rooms and doors (mw-e09.22): footsteps, breaks and
       // creatures' noises reach listeners muffled by shut doors and walls.

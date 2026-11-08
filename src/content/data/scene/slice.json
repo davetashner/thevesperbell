@@ -404,5 +404,6 @@
         "door": "exit-door"
       }
     ]
-  }
+  },
+  "ambience": [{ "zone": "slice-gallery" }]
 }

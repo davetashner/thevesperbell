@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique zone id, e.g. slice-gallery."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the zone is for and the state of its assets."
+    },
+    "bed": {
+      "description": "The looping bed under the zone; crossfades with the next zone’s over 2 s.",
+      "type": "object",
+      "properties": {
+        "cue": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Looping non-positional cue."
+        },
+        "gainDb": {
+          "default": 0,
+          "description": "Trim in dB on top of the cue and the ambience bus.",
+          "type": "number",
+          "minimum": -60,
+          "maximum": 12
+        }
+      },
+      "required": [
+        "cue"
+      ],
+      "additionalProperties": false
+    },
+    "oneShots": {
+      "default": [],
+      "description": "Randomised positional one-shots around the listener while in the zone.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cue": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Positional cue on the ambience bus, e.g. amb-cave-drip."
+          },
+          "minIntervalS": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Shortest gap between plays, seconds."
+          },
+          "maxIntervalS": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Longest gap between plays, seconds."
+          },
+          "minRadius": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Nearest spawn distance from the listener, m."
+          },
+          "maxRadius": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Farthest spawn distance from the listener, m."
+          },
+          "height": {
+            "default": 0,
+            "description": "Height of the spawn above the listener, m.",
+            "type": "number"
+          },
+          "gainDb": {
+            "default": 0,
+            "description": "Trim in dB on top of the cue and the ambience bus.",
+            "type": "number",
+            "minimum": -60,
+            "maximum": 12
+          }
+        },
+        "required": [
+          "cue",
+          "minIntervalS",
+          "maxIntervalS",
+          "minRadius",
+          "maxRadius"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "notes"
+  ],
+  "additionalProperties": false
+}
