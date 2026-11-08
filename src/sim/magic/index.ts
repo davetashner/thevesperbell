@@ -14,6 +14,7 @@ export * from './mana';
 export * from './ops';
 export * from './pipeline';
 export * from './projectile';
+export * from './remote-hold';
 export * from './registry';
 export * from './scroll';
 export * from './statuses';

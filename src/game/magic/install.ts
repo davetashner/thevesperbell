@@ -27,6 +27,7 @@ import {
   type SpellLearner,
   installSpellProjectiles,
   installSpells,
+  installRemoteHold,
   installSpellForces,
   installSpellTether,
   installSpellVolumes,
@@ -103,6 +104,7 @@ export function installGameMagic<TInput>(
   });
   installSpellVolumes(world, pipeline);
   installSpellForces(world);
+  installRemoteHold(world);
   installSpellEmission(world, pipeline);
   const tether = installSpellTether(world, pipeline, {
     casting,
