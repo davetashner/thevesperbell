@@ -326,6 +326,7 @@ export class AdaptiveMusic {
   #startVoice(layer: LayerRuntime, track: MusicTrack, when: number, level: number): boolean {
     const voice = this.#engine.startTrack(layer.spec.cue, track, {
       when,
+      offset: layer.spec.startOffsetS ?? 0,
       loop: layer.spec.loop || this.#set.lockstep,
       volume: level,
       onEnded: () => {

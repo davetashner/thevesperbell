@@ -235,26 +235,26 @@ describe('AdaptiveMusic (mw-e28.11)', () => {
     expect(SNAPSHOTS.explore.buses.music).toBeUndefined();
   });
 
-  it('AC-2: the combat layer leaves 8 s after the last creature stops fighting, not if combat resumes at 6 s', async () => {
+  it('AC-2: the combat layer leaves 4 s after the last creature stops fighting, not if combat resumes at 3 s', async () => {
     const t = setup();
     await t.loaded();
     t.alert(t.creature, 'combat');
     await t.runTo(5);
     expect(t.music.state.layer).toBe('combat');
     t.alert(t.creature, 'unaware');
-    await t.runTo(5 + 7.9);
+    await t.runTo(5 + 3.9);
     expect(t.music.state.layer).toBe('combat');
-    await t.runTo(5 + 8.1);
+    await t.runTo(5 + 4.1);
     expect(t.music.state.layer).toBe('explore');
     expect(t.music.state.inCombat).toBe(false);
 
-    // Combat resumes 6 s into the next quiet spell: the layer never leaves.
+    // Combat resumes 3 s into the next quiet spell: the layer never leaves.
     t.alert(t.other, 'combat');
     await t.runTo(30);
     expect(t.music.state.layer).toBe('combat');
     const sourcesBefore = t.ctx.sources.length;
     t.alert(t.other, 'unaware');
-    await t.runTo(36);
+    await t.runTo(33);
     t.alert(t.other, 'combat');
     await t.runTo(48);
     expect(t.music.state.layer).toBe('combat');
@@ -299,6 +299,28 @@ describe('AdaptiveMusic (mw-e28.11)', () => {
     expect(t.ctx.sources.filter((s) => s.loop && s.startedAt !== undefined)).toHaveLength(2);
     expect(second?.startOffset).toBe(0);
     expect(t.music.state.layer).toBe('combat');
+  });
+
+  it('mw-03t AC-1, AC-3: a layer with a start offset begins there every time and still loops from the loop start', async () => {
+    const combat = { cue: 'music-t-combat', loop: true, startOffsetS: 1.75 };
+    const t = setup({
+      set: { ...SEPARATE, layers: { ...SEPARATE.layers, combat } },
+      sidecar: (url) =>
+        url.includes('music-t-combat')
+          ? '{ "bpm": 90, "beatsPerBar": 4, "loopStartSample": 0, "loopEndSample": 3072000 }'
+          : undefined,
+    });
+    await t.loaded();
+    t.alert(t.creature, 'combat');
+    await t.runTo(3);
+    t.alert(t.creature, 'unaware');
+    await t.runTo(25);
+    t.alert(t.creature, 'combat');
+    await t.runTo(30);
+    const fights = t.ctx.sources.filter((s) => s.loop && s.startedAt !== undefined);
+    expect(fights.map((s) => s.startOffset)).toEqual([1.75, 1.75]);
+    expect(fights.map((s) => s.loopStart)).toEqual([0, 0]);
+    expect(t.sourceFor(0).startOffset).toBe(0);
   });
 
   it('the shorter bar of a 1:2 tempo pair sets the grid, counted from the playing track', async () => {
@@ -640,11 +662,13 @@ describe('music sets', () => {
     expect(set?.lockstep).toBe(false);
     expect(Object.keys(set?.layers ?? {})).toEqual(['explore', 'combat']);
     expect(set?.layers.combat?.bpm).toBe(128);
+    expect(set?.layers.combat?.startOffsetS).toBe(1.75); // mw-03t AC-2
+    expect(set?.layers.explore?.startOffsetS).toBeUndefined();
     expect(musicSetFor('nowhere')).toBeUndefined();
   });
 
-  it('the combat exit delay is the bead 8 s (data, tunable) and tension 6 s', () => {
-    expect(DEFAULT_TUNING.combatExitDelayS).toBe(8);
+  it('the combat exit delay is 4 s (data, tunable) and tension 6 s', () => {
+    expect(DEFAULT_TUNING.combatExitDelayS).toBe(4);
     expect(DEFAULT_TUNING.tensionExitDelayS).toBe(6);
   });
 });
