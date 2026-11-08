@@ -45,6 +45,7 @@
 // the view: look input does not turn it, and the controller strafes around the anchor point.
 
 import type { ControllerTuning, Frozen, MoveTable, RuntimeShield } from '@content/index';
+import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
 import { radians } from '../character/greybox';
@@ -585,6 +586,11 @@ export interface PlayerOptions {
   readonly climb?: PlayerClimbOptions;
   /** Wading, swimming, sinking and breath in the scene's water (mw-e02.14); absent = none. */
   readonly water?: PlayerWaterOptions;
+  /**
+   * Status definitions (mw-e06.24): the player's `moveSpeed` statuses (slowed, rooted) scale its
+   * speed, read through `modifiedStat`; absent = statuses leave movement alone.
+   */
+  readonly statuses?: StatusLookup;
 }
 
 /** The player's water (mw-e02.14, src/sim/character/water.ts). */
@@ -758,12 +764,14 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         const frame = actionFrameOf(inputs);
         const look = world.get(entity, PlayerLook);
         if (frame === undefined || look === undefined) return undefined;
+        const statusScale =
+          options.statuses === undefined ? 1 : statusMoveScale(world, options.statuses, entity);
         const actions =
           combat === undefined
-            ? frame
+            ? restrainMovement(frame, statusScale)
             : restrainMovement(
                 frame,
-                combatLocomotionScale(world, entity, combat),
+                Math.min(combatLocomotionScale(world, entity, combat), statusScale),
                 combat.melee !== undefined && isAttacking(world, entity, combat.moves)
                   ? true
                   : undefined,

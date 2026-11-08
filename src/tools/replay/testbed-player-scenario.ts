@@ -59,6 +59,7 @@ import {
   debugSpellLearner,
   givePlayerMagic,
   installGameMagic,
+  statusLookup,
   type GameMagic,
 } from '@game/magic/index';
 import { installGamePhysics, playerFocus } from '@game/physics-objects';
@@ -287,6 +288,7 @@ export function createGameWorld<TInput>(
       beforeStimuli: (sim: World<never>) => {
         magic = installGameMagic(sim, {
           spells: content.all('spell'),
+          statuses: content.all('status'),
           damage: combat.damage,
           collision: collisionWorld,
           invulnerable: invulnerabilityRule(combat.moves),
@@ -334,6 +336,7 @@ export function createGameWorld<TInput>(
     moves: combat.moves,
     melee: combat.melee,
     bow: combat.bow,
+    ...(withMagic && { statuses: statusLookup(content.all('status')) }),
     // A target at zero health is defeated, as in src/main.ts (mw-e02.32: the dummy's death hands
     // the lock on).
     lockOn: {
