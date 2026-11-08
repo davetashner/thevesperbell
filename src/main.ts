@@ -515,6 +515,8 @@ function startRenderer(
       quaternion: camera.quaternion.toArray().map(round),
     });
   };
+  // ?debug=1 pages publish the view camera every frame, so a test can ask what is in view (mw-ju8.42).
+  const publishLiveCamera = new URLSearchParams(location.search).get('debug') === '1';
   const debugCamera = new DebugCamera({
     read: () => ({
       position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
@@ -1089,7 +1091,7 @@ function startRenderer(
         bridge.frame();
         const { timeMs } = frame;
         const elapsedMs = timeMs - (lastFrameMs ?? timeMs);
-        if (debugCamera.update(elapsedMs)) writeCameraData();
+        if (debugCamera.update(elapsedMs) || publishLiveCamera) writeCameraData();
         lastFrameMs = timeMs;
         deathBeat?.frame(frame.alpha);
         if (!replayPlaying()) sliceCard?.frame();

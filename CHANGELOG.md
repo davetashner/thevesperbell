@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The riverbank path in Briar Glen lane is easy to find: two blue pillars frame the gap in the east wall, a green path leads into the alley, a signpost stands at the mouth and a lantern and brazier light the alley by night. Sign markers are now flat boards at sign height and other placeholder markers small flat discs, instead of yellow cones floating in the air (mw-ju8.42).
 - Light beams: sunlight shafts, crystals and spells cast a ray that mirrors bounce (up to 8 times), clear things like ice let through, lenses focus into heat that can ignite fuel, and opaque things or anyone stepping into the beam stop; light receivers switch on after the light has stayed at their threshold for a dwell time, optionally only for one colour (mw-e03.17)
 - Mage Hand now holds objects with the spring-damper remote hold instead of teleporting them: a held crate swings after the aim point with a little weight, jams and drops if it is pushed into a wall, floats against the world's own gravity, and lets go when you are staggered, leave the scene or save. Objects over its weight limit report "overweight", and only levers flagged remotely actuable (the testbed and mechanism-room levers) can be pulled from afar.
 - Torches, candles, sconces, braziers, lanterns and fireplaces go out when soaked, blown out by a gust stronger than they resist (a candle gutters, a brazier does not) or smothered silently by hand in a second, and relight from heat once dry; a lightChanged event says why and who
