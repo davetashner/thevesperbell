@@ -177,11 +177,22 @@ export const scenePlateSchema = z.strictObject({
  * its spherical hit zone. Signal graphs read it through lever nodes bound to the spawn; a signal into
  * a `mechanism` receiver bound to it resets it.
  */
+/**
+ * Makes a spawn a cuttable rope (mw-e05.13): a cord hanging straight down from the spawn point that
+ * slash or pierce damage (an arrow with a cutting head, a thrown blade, a spell) severs. Whatever names
+ * it in `suspendedFrom` hangs from it and falls as a physics object when it is cut or burnt. It gets
+ * the `cuttable` world property.
+ */
+export const sceneRopeSchema = z.strictObject({
+  length: z.number().positive().describe('How far it hangs straight down, metres.'),
+  radius: z.number().positive().optional().describe('Half its thickness, metres (default 0.05).'),
+});
+
 export const sceneImpactSwitchSchema = z.strictObject({
   variant: z
-    .enum(['bullseye', 'bell', 'crystal', 'counterweight'])
+    .enum(['bullseye', 'bell', 'crystal', 'counterweight', 'target'])
     .describe(
-      'Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope).',
+      'Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope), target (any projectile at or above the spawn’s `shootable` impulse, latching).',
     ),
   minEnergy: z
     .number()
@@ -499,6 +510,18 @@ export const sceneSpawnSchema = z.strictObject({
     .optional()
     .describe(
       'Makes the spawned entity a pressure plate that weighs what rests on it (mw-e03.19).',
+    ),
+  rope: sceneRopeSchema
+    .optional()
+    .describe(
+      'Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13).',
+    ),
+  suspendedFrom: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      'Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls.',
     ),
   impactSwitch: sceneImpactSwitchSchema
     .optional()
@@ -823,6 +846,16 @@ export const sceneSchema = z
       }
       seen.add(spawn.id);
       checkMechanism(spawn, index, ctx);
+      if (
+        spawn.suspendedFrom !== undefined &&
+        !scene.spawns.some((other) => other.id === spawn.suspendedFrom && other.rope !== undefined)
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['spawns', index, 'suspendedFrom'],
+          message: `spawn "${spawn.id}" hangs from "${spawn.suspendedFrom}", which is not a rope spawn of this scene`,
+        });
+      }
       if (spawn.creature !== undefined) return;
       for (const key of [
         'faction',
@@ -1041,6 +1074,23 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     if (plate.maxWeight !== undefined && plate.maxWeight < plate.minWeight) {
       issue('plate', 'has a maxWeight below its minWeight');
     }
+  }
+  if (spawn.rope !== undefined) {
+    for (const [key, what] of [
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['impactSwitch', 'an impact switch'],
+      ['container', 'a container'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+      ['suspendedFrom', 'hanging from a rope'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a rope and ${what}`);
+    }
+  }
+  if (spawn.suspendedFrom !== undefined) {
+    if (spawn.prop === undefined) issue('suspendedFrom', 'hangs but is not a movable prop');
   }
   const { impactSwitch } = spawn;
   if (impactSwitch !== undefined) {

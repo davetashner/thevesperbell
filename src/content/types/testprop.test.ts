@@ -24,6 +24,7 @@ describe('testprop content', () => {
     expect(content.all('testprop').map((p) => p.id)).toEqual([
       'barrel',
       'bottle',
+      'chandelier',
       'clay-pot',
       'crate',
       'lever',

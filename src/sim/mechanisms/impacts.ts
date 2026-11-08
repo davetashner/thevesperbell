@@ -23,6 +23,14 @@
 // A bell also rings: one noise event per tick it is struck. Outputs drive the lever nodes bound to it
 // in signal graphs, like any switch. A counterweight is released by its support giving way (a cut or
 // burnt rope): the rope calls `releaseImpactSwitch`, which trips it whatever the filter says.
+//
+// Shootable (mw-e05.13): the `shootable` world property is the authoring surface of a target, a gong
+// or any other thing a projectile fires a signal from. It is a threshold in N·s (the momentum the
+// projectile delivers), so it maps onto an impact switch's `minImpulse` (`makeShootable`; a scene
+// spawn that sets the property becomes one). The two thresholds are separate on purpose: `minEnergy`
+// is J and `minImpulse` N·s, and a switch may set either or both. Arrows and physics bodies report
+// both; a stimulus reports an impulse only when it is a force (its delivered amount is N·s), so a
+// switch with a `minImpulse` ignores a spark or a slash, which carry none.
 
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
@@ -31,6 +39,7 @@ import { arrowImpact } from '../combat/arrows/events';
 import { blameOf, BlameComponent } from '../combat/environment/environment';
 import { noiseEmitted } from '../noise/events';
 import { physicsImpact } from '../physics/objects';
+import { hasProperty, readProperty } from '../properties/components';
 import { setLever } from '../signals/runtime';
 import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import { shapeFalloff, type Vec3 } from '../stimulus/shapes';
@@ -50,13 +59,24 @@ export const IMPACT_SWITCH_MODES = ['momentary', 'latching'] as const;
 export type ImpactSwitchMode = (typeof IMPACT_SWITCH_MODES)[number];
 
 /** The prefabs. */
-export const IMPACT_SWITCH_VARIANTS = ['bullseye', 'bell', 'crystal', 'counterweight'] as const;
+export const IMPACT_SWITCH_VARIANTS = [
+  'bullseye',
+  'bell',
+  'crystal',
+  'counterweight',
+  'target',
+] as const;
 export type ImpactSwitchVariant = (typeof IMPACT_SWITCH_VARIANTS)[number];
 
 /** What an impact switch accepts. */
 export interface ImpactFilter {
   /** Least energy that counts, J (the delivered amount for an element). */
   readonly minEnergy: number;
+  /**
+   * Least impulse that counts, N·s (mw-e05.13: a `shootable` threshold); 0 or absent: any. An impact
+   * that reports no impulse never reaches a switch that asks for one.
+   */
+  readonly minImpulse?: number;
   readonly damageTypes: readonly ImpactDamageType[];
   readonly elements: readonly ImpactElement[];
 }
@@ -144,6 +164,17 @@ export const IMPACT_SWITCH_PREFABS: Readonly<Record<ImpactSwitchVariant, ImpactS
     holdSeconds: 0,
     loudness: null,
   }),
+  /** Shootable (mw-e05.13): any projectile or shove at or above its `shootable` impulse fires it for good. */
+  target: prefab({
+    variant: 'target',
+    minEnergy: 0,
+    damageTypes: ALL_DAMAGE,
+    elements: ['force'],
+    radius: 0.3,
+    mode: 'latching',
+    holdSeconds: 0,
+    loudness: null,
+  }),
 };
 
 /** Something that hit, from any source. */
@@ -152,6 +183,8 @@ export interface Impact {
   readonly position: Vec3;
   /** J for a damage type; the delivered amount for an element. */
   readonly energy: number;
+  /** N·s it delivered, when the source knows (arrows, bodies, force); absent or null: unknown. */
+  readonly impulse?: number | null;
   /** Exactly one of these is set. */
   readonly damageType: ImpactDamageType | null;
   readonly element: ImpactElement | null;
@@ -176,6 +209,8 @@ const known = <T>(value: T | undefined): T => value as T;
 /** Whether `impact` passes `filter`. */
 export function passesFilter(filter: ImpactFilter, impact: Impact): boolean {
   if (impact.energy < filter.minEnergy) return false;
+  const minImpulse = filter.minImpulse ?? 0;
+  if (minImpulse > 0 && (impact.impulse ?? 0) < minImpulse) return false;
   return (
     (impact.damageType !== null && filter.damageTypes.includes(impact.damageType)) ||
     (impact.element !== null && filter.elements.includes(impact.element))
@@ -204,6 +239,9 @@ export function makeImpactSwitch(
   if (!(Number.isFinite(sw.minEnergy) && sw.minEnergy >= 0)) {
     throw new RangeError('an impact switch needs a minimum energy of 0 or more');
   }
+  if (!(Number.isFinite(sw.minImpulse ?? 0) && (sw.minImpulse ?? 0) >= 0)) {
+    throw new RangeError('an impact switch needs a minimum impulse of 0 or more');
+  }
   if (!(Number.isFinite(sw.radius) && sw.radius > 0)) {
     throw new RangeError('an impact switch needs a hit zone above 0 m');
   }
@@ -221,6 +259,26 @@ export function makeImpactSwitch(
     lastHit: -1,
   });
   if (!world.has(entity, PlacementComponent)) placeEntity(world, entity, origin);
+}
+
+/**
+ * Makes `entity` a shootable target (mw-e05.13): an impact switch of the `target` prefab (overridden
+ * field by field by `spec`) whose `minImpulse` is the entity's `shootable` property, N·s.
+ * @throws RangeError when `entity` has no `shootable` property, or for anything `makeImpactSwitch` refuses.
+ */
+export function makeShootable(
+  world: World<never>,
+  entity: EntityId,
+  origin: Vec3,
+  spec: Partial<Omit<ImpactSwitchSpec, 'variant' | 'minImpulse'>> = {},
+): void {
+  if (!hasProperty(world, entity, 'shootable')) {
+    throw new RangeError(`entity ${String(entity)} has no shootable property`);
+  }
+  makeImpactSwitch(world, entity, origin, 'target', {
+    ...spec,
+    minImpulse: readProperty(world, entity, 'shootable'),
+  });
 }
 
 /** Writes a switch's state and tells its graphs and listeners when it turned on or off. */
@@ -361,16 +419,17 @@ const ELEMENT_SET: ReadonlySet<StimulusElement> = new Set(IMPACT_ELEMENTS);
 export function impactFeeds<TInput>(world: World<TInput>): () => void {
   const w: World<never> = world;
   const offs = [
-    world.events.on(physicsImpact, ({ entity, other, energy, position }) => {
+    world.events.on(physicsImpact, ({ entity, other, energy, impulse, position }) => {
       const blamed = (e: EntityId): EntityId | null =>
         w.isRegistered(BlameComponent) && w.isAlive(e) ? blameOf(w, e) : null;
       const source = blamed(entity) ?? (other === null ? null : blamed(other));
-      deliverImpact(w, { position, energy, damageType: 'blunt', element: null, source });
+      deliverImpact(w, { position, energy, impulse, damageType: 'blunt', element: null, source });
     }),
-    world.events.on(arrowImpact, ({ position, energy, outcome, shooter }) => {
+    world.events.on(arrowImpact, ({ position, energy, impulse, outcome, shooter }) => {
       deliverImpact(w, {
         position,
         energy,
+        impulse,
         damageType: outcome === 'stick' ? 'pierce' : 'blunt',
         element: null,
         source: shooter,
@@ -385,6 +444,7 @@ export function impactFeeds<TInput>(world: World<TInput>): () => void {
       const impact = {
         position: { x: 0, y: 0, z: 0 },
         energy: amount,
+        impulse: element === 'force' ? amount : null,
         damageType,
         element: elementOf,
         source,

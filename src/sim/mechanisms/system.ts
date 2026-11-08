@@ -94,6 +94,7 @@ import {
   impactSwitchesSystem,
   resetImpactSwitch,
 } from './impacts';
+import { CuttableComponent, ropeFeeds, ropesSystem, SuspendedComponent } from './ropes';
 import { PlateComponent, platesSystem, resetPlate, type PlateOptions } from './plates';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
@@ -806,10 +807,17 @@ export function installMechanisms<TInput>(
     keys: options.keys,
     pick: options.pick,
   };
-  world.register(...MECHANISM_COMPONENTS, PlateComponent, ImpactSwitchComponent);
+  world.register(
+    ...MECHANISM_COMPONENTS,
+    PlateComponent,
+    ImpactSwitchComponent,
+    CuttableComponent,
+    SuspendedComponent,
+  );
   world.addSystem(mechanismsSystem(rules));
   world.addSystem(platesSystem(options.plates));
   world.addSystem(impactSwitchesSystem());
+  world.addSystem(ropesSystem());
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
     removeFrom(rules.colliders, door.collider);
@@ -818,8 +826,13 @@ export function installMechanisms<TInput>(
       elementFieldOf(w).setConductivity(doorway(w, door), 1);
     }
   });
+  // A rope that goes (cut, burnt away, unloaded) takes its collider with it.
+  world.onRemove(CuttableComponent, (_entity, rope) => {
+    removeFrom(rules.colliders, rope.collider);
+  });
   const offs = [
     impactFeeds(world),
+    ropeFeeds(world),
     addAffordanceGate(world, keyGate(rules)),
     world.events.on(interacted, ({ actor, target, verb }) => {
       if (w.has(target, SwitchComponent)) {

@@ -1417,6 +1417,31 @@
             ],
             "additionalProperties": false
           },
+          "rope": {
+            "description": "Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13).",
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "How far it hangs straight down, metres."
+              },
+              "radius": {
+                "description": "Half its thickness, metres (default 0.05).",
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "length"
+            ],
+            "additionalProperties": false
+          },
+          "suspendedFrom": {
+            "description": "Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls.",
+            "type": "string",
+            "minLength": 1
+          },
           "impactSwitch": {
             "description": "Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20).",
             "type": "object",
@@ -1427,9 +1452,10 @@
                   "bullseye",
                   "bell",
                   "crystal",
-                  "counterweight"
+                  "counterweight",
+                  "target"
                 ],
-                "description": "Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope)."
+                "description": "Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope), target (any projectile at or above the spawn’s `shootable` impulse, latching)."
               },
               "minEnergy": {
                 "description": "Least energy that counts, J (the delivered amount for an element).",

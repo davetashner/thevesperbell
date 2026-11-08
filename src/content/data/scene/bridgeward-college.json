@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "bridgeward-college",
   "name": "The Bridgeward College",
-  "description": "Bead mw-ju8.13: the Bridgeward College in grey box, built from the e00 kit only. A 16 x 8 m training hall (street door in the south wall, reached by a short entry from briar-glen-lane): the fighting hall in the west half, where Sergeant Maud Garrick (npc-garrick) sells knight-technique lessons from behind her lesson table (garrick-lessons, merchant bridgeward-fighting-hall) with three practice dummies behind her, and the archery butts in the east half, where Master Ewan Rooke (npc-rooke) sells trick-shot lessons (rooke-lessons, merchant bridgeward-archery-butts) with three straw targets behind him. Each table opens the shop screen on its Services tab: a lesson takes its price in crowns and teaches the technique (story bible §5.16). Nobody here teaches sorcery. dev-crowns:600 tops the player up on first opening so the dev scene can pay. Props are kit stand-ins with named marker spawns for art. Reach it with ?scene=bridgeward-college; street-exit leads out to briar-glen-lane (arrive-from-bridgeward-college), and the lane's bridgeward-college-door leads in.",
+  "description": "Bead mw-ju8.13: the Bridgeward College in grey box, built from the e00 kit only. A 16 x 8 m training hall (street door in the south wall, reached by a short entry from briar-glen-lane): the fighting hall in the west half, where Sergeant Maud Garrick (npc-garrick) sells knight-technique lessons from behind her lesson table (garrick-lessons, merchant bridgeward-fighting-hall) with three practice dummies behind her, and the archery butts in the east half, where Master Ewan Rooke (npc-rooke) sells trick-shot lessons (rooke-lessons, merchant bridgeward-archery-butts) with three straw targets behind him. Each table opens the shop screen on its Services tab: a lesson takes its price in crowns and teaches the technique (story bible §5.16). Nobody here teaches sorcery. dev-crowns:600 tops the player up on first opening so the dev scene can pay. Props are kit stand-ins with named marker spawns for art. Reach it with ?scene=bridgeward-college; street-exit leads out to briar-glen-lane (arrive-from-bridgeward-college), and the lane's bridgeward-college-door leads in. Two trick-shot examples (mw-e05.13): the gate-target on the north wall is shootable (an arrow at full draw fires it) and lifts the archery-gate portcullis; the chandelier hangs from a cuttable rope, so a broadhead through the rope drops it as a physics object (a blunt arrow does not cut it).",
   "grid": 1,
   "camera": {
     "position": [-12, 12, -12],
@@ -255,6 +255,40 @@
         "burning": true,
         "fuel": 28800
       }
+    },
+    {
+      "id": "archery-gate",
+      "at": [5.75, 0, 1.25],
+      "tags": ["gate", "archery"],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "gate-target",
+      "at": [7, 1.5, 3.75],
+      "tags": ["target", "archery"],
+      "properties": {
+        "shootable": 1
+      }
+    },
+    {
+      "id": "chandelier-rope",
+      "at": [1.5, 3.5, 1.5],
+      "tags": ["rope", "archery"],
+      "rope": {
+        "length": 1.5
+      },
+      "properties": {
+        "material": "rope"
+      }
+    },
+    {
+      "id": "chandelier",
+      "at": [1.5, 1.75, 1.5],
+      "tags": ["prop", "archery"],
+      "prop": "chandelier",
+      "suspendedFrom": "chandelier-rope"
     }
   ],
   "light": {
@@ -278,6 +312,11 @@
       "max": [2, 3, -6.75],
       "scene": "briar-glen-lane",
       "spawn": "arrive-from-bridgeward-college"
+    }
+  ],
+  "signals": [
+    {
+      "graph": "bridgeward-archery"
     }
   ]
 }
