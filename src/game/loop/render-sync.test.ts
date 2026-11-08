@@ -96,6 +96,17 @@ describe('RenderSync', () => {
     expect(binding.object.disposed).toBe(1); // exactly once
   });
 
+  it('objectOf gives the bound scene object, or undefined for an unbound entity', () => {
+    const w = world();
+    const entity = w.spawn();
+    w.add(entity, Position, { x: 0 });
+    const sync = new RenderSync(w);
+    const binding = fakeBinding();
+    sync.bind(entity, binding);
+    expect(sync.objectOf(entity)).toBe(binding.object);
+    expect(sync.objectOf(w.spawn())).toBeUndefined();
+  });
+
   it('interpolates between the previous and latest sim step by alpha', () => {
     const w = world();
     const id = w.spawn();

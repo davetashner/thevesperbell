@@ -1,0 +1,103 @@
+{
+  "$schema": "../element-feedback.schema.json",
+  "id": "element-feedback",
+  "notes": "Grey-box element state feedback (mw-e03.28). Burning, wet, frozen and charged read by colour AND motion (style bible \u00a72.3, \u00a77): fire rises and flickers orange, wet drips downward with a darker glossy surface, frozen hangs still and pale with an icy sheen, charged throws short jagged yellow arcs and shimmers at 2 Hz (under the 3 Hz limit). Looks follow the bible: wet is about a quarter darker with a sheen. Effects scale to the entity's bounding radius over the reference radius. No sound cues exist yet for crackle, sizzle, freeze crack or zap (mw-e38), so audioCue is left off every state. Final art: mw-e29 asset beads; final SFX: mw-e38.",
+  "handleCap": 64,
+  "hysteresis": 2,
+  "states": [
+    {
+      "id": "burning",
+      "property": "burning",
+      "when": {
+        "is": true
+      },
+      "effect": "vfx-fire-burn-loop",
+      "referenceRadius": 0.25,
+      "scale": {
+        "min": 0.6,
+        "max": 3
+      },
+      "look": {
+        "tint": "#2A1C14",
+        "tintMix": 0.35,
+        "emissive": "#FF7A1A",
+        "emissiveIntensity": 0.8
+      }
+    },
+    {
+      "id": "wet",
+      "property": "wetness",
+      "when": {
+        "atLeast": 0.35
+      },
+      "effect": "vfx-element-wet-drip",
+      "referenceRadius": 0.25,
+      "scale": {
+        "min": 0.6,
+        "max": 3
+      },
+      "look": {
+        "tint": "#2B4A63",
+        "tintMix": 0.5,
+        "roughness": 0.15
+      }
+    },
+    {
+      "id": "frozen",
+      "property": "frozen",
+      "when": {
+        "is": true
+      },
+      "effect": "vfx-element-frost-glint",
+      "referenceRadius": 0.25,
+      "scale": {
+        "min": 0.6,
+        "max": 3
+      },
+      "look": {
+        "tint": "#DFF4FF",
+        "tintMix": 0.6,
+        "emissive": "#8FD8FF",
+        "emissiveIntensity": 0.5,
+        "roughness": 0.08
+      }
+    },
+    {
+      "id": "charged",
+      "property": "charge",
+      "when": {
+        "atLeast": 1
+      },
+      "effect": "vfx-element-charge-arc",
+      "referenceRadius": 0.25,
+      "scale": {
+        "min": 0.6,
+        "max": 3
+      },
+      "reducedIntensity": 0.25,
+      "look": {
+        "tint": "#FFF36B",
+        "tintMix": 0.25,
+        "emissive": "#FFF36B",
+        "emissiveIntensity": 0.6,
+        "pulseHz": 2
+      }
+    }
+  ],
+  "fields": [
+    {
+      "gas": "smoke",
+      "effect": "vfx-element-smoke-cloud",
+      "threshold": 0.05,
+      "cap": 24,
+      "referenceCell": 0.5
+    },
+    {
+      "gas": "steam",
+      "effect": "vfx-element-steam-cloud",
+      "threshold": 0.05,
+      "cap": 12,
+      "referenceCell": 0.5
+    }
+  ]
+}

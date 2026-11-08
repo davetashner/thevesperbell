@@ -184,6 +184,11 @@ export const worldPropertiesSchema = z
 /** Every canonical world-property key. */
 const PROPERTY_KEYS: readonly string[] = Object.keys(worldPropertiesSchema.shape);
 
+/** Whether `name` is a canonical world-property key (not a synonym or spelling variant). */
+export function isWorldPropertyName(name: string): boolean {
+  return PROPERTY_KEYS.includes(name);
+}
+
 /** World properties as written in a data file (any subset). */
 export type WorldPropertiesData = z.output<typeof worldPropertiesSchema>;
 

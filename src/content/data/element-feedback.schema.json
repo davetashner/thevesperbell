@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique table id; the game reads \"element-feedback\"."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Where the looks come from and what is placeholder."
+    },
+    "handleCap": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 256,
+      "description": "Most element effects live at once; beyond it the farthest from the camera go."
+    },
+    "hysteresis": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Metres of preference an effect that is already live gets over a rival at the cap, so two things at the same distance do not trade places every frame."
+    },
+    "states": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "State id, e.g. \"burning\"."
+          },
+          "property": {
+            "type": "string",
+            "description": "World property that drives the state (burning, wetness, frozen, charge…)."
+          },
+          "when": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "is": {
+                    "type": "boolean",
+                    "description": "A flag property equals this."
+                  }
+                },
+                "required": [
+                  "is"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "atLeast": {
+                    "type": "number",
+                    "description": "A number property is at least this (and the state is on)."
+                  }
+                },
+                "required": [
+                  "atLeast"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "description": "When the property counts as on."
+          },
+          "effect": {
+            "description": "VFX effect played on the entity while the state is on.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "vfx-effect"
+          },
+          "referenceRadius": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Bounding radius, metres, the effect is authored for; larger things scale it up."
+          },
+          "scale": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Smallest effect scale."
+              },
+              "max": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Largest effect scale."
+              }
+            },
+            "required": [
+              "min",
+              "max"
+            ],
+            "additionalProperties": false,
+            "description": "Limits on bounds-driven effect scale (1 = as authored)."
+          },
+          "reducedIntensity": {
+            "default": 1,
+            "description": "Emission multiplier while reduced motion is on (strobing sparks use less).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "look": {
+            "description": "Material look of the entity’s mesh in this state.",
+            "type": "object",
+            "properties": {
+              "tint": {
+                "description": "Colour the albedo is mixed towards (white leaves it alone, a dark colour darkens).",
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$"
+              },
+              "tintMix": {
+                "default": 0,
+                "description": "How far the albedo moves towards `tint`, 0 = not at all … 1 = fully.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "emissive": {
+                "description": "Glow colour added to the surface (emissive).",
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$"
+              },
+              "emissiveIntensity": {
+                "default": 0,
+                "description": "Strength of the glow.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 2
+              },
+              "roughness": {
+                "description": "Roughness the surface takes (low = a specular sheen, as wet or iced things have).",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "pulseHz": {
+                "default": 0,
+                "description": "Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3
+              }
+            },
+            "additionalProperties": false
+          },
+          "audioCue": {
+            "description": "One-shot sound cue played where the entity is when it enters the state; only cues in the sound manifest play. Absent while no cue exists.",
+            "type": "string",
+            "pattern": "^sfx-[a-z0-9-]+$"
+          }
+        },
+        "required": [
+          "id",
+          "property",
+          "when",
+          "effect",
+          "referenceRadius",
+          "scale"
+        ],
+        "additionalProperties": false
+      },
+      "description": "The states, in the order looks combine."
+    },
+    "fields": {
+      "description": "Gases of the element field drawn as clouds (smoke, steam).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "gas": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Gas id in the element field, e.g. \"smoke\" or \"steam\"."
+          },
+          "effect": {
+            "description": "Looping cloud effect held on each dense cell.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "vfx-effect"
+          },
+          "threshold": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1,
+            "description": "Concentration (0–1 of a cell) at which a cell gets a cloud."
+          },
+          "cap": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 256,
+            "description": "Most clouds of this gas at once; the densest win."
+          },
+          "referenceCell": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Cell edge, metres, the effect is authored for; the cloud scales by cell size over it."
+          }
+        },
+        "required": [
+          "gas",
+          "effect",
+          "threshold",
+          "cap",
+          "referenceCell"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "handleCap",
+    "hysteresis",
+    "states"
+  ],
+  "additionalProperties": false
+}

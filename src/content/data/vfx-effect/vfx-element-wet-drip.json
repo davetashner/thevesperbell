@@ -1,0 +1,56 @@
+{
+  "id": "vfx-element-wet-drip",
+  "notes": "Wet state (mw-e03.28), grey-box: water-blue drops that fall off a soaked thing (style bible \u00a77 Wet: darker albedo, sheen, drips; water #3F7FA0). Falls where fire rises and charge crackles, so it reads by motion as well as colour. Final art: mw-e29 asset beads.",
+  "priority": 30,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "drops",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "alpha",
+      "rate": 30,
+      "lifetime": {
+        "min": 0.6,
+        "max": 0.9
+      },
+      "speed": {
+        "min": 0,
+        "max": 0.3
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.3,
+      "gravity": 7,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.16
+        },
+        {
+          "t": 1,
+          "v": 0.08
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#CFEFFF"
+        },
+        {
+          "t": 1,
+          "color": "#4FA3D0"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0.9
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    }
+  ]
+}

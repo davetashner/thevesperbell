@@ -57,3 +57,6 @@ export {
 export * from './screen-feedback.ts';
 export * from './trail-controller.ts';
 export * from './trail-tints.ts';
+export * from './element-feedback.ts';
+export * from './element-fields.ts';
+export * from './element-look.ts';

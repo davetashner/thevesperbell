@@ -26,6 +26,20 @@ import { upTo, VfxCueBridge, type VfxCueBridgeOptions, type VfxSpawner } from '.
 const content = loadGameContent();
 const combat = content.get('vfx-cue-sheet', 'combat');
 const worldSheet = content.get('vfx-cue-sheet', 'world');
+// The burning loop is the element-state bridge's now (mw-e03.28); the bridge's own loop lifecycle
+// (attach, stopOn, destroy) is still exercised with a fire rule written here.
+const fireSheet = vfxCueSheetSchema.parse({
+  id: 'fire-loop-test',
+  notes: 'A looping flame stopped by its stop events, for the loop lifecycle tests.',
+  rules: [
+    {
+      event: 'fireIgnited',
+      layer: 'fire',
+      effect: 'vfx-fire-burn-loop',
+      stopOn: ['fireExtinguished', 'fireBurntOut'],
+    },
+  ],
+} satisfies VfxCueSheetDefInput);
 const DT = 1 / 60;
 
 afterEach(() => {
@@ -71,7 +85,7 @@ function game() {
     has: (effect) => vfx.has(effect),
   };
   const bridge = new VfxCueBridge({
-    sheets: [combat, worldSheet],
+    sheets: [combat, worldSheet, fireSheet],
     vfx: spawner,
     now: () => world.tick * 1000,
     locate,
