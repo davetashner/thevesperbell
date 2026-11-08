@@ -282,6 +282,25 @@ describe('the Briar Glen shop lane, headless (mw-ju8.5)', () => {
   });
 });
 
+describe('the riverbank path is readable (mw-ju8.42)', () => {
+  it('AC-3: a signpost spawn stands within 2 m of the gap and the alley is lit', () => {
+    const scene = content.get('scene', 'briar-glen-lane');
+    const way = scene.transitions.find((x) => x.id === 'riverbank-path');
+    expect(way).toBeDefined();
+    // The gap in the east wall: x 9, z 5.5 to 9, its middle.
+    const gap = { x: 9, z: 7.25 };
+    const signs = scene.spawns.filter((s) => s.tags.includes('sign') && s.tags.includes('path'));
+    expect(signs.length).toBeGreaterThan(0);
+    for (const sign of signs) {
+      expect(Math.hypot(sign.at[0] - gap.x, sign.at[2] - gap.z)).toBeLessThan(2);
+    }
+    const lights = scene.spawns.filter(
+      (s) => s.lightSource !== undefined && s.at[0] > 9 && s.at[2] > 5.5 && s.at[2] < 9,
+    );
+    expect(lights.map((s) => s.id).sort()).toEqual(['lantern-riverbank-path', 'riverbank-brazier']);
+  });
+});
+
 function game_arrivals(t: { marker: (id: string) => { position: Vec3 } }): Vec3[] {
   return [
     'arrive-from-valley-03',
