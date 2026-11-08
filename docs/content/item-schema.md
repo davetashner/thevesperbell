@@ -26,6 +26,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `worldProperties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `worldProperties.burning` | boolean | — | On fire right now. |
 | `worldProperties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `worldProperties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `worldProperties.frozen` | boolean | — | Frozen solid. |
 | `worldProperties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `worldProperties.conductive` | boolean | — | Conducts electric charge. |
@@ -101,6 +102,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `use[].properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `use[].properties.burning` | boolean | — | On fire right now. |
 | `use[].properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `use[].properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `use[].properties.frozen` | boolean | — | Frozen solid. |
 | `use[].properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `use[].properties.conductive` | boolean | — | Conducts electric charge. |

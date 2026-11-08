@@ -28,6 +28,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `placements[].properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `placements[].properties.burning` | boolean | — | On fire right now. |
 | `placements[].properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `placements[].properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `placements[].properties.frozen` | boolean | — | Frozen solid. |
 | `placements[].properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `placements[].properties.conductive` | boolean | — | Conducts electric charge. |
@@ -133,6 +134,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `spawns[].properties.burning` | boolean | — | On fire right now. |
 | `spawns[].properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `spawns[].properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `spawns[].properties.frozen` | boolean | — | Frozen solid. |
 | `spawns[].properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `spawns[].properties.conductive` | boolean | — | Conducts electric charge. |
