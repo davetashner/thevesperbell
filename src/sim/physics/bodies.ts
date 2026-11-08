@@ -105,6 +105,8 @@ export interface RigidBodyPort extends PhysicsPort {
   moveBody(handle: ColliderHandle, position: Vec3, rotation?: Quat): void;
   /** Puts a body to sleep now (it wakes again when something touches or pushes it). */
   sleep(handle: ColliderHandle): void;
+  /** The world's gravity, m/s² (default 9.81 straight down); what a hold must cancel to float a body. */
+  gravity(): Vec3;
   /** Contacts that started during the last step, in the engine's deterministic order. */
   impacts(): readonly ContactImpact[];
 }

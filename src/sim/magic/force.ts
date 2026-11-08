@@ -37,7 +37,7 @@ import type { Vec3 } from '../stimulus/shapes';
 import { applyStimulus } from '../stimulus/stimulus';
 import type { OpDetail } from './events';
 import type { OpContext, OpOf } from './registry';
-import { ForceResisted } from './tether';
+import { ForceResisted, type ForceResistedReason } from './tether';
 
 /** The heaviest object a lift raises, kg. Above it the lift is resisted. */
 export const MAX_LIFTABLE_WEIGHT = 250;
@@ -88,12 +88,15 @@ export function resistanceTo(
   world: World<never>,
   target: EntityId,
   lifting: boolean,
-): { readonly weight: number; readonly limit: number } | undefined {
+):
+  | { readonly weight: number; readonly limit: number; readonly reason: ForceResistedReason }
+  | undefined {
   const weight = readProperty(world, target, 'weight');
   if (!readProperty(world, target, 'pushable') && !readProperty(world, target, 'liftable')) {
-    return { weight, limit: 0 };
+    return { weight, limit: 0, reason: 'anchored' };
   }
-  if (lifting && weight > MAX_LIFTABLE_WEIGHT) return { weight, limit: MAX_LIFTABLE_WEIGHT };
+  if (lifting && weight > MAX_LIFTABLE_WEIGHT)
+    return { weight, limit: MAX_LIFTABLE_WEIGHT, reason: 'overweight' };
   return undefined;
 }
 
