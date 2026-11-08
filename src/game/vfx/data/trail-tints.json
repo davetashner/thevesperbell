@@ -1,0 +1,16 @@
+{
+  "damage": {
+    "slash": "#E6EDF5",
+    "pierce": "#CFE3F2",
+    "blunt": "#D9C7A8",
+    "fire": "#FF7A2E",
+    "frost": "#8FD8FF",
+    "shock": "#F6F07A",
+    "arcane": "#B98CFF",
+    "poison": "#8CD65A"
+  },
+  "neutral": "#E6EDF5",
+  "arrow": "#F3E7C4",
+  "glow": ["#FFE9B0", "#FFC46B", "#FFFFFF"],
+  "alpha": { "swing": 0.7, "arrow": 0.22 }
+}
