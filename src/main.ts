@@ -63,6 +63,7 @@ import {
   prepareConsumables,
   prepareWorldItems,
   startConsumables,
+  startCarry,
   startWorldItems,
 } from '@game/items/index';
 import { startInventoryUi, type InventoryUi } from '@game/items/inventory-screen';
@@ -214,6 +215,7 @@ import { createBolt, createGroundMarker, disposeBolt } from '@render/magic/index
 import { createRenderBootstrap } from '@render/bootstrap/index';
 import { createLeftover, disposeLeftover } from '@render/breakables/index';
 import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
+import { createThrowArc } from '@render/player/index';
 import { createDoorLeaf, disposeDoorLeaf } from '@render/mechanisms/index';
 import {
   createArrowShaft,
@@ -1479,6 +1481,15 @@ function startRenderer(
       // is rebuilt only after a take, drop, throw or refusal.
       const worldItems = prepareWorldItems(content);
       startWorldItems(world, worldItems, loaded.spawns, player?.entity);
+      // Carrying (mw-e02.17): Interact lifts a liftable object up to the class's carry limit; Drop
+      // (G) lets go, Drop with crouch places it, and Throw (T), held and released, throws it. The
+      // arc a charged throw would fly is drawn while the button is held.
+      const carry = startCarry(world, content, new RapierCollisionWorld(physics));
+      const throwArc = createThrowArc();
+      view.scene.add(throwArc.object);
+      afterStep.push(() => {
+        throwArc.update(player === undefined ? undefined : carry.preview(player.entity));
+      });
       // Consumables (mw-e17.6): the use pipeline and the player's four quick slots; a thrown
       // consumable flies as a world item carrying its world properties. No buttons use the slots
       // yet (keys 1–4 are the abilities').

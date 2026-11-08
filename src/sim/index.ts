@@ -3,6 +3,7 @@ export const layer = 'sim' as const;
 
 export * from './ai';
 export * from './breakables';
+export * from './carry';
 export * from './character';
 export * from './climb';
 export * from './combat';

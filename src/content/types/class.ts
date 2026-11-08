@@ -53,6 +53,12 @@ export const STAT_CAP = 200;
 /** Upper bound for a class's armor capacity, kg (ADR-0003's knight has 30). */
 export const MAX_ARMOR_CAPACITY_KG = 60;
 
+/** The hand-carry limit of a class that does not say, kg (ADR-0003). */
+export const DEFAULT_CARRY_LIMIT_KG = 25;
+
+/** Upper bound for a class's hand-carry limit, kg. */
+export const MAX_CARRY_LIMIT_KG = 60;
+
 /** Class emblem asset ids (style bible §15.1), e.g. "ui-emblem-class-thief-01". */
 export const CLASS_ICON_PATTERN = /^ui-emblem-class-[a-z0-9]+(?:-[a-z0-9]+)*-\d{2}$/;
 /** Class card art asset ids (style bible §15.1), e.g. "keyart-class-card-thief-01". */
@@ -166,6 +172,14 @@ export const classSchema = z
       .positive()
       .max(MAX_ARMOR_CAPACITY_KG)
       .describe('Equipped armor weight at 100% load (ADR-0003: knight 30, others 23). Kilograms.'),
+    carryLimitKg: z
+      .number()
+      .positive()
+      .max(MAX_CARRY_LIMIT_KG)
+      .default(DEFAULT_CARRY_LIMIT_KG)
+      .describe(
+        'Heaviest world object the class hand-carries, kilograms (ADR-0003, mw-e02.17: 25 by default); a class constant nothing raises.',
+      ),
     stats: z
       .strictObject({
         health: statValue('health'),

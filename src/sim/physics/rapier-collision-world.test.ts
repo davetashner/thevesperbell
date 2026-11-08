@@ -24,6 +24,22 @@ describe('AC-1: the shared CollisionWorld contract (mw-e02.21)', () => {
   });
 });
 
+describe('sweeping past an ignored collider (mw-e02.17)', () => {
+  it('never sees the ignored collider, and sees the next one behind it', () => {
+    const physics = new RapierPhysics(RAPIER);
+    const crate = physics.add(box(v(1, 0, -0.5), v(1.5, 1, 0.5)));
+    const wall = physics.add(box(v(3, 0, -2), v(3.5, 2, 2)));
+    physics.step(0);
+    const collision = new RapierCollisionWorld(physics);
+    const east = v(1, 0, 0);
+    const feet = v(0, 0.1, 0);
+    expect(collision.sweepCapsule(STANDING, feet, east, 5)?.body).toBe(crate);
+    expect(collision.sweepCapsule(STANDING, feet, east, 5, crate)?.body).toBe(wall);
+    expect(physics.rapierHandleOf(crate)).toBeTypeOf('number');
+    expect(physics.rapierHandleOf(999 as ColliderHandle)).toBeUndefined();
+  });
+});
+
 describe('RapierCollisionWorld (mw-e02.21)', () => {
   it('answers from the physics world as of its last step, which the World takes every tick', () => {
     const physics = new RapierPhysics(RAPIER);
