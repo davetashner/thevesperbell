@@ -163,6 +163,11 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 100
+          },
+          "caption": {
+            "description": "Localisation key of the sound caption shown for this cue (mw-e28.14), e.g. \"caption.footsteps\"; it also orders captions (the rule’s priority). Absent = no caption.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
           }
         },
         "required": [

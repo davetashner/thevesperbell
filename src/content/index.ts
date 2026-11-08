@@ -240,6 +240,7 @@ export {
   type CueSheetDef,
   type CueSheetDefInput,
 } from './types/cue-sheet.ts';
+export { formatString, hasString, UI_STRINGS } from './strings.ts';
 export {
   VFX_EFFECT_TEMPLATE_PATTERN,
   vfxCueRuleSchema,

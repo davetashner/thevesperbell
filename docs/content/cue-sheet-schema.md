@@ -26,3 +26,4 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `rules[].volumeBy.floorDb` | number -60–0 | `-12` | Volume offset at `min`, dB (≤ 0); linear in dB up to 0 at `max`. |
 | `rules[].cooldownMs` | integer ≥ 0 | `0` | Minimum ms between two plays of this rule on the same anchor. |
 | `rules[].priority` | integer 0–100 | — | Voice priority for this play (0–100); default: the manifest cue’s priority. |
+| `rules[].caption` | string | — | Localisation key of the sound caption shown for this cue (mw-e28.14), e.g. "caption.footsteps"; it also orders captions (the rule’s priority). Absent = no caption. |

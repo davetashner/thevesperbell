@@ -433,7 +433,8 @@
     {
       "event": "TelegraphStarted",
       "cue": "{telegraphSound}",
-      "priority": 80
+      "priority": 80,
+      "caption": "caption.telegraph"
     },
     {
       "event": "ActionRejected",

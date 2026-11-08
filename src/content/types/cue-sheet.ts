@@ -1,7 +1,7 @@
 // Audio cue sheets as content (mw-e28.3): `src/content/data/cue-sheet/<id>.json`. A sheet is a list
 // of rules mapping sim events to sounds, so combat, fire or a lever can make a noise without a
 // hard-coded play() call anywhere: {event, match, cue, at, variants, pitchJitter, volumeJitterDb,
-// volumeDb, volumeBy, cooldownMs, priority}. The event vocabulary (which events, which anchors and
+// volumeDb, volumeBy, cooldownMs, priority, caption}. The event vocabulary (which events, which anchors and
 // facts) is src/content/cue-events.ts, shared with VFX sheets (e29). The cue id may interpolate
 // string facts, e.g. `sfx-impact-{target}` plays the struck material's impact set, so sounds follow
 // material properties instead of per-object scripting. src/game/cues runs the sheets.
@@ -15,6 +15,8 @@ import {
   type CueEventName,
 } from '../cue-events.ts';
 import { contentId } from '../schema.ts';
+import { hasString } from '../strings.ts';
+import { localisationKey } from './capability.ts';
 
 /** A cue template: an audio cue id (audio bible §6) whose segments may be `{fact}` placeholders. */
 export const CUE_TEMPLATE_PATTERN =
@@ -88,6 +90,11 @@ export const cueRuleSchema = z
       .max(100)
       .optional()
       .describe('Voice priority for this play (0–100); default: the manifest cue’s priority.'),
+    caption: localisationKey
+      .optional()
+      .describe(
+        'Localisation key of the sound caption shown for this cue (mw-e28.14), e.g. "caption.footsteps"; it also orders captions (the rule’s priority). Absent = no caption.',
+      ),
   })
   .superRefine((rule, ctx) => {
     checkCueRule(rule, ctx);
@@ -100,6 +107,7 @@ interface PresentationShape {
   readonly cue: string;
   readonly at?: string | undefined;
   readonly volumeBy?: { readonly fact: string } | undefined;
+  readonly caption?: string | undefined;
 }
 
 /** Placeholders must be string facts, `at` an anchor and `volumeBy` a number fact of the event. */
@@ -126,6 +134,13 @@ function checkPresentation(rule: PresentationShape, ctx: z.RefinementCtx): void 
       code: 'custom',
       path: ['volumeBy', 'fact'],
       message: `"${rule.volumeBy.fact}" must be a number fact of ${rule.event}`,
+    });
+  }
+  if (rule.caption !== undefined && !hasString(rule.caption)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['caption'],
+      message: `caption "${rule.caption}" has no entry in the string table (src/content/strings.ts)`,
     });
   }
 }

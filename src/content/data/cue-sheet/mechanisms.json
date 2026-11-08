@@ -9,7 +9,8 @@
       "cue": "sfx-impact-{entity}",
       "pitchJitter": 0.05,
       "volumeDb": -9,
-      "priority": 35
+      "priority": 35,
+      "caption": "caption.door-open"
     },
     {
       "event": "doorStateChanged",
@@ -18,7 +19,8 @@
       "cue": "sfx-impact-{entity}",
       "pitchJitter": 0.05,
       "volumeDb": -9,
-      "priority": 35
+      "priority": 35,
+      "caption": "caption.door-close"
     },
     {
       "event": "doorStateChanged",

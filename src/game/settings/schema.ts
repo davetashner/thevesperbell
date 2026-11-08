@@ -223,6 +223,21 @@ export const SETTINGS_SCHEMA = {
         help: 'Shows spoken lines as text.',
         default: true,
       }),
+      captions: toggle({
+        label: 'Sound captions',
+        help: 'Shows important sounds as text with a direction arrow: footsteps, attack warnings, doors, breaking objects.',
+        default: false,
+      }),
+      captionSize: choice({
+        label: 'Caption size',
+        help: 'How large sound captions are.',
+        options: [
+          { value: 'small', label: 'Small' },
+          { value: 'medium', label: 'Medium' },
+          { value: 'large', label: 'Large' },
+        ],
+        default: 'medium',
+      }),
       wheelSlowsTime: toggle({
         label: 'Slow time in the spell wheel',
         help: 'Slows the game to a quarter speed while the spell wheel is held open.',
