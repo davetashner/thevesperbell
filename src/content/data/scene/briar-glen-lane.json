@@ -694,7 +694,8 @@
       "tags": ["lantern", "street"],
       "lightSource": {
         "variant": "lantern",
-        "infiniteFuel": true
+        "infiniteFuel": true,
+        "tint": [1, 0.82, 0.45]
       }
     },
     {
@@ -744,7 +745,18 @@
         "level": 0.22,
         "reach": 60
       }
-    ]
+    ],
+    "timeOfDay": {
+      "keyframes": [
+        { "minute": 0, "ambient": 0.1, "directional": 0.08, "sky": "#0B0A16" },
+        { "minute": 300, "ambient": 0.12, "directional": 0.08, "sky": "#14142A" },
+        { "minute": 390, "ambient": 0.28, "directional": 0.2, "sky": "#6B5A78" },
+        { "minute": 480, "ambient": 0.55, "directional": 0.55, "sky": "#9CC4E8" },
+        { "minute": 1020, "ambient": 0.55, "directional": 0.55, "sky": "#9CC4E8" },
+        { "minute": 1110, "ambient": 0.32, "directional": 0.25, "sky": "#C07A50" },
+        { "minute": 1260, "ambient": 0.14, "directional": 0.1, "sky": "#10101E" }
+      ]
+    }
   },
   "environment": {
     "sky": "#1E1B2E"

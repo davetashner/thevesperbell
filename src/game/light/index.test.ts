@@ -20,6 +20,7 @@ import {
   lightProbe,
   lightReadout,
   lightSpawns,
+  lightTints,
   probeGrid,
   selectLights,
 } from './index';
@@ -100,6 +101,14 @@ describe('game light wiring (mw-e03.37)', () => {
       Array.from({ length: 8 }, (_, i) => `lamp-${String(i)}`),
     );
     expect(field.lights().length).toBe(8);
+  });
+
+  it('mw-ju8.43 AC-3: a light source may declare a colour tint, which the rig is given', () => {
+    const { loaded, spawn } = lightingRoom('briar-glen-lane');
+    const tints = lightTints(loaded);
+    expect([...tints.keys()]).toEqual([spawn('lantern-riverbank-path')]);
+    expect(tints.get(spawn('lantern-riverbank-path'))).toEqual([1, 0.82, 0.45]);
+    expect(lightTints(lightingRoom().loaded).size).toBe(0); // no tint: flame or lamp colour
   });
 
   it('AC-3: a torch that stops burning goes out in the sim on the same tick', () => {

@@ -1489,6 +1489,30 @@
               "infiniteFuel": {
                 "description": "Never runs out of fuel while lit (default false).",
                 "type": "boolean"
+              },
+              "tint": {
+                "description": "Colour of its rendered light, [r, g, b] 0–1 (mw-ju8.43); the prefab default (flame or lamp) when absent. Looks only: the sim light level is unchanged.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
               }
             },
             "required": [
@@ -2110,6 +2134,54 @@
             ],
             "additionalProperties": false
           }
+        },
+        "timeOfDay": {
+          "description": "Day and night look of the rendered light, following the game clock (mw-ju8.43).",
+          "type": "object",
+          "properties": {
+            "keyframes": {
+              "minItems": 2,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minute": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1439,
+                    "description": "Minute of the day it applies at, 0–1439."
+                  },
+                  "ambient": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Rendered ambient fill level, 0–1."
+                  },
+                  "directional": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Rendered level of the key light (sun or moon), 0–1."
+                  },
+                  "sky": {
+                    "description": "Sky colour, #RRGGBB.",
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  }
+                },
+                "required": [
+                  "minute",
+                  "ambient",
+                  "directional"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "keyframes"
+          ],
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
