@@ -218,6 +218,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].lightSource.variant` | `"candle"` \| `"torch"` \| `"sconce"` \| `"brazier"` \| `"lantern"` \| `"fireplace"` | required | Prefab: its fuel, light, ignition point and how much wind it takes to blow it out. |
 | `spawns[].lightSource.unlit` | boolean | — | Starts dark; heat lights it (default false). |
 | `spawns[].lightSource.infiniteFuel` | boolean | — | Never runs out of fuel while lit (default false). |
+| `spawns[].lightSource.tint` | list of any (at least 3) | — | Colour of its rendered light, [r, g, b] 0–1 (mw-ju8.43); the prefab default (flame or lamp) when absent. Looks only: the sim light level is unchanged. |
 | `spawns[].impactSwitch` | object | — | Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20). |
 | `spawns[].impactSwitch.variant` | `"bullseye"` \| `"bell"` \| `"crystal"` \| `"counterweight"` \| `"target"` | required | Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope), target (any projectile at or above the spawn’s `shootable` impulse, latching). |
 | `spawns[].impactSwitch.minEnergy` | number ≥ 0 | — | Least energy that counts, J (the delivered amount for an element). |
@@ -282,6 +283,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `light.directional[].direction` | list of any (at least 3) | required | Direction the light travels, e.g. [0, -1, 0] straight down. |
 | `light.directional[].level` | number 0–1 | required | Level where it reaches, 0–1. |
 | `light.directional[].reach` | number > 0 | required | How far back towards the light a position must be clear to receive it, metres. |
+| `light.timeOfDay` | object | — | Day and night look of the rendered light, following the game clock (mw-ju8.43). |
+| `light.timeOfDay.keyframes` | list of object (at least 2) | required |  |
+| `light.timeOfDay.keyframes[].minute` | integer 0–1439 | required | Minute of the day it applies at, 0–1439. |
+| `light.timeOfDay.keyframes[].ambient` | number 0–1 | required | Rendered ambient fill level, 0–1. |
+| `light.timeOfDay.keyframes[].directional` | number 0–1 | required | Rendered level of the key light (sun or moon), 0–1. |
+| `light.timeOfDay.keyframes[].sky` | string | — | Sky colour, #RRGGBB. |
 | `signals` | list of object | — | Signal graphs wiring its switches, volumes and doors (mw-e03.18). |
 | `signals[].graph` | ref → signal-graph | required | The graph to place. |
 | `signals[].bindings` | map of id → id | `{}` | Binding name → spawn id, for names that are not themselves spawn ids. |

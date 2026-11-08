@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { attachFrame, captureFrame, type Frame } from './helpers/canvas';
 import {
   holdKey,
   playerState,
@@ -224,5 +225,47 @@ test('mw-e03.49 AC-4: walking the lane down its centre line, under every street 
   const after = await knight();
   expect(after?.environment).toBeNull();
   expect(after?.health?.current).toBe(before?.health?.current);
+  expect(problems).toEqual([]);
+});
+
+/** Per-cell luma (0-255) of a frame's 64x36 sample. */
+const lumas = (frame: Frame): number[] =>
+  frame.rgb.map((c) => 0.2126 * ((c >> 16) & 255) + 0.7152 * ((c >> 8) & 255) + 0.0722 * (c & 255));
+const mean = (values: number[]): number => values.reduce((a, b) => a + b, 0) / values.length;
+
+test('mw-ju8.43 AC-2: the lane at 22:00 is clearly darker than at 12:00 and its lantern pools stand out', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(90_000);
+  const problems = collectProblems(page);
+  await openLane(page);
+  await takeControl(page);
+  await runConsole(page, 'tp 0 0 4');
+  await turnTo(page, { x: 0, z: 40 });
+
+  await runConsole(page, 'time set 1 12:00');
+  const noon = await captureFrame(page, { afterMs: 400, png: true });
+  await runConsole(page, 'time set 1 22:00');
+  const night = await captureFrame(page, { afterMs: 400, png: true });
+  await attachFrame(testInfo, 'lane-1200', noon);
+  await attachFrame(testInfo, 'lane-2200', night);
+
+  const noonLuma = lumas(noon);
+  const nightLuma = lumas(night);
+  testInfo.annotations.push({
+    type: 'luminance',
+    description: `12:00 ${mean(noonLuma).toFixed(1)}, 22:00 ${mean(nightLuma).toFixed(1)}`,
+  });
+  // Clearly darker: under half the average luminance.
+  expect(mean(nightLuma)).toBeLessThan(mean(noonLuma) * 0.5);
+  // Lantern pools stand out: the brightest cells sit well above the night frame's average, which
+  // they do not at noon, when everything is evenly lit.
+  const brightest = (values: number[]): number =>
+    mean([...values].sort((a, b) => b - a).slice(0, 40));
+  const contrast = (values: number[]): number => brightest(values) / Math.max(mean(values), 1);
+  expect(contrast(nightLuma)).toBeGreaterThan(contrast(noonLuma));
+  expect(contrast(nightLuma)).toBeGreaterThan(2);
+  // Not black: the lane is still readable.
+  expect(mean(nightLuma)).toBeGreaterThan(8);
   expect(problems).toEqual([]);
 });

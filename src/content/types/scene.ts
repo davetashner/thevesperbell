@@ -188,6 +188,10 @@ export const sceneRopeSchema = z.strictObject({
   radius: z.number().positive().optional().describe('Half its thickness, metres (default 0.05).'),
 });
 
+const colourSchema = z
+  .tuple([z.number().min(0).max(1), z.number().min(0).max(1), z.number().min(0).max(1)])
+  .refine(([r, g, b]) => r > 0 || g > 0 || b > 0, { message: 'a colour cannot be black' });
+
 /**
  * Makes a spawn a light source (mw-e03.16): flammable fuel plus a light that shines only while it
  * burns, which water, wind, a hand smother or running out of fuel put out and heat relights. The
@@ -203,11 +207,12 @@ export const sceneLightSourceSchema = z.strictObject({
     .boolean()
     .optional()
     .describe('Never runs out of fuel while lit (default false).'),
+  tint: colourSchema
+    .optional()
+    .describe(
+      'Colour of its rendered light, [r, g, b] 0–1 (mw-ju8.43); the prefab default (flame or lamp) when absent. Looks only: the sim light level is unchanged.',
+    ),
 });
-
-const colourSchema = z
-  .tuple([z.number().min(0).max(1), z.number().min(0).max(1), z.number().min(0).max(1)])
-  .refine(([r, g, b]) => r > 0 || g > 0 || b > 0, { message: 'a colour cannot be black' });
 
 /**
  * Makes a spawn a light beam emitter (mw-e03.17): a sunlight shaft, crystal or spell that casts a ray
@@ -617,6 +622,7 @@ export const sceneSpawnSchema = z.strictObject({
 });
 
 const lightLevel = z.number().min(0).max(1);
+const hexColour = z.string().regex(/^#[0-9a-fA-F]{6}$/, { message: 'must be a #RRGGBB colour' });
 
 /** A box of the scene with its own ambient light (mw-e03.37; see src/sim/light/field.ts). */
 export const sceneAmbientZoneSchema = z
@@ -644,6 +650,33 @@ export const sceneDirectionalLightSchema = z.strictObject({
     .describe('How far back towards the light a position must be clear to receive it, metres.'),
 });
 
+/** One keyframe of a scene's day and night look (mw-ju8.43). */
+export const sceneTimeOfDayKeySchema = z.strictObject({
+  minute: z.int().min(0).max(1439).describe('Minute of the day it applies at, 0–1439.'),
+  ambient: lightLevel.describe('Rendered ambient fill level, 0–1.'),
+  directional: lightLevel.describe('Rendered level of the key light (sun or moon), 0–1.'),
+  sky: hexColour.optional().describe('Sky colour, #RRGGBB.'),
+});
+
+/**
+ * A scene's day and night look (mw-ju8.43): keyframes over the game day that the renderer blends
+ * between (wrapping past midnight) for its ambient fill, key light and sky. Render-only: the sim's
+ * light field keeps the scene's static `ambient` and `directional` levels, so stealth is the same at
+ * noon and at night. Scenes without it keep their fixed look.
+ */
+export const sceneTimeOfDaySchema = z
+  .strictObject({
+    keyframes: z.array(sceneTimeOfDayKeySchema).min(2),
+  })
+  .refine(
+    ({ keyframes }) => {
+      const minutes = keyframes.map((key) => key.minute);
+      const sorted = [...new Set(minutes)].sort((x, y) => x - y);
+      return minutes.length === sorted.length && minutes.every((m, i) => m === sorted[i]);
+    },
+    { message: 'keyframes must ascend by minute', path: ['keyframes'] },
+  );
+
 /**
  * The scene's static lighting (mw-e03.37), loaded into the sim's light field; the renderer mirrors
  * it. Without it a scene is dark apart from its light-emitting and burning entities.
@@ -658,6 +691,9 @@ export const sceneLightSchema = z.strictObject({
     .array(sceneDirectionalLightSchema)
     .default([])
     .describe('Directional lights (moon, sun); the brightest is the rendered key light.'),
+  timeOfDay: sceneTimeOfDaySchema
+    .optional()
+    .describe('Day and night look of the rendered light, following the game clock (mw-ju8.43).'),
 });
 
 /** The room id that stands for everywhere outside the scene's rooms (open terrain). */
@@ -720,8 +756,6 @@ const cameraSchema = z.strictObject({
   position: vec3Schema.describe('Camera position in metres.'),
   target: vec3Schema.describe('Point the camera looks at, metres.'),
 });
-
-const hexColour = z.string().regex(/^#[0-9a-fA-F]{6}$/, { message: 'must be a #RRGGBB colour' });
 
 /**
  * A backdrop layer (mw-ju8.1): one painted image on a curved, unlit card behind the scene. It hangs on

@@ -747,6 +747,37 @@ describe('scene schema (mw-e00.21)', () => {
     ]);
   });
 
+  it('mw-ju8.43: light sources take a colour tint; scenes take day and night keyframes, validated', () => {
+    const key = { minute: 0, ambient: 0.1, directional: 0.1 };
+    const spawn = {
+      id: 'lamp',
+      at: [0, 2, 0],
+      lightSource: { variant: 'lantern', tint: [1, 0.8, 0.4] },
+    };
+    expect(sceneSchema.parse({ ...room, spawns: [spawn] }).spawns[0]?.lightSource?.tint).toEqual([
+      1, 0.8, 0.4,
+    ]);
+    expect(
+      problems({
+        ...room,
+        spawns: [{ ...spawn, lightSource: { variant: 'lantern', tint: [0, 0, 0] } }],
+      }),
+    ).toEqual([expect.stringMatching(/^spawns\.0\.lightSource\.tint: /)]);
+    const timeOfDay = { keyframes: [key, { ...key, minute: 720, sky: '#aabbcc' }] };
+    expect(sceneSchema.parse({ ...room, light: { timeOfDay } }).light?.timeOfDay).toEqual(
+      timeOfDay,
+    );
+    expect(problems({ ...room, light: { timeOfDay: { keyframes: [key] } } })).toEqual([
+      expect.stringMatching(/^light\.timeOfDay\.keyframes: /),
+    ]);
+    expect(problems({ ...room, light: { timeOfDay: { keyframes: [key, key] } } })).toEqual([
+      'light.timeOfDay.keyframes: keyframes must ascend by minute',
+    ]);
+    expect(
+      problems({ ...room, light: { timeOfDay: { keyframes: [key, { ...key, minute: 1440 }] } } }),
+    ).toEqual([expect.stringMatching(/^light\.timeOfDay\.keyframes\.1\.minute: /)]);
+  });
+
   it('AC-3: a scene using a kit piece or prop that does not exist fails to load, naming it', () => {
     const broken = {
       ...room,
