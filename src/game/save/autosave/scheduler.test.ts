@@ -195,35 +195,34 @@ describe('AutosaveScheduler', () => {
     expect(events.map((e) => e.type)).toEqual(['saving', 'saved', 'saving', 'saved']);
   });
 
-  it('does not save when a veto starts while the ring is read, and stays pending', async () => {
+  it('saves the world as it was when the moment was judged safe, however long the ring read takes (mw-e01.21)', async () => {
     const vetoes = new SafetyVetoes();
     let dialogue = false;
-    let started = false;
-    vetoes.register('dialogue', () => (dialogue ? 'talking' : null));
+    const w = world(5);
     const inner = new MemorySaveStore();
     const store: SaveStore = {
       kind: 'memory',
       durable: false,
       write: inner.write.bind(inner),
       read: (slot) => {
-        if (!started) dialogue = started = true;
+        // Storage answers later: the game has run on, and a veto has started.
+        dialogue = true;
+        at(w, 9);
         return inner.read(slot);
       },
       list: inner.list.bind(inner),
       delete: inner.delete.bind(inner),
     };
-    const { scheduler, events } = setup({ vetoes }, store);
+    vetoes.register('dialogue', () => (dialogue ? 'talking' : null));
+    const { slots, scheduler } = setup({ vetoes }, store);
     scheduler.request({ kind: 'checkpoint' });
-    const attempt = scheduler.update(world(0));
+    const attempt = scheduler.update(w);
     scheduler.request({ kind: 'quest' });
-    expect(await attempt).toBeNull();
-    expect(events).toEqual([]);
-    expect(await inner.list()).toEqual([]);
-    expect(scheduler.pending).toEqual({ kind: 'checkpoint' });
-    dialogue = false;
-    expect((await scheduler.update(world(1)))?.trigger).toEqual({ kind: 'checkpoint' });
-    // The request made while the ring was read was covered by that autosave.
-    expect(scheduler.pending).toBeNull();
+    expect((await attempt)?.type).toBe('saved');
+    // The save is the world of tick 5, not of the tick the ring read finished at.
+    expect(ticksIn(await slots.list(['auto-1']))).toEqual(['auto-1@5']);
+    // The request made during the write waits for its own autosave, as ever.
+    expect(scheduler.pending).toEqual({ kind: 'quest' });
   });
 
   it('retries a failed write once, then warns and gives up on that request', async () => {
