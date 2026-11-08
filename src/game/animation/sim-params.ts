@@ -100,7 +100,7 @@ export interface SimAnimSource {
    * The entity holds a sword at the low-ready (mw-a6t): `carry` reads true while it stands, walks,
    * runs, sprints or crouches (and its locomotion state is published), false in the air, on a ledge
    * or ladder, and in water, where the arm belongs to the traversal clip. Without it `carry` reads
-   * false. The carry layer is additive and sits under the action layer, so a move's clip overrides it.
+   * false. The carry layer overrides the arm and sits under the action layer, so a move's clip overrides it.
    */
   readonly carry?: boolean;
 }
