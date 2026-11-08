@@ -55,6 +55,7 @@ export {
 export * from './debug';
 export * from './deltas';
 export * from './economy';
+export * from './electricity';
 export * from './elements';
 export * from './liquids';
 export * from './factions';

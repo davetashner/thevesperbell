@@ -29,13 +29,25 @@ export function applyMaterial(
   init: WorldPropertyInit,
 ): WorldPropertyInit {
   const id = init.material;
-  if (id === undefined) return withThermalState({ ...init });
+  if (id === undefined) return withChargeState(withThermalState({ ...init }));
   const preset = presets.get(id);
   if (preset === undefined) {
     const known = [...presets.keys()].sort().join(', ');
     throw new RangeError(`unknown material "${id}"; known materials: ${known}`);
   }
-  return withThermalState({ ...preset, ...init });
+  return withChargeState(withThermalState({ ...preset, ...init }));
+}
+
+/**
+ * A charge stimulus only reaches things that have a `charge` (mw-e03.8), so a conductor is given a
+ * neutral one when it has none of its own: lightning on a puddle or a knight lands on the tick it
+ * strikes, not the next. Everything else stays sparse (a wet crate that conducts gets its charge
+ * added when current first reaches it).
+ */
+function withChargeState(values: WorldPropertyInit): WorldPropertyInit {
+  return values.conductive === true && values.charge === undefined
+    ? { ...values, charge: 0 }
+    : values;
 }
 
 /**

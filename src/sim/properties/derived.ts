@@ -40,6 +40,18 @@ export function isFlammableNow(world: World<never>, entity: EntityId): boolean {
   );
 }
 
+/**
+ * Whether `entity` carries electric charge right now (mw-e03.8): conductive, or soaked (wetness at
+ * or above SOAKED_WETNESS, so a wet crate or a puddle conducts), and not frozen (ice insulates).
+ */
+export function conductsNow(world: World<never>, entity: EntityId): boolean {
+  if (readProperty(world, entity, 'frozen')) return false;
+  return (
+    readProperty(world, entity, 'conductive') ||
+    readProperty(world, entity, 'wetness') >= SOAKED_WETNESS
+  );
+}
+
 /** Divisor of a frozen thing's `fragile` threshold: ice is brittle (mw-e03.7). */
 export const FROZEN_FRAGILITY = 3;
 

@@ -6,10 +6,12 @@
 // The caller adds these after the stimulus system (installGamePhysics's `afterStimuli`), in this
 // order: the rules read the tick's resolved stimuli, then the field diffuses what they changed.
 // Water (mw-e03.6) rides the same rule set: liquid volumes, wetness drying, submersion and rain.
+// Electricity (mw-e03.8) follows it, so conduction sees the tick's wetness.
 // The field is open air everywhere (a scene's doors seal and unseal their doorways themselves).
 
 import { burntMaterials, materialPresets, type GameContent } from '@content/index';
 import {
+  conductionRules,
   ElementRuleSet,
   elementFieldSystem,
   elementRulesSystem,
@@ -44,6 +46,7 @@ export function installGameFire<TInput>(
           }),
           ...freezeRules(),
           ...liquidRules({ presets }),
+          ...conductionRules(),
         ]),
       ),
     )

@@ -104,6 +104,7 @@ import {
   OpticComponent,
 } from '../light/beams';
 import type { StaticOccluders } from '../light/occluders';
+import { ChargeReceiverComponent, resetChargeReceiver } from './charge-receivers';
 import { lightReceiversSystem, resetLightReceiver } from './receivers';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
@@ -827,6 +828,7 @@ export function installMechanisms<TInput>(
     BeamEmitterComponent,
     OpticComponent,
     LightReceiverComponent,
+    ChargeReceiverComponent,
   );
   const occluders = options.occluders as Partial<StaticOccluders> | undefined;
   const tracer =
@@ -891,6 +893,8 @@ export function installMechanisms<TInput>(
         if (value) resetPlate(w, entity, graph);
       } else if (w.has(entity, LightReceiverComponent)) {
         if (value) resetLightReceiver(w, entity, graph);
+      } else if (w.has(entity, ChargeReceiverComponent)) {
+        if (value) resetChargeReceiver(w, entity, graph);
       } else if (w.has(entity, ImpactSwitchComponent)) {
         // Likewise an impact switch: on resets it (a latching one's way off).
         if (value) resetImpactSwitch(w, entity, graph);
