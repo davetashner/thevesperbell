@@ -566,6 +566,28 @@ describe('testbed orbit camera (mw-e02.4)', () => {
     expect(publishCamera).toHaveBeenCalledTimes(121);
   });
 
+  it('adds the shake offset after the rig resolved, without moving the published pose or the view', () => {
+    const publishCamera = vi.fn<(readout: CameraReadout) => void>();
+    const calm = testbed({ publishCamera });
+    calm.run(0.5);
+    const rest = { ...calm.camera.at };
+    const restTarget = { ...calm.camera.target };
+    const shaken = testbed({ shake: () => ({ x: 0.1, y: 0 }) });
+    shaken.run(0.5);
+    const moved = Math.hypot(
+      shaken.camera.at.x - rest.x,
+      shaken.camera.at.y - rest.y,
+      shaken.camera.at.z - rest.z,
+    );
+    expect(moved).toBeCloseTo(0.1, 6);
+    // The look direction is unchanged: the target moved by the same offset.
+    expect(shaken.camera.target.x - shaken.camera.at.x).toBeCloseTo(restTarget.x - rest.x, 6);
+    expect(shaken.camera.target.z - shaken.camera.at.z).toBeCloseTo(restTarget.z - rest.z, 6);
+    const probed = testbed({ publishCamera, shake: () => ({ x: 0.1, y: 0.1 }) });
+    probed.run(0.5);
+    expect(publishCamera.mock.calls.at(-1)?.[0].clipped).toBe(0);
+  });
+
   it('the wheel zooms within 2–6 m', () => {
     const publishCamera = vi.fn<(readout: CameraReadout) => void>();
     const { run, player } = testbed({ publishCamera });

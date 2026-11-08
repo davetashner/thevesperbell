@@ -118,6 +118,15 @@ export const SETTINGS_SCHEMA = {
         help: 'Pushing right turns the camera left.',
         default: false,
       }),
+      shakeScale: slider({
+        label: 'Camera shake',
+        help: 'How much the camera shakes when you are hit or something explodes. 0 turns it off.',
+        min: 0,
+        max: 1,
+        step: 0.05,
+        default: 1,
+        unit: 'percent',
+      }),
       fov: slider({
         label: 'Field of view',
         help: 'How wide the view is. Wider shows more but can feel faster.',

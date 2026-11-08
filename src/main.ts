@@ -29,6 +29,7 @@ import {
   installSandboxRules,
   prepareTestbedCombat,
   attachCombatHud,
+  attachScreenFeedback,
   attachTargetHud,
   cameraForward,
   horizontalHalfFov,
@@ -38,6 +39,7 @@ import {
   startTestbedCombat,
   TRAINING_DUMMY,
   type CombatHudGlue,
+  type ScreenFeedbackGlue,
   type TargetHudGlue,
   type SandboxHud,
 } from '@game/combat/index';
@@ -215,7 +217,7 @@ import { createGameSaveRegistry } from '@game/save/sections';
 import { SaveSlots } from '@game/save/slots/index';
 import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
-import { vfxTextureManifest, vfxTextureUrls, VfxSystem } from '@game/vfx/index';
+import { DamageVignette, vfxTextureManifest, vfxTextureUrls, VfxSystem } from '@game/vfx/index';
 import { createBolt, createGroundMarker, disposeBolt } from '@render/magic/index';
 import { createRenderBootstrap } from '@render/bootstrap/index';
 import { createLeftover, disposeLeftover } from '@render/breakables/index';
@@ -244,7 +246,7 @@ import { createGreyboxView } from '@render/greybox/index';
 import { createLightRig } from '@render/light/index';
 import { AnimationController, compileGraph } from '@render/animation/index';
 import { createPlayerBody, loadKnight, OcclusionFade, projectToNdc } from '@render/player/index';
-import { anyHiddenByBody } from '@game/camera/index';
+import { anyHiddenByBody, CameraShake } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
@@ -340,6 +342,8 @@ import {
   SpellHotbar,
   SpellWheel,
   reducedMotion,
+  ScreenFeedback,
+  setMotionPreference,
   setTextScale,
   UiRoot,
   WaterHud,
@@ -534,6 +538,11 @@ function startRenderer(
   // The HUD/menu layer (mw-e00.23). Screens pushed onto it may capture input (gameplay action frames
   // are withheld) and pause the sim; menus need the pointer, so capture releases pointer lock.
   const ui = new UiRoot(root);
+  // The motion setting (accessibility.motion) reduces scripted motion, the camera shake included.
+  setMotionPreference(ui.element, settings.get('accessibility.motion'));
+  settings.on('accessibility.motion', (preference) => {
+    setMotionPreference(ui.element, preference);
+  });
   // The text size setting (accessibility.textScale) scales every menu and HUD text.
   setTextScale(ui.element, settings.get('accessibility.textScale'));
   settings.on('accessibility.textScale', (scale) => {
@@ -771,6 +780,19 @@ function startRenderer(
     // The player's health and stamina bars with damage feedback (mw-e04.10), once it is a combatant.
     let combatHud: CombatHudGlue | undefined;
     let targetHud: TargetHudGlue | undefined;
+    // Camera shake, the damage vignette and the low-health grade (mw-e29.5). The shake scale
+    // setting and reduced motion (accessibility.motion, else the OS) switch the shake off.
+    const shake = new CameraShake();
+    const configureShake = (): void => {
+      shake.configure(
+        settings.get('camera.shakeScale'),
+        reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+      );
+    };
+    configureShake();
+    settings.on('camera.shakeScale', configureShake);
+    settings.on('accessibility.motion', configureShake);
+    let screenFeedback: ScreenFeedbackGlue | undefined;
     // The breath meter and the sinking warning (mw-e02.14).
     let waterHud: WaterHudGlue | undefined;
     let publishedDummy = '';
@@ -1059,6 +1081,7 @@ function startRenderer(
         }
         sandboxHud?.frame();
         combatHud?.frame(timeMs);
+        screenFeedback?.frame(timeMs);
         waterHud?.frame(timeMs);
         targetHud?.frame(timeMs);
         spellHud?.frame(timeMs);
@@ -1270,6 +1293,7 @@ function startRenderer(
             return object3DBinding(object, read);
           },
           camera,
+          shake: (dt) => shake.update(dt),
           // Lock-on (mw-e02.16): the scene's targetable spawns, seen through the sim's physics.
           lockOn: {
             tuning: content.get('lock-on', PLAYER_LOCK_ON_ID),
@@ -1480,6 +1504,15 @@ function startRenderer(
             forward: cameraForward(camera.quaternion),
             halfFov: horizontalHalfFov(camera.fov, camera.aspect),
           }),
+        });
+        const feedback = new ScreenFeedback();
+        ui.hud.append(feedback.element);
+        screenFeedback = attachScreenFeedback({
+          world,
+          player: player.entity,
+          shake,
+          vignette: new DamageVignette(),
+          overlay: feedback,
         });
         // The breath meter (mw-e02.14): shown only while the player is short of breath, with the
         // armor's warning when it drags the player under.
