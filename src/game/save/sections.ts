@@ -10,6 +10,7 @@ import {
   PlayerClassComponent,
   RecoveryAnchorComponent,
   settleHeldObjects,
+  settlePushes,
   settleRemoteHolds,
   SpellHotbarComponent,
   StatsComponent,
@@ -55,6 +56,7 @@ export function createGameSaveRegistry(options: GameSaveOptions = {}): SaveRegis
     beforeWrite: (world) => {
       settleHeldObjects(world);
       settleRemoteHolds(world);
+      settlePushes(world);
     },
   })
     .register(inventorySaveSection(options))

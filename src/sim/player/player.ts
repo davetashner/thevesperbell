@@ -49,6 +49,7 @@ import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
 import { carryRestraint, refuseGrab } from '../carry/state';
+import { pushRestraint } from '../push/state';
 import { radians } from '../character/greybox';
 import {
   CharacterController,
@@ -773,7 +774,8 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         if (frame === undefined || look === undefined) return undefined;
         const statusScale =
           options.statuses === undefined ? 1 : statusMoveScale(world, options.statuses, entity);
-        const carrying = carryRestraint(world, entity);
+        // What the player carries or has hold of (pushing a crate) slows it the same way.
+        const carrying = carryRestraint(world, entity) ?? pushRestraint(world, entity, frame.move);
         const fought =
           combat === undefined
             ? undefined
