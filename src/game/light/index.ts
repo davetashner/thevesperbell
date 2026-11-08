@@ -108,7 +108,9 @@ export function lightSpawns(loaded: LoadedScene): LightSpawn[] {
   return loaded.spawns
     .filter(
       ({ spawn }) =>
-        spawn.properties?.burning !== undefined || spawn.properties?.lightEmitter !== undefined,
+        spawn.lightSource !== undefined ||
+        spawn.properties?.burning !== undefined ||
+        spawn.properties?.lightEmitter !== undefined,
     )
     .map(({ entity, spawn }) => ({ id: spawn.id, entity }));
 }

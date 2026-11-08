@@ -142,11 +142,7 @@
       "id": "quillon-brazier",
       "at": [1.75, 0.5, 1.0],
       "tags": ["brazier", "hearth"],
-      "properties": {
-        "flammable": true,
-        "burning": true,
-        "fuel": 86400
-      }
+      "lightSource": { "variant": "brazier", "infiniteFuel": true }
     },
     {
       "id": "quillon-lantern",

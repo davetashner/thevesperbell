@@ -139,6 +139,11 @@ export interface FireRulesOptions {
   readonly burnt: BurntMaterials;
   readonly heat?: Partial<HeatConfig>;
   readonly fire?: Partial<FireConfig>;
+  /**
+   * Objects that stay in the world, unlit and out of fuel, when they burn out without a burnt
+   * material (a brazier, a lantern) instead of burning away. Absent: every such object is destroyed.
+   */
+  readonly keepWhenSpent?: (world: World<never>, entity: EntityId) => boolean;
 }
 
 /** The temperature a burning object with `ignitionPoint` and its flames hold. */
@@ -296,7 +301,7 @@ export function fireRules(options: FireRulesOptions): ElementRule[] {
         const state = burntStates.get(readProperty(world, entity, 'material'));
         if (state === undefined) {
           world.events.emit(fireBurntOut, { entity, becomes: null });
-          world.destroy(entity);
+          if (options.keepWhenSpent?.(world, entity) !== true) world.destroy(entity);
           continue;
         }
         world.events.emit(fireBurntOut, { entity, becomes: state.becomes });

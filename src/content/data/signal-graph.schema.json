@@ -265,6 +265,7 @@
                             "liquid",
                             "flammableGas",
                             "extinguishable",
+                            "windResistance",
                             "waterSurface",
                             "unstable",
                             "suspended",
@@ -508,6 +509,7 @@
                             "liquid",
                             "flammableGas",
                             "extinguishable",
+                            "windResistance",
                             "waterSurface",
                             "unstable",
                             "suspended",
@@ -1104,6 +1106,12 @@
                     "type": "boolean",
                     "description": "A fire or light source that water, force or an interaction puts out."
                   },
+                  "windResistance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000,
+                    "description": "Force of one gust, blast or kick that blows its flame out, N·s."
+                  },
                   "waterSurface": {
                     "type": "boolean",
                     "description": "Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material)."
@@ -1406,6 +1414,12 @@
                   "extinguishable": {
                     "type": "boolean",
                     "description": "A fire or light source that water, force or an interaction puts out."
+                  },
+                  "windResistance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000,
+                    "description": "Force of one gust, blast or kick that blows its flame out, N·s."
                   },
                   "waterSurface": {
                     "type": "boolean",

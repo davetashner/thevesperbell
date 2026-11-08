@@ -62,6 +62,21 @@ export function toLightOccluderBox(value: unknown): LightOccluderBox {
   return Object.freeze({ halfExtents: Object.freeze(half) });
 }
 
+/**
+ * Marks an entity as a light source prefab (mw-e03.16: candle, torch, brazier, lantern…). Its
+ * `lightEmitter` only shines while it is `burning`; the rest is what designers set per instance.
+ */
+export interface LightSourceData {
+  /** Which prefab it is (`torch`, `brazier`…); informational, behaviour comes from properties. */
+  readonly variant: string;
+  /** Its fuel never runs out: it is topped up every tick while it burns. */
+  readonly infiniteFuel: boolean;
+  /** The actor carrying it (a guard's lantern), or null when it is fixed in the world. */
+  readonly carrier: EntityId | null;
+  /** Where it hangs relative to its carrier, metres. */
+  readonly offset: Vec3;
+}
+
 /** The spotlight cone component (`light.cone`; a snapshot and save key, never renamed). */
 export const LightConeComponent = defineComponent<LightCone>('light.cone', {
   deserialize: toLightCone,
@@ -72,8 +87,15 @@ export const LightOccluderComponent = defineComponent<LightOccluderBox>('light.o
   deserialize: toLightOccluderBox,
 });
 
+/** The light source component (`light.source`; a snapshot and save key, never renamed). */
+export const LightSourceComponent = defineComponent<LightSourceData>('light.source');
+
 /** Every component the light field reads besides placements and world properties. */
-export const lightComponents = [LightConeComponent, LightOccluderComponent] as const;
+export const lightComponents = [
+  LightConeComponent,
+  LightOccluderComponent,
+  LightSourceComponent,
+] as const;
 
 /** Gives `entity`'s light the cone `cone` (validated; structural during a step, like `World.add`). */
 export function setLightCone(world: World<never>, entity: EntityId, cone: LightCone): void {

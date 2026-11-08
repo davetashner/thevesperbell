@@ -14,8 +14,9 @@
  * Bumped whenever a property is added, removed, renamed or changes type or range.
  * v1: the mw-e03.1 set. v2: mw-e03.31 additions (additive only: a v1 save loads unchanged).
  * v3: `climbable` is a grade enum (mw-e03.22); a stored 1/2/3 maps to ivy/rough/sheer.
+ * v4: `remoteActuatable` (mw-e03.12). v5: `windResistance` (mw-e03.16); both additive.
  */
-export const WORLD_PROPERTIES_VERSION = 4;
+export const WORLD_PROPERTIES_VERSION = 5;
 
 /** A light source's output. Colour is a render concern and lives outside the sim. */
 export interface LightEmission {
@@ -117,6 +118,8 @@ export interface WorldPropertyValues {
   flammableGas: boolean;
   /** A fire or light source that water, force or an interaction can put out (and relight). */
   extinguishable: boolean;
+  /** Force of a single gust, blast or kick that blows its flame out, N·s (absent: never). */
+  windResistance: number;
   /** The top surface of a body of liquid: cold freezes it into walkable ice; it can be waded. */
   waterSurface: boolean;
   /** Force of a single push, blast or quake that shakes it loose so it topples or falls, J. */
@@ -350,6 +353,11 @@ export const WORLD_PROPERTY_SPECS: {
   liquid: flag('A liquid: it pours, puddles and can have a water surface.'),
   flammableGas: flag('A gas that ignites (flares or explodes) when fire reaches it.'),
   extinguishable: flag('A fire or light source that water, force or an interaction puts out.'),
+  windResistance: threshold(
+    1_000_000,
+    'N·s',
+    'Force of one gust, blast or kick that blows its flame out (the default never does).',
+  ),
   waterSurface: flag('Top surface of a body of liquid: cold freezes it into walkable ice.'),
   unstable: threshold(MAX_ENERGY, 'J', 'Force of one push, blast or quake that topples it.'),
   suspended: flag('Hangs from its support; falls when the support breaks, burns or is cut.'),

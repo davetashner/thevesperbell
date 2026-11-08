@@ -6,6 +6,7 @@ import type { System, World } from '../core/world';
 import { stimulusResolved } from '../stimulus/stimulus';
 import { lightComponents } from './components';
 import type { LightField } from './field';
+import { installLightSources, updateLightSources } from './sources';
 
 /**
  * Registers the light components on `world` and feeds `field` every resolved light stimulus. The
@@ -13,6 +14,7 @@ import type { LightField } from './field';
  */
 export function installLightField<W extends World<never>>(world: W, field: LightField): W {
   world.register(...lightComponents);
+  installLightSources(world);
   world.events.on(stimulusResolved, (resolution) => {
     field.noteStimulus(resolution);
   });
@@ -28,6 +30,7 @@ export function lightFieldSystem<TInput>(field: LightField): System<TInput> {
   return {
     name: 'light-field',
     run: ({ world }) => {
+      updateLightSources(world);
       field.update(world);
     },
   };

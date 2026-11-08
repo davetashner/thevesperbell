@@ -20,6 +20,7 @@ import { compileSignalGraph, type SignalGraphDef } from '../signals/graph';
 import { addSignalGraph } from '../signals/runtime';
 import { PlacementComponent, placeEntity } from '../stimulus/placement';
 import type { DoorProfileLookup, LockLookup, SwitchKind } from './components';
+import { makeLightSource } from '../light/sources';
 import { makeCuttable, suspendFrom } from './ropes';
 import { makeImpactSwitch, syncImpactSwitchNodes } from './impacts';
 import { makePlate, syncPlateNodes } from './plates';
@@ -47,6 +48,8 @@ export interface SceneMechanisms {
   readonly impactSwitches: readonly EntityId[];
   /** Cuttable ropes (mw-e05.13). */
   readonly ropes: readonly EntityId[];
+  /** Light sources (mw-e03.16). */
+  readonly lights: readonly EntityId[];
   /** The placed graphs' entities. */
   readonly graphs: readonly EntityId[];
 }
@@ -81,6 +84,7 @@ export function addSceneMechanisms<T>(
   const plates: EntityId[] = [];
   const impactSwitches: EntityId[] = [];
   const ropes: EntityId[] = [];
+  const lights: EntityId[] = [];
   const interactive = sim.isRegistered(InteractableComponent);
   for (const { entity, spawn } of loaded.spawns) {
     const { door } = spawn;
@@ -128,6 +132,14 @@ export function addSceneMechanisms<T>(
         ...(options.colliders !== undefined && { colliders: options.colliders }),
       });
       ropes.push(entity);
+    }
+    const { lightSource: light } = spawn;
+    if (light !== undefined) {
+      makeLightSource(sim, entity, light.variant, spawn.position, {
+        unlit: light.unlit === true,
+        infiniteFuel: light.infiniteFuel === true,
+      });
+      lights.push(entity);
     }
     const { impactSwitch: impact } = spawn;
     // A spawn with the `shootable` property is a target even when the scene says no more
@@ -198,6 +210,7 @@ export function addSceneMechanisms<T>(
     plates: Object.freeze(plates),
     impactSwitches: Object.freeze(impactSwitches),
     ropes: Object.freeze(ropes),
+    lights: Object.freeze(lights),
     graphs: Object.freeze(graphs),
   });
 }

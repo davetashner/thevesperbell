@@ -42,6 +42,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `properties.impactAbsorb` | number 0–1 | — | Fraction of impact energy it absorbs, 0 … 1. |
 | `properties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
 | `properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
+| `properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
 | `properties.breakable` | boolean | — | A single hit at or above its toughness for that kind of hit breaks it. |
 | `properties.toughness` | object | — | Per kind of hit, the single-hit energy that breaks a breakable object; a kind left out never does. |
 | `properties.toughness.blunt` | number 0–1000000000 | — | Blunt hit energy that breaks it, J. |

@@ -256,21 +256,13 @@
       "id": "torch-arena-east",
       "at": [5.75, 2.25, 29],
       "tags": ["torch"],
-      "properties": {
-        "flammable": true,
-        "burning": true,
-        "fuel": 3600
-      }
+      "lightSource": { "variant": "torch" }
     },
     {
       "id": "arena-brazier",
       "at": [-4.5, 0.75, 35.5],
       "tags": ["brazier"],
-      "properties": {
-        "flammable": true,
-        "burning": true,
-        "fuel": 3600
-      }
+      "lightSource": { "variant": "brazier" }
     },
     {
       "id": "step-crate",
