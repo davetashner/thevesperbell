@@ -55,3 +55,5 @@ export {
   type VfxTextureEntry,
 } from './textures.ts';
 export * from './screen-feedback.ts';
+export * from './trail-controller.ts';
+export * from './trail-tints.ts';
