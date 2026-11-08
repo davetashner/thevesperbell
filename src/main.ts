@@ -707,6 +707,8 @@ function startRenderer(
     let castSelect: ((id: string) => boolean) | undefined;
     // Aims a scroll's spell from the current view (mw-ju8.17), once the player can cast.
     let scrollAim: ((spellId: string | undefined) => ScrollAim | undefined) | undefined;
+    // Takes Interact out of the frame while the player holds a Mage Hand tether (mw-e08.25).
+    let tetherShape: ((frame: ActionFrame) => ActionFrame) | undefined;
     // The player's casting (mw-e06.15): turns a gameplay frame into cast commands, once there is a player.
     let castFrame: ((frame: ActionFrame) => readonly SpellCommand[]) | undefined;
     let wheelShape: ((frame: ActionFrame) => ActionFrame) | undefined;
@@ -983,8 +985,10 @@ function startRenderer(
         const frames = bridge.sampleCommands(tick);
         if (castFrame === undefined) return frames;
         // With the quick-select wheel open, look moves its pointer instead of the view.
-        const shaped = wheelShape === undefined ? frames : frames.map(wheelShape);
-        return [...shaped, ...shaped.flatMap(castFrame)];
+        const wheeled = wheelShape === undefined ? frames : frames.map(wheelShape);
+        const shaped = tetherShape === undefined ? wheeled : wheeled.map(tetherShape);
+        // The cast controller reads Interact before the held tether takes it out of the frame.
+        return [...shaped, ...wheeled.flatMap(castFrame)];
       }),
       simPaused: () =>
         bridge.simPaused() || aiDebug?.held() === true || transitions?.leaving === true,
@@ -1348,8 +1352,10 @@ function startRenderer(
           collision,
           locked: () => player?.readout()?.lock,
           canCast: () => !isPlayerDead(world, hero),
+          tethering: () => spellbook.tether.tetherOf(hero) !== undefined,
         });
         castSelect = (id) => caster.select(id);
+        tetherShape = (frame) => caster.shape(frame);
         const ray = () => viewRay(camera);
         scrollAim = (id) => {
           const spell = id === undefined ? undefined : spellbook.spells(id);
@@ -1398,7 +1404,14 @@ function startRenderer(
         };
         const reticle = new Reticle();
         ui.hud.append(reticle.element);
-        spellHud = attachSpellHud({ world, player: hero, caster, reticle, ray });
+        spellHud = attachSpellHud({
+          world,
+          player: hero,
+          caster,
+          reticle,
+          ray,
+          usable: () => spellbook.tether.canUse(hero),
+        });
         const marker = createGroundMarker();
         view.scene.add(marker.object);
         const readout = attachSpellReadout({

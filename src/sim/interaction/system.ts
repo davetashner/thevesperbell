@@ -260,15 +260,25 @@ export function interactRemotely(
   actor: EntityId,
   target: EntityId,
 ): Interaction | undefined {
+  const found = remoteAffordance(world, actor, target);
+  if (found === undefined) return undefined;
+  const interaction: Interaction = { actor, target, verb: found.verb, affordance: found.index };
+  world.events.emit(interacted, interaction);
+  return interaction;
+}
+
+/** The affordance `interactRemotely` would perform (verb and index), or undefined; dispatches nothing. */
+export function remoteAffordance(
+  world: World<never>,
+  actor: EntityId,
+  target: EntityId,
+): { readonly verb: AffordanceVerb; readonly index: number } | undefined {
   if (!isRevealed(world, target)) return undefined;
   const kit = world.get(actor, InteractorComponent) ?? NO_KIT;
   const affordances = affordancesOf(world, target);
   const index = primaryIndex(world, actor, kit, target, affordances);
   const chosen = affordances[index];
-  if (chosen === undefined) return undefined;
-  const interaction: Interaction = { actor, target, verb: chosen.verb, affordance: index };
-  world.events.emit(interacted, interaction);
-  return interaction;
+  return chosen === undefined ? undefined : { verb: chosen.verb, index };
 }
 
 export interface InteractionOptions<TInput> {
