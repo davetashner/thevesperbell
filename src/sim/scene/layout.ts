@@ -141,6 +141,12 @@ export interface SceneImpactSwitchSpec {
   readonly loudness?: number | null | undefined;
 }
 
+/** A cuttable rope spawn (mw-e05.13): it hangs straight down from the spawn point. */
+export interface SceneRopeSpec {
+  readonly length: number;
+  readonly radius?: number | undefined;
+}
+
 /** A container spawn as written in data (mw-e18.3): its loot table, contents and lock. */
 export interface SceneContainerSpec {
   readonly loot?: { readonly id: string } | undefined;
@@ -278,6 +284,10 @@ export interface SceneSpawnSpec {
   readonly impactSwitch?: SceneImpactSwitchSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
+  /** Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). */
+  readonly rope?: SceneRopeSpec | undefined;
+  /** Spawn id of the rope this spawned prop hangs from (mw-e05.13). */
+  readonly suspendedFrom?: string | undefined;
 }
 
 /** A named point routes walk through, grid cells (mw-e11.9). */
@@ -437,6 +447,10 @@ export interface SceneSpawnPlacement {
   readonly impactSwitch?: SceneImpactSwitchSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
+  /** Its rope data, when it is a cuttable rope (mw-e05.13). */
+  readonly rope?: SceneRopeSpec;
+  /** The rope spawn it hangs from, when it hangs (mw-e05.13). */
+  readonly suspendedFrom?: string;
 }
 
 export interface SceneLayout {
@@ -778,6 +792,13 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
       ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
       ...(spawn.impactSwitch !== undefined && { impactSwitch: impactSwitchOf(spawn.impactSwitch) }),
       ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
+      ...(spawn.rope !== undefined && {
+        rope: Object.freeze({
+          length: spawn.rope.length,
+          ...(spawn.rope.radius !== undefined && { radius: spawn.rope.radius }),
+        }),
+      }),
+      ...(spawn.suspendedFrom !== undefined && { suspendedFrom: spawn.suspendedFrom }),
     }),
   );
   return Object.freeze({

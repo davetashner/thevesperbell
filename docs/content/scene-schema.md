@@ -206,8 +206,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].plate.width` | number > 0 | `1` | Footprint along x, metres. |
 | `spawns[].plate.depth` | number > 0 | `1` | Footprint along z, metres. |
 | `spawns[].plate.hidden` | boolean | `false` | The trap variant: nothing to see or prompt; wire it to trap signals. |
+| `spawns[].rope` | object | — | Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). |
+| `spawns[].rope.length` | number > 0 | required | How far it hangs straight down, metres. |
+| `spawns[].rope.radius` | number > 0 | — | Half its thickness, metres (default 0.05). |
+| `spawns[].suspendedFrom` | string | — | Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls. |
 | `spawns[].impactSwitch` | object | — | Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20). |
-| `spawns[].impactSwitch.variant` | `"bullseye"` \| `"bell"` \| `"crystal"` \| `"counterweight"` | required | Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope). |
+| `spawns[].impactSwitch.variant` | `"bullseye"` \| `"bell"` \| `"crystal"` \| `"counterweight"` \| `"target"` | required | Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope), target (any projectile at or above the spawn’s `shootable` impulse, latching). |
 | `spawns[].impactSwitch.minEnergy` | number ≥ 0 | — | Least energy that counts, J (the delivered amount for an element). |
 | `spawns[].impactSwitch.damageTypes` | list of `"blunt"` \| `"slash"` \| `"pierce"` | — | Damage types it accepts. |
 | `spawns[].impactSwitch.elements` | list of `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"light"` | — | Elements it accepts. |

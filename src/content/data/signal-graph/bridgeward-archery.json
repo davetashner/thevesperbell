@@ -1,0 +1,11 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "bridgeward-archery",
+  "name": "Bridgeward archery butts gate",
+  "notes": "mw-e05.13: the shootable gate-target on the archery wall (an impact switch made by its `shootable` property) lifts the archery-gate portcullis. The target latches, so the gate stays up once an arrow at full draw has hit it. Binding names are the scene's spawn ids.",
+  "nodes": [
+    { "id": "gate-target", "kind": "lever", "entity": "gate-target" },
+    { "id": "archery-gate", "kind": "receiver", "receiver": "door", "entity": "archery-gate" }
+  ],
+  "wires": [{ "from": "gate-target", "to": "archery-gate" }]
+}

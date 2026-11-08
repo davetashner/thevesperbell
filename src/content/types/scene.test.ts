@@ -864,3 +864,43 @@ describe('scene environment and regions (mw-ju8.1)', () => {
     ]);
   });
 });
+
+describe('scene ropes and hanging props (mw-e05.13)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 3, 0], ...extra });
+
+  it('takes a rope with a length, and a prop that hangs from it', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('cord', { rope: { length: 2 } }),
+        spawn('lamp', { prop: 'barrel', suspendedFrom: 'cord' }),
+      ],
+    });
+    expect(scene.spawns[0]?.rope).toEqual({ length: 2 });
+    expect(scene.spawns[1]?.suspendedFrom).toBe('cord');
+  });
+
+  it('rejects a rope that is also something else, and hanging from what is not a rope or is not a prop', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('odd', {
+            rope: { length: 1 },
+            door: { profile: 'wooden-door' },
+            suspendedFrom: 'odd',
+          }),
+          spawn('lamp', { suspendedFrom: 'odd' }),
+          spawn('ghost', { prop: 'barrel', suspendedFrom: 'missing' }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.door: spawn "odd" cannot be both a rope and a door',
+        'spawns.0.suspendedFrom: spawn "odd" cannot be both a rope and hanging from a rope',
+        'spawns.1.suspendedFrom: spawn "lamp" hangs but is not a movable prop',
+        'spawns.2.suspendedFrom: spawn "ghost" hangs from "missing", which is not a rope spawn of this scene',
+      ]),
+    );
+  });
+});
