@@ -92,10 +92,10 @@ describe('game audio wiring (mw-e28.2)', () => {
     attachGameAudio({
       world,
       engine: { context: { state: 'running' }, play },
-      registry: { get: () => undefined },
+      registry: { get: (id) => (id === 'sfx-skel-death' ? { variants: ['a'] } : undefined) },
       sheets: [{ rules: [cueRuleSchema.parse({ event: 'Died', cue: '{creatureDeath}' })] }],
       materials: [],
-      creatures: [{ id: 'skeleton', audio: { death: 'sfx-skel-death' } }],
+      creatures: [{ id: 'skeleton', audio: { death: 'sfx-skel-death', hurt: 'sfx-skel-hurt' } }],
       now: () => 0,
     });
     const skeleton = world.spawn();
@@ -108,6 +108,33 @@ describe('game audio wiring (mw-e28.2)', () => {
     world.events.emit(Died, { tick: 0, target: skeleton, killer: null, source: null, tags: [] });
     world.step();
     expect(play.mock.calls.map((c) => c[0])).toEqual(['sfx-skel-death']);
+  });
+
+  it('mw-e28.8: a placeholder creature slot the manifest lacks plays nothing and logs nothing', () => {
+    const world = registerCreatureComponents(registerWorldProperties(new World({ seed: 1 })));
+    const play = vi.fn<(cue: string, options: unknown) => null>(() => null);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    attachGameAudio({
+      world,
+      engine: { context: { state: 'running' }, play },
+      registry: { get: () => undefined },
+      sheets: [{ rules: [cueRuleSchema.parse({ event: 'Died', cue: '{creatureDeath}' })] }],
+      materials: [],
+      creatures: [{ id: 'skeleton', audio: { death: 'sfx-placeholder-death' } }],
+      now: () => 0,
+    });
+    const skeleton = world.spawn();
+    world.add(skeleton, CreatureComponent, {
+      origin: { creature: 'skeleton', at: { x: 0, y: 0, z: 0 }, facing: { x: 0, y: 0, z: 1 } },
+      behaviour: 'x',
+      tuning: {},
+      needs: {},
+    });
+    world.events.emit(Died, { tick: 0, target: skeleton, killer: null, source: null, tags: [] });
+    world.step();
+    expect(play).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it('reports captioned cues with their position, even before the audio context runs', () => {

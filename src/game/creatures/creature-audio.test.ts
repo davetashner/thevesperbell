@@ -1,6 +1,6 @@
 // Creature idle loops (mw-e28.8): started per live creature, stopped on death within 200 ms.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { PlayOptions, SoundHandle } from '@audio/index';
 import { loadGameContent } from '@content/index';
 import { AudioCueBridge, worldCueLookups } from '@game/cues/audio-bridge';
@@ -155,6 +155,27 @@ describe('creature idle loops (mw-e28.8)', () => {
     loops.update();
     expect(loops.count).toBe(0);
     loops.dispose();
+  });
+
+  it('a placeholder idle loop the manifest lacks is never requested', () => {
+    const world = registerCreatureComponents(registerWorldProperties(new World({ seed: 1 })));
+    const play = vi.fn(() => null);
+    const loops = new CreatureIdleLoops({
+      world,
+      engine: { context: { state: 'running' }, play },
+      creatures,
+      knownCue: () => false,
+    });
+    const entity = world.spawn();
+    world.add(entity, CreatureComponent, {
+      origin: { creature: 'skeleton', at: { x: 0, y: 0, z: 0 }, facing: { x: 0, y: 0, z: 1 } },
+      behaviour: 'x',
+      tuning: {},
+      needs: {},
+    });
+    world.step();
+    loops.update();
+    expect(play).not.toHaveBeenCalled();
   });
 
   it('with no creature loops declared it does nothing at all', () => {

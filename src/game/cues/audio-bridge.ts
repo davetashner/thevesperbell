@@ -286,6 +286,12 @@ export interface WorldCueLookupOptions {
   readonly arrows?: readonly Pick<ArrowDefinition, 'id' | 'cues'>[];
   /** Creatures, for their audio slots (barks, hurt, death, creature footsteps, telegraphs). */
   readonly creatures?: readonly Pick<CreatureDef, 'id' | 'audio'>[];
+  /**
+   * Whether the sound manifest has a cue id. A creature slot naming a cue it lacks (a placeholder
+   * id until the SFX asset groups deliver it) is dropped from the creature's audio, so nothing
+   * plays and the engine never warns; absent = every id is known.
+   */
+  readonly knownCue?: (cueId: string) => boolean;
   /** Armour weight class of a character (e04.16 will own it); none by default. */
   readonly armorOf?: (entity: EntityId) => string | undefined;
   /** Dev warnings (an unknown footstep surface, once per surface). */
@@ -311,8 +317,9 @@ export function worldCueLookups(
   for (const m of materials) if (m.footstepSurface !== undefined) known.add(m.footstepSurface);
   const sounds = new Map((options.moves ?? []).map((m) => [m.id, m.presentation.audioCue]));
   const arrowCues = new Map((options.arrows ?? []).map((a) => [a.id, a.cues]));
+  const knownCue = options.knownCue ?? (() => true);
   const creatureAudio = new Map<string, CreatureAudio | undefined>(
-    (options.creatures ?? []).map((c) => [c.id, c.audio]),
+    (options.creatures ?? []).map((c) => [c.id, c.audio && knownSlots(c.audio, knownCue)]),
   );
   const warned = new Set<string>();
   const warn =
@@ -373,4 +380,11 @@ export function worldCueLookups(
     },
     ...(options.armorOf !== undefined && { armorOf: options.armorOf }),
   };
+}
+
+/** The slots of `audio` whose cue the manifest has; the rest are placeholders and stay silent. */
+export function knownSlots(audio: CreatureAudio, known: (cueId: string) => boolean): CreatureAudio {
+  return Object.fromEntries(
+    Object.entries(audio).filter(([, cue]) => cue !== undefined && known(cue)),
+  );
 }

@@ -64,6 +64,7 @@ export function attachGameAudio(options: GameAudioOptions): () => void {
       ...(options.moves !== undefined && { moves: options.moves }),
       ...(options.arrows !== undefined && { arrows: options.arrows }),
       ...(options.creatures !== undefined && { creatures: options.creatures }),
+      knownCue: (cue) => options.registry.get(cue) !== undefined,
       ...(options.armorOf !== undefined && { armorOf: options.armorOf }),
     }),
     variantCount: soundVariantCount(options.registry),

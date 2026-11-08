@@ -1248,6 +1248,7 @@ function startRenderer(
         world,
         engine: audio,
         creatures: content.all('creature'),
+        knownCue: (cue) => sounds.get(cue) !== undefined,
       });
       // Marsh's General Store plays one music bed, its shop theme, on both floors (mw-ju8.11).
       const beds = new SceneBeds({ engine: audio, scene: scene.id });

@@ -23,6 +23,8 @@ export interface CreatureIdleLoopsOptions {
   readonly engine: IdleLoopEngine;
   /** Creatures, for their `audio.idleLoop`. */
   readonly creatures: readonly Pick<CreatureDef, 'id' | 'audio'>[];
+  /** Whether the sound manifest has a cue; a placeholder idle loop it lacks stays silent. */
+  readonly knownCue?: (cueId: string) => boolean;
 }
 
 export class CreatureIdleLoops {
@@ -36,9 +38,10 @@ export class CreatureIdleLoops {
   constructor(options: CreatureIdleLoopsOptions) {
     this.#world = options.world;
     this.#engine = options.engine;
+    const known = options.knownCue ?? (() => true);
     const loops = new Map<string, string>();
     for (const { id, audio } of options.creatures) {
-      if (audio?.idleLoop !== undefined) loops.set(id, audio.idleLoop);
+      if (audio?.idleLoop !== undefined && known(audio.idleLoop)) loops.set(id, audio.idleLoop);
     }
     this.#loops = loops;
     this.#off = options.world.events.on(Died, ({ target }) => {
