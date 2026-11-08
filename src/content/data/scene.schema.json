@@ -336,6 +336,12 @@
                 "type": "boolean",
                 "description": "A fire or light source that water, force or an interaction puts out."
               },
+              "windResistance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Force of one gust, blast or kick that blows its flame out, N·s."
+              },
               "waterSurface": {
                 "type": "boolean",
                 "description": "Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material)."
@@ -1096,6 +1102,12 @@
                 "type": "boolean",
                 "description": "A fire or light source that water, force or an interaction puts out."
               },
+              "windResistance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Force of one gust, blast or kick that blows its flame out, N·s."
+              },
               "waterSurface": {
                 "type": "boolean",
                 "description": "Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material)."
@@ -1441,6 +1453,36 @@
             "description": "Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls.",
             "type": "string",
             "minLength": 1
+          },
+          "lightSource": {
+            "description": "Makes the spawned entity a light source that can be put out and relit (mw-e03.16).",
+            "type": "object",
+            "properties": {
+              "variant": {
+                "type": "string",
+                "enum": [
+                  "candle",
+                  "torch",
+                  "sconce",
+                  "brazier",
+                  "lantern",
+                  "fireplace"
+                ],
+                "description": "Prefab: its fuel, light, ignition point and how much wind it takes to blow it out."
+              },
+              "unlit": {
+                "description": "Starts dark; heat lights it (default false).",
+                "type": "boolean"
+              },
+              "infiniteFuel": {
+                "description": "Never runs out of fuel while lit (default false).",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "variant"
+            ],
+            "additionalProperties": false
           },
           "impactSwitch": {
             "description": "Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20).",

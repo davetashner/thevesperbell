@@ -7,6 +7,9 @@ import {
   ElementFieldComponent,
   fireIgnited,
   installStimuli,
+  lightComponents,
+  setProperty,
+  spawnLightSource,
   placeEntity,
   readProperty,
   registerWorldProperties,
@@ -57,5 +60,29 @@ describe('fire in the game (mw-e06.15)', () => {
     expect(readProperty(world, torch, 'burning')).toBe(true);
     expect(readProperty(world, torch, 'temperature')).toBeGreaterThanOrEqual(300);
     expect(readProperty(world, crate, 'burning')).toBe(false);
+  }, 30_000);
+
+  it('mw-e03.16: a light source that runs out of fuel stays in the world, unlit; a straw bale burns away', () => {
+    const content = loadGameContent();
+    const presets = materialPresets(content.all('material'));
+    const world = installStimuli(registerWorldProperties(new World<never>({ seed: 1 })));
+    world.register(...lightComponents);
+    world.addSystem(stimulusSystem());
+    installGameFire(world, content);
+    const torch = spawnLightSource(world, 'torch', { x: 0, y: 1, z: 0 });
+    const straw = world.spawn();
+    addMaterialProperties(world, straw, presets, {
+      material: 'straw',
+      burning: true,
+      temperature: 600,
+      fuel: 0.05,
+    });
+    placeEntity(world, straw, { x: 2, y: 0.5, z: 0 }, 0.3);
+    world.step([]);
+    setProperty(world, torch, 'fuel', 0.05);
+    for (let i = 0; i < 30; i++) world.step([]);
+    expect(world.isAlive(torch)).toBe(true);
+    expect(readProperty(world, torch, 'burning')).toBe(false);
+    expect(world.isAlive(straw)).toBe(false);
   }, 30_000);
 });

@@ -54,6 +54,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `placements[].properties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
 | `placements[].properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `placements[].properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
+| `placements[].properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
 | `placements[].properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `placements[].properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `placements[].properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
@@ -157,6 +158,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].properties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
 | `spawns[].properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `spawns[].properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
+| `spawns[].properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
 | `spawns[].properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `spawns[].properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `spawns[].properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
@@ -210,6 +212,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].rope.length` | number > 0 | required | How far it hangs straight down, metres. |
 | `spawns[].rope.radius` | number > 0 | — | Half its thickness, metres (default 0.05). |
 | `spawns[].suspendedFrom` | string | — | Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls. |
+| `spawns[].lightSource` | object | — | Makes the spawned entity a light source that can be put out and relit (mw-e03.16). |
+| `spawns[].lightSource.variant` | `"candle"` \| `"torch"` \| `"sconce"` \| `"brazier"` \| `"lantern"` \| `"fireplace"` | required | Prefab: its fuel, light, ignition point and how much wind it takes to blow it out. |
+| `spawns[].lightSource.unlit` | boolean | — | Starts dark; heat lights it (default false). |
+| `spawns[].lightSource.infiniteFuel` | boolean | — | Never runs out of fuel while lit (default false). |
 | `spawns[].impactSwitch` | object | — | Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20). |
 | `spawns[].impactSwitch.variant` | `"bullseye"` \| `"bell"` \| `"crystal"` \| `"counterweight"` \| `"target"` | required | Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope), target (any projectile at or above the spawn’s `shootable` impulse, latching). |
 | `spawns[].impactSwitch.minEnergy` | number ≥ 0 | — | Least energy that counts, J (the delivered amount for an element). |

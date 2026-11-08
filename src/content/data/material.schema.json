@@ -210,6 +210,12 @@
           "type": "boolean",
           "description": "A gas that ignites (flares or explodes) when fire reaches it."
         },
+        "windResistance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Force of one gust, blast or kick that blows its flame out, N·s."
+        },
         "breakable": {
           "type": "boolean",
           "description": "A single hit at or above its toughness for that kind of hit breaks it."
