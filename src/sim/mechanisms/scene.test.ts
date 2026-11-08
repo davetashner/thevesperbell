@@ -23,6 +23,7 @@ import {
   type DoorProfile,
   type LockSpec,
 } from './components';
+import { ImpactSwitchComponent, IMPACT_SWITCH_PREFABS } from './impacts';
 import { DEFAULT_PLATE, PlateComponent } from './plates';
 import { addSceneMechanisms, SWITCH_AFFORDANCES, type SceneMechanismsOptions } from './scene';
 import { doorStatus, installMechanisms } from './system';
@@ -114,6 +115,26 @@ const SCENE = {
       },
     },
     { id: 'step', at: [7, 0, 5], yaw: 0, tags: [], plate: { minWeight: 10 } },
+    {
+      id: 'target',
+      at: [0, 2, 8],
+      yaw: 0,
+      tags: [],
+      impactSwitch: { variant: 'bullseye', minEnergy: 30, radius: 0.2, holdSeconds: 5 },
+    },
+    {
+      id: 'chime',
+      at: [2, 2, 8],
+      yaw: 0,
+      tags: [],
+      impactSwitch: {
+        variant: 'bell',
+        damageTypes: ['blunt'],
+        elements: [],
+        mode: 'latching',
+        loudness: null,
+      },
+    },
   ],
   signals: [{ graph: { id: 'gate' }, bindings: { 'gate-lever': 'lever' } }],
 } as unknown as SceneSpec;
@@ -209,6 +230,31 @@ describe('scene mechanisms (mw-e03.18)', () => {
       ...DEFAULT_PLATE,
       minWeight: 10,
       origin: { x: 7, y: 0, z: 5 },
+    });
+  });
+
+  it('makes impact switch spawns from their prefab with the scene overrides (mw-e03.20)', () => {
+    const { world, loaded } = setup();
+    const made = addSceneMechanisms(world, loaded, OPTIONS);
+    const [target, chime] = [entityOf(loaded, 8), entityOf(loaded, 9)];
+    expect(made.impactSwitches).toEqual([target, chime]);
+    expect(world.get(target, ImpactSwitchComponent)).toEqual({
+      ...IMPACT_SWITCH_PREFABS.bullseye,
+      minEnergy: 30,
+      radius: 0.2,
+      holdSeconds: 5,
+      origin: { x: 0, y: 2, z: 8 },
+      active: false,
+      holdLeft: 0,
+      lastHit: -1,
+    });
+    expect(world.get(chime, ImpactSwitchComponent)).toMatchObject({
+      variant: 'bell',
+      damageTypes: ['blunt'],
+      elements: [],
+      mode: 'latching',
+      loudness: null,
+      minEnergy: IMPACT_SWITCH_PREFABS.bell.minEnergy,
     });
   });
 

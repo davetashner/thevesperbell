@@ -1417,6 +1417,88 @@
             ],
             "additionalProperties": false
           },
+          "impactSwitch": {
+            "description": "Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20).",
+            "type": "object",
+            "properties": {
+              "variant": {
+                "type": "string",
+                "enum": [
+                  "bullseye",
+                  "bell",
+                  "crystal",
+                  "counterweight"
+                ],
+                "description": "Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope)."
+              },
+              "minEnergy": {
+                "description": "Least energy that counts, J (the delivered amount for an element).",
+                "type": "number",
+                "minimum": 0
+              },
+              "damageTypes": {
+                "description": "Damage types it accepts.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "blunt",
+                    "slash",
+                    "pierce"
+                  ]
+                }
+              },
+              "elements": {
+                "description": "Elements it accepts.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "heat",
+                    "cold",
+                    "water",
+                    "charge",
+                    "force",
+                    "light"
+                  ]
+                }
+              },
+              "radius": {
+                "description": "Radius of the hit zone, metres.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mode": {
+                "description": "momentary stays on for holdSeconds after the last hit; latching until reset.",
+                "type": "string",
+                "enum": [
+                  "momentary",
+                  "latching"
+                ]
+              },
+              "holdSeconds": {
+                "description": "Momentary: seconds it stays on.",
+                "type": "number",
+                "minimum": 0
+              },
+              "loudness": {
+                "description": "Noise made when struck, dB at 1 m; null for silent.",
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "variant"
+            ],
+            "additionalProperties": false
+          },
           "container": {
             "description": "Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3).",
             "type": "object",
