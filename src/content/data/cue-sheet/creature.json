@@ -1,0 +1,65 @@
+{
+  "id": "creature",
+  "notes": "Creature voice cue rules (mw-e28.8). A creature's sounds are its own content, in the `audio` block of its creature file (idle loop, footsteps, alert bark, telegraph, unblockable telegraph, hurt, poise break, death), so these rules only forward the slot the event's creature declares: a creature's footsteps layer over the surface's own step sound; a clean hit that leaves it alive plays its hurt cue; a poise break plays its stagger cue; death plays its death cue (its idle loop stops on the same Died event, see CreatureIdleLoops); and an alert state change to Alerted or Combat plays its alert bark where it stands, rate limited so Alerted then Combat is one bark. Anything that is no creature, or a slot whose cue the manifest lacks (placeholder ids until the SFX asset groups), plays nothing. Telegraph cues are in the combat sheet (TelegraphStarted); the stinger hook events (MusicStinger) are the music system's (AlertStingerHooks), not audio rules.",
+  "rules": [
+    {
+      "event": "LocomotionEvents",
+      "match": {},
+      "layer": "creature-step",
+      "cue": "{creatureSteps}",
+      "pitchJitter": 0.04,
+      "volumeJitterDb": 1,
+      "priority": 28
+    },
+    {
+      "event": "DamageApplied",
+      "match": {},
+      "layer": "creature-voice",
+      "cue": "{creatureHurt}",
+      "pitchJitter": 0.05,
+      "volumeJitterDb": 1,
+      "cooldownMs": 250,
+      "priority": 65
+    },
+    {
+      "event": "PoiseBroken",
+      "match": {},
+      "layer": "creature-voice",
+      "cue": "{creaturePoiseBreak}",
+      "pitchJitter": 0.04,
+      "priority": 70
+    },
+    {
+      "event": "Died",
+      "match": {},
+      "layer": "creature-voice",
+      "cue": "{creatureDeath}",
+      "pitchJitter": 0.04,
+      "priority": 75
+    },
+    {
+      "event": "aiAlertStateChanged",
+      "match": {
+        "to": "alerted"
+      },
+      "layer": "creature-voice",
+      "cue": "{bark}",
+      "pitchJitter": 0.05,
+      "cooldownMs": 3000,
+      "priority": 70,
+      "caption": "caption.alert-bark"
+    },
+    {
+      "event": "aiAlertStateChanged",
+      "match": {
+        "to": "combat"
+      },
+      "layer": "creature-voice",
+      "cue": "{bark}",
+      "pitchJitter": 0.05,
+      "cooldownMs": 3000,
+      "priority": 70,
+      "caption": "caption.alert-bark"
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 // see installGestureUnlock), so sounds from the scene settling at load are dropped, not queued.
 
 import type { CaptionTrigger, PlayOptions, Vec3 } from '@audio/index';
-import type { ArrowDefinition, CueRuleDef, MoveDef } from '@content/index';
+import type { ArrowDefinition, CreatureDef, CueRuleDef, MoveDef } from '@content/index';
 import type { EntityId, World } from '@sim/index';
 import type { SimView, Transform } from '../loop/render-sync.ts';
 import {
@@ -32,6 +32,8 @@ export interface GameAudioOptions {
   readonly moves?: readonly Pick<MoveDef, 'id' | 'presentation'>[];
   /** Arrows, for their own impact sounds (arrowImpact's `sound` fact). */
   readonly arrows?: readonly Pick<ArrowDefinition, 'id' | 'cues'>[];
+  /** Creatures, for their audio slots (mw-e28.8). */
+  readonly creatures?: readonly Pick<CreatureDef, 'id' | 'audio'>[];
   /** Armour weight class of a character, for the footstep armour layer (e04.16 will own it). */
   readonly armorOf?: (entity: EntityId) => string | undefined;
   /** Presentation clock in ms. */
@@ -61,6 +63,8 @@ export function attachGameAudio(options: GameAudioOptions): () => void {
     lookups: worldCueLookups(options.world, options.materials, {
       ...(options.moves !== undefined && { moves: options.moves }),
       ...(options.arrows !== undefined && { arrows: options.arrows }),
+      ...(options.creatures !== undefined && { creatures: options.creatures }),
+      knownCue: (cue) => options.registry.get(cue) !== undefined,
       ...(options.armorOf !== undefined && { armorOf: options.armorOf }),
     }),
     variantCount: soundVariantCount(options.registry),

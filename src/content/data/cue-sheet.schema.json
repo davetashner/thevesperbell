@@ -28,6 +28,7 @@
               "DamageApplied",
               "PoiseBroken",
               "Died",
+              "aiAlertStateChanged",
               "HitParried",
               "GuardBroken",
               "DodgedHit",

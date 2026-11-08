@@ -21,6 +21,15 @@ function creatureFile(id: string, patch: Record<string, unknown>): ContentSource
       stats: { health: 40, poise: 10, mass: 30, size: 'small' },
       senses: 'beast',
       locomotion: 'humanoid',
+      audio: {
+        idleLoop: `sfx-${id}-idle`,
+        footsteps: `sfx-${id}-step`,
+        alertBark: `sfx-${id}-bark-alert`,
+        telegraph: `sfx-${id}-telegraph`,
+        hurt: `sfx-${id}-hurt`,
+        poiseBreak: `sfx-${id}-stagger`,
+        death: `sfx-${id}-death`,
+      },
       ...patch,
     }),
   };

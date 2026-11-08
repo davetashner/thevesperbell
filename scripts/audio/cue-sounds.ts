@@ -38,6 +38,19 @@ export function factDomains(content: Pick<GameContent, 'all'>): FactDomains {
       ...content.all('move').flatMap((m) => m.presentation.telegraph?.audioCue ?? []),
     ]),
   ]);
+  // A creature's own sounds (mw-e28.8: its `audio` slots: bark, hurt, poise break, death, footsteps)
+  // are authored per creature by the SFX asset groups and may be placeholder ids the manifest lacks,
+  // which the engine skips quietly; the facts are known, with no value set to resolve here. The
+  // creature content check (creature-audio-checks.ts) is what makes every creature declare them.
+  for (const fact of [
+    'bark',
+    'creatureHurt',
+    'creaturePoiseBreak',
+    'creatureDeath',
+    'creatureSteps',
+  ]) {
+    domains.set(fact, []);
+  }
   // Footstep surfaces the materials declare, plus stone, which unknown surfaces fall back to.
   domains.set('surface', [
     ...new Set(['stone', ...materials.flatMap((m) => m.footstepSurface ?? [])]),

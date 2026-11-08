@@ -101,6 +101,8 @@ describe('cue sheet schema', () => {
     expect([...new Set(flagged)].sort()).toEqual([
       'LocomotionEvents:caption.footsteps',
       'TelegraphStarted:caption.telegraph',
+      'TelegraphStarted:caption.telegraph-unblockable',
+      'aiAlertStateChanged:caption.alert-bark',
       'arrowImpact:caption.noise-rattle',
       'breakableBroken:caption.breaking',
       'doorStateChanged:caption.door-close',
