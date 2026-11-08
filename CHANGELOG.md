@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The lock-on HUD is complete: the target bar gains a poise bar that appears after the first poise damage and flashes with "Poise broken" when it breaks, a "No effect" note for 800 ms when a hit does nothing, and the reticle and bar vanish the moment the target dies. A creature flagged boss gets a bar docked at the bottom with its name and health, and each landed hit shows a marker shaped for what it struck (normal, weak point, headshot, deflected). No creature is flagged boss yet.
 - Scenes have ambience zones: a looping bed per zone that crossfades over 2 s as you move between zones, plus randomised positional one-shots (drips, gusts, birds, creaks) at random gaps and distances around you, all on the ambience volume slider. Only the mine gallery's existing drip bed is audible so far; the one-shot sounds wait on the ambience assets.
 - Pressure plates weigh whatever rests on them, crates, bodies, actors and what they carry or wear, and switch on inside a weight window (too heavy fails) after an optional delay, momentary or latching until a signal resets them; a floating or spell-held object weighs nothing, and hidden plates drive trap signals.
 - Key bindings in Settings > Controls: remap any keyboard or mouse action with a press-a-key capture (Esc cancels), swap or cancel when a key is already in use, clear or reset a binding, and keep Pause always bound. Your layout is saved in the browser.

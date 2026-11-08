@@ -32,6 +32,7 @@ import {
   attachCombatHud,
   attachScreenFeedback,
   attachTargetHud,
+  liveLock,
   cameraForward,
   horizontalHalfFov,
   readArrowTransform,
@@ -338,6 +339,8 @@ import {
   CombatHud,
   DamageNumbers,
   TargetBar,
+  BossBar,
+  HitMarkers,
   DeathFade,
   InteractPrompt,
   KitPanel,
@@ -1116,7 +1119,7 @@ function startRenderer(
         publishSpells?.();
         lockMarker.update(
           lockMarkerModel(
-            player?.lockTarget(),
+            liveLock(world, player?.lockTarget()),
             (point) => projectToNdc(camera, point),
             root.clientWidth,
             root.clientHeight,
@@ -1576,12 +1579,22 @@ function startRenderer(
         // and what each hit did, over whoever took it.
         const reduced = (): boolean => reducedMotion(ui.element, (q) => globalThis.matchMedia(q));
         const targetBar = new TargetBar({ reducedMotion: reduced });
+        const bossBar = new BossBar({ reducedMotion: reduced });
+        const hitMarkers = new HitMarkers();
         const damageNumbers = new DamageNumbers({ reducedMotion: reduced });
-        ui.hud.append(targetBar.element, damageNumbers.element);
+        ui.hud.append(
+          targetBar.element,
+          bossBar.element,
+          hitMarkers.element,
+          damageNumbers.element,
+        );
         targetHud = attachTargetHud({
           world,
           player: player.entity,
           bar: targetBar,
+          boss: bossBar,
+          markers: hitMarkers,
+          isBoss: (id) => content.get('creature', id).tags.includes('boss'),
           numbers: damageNumbers,
           lock: () => player?.lockTarget(),
           project: (point) => projectToNdc(camera, point),
