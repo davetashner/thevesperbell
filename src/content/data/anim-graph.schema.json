@@ -222,6 +222,7 @@
                             "hitReact",
                             "hitReaction",
                             "hitDirection",
+                            "carry",
                             "guard"
                           ],
                           "description": "Number parameter the blend follows, e.g. \"speed\"."
@@ -280,6 +281,7 @@
                             "hitReact",
                             "hitReaction",
                             "hitDirection",
+                            "carry",
                             "guard"
                           ],
                           "description": "Number parameter on the x axis, e.g. \"speed\"."
@@ -298,6 +300,7 @@
                             "hitReact",
                             "hitReaction",
                             "hitDirection",
+                            "carry",
                             "guard"
                           ],
                           "description": "Number parameter on the y axis, e.g. \"turnRate\"."
@@ -437,6 +440,7 @@
                           "hitReact",
                           "hitReaction",
                           "hitDirection",
+                          "carry",
                           "guard"
                         ],
                         "description": "A sim-published parameter (ANIM_PARAMETERS)."

@@ -757,7 +757,16 @@ describe('testbed player animation (mw-e02.6)', () => {
     run(1);
     expect(state().grounded).toBe(true);
     const probe = body.last();
-    expect(probe?.history).toEqual(['idle', 'move', 'jump', 'fall', 'land', 'move']);
+    // (The history spans every layer: the carry layer enters idle and move beside the base layer, so
+    // runs of the same name collapse to one.)
+    expect((probe?.history ?? []).filter((state, i, all) => state !== all[i - 1])).toEqual([
+      'idle',
+      'move',
+      'jump',
+      'fall',
+      'land',
+      'move',
+    ]);
     expect(probe?.clipHistory).toEqual(
       expect.arrayContaining(['anim-humanoid-run', 'anim-humanoid-jump', 'anim-humanoid-fall']),
     );

@@ -269,7 +269,13 @@ import { Color } from 'three';
 import { createGreyboxView } from '@render/greybox/index';
 import { createLightRig } from '@render/light/index';
 import { AnimationController, compileGraph } from '@render/animation/index';
-import { createPlayerBody, loadKnight, OcclusionFade, projectToNdc } from '@render/player/index';
+import {
+  createPlayerBody,
+  loadKnight,
+  OcclusionFade,
+  projectToNdc,
+  readPlayerBlade,
+} from '@render/player/index';
 import { anyHiddenByBody, CameraShake } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
 import { createTrailRenderer } from '@render/vfx/trails';
@@ -1354,6 +1360,7 @@ function startRenderer(
         const body = createPlayerBody(graph.rig, loadKnight());
         playerFade = new OcclusionFade(body.root);
         let publishedPlayerProbe = '';
+        let publishedSword = '';
         player = setupTestbedPlayer({
           world,
           scene: loaded,
@@ -1394,6 +1401,10 @@ function startRenderer(
               if (json !== publishedPlayerProbe) {
                 root.dataset['playerAnimation'] = publishedPlayerProbe = json;
               }
+              // Where the sword points (mw-a6t), in the body's space: the e2e checks the carry.
+              const blade = readPlayerBlade(body.root);
+              const sword = blade === undefined ? '' : JSON.stringify(blade);
+              if (sword !== publishedSword) root.dataset['sword'] = publishedSword = sword;
             },
           },
           binding: (object, read) => {

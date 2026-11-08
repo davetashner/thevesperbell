@@ -249,7 +249,7 @@ test('AC-4 (mw-e02.6): running and jumping play the rig’s run and jump clips, 
     order(probe.clipHistory, ['anim-humanoid-run', 'anim-humanoid-jump', 'anim-humanoid-fall']),
   ).toBe(true);
   // The guard layer (mw-ju8.24) sits between base and action on the humanoid rig.
-  expect(Object.keys(probe.layers)).toEqual(['base', 'guard', 'action', 'hit']);
+  expect(Object.keys(probe.layers)).toEqual(['base', 'carry', 'guard', 'action', 'hit']);
   expect(problems).toEqual([]);
 });
 

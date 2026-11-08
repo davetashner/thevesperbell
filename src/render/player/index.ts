@@ -4,3 +4,4 @@ export * from './project';
 export * from './throw-arc';
 export * from './knight-model';
 export * from './occlusion-fade';
+export * from './blade';

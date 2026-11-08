@@ -96,7 +96,23 @@ export interface SimAnimSource {
    * reads none. The world must register GuardComponent. Read only: animation never touches the guard.
    */
   readonly guard?: boolean;
+  /**
+   * The entity holds a sword at the low-ready (mw-a6t): `carry` reads true while it stands, walks,
+   * runs, sprints or crouches (and its locomotion state is published), false in the air, on a ledge
+   * or ladder, and in water, where the arm belongs to the traversal clip. Without it `carry` reads
+   * false. The carry layer overrides the arm and sits under the action layer, so a move's clip overrides it.
+   */
+  readonly carry?: boolean;
 }
+
+/** Locomotion states in which a carried sword is held at the low-ready. */
+const CARRY_STATES: ReadonlySet<LocomotionState> = new Set([
+  'idle',
+  'walk',
+  'run',
+  'sprint',
+  'crouch',
+]);
 
 /** How long, in ticks (0.25 s), the `guard` parameter reads lowering after a shield drops. */
 export const LOWERING_TICKS = 15;
@@ -158,6 +174,7 @@ export function simAnimReader(source: SimAnimSource): SimAnimReader {
       hitReaction: reaction?.kind ?? 'none',
       hitDirection: reaction?.direction ?? 'none',
       guard: guardPhase(view, entity),
+      carry: source.carry === true && motion?.state !== undefined && CARRY_STATES.has(motion.state),
     };
     return { values, timeScale: timeline?.timeScale ?? 1, action };
   };

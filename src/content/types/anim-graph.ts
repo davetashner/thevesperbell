@@ -99,6 +99,12 @@ export const ANIM_PARAMETERS = {
     values: ANIM_HIT_DIRECTIONS,
     description: 'Side of the entity the reacting hit came from, or none when not reacting.',
   },
+  carry: {
+    kind: 'boolean',
+    description:
+      'The entity carries its sword at the low-ready while it stands, walks, runs or crouches ' +
+      '(mw-a6t); published only for readers that opt in (the knight), false otherwise.',
+  },
   guard: {
     kind: 'string',
     values: ANIM_GUARD_PHASES,
