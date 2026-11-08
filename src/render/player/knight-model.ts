@@ -11,8 +11,11 @@
 import {
   Bone,
   Group,
+  type BufferGeometry,
   Mesh,
   Float32BufferAttribute,
+  type Object3D,
+  Vector3,
   Skeleton,
   SkinnedMesh,
   Uint16BufferAttribute,
@@ -33,6 +36,7 @@ import {
   type Rig,
   type SegmentFit,
 } from '../animation/index';
+import { readBlade, type BladeReadout, type Point3 } from './blade';
 
 /** Where the optimised models are served from (public/assets/model). */
 export const KNIGHT_MODEL_URL = '/assets/model/model-char-knight-01.glb';
@@ -230,4 +234,32 @@ export function createKnightRig(
       if (pelvis !== undefined) pelvis.position.y = rest - metres;
     },
   };
+}
+
+/**
+ * Where the knight's blade points now, in the body's space, or undefined while the knight model or
+ * its sword has not loaded (mw-a6t). The grip and tip are the sword mesh's highest and lowest
+ * vertices; the leg is the right hip, knee and ankle. Read by the page for the e2e; render-only.
+ */
+export function readPlayerBlade(body: Object3D): BladeReadout | undefined {
+  const prop = body.getObjectByName('knight-sword-prop');
+  const hip = body.getObjectByName('thigh-r');
+  const knee = body.getObjectByName('shin-r');
+  if (!(prop instanceof Mesh) || hip === undefined || knee === undefined) return undefined;
+  const geometry = prop.geometry as BufferGeometry;
+  geometry.computeBoundingBox();
+  const box = geometry.boundingBox;
+  if (box === null) return undefined;
+  body.updateMatrixWorld(true);
+  const local = (object: Object3D, x: number, y: number, z: number): Point3 => {
+    const v = body.worldToLocal(object.localToWorld(new Vector3(x, y, z)));
+    return [v.x, v.y, v.z];
+  };
+  const cx = (box.min.x + box.max.x) / 2;
+  const cz = (box.min.z + box.max.z) / 2;
+  return readBlade(local(prop, cx, box.max.y, cz), local(prop, cx, box.min.y, cz), [
+    local(hip, 0, 0, 0),
+    local(knee, 0, 0, 0),
+    local(knee, 0, -0.44, 0),
+  ]);
 }

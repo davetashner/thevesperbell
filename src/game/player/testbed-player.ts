@@ -402,6 +402,8 @@ function animatedBody(
       moves: moves ?? new Map(),
       locomotion: characterLocomotion,
       timeline: moves !== undefined,
+      // The knight always holds its sword (mw-a6t): low and clear of the legs, not hanging.
+      carry: true,
     }),
     apply: animation.apply,
   });

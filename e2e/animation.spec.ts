@@ -55,7 +55,7 @@ test('AC-6: each rig reports idle → move → attack → hit-react in order, wi
   const final = await probe(page);
   // The humanoid rig also has the upper-body guard layer (shield raise/hold/lower, mw-ju8.24).
   const layers: Record<string, string[]> = {
-    'greybox-humanoid': ['base', 'guard', 'action', 'hit'],
+    'greybox-humanoid': ['base', 'carry', 'guard', 'action', 'hit'],
     'greybox-beast': ['base', 'action', 'hit'],
   };
   for (const rig of RIGS) {

@@ -12,6 +12,7 @@ import {
   setTimeScale,
   World,
   type EntityId,
+  type LocomotionState,
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
 import { characterLocomotion, LOWERING_TICKS, simAnimReader } from './sim-params';
@@ -85,6 +86,7 @@ describe('simAnimReader', () => {
         hitReaction: 'none',
         hitDirection: 'none',
         guard: 'none',
+        carry: false,
       },
       timeScale: 1,
       action: null,
@@ -116,6 +118,7 @@ describe('simAnimReader', () => {
         hitReaction: 'none',
         hitDirection: 'none',
         guard: 'none',
+        carry: false,
       },
       timeScale: 0,
       action: {
@@ -185,10 +188,35 @@ describe('simAnimReader', () => {
         hitReaction: 'none',
         hitDirection: 'none',
         guard: 'none',
+        carry: false,
       },
       timeScale: 1,
       action: null,
     });
     expect(characterLocomotion(world, world.spawn())).toBeUndefined();
+  });
+});
+
+describe('simAnimReader carry (mw-a6t)', () => {
+  const carryAt = (carry: boolean | undefined, state: LocomotionState | undefined) => {
+    const { world, entity, moves } = timelineWorld();
+    const read = simAnimReader({
+      moves,
+      ...(carry !== undefined && { carry }),
+      locomotion: () => ({ speed: 0, turnRate: 0, grounded: true, ...(state && { state }) }),
+    });
+    return read(world, entity)?.values.carry;
+  };
+
+  it('AC-2: reads true only for an opted-in reader on the ground, standing, walking, running or crouching', () => {
+    for (const state of ['idle', 'walk', 'run', 'sprint', 'crouch'] as const) {
+      expect(carryAt(true, state)).toBe(true);
+      expect(carryAt(undefined, state)).toBe(false);
+      expect(carryAt(false, state)).toBe(false);
+    }
+    for (const state of ['airborne', 'landing', 'climb', 'mantle', 'hang', 'swim'] as const) {
+      expect(carryAt(true, state)).toBe(false);
+    }
+    expect(carryAt(true, undefined)).toBe(false);
   });
 });
