@@ -103,6 +103,8 @@ export interface RigidBodyPort extends PhysicsPort {
    * @throws RangeError for a non-finite position or rotation, or a handle that is not a body.
    */
   moveBody(handle: ColliderHandle, position: Vec3, rotation?: Quat): void;
+  /** Wakes a body now (what removing or changing the collider it rests on must do). */
+  wake(handle: ColliderHandle): void;
   /** Puts a body to sleep now (it wakes again when something touches or pushes it). */
   sleep(handle: ColliderHandle): void;
   /** The world's gravity, m/s² (default 9.81 straight down); what a hold must cancel to float a body. */

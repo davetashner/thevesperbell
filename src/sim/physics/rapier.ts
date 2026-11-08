@@ -287,6 +287,10 @@ export class RapierPhysics implements RigidBodyPort {
     };
   }
 
+  wake(handle: ColliderHandle): void {
+    this.bodyOf(handle).wakeUp();
+  }
+
   sleep(handle: ColliderHandle): void {
     this.bodyOf(handle).sleep();
   }

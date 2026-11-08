@@ -91,6 +91,16 @@ const EFFECTS: Readonly<Record<StimulusElement, Effect>> = {
   pierce: { kind: 'impact' },
 };
 
+/**
+ * Which way `element` moves a temperature: +1 for heat, -1 for cold, 0 for every other element.
+ * Things that hold their own temperature apart from the entities (a liquid volume's surface cells)
+ * read the direction here, so they never name an element.
+ */
+export function temperatureSign(element: StimulusElement): -1 | 0 | 1 {
+  const effect = EFFECTS[element];
+  return effect.kind === 'property' && effect.key === 'temperature' ? effect.sign : 0;
+}
+
 /** A stimulus as callers describe it; see the file header for element semantics and units. */
 export interface StimulusInput {
   readonly shape: StimulusShape;

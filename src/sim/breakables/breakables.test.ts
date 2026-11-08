@@ -367,8 +367,8 @@ describe('breakables: fragility (mw-e03.11)', () => {
     expect(breakThreshold(world, frozen)).toBe(40 / DEFAULT_FROZEN_FRAGILITY);
     expect(breakThreshold(world, thawed)).toBe(40);
     expect(breakThreshold(world, frozen, 8)).toBe(5);
-    hit(world, frozen, 'blunt', 12);
-    hit(world, thawed, 'blunt', 12);
+    hit(world, frozen, 'blunt', 14);
+    hit(world, thawed, 'blunt', 14);
     world.step();
     expect(log.broken.map((b) => [b.entity, b.cause])).toEqual([[frozen, 'impact']]);
     expect(world.isAlive(thawed)).toBe(true);
