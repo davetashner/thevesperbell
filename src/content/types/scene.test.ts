@@ -157,6 +157,67 @@ describe('scene containers (mw-e18.3)', () => {
   });
 });
 
+describe('scene pressure plates (mw-e03.19)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
+
+  it('takes a weight window, timing and footprint, with defaults', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('scale', {
+          plate: { minWeight: 40, maxWeight: 60, mode: 'latching', armSeconds: 1, hidden: true },
+        }),
+        spawn('step', { plate: { minWeight: 5 } }),
+      ],
+    });
+    expect(scene.spawns[0]?.plate).toEqual({
+      minWeight: 40,
+      maxWeight: 60,
+      hysteresis: 0,
+      mode: 'latching',
+      armSeconds: 1,
+      width: 1,
+      depth: 1,
+      hidden: true,
+    });
+    expect(scene.spawns[1]?.plate).toMatchObject({
+      minWeight: 5,
+      mode: 'momentary',
+      hidden: false,
+    });
+  });
+
+  it('rejects a ceiling below the floor, and a plate that is also a door, switch, item, creature or container', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('odd', {
+            plate: { minWeight: 40, maxWeight: 30 },
+            door: { profile: 'wooden-door' },
+            switch: { kind: 'lever' },
+            item: { id: 'healing-draught' },
+            creature: 'forgotten-miner',
+            container: {},
+          }),
+        ],
+      }),
+    ).toEqual([
+      'spawns.0.switch: spawn "odd" cannot be both a door and a switch',
+      'spawns.0.door: spawn "odd" cannot be both a container and a door',
+      'spawns.0.switch: spawn "odd" cannot be both a container and a switch',
+      'spawns.0.plate: spawn "odd" cannot be both a container and a plate',
+      'spawns.0.item: spawn "odd" cannot be both a container and an item',
+      'spawns.0.creature: spawn "odd" cannot be both a container and a creature',
+      'spawns.0.door: spawn "odd" cannot be both a plate and a door',
+      'spawns.0.switch: spawn "odd" cannot be both a plate and a switch',
+      'spawns.0.item: spawn "odd" cannot be both a plate and an item',
+      'spawns.0.creature: spawn "odd" cannot be both a plate and a creature',
+      'spawns.0.plate: spawn "odd" has a maxWeight below its minWeight',
+    ]);
+  });
+});
+
 describe('scene checkpoints (mw-e01.4)', () => {
   it('marks volume nodes of a placed graph as checkpoints, each once', () => {
     const scene = sceneSchema.parse({

@@ -25,6 +25,7 @@ import {
   lockSpecs,
   MechanismWatch,
   PLAYER_TAG,
+  plateOptions,
   readDoorLeaf,
   sceneCheckpoints,
   startMechanisms,
@@ -158,7 +159,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     expect(
       doorLeafLooks(
         world,
-        { doors: [spawn('west-door')], switches: [], graphs: [] },
+        { doors: [spawn('west-door')], switches: [], plates: [], graphs: [] },
         {
           ...content,
           has: () => false,
@@ -171,6 +172,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     const watch = new MechanismWatch(world, {
       doors: [],
       switches: [spawn('east-button'), odd],
+      plates: [],
       graphs: [],
     });
     expect(watch.readout().switches).toEqual({ [String(spawn('east-button'))]: 0 });
@@ -204,5 +206,15 @@ describe('slice triggers in the game (mw-e01.4)', () => {
     expect(isCheckpoint(crossing('slice', 'slice-complete'))).toBe(false);
     expect(isCheckpoint(crossing('other', 'cp-1'))).toBe(false);
     expect(sceneCheckpoints(room().loaded.layout)(crossing('mechanism-room', 'cp-1'))).toBe(false);
+  });
+});
+
+describe('plate options (mw-e03.19)', () => {
+  it('reads worn weight from equipment (0 without) and gravity from remote holds (1 without)', () => {
+    const world = registerWorldProperties(new World<never>({ seed: 1 }));
+    const actor = world.spawn();
+    const options = plateOptions(content);
+    expect(options.gear?.(world, actor)).toBe(0);
+    expect(options.gravityScale?.(world, actor)).toBe(1);
   });
 });

@@ -1359,6 +1359,64 @@
             ],
             "additionalProperties": false
           },
+          "plate": {
+            "description": "Makes the spawned entity a pressure plate that weighs what rests on it (mw-e03.19).",
+            "type": "object",
+            "properties": {
+              "minWeight": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Lightest total weight that turns it on, kg."
+              },
+              "maxWeight": {
+                "description": "Heaviest total weight that keeps it on, kg; absent: no ceiling (too heavy fails).",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "hysteresis": {
+                "default": 0,
+                "description": "Margin, kg, by which the window widens once it is on, so a jittering load holds.",
+                "type": "number",
+                "minimum": 0
+              },
+              "mode": {
+                "default": "momentary",
+                "description": "momentary follows its load; latching stays on until a signal resets it.",
+                "type": "string",
+                "enum": [
+                  "momentary",
+                  "latching"
+                ]
+              },
+              "armSeconds": {
+                "default": 0,
+                "description": "Seconds the load must stay in the window before it turns on.",
+                "type": "number",
+                "minimum": 0
+              },
+              "width": {
+                "default": 1,
+                "description": "Footprint along x, metres.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "depth": {
+                "default": 1,
+                "description": "Footprint along z, metres.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "hidden": {
+                "default": false,
+                "description": "The trap variant: nothing to see or prompt; wire it to trap signals.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "minWeight"
+            ],
+            "additionalProperties": false
+          },
           "container": {
             "description": "Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3).",
             "type": "object",

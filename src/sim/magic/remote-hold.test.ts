@@ -31,6 +31,7 @@ import {
   addAttractor,
   addGravityZone,
   canHoldRemotely,
+  gravityScaleOf,
   holdOnTarget,
   holdRemotely,
   HOLD_STALL_SECONDS,
@@ -259,6 +260,26 @@ describe('remote holds (mw-e03.12)', () => {
     expect(r.velocityOf(heavier).y).toBeCloseTo(-9.81, 0);
     r.steps(60); // the zone ends after 1 s and the floater begins to fall
     expect(r.velocityOf(floater).y).toBeLessThan(-1);
+  });
+
+  it('gravityScaleOf reads the gravity a thing feels: held 0, zones add to 1, others and bare worlds 1 (mw-e03.19)', () => {
+    const r = rig();
+    r.steps(1);
+    const loose = r.body(10, v(0, 10, 0));
+    const fixed = r.body(10, v(0, 10, 5), { liftable: false });
+    const held = r.body(10, v(10, 10, 0));
+    const far = r.body(10, v(20, 10, 0));
+    const marker = r.world.spawn();
+    expect(gravityScaleOf(r.world, loose)).toBe(1);
+    addGravityZone(r.world, { min: v(-3, 0, -3), max: v(3, 30, 8), scale: 0 });
+    addGravityZone(r.world, { min: v(-3, 0, -3), max: v(3, 30, 3), scale: 3 });
+    expect(gravityScaleOf(r.world, loose)).toBe(2); // 1 + (0 − 1) + (3 − 1)
+    expect(gravityScaleOf(r.world, far)).toBe(1); // outside every zone
+    expect(gravityScaleOf(r.world, fixed)).toBe(1); // zones act on liftable objects only
+    expect(gravityScaleOf(r.world, marker)).toBe(1); // not a body
+    holdRemotely(r.world, r.holder, held, v(10, 10, 0), 50);
+    expect(gravityScaleOf(r.world, held)).toBe(0);
+    expect(gravityScaleOf(rig(false).world, loose)).toBe(1); // remote holds not installed
   });
 
   it('AC-5: a hold released with velocity v leaves at v within 1%', () => {

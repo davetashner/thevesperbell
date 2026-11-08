@@ -14,6 +14,7 @@ import type { CreatureLeash } from '../creatures/components';
 import type { InteractableSpec } from '../interaction/affordance';
 import type { LightEnvironment } from '../light/field';
 import type { DoorHinge, DoorSwing, SwitchKind } from '../mechanisms/components';
+import type { PlateMode } from '../mechanisms/plates';
 import type { StaticColliderDesc } from '../physics/static-colliders';
 import type { WorldPropertyValues } from '../properties/spec';
 import type { Vec3 } from '../stimulus/shapes';
@@ -108,6 +109,18 @@ export interface SceneSwitchSpec {
   readonly kind: SwitchKind;
   readonly positions?: number | undefined;
   readonly initial?: number | undefined;
+}
+
+/** A pressure plate spawn (mw-e03.19): the window, timing and footprint it is made with. */
+export interface ScenePlateSpec {
+  readonly minWeight: number;
+  readonly maxWeight?: number | undefined;
+  readonly hysteresis?: number | undefined;
+  readonly mode?: PlateMode | undefined;
+  readonly armSeconds?: number | undefined;
+  readonly width?: number | undefined;
+  readonly depth?: number | undefined;
+  readonly hidden?: boolean | undefined;
 }
 
 /** A container spawn as written in data (mw-e18.3): its loot table, contents and lock. */
@@ -241,6 +254,8 @@ export interface SceneSpawnSpec {
   readonly door?: SceneDoorSpec | undefined;
   /** Makes the spawned entity a switch (mw-e03.18). */
   readonly switch?: SceneSwitchSpec | undefined;
+  /** Makes the spawned entity a pressure plate (mw-e03.19). */
+  readonly plate?: ScenePlateSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
 }
@@ -396,6 +411,8 @@ export interface SceneSpawnPlacement {
   readonly door?: SceneDoor;
   /** Its switch data, when it is a switch (mw-e03.18). */
   readonly switch?: SceneSwitchSpec;
+  /** Its pressure plate data, when it is a plate (mw-e03.19). */
+  readonly plate?: ScenePlateSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
 }
@@ -529,6 +546,20 @@ function switchOf(spec: SceneSwitchSpec): SceneSwitchSpec {
     kind: spec.kind,
     ...(spec.positions !== undefined && { positions: spec.positions }),
     ...(spec.initial !== undefined && { initial: spec.initial }),
+  });
+}
+
+/** A plate's data without absent fields. */
+function plateOf(spec: ScenePlateSpec): ScenePlateSpec {
+  return Object.freeze({
+    minWeight: spec.minWeight,
+    ...(spec.maxWeight !== undefined && { maxWeight: spec.maxWeight }),
+    ...(spec.hysteresis !== undefined && { hysteresis: spec.hysteresis }),
+    ...(spec.mode !== undefined && { mode: spec.mode }),
+    ...(spec.armSeconds !== undefined && { armSeconds: spec.armSeconds }),
+    ...(spec.width !== undefined && { width: spec.width }),
+    ...(spec.depth !== undefined && { depth: spec.depth }),
+    ...(spec.hidden !== undefined && { hidden: spec.hidden }),
   });
 }
 
@@ -708,6 +739,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
       ...(spawn.breakable !== undefined && { breakable: breakableOf(spawn.breakable) }),
       ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
       ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
+      ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
       ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
     }),
   );

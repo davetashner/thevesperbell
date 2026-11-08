@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Pressure plates weigh whatever rests on them, crates, bodies, actors and what they carry or wear, and switch on inside a weight window (too heavy fails) after an optional delay, momentary or latching until a signal resets them; a floating or spell-held object weighs nothing, and hidden plates drive trap signals.
 - Key bindings in Settings > Controls: remap any keyboard or mouse action with a press-a-key capture (Esc cancels), swap or cancel when a key is already in use, clear or reset a binding, and keep Pause always bound. Your layout is saved in the browser.
 - The knight can kick (K, or block and attack with no shield): it shoves crates and barrels up to 40 kg, tips a burning brazier into whatever can burn, slams an unlocked door open onto whoever stands behind it, bounces off a locked one with a thud, and knocks small creatures back, even over a ledge.
 - Sound captions (Settings > Accessibility): important sounds within 20 m (creature footsteps, attack telegraphs, rattling noise arrows, doors, breaking objects) show as text such as "[Footsteps, behind left]" with an arrow relative to the camera, up to 4 at once, with a size setting.

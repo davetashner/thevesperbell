@@ -305,6 +305,35 @@ export function addGravityZone(
   return nextId;
 }
 
+/**
+ * The gravity `target` feels now, as a share of normal (mw-e03.19): 0 while a remote hold carries
+ * it (the hold cancels gravity), otherwise 1 plus each gravity zone it is inside adds (a 0 zone
+ * floats it, a 2 zone doubles it). Only loose liftable physics objects feel zones, as in the
+ * system's fields; anything else, and a world without remote holds, reads 1. Pressure plates weigh
+ * things by it: what floats weighs nothing.
+ */
+export function gravityScaleOf(world: World<never>, target: EntityId): number {
+  const entry = ledgerOf(world);
+  if (entry === undefined) return 1;
+  const [, ledger] = entry;
+  if (ledger.holds.some((hold) => hold.target === target)) return 0;
+  const object = world.get(target, PhysicsObjectComponent);
+  if (object === undefined || !readProperty(world, target, 'liftable')) return 1;
+  const at = object.position;
+  let scale = 1;
+  for (const zone of ledger.zones) {
+    const inside =
+      at.x >= zone.min.x &&
+      at.x <= zone.max.x &&
+      at.y >= zone.min.y &&
+      at.y <= zone.max.y &&
+      at.z >= zone.min.z &&
+      at.z <= zone.max.z;
+    if (inside) scale += zone.scale - 1;
+  }
+  return scale;
+}
+
 /** Adds a point attractor for `seconds` (forever when omitted); returns its id. */
 export function addAttractor(
   world: World<never>,

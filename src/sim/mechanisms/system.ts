@@ -50,7 +50,7 @@ import { bodyMaterialOf, PhysicsColliderComponent, rigidBodiesOf } from '../phys
 import type { ColliderHandle, StaticColliderSink } from '../physics/static-colliders';
 import { readProperty } from '../properties/components';
 import { ScenePieceComponent } from '../scene/loader';
-import { pressButton, setLever, SignalGraphComponent, signalReceived } from '../signals/runtime';
+import { pressButton, setLever, signalReceived } from '../signals/runtime';
 import {
   boundingSphereOf,
   PlacementCentreComponent,
@@ -85,8 +85,10 @@ import {
   type DoorState,
   type LockRefusal,
 } from './events';
+import { boundNodes } from './bindings';
 import { closedBox, contactOpenness, leafBox, leafCentre, type Obstacle } from './geometry';
 import type { Keyring } from './keys';
+import { PlateComponent, platesSystem, resetPlate, type PlateOptions } from './plates';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
 export const SLAM_SPEED = 4;
@@ -116,6 +118,8 @@ export interface MechanismsOptions {
   readonly keys?: Keyring;
   /** Decides a pick attempt; none: a pickable lock always yields to someone with lockpicks. */
   readonly pick?: LockPick;
+  /** What pressure plates read beyond properties: gravity felt and worn gear (plates.ts). */
+  readonly plates?: PlateOptions;
 }
 
 /** How a door is placed (a scene spawn's door data). */
@@ -462,21 +466,6 @@ export function lockDoor(world: World<never>, entity: EntityId): boolean {
   return true;
 }
 
-/** The lever and button nodes bound to `entity`, as [graph, node, kind]. */
-function boundNodes(world: World<never>, entity: EntityId): [EntityId, string, string][] {
-  const found: [EntityId, string, string][] = [];
-  if (!world.isRegistered(SignalGraphComponent)) return found;
-  world.query(SignalGraphComponent).forEach((graph, instance) => {
-    for (const node of instance.graph.nodes) {
-      if (node.kind !== 'lever' && node.kind !== 'button') continue;
-      if (node.entity !== undefined && instance.bindings[node.entity] === entity) {
-        found.push([graph, node.id, node.kind]);
-      }
-    }
-  });
-  return found;
-}
-
 /**
  * Sets every lever node bound to `entity`'s switch to its position (on unless 0), without the events
  * of moving it: a scene's switches that start on. Between steps, after placing the graphs.
@@ -811,8 +800,9 @@ export function installMechanisms<TInput>(
     keys: options.keys,
     pick: options.pick,
   };
-  world.register(...MECHANISM_COMPONENTS);
+  world.register(...MECHANISM_COMPONENTS, PlateComponent);
   world.addSystem(mechanismsSystem(rules));
+  world.addSystem(platesSystem(options.plates));
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
     removeFrom(rules.colliders, door.collider);
@@ -851,7 +841,10 @@ export function installMechanisms<TInput>(
     }),
     world.events.on(signalReceived, ({ receiver, entity, value, graph }) => {
       if ((receiver !== 'door' && receiver !== 'mechanism') || entity === null) return;
-      if (w.has(entity, DoorComponent)) moveDoor(w, entity, value ? 1 : 0, graph);
+      if (w.has(entity, PlateComponent)) {
+        // A signal on resets a plate (a latching one's way off); off does nothing.
+        if (value) resetPlate(w, entity, graph);
+      } else if (w.has(entity, DoorComponent)) moveDoor(w, entity, value ? 1 : 0, graph);
       else setSwitch(w, entity, value ? 1 : 0, graph);
     }),
     world.events.on(fireBurntOut, ({ entity }) => {
