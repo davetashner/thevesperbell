@@ -8,15 +8,19 @@
 
 import type { EntityId } from '../core/component';
 import type { World } from '../core/world';
+import type { StaticColliderSink } from '../physics/static-colliders';
 import type { AffordanceSpec } from '../interaction/affordance';
 import { addInteractable, InteractableComponent } from '../interaction/system';
+import { hasProperty, readProperty } from '../properties/components';
 import { addMaterialProperties, type MaterialPresets } from '../properties/materials';
+import type { SceneImpactSwitchSpec } from '../scene/layout';
 import type { LoadedScene } from '../scene/loader';
 import { placementProperties } from '../scene/physics';
 import { compileSignalGraph, type SignalGraphDef } from '../signals/graph';
 import { addSignalGraph } from '../signals/runtime';
 import { PlacementComponent, placeEntity } from '../stimulus/placement';
 import type { DoorProfileLookup, LockLookup, SwitchKind } from './components';
+import { makeCuttable, suspendFrom } from './ropes';
 import { makeImpactSwitch, syncImpactSwitchNodes } from './impacts';
 import { makePlate, syncPlateNodes } from './plates';
 import { makeDoor, makeSwitch, refreshAffordances, syncSwitchNodes } from './system';
@@ -29,6 +33,8 @@ export interface SceneMechanismsOptions {
   /** Door profile id → its material; with `materials`, doors get that material's properties. */
   readonly doorMaterial?: (profile: string) => string | undefined;
   readonly materials?: MaterialPresets;
+  /** Where ropes' colliders go (the physics port in the game); none: ropes have no body to hit. */
+  readonly colliders?: StaticColliderSink;
 }
 
 /** What `addSceneMechanisms` made, in scene order. */
@@ -39,6 +45,8 @@ export interface SceneMechanisms {
   readonly plates: readonly EntityId[];
   /** Impact switches (mw-e03.20). */
   readonly impactSwitches: readonly EntityId[];
+  /** Cuttable ropes (mw-e05.13). */
+  readonly ropes: readonly EntityId[];
   /** The placed graphs' entities. */
   readonly graphs: readonly EntityId[];
 }
@@ -72,6 +80,7 @@ export function addSceneMechanisms<T>(
   const switches: EntityId[] = [];
   const plates: EntityId[] = [];
   const impactSwitches: EntityId[] = [];
+  const ropes: EntityId[] = [];
   const interactive = sim.isRegistered(InteractableComponent);
   for (const { entity, spawn } of loaded.spawns) {
     const { door } = spawn;
@@ -112,10 +121,22 @@ export function addSceneMechanisms<T>(
       });
       plates.push(entity);
     }
+    const { rope } = spawn;
+    if (rope !== undefined) {
+      makeCuttable(sim, entity, spawn.position, rope.length, {
+        ...(rope.radius !== undefined && { radius: rope.radius }),
+        ...(options.colliders !== undefined && { colliders: options.colliders }),
+      });
+      ropes.push(entity);
+    }
     const { impactSwitch: impact } = spawn;
-    if (impact !== undefined) {
-      const { variant, ...rest } = impact;
+    // A spawn with the `shootable` property is a target even when the scene says no more
+    // (mw-e05.13); the property is the threshold of whichever prefab it is.
+    const shootable = hasProperty(sim, entity, 'shootable');
+    if (impact !== undefined || shootable) {
+      const { variant = 'target', ...rest }: Partial<SceneImpactSwitchSpec> = impact ?? {};
       makeImpactSwitch(sim, entity, spawn.position, variant, {
+        ...(shootable && { minImpulse: readProperty(sim, entity, 'shootable') }),
         ...(rest.minEnergy !== undefined && { minEnergy: rest.minEnergy }),
         ...(rest.damageTypes !== undefined && { damageTypes: rest.damageTypes }),
         ...(rest.elements !== undefined && { elements: rest.elements }),
@@ -146,6 +167,14 @@ export function addSceneMechanisms<T>(
   }
 
   const bySpawn = new Map(loaded.spawns.map(({ entity, spawn }) => [spawn.id, entity]));
+  for (const { entity, spawn } of loaded.spawns) {
+    if (spawn.suspendedFrom === undefined) continue;
+    const rope = need(
+      bySpawn.get(spawn.suspendedFrom),
+      `spawn "${spawn.id}" hangs from "${spawn.suspendedFrom}", which the scene does not have`,
+    );
+    suspendFrom(sim, entity, rope);
+  }
   const graphs = loaded.layout.signals.map((signal, index) => {
     const def = need(options.graphs(signal.graph), `unknown signal graph "${signal.graph}"`);
     const bindings: Record<string, EntityId> = {};
@@ -168,6 +197,7 @@ export function addSceneMechanisms<T>(
     switches: Object.freeze(switches),
     plates: Object.freeze(plates),
     impactSwitches: Object.freeze(impactSwitches),
+    ropes: Object.freeze(ropes),
     graphs: Object.freeze(graphs),
   });
 }

@@ -90,6 +90,9 @@ export function hasMechanisms(layout: SceneLayout): boolean {
       (spawn) =>
         spawn.door !== undefined ||
         spawn.switch !== undefined ||
+        spawn.rope !== undefined ||
+        spawn.impactSwitch !== undefined ||
+        spawn.properties?.shootable !== undefined ||
         spawn.container?.lock !== undefined,
     )
   );
@@ -155,6 +158,7 @@ export function startMechanisms<T>(
     graphs: (id) => content.get('signal-graph', id) as unknown as SignalGraphDef,
     doorMaterial: (id) => content.get('door', id).material.id,
     materials: options.materials,
+    colliders: options.colliders,
   });
 }
 
