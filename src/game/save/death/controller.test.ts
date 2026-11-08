@@ -11,7 +11,7 @@ import { IDBFactory } from 'fake-indexeddb';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { decodeSave, encodeSave, SaveRegistry, WORLD_SECTION_ID } from '../format/index';
 import { createGameSaveRegistry } from '../sections';
-import type { SlotId } from '../slots/index';
+import { SaveSlots, type SlotId } from '../slots/index';
 import { MemorySaveStore, openSaveStore, type SaveStore } from '../storage/index';
 import {
   DeathReload,
@@ -314,7 +314,10 @@ describe('load on boot', () => {
     expect(hash).not.toBe(before);
     expect(hash).toBe(hashWorld(s.world));
     const loaded = world(0);
-    const read = await s.reload['slots'].load('manual-1', loaded);
+    const read = await new SaveSlots({ store: s.store, registry, build, now: () => T0 }).load(
+      'manual-1',
+      loaded,
+    );
     expect(read.status).toBe('loaded');
     expect(hashWorld(loaded)).toBe(hash);
   });
