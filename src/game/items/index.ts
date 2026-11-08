@@ -25,6 +25,7 @@ import {
   addSceneItems,
   Consumables,
   installCarry,
+  installPush,
   installConsumables,
   classOf,
   holdOf,
@@ -130,6 +131,7 @@ export function startCarry<T>(
   content: Pick<GameContent, 'get' | 'has'>,
   collision: CollisionWorld,
 ): CarryController {
+  installPush(world, { collision });
   return installCarry(world, {
     collision,
     limit: (w, actor) => {

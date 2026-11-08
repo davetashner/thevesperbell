@@ -23,13 +23,14 @@ in priority order.
 ```
 
 - `verb` is one of the closed list in `AFFORDANCE_VERBS` (`use`, `open`, `close`, `pull`, `press`,
-  `pick-up`, `read`, `search`, `hide`, `climb`, `talk`, `push`, `unlock`, `pick-lock`, `light`,
+  `pick-up`, `read`, `search`, `hide`, `climb`, `talk`, `push`, `release`, `rotate`, `unlock`, `pick-lock`, `light`,
   `extinguish`). Add a verb in the sim; the content schema then fails to compile until it lists it.
 - `requires`: every requirement must hold. A capability comes from the actor's class or skills, an
   item from what it carries (`Interactor` component: `capabilities`, `items`).
 - An affordance the actor can't use is still shown, greyed, with `reason` (or "Needs <requirement>").
 - **World properties add affordances**, so new objects need no code: `liftable` → pick up,
-  `container` → search, `hideable` → hide, `pushable` → push. A declared affordance with the same verb
+  `container` → search, `hideable` → hide, `pushable` → push (grab; Interact again releases; `release` and `rotate` are declared on
+  the object, see `src/sim/push`). A declared affordance with the same verb
   replaces the derived one (to gate or relabel it). `hidden` objects are never focused.
 
 ## Focus

@@ -208,6 +208,8 @@
                         "climb",
                         "talk",
                         "push",
+                        "release",
+                        "rotate",
                         "unlock",
                         "pick-lock",
                         "light",
