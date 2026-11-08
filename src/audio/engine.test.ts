@@ -415,9 +415,15 @@ describe('AudioEngine routing and parameters', () => {
     await settle();
     const [click, bellow, parry] = ctx.sources;
     const [master, music, sfx, combat, footsteps, creatures, ambience, ui] = ctx.gains;
-    expect(music?.outputs).toEqual([master]);
+    // Mix buses reach their parent through the snapshot → duck → low-pass stage (mw-e28.9).
+    const through = (node: { outputs: unknown[] } | undefined): unknown => {
+      let at: { outputs: unknown[] } | undefined = node;
+      for (let hops = 0; hops < 4; hops++) at = at?.outputs[0] as typeof at;
+      return at;
+    };
+    expect(through(music)).toBe(master);
     expect(footsteps?.outputs).toEqual([sfx]);
-    expect(ambience?.outputs).toEqual([master]);
+    expect(through(ambience)).toBe(master);
 
     expect(click?.playbackRate.value).toBe(1.1);
     expect(click && gainOf(click).gain.value).toBe(0.5);

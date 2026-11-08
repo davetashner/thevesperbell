@@ -6,6 +6,8 @@ import {
   buildBusGraph,
   dbToGain,
   LIMITER,
+  type MixBusId,
+  type MixStage,
   NIGHT_COMPRESSOR,
 } from './buses.ts';
 import { FakeAudioContext, type FakeCompressor, type FakeGain } from './fake-context.ts';
@@ -22,7 +24,16 @@ describe('bus graph', () => {
     expect((graph.night as FakeCompressor).outputs).toEqual([limiter]);
     expect(limiter.outputs).toEqual([ctx.destination]);
     for (const bus of PLAYABLE_BUS_IDS) {
-      expect(buses[bus].outputs).toEqual([buses[BUS_PARENT[bus]]]);
+      // Mix buses go through their stage (snapshot → duck → low-pass) to the parent.
+      const stage = graph.stages[bus as MixBusId] as MixStage | undefined;
+      let out: unknown = buses[bus];
+      if (stage) {
+        out = stage.filter;
+        expect(buses[bus].outputs).toEqual([stage.snapshot]);
+        expect((stage.snapshot as FakeGain).outputs).toEqual([stage.duck]);
+        expect((stage.duck as FakeGain).outputs).toEqual([stage.filter]);
+      }
+      expect((out as FakeGain).outputs).toEqual([buses[BUS_PARENT[bus]]]);
     }
     expect(BUS_PARENT).toMatchObject({ combat: 'sfx', footsteps: 'sfx', creatures: 'sfx' });
   });

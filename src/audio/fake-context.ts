@@ -10,6 +10,7 @@ import type {
   AudioListenerLike,
   AudioNodeLike,
   AudioParamLike,
+  BiquadFilterNodeLike,
   DynamicsCompressorNodeLike,
   GainNodeLike,
   PannerNodeLike,
@@ -98,6 +99,15 @@ export class FakeCompressor extends FakeNode implements DynamicsCompressorNodeLi
 
   constructor() {
     super('compressor');
+  }
+}
+
+export class FakeBiquad extends FakeNode implements BiquadFilterNodeLike {
+  type: BiquadFilterType = 'lowpass';
+  readonly frequency = new FakeParam(350);
+
+  constructor() {
+    super('biquad');
   }
 }
 
@@ -224,6 +234,7 @@ export class FakeAudioContext implements AudioContextLike {
   readonly panners: FakePanner[] = [];
   readonly sources: FakeSource[] = [];
   readonly compressors: FakeCompressor[] = [];
+  readonly biquads: FakeBiquad[] = [];
   resumeCalls = 0;
   readonly #decode: (data: ArrayBuffer) => AudioBufferLike;
 
@@ -250,6 +261,12 @@ export class FakeAudioContext implements AudioContextLike {
   createDynamicsCompressor(): FakeCompressor {
     const node = new FakeCompressor();
     this.compressors.push(node);
+    return node;
+  }
+
+  createBiquadFilter(): FakeBiquad {
+    const node = new FakeBiquad();
+    this.biquads.push(node);
     return node;
   }
 

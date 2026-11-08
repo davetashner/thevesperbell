@@ -32,6 +32,11 @@ export interface DynamicsCompressorNodeLike extends AudioNodeLike {
   readonly release: AudioParamLike;
 }
 
+export interface BiquadFilterNodeLike extends AudioNodeLike {
+  type: BiquadFilterType;
+  readonly frequency: AudioParamLike;
+}
+
 export interface PannerNodeLike extends AudioNodeLike {
   panningModel: PanningModelType;
   distanceModel: DistanceModelType;
@@ -90,6 +95,7 @@ export interface AudioContextLike {
   resume(): Promise<void>;
   createGain(): GainNodeLike;
   createDynamicsCompressor(): DynamicsCompressorNodeLike;
+  createBiquadFilter(): BiquadFilterNodeLike;
   createPanner(): PannerNodeLike;
   createBufferSource(): AudioBufferSourceNodeLike;
   createBuffer(numberOfChannels: number, length: number, sampleRate: number): AudioBufferLike;

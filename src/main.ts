@@ -1,5 +1,6 @@
 import {
   bindMixer,
+  MixController,
   createBrowserAudioEngine,
   documentVisibility,
   gameSoundRegistry,
@@ -98,6 +99,7 @@ import {
   playableClasses,
 } from '@game/classes';
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
+import { bindMix, type MixBindings } from '@game/music/mix-bindings';
 import { SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
@@ -818,6 +820,14 @@ function startRenderer(
     installGestureUnlock(document, audio);
     // The saved mix applies now, before the context exists and so before the first sound (mw-e28.5).
     bindMixer(audio, settings, documentVisibility(document));
+    // Snapshots and ducks layer over the player's volumes (mw-e28.9); the sim's alert states, parries
+    // and the pause menu drive them (bindMix, per world). Ducks release on a presentation timer so
+    // they end while the sim is paused too.
+    const mix = new MixController(audio);
+    let mixBindings: MixBindings | undefined;
+    setInterval(() => {
+      mix.update(performance.now());
+    }, 50);
     const recentCues: string[] = [];
     attachGameAudio({
       world,
@@ -1149,6 +1159,8 @@ function startRenderer(
       applyEnvironment(view.scene, scene.environment, { load: import.meta.env.DEV });
       // The slice's ambience and music beds play from the first gesture on (mw-0j5), a stand-in for
       // the adaptive controller (mw-e28.11). The volume sliders are bound once, with the engine.
+      mixBindings?.dispose();
+      mixBindings = bindMix({ world, mix, now: () => performance.now() });
       const music =
         scene.id === 'slice'
           ? new SliceMusic({ world, engine: audio, now: () => performance.now() })
@@ -2212,6 +2224,7 @@ function startRenderer(
         quitToTitle: leaveForTitle,
         publish: (state) => {
           root.dataset['pause'] = state;
+          mixBindings?.setPaused(state === 'open');
         },
       });
       pauseUi = pause;
