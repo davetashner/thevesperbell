@@ -170,7 +170,7 @@ describe('projectile spells replay deterministically (mw-e06.6)', () => {
         trail: { element: 'heat', intensity: 50, radius: 0.5 },
       },
       [
-        { op: 'status', status: 'marked', duration: 2 },
+        { op: 'status', status: 'revealed', duration: 2 },
         { op: 'stimulus', element: 'heat', intensity: 40, radius: 1 },
       ],
     ),
