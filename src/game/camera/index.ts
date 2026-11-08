@@ -4,3 +4,4 @@ export * from './aim-zoom';
 export * from './lock-framing';
 export * from './occlusion';
 export * from './orbit-camera';
+export * from './shake';

@@ -101,6 +101,8 @@ import {
   lookSettings,
   nearPlaneClear,
   OrbitCamera,
+  shakeWorldOffset,
+  type ShakeOffset,
   toRadians,
   type OrbitCameraTarget,
 } from '../camera';
@@ -264,6 +266,11 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly publish?: (readout: PlayerReadout) => void;
   /** Receives the camera's readout after every frame it drives (the e2e clipping probe). */
   readonly publishCamera?: (readout: CameraReadout) => void;
+  /**
+   * Camera shake (mw-e29.5): the camera-plane offset for this frame given the frame's seconds. It is
+   * added after the orbit rig resolved (the clipping probe still reads the rig's own pose).
+   */
+  readonly shake?: (dt: number) => ShakeOffset;
   /** Mouse look, radians per count; defaults to the camera tuning's. */
   readonly sensitivity?: number;
   /**
@@ -418,7 +425,7 @@ const secondsSince = (last: number | undefined, now: number): number =>
 export function setupTestbedPlayer<TObject, TCommand>(
   options: TestbedPlayerOptions<TObject, TCommand>,
 ): TestbedPlayer {
-  const { world, scene, sync, camera, publish, publishCamera, collision, tuning } = options;
+  const { world, scene, sync, camera, publish, publishCamera, collision, tuning, shake } = options;
   const cameraTuning = options.cameraTuning;
   const look = lookSettings(cameraTuning);
   const lowestPitch = look.minPitch;
@@ -629,7 +636,19 @@ export function setupTestbedPlayer<TObject, TCommand>(
           };
     zoomLens(dt);
     const pose = orbit.update({ feet, ...view, height }, camera, dt);
-    applyOrbitPose(camera, pose);
+    const jolt = shake?.(dt);
+    if (jolt === undefined) applyOrbitPose(camera, pose);
+    else {
+      const by = shakeWorldOffset(pose.forward, jolt);
+      applyOrbitPose(camera, {
+        forward: pose.forward,
+        position: {
+          x: pose.position.x + by.x,
+          y: pose.position.y + by.y,
+          z: pose.position.z + by.z,
+        },
+      });
+    }
     if (publishCamera === undefined) return;
     counts.frames += 1;
     if (!nearPlaneClear(collision, pose, camera)) counts.clipped += 1;
