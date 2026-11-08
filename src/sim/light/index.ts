@@ -2,5 +2,6 @@
 export * from './components';
 export * from './field';
 export * from './install';
+export * from './beams';
 export * from './occluders';
 export * from './sources';
