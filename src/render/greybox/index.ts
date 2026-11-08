@@ -38,6 +38,7 @@ import {
   BufferGeometry,
   Color,
   ConeGeometry,
+  CylinderGeometry,
   DirectionalLight,
   Float32BufferAttribute,
   Group,
@@ -68,6 +69,11 @@ export const PURPOSE_COLOURS: Readonly<Record<KitPurpose, number>> = {
 };
 
 const MARKER_COLOUR = 0xe8c547;
+/** Spawn tags whose marker keeps the facing cone: they stand on the ground (mw-ju8.42). */
+export const MARKER_CONE_TAGS: readonly string[] = ['arrival', 'player-start'];
+/** A sign board, metres (width, height, thickness), and its weathered-wood colour. */
+const SIGN_BOARD = [1.1, 0.5, 0.08] as const;
+const SIGN_COLOUR = 0xc9a66b;
 /** Crack lines on a weak wall (mw-e03.11). */
 const CRACK_COLOUR = 0x1a1612;
 /** A wall bracket holding a light (a torch spawn). */
@@ -460,21 +466,39 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         // A container (mw-e18.3): a chest-sized box standing on the spawn point.
         mesh = new Mesh(new BoxGeometry(0.9, 0.6, 0.6), gridMaterial(PURPOSE_COLOURS.interactive));
         mesh.position.y = 0.3;
-      } else if (spawn.prop === undefined && spawn.properties !== undefined) {
+      } else if (
+        spawn.prop === undefined &&
+        (spawn.properties !== undefined || spawn.lightSource !== undefined)
+      ) {
         // A placed light (a torch): a small bracket under where its flame burns. The flame and
         // its light come from the light rig, which mirrors the sim (src/render/light).
         mesh = new Mesh(
           new BoxGeometry(0.1, 0.35, 0.1).translate(0, -0.25, 0),
           new MeshStandardMaterial({ color: new Color(BRACKET_COLOUR), roughness: 0.8 }),
         );
-      } else if (spawn.prop === undefined) {
-        // A marker: a flat cone lying down, pointing the way the spawn faces (+z at yaw 0).
+      } else if (spawn.prop === undefined && spawn.tags.includes('sign')) {
+        // A sign (mw-ju8.42): a flat board at its own height, facing the way the spawn faces, not a
+        // cone floating in the air.
+        mesh = new Mesh(
+          new BoxGeometry(SIGN_BOARD[0], SIGN_BOARD[1], SIGN_BOARD[2]),
+          new MeshStandardMaterial({ color: new Color(SIGN_COLOUR), roughness: 0.8 }),
+        );
+      } else if (spawn.prop === undefined && MARKER_CONE_TAGS.some((t) => spawn.tags.includes(t))) {
+        // An arrival or the start point: a flat cone lying down, pointing the way the spawn faces
+        // (+z at yaw 0). It stands on the ground, so it cannot mislead.
         mesh = new Mesh(
           new ConeGeometry(0.3, 0.8, 12),
           new MeshStandardMaterial({ color: new Color(MARKER_COLOUR), roughness: 0.6 }),
         );
         mesh.rotation.x = Math.PI / 2;
         mesh.position.y = 0.3;
+      } else if (spawn.prop === undefined) {
+        // Any other marker (a banner, a path, a bridge end): a small flat disc, so it does not
+        // read as a thing in the world (mw-ju8.42).
+        mesh = new Mesh(
+          new CylinderGeometry(0.15, 0.15, 0.02, 12),
+          new MeshStandardMaterial({ color: new Color(MARKER_COLOUR), roughness: 0.6 }),
+        );
       } else {
         mesh = new Mesh(
           new BoxGeometry(0.7, 0.7, 0.7),
@@ -482,7 +506,13 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         );
         mesh.position.y = 0.35;
       }
-      mesh.name = spawn.prop ?? (spawn.container === undefined ? 'marker' : 'container');
+      mesh.name =
+        spawn.prop ??
+        (spawn.container !== undefined
+          ? 'container'
+          : spawn.tags.includes('sign')
+            ? 'sign'
+            : 'marker');
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);

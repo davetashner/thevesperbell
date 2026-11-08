@@ -136,6 +136,58 @@ test('mw-ju8.7: gear sells back at the Forge counter for fewer crowns than it co
   expect(problems).toEqual([]);
 });
 
+/** The camera's field of view (render/bootstrap), degrees, vertical. */
+const CAMERA_FOV = 55;
+
+/** Where a world point lands on screen: normalised device coordinates, or null behind the camera. */
+function project(
+  camera: { position: number[]; quaternion: number[] },
+  aspect: number,
+  point: [number, number, number],
+): { x: number; y: number } | null {
+  const [px = 0, py = 0, pz = 0] = camera.position;
+  const [qx = 0, qy = 0, qz = 0, qw = 1] = camera.quaternion;
+  // Rotate the world offset by the inverse of the camera's rotation, into camera space (-z forward).
+  const d = [point[0] - px, point[1] - py, point[2] - pz] as const;
+  const cross = (a: readonly number[], b: readonly number[]) =>
+    [
+      (a[1] ?? 0) * (b[2] ?? 0) - (a[2] ?? 0) * (b[1] ?? 0),
+      (a[2] ?? 0) * (b[0] ?? 0) - (a[0] ?? 0) * (b[2] ?? 0),
+      (a[0] ?? 0) * (b[1] ?? 0) - (a[1] ?? 0) * (b[0] ?? 0),
+    ] as const;
+  const q = [-qx, -qy, -qz] as const; // inverse rotation (unit quaternion)
+  const t = cross(q, d).map((v) => 2 * v) as [number, number, number];
+  const c = cross(q, t);
+  const v = [d[0] + qw * t[0] + c[0], d[1] + qw * t[1] + c[1], d[2] + qw * t[2] + c[2]] as const;
+  if (v[2] >= -0.1) return null;
+  const f = 1 / Math.tan((CAMERA_FOV * Math.PI) / 360);
+  return { x: (v[0] * f) / aspect / -v[2], y: (v[1] * f) / -v[2] };
+}
+
+test('AC-1: from the bridge arrival, turning towards the gap puts its signpost and light in view', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const problems = collectProblems(page);
+  await openLane(page);
+  await takeControl(page);
+  await runConsole(page, 'tp 0 0 5');
+  // East, across the lane: the riverbank gap (mw-ju8.42).
+  await turnTo(page, { x: 9, z: 7.25 });
+  const size = page.viewportSize() ?? { width: 1280, height: 720 };
+  const aspect = size.width / size.height;
+  const camera = await data<{ position: number[]; quaternion: number[] }>(page, 'camera');
+  expect(camera).not.toBeNull();
+  const seen = (point: [number, number, number]) => {
+    const at = project(camera ?? { position: [], quaternion: [] }, aspect, point);
+    return at !== null && Math.abs(at.x) < 1 && Math.abs(at.y) < 1;
+  };
+  expect(seen([8.5, 1.5, 5.5]), 'the signpost (sign-riverbank-path) is in view').toBe(true);
+  expect(seen([9.5, 2.5, 7.25]), 'the alley lantern is in view').toBe(true);
+  expect(seen([10.75, 0.5, 8.25]), 'the alley brazier is in view').toBe(true);
+  expect(problems).toEqual([]);
+});
+
 interface Fighter {
   role: 'player' | 'attacker' | 'dummy';
   health: { current: number; max: number } | null;
