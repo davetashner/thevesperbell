@@ -272,28 +272,29 @@ describe('the kick against doors and creatures (mw-e04.18)', () => {
     expect(game.resisted.map((e) => e.entity)).toEqual([door]);
   });
 
-  it('AC-5: a small creature kicked towards a ledge 0.5 m away goes over it and lands below', () => {
+  /** The knight kicks what stands on the arena platform between it and the east edge. */
+  function kickOnLedge(creature: boolean) {
     const game = testbed();
     const { world, player } = game;
     // The arena platform at x 5…7, z 28…30, top at y = 2 (hit-reaction-ledge.test.ts): the knight
     // stands at its west side looking east, the creature between it and the edge.
-    const state = world.get(player, CharacterController) ?? expect.fail('no player');
     world.set(player, CharacterController, initialCharacterState({ x: 5.3, y: 2 + SKIN, z: 29 }));
-    expect(state).toBeDefined();
     const look = world.get(player, PlayerLook) ?? expect.fail('no look');
     world.set(player, PlayerLook, { ...look, yaw: -Math.PI / 2 });
     const goblin = spawnCharacter(world, { x: 6.5, y: 2 + SKIN, z: 29 });
-    world.add(goblin, CreatureComponent, {
-      origin: {
-        creature: 'fixture-hound',
-        at: { x: 6.5, y: 2, z: 29 },
-        facing: { x: -1, y: 0, z: 0 },
-      },
-      behaviour: 'none',
-      tuning: {},
-      needs: {},
-    });
-    giveCombatant(world, goblin, { health: 60, poise: 20 });
+    if (creature) {
+      world.add(goblin, CreatureComponent, {
+        origin: {
+          creature: 'fixture-hound',
+          at: { x: 6.5, y: 2, z: 29 },
+          facing: { x: -1, y: 0, z: 0 },
+        },
+        behaviour: 'none',
+        tuning: {},
+        needs: {},
+      });
+    }
+    giveCombatant(world, goblin, { health: 60, poise: 60 });
     giveHurtboxes(world, goblin, {
       boxes: [
         {
@@ -315,11 +316,21 @@ describe('the kick against doors and creatures (mw-e04.18)', () => {
     giveHitReactions(world, goblin, reactionProfileFromCreature(hound));
     game.run(10);
     game.kick(90);
-    expect(game.reactions.filter((r) => r.entity === goblin).map((r) => r.reaction)).toContain(
-      'knockback',
-    );
+    const reactions = game.reactions.filter((r) => r.entity === goblin).map((r) => r.reaction);
     const landed = world.get(goblin, CharacterController) ?? expect.fail('no goblin');
-    expect(landed.position.x).toBeGreaterThan(7);
-    expect(landed.position.y).toBeLessThan(0.5);
+    return { reactions, landed: landed.position };
+  }
+
+  it('AC-5: a small creature kicked towards a ledge 0.5 m away goes over it and lands below', () => {
+    const { reactions, landed } = kickOnLedge(true);
+    expect(reactions).toContain('knockback');
+    expect(landed.x).toBeGreaterThan(7);
+    expect(landed.y).toBeLessThan(0.5);
+  });
+
+  it('a kicked combatant that is no creature just flinches, and stays on the platform', () => {
+    const { reactions, landed } = kickOnLedge(false);
+    expect(reactions).toEqual(['flinch']);
+    expect(landed.y).toBeGreaterThan(1.9);
   });
 });

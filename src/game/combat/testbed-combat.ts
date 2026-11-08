@@ -318,6 +318,7 @@ export function startTestbedCombat<TInput>(
   // A scene without a player has no timeline, stamina or melee yet; console-spawned dummies need them.
   ensureRegistered(world, [...ACTION_TIMELINE_COMPONENTS, ...MELEE_COMPONENTS, StaminaComponent]);
   ensureRegistered(world, [PlacementComponent, HitReactionComponent, HitStopComponent]);
+  ensureRegistered(world, [CreatureComponent]);
   world.addSystem(
     hitVolumeSystem({ isAlly: noAllies, invulnerable: invulnerabilityRule(combat.moves) }),
   );
@@ -340,14 +341,8 @@ export function startTestbedCombat<TInput>(
     damage: combat.damage,
     reactions,
     move: KNIGHT_KICK,
-    sizeOf: (w, entity) => {
-      const creature = w.isRegistered(CreatureComponent)
-        ? w.get(entity, CreatureComponent)
-        : undefined;
-      return creature === undefined
-        ? undefined
-        : combat.creatureSizes.get(creature.origin.creature);
-    },
+    sizeOf: (w, entity) =>
+      combat.creatureSizes.get(w.get(entity, CreatureComponent)?.origin.creature ?? ''),
   });
   if (!world.isRegistered(ArrowComponent)) {
     installArrows(world, {
