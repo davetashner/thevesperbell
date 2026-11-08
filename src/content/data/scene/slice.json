@@ -303,6 +303,26 @@
       "id": "exit",
       "at": [0, 0, 39],
       "tags": ["goal"]
+    },
+    {
+      "id": "spawn-room-bottle",
+      "at": [1.5, 0, -3],
+      "prop": "bottle",
+      "properties": { "liftable": true },
+      "breakable": { "profile": "glass-bottle" }
+    },
+    {
+      "id": "spawn-room-barrel",
+      "at": [-3, 0, -3],
+      "prop": "barrel",
+      "properties": { "liftable": true }
+    },
+    {
+      "id": "miner-lure-pot",
+      "at": [2.5, 0, 30.5],
+      "prop": "clay-pot",
+      "properties": { "liftable": true, "fragile": 15 },
+      "breakable": { "profile": "pottery" }
     }
   ],
   "signals": [

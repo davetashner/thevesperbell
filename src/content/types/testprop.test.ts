@@ -21,7 +21,14 @@ describe('testprop content', () => {
   it('AC-6: the example has two entries, one breaking into the other', () => {
     const content = loadGameContent();
     expect(Object.isFrozen(content)).toBe(true);
-    expect(content.all('testprop').map((p) => p.id)).toEqual(['crate', 'lever', 'plank']);
+    expect(content.all('testprop').map((p) => p.id)).toEqual([
+      'barrel',
+      'bottle',
+      'clay-pot',
+      'crate',
+      'lever',
+      'plank',
+    ]);
     expect(content.get('testprop', 'crate').breaksInto?.toString()).toBe('testprop:plank');
     expect(content.get('testprop', 'plank').tags).toEqual([]);
   });

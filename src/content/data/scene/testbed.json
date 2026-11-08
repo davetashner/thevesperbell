@@ -300,6 +300,26 @@
       "id": "supply-chest",
       "at": [-2, 0, 1],
       "container": { "loot": "testbed-supply-crate" }
+    },
+    {
+      "id": "testbed-bottle",
+      "at": [0, 0, -2.5],
+      "prop": "bottle",
+      "properties": { "liftable": true },
+      "breakable": { "profile": "glass-bottle" }
+    },
+    {
+      "id": "testbed-pot",
+      "at": [-2.5, 0, -0.5],
+      "prop": "clay-pot",
+      "properties": { "liftable": true, "fragile": 15 },
+      "breakable": { "profile": "pottery" }
+    },
+    {
+      "id": "testbed-barrel",
+      "at": [2.5, 0, 0.5],
+      "prop": "barrel",
+      "properties": { "liftable": true }
     }
   ],
   "light": {

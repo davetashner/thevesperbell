@@ -591,7 +591,7 @@ describe('scene schema (mw-e00.21)', () => {
     const broken = {
       ...room,
       placements: [{ piece: 'trapdoor', at: [0, 0, 0] }],
-      spawns: [{ id: 'thing', at: [0, 0, 0], prop: 'barrel' }],
+      spawns: [{ id: 'thing', at: [0, 0, 0], prop: 'rain-barrel' }],
     };
     const load = () =>
       loadContent(
@@ -601,7 +601,7 @@ describe('scene schema (mw-e00.21)', () => {
       );
     expect(load).toThrow(ContentLoadError);
     expect(load).toThrow(/scene:room references missing kit:trapdoor/);
-    expect(load).toThrow(/scene:room references missing testprop:barrel/);
+    expect(load).toThrow(/scene:room references missing testprop:rain-barrel/);
   });
 });
 
