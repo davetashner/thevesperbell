@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
-import { runConsole, stubPointerLock, takeControl, turnTo } from './helpers/player';
+import {
+  holdKey,
+  playerState,
+  runConsole,
+  stubPointerLock,
+  takeControl,
+  turnTo,
+} from './helpers/player';
 
 // mw-ju8.5: the Briar Glen shop lane against the production build (Chromium), ?scene=briar-glen-lane.
 // AC-2: the three keepers (Oswin Brand, Juniper Fenn, Hollis Pell) are loaded and drawn in their
@@ -126,5 +133,44 @@ test('mw-ju8.7: gear sells back at the Forge counter for fewer crowns than it co
   expect(sold?.crowns).toBeGreaterThan(bought?.crowns ?? Number.POSITIVE_INFINITY);
   expect(sold?.crowns).toBeLessThan(400);
   expect(sold?.pack).toEqual([]);
+  expect(problems).toEqual([]);
+});
+
+interface Fighter {
+  role: 'player' | 'attacker' | 'dummy';
+  health: { current: number; max: number } | null;
+  environment: { kind: string; amount: number; tick: number } | null;
+}
+
+test('mw-e03.49 AC-4: walking the lane down its centre line, under every street lantern, burns nobody', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const problems = collectProblems(page);
+  await stubPointerLock(page);
+  await page.goto('/?scene=briar-glen-lane&frames&debug=1');
+  const app = page.locator('#app');
+  await expect(app).toHaveAttribute('data-scene', 'briar-glen-lane', { timeout: 10_000 });
+  await expect(app).toHaveAttribute('data-player', /"grounded":true/, { timeout: 10_000 });
+  await expect(app).toHaveAttribute('data-frame-data', /"role":"player"/);
+  await takeControl(page);
+  const knight = async (): Promise<Fighter | undefined> => {
+    const json = await app.getAttribute('data-frame-data');
+    const frame = JSON.parse(json ?? 'null') as { fighters: Fighter[] } | null;
+    return frame?.fighters.find((f) => f.role === 'player');
+  };
+
+  // The lane runs north along +z; the street lanterns hang at x 0, 2.5 m up, at z 6, 17, 28 and 38.
+  await runConsole(page, 'tp 0 0 4');
+  await turnTo(page, { x: 0, z: 40 });
+  const before = await knight();
+  expect(before?.environment).toBeNull();
+  await holdKey(page, { code: 'KeyW', key: 'w' }, 420, 0);
+  const end = await playerState(page);
+  expect(end.position.z).toBeGreaterThan(30);
+  expect(Math.abs(end.position.x)).toBeLessThan(1.5);
+  const after = await knight();
+  expect(after?.environment).toBeNull();
+  expect(after?.health?.current).toBe(before?.health?.current);
   expect(problems).toEqual([]);
 });

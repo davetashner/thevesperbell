@@ -23,6 +23,8 @@ import {
 import { RapierCollisionWorld } from '../../physics/rapier-collision-world';
 import { RapierPhysics } from '../../physics/rapier';
 import { addProperties, registerWorldProperties, setProperty } from '../../properties/components';
+import { lightComponents } from '../../light/components';
+import { spawnLightSource } from '../../light/sources';
 import { placeEntity } from '../../stimulus/placement';
 import type { Vec3 } from '../../stimulus/shapes';
 import { applyStimulus, installStimuli, stimulusSystem } from '../../stimulus/stimulus';
@@ -518,6 +520,65 @@ describe('hazards (mw-e04.19)', () => {
     world.step();
     // At 1 Hz a 250 ms pulse rounds to no ticks: it lasts one tick (1 s, 8 fire).
     expect(hurt.map((h) => h.total)).toEqual([8, 8]);
+  });
+});
+
+describe('flames that do not burn passers-by (mw-e03.49)', () => {
+  const burned = (s: ReturnType<typeof env>, e: EntityId) => s.hits.filter((h) => h.target === e);
+
+  const lit = () => {
+    const s = env();
+    s.world.register(...lightComponents);
+    return s;
+  };
+
+  it('AC-1: walking under a lantern hung at 2.5 m deals no fire damage', () => {
+    const s = lit();
+    spawnLightSource(s.world, 'lantern', v(0, 2.5, 0));
+    const walker = s.creature(v(0, SKIN, 0), 100);
+    s.steps(120);
+    expect(burned(s, walker)).toEqual([]);
+    expect(healthOf(s.world, walker)?.current).toBe(100);
+  });
+
+  it('AC-1: a legacy lit spawn that only declares flameRadius 0 is enclosed too', () => {
+    const s = env();
+    const lamp = s.world.spawn();
+    addProperties(s.world, lamp, { burning: true, flammable: true, flameRadius: 0 });
+    placeEntity(s.world, lamp, v(0, 1, 0), 0.15);
+    const walker = s.creature(v(0, SKIN, 0), 100);
+    s.steps(60);
+    expect(burned(s, walker)).toEqual([]);
+  });
+
+  it('AC-2: brushing past a wall torch at head height, 0.5 m away, deals no damage', () => {
+    const s = lit();
+    spawnLightSource(s.world, 'torch', v(0.5, 1.5, 0));
+    spawnLightSource(s.world, 'torch', v(0.5, 2, 0));
+    const walker = s.creature(v(0, SKIN, 0), 100);
+    s.steps(120);
+    expect(burned(s, walker)).toEqual([]);
+  });
+
+  it('AC-2: standing in a brazier’s flame burns, and so does walking into a torch', () => {
+    const s = lit();
+    spawnLightSource(s.world, 'brazier', v(0, 0.4, 0));
+    spawnLightSource(s.world, 'torch', v(5, 1, 0));
+    const standing = s.creature(v(0.2, SKIN, 0), 100);
+    const walkedInto = s.creature(v(5.3, SKIN, 0), 100);
+    s.steps(60);
+    expect(burned(s, standing).length).toBeGreaterThan(0);
+    expect(burned(s, walkedInto).length).toBeGreaterThan(0);
+  });
+
+  it('AC-3: a burning crate on the floor still burns a creature touching it', () => {
+    const s = env();
+    const crate = s.world.spawn();
+    addProperties(s.world, crate, { burning: true, flammable: true });
+    placeEntity(s.world, crate, v(0, 0.25, 0), 0.4);
+    const touching = s.creature(v(0.9, SKIN, 0), 100);
+    s.steps(60);
+    expect(burned(s, touching).length).toBeGreaterThan(0);
   });
 });
 

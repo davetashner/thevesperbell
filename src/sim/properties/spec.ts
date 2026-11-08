@@ -14,9 +14,9 @@
  * Bumped whenever a property is added, removed, renamed or changes type or range.
  * v1: the mw-e03.1 set. v2: mw-e03.31 additions (additive only: a v1 save loads unchanged).
  * v3: `climbable` is a grade enum (mw-e03.22); a stored 1/2/3 maps to ivy/rough/sheer.
- * v4: `remoteActuatable` (mw-e03.12). v5: `windResistance` (mw-e03.16); both additive.
+ * v4: `remoteActuatable` (mw-e03.12). v5: `windResistance` (mw-e03.16). v6: `flameRadius` (mw-e03.49); all additive.
  */
-export const WORLD_PROPERTIES_VERSION = 5;
+export const WORLD_PROPERTIES_VERSION = 6;
 
 /** A light source's output. Colour is a render concern and lives outside the sim. */
 export interface LightEmission {
@@ -120,6 +120,12 @@ export interface WorldPropertyValues {
   extinguishable: boolean;
   /** Force of a single gust, blast or kick that blows its flame out, N·s (absent: never). */
   windResistance: number;
+  /**
+   * How far from its placement centre its flame hurts a creature that touches it, m (0 = enclosed,
+   * never a contact hazard). Absent: a loose burning object, which hurts within its own bounding
+   * radius plus the hazard rule's reach.
+   */
+  flameRadius: number;
   /** The top surface of a body of liquid: cold freezes it into walkable ice; it can be waded. */
   waterSurface: boolean;
   /** Force of a single push, blast or quake that shakes it loose so it topples or falls, J. */
@@ -358,6 +364,14 @@ export const WORLD_PROPERTY_SPECS: {
     'N·s',
     'Force of one gust, blast or kick that blows its flame out (the default never does).',
   ),
+  flameRadius: {
+    type: 'number',
+    min: 0,
+    max: 5,
+    unit: 'm',
+    default: 0,
+    doc: 'Radius around its centre in which its flame burns a creature that touches it (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach.',
+  },
   waterSurface: flag('Top surface of a body of liquid: cold freezes it into walkable ice.'),
   unstable: threshold(MAX_ENERGY, 'J', 'Force of one push, blast or quake that topples it.'),
   suspended: flag('Hangs from its support; falls when the support breaks, burns or is cut.'),

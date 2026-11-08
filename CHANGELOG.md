@@ -454,6 +454,7 @@ check enforces this).
 
 ### Fixed
 
+- Walking past lights no longer sets you on fire: lanterns and glazed sconces never burn anyone, and open flames (torches, candles, braziers, fireplaces) burn only when you actually step into the flame, instead of within three quarters of a metre of anything alight. A burning crate or a kicked brazier still burns as before.
 - The knight's body no longer stretches into red ribbons and spikes when the sword arm swings up for a strong attack, and the sword now sits in the knight's hand.
 - If you fall out of the level, you are put back at the start instead of falling forever.
 - A hinged door you open while standing right up against it now swings open away from you,

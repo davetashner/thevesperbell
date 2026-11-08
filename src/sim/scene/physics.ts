@@ -113,7 +113,7 @@ export function addScenePhysics<T>(
   const objects: EntityId[] = [];
   const placed: EntityId[] = [];
   for (const { entity, spawn } of loaded.spawns) {
-    const own = placementProperties(spawn.properties);
+    const own = withLegacyLanternGlass(spawn, placementProperties(spawn.properties));
     const body = spawn.prop === undefined ? undefined : options.props(spawn.prop);
     if (body !== undefined) {
       addPropPhysics(sim, entity, body, options.materials, spawn.position, spawn.rotation, own);
@@ -130,6 +130,21 @@ export function addScenePhysics<T>(
     solids: Object.freeze(solids),
     placed: Object.freeze(placed),
   });
+}
+
+/**
+ * Older scenes hang a lantern as a bare spawn tagged `lantern` that only says `burning`: its flame
+ * is behind glass, so it gets `flameRadius` 0 and never burns a passer-by (mw-e03.49). A spawn that
+ * sets its own `flameRadius`, or that is not lit, is left alone.
+ */
+function withLegacyLanternGlass(
+  spawn: { readonly tags: readonly string[] },
+  own: WorldPropertyInit,
+): WorldPropertyInit {
+  if (!spawn.tags.includes('lantern') || own.burning !== true || own.flameRadius !== undefined) {
+    return own;
+  }
+  return { ...own, flameRadius: 0 };
 }
 
 /**

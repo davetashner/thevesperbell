@@ -43,6 +43,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `properties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
 | `properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `properties.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
 | `properties.breakable` | boolean | — | A single hit at or above its toughness for that kind of hit breaks it. |
 | `properties.toughness` | object | — | Per kind of hit, the single-hit energy that breaks a breakable object; a kind left out never does. |
 | `properties.toughness.blunt` | number 0–1000000000 | — | Blunt hit energy that breaks it, J. |
