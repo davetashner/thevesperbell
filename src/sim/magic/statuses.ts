@@ -23,6 +23,7 @@ import type { DamageModel } from '../combat/damage';
 import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
+import type { AiNavigation, TravelRequest } from '../ai/navigation';
 import { readProperty } from '../properties/components';
 import type { WorldPropertyKey } from '../properties/spec';
 import { placementOf } from '../stimulus/placement';
@@ -198,6 +199,44 @@ export function modifiedStat(
     }
   }
   return (base + add) * mul;
+}
+
+/**
+ * The fraction of normal speed `entity` moves at under its statuses (`moveSpeed`: slowed, rooted…), 1
+ * with none and in a world with no spells installed. Never negative.
+ */
+export function statusMoveScale(
+  world: World<never>,
+  lookup: StatusLookup,
+  entity: EntityId,
+): number {
+  if (!world.isRegistered(StatusLedgerComponent)) return 1;
+  return Math.max(0, modifiedStat(world, lookup, entity, 'moveSpeed', 1));
+}
+
+/** `navigation` with every agent's travel speed scaled by its `moveSpeed` statuses. */
+export function statusScaledNavigation(
+  navigation: AiNavigation,
+  lookup: StatusLookup,
+): AiNavigation {
+  const scaled = (
+    world: World<never>,
+    entity: EntityId,
+    request: TravelRequest,
+  ): TravelRequest => ({
+    ...request,
+    speed: request.speed * statusMoveScale(world, lookup, entity),
+  });
+  const { approach } = navigation;
+  return {
+    ...navigation,
+    travel: (world, entity, request) =>
+      navigation.travel(world, entity, scaled(world, entity, request)),
+    ...(approach !== undefined && {
+      approach: (world: World<never>, entity: EntityId, request: TravelRequest) =>
+        approach.call(navigation, world, entity, scaled(world, entity, request)),
+    }),
+  };
 }
 
 type BreakTest = StatusEntry['breakWhen'][number];

@@ -1,4 +1,5 @@
-import type { ControllerTuning, Frozen } from '@content/index';
+import type { ControllerTuning, Frozen, StatusEntry } from '@content/index';
+import { DamageModel } from '../combat/damage/model';
 import { describe, expect, it } from 'vitest';
 import { SKIN } from '../character/controller';
 import { CharacterController, spawnCharacter } from '../character/system';
@@ -39,6 +40,9 @@ import {
   wrapYaw,
   type PlayerOptions,
 } from './player';
+import { installSpells } from '../magic/pipeline';
+import { applyStatus } from '../magic/statuses';
+import { installStimuli } from '../stimulus/stimulus';
 import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import { LockOnComponent, NO_LOCK } from '../targeting/components';
 
@@ -240,6 +244,54 @@ describe('ActionFrames drive the player (mw-e02.23)', () => {
     for (let i = 0; i < 60; i++) world.step([frame({ move: [0, 1] })]);
     expect(state().position.z).toBeGreaterThan(-2 + 4);
     expect(state().position.x).toBeCloseTo(0, 9);
+  });
+
+  it('statuses scale the player’s speed through modifiedStat, and rooted holds it still (mw-e06.24)', () => {
+    const slowed: StatusEntry = {
+      id: 't-slowed',
+      name: 't-slowed',
+      description: 't-slowed',
+      stack: { rule: 'refresh' },
+      tags: [],
+      modifiers: [{ stat: 'moveSpeed', mode: 'multiply', value: 0.5 }],
+      sourceBound: false,
+      breakWhen: [],
+    };
+    const rooted: StatusEntry = {
+      ...slowed,
+      id: 't-rooted',
+      modifiers: [{ stat: 'moveSpeed', mode: 'multiply', value: 0 }],
+    };
+    const lookup = (id: string) => [slowed, rooted].find((status) => status.id === id);
+    const walk = (status?: StatusEntry): number => {
+      const world = installStimuli(registerWorldProperties(new World<ActionFrame>({ seed: 3 })));
+      installSpells(world, {
+        spells: () => undefined,
+        damage: new DamageModel(),
+        statuses: lookup,
+      });
+      const player = installPlayer(world, {
+        spawns: LAYOUT.spawns,
+        collision: sceneCollisionWorld(),
+        tuning: TUNING,
+        statuses: lookup,
+      });
+      if (status !== undefined) {
+        applyStatus(world, status, {
+          target: player,
+          status: status.id,
+          source: player,
+          seconds: 30,
+        });
+      }
+      const start = world.get(player, CharacterController)?.position.z ?? 0;
+      for (let i = 0; i < 60; i++) world.step([frame({ move: [0, 1] })]);
+      return (world.get(player, CharacterController)?.position.z ?? 0) - start;
+    };
+    const free = walk();
+    expect(walk(slowed)).toBeLessThan(free * 0.7);
+    expect(walk(slowed)).toBeGreaterThan(0.5);
+    expect(walk(rooted)).toBeCloseTo(0, 6);
   });
 
   it('jump leaves the ground and lands again', () => {

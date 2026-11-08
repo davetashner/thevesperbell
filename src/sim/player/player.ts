@@ -45,6 +45,7 @@
 // the view: look input does not turn it, and the controller strafes around the anchor point.
 
 import type { ControllerTuning, Frozen, MoveTable, RuntimeShield } from '@content/index';
+import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
 import { carryRestraint } from '../carry/state';
@@ -586,6 +587,11 @@ export interface PlayerOptions {
   readonly climb?: PlayerClimbOptions;
   /** Wading, swimming, sinking and breath in the scene's water (mw-e02.14); absent = none. */
   readonly water?: PlayerWaterOptions;
+  /**
+   * Status definitions (mw-e06.24): the player's `moveSpeed` statuses (slowed, rooted) scale its
+   * speed, read through `modifiedStat`; absent = statuses leave movement alone.
+   */
+  readonly statuses?: StatusLookup;
 }
 
 /** The player's water (mw-e02.14, src/sim/character/water.ts). */
@@ -759,6 +765,8 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         const frame = actionFrameOf(inputs);
         const look = world.get(entity, PlayerLook);
         if (frame === undefined || look === undefined) return undefined;
+        const statusScale =
+          options.statuses === undefined ? 1 : statusMoveScale(world, options.statuses, entity);
         const carrying = carryRestraint(world, entity);
         const fought =
           combat === undefined
@@ -770,13 +778,14 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
                     ? true
                     : undefined,
               };
-        // What the carrier holds slows it on top of any combat restraint (ADR-0003: they stack).
+        // Statuses and combat take the slower of the two; what the carrier holds slows it on top
+        // (ADR-0003: carry stacks with other restraints).
         const actions =
-          fought === undefined && carrying === undefined
+          fought === undefined && carrying === undefined && statusScale === 1
             ? frame
             : restrainMovement(
                 frame,
-                (fought?.scale ?? 1) * (carrying?.scale ?? 1),
+                Math.min(fought?.scale ?? 1, statusScale) * (carrying?.scale ?? 1),
                 fought?.noJump === true || carrying?.noJump === true ? true : undefined,
               );
         const motion = combat && world.get(entity, DodgeComponent)?.velocity;
