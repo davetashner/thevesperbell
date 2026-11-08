@@ -10,6 +10,7 @@ import {
   PhysicsObjectComponent,
   addPhysicsObject,
   installPhysicsObjects,
+  removePhysicsObject,
 } from '../physics/objects';
 import { RapierPhysics } from '../physics/rapier';
 import { InMemoryColliderSink } from '../physics/static-colliders';
@@ -181,6 +182,30 @@ describe('cuttable ropes (mw-e05.13)', () => {
     expect(changes).toEqual([true]);
   });
 
+  it('keeps the cuttable property its entity already has', () => {
+    const r = rig();
+    const rope = r.world.spawn();
+    addProperties(r.world, rope, { cuttable: false });
+    r.steps(1);
+    makeCuttable(r.world, rope, v(0, 3, 0), 1);
+    r.steps(1);
+    expect(readProperty(r.world, rope, 'cuttable')).toBe(false);
+    expect(severCuttable(r.world, rope)).toBe(false);
+  });
+
+  it('cutting one rope leaves what hangs from another, and a body removed from physics hangs on', () => {
+    const r = rig();
+    const a = r.hang();
+    const b = r.hang();
+    removePhysicsObject(r.world, b.weight);
+    r.steps(2);
+    expect(severCuttable(r.world, a.rope)).toBe(true);
+    r.steps(2);
+    expect(r.released.map((e) => e.entity)).toEqual([a.weight]);
+    expect(r.world.has(b.weight, SuspendedComponent)).toBe(true);
+    expect(r.world.has(b.weight, PhysicsObjectComponent)).toBe(false);
+  });
+
   it('a rope with a sink gets a thin collider that goes with it', () => {
     const r = rig();
     const sink = new InMemoryColliderSink();
@@ -347,6 +372,28 @@ describe('scene authoring (mw-e05.13)', () => {
     expect(world.get(cord, CuttableComponent)).toMatchObject({ length: 2, radius: 0.1 });
     expect(world.get(line, CuttableComponent)?.radius).toBe(0.05);
     expect(readProperty(world, cord, 'cuttable')).toBe(true);
+  });
+
+  it('a rope spawn gets its collider in the sink the game gives', () => {
+    const physics = new RapierPhysics(RAPIER);
+    const world = installSignals(
+      installStimuli(
+        registerWorldProperties(
+          registerSceneComponents(new World<never>({ seed: 2, hz: 60, physics })),
+        ),
+      ),
+    );
+    installPhysicsObjects(world);
+    installMechanisms(world);
+    const loaded = loadScene(
+      world,
+      SCENE([{ id: 'cord', at: [0, 3, 0], yaw: 0, tags: [], rope: { length: 2 } }]),
+      kit,
+      new InMemoryColliderSink(),
+    );
+    const made = addSceneMechanisms(world, loaded, { ...options, colliders: physics });
+    const [cord] = made.ropes as [EntityId];
+    expect(world.get(cord, CuttableComponent)?.collider).not.toBeNull();
   });
 
   it('a prop that hangs from a rope spawn the scene does not have is an error', () => {
