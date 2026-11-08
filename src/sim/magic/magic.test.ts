@@ -128,8 +128,8 @@ describe('spell pipeline: cast → deliver → effect (mw-e06.2)', () => {
     const ops = builtInOps();
     expect(() => ops.register('damage', () => undefined)).toThrow(/already registered/);
     expect(() => ops.register('nonsense' as 'damage', () => undefined)).toThrow(/unknown/);
-    expect(ops.names()).toEqual(['damage', 'status', 'stimulus']);
-    expect(() => ops.require('force')).toThrow(/no handler/);
+    expect(ops.names()).toEqual(['damage', 'force', 'status', 'stimulus']);
+    expect(() => ops.require('summon')).toThrow(/no handler/);
     expect(() => builtInDeliveries().require('beam')).toThrow(/no handler/);
     const deliveries = builtInDeliveries();
     expect(() => deliveries.register('self', () => ({ kind: 'pending' }))).toThrow(
@@ -152,7 +152,7 @@ describe('spell pipeline: validation and fizzles', () => {
       delivery: projectileDelivery({ speed: 10, maxRange: 20 }),
     });
     const forceful = makeSpell('t-shove', {
-      effects: [{ op: 'force', mode: 'push', impulse: 5, duration: 0 }],
+      effects: [{ op: 'light', intensity: 5, radius: 3, duration: 1, attach: 'point' }],
     });
     const { world, pipeline, spawn } = spellWorld([ward, projectile, forceful]);
     const caster = spawn();

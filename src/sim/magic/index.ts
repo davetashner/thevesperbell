@@ -7,6 +7,7 @@ export * from './deliveries';
 export * from './emission';
 export * from './hotbar';
 export * from './events';
+export * from './force';
 export * from './learning';
 export * from './learn-command';
 export * from './mana';

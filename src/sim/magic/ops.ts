@@ -1,5 +1,5 @@
-// The effect ops the pipeline ships with (mw-e06.2): damage, stimulus and status. Every other op
-// (force, summon, light, noise…) is one `OpRegistry.register` call in its own bead. Ops speak the
+// The effect ops the pipeline ships with: damage, stimulus, status (mw-e06.2) and force (e06.8).
+// Every other op (summon, light, noise…) is one `OpRegistry.register` call in its own bead. Ops speak the
 // sim's shared vocabularies — the damage model and the one stimulus API — and never script a pair
 // of things against each other.
 
@@ -8,6 +8,7 @@ import type { StimulusInput } from '../stimulus/stimulus';
 import type { StimulusShape } from '../stimulus/shapes';
 import { placementOf } from '../stimulus/placement';
 import { OpRegistry, type OpContext } from './registry';
+import { forceOp } from './force';
 import { applyStatus } from './statuses';
 
 /**
@@ -63,6 +64,7 @@ export function builtInOps(): OpRegistry {
         ? { element: op.element, intensity: op.intensity }
         : undefined;
     })
+    .register('force', forceOp)
     .register('status', (ctx, op) => {
       if (ctx.target === null) return undefined;
       const applied = applyStatus(ctx.world, ctx.statuses?.(op.status), {

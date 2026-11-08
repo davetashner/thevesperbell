@@ -976,6 +976,11 @@ function startRenderer(
     let aiDebug: { held(): boolean; frame(): void } | undefined;
     // Debug pages only (mw-e01.9): the input log's recorder or replay runs just before each sample.
     let beforeSample: ((tick: number) => void) | undefined;
+    // While a replay still has inputs to play, the slice-complete card stays shut: its opening (in a
+    // draw, so at a tick that depends on how frames batch the steps) would gate the sampled inputs
+    // from that tick on, and release the pointer lock, which releases the held keys, so the replay's
+    // movement would end a tick or more earlier or later from run to run (mw-e06.8).
+    let replayPlaying: () => boolean = () => false;
     const { loop, sync } = createGameLoop({
       world,
       sources,
@@ -1009,7 +1014,7 @@ function startRenderer(
         if (debugCamera.update(elapsedMs)) writeCameraData();
         lastFrameMs = timeMs;
         deathBeat?.frame(frame.alpha);
-        sliceCard?.frame();
+        if (!replayPlaying()) sliceCard?.frame();
         containerUi?.frame(timeMs);
         player?.frame(frame);
         if (player !== undefined && playerFade !== undefined) {
@@ -2326,6 +2331,7 @@ function startRenderer(
                 if (isSlotId(slot)) debugSave(slot);
               },
             });
+      replayPlaying = () => player !== undefined && !player.done;
       let published = '';
       beforeSample = (tick) => {
         inputRecorder.sampled(tick);

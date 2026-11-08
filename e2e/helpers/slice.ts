@@ -53,12 +53,15 @@ export async function run(page: Page, line: string): Promise<void> {
 }
 
 /**
- * Walks north along x = 0 until the player's z reaches `target`, or until a leg makes no headway.
+ * Walks north along x = 0 until the player's z reaches `target`, or until a leg makes no headway, or
+ * the slice is complete (its card opens a frame after the pass and takes the keys and the mouse, so
+ * how far a leg gets past the pass depends on frame batching: not a reason to turn again).
  * Returns where it stopped.
  */
 export async function walkNorth(page: Page, target: number, maxLegs = 12): Promise<PlayerState> {
   let state = await playerState(page);
   for (let leg = 0; leg < maxLegs && state.position.z < target; leg++) {
+    if ((await data<Record<string, unknown>>(page, 'facts'))['slice.complete'] === true) break;
     await turnTo(page, { x: 0, z: target + 2 }, { tolerance: 0.03 });
     const ticks = Math.max(5, Math.ceil((target - state.position.z) * TICKS_PER_METRE));
     const before = state.position.z;

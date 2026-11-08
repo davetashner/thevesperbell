@@ -27,6 +27,7 @@ import {
   type SpellLearner,
   installSpellProjectiles,
   installSpells,
+  installSpellForces,
   installSpellTether,
   installSpellVolumes,
   type CastController,
@@ -101,6 +102,7 @@ export function installGameMagic<TInput>(
     ...(options.water !== undefined && { water: options.water }),
   });
   installSpellVolumes(world, pipeline);
+  installSpellForces(world);
   installSpellEmission(world, pipeline);
   const tether = installSpellTether(world, pipeline, {
     casting,
