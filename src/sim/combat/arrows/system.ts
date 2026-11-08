@@ -56,6 +56,7 @@ import { applyStimulus, StimulusQueueComponent } from '../../stimulus/stimulus';
 import { rotateToWorld } from '../attacks/frame';
 import { scaleDamage, type DamageModel } from '../damage/model';
 import type { DamageResult } from '../damage/events';
+import { DAMAGE_TAGS } from '../damage/packet';
 import type { Hurtbox } from '../hits/components';
 import { DodgedHit } from '../hits/events';
 import {
@@ -318,7 +319,10 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
       direction,
       region: hurtbox.region,
       regionMultiplier: hurtbox.multiplier,
-      tags: def.damage.tags,
+      ...(hurtbox.armor !== undefined && { armor: hurtbox.armor }),
+      penetration: def.penetration,
+      // A blunt head ignores deflection but deals half to armour (mw-e05.6).
+      tags: def.onImpact === 'bounce' ? [...def.damage.tags, DAMAGE_TAGS.blunt] : def.damage.tags,
     });
   }
 
@@ -355,11 +359,15 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
     let after: Vec3 = { x: 0, y: 0, z: 0 };
     let damage: DamageResult | undefined;
     const hitCreature = hurtbox !== undefined && other !== null;
+    // Armour the arrow cannot pierce turns it away (mw-e05.6); a blunt head is never turned away.
+    const armor = hurtbox?.armor ?? 0;
+    const deflected =
+      hitCreature && def.onImpact !== 'bounce' && armor > 0 && def.penetration < armor;
     if (flight.spent) {
       outcome = 'drop';
     } else if (def.onImpact === 'shatter') {
       outcome = 'shatter';
-    } else if (def.onImpact === 'stick' && penetrates(def.penetration, hardness)) {
+    } else if (def.onImpact === 'stick' && !deflected && penetrates(def.penetration, hardness)) {
       outcome = 'stick';
     } else {
       after = ricochet(velocity, contact.normal, rules.ricochetSpeedFactor);
@@ -369,7 +377,7 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
     if (
       hitCreature &&
       outcome !== 'drop' &&
-      (outcome !== 'ricochet' || def.onImpact === 'bounce')
+      (outcome !== 'ricochet' || def.onImpact === 'bounce' || deflected)
     ) {
       damage = strike(world, arrow, other, hurtbox);
     }

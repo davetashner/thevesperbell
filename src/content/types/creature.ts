@@ -76,7 +76,48 @@ export const PERSONALITY_TRAITS = [
   'greed',
 ] as const;
 
+/** Hurtbox regions a creature can declare, highest hit priority first (mirrors the sim's HIT_REGIONS). */
+export const CREATURE_REGIONS = ['weakpoint', 'head', 'torso', 'limb'] as const;
+
+/** Families whose members are humanoids: an unaware one staggers from a head hit (mw-e05.6). */
+export const HUMANOID_FAMILIES = ['human', 'forgotten', 'rootcellar-goblin'] as const;
+
+/** Whether a creature is a humanoid: a humanoid family, or tagged `humanoid`. */
+export function isHumanoid(def: {
+  readonly family: string;
+  readonly tags: readonly string[];
+}): boolean {
+  return (
+    (HUMANOID_FAMILIES as readonly string[]).includes(def.family) || def.tags.includes('humanoid')
+  );
+}
+
 const unit = z.number().min(0).max(1);
+
+const regionSchema = z.strictObject({
+  id: contentId.describe('Hurtbox id, unique within the creature, e.g. "core".'),
+  region: z.enum(CREATURE_REGIONS).describe('Region it counts as: head ×2, weakpoint ×3, …'),
+  multiplier: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('Damage multiplier; absent = the region default (weakpoint 3, head 2, else 1).'),
+  armor: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('Armour value: arrows with less penetration ricochet off it for 0 damage.'),
+  enabledIn: z
+    .array(contentId)
+    .optional()
+    .describe(
+      'Weakpoints only (required for them): the creature states it is enabled in, e.g. ["roaring"]; outside them a hit resolves against `underlying`.',
+    ),
+  underlying: z
+    .enum(['head', 'torso', 'limb'])
+    .optional()
+    .describe('Region a disabled weakpoint resolves as; absent = torso.'),
+});
 
 const statsSchema = z
   .strictObject({
@@ -128,6 +169,12 @@ export const creatureSchema = z.strictObject({
     .array(ref('attack'))
     .prefault([])
     .describe('Attack ids it can use (attack content, e12.5); none = it never attacks.'),
+  regions: z
+    .array(regionSchema)
+    .prefault([])
+    .describe(
+      'Hit regions beyond the body (mw-e05.6): head, weak points, armoured plates. Shapes come with the rig.',
+    ),
   properties: z
     .array(contentId)
     .prefault([])
@@ -204,6 +251,8 @@ export interface RuntimeCreature {
   readonly nav: Frozen<NavAgent>;
   /** Speed per gait, m/s, of its walking mode (else its first moving mode; 0 when stationary). AI moves it. */
   readonly gaits: Readonly<Record<Gait, number>>;
+  /** A humanoid (see `isHumanoid`): an unaware one staggers from a head hit (mw-e05.6). */
+  readonly humanoid?: boolean;
 }
 
 /** Runtime creatures by id (`compileCreatures`). */
@@ -242,6 +291,7 @@ export function compileCreature(
     senses: deepFreeze(resolveSenses(def.senses, profiles)),
     nav: deepFreeze(deriveNavAgent(locomotion)),
     gaits: gaitSpeeds(locomotion),
+    humanoid: isHumanoid(def),
   });
 }
 

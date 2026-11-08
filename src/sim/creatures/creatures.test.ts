@@ -9,7 +9,7 @@ import {
   PoiseComponent,
   ResistancesComponent,
 } from '../combat/damage/components';
-import { HitboxComponent, HurtboxComponent } from '../combat/hits/components';
+import { HitboxComponent, HurtboxComponent, RegionStateComponent } from '../combat/hits/components';
 import { ACTION_TIMELINE_COMPONENTS, ActionTimelineComponent } from '../combat/timeline/components';
 import { CombatFacingComponent, GuardComponent, guardOf } from '../combat/melee/components';
 import { HitReactionComponent } from '../combat/reactions/components';
@@ -87,12 +87,14 @@ const tinyPup: RuntimeCreature = Object.freeze({
   nav: Object.freeze({ ...pup.nav, radius: 0.3, height: 0.4 }),
 });
 const lost = creature('lost', { faction: { id: 'nobody' } });
+const humanoid: RuntimeCreature = Object.freeze({ ...creature('humanoid'), humanoid: true });
 
 const creatures: CreatureTable = new Map([
   [hound.id, hound],
   [guard.id, guard],
   [tinyPup.id, tinyPup],
   [lost.id, lost],
+  [humanoid.id, humanoid],
 ]);
 
 const factions = buildFactionTable([
@@ -145,6 +147,14 @@ describe('creature spawner (mw-e12.4)', () => {
       return hashWorld(w);
     });
     expect(hashes[0]).toBe(hashes[1]);
+  });
+
+  it('mw-e05.6: a humanoid creature gets region state marking it humanoid; others get none', () => {
+    const w = world();
+    const person = spawned(w, { creature: 'humanoid', at: origin });
+    const beast = spawned(w, { creature: 'hound', at: origin });
+    expect(w.get(person, RegionStateComponent)).toEqual({ humanoid: true, state: 'default' });
+    expect(w.get(beast, RegionStateComponent)).toBeUndefined();
   });
 
   it('builds placement, facing, hurtbox, combatant, reactions, faction and creature state', () => {

@@ -89,6 +89,13 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `locomotion.opensDoors` | boolean | — | Overrides whether it opens unlocked doors. |
 | `locomotion.areaCosts` | map of `"ground"` \| `"water-shallow"` \| `"water-deep"` \| `"crawlspace"` → number 0.1–100 or null | — | Area costs to override (ground, water-shallow, water-deep, crawlspace); null resets one to 1. |
 | `attacks` | list of ref → attack | `[]` | Attack ids it can use (attack content, e12.5); none = it never attacks. |
+| `regions` | list of object | `[]` | Hit regions beyond the body (mw-e05.6): head, weak points, armoured plates. Shapes come with the rig. |
+| `regions[].id` | id | required | Hurtbox id, unique within the creature, e.g. "core". |
+| `regions[].region` | `"weakpoint"` \| `"head"` \| `"torso"` \| `"limb"` | required | Region it counts as: head ×2, weakpoint ×3, … |
+| `regions[].multiplier` | number ≥ 0 | — | Damage multiplier; absent = the region default (weakpoint 3, head 2, else 1). |
+| `regions[].armor` | number ≥ 0 | — | Armour value: arrows with less penetration ricochet off it for 0 damage. |
+| `regions[].enabledIn` | list of id | — | Weakpoints only (required for them): the creature states it is enabled in, e.g. ["roaring"]; outside them a hit resolves against `underlying`. |
+| `regions[].underlying` | `"head"` \| `"torso"` \| `"limb"` | — | Region a disabled weakpoint resolves as; absent = torso. |
 | `properties` | list of id | `[]` | World-property tags (e03), e.g. "flammable", "conductive". |
 | `resistances` | map of `"slash"` \| `"pierce"` \| `"blunt"` \| `"fire"` \| `"frost"` \| `"shock"` \| `"arcane"` \| `"poison"` → number 0–3 | `{}` | Damage multiplier per damage type, 0–3: 0 = immune, below 1 resists, above 1 vulnerable. Unlisted types take 1. |
 | `poiseRegen` | object | `{}` | How poise recovers after poise damage. |

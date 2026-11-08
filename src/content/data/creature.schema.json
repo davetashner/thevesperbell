@@ -625,6 +625,63 @@
         "x-contentRef": "attack"
       }
     },
+    "regions": {
+      "description": "Hit regions beyond the body (mw-e05.6): head, weak points, armoured plates. Shapes come with the rig.",
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Hurtbox id, unique within the creature, e.g. \"core\"."
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "weakpoint",
+              "head",
+              "torso",
+              "limb"
+            ],
+            "description": "Region it counts as: head ×2, weakpoint ×3, …"
+          },
+          "multiplier": {
+            "description": "Damage multiplier; absent = the region default (weakpoint 3, head 2, else 1).",
+            "type": "number",
+            "minimum": 0
+          },
+          "armor": {
+            "description": "Armour value: arrows with less penetration ricochet off it for 0 damage.",
+            "type": "number",
+            "minimum": 0
+          },
+          "enabledIn": {
+            "description": "Weakpoints only (required for them): the creature states it is enabled in, e.g. [\"roaring\"]; outside them a hit resolves against `underlying`.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "underlying": {
+            "description": "Region a disabled weakpoint resolves as; absent = torso.",
+            "type": "string",
+            "enum": [
+              "head",
+              "torso",
+              "limb"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "region"
+        ],
+        "additionalProperties": false
+      }
+    },
     "properties": {
       "description": "World-property tags (e03), e.g. \"flammable\", \"conductive\".",
       "default": [],

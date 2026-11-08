@@ -12,8 +12,8 @@ import {
   CreatureComponent,
   creaturesInstalled,
   DamageApplied,
-  DAMAGE_TAGS,
   healthOf,
+  hitMarkerVariant,
   isDead,
   PlacementComponent,
   PoiseBroken,
@@ -68,13 +68,7 @@ export function hitVariant(hit: {
   readonly tags: readonly string[];
   readonly packet: { readonly region?: string };
 }): HitVariant {
-  if (hit.tags.includes(DAMAGE_TAGS.parried) || hit.tags.includes(DAMAGE_TAGS.blocked)) {
-    return 'deflected';
-  }
-  const region = hit.packet.region;
-  if (region === 'head') return 'headshot';
-  if (region === 'weakpoint' || hit.tags.includes(DAMAGE_TAGS.weakpoint)) return 'weakpoint';
-  return 'normal';
+  return hitMarkerVariant(hit.tags, hit.packet.region);
 }
 
 /** What a bar shows beyond name and health: its poise and the note flags. */
