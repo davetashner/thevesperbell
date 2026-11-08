@@ -1,6 +1,6 @@
 // The options menu shell (mw-e31.1): one tab per settings category, each control generated from the
 // schema's metadata (label, help text, range or choices) with the UI kit's generic toggle, slider and
-// select, plus a keybind placeholder until remapping lands (mw-e31.2). Changes apply immediately
+// select, and the Key bindings panel under Controls (mw-e31.2). Changes apply immediately
 // through the store; "Reset to defaults" asks first and resets only the category it sits in. Every
 // control is keyboard and gamepad reachable through the kit's focus navigation (docs/design/ui.md).
 
@@ -16,10 +16,13 @@ import {
   type Tabs,
   type UiRoot,
 } from '@ui/index';
+import { BindingsEditor } from './bindings-editor';
+import { bindingsPanel } from './bindings-panel';
 import {
   SETTINGS_CATEGORIES,
   SETTINGS_SCHEMA,
   settingDefs,
+  type KeybindSetting,
   type SettingDef,
   type SettingKey,
   type SettingsCategory,
@@ -34,6 +37,8 @@ export interface OptionsMenuOptions {
   readonly category?: SettingsCategory;
   /** Pause the sim while open (default true). */
   readonly pausesSim?: boolean;
+  /** The bindings the Key bindings panel edits (default: the settings store's own). */
+  readonly bindings?: BindingsEditor;
 }
 
 export interface OptionsMenu {
@@ -64,7 +69,11 @@ interface Control {
 }
 
 /** Builds the generic control for one setting, wired to the store both ways. */
-function control(settings: SettingsStore, key: SettingKey, def: SettingDef): Control {
+function control(
+  settings: SettingsStore,
+  key: SettingKey,
+  def: Exclude<SettingDef, KeybindSetting>,
+): Control {
   const set = (value: unknown): void => {
     settings.set(key, value as never);
   };
@@ -99,13 +108,6 @@ function control(settings: SettingsStore, key: SettingKey, def: SettingDef): Con
         value: value as string,
         onChange: set,
       });
-    case 'keybind': {
-      // Placeholder: shows the binding, focusable so it is read out, not yet editable.
-      const element = button({ label: `${def.label}: ${keyLabel(value as string)}` });
-      element.setAttribute('aria-disabled', 'true');
-      element.dataset['uiComponent'] = 'keybind';
-      return { element, value };
-    }
   }
 }
 
@@ -113,7 +115,7 @@ function control(settings: SettingsStore, key: SettingKey, def: SettingDef): Con
 function row(
   settings: SettingsStore,
   key: SettingKey,
-  def: SettingDef,
+  def: Exclude<SettingDef, KeybindSetting>,
   track: (c: Control) => void,
 ) {
   const item = control(settings, key, def);
@@ -136,6 +138,7 @@ export function openOptionsMenu(
   options: OptionsMenuOptions = {},
 ): OptionsMenu {
   const controls = new Map<SettingKey, Control>();
+  const panel = bindingsPanel(ui, options.bindings ?? new BindingsEditor(settings));
   const panels = SETTINGS_CATEGORIES.map((category) => {
     const { label } = SETTINGS_SCHEMA[category];
     const reset = button({
@@ -153,15 +156,17 @@ export function openOptionsMenu(
       },
     });
     reset.dataset['reset'] = category;
-    const panel = h(
+    const content = h(
       'div',
       { className: 'vb-stack', data: { category } },
-      ...settingDefs(category).map(({ key, def }) =>
-        row(settings, key, def, (c) => controls.set(key, c)),
+      // Keybind settings are edited in the Key bindings panel, not as generic controls.
+      ...settingDefs(category).flatMap(({ key, def }) =>
+        def.kind === 'keybind' ? [] : [row(settings, key, def, (c) => controls.set(key, c))],
       ),
+      ...(category === 'controls' ? [panel.element] : []),
       h('div', { className: 'vb-row' }, reset),
     );
-    return { id: category, label, panel };
+    return { id: category, label, panel: content };
   });
   const strip = tabs({
     label: 'Settings categories',
@@ -191,7 +196,10 @@ export function openOptionsMenu(
     label: 'Options',
     content,
     pausesSim: options.pausesSim ?? true,
-    onClose: unsubscribe,
+    onClose: () => {
+      unsubscribe();
+      panel.dispose();
+    },
   });
   return { screen, tabs: strip };
 }

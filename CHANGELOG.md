@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Key bindings in Settings > Controls: remap any keyboard or mouse action with a press-a-key capture (Esc cancels), swap or cancel when a key is already in use, clear or reset a binding, and keep Pause always bound. Your layout is saved in the browser.
 - The knight can kick (K, or block and attack with no shield): it shoves crates and barrels up to 40 kg, tips a burning brazier into whatever can burn, slams an unlocked door open onto whoever stands behind it, bounces off a locked one with a thud, and knocks small creatures back, even over a ledge.
 - Sound captions (Settings > Accessibility): important sounds within 20 m (creature footsteps, attack telegraphs, rattling noise arrows, doors, breaking objects) show as text such as "[Footsteps, behind left]" with an arrow relative to the camera, up to 4 at once, with a size setting.
 - Hit feedback on screen: the camera shakes when you are hit (a light blow a little, a heavy one or a broken guard much more) and settles in about a third of a second, a red vignette flashes at the screen edges for 300 ms in proportion to the health you lost, and the colour drains from the screen below a quarter health. Options, Camera has a Camera shake slider (0 to 100; 0 turns it off), and the Motion setting in Accessibility (or your system's reduced-motion setting) turns the shake off too. Screen flashes never fire more than three times a second. Explosions will shake the camera by distance once they exist; the manual playtest of the default feel is still to do.
