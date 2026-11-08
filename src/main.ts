@@ -1,5 +1,7 @@
 import {
+  bindMixer,
   createBrowserAudioEngine,
+  documentVisibility,
   gameSoundRegistry,
   installGestureUnlock,
   listenerPose,
@@ -96,7 +98,7 @@ import {
   playableClasses,
 } from '@game/classes';
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
-import { bindVolumes, SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
+import { SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
 import { debugConsoleEnabled } from '@game/debug-console-gate';
@@ -814,6 +816,8 @@ function startRenderer(
       ]),
     });
     installGestureUnlock(document, audio);
+    // The saved mix applies now, before the context exists and so before the first sound (mw-e28.5).
+    bindMixer(audio, settings, documentVisibility(document));
     const recentCues: string[] = [];
     attachGameAudio({
       world,
@@ -1143,9 +1147,8 @@ function startRenderer(
       // Sky, fog and the painted backdrop of outdoor scenes (mw-ju8.1). The unapproved backdrop images
       // are not in production builds, so only dev loads them.
       applyEnvironment(view.scene, scene.environment, { load: import.meta.env.DEV });
-      // Volume sliders drive the buses; the slice's ambience and music beds play from the first
-      // gesture on (mw-0j5), a stand-in for the adaptive controller (mw-e28.11).
-      const volumes = bindVolumes(audio, settings);
+      // The slice's ambience and music beds play from the first gesture on (mw-0j5), a stand-in for
+      // the adaptive controller (mw-e28.11). The volume sliders are bound once, with the engine.
       const music =
         scene.id === 'slice'
           ? new SliceMusic({ world, engine: audio, now: () => performance.now() })
@@ -1158,7 +1161,6 @@ function startRenderer(
       const beds = new SceneBeds({ engine: audio, scene: scene.id });
       const shopStingers = new ShopStingers({ engine: audio, now: () => performance.now() });
       afterStep.push(() => {
-        volumes.update();
         music?.update();
         hums.update();
         beds.update();

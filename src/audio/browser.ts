@@ -3,6 +3,7 @@
 // tested with stubbed globals and exercised for real by e2e/audio.spec.ts in Chromium, Firefox and
 // WebKit.
 import { AudioEngine, type AudioEngineOptions } from './engine.ts';
+import type { Visibility } from './mixer.ts';
 import { pickFormat, registryAssetUrl, type AudioFormat } from './manifest.ts';
 
 /** Where runtime audio lives (audio bible §6: `public/assets/audio/<category>/<asset-id>.<ext>`). */
@@ -74,4 +75,19 @@ export function installGestureUnlock(
     target.addEventListener(type, onGesture, { capture: true, signal: listening.signal });
   }
   return remove;
+}
+
+/** The page's visibility for the mixer's mute-when-hidden (mw-e28.5). */
+export function documentVisibility(
+  doc: Pick<Document, 'visibilityState' | 'addEventListener' | 'removeEventListener'>,
+): Visibility {
+  return {
+    hidden: () => doc.visibilityState === 'hidden',
+    subscribe(listener) {
+      doc.addEventListener('visibilitychange', listener);
+      return () => {
+        doc.removeEventListener('visibilitychange', listener);
+      };
+    },
+  };
 }

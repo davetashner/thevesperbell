@@ -493,8 +493,9 @@ describe('AudioEngine routing and parameters', () => {
     ]);
   });
 
-  it('sets bus gains immediately or with a ramp', () => {
+  it('sets bus gains immediately or with a ramp', async () => {
     const { engine, ctx } = setup();
+    await engine.unlock();
     engine.setBusGain('music', 0.5);
     ctx.currentTime = 2;
     engine.setBusGain('sfx', 0.25, 0.05);
@@ -505,6 +506,31 @@ describe('AudioEngine routing and parameters', () => {
       { type: 'set', value: 1, time: 2 },
       { type: 'ramp', value: 0.25, time: 2.05 },
     ]);
+  });
+});
+
+describe('AudioEngine mixer state (mw-e28.5)', () => {
+  it('holds bus gains, mono and night mode set before the context exists, then applies them on creation', () => {
+    const { engine, ctx, createContext } = setup();
+    engine.setBusGain('sfx', 0.25);
+    engine.setMono(true);
+    engine.setNightMode(true, 0.05);
+    expect(createContext).not.toHaveBeenCalled();
+    engine.play('sfx-ui-click');
+    const [master, , sfx] = ctx.gains;
+    expect(sfx?.gain.value).toBe(0.25);
+    expect(master?.channelCount).toBe(1);
+    expect(ctx.compressors[1]?.ratio.value).toBe(6);
+  });
+
+  it('switches mono and night mode live, with the compressor ramped', async () => {
+    const { engine, ctx } = setup();
+    await engine.unlock();
+    engine.setMono(true);
+    engine.setMono(false);
+    expect(ctx.gains[0]?.channelCount).toBe(2);
+    engine.setNightMode(true, 0.05);
+    expect(ctx.compressors[1]?.ratio.events).toContainEqual({ type: 'ramp', value: 6, time: 0.05 });
   });
 });
 

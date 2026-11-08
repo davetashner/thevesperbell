@@ -19,6 +19,9 @@ export interface AudioNodeLike {
 
 export interface GainNodeLike extends AudioNodeLike {
   readonly gain: AudioParamLike;
+  channelCount: number;
+  channelCountMode: ChannelCountMode;
+  channelInterpretation: ChannelInterpretation;
 }
 
 export interface DynamicsCompressorNodeLike extends AudioNodeLike {

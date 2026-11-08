@@ -21,6 +21,7 @@ export {
   GESTURE_EVENTS,
   browserFormat,
   createBrowserAudioEngine,
+  documentVisibility,
   fetchBytes,
   installGestureUnlock,
   type BrowserAudioOptions,
@@ -48,7 +49,32 @@ export {
   type SoundDef,
   type SoundDefInput,
 } from './manifest.ts';
-export { BUS_PARENT, LIMITER, buildBusGraph, dbToGain, type BusGraph } from './buses.ts';
+export {
+  BUS_PARENT,
+  LIMITER,
+  NIGHT_BYPASS,
+  NIGHT_COMPRESSOR,
+  applyMono,
+  applyNightMode,
+  buildBusGraph,
+  dbToGain,
+  rampParam,
+  type BusGraph,
+} from './buses.ts';
+export {
+  MIN_DB,
+  MIXER_BUSES,
+  MIXER_RAMP_S,
+  bindMixer,
+  sliderToGain,
+  type MixerBinding,
+  type MixerEngine,
+  type MixerKey,
+  type MixerSettings,
+  type MixerValues,
+  type MixerVolumeKey,
+  type Visibility,
+} from './mixer.ts';
 export {
   BufferCache,
   DEFAULT_CACHE_BYTES,
