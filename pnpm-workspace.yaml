@@ -1,3 +1,6 @@
 # Single-package workspace for now; packages: will list sub-packages if we ever split.
 engineStrict: true
 onlyBuiltDependencies: []
+overrides:
+  # Parents pin ^10; 10.x is flagged by Dependabot (fixed in 11.0.1). [mw-e00.36]
+  minimatch: ^11.0.1
