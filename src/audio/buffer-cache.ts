@@ -6,10 +6,12 @@ import type { AudioBufferLike } from './web-audio.ts';
 /** Default decoded-audio cap (bead mw-e28.1). */
 export const DEFAULT_CACHE_BYTES = 64 * 1024 * 1024;
 
-/** A decoded asset plus its loop region in seconds, when its sidecar provided one. */
+/** A decoded asset plus its loop region in seconds and its tempo, when its sidecar provided them. */
 export interface LoadedSound {
   readonly buffer: AudioBufferLike;
   readonly loop?: { readonly start: number; readonly end: number };
+  /** Tempo from the sidecar (audio bible §5.3), for the music clock. */
+  readonly timing?: { readonly bpm: number; readonly beatsPerBar: number };
 }
 
 export type AssetStatus = 'absent' | 'loading' | 'ready' | 'failed';

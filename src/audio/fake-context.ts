@@ -156,14 +156,16 @@ export class FakeSource extends FakeNode implements AudioBufferSourceNodeLike {
   readonly playbackRate = new FakeParam(1);
   onended: ((this: never, ev: Event) => unknown) | null = null;
   startedAt: number | undefined;
+  startOffset: number | undefined;
   stoppedAt: number | undefined;
 
   constructor() {
     super('source');
   }
 
-  start(when = 0): void {
+  start(when = 0, offset = 0): void {
     this.startedAt = when;
+    this.startOffset = offset;
   }
 
   stop(when = 0): void {

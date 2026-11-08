@@ -29,10 +29,14 @@ export const SNAPSHOTS: Readonly<Record<SnapshotName, Snapshot>> = {
     rampMs: 1500,
     buses: { music: { gainDb: -4 }, ambience: { gainDb: 2 }, sfx: { gainDb: 1 } },
   },
-  /** Combat: SFX forward, ambience pushed under the fight. Entered quickly. */
+  /**
+   * Combat: SFX forward, ambience pushed under the fight. Entered quickly. The music bus stays
+   * where it is: the adaptive music controller (mw-e28.11) crossfades its layers on a bar line, and
+   * a bus move at the moment combat starts would be a gain jump ahead of that crossfade.
+   */
   combat: {
     rampMs: 500,
-    buses: { music: { gainDb: -1 }, ambience: { gainDb: -8 }, sfx: { gainDb: 2 } },
+    buses: { ambience: { gainDb: -8 }, sfx: { gainDb: 2 } },
   },
   /** Title and full-screen menus: the world recedes behind soft, dull sound. */
   menu: {

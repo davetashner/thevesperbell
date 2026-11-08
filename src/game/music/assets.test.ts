@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { assetCategory, gameSoundRegistry, loopSidecarSchema } from '@audio/index';
 import { loadGameContent } from '@content/game-content';
-import { SLICE_MUSIC_CUES } from './slice-music.ts';
+import { SLICE_MUSIC_CUES } from './music-sets.ts';
 
 // The gallery's ambience bed is the bed of the slice-gallery ambience zone (mw-e28.13).
 const AMBIENCE_CUE = loadGameContent().get('ambience', 'slice-gallery').bed?.cue ?? '';

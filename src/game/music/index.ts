@@ -1,16 +1,22 @@
-// Public API of the slice music layer (mw-0j5).
+// Public API of the music layer (mw-0j5, mw-e28.11).
 export {
-  COMBAT_EXIT_DELAY_MS,
-  COMBAT_FADE_IN_S,
-  COMBAT_FADE_OUT_S,
-  EXPLORE_DUCK_S,
-  EXPLORE_RESTORE_S,
+  AdaptiveMusic,
+  type AdaptiveMusicEngine,
+  type AdaptiveMusicOptions,
+  type AdaptiveMusicState,
+  type StingerSource,
+} from './adaptive-music.ts';
+export {
+  DEFAULT_TUNING,
+  MUSIC_LAYERS,
+  MUSIC_SETS,
   SLICE_MUSIC_CUES,
-  SliceMusic,
-  type MusicEngine,
-  type SliceMusicOptions,
-  type SliceMusicState,
-} from './slice-music.ts';
+  musicSetFor,
+  type LayerSpec,
+  type MusicLayer,
+  type MusicSet,
+  type MusicTuning,
+} from './music-sets.ts';
 export {
   HUM_FADE_OUT_S,
   SCENE_HUMS,
