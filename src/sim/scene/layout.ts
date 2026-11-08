@@ -13,6 +13,7 @@ import type { RampRise } from '../character/greybox';
 import type { CreatureLeash } from '../creatures/components';
 import type { InteractableSpec } from '../interaction/affordance';
 import type { LightEnvironment } from '../light/field';
+import type { BeamKind, OpticKind, ReceiverMode } from '../light/beams';
 import type { LightSourceVariant } from '../light/sources';
 import type { DoorHinge, DoorSwing, SwitchKind } from '../mechanisms/components';
 import type {
@@ -128,6 +129,35 @@ export interface ScenePlateSpec {
   readonly width?: number | undefined;
   readonly depth?: number | undefined;
   readonly hidden?: boolean | undefined;
+}
+
+/** A beam emitter spawn (mw-e03.17). */
+export interface SceneBeamEmitterSpec {
+  readonly kind: BeamKind;
+  readonly direction: Triple;
+  readonly intensity?: number | undefined;
+  readonly colour?: Triple | undefined;
+  readonly range?: number | undefined;
+  readonly maxBounces?: number | undefined;
+  readonly active?: boolean | undefined;
+}
+
+/** A mirror, lens or pane spawn (mw-e03.17). */
+export interface SceneOpticSpec {
+  readonly kind: OpticKind;
+  readonly normal: Triple;
+  readonly radius?: number | undefined;
+  readonly focus?: number | undefined;
+  readonly tint?: Triple | undefined;
+}
+
+/** A light receiver spawn (mw-e03.17). */
+export interface SceneLightReceiverSpec {
+  readonly threshold?: number | undefined;
+  readonly dwellSeconds?: number | undefined;
+  readonly filter?: Triple | undefined;
+  readonly mode?: ReceiverMode | undefined;
+  readonly radius?: number | undefined;
 }
 
 /** A light source spawn (mw-e03.16): its prefab and the designer flags. */
@@ -292,6 +322,12 @@ export interface SceneSpawnSpec {
   readonly lightSource?: SceneLightSourceSpec | undefined;
   /** Makes the spawned entity an impact switch (mw-e03.20). */
   readonly impactSwitch?: SceneImpactSwitchSpec | undefined;
+  /** Makes the spawned entity a light beam emitter (mw-e03.17). */
+  readonly beamEmitter?: SceneBeamEmitterSpec | undefined;
+  /** Makes the spawned entity a mirror, lens or pane (mw-e03.17). */
+  readonly optic?: SceneOpticSpec | undefined;
+  /** Makes the spawned entity a light receiver (mw-e03.17). */
+  readonly lightReceiver?: SceneLightReceiverSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
   /** Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). */
@@ -457,6 +493,10 @@ export interface SceneSpawnPlacement {
   readonly lightSource?: SceneLightSourceSpec;
   /** Its impact switch data, when it is one (mw-e03.20). */
   readonly impactSwitch?: SceneImpactSwitchSpec;
+  /** Its beam emitter, optic and receiver data (mw-e03.17). */
+  readonly beamEmitter?: SceneBeamEmitterSpec;
+  readonly optic?: SceneOpticSpec;
+  readonly lightReceiver?: SceneLightReceiverSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
   /** Its rope data, when it is a cuttable rope (mw-e05.13). */
@@ -595,6 +635,16 @@ function switchOf(spec: SceneSwitchSpec): SceneSwitchSpec {
     ...(spec.positions !== undefined && { positions: spec.positions }),
     ...(spec.initial !== undefined && { initial: spec.initial }),
   });
+}
+
+/** `spec` without its absent fields, frozen (colours and vectors are copied, they are arrays). */
+function definedOf<T extends object>(spec: T): T {
+  const copy: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(spec)) {
+    if (value !== undefined)
+      copy[key] = Array.isArray(value) ? Object.freeze([...(value as unknown[])]) : value;
+  }
+  return Object.freeze(copy) as T;
 }
 
 /** A plate's data without absent fields. */
@@ -806,6 +856,9 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         lightSource: Object.freeze({ ...spawn.lightSource }),
       }),
       ...(spawn.impactSwitch !== undefined && { impactSwitch: impactSwitchOf(spawn.impactSwitch) }),
+      ...(spawn.beamEmitter !== undefined && { beamEmitter: definedOf(spawn.beamEmitter) }),
+      ...(spawn.optic !== undefined && { optic: definedOf(spawn.optic) }),
+      ...(spawn.lightReceiver !== undefined && { lightReceiver: definedOf(spawn.lightReceiver) }),
       ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
       ...(spawn.rope !== undefined && {
         rope: Object.freeze({

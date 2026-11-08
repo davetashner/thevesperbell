@@ -26,6 +26,7 @@ import {
   type LockSpec,
 } from './components';
 import { ImpactSwitchComponent, IMPACT_SWITCH_PREFABS } from './impacts';
+import { BeamEmitterComponent, LightReceiverComponent, OpticComponent } from '../light/beams';
 import { DEFAULT_PLATE, PlateComponent } from './plates';
 import { addSceneMechanisms, SWITCH_AFFORDANCES, type SceneMechanismsOptions } from './scene';
 import { doorStatus, installMechanisms } from './system';
@@ -151,6 +152,56 @@ const SCENE = {
       tags: [],
       lightSource: { variant: 'brazier', infiniteFuel: true },
     },
+    {
+      id: 'sun-shaft',
+      at: [0, 3, 12],
+      yaw: 0,
+      tags: [],
+      beamEmitter: {
+        kind: 'crystal',
+        direction: [1, 0, 0],
+        intensity: 2,
+        colour: [1, 0.5, 0],
+        range: 12,
+        maxBounces: 3,
+        active: false,
+      },
+    },
+    {
+      id: 'plain-beam',
+      at: [0, 3, 14],
+      yaw: 0,
+      tags: [],
+      beamEmitter: { kind: 'sunlight', direction: [0, 0, 1] },
+    },
+    {
+      id: 'focus',
+      at: [4, 3, 12],
+      yaw: 0,
+      tags: [],
+      optic: { kind: 'lens', normal: [1, 0, 0], radius: 0.7, focus: 3, tint: [1, 1, 0.5] },
+    },
+    {
+      id: 'looking-glass',
+      at: [6, 3, 12],
+      yaw: 0,
+      tags: [],
+      optic: { kind: 'mirror', normal: [0, 0, 1] },
+    },
+    {
+      id: 'eye',
+      at: [8, 3, 12],
+      yaw: 0,
+      tags: [],
+      lightReceiver: {
+        threshold: 0.8,
+        dwellSeconds: 2,
+        filter: [1, 0, 0],
+        mode: 'latching',
+        radius: 0.5,
+      },
+    },
+    { id: 'plain-eye', at: [9, 3, 12], yaw: 0, tags: [], lightReceiver: {} },
   ],
   signals: [{ graph: { id: 'gate' }, bindings: { 'gate-lever': 'lever' } }],
 } as unknown as SceneSpec;
@@ -247,6 +298,54 @@ describe('scene mechanisms (mw-e03.18)', () => {
       ...DEFAULT_PLATE,
       minWeight: 10,
       origin: { x: 7, y: 0, z: 5 },
+    });
+  });
+
+  it('makes beam emitter, optic and light receiver spawns (mw-e03.17)', () => {
+    const { world, loaded } = setup();
+    const made = addSceneMechanisms(world, loaded, OPTIONS);
+    const named = (id: string) => loaded.spawns.find(({ spawn }) => spawn.id === id)!.entity;
+    expect(world.get(named('sun-shaft'), BeamEmitterComponent)).toEqual({
+      kind: 'crystal',
+      direction: { x: 1, y: 0, z: 0 },
+      intensity: 2,
+      colour: { x: 1, y: 0.5, z: 0 },
+      range: 12,
+      maxBounces: 3,
+      active: false,
+    });
+    expect(world.get(named('plain-beam'), BeamEmitterComponent)).toMatchObject({
+      kind: 'sunlight',
+      intensity: 1,
+      maxBounces: 8,
+      active: true,
+    });
+    expect(world.get(named('focus'), OpticComponent)).toMatchObject({
+      kind: 'lens',
+      radius: 0.7,
+      focus: 3,
+      tint: { x: 1, y: 1, z: 0.5 },
+    });
+    expect(readProperty(world, named('focus'), 'transparent')).toBe(true);
+    expect(world.get(named('looking-glass'), OpticComponent)).toMatchObject({
+      radius: 0.5,
+      focus: 1,
+    });
+    expect(readProperty(world, named('looking-glass'), 'reflective')).toBe(true);
+    expect(made.receivers).toEqual([named('eye'), named('plain-eye')]);
+    expect(world.get(named('eye'), LightReceiverComponent)).toMatchObject({
+      threshold: 0.8,
+      dwellSeconds: 2,
+      filter: { x: 1, y: 0, z: 0 },
+      mode: 'latching',
+      radius: 0.5,
+      active: false,
+    });
+    expect(world.get(named('plain-eye'), LightReceiverComponent)).toMatchObject({
+      threshold: 0.5,
+      dwellSeconds: 0,
+      filter: null,
+      mode: 'momentary',
     });
   });
 
