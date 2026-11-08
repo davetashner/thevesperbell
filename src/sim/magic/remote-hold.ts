@@ -28,7 +28,6 @@ import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
 import { interactRemotely, type Interaction } from '../interaction';
 import { hypot } from '../math';
-import { DEFAULT_GRAVITY } from '../physics/rapier';
 import {
   MIN_BODY_MASS,
   PhysicsObjectComponent,
@@ -39,7 +38,7 @@ import type { ColliderHandle } from '../physics/static-colliders';
 import { readProperty } from '../properties/components';
 import { placementOf } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
-import { ForceResisted } from './tether';
+import { ForceResisted } from './resisted';
 
 /** The spring's natural frequency, rad/s: a critically damped approach settles in about 0.3 s. */
 export const HOLD_OMEGA = 20;
@@ -51,8 +50,6 @@ export const HOLD_REACHED = 0.5;
 export const HOLD_STALL_DISTANCE = 0.1;
 /** Seconds stalled short of the point before an obstructed hold breaks. */
 export const HOLD_STALL_SECONDS = 1;
-
-const GRAVITY = -DEFAULT_GRAVITY.y;
 
 /** One remote hold (a row of `magic.remoteHolds`). */
 export interface RemoteHold {
@@ -190,6 +187,7 @@ export function holdRemotely(
         target,
         weight: readProperty(world, target, 'weight'),
         limit: strength,
+        reason: 'overweight',
       });
     }
     return result;
@@ -433,11 +431,12 @@ function steer(world: World<never>, hold: RemoteHold, tick: number, dt: number):
   }
   const { linvel } = rigidBodiesOf(world).motionOf(object.body as ColliderHandle);
   const k = HOLD_OMEGA;
-  // Spring-damper acceleration plus the lift that cancels the gravity this tick's step just applied.
+  const g = rigidBodiesOf(world).gravity();
+  // Spring-damper acceleration plus the lift that cancels the world's gravity this tick's step just applied.
   const wanted = {
-    x: linvel.x + (k * k * toPoint.x - 2 * k * linvel.x) * dt,
-    y: linvel.y + (k * k * toPoint.y - 2 * k * linvel.y + GRAVITY) * dt,
-    z: linvel.z + (k * k * toPoint.z - 2 * k * linvel.z) * dt,
+    x: linvel.x + (k * k * toPoint.x - 2 * k * linvel.x - g.x) * dt,
+    y: linvel.y + (k * k * toPoint.y - 2 * k * linvel.y - g.y) * dt,
+    z: linvel.z + (k * k * toPoint.z - 2 * k * linvel.z - g.z) * dt,
   };
   const speed = lengthOf(wanted);
   const scale = speed > HOLD_MAX_SPEED ? HOLD_MAX_SPEED / speed : 1;
@@ -457,6 +456,7 @@ function applyFields(
 ): void {
   if (ledger.zones.length === 0 && ledger.attractors.length === 0) return;
   const port = rigidBodiesOf(world);
+  const pull = -port.gravity().y;
   world.query(PhysicsObjectComponent).forEach((entity, object) => {
     if (held.has(entity) || !readProperty(world, entity, 'liftable')) return;
     const at = object.position;
@@ -472,7 +472,7 @@ function applyFields(
         at.y <= zone.max.y &&
         at.z >= zone.min.z &&
         at.z <= zone.max.z;
-      if (inside) dvy += (1 - zone.scale) * GRAVITY * dt;
+      if (inside) dvy += (1 - zone.scale) * pull * dt;
     }
     for (const attractor of ledger.attractors) {
       const toPoint = minus(attractor.point, at);

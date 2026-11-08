@@ -2,18 +2,21 @@
 // Mage Hand. A spell with a `tether` delivery grabs the object it is aimed at (a chosen `target`, else
 // the nearest thing near the aim point that can be moved or used), and from then on:
 //
-// - a movable object (a physics object) is held up to the delivery's weight limit and follows the aim
-//   point at up to `speed` m/s, stopped by solid geometry rather than passing through it; it is moved
-//   by teleporting its body each tick, so it carries no speed and never hits anything hard (a held
-//   crate nudging a creature deals no damage: throwing is a different verb);
+// - a movable object (a liftable physics object) is held with the remote-hold spring-damper
+//   (`remote-hold.ts`, mw-e03.47): the delivery's weight limit is the grip strength, the hold point
+//   follows the aim point at up to `speed` m/s, and the body is steered to it by physics, so it is
+//   stopped by solid geometry rather than passing through it (a hold jammed against geometry for a
+//   second breaks as obstructed), and it lets go with whatever velocity it has;
 // - `use` performs the object's primary interact verb for the caster through the Interact verb's own
-//   door (`interactRemotely`), so a lever pulled from afar is exactly a lever pulled by hand;
+//   door (`interactRemotely`), so a lever pulled from afar is exactly a lever pulled by hand; only a
+//   `remoteActuatable` thing can be used (or grabbed just to be used) from afar;
 // - the tether lets go on release, when the caster's channel ends, when the hold runs out, when the
-//   object passes beyond range, when either party is gone, or when line of sight has been broken for
-//   longer than `lineOfSightGrace` seconds (the object holds still meanwhile).
+//   object passes beyond range, when either party is gone, when the caster is staggered or leaves the
+//   scene, when the remote hold breaks (obstructed, overloaded, saved, taken over), or when line of
+//   sight has been broken for longer than `lineOfSightGrace` seconds (the object holds still meanwhile).
 //
-// An object above the weight limit is not lifted: `ForceResisted` fires and the cast fizzles
-// (`too-heavy`). Nothing here names a spell; every number comes from the delivery section. Deliberately
+// An object above the weight limit is not lifted: `ForceResisted` (reason `overweight`) fires and the
+// cast fizzles (`too-heavy`); one that is not liftable fizzles `not-liftable`. Nothing here names a spell; every number comes from the delivery section. Deliberately
 // powerful (constitution §4): the only balance is mana, cast time and cooldown, never exceptions for
 // particular objects.
 
@@ -21,8 +24,12 @@ import type { BodyId } from '../character/collision-world';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
+import { HitReaction } from '../combat/reactions/events';
+import { reactionRank } from '../combat/reactions/components';
+import { PoiseBroken } from '../combat/damage/events';
+import { areaTransition } from '../scene/transitions';
 import { affordancesOf, interactRemotely, physicsBodiesOf, remoteAffordance } from '../interaction';
-import { teleportPhysicsObject, PhysicsObjectComponent } from '../physics/objects';
+import { PhysicsObjectComponent } from '../physics/objects';
 import { PlayerLook } from '../player/player';
 import { readProperty } from '../properties/components';
 import type { SightWorld } from '../sight/sight-world';
@@ -31,7 +38,16 @@ import { PlacementComponent, placementOf } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
 import { castStateOf, ChannelEnded, type CastController } from './casting';
 import type { SpellPipeline } from './pipeline';
+import { ForceResisted } from './resisted';
 import type { DeliveryContext, DeliveryResult } from './registry';
+import {
+  canHoldRemotely,
+  holdOnTarget,
+  holdRemotely,
+  releaseHold,
+  RemoteHoldReleased,
+  setHoldPoint,
+} from './remote-hold';
 
 /** Height of the caster's eye above its placement (feet), metres. */
 export const TETHER_EYE_HEIGHT = 1.5;
@@ -61,7 +77,16 @@ export interface TetherLedger {
 export const TetherLedgerComponent = defineComponent<TetherLedger>('magic.tethers');
 
 export type TetherReleaseReason =
-  'player' | 'channel-ended' | 'expired' | 'out-of-range' | 'line-of-sight' | 'lost' | 'replaced';
+  | 'player'
+  | 'channel-ended'
+  | 'expired'
+  | 'out-of-range'
+  | 'line-of-sight'
+  | 'lost'
+  | 'replaced'
+  | 'staggered'
+  | 'exit'
+  | 'hold-broken';
 
 export interface TetherGrabbedInfo {
   readonly tick: number;
@@ -90,18 +115,7 @@ export interface TetherUsedInfo {
 }
 export const TetherUsed = defineEvent<TetherUsedInfo>('TetherUsed');
 
-/** A force could not move its target: a tether met something heavier than its limit. */
-export interface ForceResistedInfo {
-  readonly tick: number;
-  readonly caster: EntityId;
-  /** The spell id for a tether; null for a force op, which never sees one. */
-  readonly spell: string | null;
-  readonly target: EntityId;
-  /** The target's weight and the heaviest the spell lifts, kg. */
-  readonly weight: number;
-  readonly limit: number;
-}
-export const ForceResisted = defineEvent<ForceResistedInfo>('ForceResisted');
+export { ForceResisted, type ForceResistedInfo, type ForceResistedReason } from './resisted';
 
 /** The input command that uses the held object. */
 export interface TetherUseCommand {
@@ -217,6 +231,7 @@ export function installSpellTether<TInput>(
     const held = tetherOf(caster);
     if (held === undefined) return false;
     putAll(ledger().filter((t) => t !== held));
+    if (held.movable) releaseHold(w, held.target);
     w.events.emit(TetherReleased, {
       tick: w.tick,
       caster,
@@ -265,27 +280,30 @@ export function installSpellTether<TInput>(
     const at = placementOf(w, target);
     if (eye === undefined || at === undefined) return { kind: 'fizzle', reason: 'no-position' };
     const movable = w.has(target, PhysicsObjectComponent);
-    if (!movable && affordancesOf(w, target).length === 0) {
+    if (!movable && (affordancesOf(w, target).length === 0 || !actuatable(target))) {
       return { kind: 'fizzle', reason: 'not-tetherable' };
     }
     const distance = distanceBetween(eye, at);
     if (distance - at.radius > delivery.range) return { kind: 'fizzle', reason: 'out-of-reach' };
     if (!clear(target, eye, at)) return { kind: 'fizzle', reason: 'blocked' };
     if (movable) {
-      const weight = readProperty(w, target, 'weight');
-      if (weight > delivery.maxWeight) {
+      const grip = canHoldRemotely(w, target, delivery.maxWeight);
+      if (!grip.ok && grip.reason === 'overweight') {
         w.events.emit(ForceResisted, {
           tick: w.tick,
           caster,
           spell: spell.id,
           target,
-          weight,
+          weight: readProperty(w, target, 'weight'),
           limit: delivery.maxWeight,
+          reason: 'overweight',
         });
         return { kind: 'fizzle', reason: 'too-heavy' };
       }
+      if (!grip.ok) return { kind: 'fizzle', reason: 'not-liftable' };
     }
     release(caster, 'replaced', false);
+    if (movable) holdRemotely(w, caster, target, at, delivery.maxWeight);
     const hz = w.clock.hz;
     putAll([
       ...ledger(),
@@ -306,6 +324,9 @@ export function installSpellTether<TInput>(
     return { kind: 'hits', hits: [{ target, point: { x: at.x, y: at.y, z: at.z } }] };
   });
 
+  /** Whether `target` may be used from afar (the `remoteActuatable` property). */
+  const actuatable = (target: EntityId): boolean => readProperty(w, target, 'remoteActuatable');
+
   /** The held tether, when its target is in reach and sight. */
   const usableTether = (caster: EntityId): Tether | undefined => {
     const held = tetherOf(caster);
@@ -321,7 +342,7 @@ export function installSpellTether<TInput>(
 
   const use = (caster: EntityId): boolean => {
     const held = usableTether(caster);
-    if (held === undefined) return false;
+    if (held === undefined || !actuatable(held.target)) return false;
     const done = interactRemotely(w, caster, held.target);
     if (done === undefined) return false;
     w.events.emit(TetherUsed, {
@@ -369,29 +390,28 @@ export function installSpellTether<TInput>(
       put({ ...held, blockedSince: null });
     }
     if (!held.movable) return;
-    // Hold the body where it is (gravity must not win) or carry it a step toward the aim point,
-    // stopping where solid geometry is in the way.
-    let next: Vec3 = { x: at.x, y: at.y, z: at.z };
+    // Move the hold point a step toward the aim point (the spring carries the body after it); with
+    // line of sight lost the point stays and the object holds still.
     const wanted = seen ? aimOf(w, caster, held.distance) : undefined;
-    if (wanted !== undefined) {
-      const reach = distanceBetween(eye, wanted);
-      const k = reach > held.range ? held.range / reach : 1;
-      const goal = {
-        x: eye.x + (wanted.x - eye.x) * k,
-        y: eye.y + (wanted.y - eye.y) * k,
-        z: eye.z + (wanted.z - eye.z) * k,
-      };
-      const gap = distanceBetween(at, goal);
-      const reachStep = held.speed * dt;
-      const f = gap <= reachStep ? 1 : reachStep / gap;
-      const moved = {
-        x: at.x + (goal.x - at.x) * f,
-        y: at.y + (goal.y - at.y) * f,
-        z: at.z + (goal.z - at.z) * f,
-      };
-      if (clear(target, at, moved)) next = moved;
-    }
-    teleportPhysicsObject(w, target, next);
+    if (wanted === undefined) return;
+    const reach = distanceBetween(eye, wanted);
+    const k = reach > held.range ? held.range / reach : 1;
+    const goal = {
+      x: eye.x + (wanted.x - eye.x) * k,
+      y: eye.y + (wanted.y - eye.y) * k,
+      z: eye.z + (wanted.z - eye.z) * k,
+    };
+    // the hold is made at the grab and the tether lets go the moment it breaks
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const from = holdOnTarget(w, target)!.point;
+    const gap = distanceBetween(from, goal);
+    const reachStep = held.speed * dt;
+    const f = gap <= reachStep ? 1 : reachStep / gap;
+    setHoldPoint(w, target, {
+      x: from.x + (goal.x - from.x) * f,
+      y: from.y + (goal.y - from.y) * f,
+      z: from.z + (goal.z - from.z) * f,
+    });
   };
 
   world.addSystem({
@@ -406,6 +426,25 @@ export function installSpellTether<TInput>(
     },
   } satisfies System<TInput>);
 
+  // The remote hold breaking under the tether (jammed, overloaded, saved, taken over) ends the tether.
+  w.events.on(RemoteHoldReleased, ({ holder, target, reason }) => {
+    const held = tetherOf(holder);
+    if (held?.target === target) release(holder, reason === 'lost' ? 'lost' : 'hold-broken');
+  });
+  // A staggered caster loses its grip; leaving the scene ends the tether (objects never cross a load).
+  const staggered = (caster: EntityId): void => {
+    release(caster, 'staggered');
+  };
+  w.events.on(PoiseBroken, ({ target }) => {
+    staggered(target);
+  });
+  w.events.on(HitReaction, ({ entity, reaction }) => {
+    if (reactionRank(reaction) >= reactionRank('stagger')) staggered(entity);
+  });
+  w.events.on(areaTransition, ({ entity }) => {
+    release(entity, 'exit');
+  });
+
   w.events.on(ChannelEnded, ({ caster, spell }) => {
     if (tetherOf(caster)?.spell === spell) release(caster, 'channel-ended', false);
   });
@@ -416,7 +455,11 @@ export function installSpellTether<TInput>(
     use,
     canUse: (caster) => {
       const held = usableTether(caster);
-      return held !== undefined && remoteAffordance(w, caster, held.target) !== undefined;
+      return (
+        held !== undefined &&
+        actuatable(held.target) &&
+        remoteAffordance(w, caster, held.target) !== undefined
+      );
     },
     release: (caster) => release(caster, 'player'),
   };

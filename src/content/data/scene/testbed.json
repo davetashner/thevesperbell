@@ -247,6 +247,7 @@
       "id": "room-lever",
       "at": [0, 0, 1],
       "prop": "lever",
+      "properties": { "remoteActuatable": true },
       "interact": {
         "affordances": [{ "verb": "pull", "label": "Pull lever" }],
         "anchor": [0, 0.35, 0],
