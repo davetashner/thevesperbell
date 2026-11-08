@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   autoSkin,
+  bindRegion,
   fitSegments,
   restSegments,
   SKIN_INFLUENCES,
@@ -174,5 +175,64 @@ describe('autoSkin', () => {
     // leg's tail end is the closest point and still dominates.
     const skin = autoSkin([0, -5, 0], [LEG, ARM]);
     expect(weightOf(skin, 0, 0)).toBeGreaterThan(weightOf(skin, 0, 1));
+  });
+});
+
+describe('bindRegion (mw-a6t)', () => {
+  const sum = (skin: ReturnType<typeof autoSkin>, vertex: number) => {
+    let total = 0;
+    for (let i = 0; i < SKIN_INFLUENCES; i++)
+      total += skin.weights[vertex * SKIN_INFLUENCES + i] ?? 0;
+    return total;
+  };
+  // Two vertices on the arm, one near the hand end and one near the shoulder.
+  const positions = [0.45, 1.5, 0, 0.05, 1.5, 0];
+  const bones: BoneSegment[] = [ARM, LEG, { head: [0.5, 1.5, 0], tail: [0.5, 1.5, 0] }];
+
+  it('moves a whole vertex to the bone and leaves the rest alone', () => {
+    const skin = autoSkin(positions, bones, new Set([2]));
+    const before = weightOf(skin, 1, 0);
+    bindRegion(skin, positions, 2, (x) => (x > 0.3 ? 1 : 0));
+    expect(weightOf(skin, 0, 2)).toBeCloseTo(1, 6);
+    expect(weightOf(skin, 0, 0)).toBeCloseTo(0, 6);
+    expect(weightOf(skin, 1, 2)).toBe(0);
+    expect(weightOf(skin, 1, 0)).toBe(before);
+  });
+
+  it('blends a part share in and keeps every vertex summing to 1', () => {
+    const skin = autoSkin(positions, bones, new Set([2]));
+    const arm = weightOf(skin, 0, 0);
+    bindRegion(skin, positions, 2, () => 0.25);
+    expect(weightOf(skin, 0, 2)).toBeCloseTo(0.25, 6);
+    expect(weightOf(skin, 0, 0)).toBeCloseTo(arm * 0.75, 6);
+    expect(sum(skin, 0)).toBeCloseTo(1, 6);
+    expect(sum(skin, 1)).toBeCloseTo(1, 6);
+    // Binding again grows the bone's own share towards 1 instead of adding a second slot.
+    bindRegion(skin, positions, 2, () => 0.5);
+    expect(weightOf(skin, 0, 2)).toBeCloseTo(0.25 + 0.75 * 0.5, 6);
+    expect(sum(skin, 0)).toBeCloseTo(1, 6);
+  });
+
+  it('replaces the lightest influence when all four are in use, and clamps shares to 0..1', () => {
+    const many: BoneSegment[] = [
+      ARM,
+      LEG,
+      ARM,
+      LEG,
+      ARM,
+      { head: [0.5, 1.5, 0], tail: [0.5, 1.5, 0] },
+    ];
+    const skin = autoSkin([0.2, 1.4, 0], many, new Set([5]));
+    bindRegion(skin, [0.2, 1.4, 0], 5, () => 7);
+    expect(weightOf(skin, 0, 5)).toBeCloseTo(1, 6);
+    expect(sum(skin, 0)).toBeCloseTo(1, 6);
+    bindRegion(skin, [0.2, 1.4, 0], 5, () => -3);
+    expect(weightOf(skin, 0, 5)).toBeCloseTo(1, 6);
+  });
+
+  it('leaves a vertex that already belongs wholly to the bone as it is', () => {
+    const skin = autoSkin([0.2, 1.4, 0], [ARM]);
+    bindRegion(skin, [0.2, 1.4, 0], 0, () => 0.5);
+    expect(weightOf(skin, 0, 0)).toBeCloseTo(1, 6);
   });
 });
