@@ -40,6 +40,7 @@ import {
   type LoadedScene,
   type LockLookup,
   type MaterialPresets,
+  type PlateOptions,
   type SceneLayout,
   type SceneMechanisms,
   type SignalGraphDef,
@@ -112,6 +113,18 @@ export interface StartMechanismsOptions {
 export const PLAYER_TAG = 'player';
 
 /**
+ * What pressure plates read beyond properties (mw-e03.19): the gravity a thing feels (remote holds
+ * and gravity zones) and the armour and shield an actor wears.
+ */
+export function plateOptions(content: Content): PlateOptions {
+  const equipment = new EquipmentRules(content.all('item'), content.all('class'));
+  return {
+    gravityScale: gravityScaleOf,
+    gear: (world, actor) => equipment.wornKg(world, actor),
+  };
+}
+
+/**
  * Installs signals (unless installed) and mechanisms in `world` and makes `loaded`'s doors, switches
  * and signal graphs. Call between steps, once, after the player is set up.
  */
@@ -129,15 +142,11 @@ export function startMechanisms<T>(
   if (options.player !== undefined && loaded.layout.signals.length > 0) {
     tagEntity(sim, options.player, PLAYER_TAG);
   }
-  const equipment = new EquipmentRules(content.all('item'), content.all('class'));
   installMechanisms(world, {
     colliders: options.colliders,
     occluders: options.occluders,
     keys: keyring(new InventoryRules(content.all('item'))),
-    plates: {
-      gravityScale: gravityScaleOf,
-      gear: (actors, actor) => equipment.wornKg(actors as unknown as World, actor),
-    },
+    plates: plateOptions(content),
   });
   return addSceneMechanisms(world, loaded, {
     doors: doorProfiles(content),
