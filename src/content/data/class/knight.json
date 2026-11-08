@@ -33,6 +33,7 @@
   },
   "proficiencies": ["blades", "maces", "shields", "light-armor", "medium-armor", "heavy-armor"],
   "armorCapacityKg": 30,
+  "carryLimitKg": 25,
   "stats": {
     "health": 120,
     "stamina": 100,

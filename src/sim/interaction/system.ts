@@ -162,6 +162,8 @@ export function affordancesOf(world: World<never>, entity: EntityId): readonly A
   return derived.length === 0 ? declared : [...declared, ...derived];
 }
 
+const NO_FILTERS: readonly FocusFilter[] = Object.freeze([]);
+
 const NO_KIT: InteractorKit = Object.freeze({ capabilities: [], items: [] });
 
 /**
@@ -188,6 +190,28 @@ export function addAffordanceGate<TInput>(world: World<TInput>, gate: Affordance
   list.push(gate);
   return () => {
     const at = list.indexOf(gate);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
+/**
+ * A rule that takes an object out of an actor's focus altogether: true when `target` must never be
+ * focused by `actor` right now (the crate it is carrying, which would otherwise hide whatever lies
+ * behind it). Like gates, filters are rules, not state, and must only read the world.
+ */
+export type FocusFilter = (world: World<never>, actor: EntityId, target: EntityId) => boolean;
+
+const focusFilters = new WeakMap<World<never>, FocusFilter[]>();
+
+/** Adds `filter` to `world`'s focus (see `FocusFilter`). Returns a function that removes it. */
+export function addFocusFilter<TInput>(world: World<TInput>, filter: FocusFilter): () => void {
+  const w: World<never> = world;
+  let own = focusFilters.get(w);
+  if (own === undefined) focusFilters.set(w, (own = []));
+  const list = own;
+  list.push(filter);
+  return () => {
+    const at = list.indexOf(filter);
     if (at >= 0) list.splice(at, 1);
   };
 }
@@ -345,9 +369,11 @@ export function interactionSystem<TInput>(
     all: readonly EntityId[],
     current: EntityId | null,
   ): ScoredFocus | undefined => {
+    const filters = focusFilters.get(world) ?? NO_FILTERS;
     const scored: ScoredFocus[] = [];
     for (const entity of all) {
       if (entity === actor || !isRevealed(world, entity)) continue;
+      if (filters.some((excluded) => excluded(world, actor, entity))) continue;
       const placement = world.get(entity, PlacementComponent);
       if (placement === undefined) continue;
       const range = world.get(entity, InteractableComponent)?.range ?? settings.range;

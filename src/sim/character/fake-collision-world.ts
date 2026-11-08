@@ -194,6 +194,7 @@ export class FakeCollisionWorld implements CollisionWorld {
     feet: Vec3,
     direction: Vec3,
     maxDistance: number,
+    ignore?: BodyId,
   ): CollisionHit | undefined {
     const { radius } = capsule;
     const core = Math.max(0, capsule.height - 2 * radius);
@@ -202,7 +203,7 @@ export class FakeCollisionWorld implements CollisionWorld {
     const [lo, hi] = bounds(base, end, core, radius);
     let best: CollisionHit | undefined;
     this.bodies.forEach((body, index) => {
-      if (!this.touchesBounds(body, lo, hi)) return;
+      if (index + 1 === ignore || !this.touchesBounds(body, lo, hi)) return;
       const planes = this.worldPlanes(body);
       // Plane i, pushed out by the radius, in (s, t): (n·d)s + (n.y)t ≤ c + r − n·base.
       const faces: Face[] = planes.map(({ n, c }) => ({

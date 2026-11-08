@@ -189,6 +189,21 @@ function placeAhead(s: Setup, defId: string, d = 1, extra: { count?: number } = 
 const pack = (s: Setup) => inventoryOf(s.sim, s.actor)?.items ?? [];
 const worldItems = (s: Setup) => s.world.query(WorldItemComponent).ids();
 
+describe('world items while the hands are busy (mw-e02.17)', () => {
+  it('the pack ignores Drop and Throw while the actor carries something else', () => {
+    let busy = true;
+    const s = setup({ install: { busy: () => busy } });
+    s.items.inventory.add(s.sim, s.actor, 'arming-sword', 1);
+    s.world.step([frame('drop')]);
+    s.world.step([frame('throw')]);
+    expect(s.dropped).toEqual([]);
+    expect(pack(s)).toHaveLength(1);
+    busy = false;
+    s.world.step([frame('drop')]);
+    expect(pack(s)).toHaveLength(0);
+  });
+});
+
 describe('world items (mw-e17.7)', () => {
   it('AC-1: interacting with an item in range adds it to the inventory and despawns it in the same tick', () => {
     const s = setup();

@@ -48,6 +48,7 @@ import {
   prepareConsumables,
   prepareWorldItems,
   startConsumables,
+  startCarry,
   startWorldItems,
 } from '@game/items/index';
 import { hasContainers, prepareContainers, startContainers } from '@game/items/containers';
@@ -353,6 +354,8 @@ export function createGameWorld<TInput>(
   // World items (mw-e17.7): the scene's items, taken with Interact, dropped and thrown.
   const items = prepareWorldItems(content);
   startWorldItems(world, items, scene.spawns, player);
+  // Carrying (mw-e02.17): liftable objects, as src/main.ts starts them.
+  startCarry(world, content, collision);
   // Consumables (mw-e17.6): the use pipeline and the player's quick slots.
   const consumables = prepareConsumables(content, items);
   startConsumables(world, consumables, player);

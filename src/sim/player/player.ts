@@ -47,6 +47,7 @@
 import type { ControllerTuning, Frozen, MoveTable, RuntimeShield } from '@content/index';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
+import { carryRestraint } from '../carry/state';
 import { radians } from '../character/greybox';
 import {
   CharacterController,
@@ -758,15 +759,25 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         const frame = actionFrameOf(inputs);
         const look = world.get(entity, PlayerLook);
         if (frame === undefined || look === undefined) return undefined;
-        const actions =
+        const carrying = carryRestraint(world, entity);
+        const fought =
           combat === undefined
+            ? undefined
+            : {
+                scale: combatLocomotionScale(world, entity, combat),
+                noJump:
+                  combat.melee !== undefined && isAttacking(world, entity, combat.moves)
+                    ? true
+                    : undefined,
+              };
+        // What the carrier holds slows it on top of any combat restraint (ADR-0003: they stack).
+        const actions =
+          fought === undefined && carrying === undefined
             ? frame
             : restrainMovement(
                 frame,
-                combatLocomotionScale(world, entity, combat),
-                combat.melee !== undefined && isAttacking(world, entity, combat.moves)
-                  ? true
-                  : undefined,
+                (fought?.scale ?? 1) * (carrying?.scale ?? 1),
+                fought?.noJump === true || carrying?.noJump === true ? true : undefined,
               );
         const motion = combat && world.get(entity, DodgeComponent)?.velocity;
         const anchor = world.get(entity, ViewAnchor);
