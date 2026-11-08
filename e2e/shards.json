@@ -21,6 +21,8 @@
     "death-reload.spec.ts": 113,
     "death-respawn.spec.ts": 90.6,
     "debug-console.spec.ts": 70.3,
+    "element-perf.spec.ts": 0,
+    "element-states.spec.ts": 26,
     "gamepad.spec.ts": 58.9,
     "inventory.spec.ts": 31.5,
     "items.spec.ts": 22.7,

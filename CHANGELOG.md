@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Burning, wet, frozen and charged things now read at a glance: flames rise off burning objects, soaked ones darken and drip, frozen ones turn icy with drifting frost, charged ones shimmer and throw sparks, and smoke and steam hang in the air as clouds.
 - The knight now carries his sword at the low-ready, elbow bent and the blade angled out and away from his body, instead of hanging straight down beside his leg; attacks, blocks and dodges start from and return to it (mw-a6t).
 - The battle music now begins on the first strong hit, 1.75 seconds into the track, instead of from its very start (mw-03t).
 - The music now changes on the beat: going into a fight, the explore music crossfades into the battle music on the next bar line over one bar (equal-power, no abrupt cut or volume jump), and out of it over two bars once nothing has been fighting for 4 seconds. The adaptive music controller also supports tension and stealth layers and plays alert stingers on the next beat.

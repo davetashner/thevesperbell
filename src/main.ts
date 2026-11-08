@@ -9,7 +9,9 @@ import {
   listenerPose,
 } from '@audio/index';
 import {
+  compileElementFeedback,
   controllerTuningFor,
+  ELEMENT_FEEDBACK_ID,
   GAME_CONFIG_ID,
   loadGameContent,
   materialPresets,
@@ -234,6 +236,10 @@ import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
 import {
   DamageVignette,
+  type CombinedLook,
+  ElementFeedbackBridge,
+  GasFieldPresenter,
+  pulseFactor,
   SwingTrails,
   trailTints,
   vfxTextureManifest,
@@ -265,7 +271,7 @@ import { pickVariant, randomSalt, variantFromSearch } from '@render/creatures/va
 import { createHitVolumeOverlay } from '@render/debug/hit-volumes';
 import { applyEnvironment } from '@render/environment/index';
 import { applyLook, lookAt, type TimeOfDayLook } from '@game/light/time-of-day';
-import { Color } from 'three';
+import { Color, type Object3D } from 'three';
 import { createGreyboxView } from '@render/greybox/index';
 import { createLightRig } from '@render/light/index';
 import { AnimationController, compileGraph } from '@render/animation/index';
@@ -278,6 +284,7 @@ import {
 } from '@render/player/index';
 import { anyHiddenByBody, CameraShake } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
+import { ElementLooks } from '@render/element-look';
 import { createTrailRenderer } from '@render/vfx/trails';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
@@ -318,6 +325,7 @@ import {
   creaturesInstalled,
   CreatureComponent,
   PlacementComponent,
+  elementFieldOf,
   registerPersistence,
   installSlainFacts,
   registerSceneComponents,
@@ -863,6 +871,52 @@ function startRenderer(
       locate: vfxAnchor,
       now: () => performance.now(),
     });
+    // Element state feedback (mw-e03.28): burning, wet, frozen and charged things get their VFX,
+    // mesh look and cue from the element-feedback table, by property, never entity type. Gas in
+    // the element field (smoke, steam) is drawn as clouds. Both read the sim and never write to it.
+    const elementTable = compileElementFeedback(
+      content.get('element-feedback', ELEMENT_FEEDBACK_ID),
+    );
+    const motionReduced = (): boolean => reducedMotion(ui.element, (q) => globalThis.matchMedia(q));
+    const elements = new ElementFeedbackBridge({
+      table: elementTable,
+      vfx,
+      events: world.events,
+      isAlive: (entity) => world.isAlive(entity),
+      boundsOf: (entity) => {
+        const placement = world.get(entity, PlacementComponent);
+        const at = placement ?? vfxAnchor(entity)?.position;
+        return at === undefined
+          ? undefined
+          : {
+              position: { x: at.x, y: at.y, z: at.z },
+              radius: placement?.radius ?? 0,
+            };
+      },
+      reducedMotion: motionReduced,
+      playCue: (cue, entity) => {
+        if (sounds.get(cue) !== undefined && audio.context?.state === 'running') {
+          audio.play(cue, { entity });
+        }
+      },
+    });
+    elements.attach();
+    const gasClouds = new GasFieldPresenter({
+      rules: elementTable.fields,
+      vfx,
+      field: () => {
+        try {
+          return elementFieldOf(world);
+        } catch {
+          return undefined;
+        }
+      },
+      reducedMotion: motionReduced,
+    });
+    const elementLooks = new ElementLooks();
+    let publishedElements = '';
+    // ?elements publishes the element feedback counters on #app[data-elements] (the e2e probe).
+    const elementsProbe = new URLSearchParams(location.search).has('elements');
     // Textures load by asset id from the texture manifest: generated placeholders (mw-e29.2) until
     // approved art replaces them under the same ids.
     const vfxView = createVfxRenderer(view.scene, {
@@ -1193,6 +1247,34 @@ function startRenderer(
         }
         showControls();
         vfxDemo?.update(elapsedMs / 1000);
+        elements.update(camera.position);
+        gasClouds.update(elapsedMs / 1000, camera.position);
+        const looked = new Map<Object3D, CombinedLook>();
+        for (const [entity, look] of elements.looks()) {
+          const object = sync.objectOf(entity) as Object3D | undefined;
+          if (object !== undefined) looked.set(object, look);
+        }
+        const reducedLooks = motionReduced();
+        elementLooks.sync(looked, (look) =>
+          pulseFactor((look as CombinedLook).pulseHz, timeMs / 1000, reducedLooks),
+        );
+        if (elementsProbe) {
+          const json = JSON.stringify({
+            ...elements.stats(),
+            clouds: gasClouds.clouds,
+            looks: elementLooks.size,
+            vfx: vfx.stats().effects,
+            // Loose bodies the e2e can put into states, with where they sit.
+            objects: world
+              .query(PhysicsObjectComponent)
+              .ids()
+              .map((id) => {
+                const at = world.get(id, PlacementComponent);
+                return { id, x: at?.x ?? 0, y: at?.y ?? 0, z: at?.z ?? 0 };
+              }),
+          });
+          if (json !== publishedElements) root.dataset['elements'] = publishedElements = json;
+        }
         vfx.update(elapsedMs / 1000, camera.position);
         vfxView.draw(vfx.batches, vfx.markers);
         if (swingTrails !== undefined) {

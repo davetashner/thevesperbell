@@ -510,6 +510,19 @@ export {
   type StatusStackRule,
 } from './types/status.ts';
 export {
+  compileElementFeedback,
+  ELEMENT_FEEDBACK_ID,
+  elementFeedbackSchema,
+  MAX_ELEMENT_HANDLES,
+  type ElementFeedbackDef,
+  type ElementFeedbackDefInput,
+  type ElementFeedbackEntry,
+  type ElementFeedbackTable,
+  type ElementFieldRule,
+  type ElementLookDef,
+  type ElementStateRule,
+} from './types/element-feedback.ts';
+export {
   HIT_STOP_ID,
   HIT_STOP_TIERS,
   MAX_HIT_STOP_TICKS,
