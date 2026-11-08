@@ -72,6 +72,11 @@ export const CUE_EVENTS = {
       shield: 'string',
       /** Hurtbox region struck, e.g. "head". */
       region: 'string',
+      /**
+       * The struck creature's `audio.hurt` cue (mw-e28.8), only for a clean hit that left it alive:
+       * a rule plays it with `cue: "{creatureHurt}"`.
+       */
+      creatureHurt: 'string',
       tags: 'list',
       immune: 'boolean',
       died: 'boolean',
@@ -82,11 +87,27 @@ export const CUE_EVENTS = {
   },
   PoiseBroken: {
     anchors: ['target', 'instigator', 'source'],
-    facts: { target: 'string', targetMaterial: 'string' },
+    /** `creaturePoiseBreak` is the creature's `audio.poiseBreak` cue (mw-e28.8). */
+    facts: { target: 'string', targetMaterial: 'string', creaturePoiseBreak: 'string' },
   },
   Died: {
     anchors: ['target', 'killer', 'source'],
-    facts: { target: 'string', targetMaterial: 'string', tags: 'list' },
+    /** `creatureDeath` is the creature's `audio.death` cue (mw-e28.8). */
+    facts: {
+      target: 'string',
+      targetMaterial: 'string',
+      tags: 'list',
+      creatureDeath: 'string',
+    },
+  },
+  aiAlertStateChanged: {
+    anchors: ['entity'],
+    /**
+     * A creature's alert state changed (mw-e11.7): `from` and `to` are alert states ("unaware",
+     * "suspicious", "investigating", "searching", "alerted", "combat"), `cause` why; `bark` is its
+     * `audio.alertBark` cue (mw-e28.8): a rule plays it with `cue: "{bark}"`.
+     */
+    facts: { from: 'string', to: 'string', cause: 'string', bark: 'string' },
   },
   HitParried: {
     /** `entity` is the parrier (mw-e04.12), `attacker` whose swing it deflected. */
@@ -130,6 +151,8 @@ export const CUE_EVENTS = {
       surface: 'string',
       /** Armour weight class of the character's armour layer, e.g. "plate", when it wears one. */
       armor: 'string',
+      /** A creature's own `audio.footsteps` cue (mw-e28.8), on its footsteps: layered over the surface's. */
+      creatureSteps: 'string',
       /** "light" or "heavy" (landings; heavy from the default hard-landing impact speed). */
       landing: 'string',
       /** Downward speed at touchdown, m/s (landings): scale volume by it. */
@@ -146,7 +169,8 @@ export const CUE_EVENTS = {
     /**
      * A creature move's windup reads (mw-e04.20). `telegraph` is the attack's own telegraph cue id;
      * `telegraphSound` is the sound it plays: the move's declared telegraph audio cue, else
-     * `sfx-telegraph-{telegraph}` (a rule plays it with `cue: "{telegraphSound}"`); `telegraphVfx`
+     * the attacker creature's `audio.telegraph` (`audio.unblockableTelegraph` for an unblockable move
+     * or grab, mw-e28.8), else `sfx-telegraph-{telegraph}` (a rule plays it with `cue: "{telegraphSound}"`); `telegraphVfx`
      * is the move's declared telegraph VFX cue, absent when it declares none; `unblockable` marks an
      * unblockable move or a grab, `parryable` a move a parry deflects.
      */

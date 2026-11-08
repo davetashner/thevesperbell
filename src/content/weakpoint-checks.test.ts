@@ -10,6 +10,15 @@ const creatureText = (regions: unknown) =>
     stats: { health: 100, poise: 10, mass: 100, size: 'large' },
     senses: { base: 'undead' },
     locomotion: { base: 'goblin' },
+    audio: {
+      idleLoop: 'sfx-beast-idle',
+      footsteps: 'sfx-beast-step',
+      alertBark: 'sfx-beast-bark-alert',
+      telegraph: 'sfx-beast-telegraph',
+      hurt: 'sfx-beast-hurt',
+      poiseBreak: 'sfx-beast-stagger',
+      death: 'sfx-beast-death',
+    },
     regions,
   });
 

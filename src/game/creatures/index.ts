@@ -69,6 +69,7 @@ import { installCreatureAi, type CreatureAi, type CreatureAiOptions } from './ai
 import type { RenderSync, SceneBinding } from '../loop/render-sync';
 
 export * from './ai';
+export * from './creature-audio';
 export * from './drops';
 export * from './presence';
 export * from './save-veto';

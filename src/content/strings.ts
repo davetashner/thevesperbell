@@ -10,6 +10,8 @@ const CAPTION_STRINGS = {
   'caption.format': '[{sound}, {direction}]',
   'caption.footsteps': 'Footsteps',
   'caption.telegraph': 'Attack incoming',
+  'caption.telegraph-unblockable': 'Unblockable attack incoming',
+  'caption.alert-bark': 'Alert bark',
   'caption.noise-rattle': 'Rattling',
   'caption.door-open': 'Door opening',
   'caption.door-close': 'Door closing',

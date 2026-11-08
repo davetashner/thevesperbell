@@ -37,3 +37,11 @@ export {
   type ShopStingersOptions,
   type StingerEngine,
 } from './shop-stingers.ts';
+export {
+  AlertStingerHooks,
+  STINGER_ALERT_STATES,
+  type AlertStingerHooksOptions,
+  type MusicStinger,
+  type MusicStingerListener,
+  type StingerAlertState,
+} from './stinger-hooks.ts';

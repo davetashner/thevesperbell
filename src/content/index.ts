@@ -208,6 +208,14 @@ export {
   type RuntimeCreature,
 } from './types/creature.ts';
 export {
+  CREATURE_AUDIO_SLOTS,
+  CREATURE_CUE_PATTERN,
+  creatureAudioSchema,
+  type CreatureAudio,
+  type CreatureAudioSlot,
+} from './types/creature-audio.ts';
+export { CREATURE_AUDIO_MIN_LEAD_TICKS } from './creature-audio-checks.ts';
+export {
   DEFAULT_ENVIRONMENT_DAMAGE_ID,
   HAZARD_PROPERTIES,
   environmentDamageSchema,

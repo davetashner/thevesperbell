@@ -4,9 +4,10 @@
 // here fails typecheck; events.test.ts checks every reader only produces declared facts of the
 // declared kind. Readers only read: payloads and, through `CueLookups`, an entity's material.
 
-import type { CueDirection, CueEventName } from '@content/index';
+import type { CreatureAudio, CueDirection, CueEventName } from '@content/index';
 import {
   ActionPhaseChanged,
+  AlertStateChanged,
   ActionRejected,
   AttackEnded,
   AttackHit,
@@ -89,6 +90,8 @@ export interface CueLookups {
   readonly armorOf?: (entity: EntityId) => string | undefined;
   /** An arrow's own presentation cues (its content `cues`: trail, flight and impact). */
   readonly arrowCuesOf?: (arrow: string) => ArrowCues | undefined;
+  /** A creature's audio slots (content `audio`, mw-e28.8); absent for anything that is no creature. */
+  readonly creatureAudioOf?: (entity: EntityId) => CreatureAudio | undefined;
   /** The horizontal way an entity faces (its combat facing), for directions a payload lacks. */
   readonly facingOf?: (entity: EntityId) => Vec3 | undefined;
 }
@@ -219,7 +222,10 @@ const facing = (look: CueLookups, entity: EntityId | null): Vec3 | undefined =>
  * The sound a creature telegraph plays (mw-e04.20): its move's declared telegraph audio cue, else
  * the attack's telegraph cue as `sfx-telegraph-<cue>`.
  */
-export const telegraphSound = (e: TelegraphInfo): string => e.audioCue ?? `sfx-telegraph-${e.cue}`;
+export const telegraphSound = (e: TelegraphInfo, audio?: CreatureAudio): string =>
+  e.audioCue ??
+  (e.unblockable ? audio?.unblockableTelegraph : audio?.telegraph) ??
+  `sfx-telegraph-${e.cue}`;
 
 const entityOnly = (payload: { entity: EntityId }): CueReading => ({
   anchors: { entity: { entity: payload.entity } },
@@ -243,6 +249,7 @@ export const CUE_EVENT_BINDINGS: Readonly<Record<CueEventName, CueEventBinding>>
         contact: contactOf(e),
         shield: e.tags.includes(DAMAGE_TAGS.blocked) ? look.shieldOf?.(e.target) : undefined,
         region: e.packet.region,
+        creatureHurt: e.died || e.immune ? undefined : look.creatureAudioOf?.(e.target)?.hurt,
         tags: e.tags,
         immune: e.immune,
         died: e.died,
@@ -255,11 +262,27 @@ export const CUE_EVENT_BINDINGS: Readonly<Record<CueEventName, CueEventBinding>>
   }),
   PoiseBroken: bind(PoiseBroken, (e, look) => ({
     anchors: { target: { entity: e.target }, instigator: at(e.instigator), source: at(e.source) },
-    facts: materialFacts('target', e.target, look),
+    facts: {
+      ...materialFacts('target', e.target, look),
+      creaturePoiseBreak: look.creatureAudioOf?.(e.target)?.poiseBreak,
+    },
   })),
   Died: bind(Died, (e, look) => ({
     anchors: { target: { entity: e.target }, killer: at(e.killer), source: at(e.source) },
-    facts: { ...materialFacts('target', e.target, look), tags: e.tags },
+    facts: {
+      ...materialFacts('target', e.target, look),
+      tags: e.tags,
+      creatureDeath: look.creatureAudioOf?.(e.target)?.death,
+    },
+  })),
+  aiAlertStateChanged: bind(AlertStateChanged, (e, look) => ({
+    anchors: { entity: { entity: e.entity } },
+    facts: {
+      from: e.from,
+      to: e.to,
+      cause: e.cause,
+      bark: look.creatureAudioOf?.(e.entity)?.alertBark,
+    },
   })),
   HitParried: bind(HitParried, (e, look) => ({
     anchors: { entity: { entity: e.entity }, attacker: at(e.attacker), source: at(e.source) },
@@ -290,6 +313,8 @@ export const CUE_EVENT_BINDINGS: Readonly<Record<CueEventName, CueEventBinding>>
           landing: landingWeight(e.impactSpeed),
         }),
         surface: grounded ? stepSurface(e, look) : undefined,
+        creatureSteps:
+          e.kind === 'footstep' ? look.creatureAudioOf?.(e.entity)?.footsteps : undefined,
         armor: look.armorOf?.(e.entity),
       },
     };
@@ -298,13 +323,13 @@ export const CUE_EVENT_BINDINGS: Readonly<Record<CueEventName, CueEventBinding>>
     anchors: { entity: { entity: e.entity } },
     facts: { speed: e.speed },
   })),
-  TelegraphStarted: bind(TelegraphStarted, (e) => ({
+  TelegraphStarted: bind(TelegraphStarted, (e, look) => ({
     anchors: { attacker: { entity: e.attacker } },
     facts: {
       attack: e.attack,
       move: e.move,
       telegraph: e.cue,
-      telegraphSound: telegraphSound(e),
+      telegraphSound: telegraphSound(e, look.creatureAudioOf?.(e.attacker)),
       telegraphVfx: e.vfxCue ?? undefined,
       parryable: e.parryable,
       unblockable: e.unblockable,

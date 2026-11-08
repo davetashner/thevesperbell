@@ -18,5 +18,14 @@
   },
   "needs": { "sleep": { "ratePerMinute": 1, "threshold": 80 } },
   "behaviour": { "profile": "fixture-guard" },
+  "audio": {
+    "idleLoop": "sfx-fixture-guard-idle",
+    "footsteps": "sfx-fixture-guard-step",
+    "alertBark": "sfx-fixture-guard-bark-alert",
+    "telegraph": "sfx-telegraph-fixture-guard-strike-windup",
+    "hurt": "sfx-fixture-guard-hurt",
+    "poiseBreak": "sfx-fixture-guard-stagger",
+    "death": "sfx-fixture-guard-death"
+  },
   "presentation": { "mesh": "placeholder-capsule", "sfx": "placeholder" }
 }

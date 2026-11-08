@@ -437,6 +437,15 @@
       "caption": "caption.telegraph"
     },
     {
+      "event": "TelegraphStarted",
+      "match": {
+        "unblockable": true
+      },
+      "cue": "{telegraphSound}",
+      "priority": 95,
+      "caption": "caption.telegraph-unblockable"
+    },
+    {
       "event": "ActionRejected",
       "match": {
         "reason": "stamina"

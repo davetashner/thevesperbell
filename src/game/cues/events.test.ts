@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CUE_EVENT_NAMES, cueDirections, cueEventSpec, type CueEventName } from '@content/index';
-import { CUE_EVENT_BINDINGS, type CueLookups, type CueReading } from './events.ts';
+import type { TelegraphInfo } from '@sim/index';
+import { CUE_EVENT_BINDINGS, telegraphSound, type CueLookups, type CueReading } from './events.ts';
 
 const MATERIALS: Record<number, string> = { 1: 'bone', 2: 'iron', 3: 'dry-wood' };
 const CLASSES: Record<string, string> = { iron: 'metal', bone: 'bone', stone: 'stone' };
@@ -65,6 +66,13 @@ const SAMPLES: Record<CueEventName, unknown> = {
     died: false,
   },
   PoiseBroken: { tick: 1, target: 1, instigator: 4, source: null },
+  aiAlertStateChanged: {
+    tick: 1,
+    entity: 4,
+    from: 'suspicious',
+    to: 'alerted',
+    cause: 'event:saw-target',
+  },
   GuardBroken: { tick: 1, entity: 1, instigator: 4, source: null, staggerTicks: 60 },
   HitParried: { tick: 1, entity: 1, attacker: 4, source: null, parriedTicks: 90 },
   DodgedHit: hitbox,
@@ -695,5 +703,56 @@ describe('cue event bindings', () => {
     const trap = read('ArrowFired', { ...(SAMPLES.ArrowFired as object), shooter: null }, bare);
     expect(trap.anchors['shooter']).toBeUndefined();
     expect(trap.facts).toMatchObject({ arrow: 'water', trail: undefined });
+  });
+
+  it('mw-e28.8: creature slots read as facts: bark, hurt, poise break, death, steps and telegraphs', () => {
+    const audio = {
+      idleLoop: 'sfx-t-idle',
+      footsteps: 'sfx-t-step',
+      alertBark: 'sfx-t-bark',
+      telegraph: 'sfx-t-tele',
+      unblockableTelegraph: 'sfx-t-tele-heavy',
+      hurt: 'sfx-t-hurt',
+      poiseBreak: 'sfx-t-stagger',
+      death: 'sfx-t-death',
+    };
+    const creature = { ...lookups, creatureAudioOf: () => audio };
+    expect(read('aiAlertStateChanged', SAMPLES.aiAlertStateChanged, creature)).toEqual({
+      anchors: { entity: { entity: 4 } },
+      facts: { from: 'suspicious', to: 'alerted', cause: 'event:saw-target', bark: 'sfx-t-bark' },
+    });
+    expect(read('Died', SAMPLES.Died, creature).facts['creatureDeath']).toBe('sfx-t-death');
+    expect(read('PoiseBroken', SAMPLES.PoiseBroken, creature).facts['creaturePoiseBreak']).toBe(
+      'sfx-t-stagger',
+    );
+    expect(read('LocomotionEvents', SAMPLES.LocomotionEvents, creature).facts).toMatchObject({
+      creatureSteps: 'sfx-t-step',
+    });
+    const land = read(
+      'LocomotionEvents',
+      { tick: 1, entity: 4, kind: 'land', impactSpeed: 3 },
+      creature,
+    );
+    expect(land.facts['creatureSteps']).toBeUndefined();
+    // Hurt is for a clean hit that left it standing: not a kill, not an immune glance.
+    const damage = SAMPLES.DamageApplied as object;
+    expect(read('DamageApplied', damage, creature).facts['creatureHurt']).toBe('sfx-t-hurt');
+    expect(
+      read('DamageApplied', { ...damage, died: true }, creature).facts['creatureHurt'],
+    ).toBeUndefined();
+    expect(
+      read('DamageApplied', { ...damage, immune: true }, creature).facts['creatureHurt'],
+    ).toBeUndefined();
+    // The move's own cue wins; else the creature's slot (unblockable one for unblockable moves).
+    const tele = SAMPLES.TelegraphStarted as TelegraphInfo;
+    expect(telegraphSound(tele, audio)).toBe('sfx-t-tele');
+    expect(telegraphSound({ ...tele, unblockable: true }, audio)).toBe('sfx-t-tele-heavy');
+    expect(telegraphSound({ ...tele, audioCue: 'sfx-own' }, audio)).toBe('sfx-own');
+    expect(telegraphSound(tele)).toBe('sfx-telegraph-guard-strike-windup');
+    expect(read('TelegraphStarted', tele, creature).facts['telegraphSound']).toBe('sfx-t-tele');
+    // Nothing that is no creature has a slot.
+    expect(
+      read('aiAlertStateChanged', SAMPLES.aiAlertStateChanged, bare).facts['bark'],
+    ).toBeUndefined();
   });
 });
