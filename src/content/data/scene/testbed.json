@@ -303,21 +303,21 @@
     },
     {
       "id": "testbed-bottle",
-      "at": [0, 0, -2.5],
+      "at": [-4.25, 0, -2],
       "prop": "bottle",
       "properties": { "liftable": true },
       "breakable": { "profile": "glass-bottle" }
     },
     {
       "id": "testbed-pot",
-      "at": [-2.5, 0, -0.5],
+      "at": [-4.25, 0, -0.5],
       "prop": "clay-pot",
       "properties": { "liftable": true, "fragile": 15 },
       "breakable": { "profile": "pottery" }
     },
     {
       "id": "testbed-barrel",
-      "at": [2.5, 0, 0.5],
+      "at": [-4.25, 0, 2.5],
       "prop": "barrel",
       "properties": { "liftable": true }
     }

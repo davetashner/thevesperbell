@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { holdKey, stubPointerLock, takeControl, turnTo } from './helpers/player';
+import { holdKey, runConsole, stubPointerLock, takeControl, turnTo } from './helpers/player';
 
 // mw-e02.38 AC-1: the testbed has liftable props (a glass bottle, a clay pot, a small barrel). The
 // player lifts the bottle with Interact (E), faces the back wall and throws it by holding Throw (T);
@@ -33,12 +33,12 @@ function collectProblems(page: Page): string[] {
 
 test.setTimeout(60_000);
 
-test('AC-1: lifting the testbed bottle and throwing it at the back wall breaks it and records a noise', async ({
+test('AC-1: lifting the testbed bottle and throwing it at the west wall breaks it and records a noise', async ({
   page,
 }) => {
   const problems = collectProblems(page);
   await stubPointerLock(page);
-  await page.goto('/?scene=testbed');
+  await page.goto('/?scene=testbed&debug=1');
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-scene', 'testbed', { timeout: 5_000 });
   await expect(app).toHaveAttribute('data-player', /"grounded":true/);
@@ -46,13 +46,15 @@ test('AC-1: lifting the testbed bottle and throwing it at the back wall breaks i
   expect((await breaks(page)).broken).toEqual([]);
   expect((await breaks(page)).noises).toEqual([]);
 
-  // The bottle stands straight ahead of the start, in front of the back wall; look at it and lift it.
-  await turnTo(page, 0);
+  // The bottle stands by the west wall, off the player's usual paths: go next to it, face it (west,
+  // yaw +90 degrees) and lift it.
+  await runConsole(page, 'tp -3 0 -2');
+  await turnTo(page, Math.PI / 2);
   await expect(page.getByTestId('interact-prompt')).toContainText('Pick up');
   await page.keyboard.press('KeyE');
   await expect(page.getByTestId('interact-prompt')).toBeHidden();
 
-  // Throw at full charge at the back wall (z = -5).
+  // Throw at full charge at the west wall (x = -5), a metre or two ahead.
   await holdKey(page, KEY_T, 70, 60);
   await expect
     .poll(async () => (await breaks(page)).broken.map((b) => b.profile))
