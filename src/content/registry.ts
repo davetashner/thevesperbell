@@ -21,6 +21,7 @@ import { checkFacts } from './fact-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
 import { checkSceneSignals } from './mechanism-checks.ts';
 import { checkRepopulation } from './repopulation-checks.ts';
+import { checkRecoveryAnchors } from './recovery-checks.ts';
 import { checkSceneTransitions } from './transition-checks.ts';
 import { checkPuzzles } from './puzzle-checks.ts';
 import type { Catalogue, ContentCheck, EntryOf } from './loader.ts';
@@ -136,6 +137,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkClasses,
   checkSceneSignals,
   checkSceneTransitions,
+  checkRecoveryAnchors,
   checkLootTables,
   checkMerchants,
   checkNavmeshes,

@@ -21,6 +21,7 @@ import { materialPresets, type GameContent } from '@content/index';
 import {
   addSceneBreakables,
   addScenePhysics,
+  installObjectRecovery,
   at,
   BreakableComponent,
   loadScene,
@@ -139,8 +140,13 @@ export function readPhysicsObjectTransform(view: SimView, entity: EntityId): Tra
     : { position: object.position, rotation: object.rotation };
 }
 
+/** How far under a scene's lowest solid an object counts as lost, metres. */
+const RECOVERY_DEPTH = 20;
+
 export class SceneLoader<TObject, TCommand = unknown> {
   private loaded: LoadedScene | undefined;
+  private killY = -Infinity;
+  private recoveryInstalled = false;
   private readonly kit: KitLookup;
 
   constructor(private readonly options: SceneLoaderOptions<TObject, TCommand>) {
@@ -179,6 +185,7 @@ export class SceneLoader<TObject, TCommand = unknown> {
             ...(physics.levelMaterial !== undefined && { levelMaterial: physics.levelMaterial }),
           }).objects,
     );
+    if (physics !== undefined) this.watchRecoveries(loaded);
     if (physics !== undefined && world.isRegistered(BreakableComponent)) {
       addSceneBreakables(world, loaded, breakableProfiles(content));
     }
@@ -210,6 +217,20 @@ export class SceneLoader<TObject, TCommand = unknown> {
     this.options.light?.setEnvironment(loaded.layout.light);
     this.loaded = loaded;
     return loaded;
+  }
+
+  /**
+   * Quest-critical objects of `loaded` that name a recovery anchor (mw-e17.14) return to it when they
+   * fall out of the scene: the kill plane is 20 m under its lowest solid. Installed on the first such
+   * scene, so a world without any has no recovery rules.
+   */
+  private watchRecoveries(loaded: LoadedScene): void {
+    if (!loaded.layout.spawns.some((spawn) => spawn.recovery !== undefined)) return;
+    const lowest = Math.min(0, ...loaded.layout.parts.map((part) => part.min.y));
+    this.killY = lowest - RECOVERY_DEPTH;
+    if (this.recoveryInstalled) return;
+    this.recoveryInstalled = true;
+    installObjectRecovery(this.options.world, () => ({ killY: this.killY }));
   }
 
   /** Unloads the current scene, if any: entities, colliders and render objects. Call between steps. */

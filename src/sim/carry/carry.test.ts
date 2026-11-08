@@ -10,7 +10,10 @@ import { FakeCollisionWorld } from '../character/fake-collision-world';
 import { CharacterController } from '../character/system';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
+import { PoiseBroken } from '../combat/damage/events';
 import { BlameComponent } from '../combat/environment/environment';
+import { HitReaction, type HitReactionInfo } from '../combat/reactions/events';
+import type { HitReactionKind } from '../combat/reactions/components';
 import { type BreakableProfile } from '../breakables/components';
 import { breakableBroken, type BreakableBrokenInfo } from '../breakables/events';
 import { installBreakables, makeBreakable } from '../breakables/system';
@@ -42,6 +45,7 @@ import { addProperties, readProperty, registerWorldProperties } from '../propert
 import { registerSceneComponents } from '../scene/loader';
 import { TEST_SCENE, testKit } from '../scene/fixtures';
 import { layoutScene } from '../scene/layout';
+import { areaTransition } from '../scene/transitions';
 import { hashWorld } from '../snapshot';
 import { placementOf } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
@@ -54,6 +58,7 @@ import {
   DEFAULT_CARRY_TUNING,
   installCarry,
   objectPickedUp,
+  settleHeldObjects,
   objectReleased,
   pickUpRefused,
   REFUSAL_TEXT,
@@ -700,7 +705,7 @@ describe('a carrier moves slower (mw-e02.17 AC-6)', () => {
     slopeLimit: 45,
   };
 
-  function playerWorld() {
+  function playerWorld(loadScale = 1) {
     const physics = new RapierPhysics(RAPIER);
     const world = installStimuli(
       registerWorldProperties(
@@ -713,7 +718,14 @@ describe('a carrier moves slower (mw-e02.17 AC-6)', () => {
     const player = installPlayer(world, {
       spawns: LAYOUT.spawns,
       collision: new FakeCollisionWorld(LAYOUT.parts.flatMap((part) => part.collider ?? [])),
-      tuning: TUNING,
+      tuning: {
+        ...TUNING,
+        speeds: {
+          run: TUNING.speeds.run * loadScale,
+          sprint: TUNING.speeds.sprint * loadScale,
+          crouch: TUNING.speeds.crouch * loadScale,
+        },
+      },
     });
     const carry = installCarry(world);
     const feet = world.get(player, CharacterController)?.position ?? v(0, 0, 0);
@@ -763,6 +775,43 @@ describe('a carrier moves slower (mw-e02.17 AC-6)', () => {
     expect(rise(w)).toBeLessThanOrEqual(0.001);
   });
 
+  const SPRINT = actionFrame({
+    move: actionVector(0, 1),
+    look: actionVector(0, 0),
+    buttons: (action) => actionButton(action === 'sprint', action === 'sprint', false),
+  });
+
+  it('AC-7: a Heavy-load knight (run 4.5 m/s) shoulder-carrying a body runs at 2.25 m/s ± 0.01', () => {
+    // The load class's own speed multiplier is mw-e17.13's; here the Heavy ×0.9 profile (4.5 = 5 × 0.9)
+    // is the knight's run speed, and the carry's ×0.5 must stack on it, whatever the class.
+    const empty = playerWorld(0.9);
+    for (let i = 0; i < 60; i += 1) empty.world.step([WALK]);
+    expect(horizontal(empty)).toBeCloseTo(4.5, 2);
+    const heavy = playerWorld(0.9);
+    heavy.world.add(heavy.object, CarryBulkyComponent, { kind: 'body' });
+    heavy.world.step([IDLE]);
+    expect(heavy.carry.pickUp(heavy.player, heavy.object)).toEqual({ ok: true });
+    for (let i = 0; i < 60; i += 1) heavy.world.step([WALK]);
+    expect(Math.abs(horizontal(heavy) - 2.25)).toBeLessThanOrEqual(0.01);
+    // The same shoulder value for a light-load class: 5.0 × 0.5, never class-specific.
+    const light = playerWorld(1);
+    light.world.add(light.object, CarryBulkyComponent, { kind: 'body' });
+    light.world.step([IDLE]);
+    expect(light.carry.pickUp(light.player, light.object)).toEqual({ ok: true });
+    for (let i = 0; i < 60; i += 1) light.world.step([WALK]);
+    expect(Math.abs(horizontal(light) - 2.5)).toBeLessThanOrEqual(0.01);
+  });
+
+  it('AC-7: hand-carry is ×0.85 with no sprint, stacking on the load class speed', () => {
+    const w = playerWorld(0.9);
+    addProperties(w.sim, w.object, { weight: 10 });
+    w.world.step([IDLE]);
+    expect(w.carry.pickUp(w.player, w.object)).toEqual({ ok: true });
+    for (let i = 0; i < 60; i += 1) w.world.step([SPRINT]);
+    // Sprint is ignored: it is the 4.5 m/s run × 0.85, not the 6.75 m/s Heavy sprint.
+    expect(Math.abs(horizontal(w) - 4.5 * 0.85)).toBeLessThanOrEqual(0.01);
+  });
+
   it('hands carry at 85% and may still jump', () => {
     const free = playerWorld();
     for (let i = 0; i < 60; i += 1) free.world.step([WALK]);
@@ -776,6 +825,189 @@ describe('a carrier moves slower (mw-e02.17 AC-6)', () => {
     w.world.step([IDLE]);
     w.world.step([JUMP]);
     expect(rise(w)).toBeGreaterThan(1);
+  });
+});
+
+describe('carried objects at the edges (mw-e17.14)', () => {
+  const hit = (s: Setup, reaction: HitReactionKind): void => {
+    const info: HitReactionInfo = {
+      tick: s.world.tick,
+      entity: s.actor,
+      reaction,
+      direction: 'front',
+      ticks: 45,
+      interrupted: true,
+      displaced: false,
+      suppressed: null,
+      instigator: null,
+      source: null,
+    };
+    s.world.events.emit(HitReaction, info);
+  };
+
+  it('AC-1: a hit that breaks the carrier’s poise sets the crate down at its feet in the same tick', () => {
+    const s = setup();
+    const target = crate(s, 8);
+    lift(s, target);
+    s.world.step([IDLE]);
+    expect(positionOf(s, target).y).toBeCloseTo(1, 5); // riding at chest height
+    s.world.events.emit(PoiseBroken, {
+      tick: s.world.tick,
+      target: s.actor,
+      instigator: null,
+      source: null,
+    });
+    s.world.step([IDLE]);
+    expect(holdOf(s.sim, s.actor)).toBeUndefined();
+    expect(carryRestraint(s.sim, s.actor)).toBeUndefined();
+    expect(s.released.at(-1)).toMatchObject({ target, reason: 'staggered', speed: 0 });
+    // At the carrier's feet (the floor is at 0): its base rests on them, beside the carrier.
+    expect(positionOf(s, target).y).toBeCloseTo(0.2 + 0.01, 2);
+    expect(hypot(positionOf(s, target).x, positionOf(s, target).z)).toBeLessThan(1);
+    for (let i = 0; i < 30; i++) s.world.step([IDLE]);
+    expect(positionOf(s, target).y).toBeCloseTo(0.2, 1);
+  });
+
+  it('AC-1: a stagger, a knockback or a knockdown drops it too; a flinch or nothing does not', () => {
+    for (const reaction of ['stagger', 'knockback', 'knockdown'] as const) {
+      const s = setup();
+      const target = crate(s, 8);
+      lift(s, target);
+      hit(s, reaction);
+      s.world.step([IDLE]);
+      expect(holdOf(s.sim, s.actor)).toBeUndefined();
+      expect(s.released.at(-1)).toMatchObject({ target, reason: 'staggered' });
+    }
+    for (const reaction of ['flinch', 'none'] as const) {
+      const s = setup();
+      const target = crate(s, 8);
+      lift(s, target);
+      hit(s, reaction);
+      s.world.step([IDLE]);
+      expect(holdOf(s.sim, s.actor)?.target).toBe(target);
+    }
+    // Someone else staggering changes nothing, and neither does staggering with empty hands.
+    const s = setup();
+    const target = crate(s, 8);
+    lift(s, target);
+    const other = s.world.spawn();
+    s.world.events.emit(PoiseBroken, { tick: 0, target: other, instigator: null, source: null });
+    s.world.step([IDLE]);
+    expect(holdOf(s.sim, s.actor)?.target).toBe(target);
+    const free = setup();
+    free.world.events.emit(PoiseBroken, {
+      tick: 0,
+      target: free.actor,
+      instigator: null,
+      source: null,
+    });
+    free.world.step([IDLE]);
+    expect(free.released).toEqual([]);
+  });
+
+  /** The player walks into a transition volume 1.5 m ahead (−z): x ∈ [−2, 2], z ∈ [−4, −1.5]. */
+  const VOLUME = { min: v(-2, 0, -4), max: v(2, 3, -1.5) };
+  const cross = (s: Setup, volume: typeof VOLUME | undefined): void => {
+    s.world.events.emit(areaTransition, {
+      tick: s.world.tick,
+      from: 'a',
+      transition: 'north',
+      scene: 'b',
+      spawn: 'in',
+      follow: false,
+      entity: s.actor,
+      ...(volume !== undefined && { volume }),
+    });
+  };
+
+  it('AC-3: leaving the scene sets the crate down on the near side of the threshold, and the carrier carries nothing', () => {
+    const s = setup();
+    const target = crate(s, 8);
+    lift(s, target);
+    // The carrier has stepped just into the volume: its feet 0.1 m inside the near (+z) face.
+    s.world.set(s.actor, CharacterController, initialCharacterState(v(0, 0, -1.6)));
+    s.world.step([IDLE]);
+    cross(s, VOLUME);
+    s.world.step([IDLE]);
+    expect(holdOf(s.sim, s.actor)).toBeUndefined();
+    expect(s.released.at(-1)).toMatchObject({ target, reason: 'exit' });
+    const at = positionOf(s, target);
+    // Outside the volume, on the side the carrier came from, and standing on the floor.
+    expect(at.z).toBeGreaterThan(VOLUME.max.z);
+    expect(at.z).toBeLessThan(VOLUME.max.z + 1);
+    expect(at.x).toBeCloseTo(0, 5);
+    expect(at.y).toBeCloseTo(0.2 + 0.01, 2);
+    expect(s.world.isAlive(target)).toBe(true);
+  });
+
+  it('AC-3: the near side is the face the carrier is closest to, on any side', () => {
+    for (const [feet, axis, sign] of [
+      [v(1.9, 0, -3), 'x', 1],
+      [v(-1.9, 0, -3), 'x', -1],
+      [v(0, 0, -3.9), 'z', -1],
+    ] as const) {
+      const s = setup();
+      const target = crate(s, 8);
+      lift(s, target);
+      s.world.set(s.actor, CharacterController, initialCharacterState(feet));
+      s.world.step([IDLE]);
+      cross(s, VOLUME);
+      s.world.step([IDLE]);
+      const at = positionOf(s, target);
+      const bound = sign > 0 ? VOLUME.max[axis] : VOLUME.min[axis];
+      expect((at[axis] - bound) * sign).toBeGreaterThan(0);
+      expect(holdOf(s.sim, s.actor)).toBeUndefined();
+    }
+  });
+
+  it('AC-3: without a volume it is set down at the carrier’s feet; empty hands and other actors change nothing', () => {
+    const s = setup();
+    const target = crate(s, 8);
+    lift(s, target);
+    cross(s, undefined);
+    s.world.step([IDLE]);
+    expect(s.released.at(-1)).toMatchObject({ target, reason: 'exit' });
+    expect(positionOf(s, target).y).toBeCloseTo(0.2 + 0.01, 2);
+    const free = setup();
+    cross(free, VOLUME);
+    free.world.step([IDLE]);
+    expect(free.released).toEqual([]);
+  });
+
+  it('settling for a save sets what is held down at the carrier’s feet; nowhere installed is a no-op', () => {
+    const s = setup();
+    const target = crate(s, 8);
+    lift(s, target);
+    s.world.step([IDLE]);
+    settleHeldObjects(s.sim);
+    expect(holdsOf(s.sim)).toEqual([]);
+    expect(s.carry.holdOf(s.actor)).toBeUndefined();
+    expect(positionOf(s, target).y).toBeCloseTo(0.2 + 0.01, 2);
+    s.world.step([IDLE]);
+    expect(s.released.at(-1)).toMatchObject({ target, reason: 'saved' });
+    settleHeldObjects(s.sim);
+    settleHeldObjects(new World<never>({ seed: 1 }));
+  });
+
+  it('a body carried on the shoulder is set down the same way', () => {
+    const s = setup();
+    const body = crate(s, 70, {}, 0.2, 1, { kind: 'box', halfExtents: v(0.3, 0.2, 0.6) });
+    s.world.add(body, CarryBulkyComponent, { kind: 'body' });
+    lift(s, body);
+    expect(holdOf(s.sim, s.actor)?.mode).toBe('shoulder');
+    settleHeldObjects(s.sim);
+    expect(positionOf(s, body).y).toBeCloseTo(0.2 + 0.01, 2);
+  });
+
+  it('settling a hold whose carrier or object is gone just lets go', () => {
+    const s = setup();
+    const target = crate(s, 8);
+    lift(s, target);
+    s.world.destroy(s.actor);
+    s.carry.settleAll();
+    s.world.events.flush();
+    expect(holdsOf(s.sim)).toEqual([]);
+    expect(s.released.at(-1)).toMatchObject({ target, reason: 'saved' });
   });
 });
 

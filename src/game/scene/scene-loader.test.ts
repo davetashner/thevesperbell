@@ -1,12 +1,16 @@
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
-import { loadGameContent } from '@content/index';
+import { contentTypes, gameContentSources, loadContent, loadGameContent } from '@content/index';
 import {
   applyStimulus,
   BreakableComponent,
   InMemoryColliderSink,
+  objectRecovered,
   PhysicsColliderComponent,
   PhysicsObjectComponent,
   RapierPhysics,
+  RecoveryAnchorComponent,
+  teleportPhysicsObject,
+  type ObjectRecovered,
   readProperty,
   registerSceneComponents,
   SceneLayoutError,
@@ -425,5 +429,68 @@ describe('scene loader breakables (mw-e03.11)', () => {
     const plain = breakSetup({ pieces: false });
     expect(plain.sync.has(plain.wall)).toBe(false);
     expect([...plain.drawn.keys()].some((label) => label.startsWith('piece:'))).toBe(false);
+  });
+});
+
+describe('scene loader recovery anchors (mw-e17.14)', () => {
+  /** The testbed with its loose crate flagged quest-critical, anchored at grid cell [3, 0, 3]. */
+  function anchored(anchor = true) {
+    const sources = gameContentSources().map((source) => {
+      if (!source.path.endsWith('scene/testbed.json')) return source;
+      const json = JSON.parse(source.text) as { spawns: Record<string, unknown>[] };
+      const crate = json.spawns.find((spawn) => spawn['id'] === 'loose-crate');
+      if (crate !== undefined) {
+        crate['questCritical'] = true;
+        if (anchor) crate['recovery'] = [3, 0, 3];
+      }
+      return { ...source, text: JSON.stringify(json) };
+    });
+    const content = loadContent(contentTypes, sources, []);
+    const physics = new RapierPhysics(RAPIER);
+    const world = installGamePhysics(registerSceneComponents(new World({ seed: 3, physics })));
+    const loader = new SceneLoader({
+      world,
+      sync: new RenderSync(world),
+      colliders: physics,
+      content,
+      objects: { staticGeometry: () => ({}), spawn: () => ({}) },
+      binding: (object, read) => ({
+        object,
+        read,
+        apply: () => undefined,
+        dispose: () => undefined,
+      }),
+      physics: {},
+    });
+    const loaded = loader.load('testbed');
+    const crate = loaded.spawns.find((s) => s.spawn.id === 'loose-crate')?.entity ?? -1;
+    const recovered: ObjectRecovered[] = [];
+    world.events.on(objectRecovered, (e) => recovered.push(e));
+    return { world, loader, loaded, crate, recovered };
+  }
+
+  it('AC-5: a quest-critical crate thrown off the world returns to its anchor, once', () => {
+    const { world, loader, crate, recovered } = anchored();
+    expect(world.has(crate, RecoveryAnchorComponent)).toBe(true);
+    teleportPhysicsObject(world, crate, { x: 0, y: -500, z: 0 });
+    for (let i = 0; i < 5; i++) world.step();
+    expect(recovered).toHaveLength(1);
+    expect(recovered[0]).toMatchObject({ entity: crate, to: { x: 3, y: 0, z: 3 } });
+    const at = world.get(crate, PhysicsObjectComponent)?.position;
+    expect(at?.x).toBeCloseTo(3, 3);
+    expect(at?.z).toBeCloseTo(3, 3);
+    for (let i = 0; i < 30; i++) world.step();
+    expect(recovered).toHaveLength(1);
+    // Loading the scene again unloads the old crate with the rest of the scene.
+    loader.load('testbed');
+    expect(world.isAlive(crate)).toBe(false);
+  });
+
+  it('a quest-critical object with no anchor is left where it fell', () => {
+    const { world, crate, recovered } = anchored(false);
+    expect(world.isRegistered(RecoveryAnchorComponent)).toBe(false);
+    teleportPhysicsObject(world, crate, { x: 0, y: -500, z: 0 });
+    for (let i = 0; i < 5; i++) world.step();
+    expect(recovered).toEqual([]);
   });
 });

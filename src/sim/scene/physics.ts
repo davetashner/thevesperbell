@@ -26,6 +26,7 @@
 import type { EntityId } from '../core/component';
 import { at } from '../geom/vec';
 import type { World } from '../core/world';
+import { addRecoveryAnchor } from '../carry/recovery';
 import { addPhysicsObject, bindCollider } from '../physics/objects';
 import type { ColliderHandle } from '../physics/static-colliders';
 import {
@@ -116,6 +117,7 @@ export function addScenePhysics<T>(
     const body = spawn.prop === undefined ? undefined : options.props(spawn.prop);
     if (body !== undefined) {
       addPropPhysics(sim, entity, body, options.materials, spawn.position, spawn.rotation, own);
+      if (spawn.recovery !== undefined) addRecoveryAnchor(sim, entity, spawn.recovery);
       objects.push(entity);
     } else if (Object.keys(own).length > 0) {
       addMaterialProperties(sim, entity, options.materials, own);
