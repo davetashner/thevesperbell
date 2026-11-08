@@ -14,6 +14,12 @@ import type { CreatureLeash } from '../creatures/components';
 import type { InteractableSpec } from '../interaction/affordance';
 import type { LightEnvironment } from '../light/field';
 import type { DoorHinge, DoorSwing, SwitchKind } from '../mechanisms/components';
+import type {
+  ImpactDamageType,
+  ImpactElement,
+  ImpactSwitchMode,
+  ImpactSwitchVariant,
+} from '../mechanisms/impacts';
 import type { PlateMode } from '../mechanisms/plates';
 import type { StaticColliderDesc } from '../physics/static-colliders';
 import type { WorldPropertyValues } from '../properties/spec';
@@ -121,6 +127,18 @@ export interface ScenePlateSpec {
   readonly width?: number | undefined;
   readonly depth?: number | undefined;
   readonly hidden?: boolean | undefined;
+}
+
+/** An impact switch spawn (mw-e03.20): its prefab and what it overrides. */
+export interface SceneImpactSwitchSpec {
+  readonly variant: ImpactSwitchVariant;
+  readonly minEnergy?: number | undefined;
+  readonly damageTypes?: readonly ImpactDamageType[] | undefined;
+  readonly elements?: readonly ImpactElement[] | undefined;
+  readonly radius?: number | undefined;
+  readonly mode?: ImpactSwitchMode | undefined;
+  readonly holdSeconds?: number | undefined;
+  readonly loudness?: number | null | undefined;
 }
 
 /** A container spawn as written in data (mw-e18.3): its loot table, contents and lock. */
@@ -256,6 +274,8 @@ export interface SceneSpawnSpec {
   readonly switch?: SceneSwitchSpec | undefined;
   /** Makes the spawned entity a pressure plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec | undefined;
+  /** Makes the spawned entity an impact switch (mw-e03.20). */
+  readonly impactSwitch?: SceneImpactSwitchSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
 }
@@ -413,6 +433,8 @@ export interface SceneSpawnPlacement {
   readonly switch?: SceneSwitchSpec;
   /** Its pressure plate data, when it is a plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec;
+  /** Its impact switch data, when it is one (mw-e03.20). */
+  readonly impactSwitch?: SceneImpactSwitchSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
 }
@@ -560,6 +582,20 @@ function plateOf(spec: ScenePlateSpec): ScenePlateSpec {
     ...(spec.width !== undefined && { width: spec.width }),
     ...(spec.depth !== undefined && { depth: spec.depth }),
     ...(spec.hidden !== undefined && { hidden: spec.hidden }),
+  });
+}
+
+/** An impact switch's data without absent fields. */
+function impactSwitchOf(spec: SceneImpactSwitchSpec): SceneImpactSwitchSpec {
+  return Object.freeze({
+    variant: spec.variant,
+    ...(spec.minEnergy !== undefined && { minEnergy: spec.minEnergy }),
+    ...(spec.damageTypes !== undefined && { damageTypes: Object.freeze([...spec.damageTypes]) }),
+    ...(spec.elements !== undefined && { elements: Object.freeze([...spec.elements]) }),
+    ...(spec.radius !== undefined && { radius: spec.radius }),
+    ...(spec.mode !== undefined && { mode: spec.mode }),
+    ...(spec.holdSeconds !== undefined && { holdSeconds: spec.holdSeconds }),
+    ...(spec.loudness !== undefined && { loudness: spec.loudness }),
   });
 }
 
@@ -740,6 +776,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
       ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
       ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
       ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
+      ...(spawn.impactSwitch !== undefined && { impactSwitch: impactSwitchOf(spawn.impactSwitch) }),
       ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
     }),
   );

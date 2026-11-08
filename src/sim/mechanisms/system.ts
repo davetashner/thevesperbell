@@ -88,6 +88,12 @@ import {
 import { boundNodes } from './bindings';
 import { closedBox, contactOpenness, leafBox, leafCentre, type Obstacle } from './geometry';
 import type { Keyring } from './keys';
+import {
+  impactFeeds,
+  ImpactSwitchComponent,
+  impactSwitchesSystem,
+  resetImpactSwitch,
+} from './impacts';
 import { PlateComponent, platesSystem, resetPlate, type PlateOptions } from './plates';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
@@ -800,9 +806,10 @@ export function installMechanisms<TInput>(
     keys: options.keys,
     pick: options.pick,
   };
-  world.register(...MECHANISM_COMPONENTS, PlateComponent);
+  world.register(...MECHANISM_COMPONENTS, PlateComponent, ImpactSwitchComponent);
   world.addSystem(mechanismsSystem(rules));
   world.addSystem(platesSystem(options.plates));
+  world.addSystem(impactSwitchesSystem());
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
     removeFrom(rules.colliders, door.collider);
@@ -812,6 +819,7 @@ export function installMechanisms<TInput>(
     }
   });
   const offs = [
+    impactFeeds(world),
     addAffordanceGate(world, keyGate(rules)),
     world.events.on(interacted, ({ actor, target, verb }) => {
       if (w.has(target, SwitchComponent)) {
@@ -844,6 +852,9 @@ export function installMechanisms<TInput>(
       if (w.has(entity, PlateComponent)) {
         // A signal on resets a plate (a latching one's way off); off does nothing.
         if (value) resetPlate(w, entity, graph);
+      } else if (w.has(entity, ImpactSwitchComponent)) {
+        // Likewise an impact switch: on resets it (a latching one's way off).
+        if (value) resetImpactSwitch(w, entity, graph);
       } else if (w.has(entity, DoorComponent)) moveDoor(w, entity, value ? 1 : 0, graph);
       else setSwitch(w, entity, value ? 1 : 0, graph);
     }),

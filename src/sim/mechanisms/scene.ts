@@ -17,6 +17,7 @@ import { compileSignalGraph, type SignalGraphDef } from '../signals/graph';
 import { addSignalGraph } from '../signals/runtime';
 import { PlacementComponent, placeEntity } from '../stimulus/placement';
 import type { DoorProfileLookup, LockLookup, SwitchKind } from './components';
+import { makeImpactSwitch, syncImpactSwitchNodes } from './impacts';
 import { makePlate, syncPlateNodes } from './plates';
 import { makeDoor, makeSwitch, refreshAffordances, syncSwitchNodes } from './system';
 
@@ -36,6 +37,8 @@ export interface SceneMechanisms {
   readonly switches: readonly EntityId[];
   /** Pressure plates (mw-e03.19). */
   readonly plates: readonly EntityId[];
+  /** Impact switches (mw-e03.20). */
+  readonly impactSwitches: readonly EntityId[];
   /** The placed graphs' entities. */
   readonly graphs: readonly EntityId[];
 }
@@ -68,6 +71,7 @@ export function addSceneMechanisms<T>(
   const doors: EntityId[] = [];
   const switches: EntityId[] = [];
   const plates: EntityId[] = [];
+  const impactSwitches: EntityId[] = [];
   const interactive = sim.isRegistered(InteractableComponent);
   for (const { entity, spawn } of loaded.spawns) {
     const { door } = spawn;
@@ -108,6 +112,20 @@ export function addSceneMechanisms<T>(
       });
       plates.push(entity);
     }
+    const { impactSwitch: impact } = spawn;
+    if (impact !== undefined) {
+      const { variant, ...rest } = impact;
+      makeImpactSwitch(sim, entity, spawn.position, variant, {
+        ...(rest.minEnergy !== undefined && { minEnergy: rest.minEnergy }),
+        ...(rest.damageTypes !== undefined && { damageTypes: rest.damageTypes }),
+        ...(rest.elements !== undefined && { elements: rest.elements }),
+        ...(rest.radius !== undefined && { radius: rest.radius }),
+        ...(rest.mode !== undefined && { mode: rest.mode }),
+        ...(rest.holdSeconds !== undefined && { holdSeconds: rest.holdSeconds }),
+        ...(rest.loudness !== undefined && { loudness: rest.loudness }),
+      });
+      impactSwitches.push(entity);
+    }
     const own = spawn.switch;
     if (own === undefined) continue;
     makeSwitch(sim, entity, own.kind, {
@@ -144,10 +162,12 @@ export function addSceneMechanisms<T>(
   // Switches that start on hold their bound lever nodes on from the first evaluation.
   for (const entity of switches) syncSwitchNodes(sim, entity);
   for (const entity of plates) syncPlateNodes(sim, entity);
+  for (const entity of impactSwitches) syncImpactSwitchNodes(sim, entity);
   return Object.freeze({
     doors: Object.freeze(doors),
     switches: Object.freeze(switches),
     plates: Object.freeze(plates),
+    impactSwitches: Object.freeze(impactSwitches),
     graphs: Object.freeze(graphs),
   });
 }

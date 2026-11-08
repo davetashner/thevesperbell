@@ -171,6 +171,46 @@ export const scenePlateSchema = z.strictObject({
 });
 
 /**
+ * Makes a spawn an impact switch (mw-e03.20): something struck from afar, by an arrow, a thrown
+ * object, a strike, a spell or a shove, turns it on. The variant is a prefab (bullseye, bell, crystal,
+ * counterweight); every other field overrides the prefab's setting. The spawn point is the middle of
+ * its spherical hit zone. Signal graphs read it through lever nodes bound to the spawn; a signal into
+ * a `mechanism` receiver bound to it resets it.
+ */
+export const sceneImpactSwitchSchema = z.strictObject({
+  variant: z
+    .enum(['bullseye', 'bell', 'crystal', 'counterweight'])
+    .describe(
+      'Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope).',
+    ),
+  minEnergy: z
+    .number()
+    .min(0)
+    .optional()
+    .describe('Least energy that counts, J (the delivered amount for an element).'),
+  damageTypes: z
+    .array(z.enum(['blunt', 'slash', 'pierce']))
+    .optional()
+    .describe('Damage types it accepts.'),
+  elements: z
+    .array(z.enum(['heat', 'cold', 'water', 'charge', 'force', 'light']))
+    .optional()
+    .describe('Elements it accepts.'),
+  radius: z.number().positive().optional().describe('Radius of the hit zone, metres.'),
+  mode: z
+    .enum(['momentary', 'latching'])
+    .optional()
+    .describe('momentary stays on for holdSeconds after the last hit; latching until reset.'),
+  holdSeconds: z.number().min(0).optional().describe('Momentary: seconds it stays on.'),
+  loudness: z
+    .number()
+    .min(0)
+    .nullable()
+    .optional()
+    .describe('Noise made when struck, dB at 1 m; null for silent.'),
+});
+
+/**
  * Makes a spawn a lootable container (mw-e18.3): a chest, barrel, bookshelf or corpse. What it holds
  * from the start, plus its loot table rolled once on the first open; both persist with the level.
  */
@@ -459,6 +499,11 @@ export const sceneSpawnSchema = z.strictObject({
     .optional()
     .describe(
       'Makes the spawned entity a pressure plate that weighs what rests on it (mw-e03.19).',
+    ),
+  impactSwitch: sceneImpactSwitchSchema
+    .optional()
+    .describe(
+      'Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20).',
     ),
   container: sceneContainerSchema
     .optional()
@@ -968,6 +1013,7 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
       ['door', 'a door'],
       ['switch', 'a switch'],
       ['plate', 'a plate'],
+      ['impactSwitch', 'an impact switch'],
       ['item', 'an item'],
       ['creature', 'a creature'],
     ] as const;
@@ -996,6 +1042,23 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
       issue('plate', 'has a maxWeight below its minWeight');
     }
   }
+  const { impactSwitch } = spawn;
+  if (impactSwitch !== undefined) {
+    const others = [
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+    ] as const;
+    for (const [key, what] of others) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both an impact switch and ${what}`);
+    }
+    const { damageTypes, elements } = impactSwitch;
+    if (damageTypes?.length === 0 && elements?.length === 0) {
+      issue('impactSwitch', 'accepts no damage type and no element');
+    }
+  }
   const own = spawn.switch;
   if (own === undefined) return;
   const positions = own.positions ?? (own.kind === 'button' ? 1 : 2);
@@ -1017,6 +1080,7 @@ export type SceneEnvironmentDef = z.output<typeof sceneEnvironmentSchema>;
 export type SceneBackdropDef = z.output<typeof sceneBackdropSchema>;
 export type SceneDoorDef = z.output<typeof sceneDoorSchema>;
 export type SceneSwitchDef = z.output<typeof sceneSwitchSchema>;
+export type SceneImpactSwitchDef = z.output<typeof sceneImpactSwitchSchema>;
 export type ScenePlateDef = z.output<typeof scenePlateSchema>;
 export type SceneSignalDef = z.output<typeof sceneSignalSchema>;
 export type SceneContainerDef = z.output<typeof sceneContainerSchema>;
