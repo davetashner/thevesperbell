@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Briar Glen lane now has a real day and night: the light, sky and shadows follow the game clock, fading through dusk to a dark, moonlit night at 22:00 where the street lanterns' pools of warm light stand out, and back through dawn. Lights can now carry their own colour tint (mw-ju8.43).
 - The music now changes on the beat: going into a fight, the explore music crossfades into the battle music on the next bar line over one bar (equal-power, no abrupt cut or volume jump), and out of it over two bars once nothing has been fighting for 8 seconds. The adaptive music controller also supports tension and stealth layers and plays alert stingers on the next beat.
 - The riverbank path in Briar Glen lane is easy to find: two blue pillars frame the gap in the east wall, a green path leads into the alley, a signpost stands at the mouth and a lantern and brazier light the alley by night. Sign markers are now flat boards at sign height and other placeholder markers small flat discs, instead of yellow cones floating in the air (mw-ju8.42).
 - Light beams: sunlight shafts, crystals and spells cast a ray that mirrors bounce (up to 8 times), clear things like ice let through, lenses focus into heat that can ignite fuel, and opaque things or anyone stepping into the beam stop; light receivers switch on after the light has stayed at their threshold for a dwell time, optionally only for one colour (mw-e03.17)

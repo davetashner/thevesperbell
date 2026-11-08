@@ -175,9 +175,11 @@ import {
   lightProbe,
   lightReadout,
   lightSpawns,
+  lightTints,
   probeGrid,
   selectLights,
   type LightSpawn,
+  type Tint,
 } from '@game/light/index';
 import {
   attachPlayerInput,
@@ -262,6 +264,8 @@ import { AnimationDriver, simAnimReader } from '@game/animation/index';
 import { pickVariant, randomSalt, variantFromSearch } from '@render/creatures/variant';
 import { createHitVolumeOverlay } from '@render/debug/hit-volumes';
 import { applyEnvironment } from '@render/environment/index';
+import { applyLook, lookAt, type TimeOfDayLook } from '@game/light/time-of-day';
+import { Color } from 'three';
 import { createGreyboxView } from '@render/greybox/index';
 import { createLightRig } from '@render/light/index';
 import { AnimationController, compileGraph } from '@render/animation/index';
@@ -335,6 +339,7 @@ import {
   type SandboxCommand,
   type UseQuickSlotCommand,
   type EntityId,
+  gameClockOf,
   type VolumeCrossing,
   type LightEmitterView,
   type RapierPhysics,
@@ -964,16 +969,33 @@ function startRenderer(
     let watchedLights: readonly LightSpawn[] = [];
     let probePoints: readonly Vec3[] = [];
     let shownEnvironment: unknown;
+    let shownMinute = -1;
+    let sceneLook: TimeOfDayLook | undefined;
+    let sceneTints: ReadonlyMap<EntityId, Tint> = new Map();
     let publishedLights = '';
     let publishedLightProbe = '';
     const drawLights = (): void => {
       const { field } = light;
-      if (field.environment !== shownEnvironment) {
+      // A scene with a day and night look (mw-ju8.43) has the renderer's ambient, key light and sky
+      // follow the game clock; the sim field keeps the static levels.
+      const minute = sceneLook === undefined ? -1 : (gameClockOf(world)?.time().minute ?? -1);
+      if (field.environment !== shownEnvironment || minute !== shownMinute) {
         shownEnvironment = field.environment;
-        greybox.setEnvironment(field.environment);
+        shownMinute = minute;
+        if (sceneLook === undefined || minute < 0) {
+          greybox.setEnvironment(field.environment);
+        } else {
+          const look = lookAt(sceneLook, minute);
+          greybox.setEnvironment(applyLook(field.environment, look));
+          if (look.sky !== undefined) view.scene.background = new Color(look.sky);
+        }
       }
       const chosen = selectLights(field.lights(), camera.position, lightRig.caps);
-      const withFire = (l: LightEmitterView) => ({ ...l, fire: isFire(world, l) });
+      const withFire = (l: LightEmitterView) => ({
+        ...l,
+        fire: isFire(world, l),
+        tint: l.entity === null ? undefined : sceneTints.get(l.entity),
+      });
       const drawn = lightRig.sync(chosen.points.map(withFire), chosen.spots.map(withFire));
       if (watchedLights.length > 0) {
         const readout = lightReadout(world, field, watchedLights, drawn);
@@ -1290,6 +1312,9 @@ function startRenderer(
       camera.position.set(...scene.camera.position);
       camera.lookAt(...scene.camera.target);
       watchedLights = lightSpawns(loaded);
+      sceneTints = lightTints(loaded);
+      sceneLook = scene.light?.timeOfDay;
+      shownMinute = -1;
       sceneWater = waterVolumes(loaded.layout.regions);
       // The perf-baseline stress scene (mw-e32.1): blasts at its perf-agitator markers keep its props
       // moving; scenes without markers have no agitator.

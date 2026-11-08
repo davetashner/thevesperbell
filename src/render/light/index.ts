@@ -102,6 +102,8 @@ export function useSimFalloff(): void {
 export interface RigLight extends LightEmitterView {
   /** A burning thing (torch colour and a flame), else a lamp. */
   readonly fire: boolean;
+  /** Colour the scene gave this light ([r, g, b] 0-1, mw-ju8.43); else flame or lamp colour. */
+  readonly tint?: readonly [number, number, number] | undefined;
 }
 
 export interface LightRigOptions {
@@ -159,8 +161,15 @@ export function createLightRig(scene: Scene, options: LightRigOptions = {}): Lig
     }
   };
 
+  const scratch = new Color();
+
   const place = (light: PointLight | SpotLight, source: RigLight, drawn: Map<EntityId, number>) => {
-    const colour = source.fire ? FIRE_COLOUR : LAMP_COLOUR;
+    const colour =
+      source.tint !== undefined
+        ? scratch.setRGB(source.tint[0], source.tint[1], source.tint[2])
+        : source.fire
+          ? FIRE_COLOUR
+          : LAMP_COLOUR;
     const { x, y, z } = source.position;
     light.position.set(x, y, z);
     light.color.copy(colour);

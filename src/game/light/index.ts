@@ -115,6 +115,21 @@ export function lightSpawns(loaded: LoadedScene): LightSpawn[] {
     .map(({ entity, spawn }) => ({ id: spawn.id, entity }));
 }
 
+/** An [r, g, b] colour, each 0-1. */
+export type Tint = readonly [number, number, number];
+
+/**
+ * The colour tints that `loaded`'s light source spawns declare (`lightSource.tint`), by entity, for
+ * the light rig. Spawns without a tint keep the rig's flame or lamp colour.
+ */
+export function lightTints(loaded: LoadedScene): Map<EntityId, Tint> {
+  const tints = new Map<EntityId, Tint>();
+  for (const { entity, spawn } of loaded.spawns) {
+    if (spawn.lightSource?.tint !== undefined) tints.set(entity, spawn.lightSource.tint);
+  }
+  return tints;
+}
+
 /** One watched spawn: the sim level where it stands and the intensity its rendered light has. */
 export interface LightSpawnReadout {
   readonly entity: EntityId;

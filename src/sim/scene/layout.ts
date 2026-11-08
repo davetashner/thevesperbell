@@ -165,6 +165,8 @@ export interface SceneLightSourceSpec {
   readonly variant: LightSourceVariant;
   readonly unlit?: boolean | undefined;
   readonly infiniteFuel?: boolean | undefined;
+  /** Colour of its rendered light, [r, g, b] 0-1; renderer only (mw-ju8.43). */
+  readonly tint?: readonly [number, number, number] | undefined;
 }
 
 /** An impact switch spawn (mw-e03.20): its prefab and what it overrides. */
