@@ -93,7 +93,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].tags` | list of string | `[]` | Free-form tags for systems and tools. |
 | `spawns[].interact` | object | — | Makes the spawned entity interactable: its affordances (mw-e02.5). |
 | `spawns[].interact.affordances` | list of object (at least 1) | required | In priority order: Interact uses the first one the actor can. |
-| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"hide"` \| `"climb"` \| `"talk"` \| `"push"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
+| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"hide"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
 | `spawns[].interact.affordances[].label` | string | — | Prompt text; defaults to the verb (e.g. "Pull"). |
 | `spawns[].interact.affordances[].hold` | number 0–10 | — | Seconds Interact must be held; 0 or omitted fires on press. |
 | `spawns[].interact.affordances[].requires` | list of object | — | Every one must hold for the actor to use it (else shown greyed with the reason). |

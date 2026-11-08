@@ -22,6 +22,8 @@ const VERBS: Readonly<Record<AffordanceVerb, true>> = {
   climb: true,
   talk: true,
   push: true,
+  release: true,
+  rotate: true,
   unlock: true,
   'pick-lock': true,
   light: true,
