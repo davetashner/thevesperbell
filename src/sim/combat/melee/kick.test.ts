@@ -258,7 +258,7 @@ describe('kicking a door (mw-e04.18)', () => {
   });
 
   it('a kick without a listed force or weight limit resists with an empty push', () => {
-    const plain = kickMove({ worldImpact: { blunt: 5 } } as never);
+    const plain = kickMove({ worldImpact: { blunt: 5 } });
     const s = setup({ kickMove: plain });
     s.placeDoor(1, { lock: LOCK });
     s.kick();

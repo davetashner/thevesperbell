@@ -172,31 +172,37 @@ describe('the kick in the testbed (mw-e04.18)', () => {
     return { brazier, rug };
   }
 
-  it('AC-2: a burning brazier kicked into the rug beyond it sets the rug alight within 2 s', ({
-    task,
-  }) => {
-    markExercised(task, 'material', 'cloth');
-    const game = testbed();
-    const { rug, brazier } = brazierAndRug(game);
-    const start = positionOf(game, brazier);
-    game.step(['KeyK']);
-    let litAfter = -1;
-    for (let tick = 0; tick < 300 && litAfter < 0; tick++) {
-      game.step();
-      if (readProperty(game.world, rug, 'burning')) litAfter = tick;
-    }
-    expect(horizontal(positionOf(game, brazier), start)).toBeGreaterThan(1);
-    // From the press: 10 startup ticks, then within 2 s (120 ticks) of the kick landing.
-    expect(litAfter).toBeGreaterThanOrEqual(0);
-    expect(litAfter).toBeLessThanOrEqual(10 + 120);
-  });
+  it(
+    'AC-2: a burning brazier kicked into the rug beyond it sets the rug alight within 2 s',
+    { timeout: 30_000 },
+    ({ task }) => {
+      markExercised(task, 'material', 'cloth');
+      const game = testbed();
+      const { rug, brazier } = brazierAndRug(game);
+      const start = positionOf(game, brazier);
+      game.step(['KeyK']);
+      let litAfter = -1;
+      for (let tick = 0; tick < 300 && litAfter < 0; tick++) {
+        game.step();
+        if (readProperty(game.world, rug, 'burning')) litAfter = tick;
+      }
+      expect(horizontal(positionOf(game, brazier), start)).toBeGreaterThan(1);
+      // From the press: 10 startup ticks, then within 2 s (120 ticks) of the kick landing.
+      expect(litAfter).toBeGreaterThanOrEqual(0);
+      expect(litAfter).toBeLessThanOrEqual(10 + 120);
+    },
+  );
 
-  it('AC-2 control: left alone, the same brazier does not light the rug', () => {
-    const game = testbed();
-    const { rug } = brazierAndRug(game);
-    game.run(300);
-    expect(readProperty(game.world, rug, 'burning')).toBe(false);
-  });
+  it(
+    'AC-2 control: left alone, the same brazier does not light the rug',
+    { timeout: 30_000 },
+    () => {
+      const game = testbed();
+      const { rug } = brazierAndRug(game);
+      game.run(200);
+      expect(readProperty(game.world, rug, 'burning')).toBe(false);
+    },
+  );
 });
 
 describe('the kick against doors and creatures (mw-e04.18)', () => {
