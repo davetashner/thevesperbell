@@ -17,6 +17,7 @@ import { compileSignalGraph, type SignalGraphDef } from '../signals/graph';
 import { addSignalGraph } from '../signals/runtime';
 import { PlacementComponent, placeEntity } from '../stimulus/placement';
 import type { DoorProfileLookup, LockLookup, SwitchKind } from './components';
+import { makePlate, syncPlateNodes } from './plates';
 import { makeDoor, makeSwitch, refreshAffordances, syncSwitchNodes } from './system';
 
 /** What `addSceneMechanisms` reads: profiles, locks and graphs by id. */
@@ -33,6 +34,8 @@ export interface SceneMechanismsOptions {
 export interface SceneMechanisms {
   readonly doors: readonly EntityId[];
   readonly switches: readonly EntityId[];
+  /** Pressure plates (mw-e03.19). */
+  readonly plates: readonly EntityId[];
   /** The placed graphs' entities. */
   readonly graphs: readonly EntityId[];
 }
@@ -64,6 +67,7 @@ export function addSceneMechanisms<T>(
   const sim = world as unknown as World<never>;
   const doors: EntityId[] = [];
   const switches: EntityId[] = [];
+  const plates: EntityId[] = [];
   const interactive = sim.isRegistered(InteractableComponent);
   for (const { entity, spawn } of loaded.spawns) {
     const { door } = spawn;
@@ -89,6 +93,20 @@ export function addSceneMechanisms<T>(
       });
       refreshAffordances(sim, entity);
       doors.push(entity);
+    }
+    const { plate } = spawn;
+    if (plate !== undefined) {
+      makePlate(sim, entity, spawn.position, {
+        minWeight: plate.minWeight,
+        ...(plate.maxWeight !== undefined && { maxWeight: plate.maxWeight }),
+        ...(plate.hysteresis !== undefined && { hysteresis: plate.hysteresis }),
+        ...(plate.mode !== undefined && { mode: plate.mode }),
+        ...(plate.armSeconds !== undefined && { armSeconds: plate.armSeconds }),
+        ...(plate.width !== undefined && { width: plate.width }),
+        ...(plate.depth !== undefined && { depth: plate.depth }),
+        ...(plate.hidden !== undefined && { hidden: plate.hidden }),
+      });
+      plates.push(entity);
     }
     const own = spawn.switch;
     if (own === undefined) continue;
@@ -125,9 +143,11 @@ export function addSceneMechanisms<T>(
 
   // Switches that start on hold their bound lever nodes on from the first evaluation.
   for (const entity of switches) syncSwitchNodes(sim, entity);
+  for (const entity of plates) syncPlateNodes(sim, entity);
   return Object.freeze({
     doors: Object.freeze(doors),
     switches: Object.freeze(switches),
+    plates: Object.freeze(plates),
     graphs: Object.freeze(graphs),
   });
 }

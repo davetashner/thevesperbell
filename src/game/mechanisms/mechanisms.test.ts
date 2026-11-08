@@ -158,7 +158,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     expect(
       doorLeafLooks(
         world,
-        { doors: [spawn('west-door')], switches: [], graphs: [] },
+        { doors: [spawn('west-door')], switches: [], plates: [], graphs: [] },
         {
           ...content,
           has: () => false,
@@ -171,6 +171,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     const watch = new MechanismWatch(world, {
       doors: [],
       switches: [spawn('east-button'), odd],
+      plates: [],
       graphs: [],
     });
     expect(watch.readout().switches).toEqual({ [String(spawn('east-button'))]: 0 });

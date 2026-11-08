@@ -136,6 +136,41 @@ export const sceneSwitchSchema = z.strictObject({
 });
 
 /**
+ * Makes a spawn a pressure plate (mw-e03.19): it weighs what rests on it, crates, bodies and actors
+ * with what they carry and wear, and is on while the total is in its window. The spawn point is the
+ * middle of its top surface; the footprint is axis-aligned. Signal graphs read it through lever nodes
+ * bound to the spawn; a signal into a `mechanism` receiver bound to it resets a latching plate.
+ */
+export const scenePlateSchema = z.strictObject({
+  minWeight: z.number().positive().describe('Lightest total weight that turns it on, kg.'),
+  maxWeight: z
+    .number()
+    .positive()
+    .optional()
+    .describe('Heaviest total weight that keeps it on, kg; absent: no ceiling (too heavy fails).'),
+  hysteresis: z
+    .number()
+    .min(0)
+    .default(0)
+    .describe('Margin, kg, by which the window widens once it is on, so a jittering load holds.'),
+  mode: z
+    .enum(['momentary', 'latching'])
+    .default('momentary')
+    .describe('momentary follows its load; latching stays on until a signal resets it.'),
+  armSeconds: z
+    .number()
+    .min(0)
+    .default(0)
+    .describe('Seconds the load must stay in the window before it turns on.'),
+  width: z.number().positive().default(1).describe('Footprint along x, metres.'),
+  depth: z.number().positive().default(1).describe('Footprint along z, metres.'),
+  hidden: z
+    .boolean()
+    .default(false)
+    .describe('The trap variant: nothing to see or prompt; wire it to trap signals.'),
+});
+
+/**
  * Makes a spawn a lootable container (mw-e18.3): a chest, barrel, bookshelf or corpse. What it holds
  * from the start, plus its loot table rolled once on the first open; both persist with the level.
  */
@@ -420,6 +455,11 @@ export const sceneSpawnSchema = z.strictObject({
   switch: sceneSwitchSchema
     .optional()
     .describe('Makes the spawned entity a lever, button, crank or wheel (mw-e03.18).'),
+  plate: scenePlateSchema
+    .optional()
+    .describe(
+      'Makes the spawned entity a pressure plate that weighs what rests on it (mw-e03.19).',
+    ),
   container: sceneContainerSchema
     .optional()
     .describe(
@@ -904,6 +944,7 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     const others = [
       ['door', 'a door'],
       ['switch', 'a switch'],
+      ['plate', 'a plate'],
       ['item', 'an item'],
       ['creature', 'a creature'],
     ] as const;
@@ -915,6 +956,21 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     }
     if (container.locked === true && container.lock === undefined) {
       issue('container', 'starts locked but has no lock');
+    }
+  }
+  const { plate } = spawn;
+  if (plate !== undefined) {
+    const others = [
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+    ] as const;
+    for (const [key, what] of others) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a plate and ${what}`);
+    }
+    if (plate.maxWeight !== undefined && plate.maxWeight < plate.minWeight) {
+      issue('plate', 'has a maxWeight below its minWeight');
     }
   }
   const own = spawn.switch;
@@ -938,6 +994,7 @@ export type SceneEnvironmentDef = z.output<typeof sceneEnvironmentSchema>;
 export type SceneBackdropDef = z.output<typeof sceneBackdropSchema>;
 export type SceneDoorDef = z.output<typeof sceneDoorSchema>;
 export type SceneSwitchDef = z.output<typeof sceneSwitchSchema>;
+export type ScenePlateDef = z.output<typeof scenePlateSchema>;
 export type SceneSignalDef = z.output<typeof sceneSignalSchema>;
 export type SceneContainerDef = z.output<typeof sceneContainerSchema>;
 export type SceneAcousticsDef = z.output<typeof sceneAcousticsSchema>;

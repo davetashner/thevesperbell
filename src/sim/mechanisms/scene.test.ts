@@ -23,6 +23,7 @@ import {
   type DoorProfile,
   type LockSpec,
 } from './components';
+import { DEFAULT_PLATE, PlateComponent } from './plates';
 import { addSceneMechanisms, SWITCH_AFFORDANCES, type SceneMechanismsOptions } from './scene';
 import { doorStatus, installMechanisms } from './system';
 
@@ -96,6 +97,23 @@ const SCENE = {
     },
     { id: 'wheel', at: [3, 0, 3], yaw: 0, tags: [], switch: { kind: 'wheel', positions: 4 } },
     { id: 'marker', at: [0, 0, 0], yaw: 0, tags: [] },
+    {
+      id: 'scale',
+      at: [5, 0, 5],
+      yaw: 0,
+      tags: [],
+      plate: {
+        minWeight: 40,
+        maxWeight: 60,
+        hysteresis: 5,
+        mode: 'latching',
+        armSeconds: 1,
+        width: 2,
+        depth: 1.5,
+        hidden: true,
+      },
+    },
+    { id: 'step', at: [7, 0, 5], yaw: 0, tags: [], plate: { minWeight: 10 } },
   ],
   signals: [{ graph: { id: 'gate' }, bindings: { 'gate-lever': 'lever' } }],
 } as unknown as SceneSpec;
@@ -166,6 +184,32 @@ describe('scene mechanisms (mw-e03.18)', () => {
     expect(world.get(wheel, InteractableComponent)?.affordances[0]?.label).toBe('Turn wheel');
     // The scene's own prompt stays.
     expect(world.get(pull, InteractableComponent)?.affordances[0]?.label).toBe('Ring');
+  });
+
+  it('makes plate spawns plates at the spawn point, with their data or the defaults (mw-e03.19)', () => {
+    const { world, loaded } = setup();
+    const made = addSceneMechanisms(world, loaded, OPTIONS);
+    const [scale, step] = [entityOf(loaded, 6), entityOf(loaded, 7)];
+    expect(made.plates).toEqual([scale, step]);
+    expect(world.get(scale, PlateComponent)).toEqual({
+      minWeight: 40,
+      maxWeight: 60,
+      hysteresis: 5,
+      mode: 'latching',
+      armSeconds: 1,
+      width: 2,
+      depth: 1.5,
+      hidden: true,
+      origin: { x: 5, y: 0, z: 5 },
+      active: false,
+      weight: 0,
+      arming: 0,
+    });
+    expect(world.get(step, PlateComponent)).toMatchObject({
+      ...DEFAULT_PLATE,
+      minWeight: 10,
+      origin: { x: 7, y: 0, z: 5 },
+    });
   });
 
   it('wires placed graphs to the spawns they name, and a lever that starts on opens its gate', () => {

@@ -197,6 +197,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].switch.kind` | `"lever"` \| `"button"` \| `"crank"` \| `"wheel"` | required | lever, button, crank or wheel. |
 | `spawns[].switch.positions` | integer 2–8 | — | Positions it steps through (crank and wheel; a lever has 2, a button none). |
 | `spawns[].switch.initial` | integer ≥ 0 | `0` | Position it starts in (0 = off). |
+| `spawns[].plate` | object | — | Makes the spawned entity a pressure plate that weighs what rests on it (mw-e03.19). |
+| `spawns[].plate.minWeight` | number > 0 | required | Lightest total weight that turns it on, kg. |
+| `spawns[].plate.maxWeight` | number > 0 | — | Heaviest total weight that keeps it on, kg; absent: no ceiling (too heavy fails). |
+| `spawns[].plate.hysteresis` | number ≥ 0 | `0` | Margin, kg, by which the window widens once it is on, so a jittering load holds. |
+| `spawns[].plate.mode` | `"momentary"` \| `"latching"` | `"momentary"` | momentary follows its load; latching stays on until a signal resets it. |
+| `spawns[].plate.armSeconds` | number ≥ 0 | `0` | Seconds the load must stay in the window before it turns on. |
+| `spawns[].plate.width` | number > 0 | `1` | Footprint along x, metres. |
+| `spawns[].plate.depth` | number > 0 | `1` | Footprint along z, metres. |
+| `spawns[].plate.hidden` | boolean | `false` | The trap variant: nothing to see or prompt; wire it to trap signals. |
 | `spawns[].container` | object | — | Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3). |
 | `spawns[].container.loot` | ref → loot-table | — | Loot table rolled into it the first time it is opened (once; saves keep the result). |
 | `spawns[].container.contents` | list of object | — | What it holds from the start, before any roll. |

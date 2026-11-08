@@ -312,6 +312,14 @@ describe('equipment slots (mw-e17.4)', () => {
     expect(state.noiseModifier).toBe(1.6);
   });
 
+  it('wornKg is what the actor wears, 0 without equipment (mw-e03.19)', () => {
+    const { world, actor, rules, wear } = setup('knight', PLATE);
+    expect(rules.wornKg(world, actor)).toBe(0);
+    wear(...PLATE);
+    expect(rules.wornKg(world, actor)).toBe(22);
+    expect(rules.wornKg(world, world.spawn())).toBe(0);
+  });
+
   it('AC-5: load classes follow ADR-0003 thresholds and class capacity', () => {
     const { rules } = setup('knight');
     expect(rules.loadClassOf(0)).toBe('light');

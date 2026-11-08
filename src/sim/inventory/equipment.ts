@@ -383,6 +383,14 @@ export class EquipmentRules {
   }
 
   /**
+   * What `actor` wears, kg: its equipped armour and shield (the weight pressure plates add, mw-e03.19).
+   * 0 for an actor without equipment.
+   */
+  wornKg(world: World, actor: EntityId): number {
+    return equipmentOf(world, actor) === undefined ? 0 : this.state(world, actor).armorKg;
+  }
+
+  /**
    * The derived equipment state of `actor` (see the file header). Items no longer in the inventory
    * count as not equipped.
    * @throws RangeError for an actor without equipment, or an unknown class or item.

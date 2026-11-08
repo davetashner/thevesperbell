@@ -21,6 +21,8 @@ import {
   addSceneMechanisms,
   DoorComponent,
   doorStatus,
+  EquipmentRules,
+  gravityScaleOf,
   installMechanisms,
   installSignals,
   InventoryRules,
@@ -127,10 +129,15 @@ export function startMechanisms<T>(
   if (options.player !== undefined && loaded.layout.signals.length > 0) {
     tagEntity(sim, options.player, PLAYER_TAG);
   }
+  const equipment = new EquipmentRules(content.all('item'), content.all('class'));
   installMechanisms(world, {
     colliders: options.colliders,
     occluders: options.occluders,
     keys: keyring(new InventoryRules(content.all('item'))),
+    plates: {
+      gravityScale: gravityScaleOf,
+      gear: (actors, actor) => equipment.wornKg(actors as unknown as World, actor),
+    },
   });
   return addSceneMechanisms(world, loaded, {
     doors: doorProfiles(content),
