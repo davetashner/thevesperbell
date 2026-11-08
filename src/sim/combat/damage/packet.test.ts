@@ -55,11 +55,21 @@ describe('damage packet', () => {
       [{ amounts: {}, source: 1.5 }, /source/],
       [{ amounts: {}, impulse: { x: Number.NaN, y: 0, z: 0 } }, /impulse/],
       [{ amounts: {}, regionMultiplier: -2 }, /regionMultiplier/],
+      [{ amounts: {}, armor: -1 }, /armor/],
+      [{ amounts: {}, penetration: Number.NaN }, /penetration/],
       [{ amounts: {}, tags: [''] }, /tags/],
     ] as const;
     for (const [input, message] of bad) {
       expect(() => createDamagePacket(input as never)).toThrow(message);
     }
+  });
+
+  it('carries armour and penetration only when given', () => {
+    expect(createDamagePacket({ amounts: {} })).not.toHaveProperty('armor');
+    expect(createDamagePacket({ amounts: {}, armor: 30, penetration: 20 })).toMatchObject({
+      armor: 30,
+      penetration: 20,
+    });
   });
 
   it('normalizes amounts, tags and totals', () => {

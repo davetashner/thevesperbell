@@ -64,3 +64,33 @@ export interface Death {
 
 /** A combatant's health reached 0. Emitted exactly once per entity; later hits are ignored. */
 export const Died = defineEvent<Death>('Died');
+
+/** Payload of Deflected. */
+export interface DeflectInfo {
+  readonly tick: number;
+  readonly target: EntityId;
+  readonly instigator: EntityId | null;
+  readonly source: EntityId | null;
+  readonly region: string | undefined;
+  /** The armour value that stopped the hit. */
+  readonly armor: number;
+  /** The penetration that was not enough. */
+  readonly penetration: number;
+}
+
+/** An arrow ricocheted off armour (e05.6): the hit dealt 0 damage. Follows that hit's DamageApplied. */
+export const Deflected = defineEvent<DeflectInfo>('Deflected');
+
+/** How a landed hit reads on the hit marker. */
+export type HitMarkerVariant = 'normal' | 'headshot' | 'weakpoint' | 'deflected';
+
+/** Payload of HitMarker. */
+export interface HitMarkerInfo {
+  readonly tick: number;
+  readonly target: EntityId;
+  readonly instigator: EntityId | null;
+  readonly variant: HitMarkerVariant;
+}
+
+/** A hit landed (immune targets excepted): what its marker should read (e05.6). Follows DamageApplied. */
+export const HitMarker = defineEvent<HitMarkerInfo>('HitMarker');

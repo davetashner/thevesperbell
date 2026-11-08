@@ -41,6 +41,8 @@ import {
   giveHurtboxes,
   HitboxComponent,
   HurtboxComponent,
+  markHumanoid,
+  RegionStateComponent,
 } from '../combat/hits/components';
 import {
   CombatFacingComponent,
@@ -139,6 +141,7 @@ const BODY_COMPONENTS: readonly ComponentType<unknown>[] = Object.freeze([
   CombatFacingComponent,
   ...DAMAGE_COMPONENTS,
   HurtboxComponent,
+  RegionStateComponent,
   HitReactionComponent,
 ]);
 
@@ -262,6 +265,8 @@ export function spawnCreature(
   });
   giveCombatant(world, entity, combatantFromCreature(def));
   giveHitReactions(world, entity, reactionProfileFromCreature(def));
+  if (creature.humanoid === true && world.isRegistered(RegionStateComponent))
+    markHumanoid(world, entity);
   if (def.attacks.length > 0 && world.isRegistered(AttackerComponent)) {
     giveAttacker(
       world,

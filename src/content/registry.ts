@@ -20,6 +20,7 @@ import { checkConditions } from './condition-checks.ts';
 import { checkFacts } from './fact-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
 import { checkSpellStatuses } from './spell-status-checks.ts';
+import { checkWeakpoints } from './weakpoint-checks.ts';
 import { checkSceneSignals } from './mechanism-checks.ts';
 import { checkRepopulation } from './repopulation-checks.ts';
 import { checkRecoveryAnchors } from './recovery-checks.ts';
@@ -147,6 +148,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkRespawnRules,
   checkRepopulation,
   checkSpellStatuses,
+  checkWeakpoints,
 ];
 
 export type ContentTypes = typeof contentTypes;
