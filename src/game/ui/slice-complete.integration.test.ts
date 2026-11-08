@@ -36,7 +36,10 @@ function game(options: Options = {}) {
   });
   const slots = {
     list: () => Promise.resolve([{ state: 'empty', slot: 'auto-1' }]),
-    overwrite: options.overwrite ?? (() => Promise.resolve({ summary: {}, thumbnail: {} })),
+    // The world is captured when the autosave is decided (mw-e01.21); writing it is what takes time.
+    capture: () => ({
+      writeTo: options.overwrite ?? (() => Promise.resolve({ summary: {}, thumbnail: {} })),
+    }),
   } as unknown as SaveSlots;
   const scheduler = new AutosaveScheduler({ slots, describe: () => ({}) as never });
   scheduler.subscribe((event) => {

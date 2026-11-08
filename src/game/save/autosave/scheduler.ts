@@ -203,15 +203,13 @@ export class AutosaveScheduler {
   ): Promise<AutosaveEvent | null> {
     let slot: SlotId | null = null;
     try {
+      // The world is saved now, at this tick boundary where the moment was judged safe: serializing
+      // it (which also settles a carried object) after the ring read would happen whenever the
+      // browser's storage answers, a different tick on every run (mw-e01.21).
+      const pending = this.options.slots.capture(world, this.options.describe());
       slot = pickAutosaveSlot(await this.options.slots.list(AUTOSAVE_SLOTS));
-      // Reading the ring let the game run on; the moment must still be safe when the world is saved.
-      // Requests queued meanwhile are covered by the one still waiting.
-      if (!this.vetoes.isSafe()) {
-        this.queued = null;
-        return null;
-      }
       this.emit({ type: 'saving', trigger, slot });
-      const saved = await this.options.slots.overwrite(slot, world, this.options.describe());
+      const saved = await pending.writeTo(slot);
       this.finish(tick);
       return this.emit({
         type: 'saved',

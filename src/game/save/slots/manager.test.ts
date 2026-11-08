@@ -108,6 +108,38 @@ describe('SaveSlots', () => {
     });
   });
 
+  it('capture saves the world as it was at the call, however long the thumbnail takes (mw-e01.21)', async () => {
+    const store = new MemorySaveStore();
+    const manager = slots(store);
+    const w = world(7, 1);
+    let drawn: (thumbnail: SlotThumbnail) => void = () => undefined;
+    const pending = manager.capture(w, {
+      ...input,
+      captureThumbnail: () => new Promise<SlotThumbnail>((resolve) => (drawn = resolve)),
+    });
+    // The game runs on while the frame the thumbnail is taken from is drawn.
+    w.restore({ ...w.snapshot(), clock: { tick: 12, hz: 60 } });
+    const written = pending.writeTo('auto-2');
+    drawn(png);
+    expect(await written).toMatchObject({ status: 'saved', slot: 'auto-2' });
+    const summary = (await manager.list(['auto-2']))[0];
+    expect(summary).toMatchObject({ state: 'ready' });
+    expect(summary?.state === 'ready' ? summary.details?.playtimeTicks : undefined).toBe(7);
+    const loaded = world(0, 0);
+    await manager.load('auto-2', loaded);
+    expect(loaded.tick).toBe(7);
+  });
+
+  it('capture rejects an unknown slot and an over-long label', async () => {
+    const manager = slots();
+    expect(() => manager.capture(world(), { ...input, label: 'x'.repeat(500) })).toThrow(
+      RangeError,
+    );
+    await expect(manager.capture(world(), input).writeTo('nope' as SlotId)).rejects.toThrow(
+      RangeError,
+    );
+  });
+
   it('lists every slot in display order, empty or not', async () => {
     const manager = slots();
     await manager.save('auto-2', world(), input);

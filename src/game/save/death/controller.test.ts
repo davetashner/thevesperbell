@@ -9,7 +9,7 @@ import { defineComponent, hashWorld, World } from '@sim/index';
 import { DEATH_SCREEN, LOADING_SCREEN, SAVE_NOTICE_SCREEN, UiRoot } from '@ui/index';
 import { IDBFactory } from 'fake-indexeddb';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { decodeSave, encodeSave, WORLD_SECTION_ID } from '../format/index';
+import { decodeSave, encodeSave, SaveRegistry, WORLD_SECTION_ID } from '../format/index';
 import { createGameSaveRegistry } from '../sections';
 import type { SlotId } from '../slots/index';
 import { MemorySaveStore, openSaveStore, type SaveStore } from '../storage/index';
@@ -56,6 +56,7 @@ interface Setup {
   clock?: { now: number };
   /** The session's chosen class (default knight); undefined: none. */
   chosenClass?: string | undefined;
+  registry?: SaveRegistry;
 }
 
 /** A DeathReload over a real registry, with the page reload and outputs recorded. */
@@ -76,7 +77,7 @@ function setup(options: Setup = {}) {
     ui,
     world: w,
     store,
-    registry: createGameSaveRegistry(),
+    registry: options.registry ?? createGameSaveRegistry(),
     build,
     now: () => clock.now,
     session: storage,
@@ -298,6 +299,26 @@ describe('death screen', () => {
 });
 
 describe('load on boot', () => {
+  it('a debug save publishes the hash of the world it saved, after what a save settles (mw-e01.21)', async () => {
+    // A save never stores a carried object: the registry sets it down first (here: moves the entity).
+    const registry = new SaveRegistry({
+      beforeWrite: (w) => {
+        w.query(Position).forEach((entity) => {
+          w.set(entity, Position, { x: -1 });
+        });
+      },
+    });
+    const s = setup({ registry, tick: 5 });
+    const before = hashWorld(s.world);
+    const hash = await save(s, 'manual-1', 5, T0);
+    expect(hash).not.toBe(before);
+    expect(hash).toBe(hashWorld(s.world));
+    const loaded = world(0);
+    const read = await s.reload['slots'].load('manual-1', loaded);
+    expect(read.status).toBe('loaded');
+    expect(hashWorld(loaded)).toBe(hash);
+  });
+
   it('AC-2: loads the pending save into the fresh world before the first step, at the saved state hash', async () => {
     const before = setup();
     const hash = await save(before, 'manual-1', 120, T0);
