@@ -19,6 +19,7 @@ import {
 import {
   loopSeconds,
   loopSidecarSchema,
+  type LoopSidecar,
   type AudioFormat,
   type BusId,
   type SoundDef,
@@ -41,6 +42,7 @@ import type {
   AudioBufferLike,
   AudioBufferSourceNodeLike,
   AudioContextLike,
+  AudioParamLike,
   GainNodeLike,
   PannerNodeLike,
 } from './web-audio.ts';
@@ -77,6 +79,41 @@ export interface SoundHandle {
   stop(fadeSeconds?: number): void;
   /** Ramps volume (linear) over `seconds`. */
   fade(volume: number, seconds: number): void;
+}
+
+/** A decoded music track for scheduled playback (mw-e28.11). */
+export interface MusicTrack {
+  readonly buffer: AudioBufferLike;
+  /** Loop region in seconds from the sidecar, if any. */
+  readonly loop?: { readonly start: number; readonly end: number };
+  /** Tempo from the sidecar, if any. */
+  readonly timing?: { readonly bpm: number; readonly beatsPerBar: number };
+}
+
+/** Where and how to start a music track on the audio clock. */
+export interface StartTrackOptions {
+  /** Audio-clock time to start at (seconds); default now. */
+  readonly when?: number;
+  /** Seconds into the buffer to start from. */
+  readonly offset?: number;
+  /** Repeat (within the sidecar's loop region when it has one). */
+  readonly loop?: boolean;
+  /** Starting linear volume, default 1. */
+  readonly volume?: number;
+  /** Called when the source ends (it ran out, or was stopped). */
+  readonly onEnded?: () => void;
+}
+
+/** One scheduled music source: its own gain, outside the voice pool. */
+export interface MusicVoice {
+  /** The voice's gain; callers schedule fades on it. */
+  readonly gain: AudioParamLike;
+  /** The cue's own trim as a linear gain: scheduled levels are multiplied by it. */
+  readonly trim: number;
+  /** Audio-clock time the source was scheduled to start at. */
+  readonly startTime: number;
+  /** Stops at an audio-clock time (default now). Idempotent. */
+  stop(when?: number): void;
 }
 
 /** Load / playback state of a cue id. */
@@ -260,6 +297,58 @@ export class AudioEngine {
   }
 
   /**
+   * Loads and decodes a cue's first variant for scheduled playback by the music controller
+   * (mw-e28.11). Rejects on failure without warning (the caller logs once) and does not mark the
+   * cue failed. Looping cues also read their tempo from the loop sidecar.
+   */
+  loadTrack(cueId: string): Promise<MusicTrack> {
+    const def = this.#lookup(cueId);
+    if (!def) return Promise.reject(new Error(`unknown cue "${cueId}"`));
+    const asset = def.variants[0];
+    if (def.loop) this.#loopAssets.add(asset);
+    return this.#runtime().cache.request(asset);
+  }
+
+  /**
+   * Starts a loaded track on the audio clock at `options.when`, routed to the cue's bus, so several
+   * tracks started at the same time share a sample-accurate start. Null for an unknown cue.
+   */
+  startTrack(cueId: string, track: MusicTrack, options: StartTrackOptions = {}): MusicVoice | null {
+    const def = this.#lookup(cueId);
+    if (!def) return null;
+    const { ctx, graph } = this.#runtime();
+    const startTime = options.when ?? ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = track.buffer;
+    if (options.loop) {
+      source.loop = true;
+      if (track.loop) {
+        source.loopStart = track.loop.start;
+        source.loopEnd = track.loop.end;
+      }
+    }
+    const trim = dbToGain(def.gainDb);
+    const gain = ctx.createGain();
+    gain.gain.value = (options.volume ?? 1) * trim;
+    source.connect(gain);
+    gain.connect(graph.buses[def.bus]);
+    source.onended = () => {
+      source.disconnect();
+      gain.disconnect();
+      options.onEnded?.();
+    };
+    source.start(startTime, options.offset ?? 0);
+    return {
+      gain: gain.gain,
+      trim,
+      startTime,
+      stop: (when) => {
+        source.stop(when ?? ctx.currentTime);
+      },
+    };
+  }
+
+  /**
    * Once per render frame: moves the listener to the camera and every entity-attached voice to its
    * entity's current position, then starts any queued sounds that became playable.
    */
@@ -417,16 +506,21 @@ export class AudioEngine {
 
   async #fetchAndDecode(ctx: AudioContextLike, assetId: string): Promise<LoadedSound> {
     const { fetchBytes, resolveUrl, format } = this.#opts;
-    const [bytes, sidecar] = await Promise.all([
+    const [bytes, parsed] = await Promise.all([
       fetchBytes(resolveUrl(assetId, format)),
       this.#loopAssets.has(assetId) ? this.#loadSidecar(resolveUrl(assetId, 'json')) : undefined,
     ]);
     const buffer = await ctx.decodeAudioData(bytes);
-    return sidecar ? { buffer, loop: sidecar } : { buffer };
+    if (!parsed) return { buffer };
+    return {
+      buffer,
+      loop: loopSeconds(parsed),
+      timing: { bpm: parsed.bpm, beatsPerBar: parsed.beatsPerBar },
+    };
   }
 
-  /** Loop points from the §5.3 sidecar; without one a loop repeats the whole buffer. */
-  async #loadSidecar(url: string): Promise<{ start: number; end: number } | undefined> {
+  /** The §5.3 sidecar; without one a loop repeats the whole buffer. */
+  async #loadSidecar(url: string): Promise<LoopSidecar | undefined> {
     let bytes: ArrayBuffer;
     try {
       bytes = await this.#opts.fetchBytes(url);
@@ -434,7 +528,7 @@ export class AudioEngine {
       return undefined;
     }
     try {
-      return loopSeconds(loopSidecarSchema.parse(JSON.parse(new TextDecoder().decode(bytes))));
+      return loopSidecarSchema.parse(JSON.parse(new TextDecoder().decode(bytes)));
     } catch (error) {
       this.#warn(`audio: ignoring invalid loop sidecar ${url} (${String(error)})`);
       return undefined;

@@ -670,3 +670,85 @@ describe('AudioEngine positional updates', () => {
     expect(without.ctx.panners[0]?.positionX.value).toBe(2);
   });
 });
+
+describe('AudioEngine music tracks (mw-e28.11)', () => {
+  const sidecar = { bpm: 128, beatsPerBar: 6, loopStartSample: 0, loopEndSample: 96_000 };
+  const withSidecar = (url: string): Promise<ArrayBuffer> =>
+    url.endsWith('.json')
+      ? Promise.resolve(new TextEncoder().encode(JSON.stringify(sidecar)).buffer)
+      : Promise.resolve(new ArrayBuffer(1));
+
+  it('loads a looping cue with its sidecar tempo and loop region, without warning on failure', async () => {
+    const { engine, warn } = setup({ fetchBytes: withSidecar });
+    const track = await engine.loadTrack('sfx-torch-loop');
+    expect(track.timing).toEqual({ bpm: 128, beatsPerBar: 6 });
+    expect(track.loop).toEqual({ start: 0, end: 2 });
+    const failing = setup({ fetchBytes: () => Promise.reject(new Error('HTTP 404')) });
+    await expect(failing.engine.loadTrack('sfx-ui-click')).rejects.toThrow('HTTP 404');
+    expect(failing.warn).not.toHaveBeenCalled();
+    expect(failing.engine.cueStatus('sfx-ui-click')).toBe('ok');
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('rejects an unknown cue, warning once', async () => {
+    const { engine, warn } = setup();
+    await expect(engine.loadTrack('nope')).rejects.toThrow('unknown cue');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(
+      engine.startTrack('nope', { buffer: new FakeAudioContext().createBuffer(1, 1, 48000) }),
+    ).toBeNull();
+  });
+
+  it('starts a track at an audio-clock time and offset on its cue bus, with fades on its own gain', async () => {
+    const { engine, ctx } = setup({ fetchBytes: withSidecar });
+    await engine.unlock();
+    const track = await engine.loadTrack('sfx-torch-loop');
+    const onEnded = vi.fn();
+    const voice = engine.startTrack('sfx-torch-loop', track, {
+      when: 12.5,
+      offset: 1.5,
+      loop: true,
+      volume: 0.5,
+      onEnded,
+    });
+    const source = ctx.sources.at(-1);
+    expect(source).toMatchObject({
+      startedAt: 12.5,
+      startOffset: 1.5,
+      loop: true,
+      loopStart: 0,
+      loopEnd: 2,
+    });
+    expect(voice?.startTime).toBe(12.5);
+    expect(voice?.trim).toBe(1);
+    expect(voice?.gain.value).toBe(0.5);
+    voice?.stop(14);
+    expect(source?.stoppedAt).toBe(14);
+    voice?.stop();
+    expect(source?.stoppedAt).toBe(ctx.currentTime);
+    expect(engine.stats().voices).toBe(0);
+    source?.end();
+    expect(onEnded).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays once by default, starts now, and applies the cue trim', async () => {
+    const { engine, ctx } = setup();
+    await engine.unlock();
+    ctx.currentTime = 3;
+    const track = await engine.loadTrack('sfx-creature-horn-bellow');
+    const voice = engine.startTrack('sfx-creature-horn-bellow', track);
+    const source = ctx.sources.at(-1);
+    expect(source).toMatchObject({ startedAt: 3, startOffset: 0, loop: false });
+    expect(voice?.trim).toBeCloseTo(0.501, 2);
+    source?.end();
+  });
+
+  it('a looping track without a sidecar repeats the whole buffer', async () => {
+    const { engine, ctx } = setup();
+    await engine.unlock();
+    const track = await engine.loadTrack('sfx-torch-loop');
+    expect(track.timing).toBeUndefined();
+    engine.startTrack('sfx-torch-loop', track, { loop: true });
+    expect(ctx.sources.at(-1)?.loopEnd).toBe(0);
+  });
+});

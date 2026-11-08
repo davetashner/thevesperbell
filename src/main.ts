@@ -107,7 +107,14 @@ import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index
 import { attachSoundCaptions, type SoundCaptionsGlue } from '@game/captions/sound-captions';
 import { bindMix, type MixBindings } from '@game/music/mix-bindings';
 import { AmbienceController, placeZones } from '@game/ambience/index';
-import { SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
+import {
+  AdaptiveMusic,
+  AlertStingerHooks,
+  musicSetFor,
+  SceneBeds,
+  SceneHums,
+  ShopStingers,
+} from '@game/music/index';
 import { layers } from '@game/index';
 import { ActionSampler, inputGlyph, type InputDevice } from '@game/input/index';
 import { debugConsoleEnabled } from '@game/debug-console-gate';
@@ -1233,14 +1240,20 @@ function startRenderer(
       // Sky, fog and the painted backdrop of outdoor scenes (mw-ju8.1). The unapproved backdrop images
       // are not in production builds, so only dev loads them.
       applyEnvironment(view.scene, scene.environment, { load: import.meta.env.DEV });
-      // The slice's ambience and music beds play from the first gesture on (mw-0j5), a stand-in for
-      // the adaptive controller (mw-e28.11). The volume sliders are bound once, with the engine.
+      // A scene's music plays from the first gesture on (mw-0j5) and follows the creatures' alert
+      // states, crossfading layers on bar lines (mw-e28.11). The volume sliders are bound once, with
+      // the engine.
       mixBindings?.dispose();
       mixBindings = bindMix({ world, mix, now: () => performance.now() });
-      const music =
-        scene.id === 'slice'
-          ? new SliceMusic({ world, engine: audio, now: () => performance.now() })
-          : undefined;
+      const musicSet = musicSetFor(scene.id);
+      const music = musicSet
+        ? new AdaptiveMusic({
+            world,
+            engine: audio,
+            set: musicSet,
+            stingers: new AlertStingerHooks({ world }),
+          })
+        : undefined;
       // Diegetic hums follow their creature: Ottilie hums at her counter in Marsh's General Store
       // (mw-ju8.40). The scene's creatures spawn later in this setup, and the hum finds hers by spawn
       // point, so it starts on the first frame after they exist.
