@@ -242,12 +242,15 @@ export class DeathReload {
    */
   async debugSave(slot: SlotId): Promise<void> {
     const { world } = this.options;
-    const tick = world.tick;
-    const hash = hashWorld(world);
     // The game's describe() also carries its thumbnail capture; a debug save leaves it out.
     const { characterName, classId, areaId } = this.options.describe();
     const input = { characterName, classId, areaId };
-    await this.slots.overwrite(slot, world, input);
+    // Capturing settles what a save never stores (a carried object is set down, mw-e17.14), so the
+    // hash published is the world a load of this save returns, not the one before it was settled.
+    const saved = this.slots.capture(world, input);
+    const tick = world.tick;
+    const hash = hashWorld(world);
+    await saved.writeTo(slot);
     this.options.publish?.({ kind: 'saved', slot, tick, hash });
   }
 

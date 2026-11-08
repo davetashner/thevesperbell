@@ -5,19 +5,29 @@
 // `object.recovered` is emitted once (it is back in bounds afterwards). A carrier is let go of it
 // first (carry's own lost rule), so nothing is left holding an object that has been sent away.
 //
-// Out of scope: an object that is destroyed (broken) outright has no entity left to return; quest
-// content keeps such objects unbreakable (no `fragile`, no breakable profile).
+// An object that is destroyed outright (mw-e17.18) is replaced: whatever breaks (`breakableBroken`)
+// while it holds a recovery anchor is rebuilt as an intact copy at the anchor, at rest and upright,
+// with the original's properties (less its live state: hp, fire, wetness, ice, charge, heat), its
+// body shape and its breakable profile, and `object.recovered` says so once (`reason: 'destroyed'`,
+// `entity` the copy). It is decided by the anchor alone, never by what the object is. The copy has
+// the same recovery anchor, so it is protected the same way; the debris and spill of the break stay
+// where they fell. Hit points of the copy are the property default (the broken one's are spent).
 
 import { defineComponent, type EntityId } from '../core/component';
+import { BreakableComponent, type Breakable } from '../breakables/components';
+import { breakableBroken } from '../breakables/events';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
 import type { BodyShape } from '../physics/bodies';
 import {
+  addPhysicsObject,
   PhysicsObjectComponent,
   type PhysicsObject,
   setPhysicsObjectVelocity,
   teleportPhysicsObject,
 } from '../physics/objects';
+import { addProperties, getProperty, readProperty } from '../properties/components';
+import { WORLD_PROPERTY_KEYS } from '../properties/spec';
 import type { Vec3 } from '../stimulus/shapes';
 
 /** Where a quest-critical object returns to (`object.recovery`): its base rests at `at`, metres. */
@@ -54,7 +64,7 @@ export interface ObjectRecovered {
   readonly from: Vec3;
   /** Where it was put, metres (its anchor). */
   readonly to: Vec3;
-  readonly reason: 'below-kill-plane' | 'out-of-bounds';
+  readonly reason: 'below-kill-plane' | 'out-of-bounds' | 'destroyed';
 }
 
 /** Fired once as an object returns to its recovery anchor (`object.recovered`; never renamed). */
@@ -70,6 +80,57 @@ export function restHeight(shape: BodyShape): number {
     case 'capsule':
       return shape.halfHeight + shape.radius;
   }
+}
+
+/** Live state a copy starts without: it is an intact, cold, dry, quiet new one. */
+const LIVE_STATE: ReadonlySet<string> = new Set([
+  'hp',
+  'temperature',
+  'burning',
+  'fuel',
+  'wetness',
+  'frozen',
+  'charge',
+]);
+
+/** Rebuilds the broken `entity` as an intact copy at its anchor (see the file header). */
+function replaceDestroyed(
+  w: World<never>,
+  entity: EntityId,
+  anchor: RecoveryAnchor,
+  body: PhysicsObject,
+  breakable: Breakable,
+  tick: number,
+): void {
+  const init: Record<string, unknown> = {};
+  for (const key of WORLD_PROPERTY_KEYS) {
+    if (LIVE_STATE.has(key)) continue;
+    const value = getProperty(w, entity, key);
+    if (value !== undefined) init[key] = value;
+  }
+  const copy = w.spawn();
+  addProperties(w, copy, init);
+  const to = { x: anchor.at.x, y: anchor.at.y, z: anchor.at.z };
+  const properties = {
+    weight: readProperty(w, entity, 'weight'),
+    friction: readProperty(w, entity, 'friction'),
+    impactAbsorb: readProperty(w, entity, 'impactAbsorb'),
+  };
+  addPhysicsObject(w, copy, {
+    shape: body.shape,
+    position: { ...to, y: to.y + restHeight(body.shape) },
+    properties,
+  });
+  w.add(copy, BreakableComponent, breakable);
+  addRecoveryAnchor(w, copy, anchor.at);
+  const { x, y, z } = body.position;
+  w.events.emit(objectRecovered, {
+    tick,
+    entity: copy,
+    from: { x, y, z },
+    to,
+    reason: 'destroyed',
+  });
 }
 
 /** Why `at` is out of the scene, or undefined when it is in. */
@@ -122,4 +183,11 @@ export function installObjectRecovery<TInput>(
     },
   };
   world.addSystem(system);
+  world.events.on(breakableBroken, ({ tick, entity }) => {
+    const anchor = w.get(entity, RecoveryAnchorComponent);
+    const body = w.get(entity, PhysicsObjectComponent);
+    const breakable = w.get(entity, BreakableComponent);
+    if (anchor === undefined || body === undefined || breakable === undefined) return;
+    replaceDestroyed(w, entity, anchor, body, breakable, tick);
+  });
 }

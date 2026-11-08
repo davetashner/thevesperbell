@@ -110,6 +110,12 @@ export interface WriteSaveOptions {
   readonly preserve?: Readonly<Record<string, SectionRecord>>;
 }
 
+/** A world serialized by `SaveRegistry.capture`, waiting to be encoded into save bytes. */
+export interface CapturedSave {
+  /** The save bytes: the captured sections under this envelope. Never reads the world. */
+  encode(options: Omit<WriteSaveOptions, 'preserve'>): Uint8Array;
+}
+
 /** How a registry treats worlds. */
 export interface SaveRegistryOptions {
   /**
@@ -204,9 +210,20 @@ export class SaveRegistry {
    *   CanonicalEncodingError for values with no canonical form (functions, Maps, undefined…).
    */
   write(world: World, options: WriteSaveOptions): Uint8Array {
+    return this.capture(world, options.preserve).encode(options);
+  }
+
+  /**
+   * The first half of `write`: settles the world (`beforeWrite`) and serializes every section, now,
+   * so the save holds the world as it is at this call. Everything that waits (a thumbnail, a slot
+   * lookup) happens afterwards, in `encode`, without touching the world again: a save written
+   * later must not change the running sim at a wall-clock moment (mw-e01.21).
+   * @throws as `write`.
+   */
+  capture(world: World, preserve: Readonly<Record<string, SectionRecord>> = {}): CapturedSave {
     this.beforeWrite?.(world);
     const sections: Record<string, SectionRecord> = {};
-    for (const [id, record] of Object.entries(options.preserve ?? {})) {
+    for (const [id, record] of Object.entries(preserve)) {
       if (!this.ids.has(id)) sections[id] = record;
     }
     for (const section of this.ordered) {
@@ -215,16 +232,19 @@ export class SaveRegistry {
       if (!valid.ok) throw valid.error;
       sections[section.id] = { version: section.version, data };
     }
-    const { gameVersion, buildSha, contentHash } = options.build;
-    return encodeSave({
-      gameVersion,
-      buildSha,
-      contentHash,
-      createdAtTick: world.tick,
-      wallClockSavedAt: options.wallClockSavedAt,
-      metadata: options.metadata ?? {},
-      sections,
-    });
+    const createdAtTick = world.tick;
+    return {
+      encode: ({ build, wallClockSavedAt, metadata }) =>
+        encodeSave({
+          gameVersion: build.gameVersion,
+          buildSha: build.buildSha,
+          contentHash: build.contentHash,
+          createdAtTick,
+          wallClockSavedAt,
+          metadata: metadata ?? {},
+          sections,
+        }),
+    };
   }
 
   /**

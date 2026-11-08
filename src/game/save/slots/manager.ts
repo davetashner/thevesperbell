@@ -100,6 +100,16 @@ export type SaveSlotOutcome =
 /** A save that was written. */
 export type SavedSlotOutcome = Extract<SaveSlotOutcome, { readonly status: 'saved' }>;
 
+/** A world captured by `SaveSlots.capture`, waiting to be written into a slot. */
+export interface CapturedSlotSave {
+  /**
+   * Writes the captured save into `slot` (whether or not it is occupied; the replaced save becomes
+   * the slot's backup), once the thumbnail capture has settled.
+   * @throws RangeError for an unknown slot; SaveQuotaError / SaveStorageError when storage fails.
+   */
+  writeTo(slot: SlotId): Promise<SavedSlotOutcome>;
+}
+
 /** Outcome of loading a slot into a world. */
 export type LoadSlotResult =
   | ({ readonly status: 'loaded'; readonly slot: SlotId } & Extract<LoadSaveResult, { ok: true }>)
@@ -182,11 +192,11 @@ export class SaveSlots {
     options: { readonly overwrite?: boolean } = {},
   ): Promise<SaveSlotOutcome> {
     assertSlot(slot);
-    const label = normalizeSlotLabel(input.label ?? '');
+    normalizeSlotLabel(input.label ?? ''); // an over-long label fails before anything else
     if (options.overwrite !== true && (await this.options.store.list()).includes(slot)) {
       return { status: 'confirm-overwrite', slot };
     }
-    return this.write(slot, label, world, input);
+    return this.write(slot, world, input);
   }
 
   /**
@@ -196,45 +206,62 @@ export class SaveSlots {
    */
   async overwrite(slot: SlotId, world: World, input: SaveSlotInput): Promise<SavedSlotOutcome> {
     assertSlot(slot);
-    return this.write(slot, normalizeSlotLabel(input.label ?? ''), world, input);
+    return this.write(slot, world, input);
   }
 
-  private async write(
-    slot: SlotId,
-    label: string | undefined,
-    world: World,
-    input: SaveSlotInput,
-  ): Promise<SavedSlotOutcome> {
-    // Without a capture there is nothing to wait for: the world is written the moment `save` is called
-    // (a debug save's tick and state hash are the ones it published, mw-e01.9).
-    const thumbnail =
+  /**
+   * Captures `world` now (settling it and serializing every section, at this call) and starts the
+   * thumbnail capture; the returned save is written into a slot of the caller's choosing later.
+   * Nothing after this call reads or changes `world`, so a save that waits on storage or a drawn
+   * frame never alters the running sim at a wall-clock moment: autosave captures when it decides to
+   * save, then looks for its ring slot (mw-e01.21).
+   * @throws RangeError for an over-long label; SaveSectionInvalidError / CanonicalEncodingError when
+   *   a section serializes bad data.
+   */
+  capture(world: World, input: SaveSlotInput): CapturedSlotSave {
+    const label = normalizeSlotLabel(input.label ?? '');
+    const captured = this.options.registry.capture(world, input.preserve ?? {});
+    const playtimeTicks = world.tick;
+    const tickRateHz = world.clock.hz;
+    // Without a capture there is nothing to wait for (a debug save's tick and state hash are the ones
+    // it published, mw-e01.9).
+    const thumbnailCapture =
       input.captureThumbnail === undefined
-        ? noThumbnail
-        : await captureThumbnail(input.captureThumbnail);
-    const metadata: StoredSlotMetadata = {
-      characterName: input.characterName,
-      classId: input.classId,
-      areaId: input.areaId,
-      ...(label === undefined ? {} : { label }),
-      playtimeTicks: world.tick,
-      tickRateHz: world.clock.hz,
-      thumbnail: thumbnail.stored,
-    };
-    const { build } = this.options;
-    const savedAt = this.options.now();
-    const bytes = this.options.registry.write(world, {
-      build,
-      wallClockSavedAt: savedAt,
-      metadata: { ...metadata },
-      preserve: input.preserve ?? {},
-    });
-    await this.options.store.write(slot, bytes);
+        ? Promise.resolve(noThumbnail)
+        : captureThumbnail(input.captureThumbnail);
     return {
-      status: 'saved',
-      slot,
-      summary: ready(slot, savedAt, build.gameVersion, { ...metadata }),
-      thumbnail: thumbnail.outcome,
+      writeTo: async (slot) => {
+        assertSlot(slot);
+        const thumbnail = await thumbnailCapture;
+        const metadata: StoredSlotMetadata = {
+          characterName: input.characterName,
+          classId: input.classId,
+          areaId: input.areaId,
+          ...(label === undefined ? {} : { label }),
+          playtimeTicks,
+          tickRateHz,
+          thumbnail: thumbnail.stored,
+        };
+        const { build } = this.options;
+        const savedAt = this.options.now();
+        const bytes = captured.encode({
+          build,
+          wallClockSavedAt: savedAt,
+          metadata: { ...metadata },
+        });
+        await this.options.store.write(slot, bytes);
+        return {
+          status: 'saved',
+          slot,
+          summary: ready(slot, savedAt, build.gameVersion, { ...metadata }),
+          thumbnail: thumbnail.outcome,
+        };
+      },
     };
+  }
+
+  private write(slot: SlotId, world: World, input: SaveSlotInput): Promise<SavedSlotOutcome> {
+    return this.capture(world, input).writeTo(slot);
   }
 
   /**

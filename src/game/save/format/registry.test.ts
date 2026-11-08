@@ -119,6 +119,19 @@ describe('SaveRegistry', () => {
     expect(loaded.snapshot()).toEqual(world.snapshot());
   });
 
+  it('capture serializes now: bytes encoded after the world changed hold the world as captured (mw-e01.21)', () => {
+    const registry = threeSections();
+    const world = randomWorld(11);
+    const hash = hashWorld(world);
+    const captured = registry.capture(world);
+    world.step();
+    world.step();
+    const loaded = freshWorld();
+    expect(registry.read(loaded, captured.encode(options)).ok).toBe(true);
+    expect(hashWorld(loaded)).toBe(hash);
+    expect(hashWorld(world)).not.toBe(hash);
+  });
+
   it('AC-1: saves owned components only in their own section', () => {
     const decoded = decodeSave(threeSections().write(randomWorld(3), options));
     const sections = decoded.ok ? decoded.envelope.sections : {};

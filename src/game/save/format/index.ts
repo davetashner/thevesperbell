@@ -30,6 +30,7 @@ export {
   type LoadSaveResult,
   type SaveRegistryOptions,
   type SaveWarning,
+  type CapturedSave,
   type WriteSaveOptions,
 } from './registry';
 export {

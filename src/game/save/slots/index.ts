@@ -15,6 +15,7 @@ export {
 } from './ids';
 export {
   SaveSlots,
+  type CapturedSlotSave,
   type DeleteSlotOutcome,
   type LoadSlotResult,
   type ReadySlotSummary,
