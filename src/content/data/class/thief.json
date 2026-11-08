@@ -29,6 +29,7 @@
   },
   "proficiencies": ["daggers", "blades", "light-armor"],
   "armorCapacityKg": 23,
+  "carryLimitKg": 25,
   "stats": {
     "health": 90,
     "stamina": 110,

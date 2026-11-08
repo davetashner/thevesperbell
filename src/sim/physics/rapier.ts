@@ -458,6 +458,11 @@ export class RapierPhysics implements RigidBodyPort {
     return handle;
   }
 
+  /** Rapier's handle for one of this port's colliders, or undefined for one it does not have. */
+  rapierHandleOf(handle: ColliderHandle): number | undefined {
+    return this.entries.get(handle)?.collider;
+  }
+
   /** Linear velocity of a collider, m/s: zero for a fixed one or a handle this port does not have. */
   velocityOf(handle: ColliderHandle): Vec3 {
     const body = this.entries.get(handle)?.body;

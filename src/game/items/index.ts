@@ -12,13 +12,22 @@
 // - `ItemWatch` keeps what the e2e reads (#app[data-items]): the player's pack, the world items
 //   lying about, and counts of takes, drops and refusals.
 
-import { toPropertyInit, type GameContent, materialPresets, type ItemEntry } from '@content/index';
+import {
+  DEFAULT_CARRY_LIMIT_KG,
+  toPropertyInit,
+  type GameContent,
+  materialPresets,
+  type ItemEntry,
+} from '@content/index';
 import {
   addInventory,
   addQuickSlots,
   addSceneItems,
   Consumables,
+  installCarry,
   installConsumables,
+  classOf,
+  holdOf,
   installWorldItems,
   inventoryOf,
   itemAdded,
@@ -32,6 +41,8 @@ import {
   WorldItemComponent,
   WorldItems,
   type ConsumableDef,
+  type CarryController,
+  type CollisionWorld,
   type EntityId,
   type ItemInstanceFlags,
   type ItemSpawnEntity,
@@ -104,9 +115,30 @@ export function startWorldItems<T>(
   player: EntityId | undefined,
 ): EntityId[] {
   const sim = world as unknown as World<never>;
-  installWorldItems(world, items);
+  installWorldItems(world, items, { busy: (w, actor) => holdOf(w, actor) !== undefined });
   if (player !== undefined && inventoryOf(sim, player) === undefined) addInventory(sim, player);
   return addSceneItems(sim, items, spawns);
+}
+
+/**
+ * Installs carrying (mw-e02.17) after the world items: Interact picks up a liftable object up to the
+ * class's carry limit (class data, 25 kg by default), Drop and Throw (held to charge) let it go.
+ * `collision` stops a held object at walls. Returns the controller (the throw arc preview).
+ */
+export function startCarry<T>(
+  world: World<T>,
+  content: Pick<GameContent, 'get' | 'has'>,
+  collision: CollisionWorld,
+): CarryController {
+  return installCarry(world, {
+    collision,
+    limit: (w, actor) => {
+      const id = classOf(w, actor);
+      return id !== undefined && content.has('class', id)
+        ? content.get('class', id).carryLimitKg
+        : DEFAULT_CARRY_LIMIT_KG;
+    },
+  });
 }
 
 /**

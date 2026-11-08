@@ -67,6 +67,15 @@ export function describeCollisionWorldContract(label: string, makeWorld: MakeCon
         expect(hit?.point.y).toBeLessThanOrEqual(1.9 + TOL);
       });
 
+      it('does not see the collider it is told to ignore, but sees the ones behind it', () => {
+        const front = box(v(1, 0, -1), v(1.5, 2, 1));
+        const { world, bodies } = makeWorld([front, WALL]);
+        expect(world.sweepCapsule(STANDING, v(0, 0.1, 0), EAST, 5)?.body).toBe(bodies[0]);
+        expect(world.sweepCapsule(STANDING, v(0, 0.1, 0), EAST, 5, bodies[0])?.body).toBe(
+          bodies[1],
+        );
+      });
+
       it('reports nothing when the path is clear or contact lies beyond maxDistance', () => {
         const { world } = makeWorld([WALL, box(v(-3, 0, 4), v(3, 0.2, 6))]);
         expect(world.sweepCapsule(STANDING, v(0, 0.1, 0), EAST, 1)).toBeUndefined();

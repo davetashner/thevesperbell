@@ -150,6 +150,13 @@
       "maximum": 60,
       "description": "Equipped armor weight at 100% load (ADR-0003: knight 30, others 23). Kilograms."
     },
+    "carryLimitKg": {
+      "default": 25,
+      "description": "Heaviest world object the class hand-carries, kilograms (ADR-0003, mw-e02.17: 25 by default); a class constant nothing raises.",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 60
+    },
     "stats": {
       "type": "object",
       "properties": {

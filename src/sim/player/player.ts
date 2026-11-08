@@ -48,6 +48,7 @@ import type { ControllerTuning, Frozen, MoveTable, RuntimeShield } from '@conten
 import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
+import { carryRestraint } from '../carry/state';
 import { radians } from '../character/greybox';
 import {
   CharacterController,
@@ -766,15 +767,26 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         if (frame === undefined || look === undefined) return undefined;
         const statusScale =
           options.statuses === undefined ? 1 : statusMoveScale(world, options.statuses, entity);
-        const actions =
+        const carrying = carryRestraint(world, entity);
+        const fought =
           combat === undefined
-            ? restrainMovement(frame, statusScale)
+            ? undefined
+            : {
+                scale: combatLocomotionScale(world, entity, combat),
+                noJump:
+                  combat.melee !== undefined && isAttacking(world, entity, combat.moves)
+                    ? true
+                    : undefined,
+              };
+        // Statuses and combat take the slower of the two; what the carrier holds slows it on top
+        // (ADR-0003: carry stacks with other restraints).
+        const actions =
+          fought === undefined && carrying === undefined && statusScale === 1
+            ? frame
             : restrainMovement(
                 frame,
-                Math.min(combatLocomotionScale(world, entity, combat), statusScale),
-                combat.melee !== undefined && isAttacking(world, entity, combat.moves)
-                  ? true
-                  : undefined,
+                Math.min(fought?.scale ?? 1, statusScale) * (carrying?.scale ?? 1),
+                fought?.noJump === true || carrying?.noJump === true ? true : undefined,
               );
         const motion = combat && world.get(entity, DodgeComponent)?.velocity;
         const anchor = world.get(entity, ViewAnchor);

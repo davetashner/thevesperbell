@@ -27,6 +27,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `startingKit.items[].equip` | boolean | `false` | Starts equipped in its slot (a single unit of an equippable item). |
 | `proficiencies` | list of id (at least 1) | required | Proficiency tags the class has, matching items’ equip.proficiencies, e.g. "blades", "heavy-armor", "shields". Soft (mw-e17.4). |
 | `armorCapacityKg` | number > 0 ≤ 60 | required | Equipped armor weight at 100% load (ADR-0003: knight 30, others 23). Kilograms. |
+| `carryLimitKg` | number > 0 ≤ 60 | `25` | Heaviest world object the class hand-carries, kilograms (ADR-0003, mw-e02.17: 25 by default); a class constant nothing raises. |
 | `stats` | object | required | Start values of the supporting stats. |
 | `stats.health` | integer 1–200 | required | Starting health (ADR-0004 stats table); grows only in +10 steps up to the cap. |
 | `stats.stamina` | integer 1–200 | required | Starting stamina (ADR-0004 stats table); grows only in +10 steps up to the cap. |

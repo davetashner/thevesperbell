@@ -185,7 +185,11 @@ describe('creature perception in the game loop (mw-e11.23)', () => {
     });
     world.step([spawnCommand('fixture-guard', 1, { x: -3, y: 0, z: 3 })]);
     for (let tick = 0; tick < 240 && heard.length === 0; tick++) world.step();
-    const [shouter, listener] = creatureEntities(world);
-    expect(heard[0]).toMatchObject({ listener, noise: { source: shouter } });
+    // Either guard may shout first (the race is decided by entity order); the other one hears it.
+    const guards = creatureEntities(world);
+    const first = heard[0];
+    expect(guards).toContain(first?.listener);
+    expect(guards).toContain(first?.noise.source);
+    expect(first?.listener).not.toBe(first?.noise.source);
   });
 });
