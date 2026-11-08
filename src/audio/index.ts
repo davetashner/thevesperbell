@@ -117,6 +117,19 @@ export {
   type Quat,
   type Vec3,
 } from './spatial.ts';
+export {
+  CAPTION_DEDUPE_MS,
+  CAPTION_LIFETIME_MS,
+  CAPTION_MAX_VISIBLE,
+  CAPTION_RANGE_M,
+  CAPTION_SECTORS,
+  CaptionTracker,
+  captionDirection,
+  type CaptionDirection,
+  type CaptionSector,
+  type CaptionTrigger,
+  type VisibleCaption,
+} from './captions.ts';
 export { gameSoundRegistry, SOUND_MANIFEST } from './sounds.ts';
 export { encodeWav, sineTone } from './wav.ts';
 export type * from './web-audio.ts';

@@ -784,6 +784,35 @@ ${tokens}
   color: var(--ui-color-text-muted);
 }
 .vb-pickup-flavour { font-style: italic; overflow-wrap: anywhere; }
+.vb-captions {
+  position: absolute;
+  top: var(--ui-space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ui-space-1);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--ui-space-3));
+  pointer-events: none;
+}
+.vb-captions[hidden] { display: none; }
+.vb-caption {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-1) var(--ui-space-3);
+  background: rgb(30 27 46 / 90%);
+  color: var(--ui-color-hud-text);
+  text-shadow: none;
+  border-radius: var(--ui-radius);
+  font-size: ${size(1.125)};
+}
+.vb-captions[data-size='small'] .vb-caption { font-size: ${size(0.875)}; }
+.vb-captions[data-size='large'] .vb-caption { font-size: ${size(1.5)}; }
+.vb-caption-arrow { flex: none; display: inline-block; line-height: 1; color: var(--ui-color-accent); }
+.vb-caption-text { min-width: 0; overflow-wrap: anywhere; }
 .vb-glyph-prompt { display: inline-flex; align-items: center; gap: var(--ui-space-1); }
 .vb-glyph-prompt kbd {
   font: inherit;

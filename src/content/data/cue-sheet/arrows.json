@@ -76,6 +76,15 @@
     },
     {
       "event": "arrowImpact",
+      "match": { "sound": "sfx-arrow-noise-rattle" },
+      "layer": "payload",
+      "cue": "{sound}",
+      "pitchJitter": 0.04,
+      "priority": 55,
+      "caption": "caption.noise-rattle"
+    },
+    {
+      "event": "arrowImpact",
       "layer": "payload",
       "cue": "{sound}",
       "pitchJitter": 0.04,

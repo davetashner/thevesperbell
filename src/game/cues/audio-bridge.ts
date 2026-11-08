@@ -9,7 +9,7 @@
 // of its state, and catches its own errors so a broken rule can't throw into the sim's event flush.
 
 import type { PlayOptions } from '@audio/index';
-import { dbToGain } from '@audio/index';
+import { dbToGain, type CaptionTrigger, type Vec3 } from '@audio/index';
 import {
   CUE_DEDUPE_MS,
   cueEventSpec,
@@ -61,6 +61,14 @@ export interface AudioCueBridgeOptions {
   readonly lookups?: CueLookups;
   /** Variant count of a cue in the sound manifest, e.g. `soundVariantCount(registry)`. */
   readonly variantCount?: (cueId: string) => number | undefined;
+  /**
+   * Called for each occurrence of a rule with a `caption` (mw-e28.14), whether or not the audio
+   * plays (a muted or locked context still captions), before the audio de-dupe. Needs `positionOf`
+   * for entity anchors; an occurrence with no known position is not reported.
+   */
+  readonly onCaption?: (caption: CaptionTrigger) => void;
+  /** Where an entity is, for captions anchored to one (the engine's entity position lookup). */
+  readonly positionOf?: (entity: EntityId) => Vec3 | undefined;
   readonly warn?: (message: string) => void;
 }
 
@@ -72,6 +80,9 @@ export interface CuePlay {
 
 const unknown = (): undefined => undefined;
 const NO_LOOKUPS: CueLookups = { materialOf: unknown, impactClassOf: unknown };
+
+/** Caption priority of a rule that sets none (the middle of the 0–100 voice priority range). */
+export const DEFAULT_CAPTION_PRIORITY = 50;
 
 /** De-dupe and cooldown entries older than this are pruned once the maps grow. */
 const PRUNE_AT = 512;
@@ -89,6 +100,8 @@ export class AudioCueBridge {
   readonly #lookups: CueLookups;
   readonly #variantCount: (cueId: string) => number | undefined;
   readonly #warn: (message: string) => void;
+  readonly #onCaption: ((caption: CaptionTrigger) => void) | undefined;
+  readonly #positionOf: (entity: EntityId) => Vec3 | undefined;
   /** `cue|anchor` → last play time. */
   readonly #recent = new Map<string, number>();
   /** `rule|anchor` → last play time (rules with a cooldown only). */
@@ -106,6 +119,8 @@ export class AudioCueBridge {
     this.#rng = Rng.create(options.seed ?? DEFAULT_CUE_SEED).stream('presentation.audio-cues');
     this.#lookups = options.lookups ?? NO_LOOKUPS;
     this.#variantCount = options.variantCount ?? (() => undefined);
+    this.#onCaption = options.onCaption;
+    this.#positionOf = options.positionOf ?? unknown;
     this.#warn =
       options.warn ??
       ((message) => {
@@ -140,6 +155,7 @@ export class AudioCueBridge {
       if (cue === undefined) continue;
       const anchor = reading.anchors[rule.at ?? defaultAnchor(event)];
       const where = anchorKey(anchor);
+      if (rule.caption !== undefined) this.#caption(rule, where, anchor);
       const dedupeKey = `${cue}|${where}`;
       if (within(this.#recent.get(dedupeKey), now, CUE_DEDUPE_MS)) continue;
       const cooldownKey = `${String(rule.index)}|${where}`;
@@ -154,6 +170,20 @@ export class AudioCueBridge {
     }
     this.#prune(now);
     return plays;
+  }
+
+  #caption(rule: CueRuleDef, source: string, anchor: CueAnchor | undefined): void {
+    if (this.#onCaption === undefined || rule.caption === undefined) return;
+    const position =
+      anchor?.position ??
+      (anchor?.entity === undefined ? undefined : this.#positionOf(anchor.entity));
+    if (position === undefined) return;
+    this.#onCaption({
+      stringId: rule.caption,
+      source,
+      position,
+      priority: rule.priority ?? DEFAULT_CAPTION_PRIORITY,
+    });
   }
 
   #options(rule: CueRuleDef, cue: string, anchor: CueAnchor | undefined, reading: CueReading) {

@@ -84,6 +84,36 @@ describe('game audio wiring (mw-e28.2)', () => {
     expect(play).toHaveBeenCalledTimes(2);
   });
 
+  it('reports captioned cues with their position, even before the audio context runs', () => {
+    const world = registerWorldProperties(new World({ seed: 1 }));
+    const onCaption = vi.fn();
+    const target = world.spawn();
+    attachGameAudio({
+      world,
+      engine: { context: undefined, play: vi.fn(() => null) },
+      registry: { get: () => undefined },
+      sheets: [
+        {
+          rules: [
+            cueRuleSchema.parse({ event: 'Died', cue: 'sfx-death', caption: 'caption.breaking' }),
+          ],
+        },
+      ],
+      materials: [],
+      now: () => 0,
+      onCaption,
+      positionOf: (entity) => (entity === target ? { x: 1, y: 2, z: 3 } : undefined),
+    });
+    world.events.emit(Died, { tick: 0, target, killer: null, source: null, tags: [] });
+    world.step();
+    expect(onCaption).toHaveBeenCalledWith({
+      stringId: 'caption.breaking',
+      source: `e${String(target)}`,
+      position: { x: 1, y: 2, z: 3 },
+      priority: 50,
+    });
+  });
+
   it('works without an onPlay probe', () => {
     const world = registerWorldProperties(new World({ seed: 1 }));
     const play = vi.fn(() => null);

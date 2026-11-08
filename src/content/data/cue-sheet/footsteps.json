@@ -11,7 +11,8 @@
       "cue": "sfx-foot-{surface}-walk",
       "pitchJitter": 0.04,
       "volumeJitterDb": 1,
-      "priority": 30
+      "priority": 30,
+      "caption": "caption.footsteps"
     },
     {
       "event": "LocomotionEvents",
@@ -23,7 +24,8 @@
       "cue": "sfx-foot-{surface}-run",
       "pitchJitter": 0.04,
       "volumeJitterDb": 1,
-      "priority": 30
+      "priority": 30,
+      "caption": "caption.footsteps"
     },
     {
       "event": "LocomotionEvents",
@@ -36,7 +38,8 @@
       "pitchJitter": 0.04,
       "volumeJitterDb": 1,
       "volumeDb": 3,
-      "priority": 30
+      "priority": 30,
+      "caption": "caption.footsteps"
     },
     {
       "event": "LocomotionEvents",
@@ -49,7 +52,8 @@
       "pitchJitter": 0.04,
       "volumeJitterDb": 1,
       "volumeDb": -10,
-      "priority": 30
+      "priority": 30,
+      "caption": "caption.footsteps"
     },
     {
       "event": "LocomotionEvents",

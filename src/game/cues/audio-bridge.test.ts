@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { PlayOptions } from '@audio/index';
+import type { CaptionTrigger, PlayOptions } from '@audio/index';
 import { cueRuleSchema, loadGameContent, type CueRuleDef } from '@content/index';
 import {
   addProperties,
@@ -12,6 +12,7 @@ import {
 } from '@sim/index';
 import {
   AudioCueBridge,
+  DEFAULT_CAPTION_PRIORITY,
   soundVariantCount,
   worldCueLookups,
   type AudioCueBridgeOptions,
@@ -272,6 +273,78 @@ describe('AudioCueBridge', () => {
     world.step();
     expect(spy).toHaveBeenCalledOnce();
     spy.mockRestore();
+  });
+});
+
+describe('cue captions (mw-e28.14)', () => {
+  const step = {
+    event: 'LocomotionEvents',
+    match: { kind: 'footstep' },
+    cue: 'sfx-foot-stone-walk',
+  };
+  const stepAt = (entity: number): CueReading => ({
+    anchors: { entity: { entity } },
+    facts: { kind: 'footstep' },
+  });
+
+  it('reports a captioned rule with its source position and priority, besides playing it', () => {
+    const captions: CaptionTrigger[] = [];
+    const { bridge, played } = setup(
+      rules({ ...step, caption: 'caption.footsteps', priority: 33 }),
+      {
+        onCaption: (c) => captions.push(c),
+        positionOf: (entity) => ({ x: entity, y: 0, z: 0 }),
+      },
+    );
+    bridge.handle('LocomotionEvents', stepAt(4));
+    expect(played).toHaveLength(1);
+    expect(captions).toEqual([
+      { stringId: 'caption.footsteps', source: 'e4', position: { x: 4, y: 0, z: 0 }, priority: 33 },
+    ]);
+  });
+
+  it('captions even when the audio de-dupe drops the repeat, and with a default priority', () => {
+    const captions: CaptionTrigger[] = [];
+    const { bridge, played } = setup(rules({ ...step, caption: 'caption.footsteps' }), {
+      onCaption: (c) => captions.push(c),
+      positionOf: () => ({ x: 1, y: 0, z: 0 }),
+    });
+    bridge.handle('LocomotionEvents', stepAt(4));
+    bridge.handle('LocomotionEvents', stepAt(4));
+    expect(played).toHaveLength(1);
+    expect(captions.map((c) => c.priority)).toEqual([
+      DEFAULT_CAPTION_PRIORITY,
+      DEFAULT_CAPTION_PRIORITY,
+    ]);
+  });
+
+  it('uses a fixed-position anchor directly and skips sources whose position is unknown', () => {
+    const captions: CaptionTrigger[] = [];
+    const { bridge } = setup(rules({ ...step, caption: 'caption.footsteps' }), {
+      onCaption: (c) => captions.push(c),
+    });
+    bridge.handle('LocomotionEvents', {
+      anchors: { entity: { position: { x: 1, y: 2, z: 3 } } },
+      facts: { kind: 'footstep' },
+    });
+    bridge.handle('LocomotionEvents', stepAt(4)); // an entity with no positionOf
+    bridge.handle('LocomotionEvents', { anchors: {}, facts: { kind: 'footstep' } });
+    expect(captions.map((c) => c.position)).toEqual([{ x: 1, y: 2, z: 3 }]);
+  });
+
+  it('does nothing for rules without a caption or bridges without a caption listener', () => {
+    const captions: CaptionTrigger[] = [];
+    setup(rules(step), { onCaption: (c) => captions.push(c) }).bridge.handle(
+      'LocomotionEvents',
+      stepAt(4),
+    );
+    expect(captions).toEqual([]);
+    expect(() =>
+      setup(rules({ ...step, caption: 'caption.footsteps' })).bridge.handle(
+        'LocomotionEvents',
+        stepAt(4),
+      ),
+    ).not.toThrow();
   });
 });
 
