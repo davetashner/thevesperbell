@@ -52,15 +52,34 @@ export {
 export {
   BUS_PARENT,
   LIMITER,
+  LOWPASS_OPEN_HZ,
+  MIX_BUS_IDS,
   NIGHT_BYPASS,
   NIGHT_COMPRESSOR,
   applyMono,
   applyNightMode,
+  applyDuckStage,
+  applySnapshotStage,
   buildBusGraph,
   dbToGain,
   rampParam,
   type BusGraph,
+  type MixBusId,
+  type MixStage,
 } from './buses.ts';
+export { MixController, type MixEngine } from './mix.ts';
+export {
+  DUCKS,
+  DUCK_ATTACK_MS,
+  DUCK_NAMES,
+  SNAPSHOTS,
+  SNAPSHOT_NAMES,
+  type BusMix,
+  type Duck,
+  type DuckName,
+  type Snapshot,
+  type SnapshotName,
+} from './mix-snapshots.ts';
 export {
   MIN_DB,
   MIXER_BUSES,

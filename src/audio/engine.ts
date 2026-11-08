@@ -6,12 +6,15 @@
 // in fake-context.ts; browser.ts wires the real ones.
 import { BufferCache, DEFAULT_CACHE_BYTES, type LoadedSound } from './buffer-cache.ts';
 import {
+  applyDuckStage,
   applyMono,
   applyNightMode,
+  applySnapshotStage,
   buildBusGraph,
   dbToGain,
   rampParam,
   type BusGraph,
+  type MixBusId,
 } from './buses.ts';
 import {
   loopSeconds,
@@ -180,6 +183,8 @@ export class AudioEngine {
   #listener: ListenerPose = DEFAULT_LISTENER;
   #seq = 0;
   readonly #busGains = new Map<BusId, number>();
+  readonly #snapshots = new Map<MixBusId, { gain: number; lowpassHz: number | null }>();
+  readonly #ducks = new Map<MixBusId, number>();
   #mono = false;
   #night = false;
 
@@ -291,6 +296,23 @@ export class AudioEngine {
     if (rt) rampParam(rt.graph.buses[bus].gain, gain, rt.ctx.currentTime, rampSeconds);
   }
 
+  /**
+   * Sets a bus's snapshot stage (mw-e28.9): linear gain and low-pass cutoff in Hz (`null` = open),
+   * ramped. Layered over the player's bus gain; remembered until the context exists.
+   */
+  setSnapshot(bus: MixBusId, gain: number, lowpassHz: number | null, rampSeconds = 0): void {
+    this.#snapshots.set(bus, { gain, lowpassHz });
+    const rt = this.#rt;
+    if (rt) applySnapshotStage(rt.graph, bus, gain, lowpassHz, rt.ctx.currentTime, rampSeconds);
+  }
+
+  /** Sets a bus's duck stage gain (linear), ramped; layered over the snapshot and player gain. */
+  setDuck(bus: MixBusId, gain: number, rampSeconds = 0): void {
+    this.#ducks.set(bus, gain);
+    const rt = this.#rt;
+    if (rt) applyDuckStage(rt.graph, bus, gain, rt.ctx.currentTime, rampSeconds);
+  }
+
   /** Mono downmix on or off (mw-e28.5); remembered until the context exists. */
   setMono(mono: boolean): void {
     this.#mono = mono;
@@ -344,6 +366,10 @@ export class AudioEngine {
       const graph = buildBusGraph(ctx);
       // Mixer settings given before the first sound apply here, before anything can play.
       for (const [bus, gain] of this.#busGains) graph.buses[bus].gain.value = gain;
+      for (const [bus, { gain, lowpassHz }] of this.#snapshots) {
+        applySnapshotStage(graph, bus, gain, lowpassHz, ctx.currentTime, 0);
+      }
+      for (const [bus, gain] of this.#ducks) applyDuckStage(graph, bus, gain, ctx.currentTime, 0);
       applyMono(graph, this.#mono);
       applyNightMode(graph, this.#night, ctx.currentTime, 0);
       this.#rt = { ctx, graph, cache };

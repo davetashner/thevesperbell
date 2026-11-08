@@ -5,6 +5,7 @@ import type { BusId, PlayableBusId } from './manifest.ts';
 import type {
   AudioContextLike,
   AudioParamLike,
+  BiquadFilterNodeLike,
   DynamicsCompressorNodeLike,
   GainNodeLike,
 } from './web-audio.ts';
@@ -29,7 +30,26 @@ export const NIGHT_COMPRESSOR = { threshold: -30, knee: 20, ratio: 6, attack: 0.
 /** The same compressor switched off: ratio 1 never reduces gain. */
 export const NIGHT_BYPASS = { threshold: 0, ratio: 1 } as const;
 
+/** Buses the mix (snapshots, ducks) shapes; each gets a stage between it and its parent. */
+export const MIX_BUS_IDS = ['music', 'sfx', 'ambience', 'ui'] as const;
+export type MixBusId = (typeof MIX_BUS_IDS)[number];
+
+/** Low-pass cutoff meaning "open": above the audible band, so the filter does nothing. */
+export const LOWPASS_OPEN_HZ = 20_000;
+
+/**
+ * The mix stage on a bus (mw-e28.9): bus gain (the player's slider) → snapshot gain → duck gain →
+ * low-pass → parent. Separate nodes mean the player's volume, the situation's snapshot and a duck
+ * multiply and never overwrite each other.
+ */
+export interface MixStage {
+  readonly snapshot: GainNodeLike;
+  readonly duck: GainNodeLike;
+  readonly filter: BiquadFilterNodeLike;
+}
+
 export interface BusGraph {
+  readonly stages: Readonly<Record<MixBusId, MixStage>>;
   readonly buses: Readonly<Record<BusId, GainNodeLike>>;
   /** Night-mode compressor between master and the limiter; transparent until switched on. */
   readonly night: DynamicsCompressorNodeLike;
@@ -63,10 +83,24 @@ export function buildBusGraph(ctx: AudioContextLike): BusGraph {
   // BUS_PARENT lists parents before children, so each parent exists when its child connects.
   for (const [bus, parent] of Object.entries(BUS_PARENT) as [PlayableBusId, BusId][]) {
     const node = ctx.createGain();
-    node.connect(buses[parent]);
     buses[bus] = node;
+    if (!(MIX_BUS_IDS as readonly string[]).includes(bus)) node.connect(buses[parent]);
   }
-  return { buses, night, limiter };
+  // Mix buses connect through their stage (created after every bus, so bus order is stable).
+  const stages = {} as Record<MixBusId, MixStage>;
+  for (const bus of MIX_BUS_IDS) {
+    const snapshot = ctx.createGain();
+    const duck = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = LOWPASS_OPEN_HZ;
+    buses[bus].connect(snapshot);
+    snapshot.connect(duck);
+    duck.connect(filter);
+    filter.connect(buses[BUS_PARENT[bus]]);
+    stages[bus] = { snapshot, duck, filter };
+  }
+  return { buses, stages, night, limiter };
 }
 
 /** Converts decibels to a linear gain factor. */
@@ -105,4 +139,29 @@ export function applyNightMode(
   const target = on ? NIGHT_COMPRESSOR : NIGHT_BYPASS;
   rampParam(graph.night.threshold, target.threshold, now, rampSeconds);
   rampParam(graph.night.ratio, target.ratio, now, rampSeconds);
+}
+
+/** Sets a bus's snapshot stage: gain and low-pass cutoff (`null` = open), ramped. */
+export function applySnapshotStage(
+  graph: BusGraph,
+  bus: MixBusId,
+  gain: number,
+  lowpassHz: number | null,
+  now: number,
+  rampSeconds: number,
+): void {
+  const stage = graph.stages[bus];
+  rampParam(stage.snapshot.gain, gain, now, rampSeconds);
+  rampParam(stage.filter.frequency, lowpassHz ?? LOWPASS_OPEN_HZ, now, rampSeconds);
+}
+
+/** Sets a bus's duck stage gain, ramped. */
+export function applyDuckStage(
+  graph: BusGraph,
+  bus: MixBusId,
+  gain: number,
+  now: number,
+  rampSeconds: number,
+): void {
+  rampParam(graph.stages[bus].duck.gain, gain, now, rampSeconds);
 }
