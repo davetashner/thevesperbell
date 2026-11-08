@@ -105,6 +105,11 @@ export interface LedgeTraversalOptions {
   readonly ledges: LedgeIndex;
   /** A character's capabilities (class, tools); none by default. */
   readonly capabilities?: (entity: EntityId | undefined) => readonly string[];
+  /**
+   * Whether a character may not start a mantle or a hang right now because its hands are full
+   * (carrying, ADR-0003); it is asked only when a grab would otherwise start. Never by default.
+   */
+  readonly handsFull?: (entity: EntityId | undefined) => boolean;
 }
 
 /** Gap between the capsule and a wall it hangs or climbs against. */
@@ -351,6 +356,11 @@ export function ledgeTraversal(options: LedgeTraversalOptions): LedgeTraversalHo
 
   /** The move a character in ordinary locomotion starts this tick, if any. */
   const plan = (ctx: LedgeContext): Move | undefined => {
+    const next = planGrab(ctx);
+    return next !== undefined && options.handsFull?.(ctx.entity) === true ? undefined : next;
+  };
+
+  const planGrab = (ctx: LedgeContext): Move | undefined => {
     const { state, input, tuning, params } = ctx;
     if (state.launch !== undefined || state.recovery !== undefined || input.motion !== undefined) {
       return undefined;

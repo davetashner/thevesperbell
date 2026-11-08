@@ -231,6 +231,10 @@ export interface SceneSpawnSpec {
     readonly { readonly item: { readonly id: string }; readonly count: number }[] | undefined;
   /** World properties of the spawned entity (mw-e03.37: a torch that burns). */
   readonly properties?: ScenePropertiesSpec | undefined;
+  /** The quest needs this world object, so it names a recovery anchor (mw-e17.14). */
+  readonly questCritical?: boolean | undefined;
+  /** Where the object returns to when lost, grid cells (mw-e17.14). */
+  readonly recovery?: Triple | undefined;
   /** Makes the spawned entity breakable (mw-e03.11). */
   readonly breakable?: SceneBreakableSpec | undefined;
   /** Makes the spawned entity a door (mw-e03.18). */
@@ -384,6 +388,8 @@ export interface SceneSpawnPlacement {
   readonly carries?: readonly { readonly item: string; readonly count: number }[];
   /** Its world properties, when the spawn sets any (mw-e03.37). */
   readonly properties?: ScenePropertiesSpec;
+  /** Where it returns to when lost, world metres, when it is quest-critical (mw-e17.14). */
+  readonly recovery?: Vec3;
   /** Its breakable profile and instance data, when it is breakable (mw-e03.11). */
   readonly breakable?: SceneBreakable;
   /** Its door data, when it is a door (mw-e03.18). */
@@ -698,6 +704,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         ),
       }),
       ...(spawn.properties !== undefined && { properties: spawn.properties }),
+      ...(spawn.recovery !== undefined && { recovery: gridToWorld(spawn.recovery, scene.grid) }),
       ...(spawn.breakable !== undefined && { breakable: breakableOf(spawn.breakable) }),
       ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
       ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),

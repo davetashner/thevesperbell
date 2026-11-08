@@ -42,7 +42,7 @@ describe('spell pipeline: no spell is special-cased in code', () => {
       castTime: 0,
       delivery: { kind: 'self' },
       effects: [
-        { op: 'status', status: 'drowsy', duration: 3 },
+        { op: 'status', status: 'slowed', duration: 3 },
         { op: 'stimulus', element: 'cold', intensity: 10, radius: 1 },
       ],
       vfxCue: 'vfx-spell-somnomancy-brand-new',
@@ -71,6 +71,6 @@ describe('spell pipeline: no spell is special-cased in code', () => {
     );
     world.step();
     expect(applied).toEqual(['status', 'stimulus']);
-    expect(spellStatusesOf(world, caster)[0]?.status).toBe('drowsy');
+    expect(spellStatusesOf(world, caster)[0]?.status).toBe('slowed');
   });
 });

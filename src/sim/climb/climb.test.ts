@@ -30,6 +30,13 @@ import {
 import type { KitLookup, KitPieceSpec, ScenePlacementSpec, Triple } from '../scene/layout';
 import { loadScene, registerSceneComponents, type LoadedScene } from '../scene/loader';
 import type { Vec3 } from '../stimulus/shapes';
+import {
+  CarryLedgerComponent,
+  grabRefused,
+  holdOf,
+  refuseGrab,
+  type GrabRefused,
+} from '../carry/state';
 import { climbTraversal, DEFAULT_CLIMB_TUNING } from './climb';
 import { sceneLedges } from './ledges';
 import { DEFAULT_LEDGE_TUNING, ledgeTraversal } from './mantle';
@@ -157,6 +164,8 @@ interface RigOptions {
   readonly collision?: CollisionWorld;
   /** The climb hook with only its world: no capabilities, stamina or ledge hook. */
   readonly minimal?: boolean;
+  /** Whether the character's hands are full: hooks are asked before they start a grab. */
+  readonly handsFull?: (entity: EntityId | undefined) => boolean;
 }
 
 /** A character in a scene of kit pieces with the ledge and climb hooks, stepped by the controller. */
@@ -209,6 +218,7 @@ class Rig {
       world: this.world,
       ledges: sceneLedges(this.scene),
       capabilities: caps,
+      ...(options.handsFull !== undefined && { handsFull: options.handsFull }),
     });
     if (options.noLedges !== true) this.hooks.push(ledges);
     this.hooks.push(
@@ -218,6 +228,7 @@ class Rig {
             world: this.world,
             capabilities: caps,
             stamina: (entity) => (entity === PLAYER ? this.stamina : undefined),
+            ...(options.handsFull !== undefined && { handsFull: options.handsFull }),
             ...(options.noLedges !== true && { ledges }),
           }),
     );
@@ -968,3 +979,82 @@ class PlaneWorld implements CollisionWorld {
     return v(0, 0, 0);
   }
 }
+
+describe('grabbing while carrying (mw-e17.14)', () => {
+  /** A rig whose character carries a body: a real ledger holds it, and the hooks ask `refuseGrab`. */
+  function carrier(pieces: readonly Piece[], feet: Vec3) {
+    const rig: { value?: Rig } = {};
+    const refused: GrabRefused[] = [];
+    const handsFull = (entity: EntityId | undefined) => {
+      const world = rig.value?.world;
+      return world !== undefined && refuseGrab(world, entity, 'climb');
+    };
+    const made = new Rig(pieces, { feet, handsFull });
+    rig.value = made;
+    made.world.events.on(grabRefused, (e) => refused.push(e));
+    made.world.register(CarryLedgerComponent);
+    const ledger = made.world.spawn();
+    made.world.add(ledger, CarryLedgerComponent, {
+      holds: [
+        {
+          actor: PLAYER,
+          target: made.world.spawn(),
+          mode: 'shoulder',
+          since: 0,
+          speedScale: 0.5,
+          noJump: true,
+          charge: -1,
+          burning: 0,
+        },
+      ],
+    });
+    return { rig: made, refused, ledger };
+  }
+
+  it('AC-2: carrying a body, walking into a ladder is refused "hands-full" and the body stays carried', () => {
+    const { rig, refused, ledger } = carrier([tower(), ladder()], v(1, 0, 0));
+    const before = rig.world.get(ledger, CarryLedgerComponent);
+    rig.step(FORWARD, 90);
+    expect(rig.modes()).toEqual([null]);
+    rig.world.events.flush();
+    expect(refused).toEqual([
+      { tick: rig.world.tick, actor: PLAYER, grab: 'climb', reason: 'hands-full' },
+    ]);
+    // Held presses are one refusal, not one per tick, and the hold is untouched.
+    expect(rig.world.get(ledger, CarryLedgerComponent)).toBe(before);
+    expect(holdOf(rig.world, PLAYER)?.mode).toBe('shoulder');
+  });
+
+  it('AC-2: an empty-handed climber still takes the same ladder, and a new refusal starts after a pause', () => {
+    const free = new Rig([tower(), ladder()], { feet: v(1, 0, 0) });
+    free.until(FORWARD, climbing);
+    const { rig, refused } = carrier([tower(), ladder()], v(1, 0, 0));
+    rig.step(FORWARD, 90);
+    rig.world.events.flush();
+    expect(refused).toHaveLength(1);
+    // Letting go of the press for a while and pressing again is a new refusal.
+    for (let i = 0; i < 5; i++) rig.world.step();
+    rig.step(IDLE_INPUT, 1);
+    rig.step(FORWARD, 3);
+    rig.world.events.flush();
+    expect(refused).toHaveLength(2);
+    expect(refuseGrab(rig.world, undefined, 'ledge')).toBe(false);
+  });
+
+  it('AC-2: carrying, a rope and a ledge are refused too', () => {
+    const rope = carrier([ropePiece(2, 0, 0, 3)], v(1.5, 0, 0));
+    rope.rig.step(FORWARD, 60);
+    expect(rope.rig.modes()).toEqual([null]);
+    // A low step: without the load it mantles, loaded it does not.
+    const step = block([2, 0, -2], [4, 0.5, 2]);
+    const free = new Rig([step], { feet: v(1, 0, 0) });
+    free.step(FORWARD, 90);
+    expect(free.modes()).toContain('mantle');
+    const loaded = new Rig([step], {
+      feet: v(1, 0, 0),
+      handsFull: () => true,
+    });
+    loaded.step(FORWARD, 90);
+    expect(loaded.modes()).toEqual([null]);
+  });
+});

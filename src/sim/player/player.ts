@@ -48,7 +48,7 @@ import type { ControllerTuning, Frozen, MoveTable, RuntimeShield } from '@conten
 import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
-import { carryRestraint } from '../carry/state';
+import { carryRestraint, refuseGrab } from '../carry/state';
 import { radians } from '../character/greybox';
 import {
   CharacterController,
@@ -730,7 +730,12 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   const hooks: TraversalHook[] = [];
   let ledgeHook: LedgeTraversalHook | undefined;
   if (ledges !== undefined) {
-    ledgeHook = ledgeTraversal({ world, ledges: ledges.index, capabilities });
+    ledgeHook = ledgeTraversal({
+      world,
+      ledges: ledges.index,
+      capabilities,
+      handsFull: (entity) => refuseGrab(world, entity, 'ledge'),
+    });
     hooks.push(ledgeHook);
   }
   if (climb !== undefined) {
@@ -739,6 +744,7 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
       climbTraversal({
         world,
         capabilities,
+        handsFull: (entity) => refuseGrab(world, entity, 'climb'),
         stamina: (entity) =>
           combat === undefined || entity === undefined
             ? undefined

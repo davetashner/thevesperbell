@@ -76,6 +76,11 @@ export interface ClimbTraversalOptions {
   readonly stamina?: (entity: EntityId | undefined) => number | undefined;
   /** The ledge hook whose pull-up takes climbers over the top; absent = climbers stop at the top. */
   readonly ledges?: Pick<LedgeTraversalHook, 'climbOut'>;
+  /**
+   * Whether a character may not start a climb right now because its hands are full (carrying,
+   * ADR-0003); it is asked only when a climb would otherwise start. Never by default.
+   */
+  readonly handsFull?: (entity: EntityId | undefined) => boolean;
 }
 
 /** Gap between the capsule and the surface it climbs (as it hangs from a ledge). */
@@ -279,7 +284,8 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
     if (deflection === 0 || staminaOf(ctx.entity) === 0) return undefined;
     const dir = scale(move, 1 / deflection);
     const capabilities = capabilitiesOf(ctx.entity);
-    return attachWall(ctx, dir, capabilities) ?? attachRope(ctx, dir, capabilities);
+    const next = attachWall(ctx, dir, capabilities) ?? attachRope(ctx, dir, capabilities);
+    return next !== undefined && options.handsFull?.(ctx.entity) === true ? undefined : next;
   };
 
   /** The climber standing on the ground it met moving along `dir` (`hit`, a sweep's contact). */

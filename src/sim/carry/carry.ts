@@ -28,11 +28,20 @@
 // layer's impact speed emits one noise whose loudness comes from its weight (a bottle ticks, a crate
 // thuds). World items keep their own impact noise by weight class (src/sim/items).
 //
-// Out of scope: lifting by spell (the tether's), the AI's response to the noise (e11), and dropping a
-// carried object when the carrier staggers, climbs, leaves the scene or saves (mw-e17.14).
+// Edge cases (mw-e17.14, ADR-0003): a carrier whose poise breaks or who is staggered, knocked back or
+// knocked down lets go at once, the object set down at its feet. Leaving the scene sets the object
+// down on the near side of the threshold (objects never cross a scene load). A save sets what is
+// held down at the carrier's feet first (`settleHeldObjects`), so a save never stores a hold and a
+// load never finds the player carrying. A carrier cannot take hold of a ladder, rope, ivy or ledge
+// ("Hands full", `refuseGrab` in ./state, asked by the climbing and ledge hooks).
+//
+// Out of scope: lifting by spell (the tether's) and the AI's response to the noise (e11).
 
 import type { CollisionWorld } from '../character/collision-world';
+import { PoiseBroken } from '../combat/damage/events';
 import { blame, BlameComponent } from '../combat/environment/environment';
+import { reactionRank } from '../combat/reactions/components';
+import { HitReaction } from '../combat/reactions/events';
 import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
@@ -52,9 +61,11 @@ import {
 } from '../physics/objects';
 import { readProperty } from '../properties/components';
 import type { Quat } from '../scene/layout';
+import { areaTransition } from '../scene/transitions';
 import { placementOf } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
 import { applyStimulus, StimulusQueueComponent } from '../stimulus/stimulus';
+import { restHeight } from './recovery';
 import {
   CarryBulkyComponent,
   CarryLedgerComponent,
@@ -154,7 +165,13 @@ export type ReleaseReason =
   /** It was pinned against geometry with nowhere to go. */
   | 'blocked'
   /** The carrier or the object is gone. */
-  | 'lost';
+  | 'lost'
+  /** A hit broke the carrier's poise or staggered it (set down at its feet). */
+  | 'staggered'
+  /** The carrier left the scene (set down on the near side of the threshold). */
+  | 'exit'
+  /** The game was saved (set down at the carrier's feet). */
+  | 'saved';
 
 /** Why a pick-up was refused. */
 export type CarryRefusal = 'not-carryable' | 'too-heavy' | 'hands-full' | 'held';
@@ -234,6 +251,8 @@ export interface CarryController {
   place(actor: EntityId): boolean;
   /** Throws what `actor` holds after charging `seconds`. False when it holds nothing. */
   throwHeld(actor: EntityId, seconds: number): boolean;
+  /** Sets down everything held at its carrier's feet, as a save does (`settleHeldObjects`). */
+  settleAll(reason?: 'saved'): void;
   /** The arc a throw would fly now, while `actor` charges one; undefined otherwise. */
   preview(actor: EntityId): readonly Vec3[] | undefined;
 }
@@ -297,6 +316,18 @@ function reachOf(shape: BodyShape): { readonly radius: number; readonly half: nu
     case 'capsule':
       return { radius: shape.radius, half: shape.halfHeight };
   }
+}
+
+/** The controller installed in each world, so a save (which has only the world) can settle holds. */
+const installed = new WeakMap<object, CarryController>();
+
+/**
+ * Sets down everything a carrier holds in `world` at its carrier's feet, before a save is written
+ * (mw-e17.14): the save stores the object as a placed world object and no hold, so a load never finds
+ * the player carrying. Does nothing where carrying is not installed or nothing is held.
+ */
+export function settleHeldObjects(world: World<never>): void {
+  installed.get(world)?.settleAll('saved');
 }
 
 const yawRotation = (yaw: number): Quat => ({ x: 0, y: sin(yaw / 2), z: 0, w: cos(yaw / 2) });
@@ -463,6 +494,40 @@ export function installCarry<TInput>(
     release(hold, 'placed');
   };
 
+  /**
+   * Lets go of `hold`'s object with its base on its carrier's feet: where it rides (in front, clear of
+   * walls) or, with `at`, over that spot instead.
+   */
+  const setDown = (hold: Hold, reason: ReleaseReason, at?: { x: number; z: number }): void => {
+    const object = w.get(hold.target, PhysicsObjectComponent);
+    const now = placementOf(w, hold.target);
+    const feet = w.isAlive(hold.actor) ? viewOf(world, hold.actor)?.feet : undefined;
+    if (object !== undefined && now !== undefined && feet !== undefined) {
+      teleportPhysicsObject(w, hold.target, {
+        x: at?.x ?? now.x,
+        y: feet.y + restHeight(object.shape) + PLACE_LIFT,
+        z: at?.z ?? now.z,
+      });
+    }
+    release(hold, reason);
+  };
+
+  /** Where the carrier's object goes on leaving through `volume`: outside the nearest face. */
+  const nearSide = (
+    volume: { readonly min: Vec3; readonly max: Vec3 },
+    feet: Vec3,
+    margin: number,
+  ): { x: number; z: number } => {
+    const faces = [
+      { dist: feet.x - volume.min.x, x: volume.min.x - margin, z: feet.z },
+      { dist: volume.max.x - feet.x, x: volume.max.x + margin, z: feet.z },
+      { dist: feet.z - volume.min.z, x: feet.x, z: volume.min.z - margin },
+      { dist: volume.max.z - feet.z, x: feet.x, z: volume.max.z + margin },
+    ];
+    const nearest = faces.reduce((best, face) => (face.dist < best.dist ? face : best));
+    return { x: nearest.x, z: nearest.z };
+  };
+
   const launch = (hold: Hold, view: ItemHandlerView, seconds: number): void => {
     const aim = aimOf(view);
     const speed = throwSpeed(tuning.throw, seconds);
@@ -484,6 +549,9 @@ export function installCarry<TInput>(
       if (hold === undefined) return false;
       placeHeld(hold);
       return true;
+    },
+    settleAll(reason = 'saved') {
+      for (const hold of holdsOf(w)) setDown(hold, reason);
     },
     throwHeld(actor, seconds) {
       const hold = holdOf(w, actor);
@@ -510,6 +578,32 @@ export function installCarry<TInput>(
       );
     },
   };
+
+  installed.set(world, controller);
+
+  // A hit that breaks the carrier's poise, or staggers, knocks back or knocks it down, drops the load.
+  const staggered = (actor: EntityId): void => {
+    const hold = holdOf(w, actor);
+    if (hold !== undefined) setDown(hold, 'staggered');
+  };
+  w.events.on(PoiseBroken, ({ target }) => {
+    staggered(target);
+  });
+  w.events.on(HitReaction, ({ entity, reaction }) => {
+    if (reactionRank(reaction) >= reactionRank('stagger')) staggered(entity);
+  });
+  // Objects never cross a scene load: the player's load is left on the near side of the threshold.
+  w.events.on(areaTransition, ({ entity, volume }) => {
+    const hold = holdOf(w, entity);
+    if (hold === undefined) return;
+    const object = w.get(hold.target, PhysicsObjectComponent);
+    const feet = viewOf(world, entity)?.feet;
+    if (volume === undefined || object === undefined || feet === undefined) {
+      setDown(hold, 'exit');
+      return;
+    }
+    setDown(hold, 'exit', nearSide(volume, feet, reachOf(object.shape).radius + tuning.holdGap));
+  });
 
   const burnTicks = Math.max(1, Math.round(tuning.burnSeconds * w.clock.hz));
 
