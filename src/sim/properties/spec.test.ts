@@ -11,8 +11,9 @@ import {
 describe('world property spec', () => {
   it('is a closed, versioned set: changing the keys means bumping the version', () => {
     // Update both together; a save migration (e30) keys off WORLD_PROPERTIES_VERSION.
-    expect(WORLD_PROPERTIES_VERSION).toBe(6);
+    expect(WORLD_PROPERTIES_VERSION).toBe(7);
     expect(WORLD_PROPERTY_KEYS).toEqual([
+      'absorbency',
       'bashable',
       'breakable',
       'burning',

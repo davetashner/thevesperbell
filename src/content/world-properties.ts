@@ -76,6 +76,9 @@ export const worldPropertiesSchema = z
       fuel: z.number().min(0).max(86_400).describe('Seconds of burning left.'),
       burning: flag('On fire right now.'),
       wetness: fraction('How soaked it is (dry … saturated),'),
+      absorbency: fraction(
+        'The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher,',
+      ),
       frozen: flag('Frozen solid.'),
       freezePoint: celsius('Temperature at or below which it freezes,'),
       conductive: flag('Conducts electric charge.'),

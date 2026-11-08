@@ -5,6 +5,7 @@
 //
 // The caller adds these after the stimulus system (installGamePhysics's `afterStimuli`), in this
 // order: the rules read the tick's resolved stimuli, then the field diffuses what they changed.
+// Water (mw-e03.6) rides the same rule set: liquid volumes, wetness drying, submersion and rain.
 // The field is open air everywhere (a scene's doors seal and unseal their doorways themselves).
 
 import { burntMaterials, materialPresets, type GameContent } from '@content/index';
@@ -13,7 +14,9 @@ import {
   elementFieldSystem,
   elementRulesSystem,
   fireRules,
+  liquidRules,
   installElementField,
+  installLiquids,
   LightSourceComponent,
   type World,
 } from '@sim/index';
@@ -24,17 +27,20 @@ export function installGameFire<TInput>(
   content: Pick<GameContent, 'all'>,
 ): void {
   const materials = content.all('material');
+  const presets = materialPresets(materials);
   installElementField(world);
+  installLiquids(world);
   world
     .addSystem(
       elementRulesSystem(
-        new ElementRuleSet(
-          fireRules({
-            presets: materialPresets(materials),
+        new ElementRuleSet([
+          ...fireRules({
+            presets,
             burnt: burntMaterials(materials),
             keepWhenSpent: (world, entity) => world.has(entity, LightSourceComponent),
           }),
-        ),
+          ...liquidRules({ presets }),
+        ]),
       ),
     )
     .addSystem(elementFieldSystem());

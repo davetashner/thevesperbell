@@ -37,7 +37,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].shape.to.z` | number | required | Metres. |
 | `nodes[].filter` | list of object | — | Conditions an entity must all pass. |
 | `nodes[].filter[].test` | `"property"` | required |  |
-| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
+| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"absorbency"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
 | `nodes[].filter[].op` | `"eq"` \| `"ne"` \| `"lt"` \| `"lte"` \| `"gt"` \| `"gte"` | required | Comparison; lt/lte/gt/gte need a number property. |
 | `nodes[].filter[].value` | number or boolean or string | required | Value to compare with. |
 | `nodes[].filter[].test` | `"tag"` | required |  |
@@ -80,6 +80,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].on.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `nodes[].on.burning` | boolean | — | On fire right now. |
 | `nodes[].on.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `nodes[].on.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `nodes[].on.frozen` | boolean | — | Frozen solid. |
 | `nodes[].on.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `nodes[].on.conductive` | boolean | — | Conducts electric charge. |
@@ -138,6 +139,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].off.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `nodes[].off.burning` | boolean | — | On fire right now. |
 | `nodes[].off.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `nodes[].off.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `nodes[].off.frozen` | boolean | — | Frozen solid. |
 | `nodes[].off.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `nodes[].off.conductive` | boolean | — | Conducts electric charge. |

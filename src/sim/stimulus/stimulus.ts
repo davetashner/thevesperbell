@@ -14,7 +14,8 @@
 //
 // Element effects (intensity units in brackets; each hit receives intensity × falloff):
 // - heat / cold [°C]: raise / lower `temperature` of entities that have one (clamped to its range).
-// - water [wetness 0–1]: raise `wetness` of entities that have one (clamped at 1).
+// - water [wetness 0–1]: raise `wetness` of entities that have one (clamped at 1, or at the entity's
+//   `absorbency` when that is lower: iron takes a film of water, mw-e03.6).
 // - charge [charge]: raise `charge` of entities that have one.
 // - force [N·s]: an impulse on pushable, liftable, breakable or bashable entities with weight > 0,
 //   delivered through `impulseApplied` (velocity change = impulse / weight) for the physics layer to
@@ -381,7 +382,11 @@ function applyProperty(
   const { key, sign } = effect;
   const spec = WORLD_PROPERTY_SPECS[key];
   const old = readProperty(world, entity, key);
-  const value = Math.min(spec.max, Math.max(spec.min, old + sign * amount));
+  // Water soaks in only as far as the material absorbs (iron: a film, not a sponge); wetness already
+  // above that (set directly) is never pushed down by a splash.
+  const ceiling =
+    key === 'wetness' ? Math.max(old, readProperty(world, entity, 'absorbency')) : spec.max;
+  const value = Math.min(ceiling, Math.max(spec.min, old + sign * amount));
   setProperty(world, entity, key, value, source === null ? {} : { source });
 }
 
