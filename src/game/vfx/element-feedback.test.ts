@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SOUND_MANIFEST } from '@audio/sounds';
 import { compileElementFeedback, loadGameContent } from '@content/index';
+import { markExercised } from '@content/testing';
 import {
   propertyChanged,
   registerWorldProperties,
@@ -79,7 +80,10 @@ describe('element feedback bridge (mw-e03.28)', () => {
     }
   });
 
-  it('AC-1: gaining burning requests exactly one fire effect sized to its bounds, released when it stops', () => {
+  it('AC-1: gaining burning requests exactly one fire effect sized to its bounds, released when it stops', ({
+    task,
+  }) => {
+    markExercised(task, 'element-feedback', 'element-feedback');
     const s = setup();
     const crate = s.thing(5, 0.5);
     s.change(crate, 'burning', true);
