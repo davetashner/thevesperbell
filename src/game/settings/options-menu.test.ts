@@ -52,12 +52,16 @@ describe('options menu', () => {
     ]);
     expect(menu.tabs.selected).toBe('controls');
     for (const { key, def } of settingDefs()) {
+      // A keybind setting has no generic control; the Key bindings panel edits it.
+      if (def.kind === 'keybind') {
+        expect(document.querySelector(`[data-setting="${key}"]`)).toBeNull();
+        continue;
+      }
       const el = control(key);
       const help = document.getElementById(el.getAttribute('aria-describedby') ?? '');
       expect(help?.textContent).toBe(def.help);
     }
-    expect(control('controls.interact').textContent).toBe('Interact: E');
-    expect(control('controls.interact').getAttribute('aria-disabled')).toBe('true');
+    expect(find('[data-bindings]').getAttribute('aria-label')).toBe('Key bindings');
     expect(
       openOptionsMenu(ui, settings, { category: 'audio', pausesSim: false }).tabs.selected,
     ).toBe('audio');

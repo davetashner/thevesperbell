@@ -37,7 +37,7 @@ export interface SelectSetting<T extends string = string> extends SettingMeta {
   readonly default: T;
 }
 
-/** A key binding shown in the menu; remapping it arrives with mw-e31.2 (a placeholder here). */
+/** A key binding shown in the menu; the options menu edits it in the Key bindings panel (mw-e31.2), not as a generic control. */
 export interface KeybindSetting extends SettingMeta {
   readonly kind: 'keybind';
   /** A KeyboardEvent.code, e.g. `KeyE`. */
@@ -91,7 +91,7 @@ export const SETTINGS_SCHEMA = {
       }),
       interact: keybind({
         label: 'Interact',
-        help: 'Open doors, pull levers and pick things up. Remapping arrives in a later update.',
+        help: 'Open doors, pull levers and pick things up. Change the key under Key bindings.',
         default: 'KeyE',
       }),
     },

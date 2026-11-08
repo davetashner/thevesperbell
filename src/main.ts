@@ -147,6 +147,7 @@ import {
 } from '@game/physics-objects';
 import {
   createSettingsStore,
+  BindingsEditor,
   loadBindings,
   openOptionsMenu,
   type SettingsStore,
@@ -536,6 +537,11 @@ function startRenderer(
   const sampler = new ActionSampler({
     bindings: savedBindings.bindings,
     padBindings: savedBindings.gamepad,
+  });
+  // The options menu's Key bindings panel edits these live (mw-e31.2): each change saves and the
+  // sampler maps the next sample through it.
+  const bindingsEditor = new BindingsEditor(settings, (bindings) => {
+    sampler.setBindings(bindings);
   });
 
   // The HUD/menu layer (mw-e00.23). Screens pushed onto it may capture input (gameplay action frames
@@ -2275,7 +2281,7 @@ function startRenderer(
         unsavedProgress: () => progress.unsaved,
         pauseKeys: () => sampler.bindings.pause,
         openSettings: () => {
-          openOptionsMenu(ui, settings);
+          openOptionsMenu(ui, settings, { bindings: bindingsEditor });
         },
         openSave: () => {
           void saveMenus.then((menus) => menus.openSave());
