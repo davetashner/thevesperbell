@@ -71,13 +71,19 @@ export interface LightSourcePrefab {
   readonly radius: number;
   /** Bounding radius, metres. */
   readonly size: number;
+  /**
+   * Radius around the flame point in which a creature touching it is burned, metres (mw-e03.49):
+   * 0 for a flame behind glass, a hand's breadth for a candle or torch you would have to walk into.
+   */
+  readonly flameRadius: number;
 }
 
 const prefab = (spec: LightSourcePrefab): LightSourcePrefab => Object.freeze(spec);
 
 /**
  * The prefabs' numbers. Wind resistance runs from a candle that a breath puts out to a fireplace
- * that no blast of a spell does; a lantern's glass shields its flame, a torch is in the open.
+ * that no blast of a spell does; a lantern's glass shields its flame, a torch is in the open. Flame radius is how far a flame
+ * burns what touches it: none behind glass (lantern, sconce), a hand's breadth for a candle or torch.
  */
 export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSourcePrefab>> =
   Object.freeze({
@@ -88,6 +94,7 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       intensity: 30,
       radius: 4,
       size: 0.05,
+      flameRadius: 0.05,
     }),
     torch: prefab({
       fuel: 1200,
@@ -96,6 +103,7 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       intensity: 100,
       radius: 8,
       size: 0.15,
+      flameRadius: 0.12,
     }),
     sconce: prefab({
       fuel: 3600,
@@ -104,6 +112,7 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       intensity: 80,
       radius: 7,
       size: 0.15,
+      flameRadius: 0,
     }),
     brazier: prefab({
       fuel: 3600,
@@ -112,6 +121,7 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       intensity: 120,
       radius: 9,
       size: 0.4,
+      flameRadius: 0.5,
     }),
     lantern: prefab({
       fuel: 2400,
@@ -120,6 +130,7 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       intensity: 70,
       radius: 7,
       size: 0.15,
+      flameRadius: 0,
     }),
     fireplace: prefab({
       fuel: 7200,
@@ -128,6 +139,7 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       intensity: 130,
       radius: 10,
       size: 0.6,
+      flameRadius: 0.6,
     }),
   });
 
@@ -204,7 +216,7 @@ export function makeLightSource(
   position: Vec3,
   options: LightSourceOptions = {},
 ): void {
-  const { fuel, ignitionPoint, windResistance, intensity, radius, size } =
+  const { fuel, ignitionPoint, windResistance, intensity, radius, size, flameRadius } =
     LIGHT_SOURCE_PREFABS[variant];
   const lit = options.unlit !== true;
   const infiniteFuel = options.infiniteFuel === true;
@@ -217,6 +229,7 @@ export function makeLightSource(
     wetness: 0,
     extinguishable: true,
     windResistance,
+    flameRadius,
     lightEmitter: { intensity, radius },
   });
   world.add(entity, LightSourceComponent, {

@@ -37,7 +37,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].shape.to.z` | number | required | Metres. |
 | `nodes[].filter` | list of object | — | Conditions an entity must all pass. |
 | `nodes[].filter[].test` | `"property"` | required |  |
-| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
+| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
 | `nodes[].filter[].op` | `"eq"` \| `"ne"` \| `"lt"` \| `"lte"` \| `"gt"` \| `"gte"` | required | Comparison; lt/lte/gt/gte need a number property. |
 | `nodes[].filter[].value` | number or boolean or string | required | Value to compare with. |
 | `nodes[].filter[].test` | `"tag"` | required |  |
@@ -107,6 +107,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].on.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `nodes[].on.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
 | `nodes[].on.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `nodes[].on.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
 | `nodes[].on.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `nodes[].on.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `nodes[].on.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
@@ -164,6 +165,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].off.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `nodes[].off.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
 | `nodes[].off.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `nodes[].off.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
 | `nodes[].off.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `nodes[].off.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `nodes[].off.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |

@@ -2053,6 +2053,12 @@
           "maximum": 1000000,
           "description": "Force of one gust, blast or kick that blows its flame out, N·s."
         },
+        "flameRadius": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach."
+        },
         "waterSurface": {
           "type": "boolean",
           "description": "Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material)."
@@ -2515,6 +2521,12 @@
                     "minimum": 0,
                     "maximum": 1000000,
                     "description": "Force of one gust, blast or kick that blows its flame out, N·s."
+                  },
+                  "flameRadius": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 5,
+                    "description": "Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach."
                   },
                   "waterSurface": {
                     "type": "boolean",

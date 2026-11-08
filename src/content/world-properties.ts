@@ -121,6 +121,13 @@ export const worldPropertiesSchema = z
         1_000_000,
         'Force of one gust, blast or kick that blows its flame out, N·s.',
       ),
+      flameRadius: z
+        .number()
+        .min(0)
+        .max(5)
+        .describe(
+          'Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach.',
+        ),
       waterSurface: flag(
         'Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material).',
       ),

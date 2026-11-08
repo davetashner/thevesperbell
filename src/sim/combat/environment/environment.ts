@@ -46,6 +46,7 @@ import {
 import type { ColliderHandle } from '../../physics/static-colliders';
 import {
   forEachWithProperty,
+  getProperty,
   hasProperty,
   propertyChanged,
   readProperty,
@@ -357,7 +358,12 @@ export function hazardSystem<TInput>(options: HazardDamageOptions): System<TInpu
         const sources: { entity: EntityId; at: Vec3; radius: number }[] = [];
         forEachWithProperty(world, rule.when, (entity, on) => {
           const at = world.get(entity, PlacementComponent);
-          if (on && at !== undefined) sources.push({ entity, at, radius: at.radius + rule.reach });
+          if (!on || at === undefined) return;
+          // A flame that declares its own radius (a torch, a lantern: mw-e03.49) hurts within it,
+          // and not at all when it is 0; a loose burning object hurts within its own radius + reach.
+          const flame = getProperty(world, entity, 'flameRadius');
+          const radius = flame ?? at.radius + rule.reach;
+          if (radius > 0) sources.push({ entity, at, radius });
         });
         if (sources.length === 0) continue;
         const amounts = pulseAmounts(rule, pulse / clock.hz);
