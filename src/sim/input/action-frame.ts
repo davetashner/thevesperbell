@@ -28,6 +28,8 @@ export const ACTIONS = {
   crouch: { kind: 'button', label: 'Crouch', context: 'gameplay' },
   slowWalk: { kind: 'button', label: 'Slow walk', context: 'gameplay' },
   dodge: { kind: 'button', label: 'Dodge', context: 'gameplay' },
+  // The knight's kick (mw-e04.18), with or without a shield.
+  kick: { kind: 'button', label: 'Kick', context: 'gameplay' },
   interact: { kind: 'button', label: 'Interact', context: 'gameplay' },
   lockOn: { kind: 'button', label: 'Lock on', context: 'gameplay' },
   cycleTarget: { kind: 'button', label: 'Cycle target', context: 'gameplay' },

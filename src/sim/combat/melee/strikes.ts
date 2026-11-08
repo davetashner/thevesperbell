@@ -125,6 +125,25 @@ function stimulusShapeOf(shape: GeomShape): StimulusShape {
 }
 
 /**
+ * Where `move`'s swing lands in the world: its hitbox at the middle of the swing, as `attacker`
+ * facing `facing` has it (a stimulus shape). Undefined for a move without a hitbox, an unplaced
+ * attacker or a world without stimuli.
+ */
+export function worldImpactShape(
+  world: World<never>,
+  attacker: EntityId,
+  move: RuntimeMove,
+  track: SocketTrack,
+  facing: Vec3,
+): StimulusShape | undefined {
+  if (move.hitbox === null || !world.isRegistered(StimulusQueueComponent)) return undefined;
+  const frame = entityFrame(world, attacker, facing);
+  if (frame === undefined) return undefined;
+  const key = at(track.keys, Math.min(Math.ceil(move.active / 2), track.keys.length - 1));
+  return stimulusShapeOf(placeShape(move.hitbox.shape, composePose(frame, key)));
+}
+
+/**
  * Applies `move`'s world impact for `attacker` facing `facing` (see the file header). Returns how many
  * stimuli it queued: none for a move without one, an unplaced attacker or a world without stimuli.
  */
@@ -136,11 +155,9 @@ export function strikeWorld(
   facing: Vec3,
 ): number {
   const impact = move.worldImpact;
-  if (impact === undefined || move.hitbox === null) return 0;
-  const frame = entityFrame(world, attacker, facing);
-  if (frame === undefined || !world.isRegistered(StimulusQueueComponent)) return 0;
-  const key = at(track.keys, Math.min(Math.ceil(move.active / 2), track.keys.length - 1));
-  const shape = stimulusShapeOf(placeShape(move.hitbox.shape, composePose(frame, key)));
+  if (impact === undefined) return 0;
+  const shape = worldImpactShape(world, attacker, move, track, facing);
+  if (shape === undefined) return 0;
   let queued = 0;
   for (const element of BREAK_TYPES) {
     const intensity = impact[element] ?? 0;

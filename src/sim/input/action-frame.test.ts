@@ -23,6 +23,7 @@ describe('action registry', () => {
       'crouch',
       'slowWalk',
       'dodge',
+      'kick',
       'interact',
       'lockOn',
       'cycleTarget',

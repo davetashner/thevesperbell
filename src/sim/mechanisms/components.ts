@@ -55,6 +55,14 @@ export interface DoorProfile {
 /** Profile id → profile, or undefined when there is none. */
 export type DoorProfileLookup = (id: string) => DoorProfile | undefined;
 
+/** A door being slammed open (a kick, mw-e04.18): it swings faster than by hand until it stops. */
+export interface DoorSlam {
+  /** Times its normal speed. */
+  readonly speed: number;
+  /** Who slammed it, or null. */
+  readonly source: EntityId | null;
+}
+
 /** A door (`mechanisms.door`; a snapshot and save key, never renamed). */
 export interface Door extends Omit<DoorProfile, 'id'> {
   /** Its profile id. */
@@ -81,6 +89,8 @@ export interface Door extends Omit<DoorProfile, 'id'> {
   readonly occluder: number | null;
   /** Whether it has walled off the element field's cells in its doorway (gas, smoke). */
   readonly sealed: boolean;
+  /** Present only while it is being slammed open; absent otherwise (so ordinary doors hash as before). */
+  readonly slam?: DoorSlam;
 }
 
 export const DoorComponent = defineComponent<Door>('mechanisms.door');

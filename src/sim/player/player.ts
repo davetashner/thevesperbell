@@ -384,6 +384,8 @@ export interface PlayerMeleeOptions {
   readonly bash?: string;
   /** What starts instead of the bash with no shield (e.g. KNIGHT_KICK); absent = the bash itself. */
   readonly bashFallback?: string;
+  /** The move the kick button starts (e.g. KNIGHT_KICK, mw-e04.18); absent = no kick button. */
+  readonly kick?: string;
 }
 
 /**
@@ -536,6 +538,7 @@ function meleeBindings(melee: PlayerMeleeOptions): Partial<Record<ButtonAction, 
     bindings[melee.heavyButton ?? DEFAULT_HEAVY_BUTTON] = melee.heavyAttack;
   }
   if (melee.parry !== undefined) bindings[melee.parryButton ?? DEFAULT_PARRY_BUTTON] = melee.parry;
+  if (melee.kick !== undefined) bindings.kick = melee.kick;
   return bindings;
 }
 

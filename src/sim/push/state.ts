@@ -123,7 +123,8 @@ export interface PushGrabbed {
 export const pushGrabbed = defineEvent<PushGrabbed>('push.grabbed');
 
 /** Why a grab ended. */
-export type PushReleaseReason = 'released' | 'lost' | 'far' | 'staggered' | 'exit' | 'saved';
+export type PushReleaseReason =
+  'released' | 'lost' | 'far' | 'staggered' | 'acted' | 'exit' | 'saved';
 
 /** An actor let go of an object, or lost it (`push.released`). */
 export interface PushReleased {

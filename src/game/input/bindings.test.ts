@@ -211,6 +211,7 @@ describe('gamepad bindings (mw-e02.9)', () => {
       'moveLeft',
       'moveRight',
       'slowWalk',
+      'kick',
       'cycleTarget',
       ...Array.from({ length: 8 }, (_, i) => `spellSlot${String(i + 1)}`),
       'spellPrev',

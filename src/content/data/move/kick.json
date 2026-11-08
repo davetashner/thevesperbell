@@ -1,7 +1,7 @@
 {
   "$schema": "../move.schema.json",
   "id": "kick",
-  "notes": "Knight kick (mw-e04.18): 10/3/16 ticks, 8 stamina, 3 blunt, 20 poise; shoves physics objects up to 40 kg and knocks back small creatures. The 80 N·s impulse, 600 N impactForce and staminaDamage 10 are placeholders until e04.18.",
+  "notes": "Knight kick (mw-e04.18): 10/3/16 ticks, 8 stamina, 3 blunt, 20 poise. World impact: a 140 N·s shove along the facing that moves things up to 40 kg (5.6 m/s for a 25 kg crate, about 3 m on wood; a 50 kg one resists, ImpactResisted). Small creatures (size class small) it hits are knocked back by the hit's 160 N·s impulse (4 m/s for a 40 kg goblin, plus the reaction's launch); larger ones just flinch. An unlocked closed door it reaches is slammed open, a locked one resists (src/sim/combat/melee/kick.ts). The 140 and 160 N·s, 600 N impactForce and staminaDamage 10 are placeholders until the combat sandbox tunes them.",
   "verb": "attack",
   "frames": {
     "startup": 10,
@@ -25,7 +25,7 @@
     "impulse": {
       "x": 0,
       "y": 0,
-      "z": 80
+      "z": 160
     },
     "impactForce": 600
   },
@@ -42,6 +42,10 @@
     },
     "reach": "close",
     "swing": "thrust"
+  },
+  "worldImpact": {
+    "force": 140,
+    "maxWeight": 40
   },
   "presentation": {
     "anim": "anim-knight-kick",
