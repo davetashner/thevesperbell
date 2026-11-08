@@ -7,7 +7,10 @@
 //                        counted as a refusal, which the reticle shows in red
 //   cast released        ends a channel the press started (`cancel-cast`), so a held spell stops
 //                        within the tick of the release
-//   cancelCast pressed   calls off whatever the caster is winding up or channelling
+//   cancelCast pressed   calls off whatever the caster is winding up or channelling (and, while a
+//                        tether is held, lets go of it: `tether-release`)
+//   interact pressed     while a tether is held, uses the held thing (`tether-use`, mw-e08.25); the
+//                        press is taken out of the frame (`shape`) so it triggers no nearby interaction
 //
 // The selected spell is the hotbar's (mw-e06.16, src/sim/magic/hotbar.ts): the spell in the selected
 // slot, else the first spell the caster has learned. The slot keys, previous/next and the wheel's
@@ -28,6 +31,8 @@ import {
   type ButtonAction,
   type CancelCastCommand,
   type CastCommand,
+  type TetherReleaseCommand,
+  type TetherUseCommand,
   type SelectSpellSlotCommand,
   type SpellLookup,
   type World,
@@ -35,7 +40,12 @@ import {
 import { resolveAim, type AimContext, type AimInvalid, type AimRay, type AimResult } from './aim';
 
 /** What the controller adds to a frame's commands. */
-export type SpellCommand = CastCommand | CancelCastCommand | SelectSpellSlotCommand;
+export type SpellCommand =
+  | CastCommand
+  | CancelCastCommand
+  | SelectSpellSlotCommand
+  | TetherUseCommand
+  | TetherReleaseCommand;
 
 /** The action that selects each hotbar slot. */
 export const SLOT_ACTIONS: readonly ButtonAction[] = Object.freeze([
@@ -53,6 +63,8 @@ export interface SpellCasterOptions extends AimContext {
   readonly spells: SpellLookup;
   /** Whether the caster can act at all (false once dead); defaults to always. */
   readonly canCast?: () => boolean;
+  /** Whether the caster holds a Mage Hand tether now; defaults to never. */
+  readonly tethering?: () => boolean;
 }
 
 /** Why the controller itself, before the sim, did not send a cast. */
@@ -143,6 +155,15 @@ export class SpellCaster {
   }
 
   /**
+   * `frame` with the Interact button taken out while a tether is held, so the press that
+   * uses the held thing (`commands`) does not also trigger a nearby interaction.
+   */
+  shape(frame: ActionFrame): ActionFrame {
+    if (this.#options.tethering?.() !== true) return frame;
+    return { ...frame, interact: { pressed: false, held: false, released: false } };
+  }
+
+  /**
    * The cast commands for one gameplay frame. `ray` is read only when a cast is actually aimed.
    */
   commands(frame: ActionFrame, ray: () => AimRay): readonly SpellCommand[] {
@@ -156,10 +177,13 @@ export class SpellCaster {
       out.push({ type: 'cancel-cast', caster });
       this.#channelling = false;
     };
+    const tethering = this.#options.tethering?.() === true;
     if (frame.cancelCast.pressed) {
       cancel();
+      if (tethering) out.push({ type: 'tether-release', caster });
       return out;
     }
+    if (tethering && frame.interact.pressed) out.push({ type: 'tether-use', caster });
     // Selection first: a cast pressed in the same frame uses the spell just chosen.
     let spell = this.spell();
     const bar = hotbarOf(this.#world, caster);

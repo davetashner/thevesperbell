@@ -480,6 +480,19 @@ describe('tether: using', () => {
     expect(r.interactions).toHaveLength(1);
   });
 
+  it('canUse says whether use would work, without using', () => {
+    const r = rig();
+    expect(r.tether.canUse(r.caster)).toBe(false);
+    r.grab(r.crate(v(0, 1, -4)));
+    expect(r.tether.canUse(r.caster)).toBe(false); // a plain crate has no verb
+    const lever = r.lever(v(0, 0, -10));
+    r.grab(lever);
+    expect(r.tether.canUse(r.caster)).toBe(true);
+    r.sight.add(box(v(-2, 0, -6), v(2, 4, -5)));
+    expect(r.tether.canUse(r.caster)).toBe(false);
+    expect(r.interactions).toEqual([]);
+  });
+
   it('does nothing with nothing held, nothing usable, out of reach, or without sight', () => {
     const r = rig();
     expect(r.use()).toBe(false);
