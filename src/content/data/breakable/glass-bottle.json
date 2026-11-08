@@ -1,0 +1,8 @@
+{
+  "$schema": "../breakable.schema.json",
+  "id": "glass-bottle",
+  "name": "Glass bottle",
+  "notes": "A bottle or flask (mw-e02.38). It breaks by fragility, not wear: the glass material's 5 J threshold (a thrown bottle at a wall, a hard knock) shatters it, and no resistance covers the rest. Five small 0.05 m shards; a bottle smashing is about 65 dB at 1 m, a sharp crack that carries a few rooms and draws a guard to look.",
+  "debris": { "count": 5, "size": 0.05 },
+  "breakLoudness": 65
+}

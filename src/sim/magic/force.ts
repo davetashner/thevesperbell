@@ -1,6 +1,6 @@
 // The force op (mw-e06.8): radial push, directional impulse, point pull and lift. "Throw enemies
 // through furniture" is the fantasy, so a force works the same on a creature and on a loose object:
-// both are reached through properties (weight, pushable, liftable, anchored), never by what they are.
+// both are reached through properties (weight, pushable, liftable), never by what they are.
 //
 // - push / impulse: one shove of `impulse` N·s through the single stimulus API (a contact force with
 //   a direction). The velocity change is impulse / weight, so a 10 kg crate leaves four times as fast
@@ -13,7 +13,7 @@
 //   until the duration ends. It is a damped approach: the speed asked for shrinks with the distance
 //   left and with what the budget can brake, so the target settles on the point instead of swinging
 //   through it. A heavier target accelerates slower (the same budget over more mass).
-// - anchored things never move, and lift refuses anything over MAX_LIFTABLE_WEIGHT: the force does
+// - anchored things (neither pushable nor liftable: bolted down, part of the level) never move, and lift refuses anything over MAX_LIFTABLE_WEIGHT: the force does
 //   nothing and `ForceResisted` fires, so a heavy thing visibly resists rather than being ignored.
 //   Without a duration, pull is one impulse towards the point and lift one impulse upwards.
 
@@ -90,18 +90,11 @@ export function resistanceTo(
   lifting: boolean,
 ): { readonly weight: number; readonly limit: number } | undefined {
   const weight = readProperty(world, target, 'weight');
-  if (readProperty(world, target, 'anchored')) return { weight, limit: 0 };
+  if (!readProperty(world, target, 'pushable') && !readProperty(world, target, 'liftable')) {
+    return { weight, limit: 0 };
+  }
   if (lifting && weight > MAX_LIFTABLE_WEIGHT) return { weight, limit: MAX_LIFTABLE_WEIGHT };
   return undefined;
-}
-
-/** Whether a force can move `entity` at all: the same test the stimulus API applies. */
-function reachable(world: World<never>, entity: EntityId): boolean {
-  const movable = ['pushable', 'liftable', 'breakable', 'bashable'] as const;
-  return (
-    movable.some((key) => readProperty(world, entity, key)) &&
-    readProperty(world, entity, 'weight') > 0
-  );
 }
 
 /** The velocity of a creature or physics object, or undefined for anything else. */
@@ -223,7 +216,7 @@ export function forceOp(ctx: OpContext, op: OpOf<'force'>): OpDetail | undefined
   if (target === null) return undefined;
   const at = placementOf(world, target);
   if (at === undefined) return undefined;
-  if (!reachable(world, target)) return undefined;
+  if (readProperty(world, target, 'weight') <= 0) return undefined;
   const lifting = op.mode === 'lift';
   const resisted = resistanceTo(world, target, lifting);
   if (resisted !== undefined) {

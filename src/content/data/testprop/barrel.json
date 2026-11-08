@@ -1,0 +1,9 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "barrel",
+  "name": "Small barrel",
+  "mass": 20,
+  "flammable": true,
+  "tags": ["liftable"],
+  "body": { "size": [0.55, 0.75, 0.55], "material": "wood" }
+}

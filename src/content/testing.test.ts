@@ -9,7 +9,7 @@ describeContent('testprop', 'visits every entry once', (entry) => {
 
 describe('content test harness', () => {
   it('describeContent generated one named test per entry, credited on the test meta', () => {
-    expect(seen).toEqual(['crate', 'lever', 'plank']);
+    expect(seen).toEqual(['barrel', 'bottle', 'clay-pot', 'crate', 'lever', 'plank']);
   });
 
   it('markExercised appends type:id to the test meta', ({ task }) => {

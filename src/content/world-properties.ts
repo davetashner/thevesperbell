@@ -95,7 +95,6 @@ export const worldPropertiesSchema = z
         ),
       liftable: flag('Can be picked up and carried.'),
       pushable: flag('Can be pushed or dragged.'),
-      anchored: flag('Fixed in place: spell forces cannot move or lift it.'),
       hideable: flag('An actor can hide in or behind it.'),
       reflective: flag('Reflects light beams and bolts.'),
       transparent: flag('Light and sight pass through it.'),

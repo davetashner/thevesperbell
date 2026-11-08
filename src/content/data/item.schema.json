@@ -1969,10 +1969,6 @@
           "type": "boolean",
           "description": "Can be pushed or dragged."
         },
-        "anchored": {
-          "type": "boolean",
-          "description": "Fixed in place: spell forces cannot move or lift it."
-        },
         "hideable": {
           "type": "boolean",
           "description": "An actor can hide in or behind it."
@@ -2425,10 +2421,6 @@
                   "pushable": {
                     "type": "boolean",
                     "description": "Can be pushed or dragged."
-                  },
-                  "anchored": {
-                    "type": "boolean",
-                    "description": "Fixed in place: spell forces cannot move or lift it."
                   },
                   "hideable": {
                     "type": "boolean",

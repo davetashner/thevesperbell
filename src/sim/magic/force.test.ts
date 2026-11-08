@@ -244,6 +244,7 @@ describe('spell forces (mw-e06.8)', () => {
     expect(run(a, force('push', 100), null, v(0, 0, 0))).toBeUndefined();
     expect(run(a, force('push', 100), a.world.spawn(), v(0, 0, 0))).toBeUndefined();
     const inert = a.world.spawn();
+    addProperties(a.world, inert, { weight: 0, pushable: true });
     placeEntity(a.world, inert, v(1, 1, 1), 0.2);
     expect(run(a, force('push', 100), inert, v(0, 0, 0))).toBeUndefined();
     expect(run(a, force('push', 0), a.crate(1, v(0, 6, 0)), v(0, 0, 0))).toBeUndefined();
@@ -343,10 +344,10 @@ describe('spell forces (mw-e06.8)', () => {
     expect(b.reactions.find((r) => r.entity === rook)?.reaction).not.toBe('knockdown');
   });
 
-  it('AC-4: a lift on an anchored or over-heavy object leaves it on the ground and fires ForceResisted', () => {
+  it('AC-4: a lift on an anchored (neither pushable nor liftable) or over-heavy object leaves it on the ground and fires ForceResisted', () => {
     const a = arena();
     a.steps(2);
-    const bolted = a.crate(20, v(0, 0.25, 0), { anchored: true });
+    const bolted = a.crate(20, v(0, 0.25, 0), { pushable: false, liftable: false });
     const boulder = a.crate(MAX_LIFTABLE_WEIGHT + 1, v(3, 0.25, 0));
     const fine = a.crate(MAX_LIFTABLE_WEIGHT, v(6, 0.25, 0));
     a.steps(30);

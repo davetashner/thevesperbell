@@ -127,8 +127,11 @@ describe('scene loader glue (mw-e00.21)', () => {
       'spawn:dummy-centre',
       'spawn:dummy-right',
       'spawn:supply-chest',
+      'spawn:testbed-bottle',
+      'spawn:testbed-pot',
+      'spawn:testbed-barrel',
     ]);
-    expect(sync.size).toBe(11);
+    expect(sync.size).toBe(14);
     expect(built[0]?.transform?.position).toEqual({ x: 0, y: 0, z: 0 });
     expect(built[1]?.transform?.position).toEqual({ x: 0, y: 0, z: -1 });
   });

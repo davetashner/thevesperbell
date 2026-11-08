@@ -6,7 +6,7 @@
 // - `bindBreakLeftovers` gives every piece of debris and every spilled prop without one a box the
 //   size of its body after each step; render sync drops it when the sim removes the entity (debris
 //   past its lifetime or over the budget).
-// - `BreakWatch` remembers what broke and which passages opened, for the e2e (#app[data-breakables]).
+// - `BreakWatch` remembers what broke, the noises made and which passages opened, for the e2e (#app[data-breakables]).
 //
 // No breakables, no cost: the game only binds leftovers and publishes the readout in scenes that have
 // breakables (`hasBreakables`).
@@ -14,6 +14,7 @@
 import type { GameContent } from '@content/index';
 import {
   breakableBroken,
+  noiseEmitted,
   DebrisComponent,
   passageRevealed,
   PhysicsObjectComponent,
@@ -91,9 +92,17 @@ export interface BreakRecord {
   readonly by: string;
 }
 
-/** What broke so far in a scene, which passages opened, and the debris alive now. */
+/** One noise the world made, as the readout reports it. */
+export interface NoiseRecord {
+  readonly tick: number;
+  readonly kind: string;
+  readonly loudness: number;
+}
+
+/** What broke so far in a scene, the noises made, which passages opened, and the debris alive now. */
 export interface BreakReadout {
   readonly broken: readonly BreakRecord[];
+  readonly noises: readonly NoiseRecord[];
   readonly passages: readonly string[];
   readonly debris: number;
 }
@@ -101,6 +110,7 @@ export interface BreakReadout {
 /** Remembers breaks and opened passages from the moment it is made. */
 export class BreakWatch {
   private readonly broken: BreakRecord[] = [];
+  private readonly noises: NoiseRecord[] = [];
   private readonly passages: string[] = [];
   private readonly offs: (() => void)[];
 
@@ -108,6 +118,9 @@ export class BreakWatch {
     this.offs = [
       world.events.on(breakableBroken, ({ tick, profile, cause, by }) => {
         this.broken.push({ tick, profile, cause, by });
+      }),
+      world.events.on(noiseEmitted, ({ tick, kind, loudness }) => {
+        this.noises.push({ tick, kind, loudness });
       }),
       world.events.on(passageRevealed, ({ passage }) => {
         this.passages.push(passage);
@@ -119,6 +132,7 @@ export class BreakWatch {
   readout(): BreakReadout {
     return {
       broken: [...this.broken],
+      noises: [...this.noises],
       passages: [...this.passages],
       debris: this.world.query(DebrisComponent).ids().length,
     };

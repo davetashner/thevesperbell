@@ -29,7 +29,6 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `properties.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `properties.liftable` | boolean | — | Can be picked up and carried. |
 | `properties.pushable` | boolean | — | Can be pushed or dragged. |
-| `properties.anchored` | boolean | — | Fixed in place: spell forces cannot move or lift it. |
 | `properties.hideable` | boolean | — | An actor can hide in or behind it. |
 | `properties.reflective` | boolean | — | Reflects light beams and bolts. |
 | `properties.transparent` | boolean | — | Light and sight pass through it. |
