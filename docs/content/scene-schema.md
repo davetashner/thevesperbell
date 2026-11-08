@@ -178,6 +178,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].properties.container` | boolean | — | Holds items (contents live in the e18 container component). |
 | `spawns[].properties.remains` | boolean | — | Inert skeletal or corpse remains that summoning can raise. |
 | `spawns[].properties.noiseMultiplier` | number 0.2–3 | — | Multiplier on its wearer's noise; an actor's is the product of its equipment's. |
+| `spawns[].questCritical` | boolean | — | The quest needs this world object (a statue part, a counterweight; mw-e17.14): it must name a `recovery` anchor, because it is carried physically and can be dropped, thrown or lost (ADR-0003). |
+| `spawns[].recovery` | list of any (at least 3) | — | Where the object returns to, grid cells (the middle of its base), if it ends up below the scene or out of bounds; `object.recovered` is emitted (mw-e17.14). |
 | `spawns[].breakable` | object | — | Makes the spawned entity breakable, e.g. a pot that spills its contents (mw-e03.11). |
 | `spawns[].breakable.profile` | ref → breakable | required | Breakable profile: resistances, debris, break loudness. |
 | `spawns[].breakable.contents` | list of ref → testprop | — | Props it spills when it breaks (props with a body; mw-e03.39). |

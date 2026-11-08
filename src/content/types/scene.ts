@@ -398,6 +398,17 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'World properties of the spawned entity, e.g. a torch: { "burning": true, "fuel": 3600 } (mw-e03.37). A spawn with properties is placed in the sim, so the light field and stimuli reach it.',
     ),
+  questCritical: z
+    .boolean()
+    .optional()
+    .describe(
+      'The quest needs this world object (a statue part, a counterweight; mw-e17.14): it must name a `recovery` anchor, because it is carried physically and can be dropped, thrown or lost (ADR-0003).',
+    ),
+  recovery: gridPosition
+    .optional()
+    .describe(
+      'Where the object returns to, grid cells (the middle of its base), if it ends up below the scene or out of bounds; `object.recovered` is emitted (mw-e17.14).',
+    ),
   breakable: sceneBreakableSchema
     .optional()
     .describe(

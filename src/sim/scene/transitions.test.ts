@@ -57,6 +57,8 @@ describe('scene transitions system (mw-e01.11)', () => {
         scene: 'b',
         spawn: 'arrive-from-a',
         follow: true,
+        // Carried objects are set down outside this volume (mw-e17.14).
+        volume: { min: box.min, max: box.max },
       }),
     ]);
     move(0);

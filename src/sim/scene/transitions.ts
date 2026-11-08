@@ -28,6 +28,8 @@ export interface AreaTransition {
   /** Companions flagged to follow travel with the player. */
   readonly follow: boolean;
   readonly entity: EntityId;
+  /** The volume walked into, metres (carried objects are set down outside it, mw-e17.14). */
+  readonly volume?: { readonly min: Vec3; readonly max: Vec3 };
 }
 
 /** Fired once as the player enters a transition volume (`scene.transition`; never renamed). */
@@ -75,6 +77,7 @@ export function installSceneTransitions<TInput>(
           spawn: t.spawn,
           follow: t.follow,
           entity: player,
+          volume: { min: t.min, max: t.max },
         });
       }
     },

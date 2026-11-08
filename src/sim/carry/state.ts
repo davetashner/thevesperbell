@@ -6,6 +6,7 @@
 // effect at once inside a tick, and so a snapshot, a state hash and a replay carry every hold.
 
 import { defineComponent, type EntityId } from '../core/component';
+import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
 
 /** How an object is carried: in the hands (light enough to keep moving) or on the shoulder (bulky). */
@@ -80,4 +81,45 @@ export interface CarryRestraint {
 export function carryRestraint(world: World<never>, actor: EntityId): CarryRestraint | undefined {
   const hold = holdOf(world, actor);
   return hold === undefined ? undefined : { scale: hold.speedScale, noJump: hold.noJump };
+}
+
+/** What a grab was for: a ladder, rope or ivy (`climb`) or a ledge (`ledge`). */
+export type GrabKind = 'climb' | 'ledge';
+
+/** A grab refused because the carrier's hands are full (ADR-0003: the prompt reads "Hands full"). */
+export interface GrabRefused {
+  readonly tick: number;
+  readonly actor: EntityId;
+  readonly grab: GrabKind;
+  readonly reason: 'hands-full';
+}
+
+/** Fired once as a carrier presses into something it may not grab (`carry.grabRefused`). */
+export const grabRefused = defineEvent<GrabRefused>('carry.grabRefused');
+
+/** The last tick each actor's grab was refused, per world: a held press is one refusal, not sixty. */
+const lastRefusal = new WeakMap<object, Map<EntityId, number>>();
+
+/**
+ * Whether `actor` may not grab a ladder, rope, ivy or ledge because it carries something. Emits
+ * `grabRefused` when the refusal begins (not on every tick a press goes on). Climbing and ledge hooks
+ * call this where they would start a grab.
+ */
+export function refuseGrab(
+  world: World<never>,
+  actor: EntityId | undefined,
+  grab: GrabKind,
+): boolean {
+  if (actor === undefined || holdOf(world, actor) === undefined) return false;
+  let ticks = lastRefusal.get(world);
+  if (ticks === undefined) {
+    ticks = new Map();
+    lastRefusal.set(world, ticks);
+  }
+  const last = ticks.get(actor);
+  ticks.set(actor, world.tick);
+  if (last === undefined || world.tick - last > 1) {
+    world.events.emit(grabRefused, { tick: world.tick, actor, grab, reason: 'hands-full' });
+  }
+  return true;
 }
