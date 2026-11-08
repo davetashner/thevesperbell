@@ -14,7 +14,10 @@ import {
   initialCharacterState,
   installCarry,
   installInteraction,
+  holdOnTarget,
+  holdRemotely,
   installPhysicsObjects,
+  installRemoteHold,
   installStimuli,
   PhysicsObjectComponent,
   PlayerLook,
@@ -89,6 +92,20 @@ describe('saving while carrying (mw-e17.14)', () => {
     // It stays where it was put when the world steps on.
     for (let i = 0; i < 30; i++) loaded.world.step();
     expect(placementOf(loaded.world, loaded.body)?.y).toBeCloseTo(0.2, 1);
+  });
+
+  it('mw-e03.12: a save written while an object is held at a distance lets it go', () => {
+    const saved = scene();
+    installRemoteHold(saved.world);
+    saved.world.step();
+    const target = { x: 0, y: 3, z: -3 };
+    expect(holdRemotely(saved.world, saved.player, saved.body, target, 100)).toEqual({ ok: true });
+    for (let i = 0; i < 30; i++) saved.world.step();
+    expect(feetY(saved.world, saved.body)).toBeGreaterThan(2.5);
+    createGameSaveRegistry().write(saved.world, options);
+    expect(holdOnTarget(saved.world, saved.body)).toBeUndefined();
+    for (let i = 0; i < 90; i++) saved.world.step();
+    expect(placementOf(saved.world, saved.body)?.y).toBeCloseTo(0.2, 1);
   });
 
   it('a save written with nothing carried leaves the world as it was', () => {

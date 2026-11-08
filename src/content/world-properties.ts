@@ -95,6 +95,7 @@ export const worldPropertiesSchema = z
         ),
       liftable: flag('Can be picked up and carried.'),
       pushable: flag('Can be pushed or dragged.'),
+      remoteActuatable: flag('Can be operated from a distance by magic (remote actuation).'),
       hideable: flag('An actor can hide in or behind it.'),
       reflective: flag('Reflects light beams and bolts.'),
       transparent: flag('Light and sight pass through it.'),

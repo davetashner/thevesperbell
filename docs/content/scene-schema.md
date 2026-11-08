@@ -39,6 +39,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `placements[].properties.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `placements[].properties.liftable` | boolean | — | Can be picked up and carried. |
 | `placements[].properties.pushable` | boolean | — | Can be pushed or dragged. |
+| `placements[].properties.remoteActuatable` | boolean | — | Can be operated from a distance by magic (remote actuation). |
 | `placements[].properties.hideable` | boolean | — | An actor can hide in or behind it. |
 | `placements[].properties.reflective` | boolean | — | Reflects light beams and bolts. |
 | `placements[].properties.transparent` | boolean | — | Light and sight pass through it. |
@@ -141,6 +142,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].properties.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `spawns[].properties.liftable` | boolean | — | Can be picked up and carried. |
 | `spawns[].properties.pushable` | boolean | — | Can be pushed or dragged. |
+| `spawns[].properties.remoteActuatable` | boolean | — | Can be operated from a distance by magic (remote actuation). |
 | `spawns[].properties.hideable` | boolean | — | An actor can hide in or behind it. |
 | `spawns[].properties.reflective` | boolean | — | Reflects light beams and bolts. |
 | `spawns[].properties.transparent` | boolean | — | Light and sight pass through it. |

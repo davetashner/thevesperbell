@@ -15,7 +15,7 @@
  * v1: the mw-e03.1 set. v2: mw-e03.31 additions (additive only: a v1 save loads unchanged).
  * v3: `climbable` is a grade enum (mw-e03.22); a stored 1/2/3 maps to ivy/rough/sheer.
  */
-export const WORLD_PROPERTIES_VERSION = 3;
+export const WORLD_PROPERTIES_VERSION = 4;
 
 /** A light source's output. Colour is a render concern and lives outside the sim. */
 export interface LightEmission {
@@ -89,6 +89,8 @@ export interface WorldPropertyValues {
   liftable: boolean;
   /** Can be pushed or dragged. */
   pushable: boolean;
+  /** A lever, switch or door that magic may operate from a distance (Mage Hand, Telekinesis). */
+  remoteActuatable: boolean;
   /** An actor can hide in or behind it. */
   hideable: boolean;
   /** Mirror-like: light beams and bolts bounce off it by the surface normal (e03 light beams). */
@@ -320,6 +322,7 @@ export const WORLD_PROPERTY_SPECS: {
   },
   liftable: flag('Can be picked up and carried.'),
   pushable: flag('Can be pushed or dragged.'),
+  remoteActuatable: flag('Can be operated from a distance by magic (remote actuation).'),
   hideable: flag('An actor can hide in or behind it.'),
   reflective: flag('Mirror-like: light beams and bolts bounce off it by the surface normal.'),
   transparent: flag('Light and sight pass through it.'),
