@@ -1,0 +1,7 @@
+{
+  "$schema": "../ambience.schema.json",
+  "id": "slice-gallery",
+  "notes": "The vertical slice's mine gallery (mw-e28.13), replacing the slice's hard-wired ambience loop: the existing drips bed (amb-slice-gallery) loops under the whole scene. No one-shots yet: the ambience asset group (mw-e38.59) has not made drip, creak or gust sounds, and a one-shot naming a cue the manifest lacks would only be skipped.",
+  "bed": { "cue": "amb-slice-gallery", "gainDb": 0 },
+  "oneShots": []
+}
