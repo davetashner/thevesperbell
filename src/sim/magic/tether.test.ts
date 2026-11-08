@@ -10,6 +10,7 @@ import {
   addInteractable,
   addInteractor,
   INTERACTION_COMPONENTS,
+  InteractableComponent,
   interacted,
   type Interaction,
 } from '../interaction/system';
@@ -20,6 +21,12 @@ import {
   PhysicsObjectComponent,
 } from '../physics/objects';
 import { RapierPhysics } from '../physics/rapier';
+import { rigidBodiesOf } from '../physics/objects';
+import type { ColliderHandle } from '../physics/static-colliders';
+import { setProperty } from '../properties/components';
+import { PoiseBroken } from '../combat/damage/events';
+import { HitReaction } from '../combat/reactions/events';
+import { areaTransition } from '../scene/transitions';
 import { PlayerLook } from '../player/player';
 import { addProperties, registerWorldProperties } from '../properties/components';
 import { FakeSightWorld } from '../sight/fake-sight-world';
@@ -42,6 +49,13 @@ import {
   type TetherReleaseCommand,
   type TetherUseCommand,
 } from './tether';
+import {
+  holdOnTarget,
+  holdRemotely,
+  installRemoteHold,
+  remoteHolds,
+  settleRemoteHolds,
+} from './remote-hold';
 import type { SpellEntry } from '@content/index';
 
 type Input = CastCommand | CancelCastCommand | TetherUseCommand | TetherReleaseCommand;
@@ -70,15 +84,20 @@ interface RigOptions extends SpellTetherOptions {
   readonly spell?: SpellEntry;
   readonly withCasting?: boolean;
   readonly walls?: boolean;
+  readonly gravity?: Vec3;
 }
 
 function rig(options: RigOptions = {}) {
-  const physics = new RapierPhysics(RAPIER);
+  const physics = new RapierPhysics(
+    RAPIER,
+    options.gravity !== undefined ? { gravity: options.gravity } : {},
+  );
   const world = installStimuli(
     registerWorldProperties(new World<Input>({ seed: 5, hz: 60, physics })),
   );
   world.register(...INTERACTION_COMPONENTS, ...DAMAGE_COMPONENTS, PlayerLook);
   installPhysicsObjects(world);
+  installRemoteHold(world);
   physics.add(box(v(-60, -1, -60), v(60, 0, 60)));
   const spell = options.spell ?? tetherSpell();
   const pipeline = installSpells(world, { spells: (id) => (id === spell.id ? spell : undefined) });
@@ -116,7 +135,7 @@ function rig(options: RigOptions = {}) {
   world.events.on(interacted, (e) => interactions.push(e));
   const crate = (at: Vec3, weight = 10): EntityId => {
     const entity = world.spawn();
-    addProperties(world, entity, { weight, material: 'wood' });
+    addProperties(world, entity, { weight, material: 'wood', liftable: true });
     addPhysicsObject(world, entity, {
       shape: { kind: 'box', halfExtents: v(HALF, HALF, HALF) },
       position: at,
@@ -125,6 +144,7 @@ function rig(options: RigOptions = {}) {
   };
   const lever = (at: Vec3): EntityId => {
     const entity = world.spawn();
+    addProperties(world, entity, { remoteActuatable: true });
     addInteractable(world, entity, { affordances: [{ verb: 'pull' }] }, at);
     return entity;
   };
@@ -303,8 +323,9 @@ describe('tether: carrying', () => {
     for (let i = 0; i < 120; i++) {
       aim = v(i * 0.05, 1.5, -4); // 3 m/s sideways
       r.steps(1);
+      // the spring trails a steadily moving point by 2v/ω (0.3 m at 3 m/s)
       expect(hypot(at(r.world, crate).x - aim.x, at(r.world, crate).z - aim.z)).toBeLessThanOrEqual(
-        0.3,
+        0.4,
       );
     }
     expect(at(r.world, crate).y).toBeCloseTo(1.5, 1); // hovering: gravity does not win
@@ -321,13 +342,14 @@ describe('tether: carrying', () => {
     const crate = r.crate(v(0, 1.5, -4));
     r.grab(crate);
     r.steps(60);
-    expect(at(r.world, crate).z).toBeCloseTo(-10, 0); // 6 m in a second
+    expect(at(r.world, crate).z).toBeLessThan(-9); // about 6 m in a second (the spring trails a little)
+    expect(at(r.world, crate).z).toBeGreaterThan(-10.5);
     r.steps(120);
     const z = at(r.world, crate).z;
     expect(z).toBeGreaterThan(-15.1);
     expect(z).toBeLessThan(-14);
     aim = v(0, 1.5, -2);
-    r.steps(1);
+    r.steps(20);
     expect(at(r.world, crate).z).toBeGreaterThan(z);
   });
 
@@ -337,6 +359,7 @@ describe('tether: carrying', () => {
     const crate = r.crate(v(0, 1.5, -4));
     r.grab(crate);
     r.sight.add(box(v(2, 0, -6), v(2.5, 3, -2)));
+    r.physics.add(box(v(2, 0, -6), v(2.5, 3, -2)));
     aim = v(5, 1.5, -4);
     r.steps(60);
     expect(at(r.world, crate).x).toBeLessThan(2);
@@ -566,5 +589,172 @@ describe('tether: with the cast phase', () => {
     const crate = r.crate(v(0, 1, -4));
     r.grab(crate); // a scroll: no channel runs
     expect(r.tether.release(r.caster)).toBe(true);
+  });
+});
+
+describe('tether: the remote hold (mw-e03.47)', () => {
+  const speedOf = (r: ReturnType<typeof rig>, entity: EntityId): number => {
+    const object = r.world.get(entity, PhysicsObjectComponent);
+    // a held crate is a physics object
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { linvel } = rigidBodiesOf(r.world).motionOf(object!.body as ColliderHandle);
+    return hypot(linvel.x, linvel.y, linvel.z);
+  };
+
+  it('AC-1: a held crate is steered by the spring-damper hold, not teleported', () => {
+    let aim = v(0, 1.5, -4);
+    const r = rig({ aim: () => aim });
+    const crate = r.crate(v(0, 1.5, -4));
+    r.grab(crate);
+    expect(remoteHolds(r.world).map((h) => [h.holder, h.target])).toEqual([[r.caster, crate]]);
+    aim = v(3, 1.5, -4);
+    r.steps(1);
+    // a teleport would have jumped the whole step (0.2 m); the spring has only begun to move it
+    expect(at(r.world, crate).x).toBeLessThan(0.1);
+    r.steps(10);
+    expect(speedOf(r, crate)).toBeGreaterThan(0.5); // it carries speed
+    expect(holdOnTarget(r.world, crate)?.point.x).toBeGreaterThan(0);
+    r.steps(150);
+    expect(at(r.world, crate).x).toBeCloseTo(3, 1);
+    expect(r.tether.release(r.caster)).toBe(true);
+    expect(remoteHolds(r.world)).toEqual([]); // no hold is left dangling
+  });
+
+  it('AC-2: a crate above the weight limit fails with ForceResisted reason overweight and no hold', () => {
+    const r = rig();
+    const boulder = r.crate(v(0, 1, -4), 80);
+    const seen: string[] = [];
+    r.world.events.on(ForceResisted, (e) => seen.push(`${e.reason}:${String(e.spell)}`));
+    expect(r.grab(boulder).status).toBe('fizzled');
+    expect(seen).toEqual(['overweight:grip']);
+    expect(remoteHolds(r.world)).toEqual([]);
+  });
+
+  it('refuses a physics object that is not liftable', () => {
+    const r = rig();
+    const anvil = r.crate(v(0, 1, -4));
+    setProperty(r.world, anvil, 'liftable', false);
+    expect(r.grab(anvil).status).toBe('fizzled');
+    expect(r.fizzled).toEqual(['not-liftable']);
+    expect(r.resisted).toEqual([]);
+  });
+
+  it('AC-3: a lever without remoteActuatable cannot be grabbed, and one that loses it cannot be used', () => {
+    const r = rig();
+    const plain = r.lever(v(0, 1, -5));
+    setProperty(r.world, plain, 'remoteActuatable', false);
+    expect(r.grab(plain).status).toBe('fizzled');
+    expect(r.fizzled).toEqual(['not-tetherable']);
+    const lever = r.lever(v(0, 1, -6));
+    expect(r.grab(lever).status).toBe('cast');
+    expect(r.tether.canUse(r.caster)).toBe(true);
+    setProperty(r.world, lever, 'remoteActuatable', false);
+    expect(r.tether.canUse(r.caster)).toBe(false);
+    expect(r.use()).toBe(false);
+    expect(r.interactions).toEqual([]);
+  });
+
+  it('using a held lever that has lost its affordances does nothing', () => {
+    const r = rig();
+    const lever = r.lever(v(0, 1, -5));
+    r.grab(lever);
+    r.world.remove(lever, InteractableComponent);
+    expect(r.use()).toBe(false);
+    expect(r.used).toEqual([]);
+  });
+
+  it('uses the world gravity: in a light world the held crate hovers and falls slowly on release', () => {
+    const r = rig({ gravity: v(0, -2, 0) });
+    const crate = r.crate(v(0, 3, -4));
+    r.grab(crate);
+    r.steps(60);
+    expect(at(r.world, crate).y).toBeCloseTo(3, 1);
+    r.tether.release(r.caster);
+    r.steps(30);
+    // half a second of 2 m/s² fall is 0.25 m; standard gravity would have dropped it 1.2 m
+    expect(at(r.world, crate).y).toBeGreaterThan(2.5);
+  });
+
+  it('lets go (and ends the hold) when the hold jams against geometry', () => {
+    let aim = v(0, 1.5, -4);
+    const r = rig({ aim: () => aim, withCasting: true });
+    const crate = r.crate(v(0, 1.5, -4));
+    r.physics.add(box(v(2, 0, -6), v(2.5, 3, -2)));
+    r.steps(1);
+    r.grab(crate);
+    aim = v(5, 1.5, -4);
+    r.steps(150);
+    expect(r.released).toEqual(['hold-broken']);
+    expect(remoteHolds(r.world)).toEqual([]);
+    expect(r.tether.heldBy(r.caster)).toBeNull();
+  });
+
+  it('lets go when the crate becomes too heavy, a save settles holds, or another holder takes it', () => {
+    const r = rig();
+    const a = r.crate(v(0, 1.5, -4));
+    r.grab(a);
+    setProperty(r.world, a, 'weight', 500);
+    r.steps(1);
+    const b = r.crate(v(0, 1.5, -4));
+    r.grab(b);
+    settleRemoteHolds(r.world);
+    r.world.events.flush();
+    const c = r.crate(v(0, 1.5, -4));
+    r.grab(c);
+    const thief = r.world.spawn();
+    holdRemotely(r.world, thief, c, v(0, 1.5, -4), 50);
+    r.world.events.flush();
+    expect(r.released).toEqual(['hold-broken', 'hold-broken', 'hold-broken']);
+    expect(r.tether.heldBy(r.caster)).toBeNull();
+  });
+
+  it('lets go when the caster is staggered or leaves the scene, and not for a flinch or someone else', () => {
+    const r = rig();
+    const other = r.world.spawn();
+    const crate = r.crate(v(0, 1.5, -4));
+    const reaction = (entity: EntityId, kind: 'flinch' | 'stagger') => {
+      r.world.events.emit(HitReaction, {
+        tick: r.world.tick,
+        entity,
+        reaction: kind,
+        direction: 'front',
+        ticks: 10,
+        interrupted: false,
+        displaced: false,
+        suppressed: null,
+        instigator: null,
+        source: null,
+      });
+      r.world.events.flush();
+    };
+    r.grab(crate);
+    reaction(r.caster, 'flinch');
+    reaction(other, 'stagger');
+    expect(r.tether.heldBy(r.caster)).toBe(crate);
+    reaction(r.caster, 'stagger');
+    expect(r.tether.heldBy(r.caster)).toBeNull();
+    r.grab(crate);
+    r.world.events.emit(PoiseBroken, {
+      tick: r.world.tick,
+      target: r.caster,
+      instigator: null,
+      source: null,
+    });
+    r.world.events.flush();
+    expect(r.tether.heldBy(r.caster)).toBeNull();
+    r.grab(crate);
+    r.world.events.emit(areaTransition, {
+      tick: r.world.tick,
+      from: 'a',
+      transition: 'north',
+      scene: 'b',
+      spawn: 'in',
+      follow: false,
+      entity: r.caster,
+    });
+    r.world.events.flush();
+    expect(r.tether.heldBy(r.caster)).toBeNull();
+    expect(r.released).toEqual(['staggered', 'staggered', 'exit']);
+    expect(remoteHolds(r.world)).toEqual([]);
   });
 });

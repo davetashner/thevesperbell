@@ -138,6 +138,7 @@ export class RapierPhysics implements RigidBodyPort {
   /** `rapier3d-deterministic@<version>`, written into every snapshot. */
   readonly engine: string;
   private world: Rapier.World;
+  private readonly worldGravity: Vec3;
   private readonly entries = new Map<ColliderHandle, Entry>();
   /** Rapier collider handle → this port's handle (for query results). */
   private readonly byRapierCollider = new Map<number, ColliderHandle>();
@@ -155,7 +156,9 @@ export class RapierPhysics implements RigidBodyPort {
     options: RapierPhysicsOptions = {},
   ) {
     this.engine = `rapier3d-deterministic@${rapier.version()}`;
-    this.world = new rapier.World({ ...(options.gravity ?? DEFAULT_GRAVITY) });
+    const gravity = options.gravity ?? DEFAULT_GRAVITY;
+    this.worldGravity = Object.freeze({ x: gravity.x, y: gravity.y, z: gravity.z });
+    this.world = new rapier.World({ ...gravity });
     this.events = new rapier.EventQueue(true);
   }
 
@@ -286,6 +289,10 @@ export class RapierPhysics implements RigidBodyPort {
 
   sleep(handle: ColliderHandle): void {
     this.bodyOf(handle).sleep();
+  }
+
+  gravity(): Vec3 {
+    return this.worldGravity;
   }
 
   moveBody(handle: ColliderHandle, position: Vec3, rotation?: Quat): void {

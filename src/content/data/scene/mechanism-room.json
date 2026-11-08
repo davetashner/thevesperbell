@@ -167,6 +167,7 @@
       "id": "north-lever",
       "at": [1.25, 0, 4.5],
       "prop": "lever",
+      "properties": { "remoteActuatable": true },
       "switch": {
         "kind": "lever"
       }

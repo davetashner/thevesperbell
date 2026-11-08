@@ -22,6 +22,7 @@ import {
   installMana,
   installMechanisms,
   installPhysicsObjects,
+  installRemoteHold,
   installSignals,
   installSpellEmission,
   installSpells,
@@ -68,6 +69,7 @@ function scene(aim: () => Vec3 = () => v(0, 1.5, -4)) {
   );
   world.register(...INTERACTION_COMPONENTS, ...DAMAGE_COMPONENTS, PlayerLook);
   installPhysicsObjects(world);
+  installRemoteHold(world);
   installMechanisms(world);
   physics.add(box(v(-60, -1, -60), v(60, 0, 60))); // the floor
   const sightWorld = new RapierSightWorld(physics);
@@ -91,7 +93,7 @@ function scene(aim: () => Vec3 = () => v(0, 1.5, -4)) {
 
   const crate = (at: Vec3, weight = 10): EntityId => {
     const entity = world.spawn();
-    addProperties(world, entity, { weight, material: 'wood' });
+    addProperties(world, entity, { weight, material: 'wood', liftable: true });
     addPhysicsObject(world, entity, {
       shape: { kind: 'box', halfExtents: v(0.25, 0.25, 0.25) },
       position: at,
@@ -100,6 +102,7 @@ function scene(aim: () => Vec3 = () => v(0, 1.5, -4)) {
   };
   const lever = (at: Vec3): EntityId => {
     const entity = world.spawn();
+    addProperties(world, entity, { remoteActuatable: true });
     addInteractable(world, entity, { affordances: [{ verb: 'pull' }] }, at);
     makeSwitch(world, entity, 'lever');
     return entity;
@@ -259,7 +262,7 @@ describe('Mage Hand: carrying (mw-e08.10)', () => {
       const p = where(s.world, crate);
       worst = Math.max(worst, Math.hypot(p.x - aim.x, p.y - aim.y, p.z - aim.z));
     }
-    expect(worst).toBeLessThanOrEqual(0.3);
+    expect(worst).toBeLessThanOrEqual(0.4); // the spring trails a moving point by 2v/ω
     expect(signalOutput(s.world, wired, 'plate', 'active')).toBe(false); // held above it
     s.run(1, [{ type: 'tether-release', caster: s.caster }]);
     s.run(120);
