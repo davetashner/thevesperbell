@@ -6,5 +6,6 @@ export * from './impacts';
 export * from './ropes';
 export * from './keys';
 export * from './plates';
+export * from './receivers';
 export * from './scene';
 export * from './system';
