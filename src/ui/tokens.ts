@@ -42,6 +42,7 @@ export const UI_TOKENS: Readonly<Record<string, string>> = Object.freeze({
   'ui-color-breath': PALETTE.sky,
   'ui-color-mana': PALETTE.sky,
   'ui-color-bar-trail': PALETTE.hearth,
+  'ui-color-poise': PALETTE.brass,
   'ui-color-lock': PALETTE.wayfinder,
   'ui-color-flash': PALETTE.cream,
   'ui-color-damage': PALETTE.ember,
@@ -243,6 +244,7 @@ ${tokens}
 .vb-meter[data-kind='stamina'] .vb-meter-fill { background: var(--ui-color-stamina); }
 .vb-meter[data-kind='breath'] .vb-meter-fill { background: var(--ui-color-breath); }
 .vb-meter[data-kind='mana'] .vb-meter-fill { background: var(--ui-color-mana); }
+.vb-meter[data-kind='poise'] .vb-meter-fill { background: var(--ui-color-poise); }
 .vb-water-hud {
   position: absolute;
   left: 50%;
@@ -339,6 +341,63 @@ ${tokens}
   overflow: visible;
 }
 .vb-target-bar .vb-meter-trail, .vb-target-bar .vb-meter-fill { border-radius: inherit; }
+.vb-target-bar .vb-meter[data-kind='poise'] { width: 12em; height: 0.4em; }
+.vb-target-bar .vb-meter[hidden] { display: none; }
+.vb-target-note {
+  min-height: 1.1em;
+  color: var(--ui-color-hud-text);
+  font-family: var(--ui-font-heading);
+  font-size: 0.8em;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 3px var(--ui-color-hud-shadow), 0 1px 2px var(--ui-color-hud-shadow);
+}
+.vb-target-note:empty { display: none; }
+.vb-boss-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 1.25em;
+  transform: translateX(-50%);
+  width: min(36em, calc(100% - 2em));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25em;
+  pointer-events: none;
+}
+.vb-boss-bar[hidden] { display: none; }
+.vb-boss-name {
+  color: var(--ui-color-hud-text);
+  font-family: var(--ui-font-heading);
+  font-size: 1.1em;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 3px var(--ui-color-hud-shadow), 0 1px 2px var(--ui-color-hud-shadow);
+}
+.vb-boss-bar .vb-meter {
+  width: 100%;
+  height: 0.9em;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--ui-color-hud-shadow);
+  overflow: visible;
+}
+.vb-boss-bar .vb-meter-trail, .vb-boss-bar .vb-meter-fill { border-radius: inherit; }
+.vb-hit-markers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.vb-hit-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: -0.6em 0 0 -0.6em;
+  width: 1.2em;
+  height: 1.2em;
+  line-height: 1.2em;
+  text-align: center;
+  font-weight: 900;
+  color: var(--ui-color-hud-text);
+  text-shadow: 0 0 2px var(--ui-color-hud-shadow), 0 0 2px var(--ui-color-hud-shadow);
+}
+.vb-hit-marker[data-variant='weakpoint'] { color: var(--ui-color-lock); font-size: 1.3em; }
+.vb-hit-marker[data-variant='headshot'] { color: var(--ui-color-damage); font-size: 1.5em; }
+.vb-hit-marker[data-variant='deflected'] { color: var(--ui-color-poise); }
+.vb-hit-marker[hidden] { display: none; }
 .vb-damage-numbers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .vb-damage-number {
   position: absolute;

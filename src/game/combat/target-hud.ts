@@ -12,18 +12,35 @@ import {
   CreatureComponent,
   creaturesInstalled,
   DamageApplied,
+  DAMAGE_TAGS,
   healthOf,
+  isDead,
   PlacementComponent,
+  PoiseBroken,
+  poiseOf,
   type EntityId,
   type World,
 } from '@sim/index';
-import type { DamageNumbers, TargetBar, TargetModel } from '@ui/index';
+import type {
+  BossBar,
+  DamageNumbers,
+  HitMarkers,
+  HitVariant,
+  TargetBar,
+  TargetModel,
+} from '@ui/index';
 import type { LockTarget } from '../player/testbed-player';
 
 /** How long the bar stays on whoever the player last hit, when nothing is locked. */
 export const TARGET_HOLD_MS = 5000;
 /** Metres above a fighter's feet its damage numbers appear. */
 export const NUMBER_HEIGHT = 1.8;
+/** Metres above a fighter's feet its hit markers appear. */
+export const MARKER_HEIGHT = 1.2;
+/** How long the "no effect" note shows after an immune hit. */
+export const NO_EFFECT_MS = 800;
+/** How long the poise bar flashes after PoiseBroken. */
+export const POISE_BROKEN_MS = 600;
 
 /** A world point projected to normalised device coordinates (x right, y up, −1…1). */
 export type NdcOf = (point: { x: number; y: number; z: number }) => {
@@ -38,14 +55,51 @@ export function displayName(id: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
-/** The target bar's model for `target`, or null when it has no health or is dead. */
-export function targetModel(world: World<never>, target: EntityId): TargetModel | null {
+/** The lock-on target while it lives: the reticle and bars drop the frame it dies (Died). */
+export function liveLock(
+  world: World<never>,
+  lock: LockTarget | undefined,
+): LockTarget | undefined {
+  return lock !== undefined && !isDead(world, lock.entity) ? lock : undefined;
+}
+
+/** How a landed hit reads: deflected (parried or blocked), headshot, weak point, else normal. */
+export function hitVariant(hit: {
+  readonly tags: readonly string[];
+  readonly packet: { readonly region?: string };
+}): HitVariant {
+  if (hit.tags.includes(DAMAGE_TAGS.parried) || hit.tags.includes(DAMAGE_TAGS.blocked)) {
+    return 'deflected';
+  }
+  const region = hit.packet.region;
+  if (region === 'head') return 'headshot';
+  if (region === 'weakpoint' || hit.tags.includes(DAMAGE_TAGS.weakpoint)) return 'weakpoint';
+  return 'normal';
+}
+
+/** What a bar shows beyond name and health: its poise and the note flags. */
+export interface BarExtras {
+  readonly poiseSeen?: boolean;
+  readonly poiseBroken?: boolean;
+  readonly noEffect?: boolean;
+}
+
+/** The bar model for `target`, or null when it has no health or is dead. */
+export function targetModel(
+  world: World<never>,
+  target: EntityId,
+  extras: BarExtras = {},
+): TargetModel | null {
   const health = healthOf(world, target);
   if (health === undefined || health.current <= 0) return null;
   const creature = creaturesInstalled(world) ? world.get(target, CreatureComponent) : undefined;
+  const poise = extras.poiseSeen === true ? poiseOf(world, target) : undefined;
   return {
     name: creature === undefined ? 'Training dummy' : displayName(creature.origin.creature),
     health: { value: health.current, max: health.max },
+    ...(poise !== undefined && { poise: { value: poise.current, max: poise.max } }),
+    ...(extras.poiseBroken === true && { poiseBroken: true }),
+    ...(extras.noEffect === true && { noEffect: true }),
   };
 }
 
@@ -60,7 +114,11 @@ export interface TargetHudGlueOptions {
   readonly world: World<never>;
   readonly player: EntityId;
   readonly bar: TargetBar;
+  readonly boss: BossBar;
+  readonly markers: HitMarkers;
   readonly numbers: DamageNumbers;
+  /** Whether the creature with this content id is flagged boss. */
+  readonly isBoss: (creature: string) => boolean;
   /** The player's lock-on target now, if any. */
   readonly lock: () => LockTarget | undefined;
   /** Projects a world point through the drawn camera. */
@@ -84,33 +142,71 @@ interface Pending {
   readonly kind: 'dealt' | 'taken';
 }
 
-/** Wires the target bar and damage numbers to the player's sim state and events. */
+interface PendingMarker {
+  readonly entity: EntityId;
+  readonly variant: HitVariant;
+}
+
+/** Wires the target bar, boss bar, hit markers and damage numbers to the player's sim state. */
 export function attachTargetHud(options: TargetHudGlueOptions): TargetHudGlue {
-  const { world, player, bar, numbers, lock, project, size, numbersEnabled } = options;
+  const { world, player, bar, boss, markers, numbers, isBoss, lock, project, size } = options;
   const pending: Pending[] = [];
+  const pendingMarkers: PendingMarker[] = [];
   let lastHit: EntityId | undefined;
   let lastHitMs = -Infinity;
   let lastHitQueued = false;
-  const off = world.events.on(DamageApplied, (hit) => {
+  // Poise shows once its target has taken poise damage; it flashes after PoiseBroken, and "No effect"
+  // shows after an immune hit, each for a fixed time stamped on the first frame that sees the event.
+  const poiseSeen = new Set<EntityId>();
+  const brokenUntil = new Map<EntityId, number>();
+  const noEffectUntil = new Map<EntityId, number>();
+  const brokenQueued = new Set<EntityId>();
+  const noEffectQueued = new Set<EntityId>();
+  let engagedBoss: EntityId | undefined;
+
+  const bossOf = (entity: EntityId): boolean => {
+    const creature = creaturesInstalled(world) ? world.get(entity, CreatureComponent) : undefined;
+    return creature !== undefined && isBoss(creature.origin.creature);
+  };
+
+  const offPoise = world.events.on(PoiseBroken, (e) => {
+    brokenQueued.add(e.target);
+  });
+  const offDamage = world.events.on(DamageApplied, (hit) => {
+    if (hit.poiseDamage > 0) poiseSeen.add(hit.target);
+    if (hit.immune) noEffectQueued.add(hit.target);
     const dealt = hit.packet.instigator === player && hit.target !== player;
     const taken = hit.target === player;
     if (!dealt && !taken) return;
-    if (dealt) lastHitQueued = true;
-    if (dealt) lastHit = hit.target;
+    if (dealt) {
+      lastHitQueued = true;
+      lastHit = hit.target;
+      if (!hit.immune) pendingMarkers.push({ entity: hit.target, variant: hitVariant(hit) });
+      if (bossOf(hit.target)) engagedBoss = hit.target;
+    } else if (hit.packet.instigator !== null && bossOf(hit.packet.instigator)) {
+      engagedBoss = hit.packet.instigator;
+    }
     const text = damageText(hit.total, hit.immune);
     if (text !== null) {
       pending.push({ entity: hit.target, text, kind: dealt ? 'dealt' : 'taken' });
     }
   });
 
-  const anchor = (entity: EntityId): { x: number; y: number } | undefined => {
+  const anchor = (entity: EntityId, metres: number): { x: number; y: number } | undefined => {
     const at = world.get(entity, PlacementComponent);
     if (at === undefined) return undefined;
-    const ndc = project({ x: at.x, y: at.y + NUMBER_HEIGHT, z: at.z });
+    const ndc = project({ x: at.x, y: at.y + metres, z: at.z });
     if (!(Math.abs(ndc.z) <= 1)) return undefined;
     const { width, height } = size();
     return { x: ((ndc.x + 1) / 2) * width, y: ((1 - ndc.y) / 2) * height };
   };
+
+  const modelOf = (entity: EntityId, nowMs: number): TargetModel | null =>
+    targetModel(world, entity, {
+      poiseSeen: poiseSeen.has(entity),
+      poiseBroken: nowMs < (brokenUntil.get(entity) ?? -Infinity),
+      noEffect: nowMs < (noEffectUntil.get(entity) ?? -Infinity),
+    });
 
   return {
     frame(nowMs) {
@@ -118,19 +214,35 @@ export function attachTargetHud(options: TargetHudGlueOptions): TargetHudGlue {
         lastHitMs = nowMs;
         lastHitQueued = false;
       }
-      const enabled = numbersEnabled();
+      for (const e of brokenQueued) brokenUntil.set(e, nowMs + POISE_BROKEN_MS);
+      brokenQueued.clear();
+      for (const e of noEffectQueued) noEffectUntil.set(e, nowMs + NO_EFFECT_MS);
+      noEffectQueued.clear();
+      const enabled = options.numbersEnabled();
       for (const n of pending.splice(0)) {
-        const at = enabled ? anchor(n.entity) : undefined;
+        const at = enabled ? anchor(n.entity, NUMBER_HEIGHT) : undefined;
         if (at !== undefined) numbers.spawn(n.text, n.kind, at.x, at.y, nowMs);
       }
-      const locked = lock()?.entity;
+      for (const m of pendingMarkers.splice(0)) {
+        const at = anchor(m.entity, MARKER_HEIGHT);
+        if (at !== undefined) markers.spawn(m.variant, at.x, at.y, nowMs);
+      }
+      const locked = liveLock(world, lock())?.entity;
+      if (locked !== undefined && bossOf(locked)) engagedBoss = locked;
+      if (engagedBoss !== undefined && isDead(world, engagedBoss)) engagedBoss = undefined;
       const held = nowMs - lastHitMs < TARGET_HOLD_MS ? lastHit : undefined;
       const target = locked ?? held;
-      bar.update(target === undefined ? null : targetModel(world, target), nowMs);
+      // A boss gets the docked bar, not the top one.
+      const showBoss = engagedBoss;
+      const topTarget = target !== undefined && target === showBoss ? undefined : target;
+      boss.update(showBoss === undefined ? null : modelOf(showBoss, nowMs), nowMs);
+      bar.update(topTarget === undefined ? null : modelOf(topTarget, nowMs), nowMs);
+      markers.update(nowMs);
       numbers.update(nowMs);
     },
     dispose() {
-      off();
+      offDamage();
+      offPoise();
     },
   };
 }
