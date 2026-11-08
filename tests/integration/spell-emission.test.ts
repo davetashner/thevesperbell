@@ -59,7 +59,7 @@ function loadSpell(effects: object[]): SpellEntry {
 
 describe('spell light and noise from a data file (mw-e06.14)', () => {
   it('AC-5: a spell file with no noise op validates and sounds at its school default, not silence', () => {
-    const spell = loadSpell([{ op: 'status', status: 'glowing', duration: 5 }]);
+    const spell = loadSpell([{ op: 'status', status: 'revealed', duration: 5 }]);
     expect(spell.effects.some((e) => e.op === 'noise')).toBe(false);
     expect(spellNoiseDb(spell, 'release')).toBe(SCHOOL_NOISE_DB.light);
     expect(spellNoiseDb(spell, 'release')).toBeGreaterThan(0);

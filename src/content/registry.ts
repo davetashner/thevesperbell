@@ -19,6 +19,7 @@ import { checkBehaviours } from './behaviour-checks.ts';
 import { checkConditions } from './condition-checks.ts';
 import { checkFacts } from './fact-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
+import { checkSpellStatuses } from './spell-status-checks.ts';
 import { checkSceneSignals } from './mechanism-checks.ts';
 import { checkRepopulation } from './repopulation-checks.ts';
 import { checkSceneTransitions } from './transition-checks.ts';
@@ -141,6 +142,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkNavmeshes,
   checkRespawnRules,
   checkRepopulation,
+  checkSpellStatuses,
 ];
 
 export type ContentTypes = typeof contentTypes;
