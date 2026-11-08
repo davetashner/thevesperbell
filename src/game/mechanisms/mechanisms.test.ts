@@ -167,6 +167,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
           impactSwitches: [],
           ropes: [],
           lights: [],
+          receivers: [],
           graphs: [],
         },
         {
@@ -185,6 +186,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
       impactSwitches: [],
       ropes: [],
       lights: [],
+      receivers: [],
       graphs: [],
     });
     expect(watch.readout().switches).toEqual({ [String(spawn('east-button'))]: 0 });

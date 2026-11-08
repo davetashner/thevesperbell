@@ -6,153 +6,173 @@
         {
           "op": "down",
           "code": "KeyW",
-          "t": 87
+          "t": 91
         },
         {
           "op": "up",
           "code": "KeyW",
-          "t": 168
-        },
-        {
-          "op": "down",
-          "code": "KeyE",
-          "t": 197
-        },
-        {
-          "op": "up",
-          "code": "KeyE",
-          "t": 201
+          "t": 170
         },
         {
           "op": "down",
           "code": "KeyW",
-          "t": 342
+          "t": 213
         },
         {
           "op": "up",
           "code": "KeyW",
-          "t": 581
+          "t": 220
+        },
+        {
+          "op": "down",
+          "code": "KeyE",
+          "t": 247
+        },
+        {
+          "op": "up",
+          "code": "KeyE",
+          "t": 251
+        },
+        {
+          "op": "down",
+          "code": "KeyW",
+          "t": 383
+        },
+        {
+          "op": "up",
+          "code": "KeyW",
+          "t": 619
+        },
+        {
+          "op": "down",
+          "code": "KeyW",
+          "t": 665
+        },
+        {
+          "op": "up",
+          "code": "KeyW",
+          "t": 670
         },
         {
           "op": "look",
-          "x": -100,
+          "x": -99,
           "y": 0,
-          "t": 621
+          "t": 707
         },
         {
           "op": "down",
           "code": "KeyW",
-          "t": 621
+          "t": 707
         },
         {
           "op": "down",
           "code": "Mouse0",
-          "t": 687
+          "t": 762
         },
         {
           "op": "up",
           "code": "Mouse0",
-          "t": 692
+          "t": 767
         },
         {
           "op": "up",
           "code": "KeyW",
-          "t": 697
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 728
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 732
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 740
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 744
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 748
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 752
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 768
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
           "t": 772
         },
         {
           "op": "down",
           "code": "Mouse0",
-          "t": 776
+          "t": 802
         },
         {
           "op": "up",
           "code": "Mouse0",
-          "t": 780
+          "t": 805
         },
         {
           "op": "down",
           "code": "Mouse0",
-          "t": 818
+          "t": 841
         },
         {
           "op": "up",
           "code": "Mouse0",
-          "t": 822
+          "t": 844
         },
         {
           "op": "down",
           "code": "Mouse0",
-          "t": 857
+          "t": 875
         },
         {
           "op": "up",
           "code": "Mouse0",
-          "t": 861
+          "t": 878
         },
         {
           "op": "down",
+          "code": "Mouse0",
+          "t": 882
+        },
+        {
+          "op": "up",
+          "code": "Mouse0",
+          "t": 885
+        },
+        {
+          "op": "down",
+          "code": "Mouse0",
+          "t": 888
+        },
+        {
+          "op": "up",
+          "code": "Mouse0",
+          "t": 891
+        },
+        {
+          "op": "down",
+          "code": "Mouse0",
+          "t": 895
+        },
+        {
+          "op": "up",
+          "code": "Mouse0",
+          "t": 898
+        },
+        {
+          "op": "down",
+          "code": "Mouse0",
+          "t": 901
+        },
+        {
+          "op": "up",
           "code": "Mouse0",
           "t": 905
         },
         {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 909
-        },
-        {
           "op": "down",
           "code": "Mouse0",
-          "t": 913
+          "t": 908
         },
         {
           "op": "up",
           "code": "Mouse0",
-          "t": 916
+          "t": 911
         },
         {
           "op": "down",
           "code": "Mouse0",
-          "t": 920
+          "t": 915
+        },
+        {
+          "op": "up",
+          "code": "Mouse0",
+          "t": 918
+        },
+        {
+          "op": "down",
+          "code": "Mouse0",
+          "t": 921
         },
         {
           "op": "up",
@@ -160,140 +180,106 @@
           "t": 924
         },
         {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 929
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 933
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 936
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 940
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 944
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 949
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 954
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 959
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 969
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 973
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 978
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 983
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 997
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 1002
-        },
-        {
-          "op": "down",
-          "code": "Mouse0",
-          "t": 1007
-        },
-        {
-          "op": "up",
-          "code": "Mouse0",
-          "t": 1012
+          "op": "look",
+          "x": -20,
+          "y": 0,
+          "t": 928
         },
         {
           "op": "look",
-          "x": -29,
+          "x": -18,
           "y": 0,
-          "t": 1050
+          "t": 934
         },
         {
           "op": "down",
           "code": "Mouse0",
-          "t": 1050
+          "t": 960
         },
         {
           "op": "up",
           "code": "Mouse0",
-          "t": 1053
+          "t": 964
         },
         {
           "op": "look",
-          "x": -21,
+          "x": 24,
           "y": 0,
-          "t": 1056
+          "t": 996
+        },
+        {
+          "op": "down",
+          "code": "Mouse0",
+          "t": 999
+        },
+        {
+          "op": "up",
+          "code": "Mouse0",
+          "t": 1003
+        },
+        {
+          "op": "look",
+          "x": 31,
+          "y": 0,
+          "t": 1006
+        },
+        {
+          "op": "look",
+          "x": 21,
+          "y": 0,
+          "t": 1013
+        },
+        {
+          "op": "look",
+          "x": 17,
+          "y": 0,
+          "t": 1019
+        },
+        {
+          "op": "look",
+          "x": 20,
+          "y": 0,
+          "t": 1026
+        },
+        {
+          "op": "look",
+          "x": 23,
+          "y": 0,
+          "t": 1036
+        },
+        {
+          "op": "down",
+          "code": "Mouse0",
+          "t": 1049
+        },
+        {
+          "op": "up",
+          "code": "Mouse0",
+          "t": 1052
         },
         {
           "op": "down",
           "code": "KeyE",
-          "t": 1106
+          "t": 1107
         },
         {
           "op": "up",
           "code": "KeyE",
-          "t": 1109
+          "t": 1110
         },
         {
           "op": "down",
           "code": "KeyE",
-          "t": 1143
+          "t": 1145
         },
         {
           "op": "up",
           "code": "KeyE",
-          "t": 1147
-        },
-        {
-          "op": "down",
-          "code": "KeyE",
-          "t": 1181
-        },
-        {
-          "op": "up",
-          "code": "KeyE",
-          "t": 1184
+          "t": 1149
         },
         {
           "op": "releaseAll",
-          "t": 1227
+          "t": 1192
         },
         {
           "op": "command",
@@ -307,27 +293,21 @@
               "z": 35.3
             }
           },
-          "t": 1260
-        },
-        {
-          "op": "look",
-          "x": 150,
-          "y": 0,
-          "t": 1326
+          "t": 1227
         },
         {
           "op": "down",
           "code": "KeyE",
-          "t": 1347
+          "t": 1314
         },
         {
           "op": "releaseAll",
-          "t": 1348
+          "t": 1315
         },
         {
           "op": "save",
           "slot": "manual-1",
-          "t": 1420
+          "t": 1381
         },
         {
           "op": "command",
@@ -336,7 +316,7 @@
             "op": "kill",
             "target": 63
           },
-          "t": 1544
+          "t": 1480
         }
       ],
       "startTick": 0
@@ -345,7 +325,7 @@
       "events": [
         {
           "op": "releaseAll",
-          "t": 72
+          "t": 66
         },
         {
           "op": "command",
@@ -359,48 +339,48 @@
               "z": 35.5
             }
           },
-          "t": 110
+          "t": 98
         },
         {
           "op": "down",
           "code": "KeyE",
-          "t": 190
+          "t": 168
         },
         {
           "op": "up",
           "code": "KeyE",
-          "t": 193
+          "t": 171
         },
         {
           "op": "down",
           "code": "KeyW",
-          "t": 326
+          "t": 359
         },
         {
           "op": "releaseAll",
-          "t": 364
+          "t": 396
         },
         {
           "op": "save",
           "slot": "manual-2",
-          "t": 424
+          "t": 461
         }
       ],
-      "startTick": 1420
+      "startTick": 1381
     }
   ],
   "golden": {
     "save": {
       "kind": "saved",
       "slot": "manual-1",
-      "tick": 1420,
-      "hash": "55e4532a"
+      "tick": 1381,
+      "hash": "3e86d686"
     },
     "final": {
       "kind": "saved",
       "slot": "manual-2",
-      "tick": 1844,
-      "hash": "50eff4aa"
+      "tick": 1842,
+      "hash": "2abfd2ea"
     }
   }
 }

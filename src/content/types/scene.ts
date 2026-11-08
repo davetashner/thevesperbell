@@ -205,6 +205,58 @@ export const sceneLightSourceSchema = z.strictObject({
     .describe('Never runs out of fuel while lit (default false).'),
 });
 
+const colourSchema = z
+  .tuple([z.number().min(0).max(1), z.number().min(0).max(1), z.number().min(0).max(1)])
+  .refine(([r, g, b]) => r > 0 || g > 0 || b > 0, { message: 'a colour cannot be black' });
+
+/**
+ * Makes a spawn a light beam emitter (mw-e03.17): a sunlight shaft, crystal or spell that casts a ray
+ * along `direction` from the spawn point. Mirrors bounce it, lenses focus it, opaque things and
+ * actors stop it, and light receivers turn it into signals.
+ */
+export const sceneBeamEmitterSchema = z.strictObject({
+  kind: z
+    .enum(['sunlight', 'crystal', 'spell'])
+    .describe('Prefab: sets default strength and reach.'),
+  direction: vec3Schema.describe('Direction it shines along (any non-zero vector).'),
+  intensity: z.number().positive().optional().describe('Strength; 1 is a sunbeam.'),
+  colour: colourSchema.optional().describe('Red, green, blue shares, 0…1 (default white).'),
+  range: z.number().positive().optional().describe('Longest a segment runs, metres.'),
+  maxBounces: z.int().min(0).optional().describe('Bounces it survives (default 8).'),
+  active: z.boolean().default(true).describe('Shines from the start.'),
+});
+
+/**
+ * Makes a spawn a mirror, lens or pane (mw-e03.17): a disc of `radius` facing `normal`. A mirror is
+ * `reflective`, a lens or pane `transparent`. A rotatable mirror turns its normal with the push rules.
+ */
+export const sceneOpticSchema = z.strictObject({
+  kind: z.enum(['mirror', 'lens', 'pane']).describe('mirror bounces, lens focuses, pane tints.'),
+  normal: vec3Schema.describe('Direction its face points (any non-zero vector).'),
+  radius: z.number().positive().optional().describe('Radius of its disc, metres (default 0.5).'),
+  focus: z.number().min(1).optional().describe('Lens only: intensity multiplier (default 1).'),
+  tint: colourSchema.optional().describe('What it lets through of each colour (default all).'),
+});
+
+/**
+ * Makes a spawn a light receiver (mw-e03.17): on once light of its colour has been at or above the
+ * threshold for the dwell time. Signal graphs read it through lever nodes bound to the spawn.
+ */
+export const sceneLightReceiverSchema = z.strictObject({
+  threshold: z.number().positive().default(0.5).describe('Intensity at or above which it counts.'),
+  dwellSeconds: z
+    .number()
+    .min(0)
+    .default(0)
+    .describe('Seconds it must be held before it turns on.'),
+  filter: colourSchema.optional().describe('Only light of about this colour counts (default any).'),
+  mode: z
+    .enum(['momentary', 'latching'])
+    .default('momentary')
+    .describe('momentary goes off with the light; latching until a signal resets it.'),
+  radius: z.number().positive().default(0.3).describe('Radius of the sensor, metres.'),
+});
+
 export const sceneImpactSwitchSchema = z.strictObject({
   variant: z
     .enum(['bullseye', 'bell', 'crystal', 'counterweight', 'target'])
@@ -548,6 +600,15 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20).',
     ),
+  beamEmitter: sceneBeamEmitterSchema
+    .optional()
+    .describe('Makes the spawned entity a light beam emitter (mw-e03.17).'),
+  optic: sceneOpticSchema
+    .optional()
+    .describe('Makes the spawned entity a mirror, lens or pane for light beams (mw-e03.17).'),
+  lightReceiver: sceneLightReceiverSchema
+    .optional()
+    .describe('Makes the spawned entity a light receiver that beams switch on (mw-e03.17).'),
   container: sceneContainerSchema
     .optional()
     .describe(
@@ -1152,6 +1213,7 @@ export type SceneBackdropDef = z.output<typeof sceneBackdropSchema>;
 export type SceneDoorDef = z.output<typeof sceneDoorSchema>;
 export type SceneSwitchDef = z.output<typeof sceneSwitchSchema>;
 export type SceneImpactSwitchDef = z.output<typeof sceneImpactSwitchSchema>;
+export type SceneBeamEmitterDef = z.output<typeof sceneBeamEmitterSchema>;
 export type ScenePlateDef = z.output<typeof scenePlateSchema>;
 export type SceneSignalDef = z.output<typeof sceneSignalSchema>;
 export type SceneContainerDef = z.output<typeof sceneContainerSchema>;

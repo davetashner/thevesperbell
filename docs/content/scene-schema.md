@@ -227,6 +227,26 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].impactSwitch.mode` | `"momentary"` \| `"latching"` | — | momentary stays on for holdSeconds after the last hit; latching until reset. |
 | `spawns[].impactSwitch.holdSeconds` | number ≥ 0 | — | Momentary: seconds it stays on. |
 | `spawns[].impactSwitch.loudness` | number ≥ 0 or null | — | Noise made when struck, dB at 1 m; null for silent. |
+| `spawns[].beamEmitter` | object | — | Makes the spawned entity a light beam emitter (mw-e03.17). |
+| `spawns[].beamEmitter.kind` | `"sunlight"` \| `"crystal"` \| `"spell"` | required | Prefab: sets default strength and reach. |
+| `spawns[].beamEmitter.direction` | list of any (at least 3) | required | Direction it shines along (any non-zero vector). |
+| `spawns[].beamEmitter.intensity` | number > 0 | — | Strength; 1 is a sunbeam. |
+| `spawns[].beamEmitter.colour` | list of any (at least 3) | — | Red, green, blue shares, 0…1 (default white). |
+| `spawns[].beamEmitter.range` | number > 0 | — | Longest a segment runs, metres. |
+| `spawns[].beamEmitter.maxBounces` | integer ≥ 0 | — | Bounces it survives (default 8). |
+| `spawns[].beamEmitter.active` | boolean | `true` | Shines from the start. |
+| `spawns[].optic` | object | — | Makes the spawned entity a mirror, lens or pane for light beams (mw-e03.17). |
+| `spawns[].optic.kind` | `"mirror"` \| `"lens"` \| `"pane"` | required | mirror bounces, lens focuses, pane tints. |
+| `spawns[].optic.normal` | list of any (at least 3) | required | Direction its face points (any non-zero vector). |
+| `spawns[].optic.radius` | number > 0 | — | Radius of its disc, metres (default 0.5). |
+| `spawns[].optic.focus` | number ≥ 1 | — | Lens only: intensity multiplier (default 1). |
+| `spawns[].optic.tint` | list of any (at least 3) | — | What it lets through of each colour (default all). |
+| `spawns[].lightReceiver` | object | — | Makes the spawned entity a light receiver that beams switch on (mw-e03.17). |
+| `spawns[].lightReceiver.threshold` | number > 0 | `0.5` | Intensity at or above which it counts. |
+| `spawns[].lightReceiver.dwellSeconds` | number ≥ 0 | `0` | Seconds it must be held before it turns on. |
+| `spawns[].lightReceiver.filter` | list of any (at least 3) | — | Only light of about this colour counts (default any). |
+| `spawns[].lightReceiver.mode` | `"momentary"` \| `"latching"` | `"momentary"` | momentary goes off with the light; latching until a signal resets it. |
+| `spawns[].lightReceiver.radius` | number > 0 | `0.3` | Radius of the sensor, metres. |
 | `spawns[].container` | object | — | Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3). |
 | `spawns[].container.loot` | ref → loot-table | — | Loot table rolled into it the first time it is opened (once; saves keep the result). |
 | `spawns[].container.contents` | list of object | — | What it holds from the start, before any roll. |
