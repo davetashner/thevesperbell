@@ -365,3 +365,26 @@ describe('storage unavailable', () => {
     spy.mockRestore();
   });
 });
+
+describe('mixer settings (mw-e28.5)', () => {
+  it('AC-4: bus volumes, mute-when-hidden and night mode persist across a reload', () => {
+    const storage = new Map<string, string>();
+    const backing = {
+      getItem: (k: string) => storage.get(k) ?? null,
+      setItem: (k: string, v: string) => void storage.set(k, v),
+      removeItem: (k: string) => void storage.delete(k),
+    };
+    const first = createSettingsStore({ storage: () => backing });
+    expect(first.get('audio.muteHidden')).toBe(true);
+    expect(first.get('audio.nightMode')).toBe(false);
+    first.set('audio.ambience', 0.4);
+    first.set('audio.ui', 0.1);
+    first.set('audio.muteHidden', false);
+    first.set('audio.nightMode', true);
+    const reloaded = createSettingsStore({ storage: () => backing });
+    expect(reloaded.get('audio.ambience')).toBe(0.4);
+    expect(reloaded.get('audio.ui')).toBe(0.1);
+    expect(reloaded.get('audio.muteHidden')).toBe(false);
+    expect(reloaded.get('audio.nightMode')).toBe(true);
+  });
+});

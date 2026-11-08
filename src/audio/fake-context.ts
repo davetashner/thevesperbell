@@ -67,9 +67,25 @@ export class FakeNode implements AudioNodeLike {
 
 export class FakeGain extends FakeNode implements GainNodeLike {
   readonly gain = new FakeParam(1);
+  channelCount = 2;
+  channelCountMode: ChannelCountMode = 'max';
+  channelInterpretation: ChannelInterpretation = 'speakers';
 
   constructor() {
     super('gain');
+  }
+
+  /**
+   * What this node outputs for a stereo input, per the Web Audio mixing rules this fake models:
+   * an explicit one-channel node downmixes stereo speakers to (L + R) / 2, and the one channel is
+   * then up-mixed to both outputs; otherwise the channels pass through. Gain is not applied.
+   */
+  mix(input: readonly [number, number]): [number, number] {
+    if (this.channelCountMode === 'explicit' && this.channelCount === 1) {
+      const mono = (input[0] + input[1]) / 2;
+      return [mono, mono];
+    }
+    return [input[0], input[1]];
   }
 }
 

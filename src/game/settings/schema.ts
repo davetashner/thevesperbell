@@ -156,9 +156,21 @@ export const SETTINGS_SCHEMA = {
     label: 'Audio',
     settings: {
       master: volume('Master volume', 'The overall volume of the game.', 0.8),
-      music: volume('Music volume', 'The score and the ambient music beds.'),
+      music: volume('Music volume', 'The score and the music beds.'),
       sfx: volume('Effects volume', 'Footsteps, combat, doors and the world around you.'),
+      ambience: volume('Ambience volume', 'Wind, water, rooms and other sounds of the place.'),
+      ui: volume('Interface volume', 'Menu clicks and other interface sounds.'),
       voice: volume('Voice volume', 'Spoken lines and barks.'),
+      muteHidden: toggle({
+        label: 'Mute when hidden',
+        help: 'Silences the game while this tab is in the background, then brings the sound back.',
+        default: true,
+      }),
+      nightMode: toggle({
+        label: 'Night mode',
+        help: 'Evens out loud and quiet sounds so you can play at low volume.',
+        default: false,
+      }),
       mono: toggle({
         label: 'Mono audio',
         help: 'Plays everything through both speakers, for one ear or one speaker.',

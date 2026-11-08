@@ -12,15 +12,6 @@ export {
   type SliceMusicState,
 } from './slice-music.ts';
 export {
-  VOLUME_BUSES,
-  VOLUME_RAMP_S,
-  bindVolumes,
-  type VolumeBinding,
-  type VolumeEngine,
-  type VolumeKey,
-  type VolumeSettings,
-} from './volumes.ts';
-export {
   HUM_FADE_OUT_S,
   SCENE_HUMS,
   SceneHums,

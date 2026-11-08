@@ -5,7 +5,14 @@
 // dependency (context, fetch, clock, logger) is injected so the logic runs in Node against the fake
 // in fake-context.ts; browser.ts wires the real ones.
 import { BufferCache, DEFAULT_CACHE_BYTES, type LoadedSound } from './buffer-cache.ts';
-import { buildBusGraph, dbToGain, type BusGraph } from './buses.ts';
+import {
+  applyMono,
+  applyNightMode,
+  buildBusGraph,
+  dbToGain,
+  rampParam,
+  type BusGraph,
+} from './buses.ts';
 import {
   loopSeconds,
   loopSidecarSchema,
@@ -172,6 +179,9 @@ export class AudioEngine {
   #beep: AudioBufferLike | undefined;
   #listener: ListenerPose = DEFAULT_LISTENER;
   #seq = 0;
+  readonly #busGains = new Map<BusId, number>();
+  #mono = false;
+  #night = false;
 
   constructor(options: AudioEngineOptions) {
     this.#opts = options;
@@ -271,10 +281,27 @@ export class AudioEngine {
     if (this.#pending.length > 0) this.#pump(rt);
   }
 
-  /** Sets a bus gain (linear), ramped over `rampSeconds` to avoid zipper noise. */
+  /**
+   * Sets a bus gain (linear), ramped over `rampSeconds` to avoid zipper noise. Before the context
+   * exists the value is remembered and applied the moment it is created, ahead of any sound.
+   */
   setBusGain(bus: BusId, gain: number, rampSeconds = 0): void {
-    const { ctx, graph } = this.#runtime();
-    rampParam(graph.buses[bus].gain, gain, ctx.currentTime, rampSeconds);
+    this.#busGains.set(bus, gain);
+    const rt = this.#rt;
+    if (rt) rampParam(rt.graph.buses[bus].gain, gain, rt.ctx.currentTime, rampSeconds);
+  }
+
+  /** Mono downmix on or off (mw-e28.5); remembered until the context exists. */
+  setMono(mono: boolean): void {
+    this.#mono = mono;
+    if (this.#rt) applyMono(this.#rt.graph, mono);
+  }
+
+  /** "Night mode" dynamic range compression on or off, ramped (mw-e28.5). */
+  setNightMode(on: boolean, rampSeconds = 0): void {
+    this.#night = on;
+    const rt = this.#rt;
+    if (rt) applyNightMode(rt.graph, on, rt.ctx.currentTime, rampSeconds);
   }
 
   /** Whether a cue is known and whether its asset failed to load. */
@@ -314,7 +341,12 @@ export class AudioEngine {
       const cache = new BufferCache(this.#opts.cacheBytes ?? DEFAULT_CACHE_BYTES, (id) =>
         this.#fetchAndDecode(ctx, id),
       );
-      this.#rt = { ctx, graph: buildBusGraph(ctx), cache };
+      const graph = buildBusGraph(ctx);
+      // Mixer settings given before the first sound apply here, before anything can play.
+      for (const [bus, gain] of this.#busGains) graph.buses[bus].gain.value = gain;
+      applyMono(graph, this.#mono);
+      applyNightMode(graph, this.#night, ctx.currentTime, 0);
+      this.#rt = { ctx, graph, cache };
     }
     return this.#rt;
   }
@@ -506,17 +538,6 @@ export class AudioEngine {
     } else {
       voice.source.stop();
     }
-  }
-}
-
-/** Ramps a param from its current value to `value` over `seconds` (0 = set now). */
-function rampParam(param: GainNodeLike['gain'], value: number, now: number, seconds: number): void {
-  param.cancelScheduledValues(now);
-  if (seconds > 0) {
-    param.setValueAtTime(param.value, now);
-    param.linearRampToValueAtTime(value, now + seconds);
-  } else {
-    param.value = value;
   }
 }
 
