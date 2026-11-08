@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Impact switches answer to anything that hits them from afar, an arrow, a thrown object, a strike, a spell or a shove, if it passes their filter (energy, damage type, element, hit zone): a bullseye wants a piercing shot, a bell rings loudly for any impact and draws attention, a crystal wants charge or light, a counterweight is released by cutting its support; they drive signal levers like any switch.
 - Pressure plates weigh whatever rests on them, crates, bodies, actors and what they carry or wear, and switch on inside a weight window (too heavy fails) after an optional delay, momentary or latching until a signal resets them; a floating or spell-held object weighs nothing, and hidden plates drive trap signals.
 - Key bindings in Settings > Controls: remap any keyboard or mouse action with a press-a-key capture (Esc cancels), swap or cancel when a key is already in use, clear or reset a binding, and keep Pause always bound. Your layout is saved in the browser.
 - The knight can kick (K, or block and attack with no shield): it shoves crates and barrels up to 40 kg, tips a burning brazier into whatever can burn, slams an unlocked door open onto whoever stands behind it, bounces off a locked one with a thud, and knocks small creatures back, even over a ledge.

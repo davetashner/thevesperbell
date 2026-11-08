@@ -206,6 +206,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].plate.width` | number > 0 | `1` | Footprint along x, metres. |
 | `spawns[].plate.depth` | number > 0 | `1` | Footprint along z, metres. |
 | `spawns[].plate.hidden` | boolean | `false` | The trap variant: nothing to see or prompt; wire it to trap signals. |
+| `spawns[].impactSwitch` | object | — | Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20). |
+| `spawns[].impactSwitch.variant` | `"bullseye"` \| `"bell"` \| `"crystal"` \| `"counterweight"` | required | Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope). |
+| `spawns[].impactSwitch.minEnergy` | number ≥ 0 | — | Least energy that counts, J (the delivered amount for an element). |
+| `spawns[].impactSwitch.damageTypes` | list of `"blunt"` \| `"slash"` \| `"pierce"` | — | Damage types it accepts. |
+| `spawns[].impactSwitch.elements` | list of `"heat"` \| `"cold"` \| `"water"` \| `"charge"` \| `"force"` \| `"light"` | — | Elements it accepts. |
+| `spawns[].impactSwitch.radius` | number > 0 | — | Radius of the hit zone, metres. |
+| `spawns[].impactSwitch.mode` | `"momentary"` \| `"latching"` | — | momentary stays on for holdSeconds after the last hit; latching until reset. |
+| `spawns[].impactSwitch.holdSeconds` | number ≥ 0 | — | Momentary: seconds it stays on. |
+| `spawns[].impactSwitch.loudness` | number ≥ 0 or null | — | Noise made when struck, dB at 1 m; null for silent. |
 | `spawns[].container` | object | — | Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3). |
 | `spawns[].container.loot` | ref → loot-table | — | Loot table rolled into it the first time it is opened (once; saves keep the result). |
 | `spawns[].container.contents` | list of object | — | What it holds from the start, before any roll. |

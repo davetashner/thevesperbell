@@ -218,6 +218,68 @@ describe('scene pressure plates (mw-e03.19)', () => {
   });
 });
 
+describe('scene impact switches (mw-e03.20)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
+
+  it('takes a variant prefab with optional overrides', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('target', { impactSwitch: { variant: 'bullseye', minEnergy: 30, radius: 0.2 } }),
+        spawn('bell', { impactSwitch: { variant: 'bell', loudness: null, elements: ['force'] } }),
+      ],
+    });
+    expect(scene.spawns[0]?.impactSwitch).toEqual({
+      variant: 'bullseye',
+      minEnergy: 30,
+      radius: 0.2,
+    });
+    expect(scene.spawns[1]?.impactSwitch).toEqual({
+      variant: 'bell',
+      loudness: null,
+      elements: ['force'],
+    });
+  });
+
+  it('rejects an unknown variant, a filter that accepts nothing and mixed mechanism kinds', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('odd', {
+            impactSwitch: { variant: 'bell', damageTypes: [], elements: [] },
+            plate: { minWeight: 1 },
+            switch: { kind: 'lever' },
+            door: { profile: 'wooden-door' },
+            item: { id: 'healing-draught' },
+            creature: 'forgotten-miner',
+          }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.plate: spawn "odd" cannot be both an impact switch and a plate',
+        'spawns.0.switch: spawn "odd" cannot be both an impact switch and a switch',
+        'spawns.0.door: spawn "odd" cannot be both an impact switch and a door',
+        'spawns.0.item: spawn "odd" cannot be both an impact switch and an item',
+        'spawns.0.creature: spawn "odd" cannot be both an impact switch and a creature',
+        'spawns.0.impactSwitch: spawn "odd" accepts no damage type and no element',
+      ]),
+    );
+    expect(
+      problems({ ...room, spawns: [spawn('x', { impactSwitch: { variant: 'gong' } })] }),
+    ).not.toEqual([]);
+    expect(
+      problems({
+        ...room,
+        spawns: [spawn('odd', { container: {}, impactSwitch: { variant: 'bell' } })],
+      }),
+    ).toContain(
+      'spawns.0.impactSwitch: spawn "odd" cannot be both a container and an impact switch',
+    );
+  });
+});
+
 describe('scene checkpoints (mw-e01.4)', () => {
   it('marks volume nodes of a placed graph as checkpoints, each once', () => {
     const scene = sceneSchema.parse({
