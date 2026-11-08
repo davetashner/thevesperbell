@@ -695,3 +695,12 @@ export {
   type GameEntry,
 } from './registry.ts';
 export { GAME_CONTENT_ROOT, gameContentSources, loadGameContent } from './game-content.ts';
+export {
+  AMBIENCE_CROSSFADE_S,
+  ambienceOneShotSchema,
+  ambienceSchema,
+  type AmbienceDef,
+  type AmbienceDefInput,
+  type AmbienceEntry,
+  type AmbienceOneShot,
+} from './types/ambience.ts';

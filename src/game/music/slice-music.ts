@@ -1,6 +1,6 @@
-// The slice's music and ambience (mw-0j5): a deliberately small stand-in for the adaptive music
-// controller (mw-e28.11). The mine gallery's ambience bed loops under everything, the explore bed
-// plays once, and the combat loop crossfades in when any creature enters the combat alert state and
+// The slice's music (mw-0j5): a deliberately small stand-in for the adaptive music controller
+// (mw-e28.11). The explore bed plays once (the mine gallery's ambience bed is the slice-gallery
+// ambience zone now, mw-e28.13), and the combat loop crossfades in when any creature enters the combat alert state and
 // out again once none has been in combat for a while (audio bible §2.1: entering combat is
 // immediate, leaving waits 4 s so a brief break in the fight doesn't flip the score). Presentation
 // only: it reads sim events and never writes to the sim. Nothing is requested before the audio
@@ -10,7 +10,6 @@ import { AlertStateChanged, Died, type EntityId, type World } from '@sim/index';
 
 /** Cue ids in the sound manifest. */
 export const SLICE_MUSIC_CUES = {
-  ambience: 'amb-slice-gallery',
   explore: 'music-slice-explore',
   combat: 'music-slice-combat',
 } as const;
@@ -51,7 +50,6 @@ export class SliceMusic {
   #started = false;
   #inCombat = false;
   #quietSince: number | undefined;
-  #ambience: SoundHandle | null = null;
   #explore: SoundHandle | null = null;
   #combat: SoundHandle | null = null;
 
@@ -78,7 +76,6 @@ export class SliceMusic {
     if (!this.#started) {
       if (this.#engine.context?.state !== 'running') return;
       this.#started = true;
-      this.#ambience = this.#engine.play(SLICE_MUSIC_CUES.ambience);
       this.#explore = this.#engine.play(SLICE_MUSIC_CUES.explore);
     }
     if (this.#fighting.size > 0) {
@@ -93,8 +90,8 @@ export class SliceMusic {
   /** Stops everything and unsubscribes (leaving the scene). */
   dispose(): void {
     for (const off of this.#offEvents) off();
-    for (const handle of [this.#ambience, this.#explore, this.#combat]) handle?.stop(1);
-    this.#ambience = this.#explore = this.#combat = null;
+    for (const handle of [this.#explore, this.#combat]) handle?.stop(1);
+    this.#explore = this.#combat = null;
     this.#fighting.clear();
     this.#started = this.#inCombat = false;
   }

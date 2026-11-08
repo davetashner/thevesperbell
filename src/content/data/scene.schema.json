@@ -2251,6 +2251,30 @@
         ],
         "additionalProperties": false
       }
+    },
+    "ambience": {
+      "description": "Ambience zones placed over regions of the scene or all of it (mw-e28.13).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "zone": {
+            "description": "The ambience zone that plays here.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "ambience"
+          },
+          "region": {
+            "description": "Id of one of the scene’s regions; leave out to cover the whole scene.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "zone"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [

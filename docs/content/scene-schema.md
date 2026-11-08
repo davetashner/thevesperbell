@@ -292,3 +292,6 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `transitions[].scene` | ref → scene | required | The scene it leads to. |
 | `transitions[].spawn` | id | required | The spawn of that scene the player arrives at; its yaw is the way the player faces. |
 | `transitions[].follow` | boolean | `false` | Companions flagged to follow travel with the player through it (none exist yet). |
+| `ambience` | list of object | — | Ambience zones placed over regions of the scene or all of it (mw-e28.13). |
+| `ambience[].zone` | ref → ambience | required | The ambience zone that plays here. |
+| `ambience[].region` | id | — | Id of one of the scene’s regions; leave out to cover the whole scene. |

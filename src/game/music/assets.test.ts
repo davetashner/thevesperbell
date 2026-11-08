@@ -1,14 +1,19 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { assetCategory, gameSoundRegistry, loopSidecarSchema } from '@audio/index';
+import { loadGameContent } from '@content/game-content';
 import { SLICE_MUSIC_CUES } from './slice-music.ts';
+
+// The gallery's ambience bed is the bed of the slice-gallery ambience zone (mw-e28.13).
+const AMBIENCE_CUE = loadGameContent().get('ambience', 'slice-gallery').bed?.cue ?? '';
+const SLICE_CUES = [AMBIENCE_CUE, ...Object.values(SLICE_MUSIC_CUES)];
 
 const AUDIO_DIR = 'public/assets/audio';
 
 describe('slice music assets (mw-0j5)', () => {
   const registry = gameSoundRegistry();
 
-  it.each(Object.values(SLICE_MUSIC_CUES))(
+  it.each(SLICE_CUES)(
     'AC-6: %s is a final (non-placeholder) cue whose Opus and AAC files exist',
     (cue) => {
       const def = registry.get(cue);
@@ -22,7 +27,7 @@ describe('slice music assets (mw-0j5)', () => {
     },
   );
 
-  it.each([SLICE_MUSIC_CUES.ambience, SLICE_MUSIC_CUES.combat])(
+  it.each([AMBIENCE_CUE, SLICE_MUSIC_CUES.combat])(
     'AC-7: looping cue %s has a valid loop sidecar spanning its file',
     (cue) => {
       const def = registry.get(cue);
@@ -39,6 +44,6 @@ describe('slice music assets (mw-0j5)', () => {
     expect(registry.get(SLICE_MUSIC_CUES.explore)?.loop).toBe(false);
     expect(registry.get(SLICE_MUSIC_CUES.explore)?.bus).toBe('music');
     expect(registry.get(SLICE_MUSIC_CUES.combat)?.bus).toBe('music');
-    expect(registry.get(SLICE_MUSIC_CUES.ambience)?.bus).toBe('ambience');
+    expect(registry.get(AMBIENCE_CUE)?.bus).toBe('ambience');
   });
 });

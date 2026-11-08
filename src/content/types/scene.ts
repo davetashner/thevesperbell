@@ -720,6 +720,17 @@ export const sceneTransitionSchema = z
     path: ['max'],
   });
 
+/**
+ * Places an ambience zone in a scene (mw-e28.13): over the named region (a tagged box in `regions`),
+ * or over the whole scene when `region` is left out. Where several apply the later entry wins.
+ */
+export const sceneAmbienceSchema = z.strictObject({
+  zone: ref('ambience').describe('The ambience zone that plays here.'),
+  region: contentId
+    .optional()
+    .describe('Id of one of the scene’s regions; leave out to cover the whole scene.'),
+});
+
 export const sceneSchema = z
   .strictObject({
     id: contentId.describe('Scene id; also the ?scene= URL value.'),
@@ -758,6 +769,10 @@ export const sceneSchema = z
       .array(sceneTransitionSchema)
       .default([])
       .describe('Volumes that lead to another scene, and where the player arrives (mw-e01.11).'),
+    ambience: z
+      .array(sceneAmbienceSchema)
+      .default([])
+      .describe('Ambience zones placed over regions of the scene or all of it (mw-e28.13).'),
   })
   .superRefine((scene, ctx) => {
     const transitionIds = new Set<string>();
@@ -788,6 +803,14 @@ export const sceneSchema = z
         });
       }
       regionIds.add(region.id);
+    });
+    scene.ambience.forEach((placed, index) => {
+      if (placed.region === undefined || regionIds.has(placed.region)) return;
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ambience', index, 'region'],
+        message: `ambience zone "${placed.zone.id}" names region "${placed.region}", which this scene does not have`,
+      });
     });
     const seen = new Set<string>();
     scene.spawns.forEach((spawn, index) => {
