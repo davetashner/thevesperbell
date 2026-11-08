@@ -3,6 +3,7 @@ import { ContentLoadError, loadContent } from '../loader.ts';
 import { contentTypes } from '../registry.ts';
 import { describeContent } from '../testing.ts';
 import { cueEventSpec, cuePlaceholders } from '../cue-events.ts';
+import { loadGameContent } from '../game-content.ts';
 import { cueRuleSchema, cueSheetSchema, type CueSheetDefInput } from './cue-sheet.ts';
 
 const sheet = (rules: CueSheetDefInput['rules']): CueSheetDefInput => ({
@@ -77,6 +78,33 @@ describe('cue sheet schema', () => {
     expect(problems(sheet([{ event: 'TelegraphStarted', cue: '{telegraphSound}' }]))).toEqual([]);
     expect(problems(sheet([{ event: 'Died', cue: 'boom' }]))).toEqual([
       'rules.0.cue: must be an audio cue id, optionally with {fact} segments, e.g. "sfx-impact-{target}"',
+    ]);
+  });
+
+  it('accepts a caption that is in the string table and rejects an unknown or malformed one', () => {
+    const rule = (caption: string): CueSheetDefInput['rules'] => [
+      { event: 'Died', cue: 'sfx-death', caption },
+    ];
+    expect(problems(sheet(rule('caption.breaking')))).toEqual([]);
+    expect(problems(sheet(rule('caption.nope')))).toEqual([
+      'rules.0.caption: caption "caption.nope" has no entry in the string table (src/content/strings.ts)',
+    ]);
+    expect(problems(sheet(rule('Not A Key')))).toHaveLength(2);
+  });
+
+  it('flags the initial captioned cues in the shipped sheets (mw-e28.14)', () => {
+    const flagged = loadGameContent()
+      .all('cue-sheet')
+      .flatMap((s) => s.rules)
+      .filter((r) => r.caption !== undefined)
+      .map((r) => `${r.event}:${String(r.caption)}`);
+    expect([...new Set(flagged)].sort()).toEqual([
+      'LocomotionEvents:caption.footsteps',
+      'TelegraphStarted:caption.telegraph',
+      'arrowImpact:caption.noise-rattle',
+      'breakableBroken:caption.breaking',
+      'doorStateChanged:caption.door-close',
+      'doorStateChanged:caption.door-open',
     ]);
   });
 

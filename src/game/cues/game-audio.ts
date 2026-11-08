@@ -4,7 +4,7 @@
 // the sim. Nothing plays before the autoplay policy lets the context run (the first user gesture,
 // see installGestureUnlock), so sounds from the scene settling at load are dropped, not queued.
 
-import type { PlayOptions } from '@audio/index';
+import type { CaptionTrigger, PlayOptions, Vec3 } from '@audio/index';
 import type { ArrowDefinition, CueRuleDef, MoveDef } from '@content/index';
 import type { EntityId, World } from '@sim/index';
 import type { SimView, Transform } from '../loop/render-sync.ts';
@@ -38,6 +38,10 @@ export interface GameAudioOptions {
   readonly now: () => number;
   /** Called with each cue actually sent to the engine (debug overlays, e2e probes). */
   readonly onPlay?: (cue: string, options: PlayOptions) => void;
+  /** Called for each cue occurrence whose rule carries a caption (mw-e28.14), audio running or not. */
+  readonly onCaption?: (caption: CaptionTrigger) => void;
+  /** Where an entity is (the same lookup the engine positions its sounds with). */
+  readonly positionOf?: (entity: EntityId) => Vec3 | undefined;
 }
 
 /** Attaches the cue bridge to the world's events; returns a function that detaches it. */
@@ -60,6 +64,8 @@ export function attachGameAudio(options: GameAudioOptions): () => void {
       ...(options.armorOf !== undefined && { armorOf: options.armorOf }),
     }),
     variantCount: soundVariantCount(options.registry),
+    ...(options.onCaption !== undefined && { onCaption: options.onCaption }),
+    ...(options.positionOf !== undefined && { positionOf: options.positionOf }),
   });
   return bridge.attach(options.world.events);
 }

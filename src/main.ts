@@ -1,5 +1,6 @@
 import {
   bindMixer,
+  CaptionTracker,
   MixController,
   createBrowserAudioEngine,
   documentVisibility,
@@ -101,6 +102,7 @@ import {
   playableClasses,
 } from '@game/classes';
 import { attachGameAudio, attachGameVfx, soundPositions } from '@game/cues/index';
+import { attachSoundCaptions, type SoundCaptionsGlue } from '@game/captions/sound-captions';
 import { bindMix, type MixBindings } from '@game/music/mix-bindings';
 import { SceneBeds, SceneHums, ShopStingers, SliceMusic } from '@game/music/index';
 import { layers } from '@game/index';
@@ -344,6 +346,7 @@ import {
   reducedMotion,
   ScreenFeedback,
   setMotionPreference,
+  SoundCaptions,
   setTextScale,
   UiRoot,
   WaterHud,
@@ -793,6 +796,8 @@ function startRenderer(
     settings.on('camera.shakeScale', configureShake);
     settings.on('accessibility.motion', configureShake);
     let screenFeedback: ScreenFeedbackGlue | undefined;
+    let soundCaptions: SoundCaptionsGlue | undefined;
+    let publishedCaptions = '';
     // The breath meter and the sinking warning (mw-e02.14).
     let waterHud: WaterHudGlue | undefined;
     let publishedDummy = '';
@@ -866,6 +871,15 @@ function startRenderer(
         recentCues.push(cue);
         if (recentCues.length > 10) recentCues.shift();
       },
+      // Sound captions (mw-e28.14): flagged cues also show as text with a direction, audio or not.
+      onCaption: (caption) => {
+        soundCaptions?.trigger(caption);
+      },
+      positionOf: soundPositions(world, [
+        readPhysicsObjectTransform,
+        readDummyTransform,
+        readSceneTransform,
+      ]),
     });
     let publishedAudio = '';
     const publishAudio = (): void => {
@@ -1082,6 +1096,11 @@ function startRenderer(
         sandboxHud?.frame();
         combatHud?.frame(timeMs);
         screenFeedback?.frame(timeMs);
+        if (soundCaptions !== undefined) {
+          soundCaptions.frame(timeMs);
+          const stats = JSON.stringify(soundCaptions.stats());
+          if (stats !== publishedCaptions) root.dataset['captions'] = publishedCaptions = stats;
+        }
         waterHud?.frame(timeMs);
         targetHud?.frame(timeMs);
         spellHud?.frame(timeMs);
@@ -1504,6 +1523,16 @@ function startRenderer(
             forward: cameraForward(camera.quaternion),
             halfFov: horizontalHalfFov(camera.fov, camera.aspect),
           }),
+        });
+        const captionWidget = new SoundCaptions();
+        ui.hud.append(captionWidget.element);
+        soundCaptions = attachSoundCaptions({
+          tracker: new CaptionTracker(() => listenerPose(camera.position, camera.quaternion)),
+          widget: captionWidget,
+          enabled: () => settings.get('accessibility.captions'),
+          size: () => settings.get('accessibility.captionSize'),
+          ignore: (source) => source === `e${String(player?.entity)}`,
+          now: () => performance.now(),
         });
         const feedback = new ScreenFeedback();
         ui.hud.append(feedback.element);

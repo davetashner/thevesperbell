@@ -34,6 +34,7 @@ export * from './save-menus';
 export * from './screens';
 export * from './shop-window';
 export * from './slice-complete';
+export * from './sound-captions';
 export * from './testing/overflow';
 export * from './tokens';
 export * from './water-hud';

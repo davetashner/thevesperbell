@@ -3,6 +3,7 @@
 
 export {
   AudioCueBridge,
+  DEFAULT_CAPTION_PRIORITY,
   DEFAULT_CUE_SEED,
   DEFAULT_FOOTSTEP_SURFACE,
   soundVariantCount,
