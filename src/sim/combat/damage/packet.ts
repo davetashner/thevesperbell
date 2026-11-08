@@ -44,6 +44,8 @@ export const DAMAGE_TAGS = Object.freeze({
   parried: 'parried',
   /** Falls, crushes and hazards (e04.19). */
   environment: 'environment',
+  /** Raw spell force (a push, a blast): breaking poise knocks the target down, not just staggers it. */
+  force: 'force',
   /** Passes through shields: the move is unblockable (grabs, some slams). */
   unblockable: 'unblockable',
   /** Met a raised shield; added by the guard stage (e04.6). */

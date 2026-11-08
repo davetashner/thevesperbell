@@ -37,7 +37,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].shape.to.z` | number | required | Metres. |
 | `nodes[].filter` | list of object | — | Conditions an entity must all pass. |
 | `nodes[].filter[].test` | `"property"` | required |  |
-| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
+| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"anchored"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
 | `nodes[].filter[].op` | `"eq"` \| `"ne"` \| `"lt"` \| `"lte"` \| `"gt"` \| `"gte"` | required | Comparison; lt/lte/gt/gte need a number property. |
 | `nodes[].filter[].value` | number or boolean or string | required | Value to compare with. |
 | `nodes[].filter[].test` | `"tag"` | required |  |
@@ -91,6 +91,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].on.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `nodes[].on.liftable` | boolean | — | Can be picked up and carried. |
 | `nodes[].on.pushable` | boolean | — | Can be pushed or dragged. |
+| `nodes[].on.anchored` | boolean | — | Fixed in place: spell forces cannot move or lift it. |
 | `nodes[].on.hideable` | boolean | — | An actor can hide in or behind it. |
 | `nodes[].on.reflective` | boolean | — | Reflects light beams and bolts. |
 | `nodes[].on.transparent` | boolean | — | Light and sight pass through it. |
@@ -146,6 +147,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].off.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `nodes[].off.liftable` | boolean | — | Can be picked up and carried. |
 | `nodes[].off.pushable` | boolean | — | Can be pushed or dragged. |
+| `nodes[].off.anchored` | boolean | — | Fixed in place: spell forces cannot move or lift it. |
 | `nodes[].off.hideable` | boolean | — | An actor can hide in or behind it. |
 | `nodes[].off.reflective` | boolean | — | Reflects light beams and bolts. |
 | `nodes[].off.transparent` | boolean | — | Light and sight pass through it. |

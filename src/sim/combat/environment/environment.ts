@@ -44,10 +44,15 @@ import {
   rigidBodiesOf,
 } from '../../physics/objects';
 import type { ColliderHandle } from '../../physics/static-colliders';
-import { forEachWithProperty, propertyChanged, readProperty } from '../../properties/components';
+import {
+  forEachWithProperty,
+  hasProperty,
+  propertyChanged,
+  readProperty,
+} from '../../properties/components';
 import { PlacementComponent } from '../../stimulus/placement';
 import type { Vec3 } from '../../stimulus/shapes';
-import { impulseApplied } from '../../stimulus/stimulus';
+import { applyStimulus, impulseApplied } from '../../stimulus/stimulus';
 import { HealthComponent } from '../damage/components';
 import type { DamageModel } from '../damage/model';
 import { DAMAGE_TAGS } from '../damage/packet';
@@ -169,6 +174,48 @@ export function resolveFall(
       impact.kind === 'wall'
         ? [DAMAGE_TAGS.environment, ENVIRONMENT_TAGS.fall, ENVIRONMENT_TAGS.wall]
         : [DAMAGE_TAGS.environment, ENVIRONMENT_TAGS.fall],
+  });
+  return blunt;
+}
+
+/** What a launched creature striking something fragile needs. */
+export interface FragileStrikeOptions {
+  readonly damage: DamageModel;
+  readonly kinetic: KineticRules;
+  /** Defaults to `physicsSurface`. */
+  readonly surface?: SurfaceReader | undefined;
+}
+
+/**
+ * A launched creature (a spell's push, a blast) that strikes a fragile thing at kinetic.minSpeed or
+ * more breaks it and is hurt by it (mw-e06.8): its own kinetic energy ½·m·v² goes into the thing as a
+ * blunt stimulus, which breakables read, and it takes the thing's kinetic damage (the same
+ * `kineticDamage` an object striking a creature deals, by the thing's mass). Anything with the
+ * `fragile` property counts; nothing here names what it is. Returns the blunt damage asked for.
+ */
+export function resolveFragileStrike(
+  world: World<never>,
+  impact: CharacterImpactInfo,
+  options: FragileStrikeOptions,
+): number {
+  if (impact.kind !== 'wall' || impact.launch === null) return 0;
+  const struck = (options.surface ?? physicsSurface)(world, impact.body);
+  if (struck === null || !hasProperty(world, struck, 'fragile')) return 0;
+  const blunt = kineticDamage(readProperty(world, struck, 'weight'), impact.speed, options.kinetic);
+  if (blunt === 0) return 0;
+  const mass = readProperty(world, impact.entity, 'weight');
+  applyStimulus(world, {
+    shape: { kind: 'contact', target: struck },
+    element: 'blunt',
+    intensity: 0.5 * mass * impact.speed * impact.speed,
+    source: impact.launch.source,
+  });
+  options.damage.apply(world, impact.entity, {
+    amounts: { blunt },
+    instigator: impact.launch.source,
+    source: struck,
+    direction: impact.normal,
+    tags: [DAMAGE_TAGS.environment, ENVIRONMENT_TAGS.crush],
   });
   return blunt;
 }
@@ -371,6 +418,11 @@ export function installEnvironmentDamage<TInput>(
   const offs = [
     world.events.on(CharacterImpacted, (impact) => {
       resolveFall(w, impact, fall);
+      resolveFragileStrike(w, impact, {
+        damage,
+        kinetic: tuning.kinetic,
+        surface: options.surface,
+      });
     }),
     world.events.on(impulseApplied, ({ entity, source }) => {
       if (source !== null && w.has(entity, PhysicsObjectComponent)) blame(w, entity, source);

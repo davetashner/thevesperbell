@@ -133,6 +133,8 @@ export interface ReactionFactors {
   readonly invulnerable: boolean;
   /** A critical (riposte): it ignores poise and hyperarmor and always staggers at least. */
   readonly critical?: boolean;
+  /** The hit is raw force (tagged `force`): emptying poise knocks down instead of staggering. */
+  readonly forceful?: boolean;
 }
 
 /** A chosen reaction and, when it is none although the hit could have caused one, why. */
@@ -152,6 +154,7 @@ export function chooseReaction(factors: ReactionFactors, profile: ReactionProfil
   let tier: HitReactionKind = 'none';
   if (impulse >= profile.knockdownImpulse) tier = 'knockdown';
   else if (impulse >= profile.knockbackImpulse) tier = 'knockback';
+  else if (factors.forceful === true && factors.poiseBroken) tier = 'knockdown';
   else if (factors.poiseBroken || factors.hyperarmor === 'broken' || critical) tier = 'stagger';
   else if (factors.poiseDamage > 0) tier = 'flinch';
   if (tier === 'none') return { kind: 'none', suppressed: null };
@@ -381,6 +384,7 @@ export function resolveHitReaction(
         : null,
     invulnerable: tags.includes(REACTION_TAGS.invulnerable) || hasWakeIframes(world, entity),
     critical: tags.includes(DAMAGE_TAGS.critical),
+    forceful: tags.includes(DAMAGE_TAGS.force),
   };
   let { kind, suppressed } = chooseReaction(factors, state.profile);
   const playing = state.current;

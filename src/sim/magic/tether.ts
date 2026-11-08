@@ -94,7 +94,8 @@ export const TetherUsed = defineEvent<TetherUsedInfo>('TetherUsed');
 export interface ForceResistedInfo {
   readonly tick: number;
   readonly caster: EntityId;
-  readonly spell: string;
+  /** The spell id for a tether; null for a force op, which never sees one. */
+  readonly spell: string | null;
   readonly target: EntityId;
   /** The target's weight and the heaviest the spell lifts, kg. */
   readonly weight: number;
