@@ -17,6 +17,20 @@ const ok: AimResult = {
 };
 
 describe('reticle model', () => {
+  it('offers the hint while the held thing is usable, unless a refusal is showing', () => {
+    expect(reticleModel('Mage Hand', ok, '', 'Use').note).toBe('Use');
+    expect(
+      reticleModel('Mage Hand', { ...ok, valid: false, reason: 'no-target' }, '', 'Use'),
+    ).toMatchObject({
+      state: 'ready',
+      note: 'Use',
+    });
+    expect(reticleModel('Mage Hand', ok, 'Blocked', 'Use')).toMatchObject({
+      state: 'invalid',
+      note: 'Blocked',
+    });
+  });
+
   it('is hidden with no spell, ready on a good aim, far when clamped', () => {
     expect(reticleModel(undefined, ok, '')).toBe(NO_RETICLE);
     expect(reticleModel('Ember', ok, '')).toEqual({
@@ -56,6 +70,7 @@ describe('spell HUD glue', () => {
       refusals: 0,
       lastRefusal: undefined as string | undefined,
       aim: ok as AimResult | undefined,
+      usable: false,
     };
     const caster = {
       get refusals() {
@@ -73,9 +88,23 @@ describe('spell HUD glue', () => {
       caster,
       reticle,
       ray: () => ({ origin: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: -1 } }),
+      usable: () => state.usable,
     });
     return { world, reticle, state, glue };
   }
+
+  it('shows "Use" under the reticle while the held thing can be used', () => {
+    const { reticle, state, glue } = setup();
+    const note = () => reticle.element.querySelector('.vb-reticle-note')?.textContent;
+    glue.frame(0);
+    expect(note()).toBe('');
+    state.usable = true;
+    glue.frame(1);
+    expect(note()).toBe('Use');
+    state.usable = false;
+    glue.frame(2);
+    expect(note()).toBe('');
+  });
 
   it('shows the selected spell and hides without one', () => {
     const { reticle, state, glue } = setup();

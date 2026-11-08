@@ -33,6 +33,9 @@ const REASONS: Readonly<Record<string, string>> = Object.freeze({
   'not-learned': 'Not learned',
 });
 
+/** What the reticle offers while the held thing can be used (mw-e08.25). */
+export const USE_HINT = 'Use';
+
 /** Player-facing text for a refusal or fizzle reason (the reason itself when unlisted). */
 export function reasonText(reason: string): string {
   return REASONS[reason] ?? reason;
@@ -43,10 +46,12 @@ export function reticleModel(
   name: string | undefined,
   aim: AimResult | undefined,
   note: string,
+  hint = '',
 ): ReticleModel {
   if (name === undefined) return NO_RETICLE;
-  const invalid = note !== '' || (aim !== undefined && !aim.valid);
-  const text = note !== '' ? note : aim?.reason == null ? '' : reasonText(aim.reason);
+  const invalid = note !== '' || (hint === '' && aim !== undefined && !aim.valid);
+  const text =
+    note !== '' ? note : hint !== '' ? hint : aim?.reason == null ? '' : reasonText(aim.reason);
   return {
     visible: true,
     state: invalid ? 'invalid' : aim?.clamped === true ? 'far' : 'ready',
@@ -62,6 +67,8 @@ export interface SpellHudOptions {
   readonly reticle: Reticle;
   /** The camera's view ray this frame. */
   readonly ray: () => AimRay;
+  /** Whether the held tether's target can be used now (the reticle then offers "Use"). */
+  readonly usable?: () => boolean;
 }
 
 export interface SpellHudGlue {
@@ -74,7 +81,7 @@ export interface SpellHudGlue {
 
 /** Wires `reticle` to the player's casting (see the file header). */
 export function attachSpellHud(options: SpellHudOptions): SpellHudGlue {
-  const { world, player, caster, reticle, ray } = options;
+  const { world, player, caster, reticle, ray, usable } = options;
   let note = '';
   let noteUntil = -Infinity;
   let refusals = caster.refusals;
@@ -99,7 +106,7 @@ export function attachSpellHud(options: SpellHudOptions): SpellHudGlue {
       if (nowMs >= noteUntil) note = '';
       const spell = caster.spell();
       aim = spell === undefined ? undefined : caster.preview(ray());
-      reticle.update(reticleModel(spell?.name, aim, note));
+      reticle.update(reticleModel(spell?.name, aim, note, usable?.() === true ? USE_HINT : ''));
     },
     dispose: off,
   };

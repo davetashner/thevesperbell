@@ -59,7 +59,8 @@ The generic `tether` delivery (`src/sim/magic/tether.ts`) does the work; the spe
 | Weight limit | 25 kg (`weight` property) | Lifts crates, jars, keys and stools (1-10 kg); not barrels, statues or people. Above it: `ForceResisted`, the cast fizzles |
 | Follow speed | 12 m/s, stopped by solid geometry | The object trails the aim by well under 0.3 m at walking-to-running aim speeds; it never passes through a wall |
 | Sight | 0.5 s grace, then it drops | Lets go of what it can no longer see; the object holds still meanwhile |
-| Use | `tether-use` command | Performs the held object's primary affordance through `interactRemotely`, the same door as a hand interaction, so levers, switches, doors and pick-ups behave identically |
+| Use | `tether-use` command | Performs the held object's primary affordance through `interactRemotely`, the same door as a hand interaction, so levers, switches, doors and pick-ups behave identically. Bound to Interact (E, pad A) while a tether is held (`SpellCaster`, mw-e08.25); that press triggers no nearby interaction, and the reticle says "Use" when it would work |
+| Let go | `tether-release` command | Cancel cast (B, pad D-pad down) lets go and ends the channel; releasing the cast key does the same |
 | Hold | at most 60 s | A scroll's free cast has no channel to end it |
 
 Too useful, on purpose (`tooUseful`): there are no per-object exceptions. A held object is moved by teleporting its
