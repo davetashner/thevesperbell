@@ -58,12 +58,11 @@ export interface MusicTuning {
 }
 
 /**
- * Audio bible §2.1 asks 4 s to leave combat and 6 s to leave tension; the bead's AC-2 asks 8 s for
- * combat. The bead wins (a fight with a brief lull keeps its score), and it is data so it can be
- * tuned. Crossfades are 1 bar going in and 2 bars coming out (bible §2.2: 1–2 bars).
+ * Audio bible §2.1: 4 s to leave combat (the owner confirmed 4 s by ear, 2026-11-08) and 6 s to
+ * leave tension. Crossfades are 1 bar going in and 2 bars coming out (bible §2.2: 1–2 bars).
  */
 export const DEFAULT_TUNING: MusicTuning = {
-  combatExitDelayS: 8,
+  combatExitDelayS: 4,
   tensionExitDelayS: 6,
   enterBars: 1,
   exitBars: 2,

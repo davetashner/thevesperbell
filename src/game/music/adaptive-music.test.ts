@@ -235,26 +235,26 @@ describe('AdaptiveMusic (mw-e28.11)', () => {
     expect(SNAPSHOTS.explore.buses.music).toBeUndefined();
   });
 
-  it('AC-2: the combat layer leaves 8 s after the last creature stops fighting, not if combat resumes at 6 s', async () => {
+  it('AC-2: the combat layer leaves 4 s after the last creature stops fighting, not if combat resumes at 3 s', async () => {
     const t = setup();
     await t.loaded();
     t.alert(t.creature, 'combat');
     await t.runTo(5);
     expect(t.music.state.layer).toBe('combat');
     t.alert(t.creature, 'unaware');
-    await t.runTo(5 + 7.9);
+    await t.runTo(5 + 3.9);
     expect(t.music.state.layer).toBe('combat');
-    await t.runTo(5 + 8.1);
+    await t.runTo(5 + 4.1);
     expect(t.music.state.layer).toBe('explore');
     expect(t.music.state.inCombat).toBe(false);
 
-    // Combat resumes 6 s into the next quiet spell: the layer never leaves.
+    // Combat resumes 3 s into the next quiet spell: the layer never leaves.
     t.alert(t.other, 'combat');
     await t.runTo(30);
     expect(t.music.state.layer).toBe('combat');
     const sourcesBefore = t.ctx.sources.length;
     t.alert(t.other, 'unaware');
-    await t.runTo(36);
+    await t.runTo(33);
     t.alert(t.other, 'combat');
     await t.runTo(48);
     expect(t.music.state.layer).toBe('combat');
@@ -667,8 +667,8 @@ describe('music sets', () => {
     expect(musicSetFor('nowhere')).toBeUndefined();
   });
 
-  it('the combat exit delay is the bead 8 s (data, tunable) and tension 6 s', () => {
-    expect(DEFAULT_TUNING.combatExitDelayS).toBe(8);
+  it('the combat exit delay is 4 s (data, tunable) and tension 6 s', () => {
+    expect(DEFAULT_TUNING.combatExitDelayS).toBe(4);
     expect(DEFAULT_TUNING.tensionExitDelayS).toBe(6);
   });
 });
