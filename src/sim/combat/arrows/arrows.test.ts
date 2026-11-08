@@ -20,7 +20,7 @@ import {
   stimulusSystem,
 } from '../../stimulus/stimulus';
 import { DAMAGE_COMPONENTS, giveCombatant, healthOf } from '../damage/components';
-import { DamageApplied, type DamageResult } from '../damage/events';
+import { DamageApplied, Deflected, type DamageResult, type DeflectInfo } from '../damage/events';
 import { DamageModel } from '../damage/model';
 import { giveHurtboxes, HIT_VOLUME_COMPONENTS, type Hurtbox } from '../hits/components';
 import { DodgedHit, type HitboxHitInfo } from '../hits/events';
@@ -431,6 +431,63 @@ describe('arrow hits', () => {
     // Impulse (0, 1, 5) authored facing the flight: forward is +x here.
     expect(packet?.impulse.x).toBeGreaterThan(4);
     expect(packet?.impulse.z).toBeCloseTo(0, 9);
+  });
+
+  it('mw-e05.6 AC-3: an arrow below the armour value ricochets off an armoured region for 0 damage and a Deflected event', () => {
+    const t = setup({ collision: null });
+    const deflected: DeflectInfo[] = [];
+    t.world.events.on(Deflected, (e) => deflected.push(e));
+    const target = creature(t.world, v3(10, 1, 0), [sphereBox(0.5, { armored: true, armor: 30 })]);
+    t.fire('standard', v3(0, 1, 0), v3(60, 0, 0));
+    t.run(30);
+    expect(t.impacts[0]).toMatchObject({ other: target, outcome: 'ricochet' });
+    expect(t.damage[0]?.total).toBe(0);
+    expect(t.damage[0]?.tags).toContain('deflected');
+    expect(deflected).toMatchObject([{ target, armor: 30, penetration: 20, region: 'torso' }]);
+    expect(healthOf(t.world, target)?.current).toBe(100);
+  });
+
+  it('mw-e05.6 AC-3: a blunt arrow ignores armour deflection but deals half damage', () => {
+    const t = setup({ collision: null });
+    const armoured = creature(t.world, v3(10, 1, 0), [
+      sphereBox(0.5, { armored: true, armor: 30 }),
+    ]);
+    const bare = creature(t.world, v3(10, 1, 6));
+    t.fire('blunt', v3(0, 1, 0), v3(40, 0, 0));
+    t.fire('blunt', v3(0, 1, 6), v3(40, 0, 0));
+    t.run(20);
+    const dealt = (entity: EntityId) => t.damage.find((d) => d.target === entity)?.total ?? -1;
+    expect(dealt(armoured)).toBeGreaterThan(0);
+    expect(dealt(armoured)).toBeCloseTo(dealt(bare) / 2, 2);
+    expect(t.damage.every((d) => !d.tags.includes('deflected'))).toBe(true);
+  });
+
+  it('mw-e05.6: an arrow that out-penetrates the armour sticks and damages as usual', () => {
+    const t = setup({ collision: null });
+    const target = creature(t.world, v3(10, 1, 0), [sphereBox(0.5, { armored: true, armor: 15 })]);
+    t.fire('standard', v3(0, 1, 0), v3(60, 0, 0));
+    t.run(30);
+    expect(t.impacts[0]).toMatchObject({ other: target, outcome: 'stick' });
+    expect(t.damage[0]?.total).toBeGreaterThan(0);
+  });
+
+  it('mw-e05.6: a shatter head is deflected by armour but still breaks', () => {
+    const t = setup({ collision: null });
+    creature(t.world, v3(10, 1, 0), [sphereBox(0.5, { armored: true, armor: 30 })]);
+    t.fire('water', v3(0, 1, 0), v3(60, 0, 0));
+    t.run(30);
+    expect(t.impacts[0]?.outcome).toBe('shatter');
+    expect(t.damage[0]?.tags).toContain('deflected');
+  });
+
+  it('mw-e05.6: a headshot arrow does twice a body hit and is tagged headshot', () => {
+    const t = setup({ collision: null });
+    creature(t.world, v3(10, 1, 0), [sphereBox(0.5, { region: 'head', multiplier: 2 })]);
+    t.fire('standard', v3(0, 1, 0), v3(60, 0, 0));
+    t.run(30);
+    const [hit] = t.damage;
+    expect(hit?.tags).toContain('headshot');
+    expect(hit?.total).toBeGreaterThan(25 * 2 * 0.3 - 0.01);
   });
 
   it('a ricochet is not caught again by the creature it glanced off moving on into it', () => {

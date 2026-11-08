@@ -2,8 +2,10 @@
 //
 //   attacker  – difficulty `damageDealt` when the player hits someone, then attacker modifiers
 //               (thief backstab ×N, spell amplifiers, counter-hits)
-//   region    – the struck hurtbox's multiplier (packet.regionMultiplier), then region modifiers
-//               (archer weak points)
+//   region    – the struck hurtbox's multiplier (packet.regionMultiplier), the head / weak point
+//               tags and double poise on a weak point, armour (an arrow whose penetration is below
+//               the armour value is deflected for 0; a blunt one deals half), a head hit on an
+//               unaware humanoid staggering it (mw-e05.6); then region modifiers
 //   defender  – the target's resistance multipliers, then defender modifiers
 //   guard     – block and parry rules (e04.6, e04.12); nothing built in
 //   armor     – the target's flat armor absorption per type, then armor modifiers
@@ -21,7 +23,9 @@
 
 import type { EntityId } from '../../core/component';
 import type { World } from '../../core/world';
+import { BrainComponent } from '../../ai/components';
 import type { DifficultyConfig } from '../../difficulty';
+import { RegionStateComponent } from '../hits/components';
 import {
   HealthComponent,
   PlayerCombatantComponent,
@@ -32,7 +36,15 @@ import {
   UndyingComponent,
   type Resistances,
 } from './components';
-import { DamageApplied, Died, PoiseBroken, type DamageResult } from './events';
+import {
+  DamageApplied,
+  Deflected,
+  Died,
+  HitMarker,
+  PoiseBroken,
+  type DamageResult,
+  type HitMarkerVariant,
+} from './events';
 import {
   createDamagePacket,
   DAMAGE_TAGS,
@@ -166,6 +178,47 @@ export function reduceDamage(amounts: DamageAmounts, points: number): DamageAmou
 const isPlayer = (world: World<never>, entity: EntityId | null): boolean =>
   entity !== null && world.has(entity, PlayerCombatantComponent);
 
+/** Poise damage a weak point deals relative to the hit's own (mw-e05.6). */
+const WEAKPOINT_POISE_FACTOR = 2;
+/** Share of its damage a blunt arrow deals to an armoured region (mw-e05.6). */
+const BLUNT_ARMOR_FACTOR = 0.5;
+
+/** Whether `target` is an unaware humanoid: the brain's alert state is read, never changed (mw-e11.7). */
+function isUnawareHumanoid(world: World<never>, target: EntityId): boolean {
+  if (!world.isRegistered(RegionStateComponent) || !world.isRegistered(BrainComponent))
+    return false;
+  return (
+    world.get(target, RegionStateComponent)?.humanoid === true &&
+    world.get(target, BrainComponent)?.state === 'unaware'
+  );
+}
+
+/** The region stage's built-in step (see the file header). */
+const regionStep: Step = (hit, { world, packet, target }) => {
+  let out = mapUnits(hit, (units) => scaleUnits(units, packet.regionMultiplier));
+  const tags = new Set(out.tags);
+  const { region, armor = 0, penetration } = packet;
+  if (region === 'head') tags.add(DAMAGE_TAGS.headshot);
+  if (region === 'weakpoint') {
+    tags.add(DAMAGE_TAGS.weakpoint);
+    out = { ...out, poiseDamage: roundPoints(out.poiseDamage * WEAKPOINT_POISE_FACTOR) };
+  }
+  let deflected = false;
+  if (armor > 0) {
+    if (tags.has(DAMAGE_TAGS.blunt)) {
+      out = mapUnits(out, (units) => scaleUnits(units, BLUNT_ARMOR_FACTOR));
+    } else if (penetration !== undefined && penetration < armor) {
+      deflected = true;
+      tags.add(DAMAGE_TAGS.deflected);
+      out = { ...mapUnits(out, () => 0), poiseDamage: 0, staminaDamage: 0 };
+    }
+  }
+  if (region === 'head' && !deflected && isUnawareHumanoid(world, target)) {
+    tags.add(DAMAGE_TAGS.staggering);
+  }
+  return { ...out, tags: normalizeTags([...tags]) };
+};
+
 /** Built-in steps, run first within their stage. */
 const BUILT_IN: Readonly<Partial<Record<DamageStage, Step>>> = {
   attacker: (hit, { world, packet, target, difficulty }) => {
@@ -173,7 +226,7 @@ const BUILT_IN: Readonly<Partial<Record<DamageStage, Step>>> = {
     if (instigator === target || !isPlayer(world, instigator)) return hit;
     return mapUnits(hit, (units) => scaleUnits(units, difficulty.damageDealt));
   },
-  region: (hit, { packet }) => mapUnits(hit, (units) => scaleUnits(units, packet.regionMultiplier)),
+  region: regionStep,
   defender: (hit, _ctx, resistances) =>
     mapUnits(hit, (units, type) => scaleUnits(units, resistances?.multipliers[type] ?? 1)),
   armor: (hit, _ctx, resistances) =>
@@ -210,6 +263,23 @@ function normalizeHit(name: string, hit: DamageHit): DamageHit {
 function isImmune(packet: DamagePacket, resistances: Resistances | undefined): boolean {
   const dealt = DAMAGE_TYPES.filter((type) => packet.amounts[type] !== undefined);
   return dealt.length > 0 && dealt.every((type) => resistances?.multipliers[type] === 0);
+}
+
+/**
+ * How a landed hit reads on the hit marker: deflected (armour, a parry or a block), headshot, weak
+ * point, else normal. The HUD and the HitMarker event share this one rule (mw-e05.6).
+ */
+export function hitMarkerVariant(tags: readonly string[], region?: string): HitMarkerVariant {
+  if (
+    tags.includes(DAMAGE_TAGS.deflected) ||
+    tags.includes(DAMAGE_TAGS.parried) ||
+    tags.includes(DAMAGE_TAGS.blocked)
+  ) {
+    return 'deflected';
+  }
+  if (region === 'head') return 'headshot';
+  if (region === 'weakpoint' || tags.includes(DAMAGE_TAGS.weakpoint)) return 'weakpoint';
+  return 'normal';
 }
 
 /** A damage model: the modifier registry plus `apply`, which resolves hits (see the file header). */
@@ -318,6 +388,21 @@ export class DamageModel {
     });
     const { instigator, source } = packet;
     world.events.emit(DamageApplied, result);
+    if (hit.tags.includes(DAMAGE_TAGS.deflected)) {
+      world.events.emit(Deflected, {
+        tick,
+        target,
+        instigator,
+        source,
+        region: packet.region,
+        armor: packet.armor ?? 0,
+        penetration: packet.penetration ?? 0,
+      });
+    }
+    if (!result.immune) {
+      const variant: HitMarkerVariant = hitMarkerVariant(hit.tags, packet.region);
+      world.events.emit(HitMarker, { tick, target, instigator, variant });
+    }
     if (poiseBroken) world.events.emit(PoiseBroken, { tick, target, instigator, source });
     if (died) {
       world.events.emit(Died, { tick, target, killer: instigator, source, tags: hit.tags });

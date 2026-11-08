@@ -271,5 +271,9 @@ describe('target HUD glue (mw-e04.21)', () => {
     expect(hitVariant({ tags: ['weakpoint'], packet: packet() })).toBe('weakpoint');
     expect(hitVariant({ tags: ['parried'], packet: packet('head') })).toBe('deflected');
     expect(hitVariant({ tags: ['blocked'], packet: packet() })).toBe('deflected');
+    expect(hitVariant({ tags: ['deflected'], packet: packet('torso') })).toBe('deflected');
+    expect(hitVariant({ tags: ['deflected', 'weakpoint'], packet: packet('head') })).toBe(
+      'deflected',
+    );
   });
 });

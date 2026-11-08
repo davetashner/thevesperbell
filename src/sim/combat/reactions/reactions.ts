@@ -133,6 +133,8 @@ export interface ReactionFactors {
   readonly invulnerable: boolean;
   /** A critical (riposte): it ignores poise and hyperarmor and always staggers at least. */
   readonly critical?: boolean;
+  /** Staggers whatever the poise (a head hit on an unaware humanoid, mw-e05.6). */
+  readonly staggering?: boolean;
   /** The hit is raw force (tagged `force`): emptying poise knocks down instead of staggering. */
   readonly forceful?: boolean;
 }
@@ -155,7 +157,13 @@ export function chooseReaction(factors: ReactionFactors, profile: ReactionProfil
   if (impulse >= profile.knockdownImpulse) tier = 'knockdown';
   else if (impulse >= profile.knockbackImpulse) tier = 'knockback';
   else if (factors.forceful === true && factors.poiseBroken) tier = 'knockdown';
-  else if (factors.poiseBroken || factors.hyperarmor === 'broken' || critical) tier = 'stagger';
+  else if (
+    factors.poiseBroken ||
+    factors.hyperarmor === 'broken' ||
+    critical ||
+    factors.staggering === true
+  )
+    tier = 'stagger';
   else if (factors.poiseDamage > 0) tier = 'flinch';
   if (tier === 'none') return { kind: 'none', suppressed: null };
   const kind = profile.replace[tier] ?? tier;
@@ -385,6 +393,7 @@ export function resolveHitReaction(
     invulnerable: tags.includes(REACTION_TAGS.invulnerable) || hasWakeIframes(world, entity),
     critical: tags.includes(DAMAGE_TAGS.critical),
     forceful: tags.includes(DAMAGE_TAGS.force),
+    staggering: tags.includes(DAMAGE_TAGS.staggering),
   };
   let { kind, suppressed } = chooseReaction(factors, state.profile);
   const playing = state.current;

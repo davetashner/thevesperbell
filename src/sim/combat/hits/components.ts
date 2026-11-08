@@ -34,6 +34,12 @@ export type HitRegion = (typeof HIT_REGIONS)[number];
 /** The socket every entity has: its frame itself. */
 export const ROOT_SOCKET = 'root';
 
+/** The region and multiplier a disabled weakpoint resolves against. */
+export interface UnderlyingRegion {
+  readonly region: Exclude<HitRegion, 'weakpoint'>;
+  readonly multiplier: number;
+}
+
 /** One region-tagged hurtbox. */
 export interface Hurtbox {
   /** Unique among the entity's hurtboxes, e.g. "head". */
@@ -43,6 +49,18 @@ export interface Hurtbox {
   readonly region: HitRegion;
   /** Armored hurtboxes can deflect weak hits (e05.6); carried on every hit. */
   readonly armored: boolean;
+  /**
+   * Armour value of an armored hurtbox (e05.6): an arrow with less penetration ricochets off it.
+   * Absent or 0 = it never deflects.
+   */
+  readonly armor?: number;
+  /**
+   * Weakpoints only (e05.6): the creature states (see `setRegionState`) in which it is enabled.
+   * Absent = always enabled. Outside them a hit resolves against `underlying` instead.
+   */
+  readonly enabledIn?: readonly string[];
+  /** What a disabled weakpoint resolves as (default: torso ×1). */
+  readonly underlying?: UnderlyingRegion;
   /** Damage multiplier of the region (≥ 0), passed to the damage model as regionMultiplier. */
   readonly multiplier: number;
   /** Shape in the socket's frame. */
@@ -107,11 +125,26 @@ export interface HitboxSet {
 /** The hurtbox component (`combat.hurtboxes`; a snapshot and save key, never renamed). */
 export const HurtboxComponent = defineComponent<HurtboxSet>('combat.hurtboxes');
 
+/** State that decides a creature's regions (e05.6). */
+export interface RegionState {
+  /** Whether the entity is a humanoid: an unaware one staggers from a head hit. */
+  readonly humanoid: boolean;
+  /** Creature state weakpoints are enabled by (e.g. "roaring"); "default" until set. */
+  readonly state: string;
+}
+
+/** The region-state component (`combat.region-state`; a snapshot and save key, never renamed). */
+export const RegionStateComponent = defineComponent<RegionState>('combat.region-state');
+
 /** The hitbox component (`combat.hitboxes`; a snapshot and save key, never renamed). */
 export const HitboxComponent = defineComponent<HitboxSet>('combat.hitboxes');
 
 /** Every hit-volume component, for `world.register(...HIT_VOLUME_COMPONENTS)`. */
-export const HIT_VOLUME_COMPONENTS = Object.freeze([HurtboxComponent, HitboxComponent] as const);
+export const HIT_VOLUME_COMPONENTS = Object.freeze([
+  HurtboxComponent,
+  HitboxComponent,
+  RegionStateComponent,
+] as const);
 
 const FORWARD: Vec3 = Object.freeze({ x: 0, y: 0, z: 1 });
 const NO_HITBOXES: HitboxSet = Object.freeze({ live: Object.freeze([]) });
@@ -181,12 +214,61 @@ export function hurtboxSet(spec: HurtboxSpec): HurtboxSet {
       throw new RangeError(`${what}: multiplier must be a finite number ≥ 0`);
     }
     checkShape(what, box.shape);
+    if (box.armor !== undefined && (!Number.isFinite(box.armor) || box.armor < 0)) {
+      throw new RangeError(`${what}: armor must be a finite number ≥ 0`);
+    }
+    if (box.underlying !== undefined) {
+      const { region, multiplier } = box.underlying;
+      if (!['head', 'torso', 'limb'].includes(region)) {
+        throw new RangeError(`${what}: underlying region must be head, torso or limb`);
+      }
+      if (!Number.isFinite(multiplier) || multiplier < 0) {
+        throw new RangeError(`${what}: underlying multiplier must be a finite number ≥ 0`);
+      }
+    }
   }
   return Object.freeze({
     facing: horizontalAim(spec.facing ?? FORWARD),
     sockets: Object.freeze(sockets),
     boxes: Object.freeze(spec.boxes.map((box) => Object.freeze({ ...box }))),
   });
+}
+
+/** The creature state `entity`'s weakpoints are judged against ("default" when none was set). */
+export function regionStateOf(world: World<never>, entity: EntityId): string {
+  if (!world.isRegistered(RegionStateComponent)) return 'default';
+  return world.get(entity, RegionStateComponent)?.state ?? 'default';
+}
+
+/**
+ * Sets the creature state `entity`'s weakpoints are enabled by (a roar exposes a core). `humanoid`
+ * is kept when already set, else false. Adding the component is structural (see `giveHurtboxes`).
+ */
+export function setRegionState(world: World<never>, entity: EntityId, state: string): void {
+  const current = world.get(entity, RegionStateComponent);
+  const next = Object.freeze({ humanoid: current?.humanoid ?? false, state });
+  if (current === undefined) world.add(entity, RegionStateComponent, next);
+  else world.set(entity, RegionStateComponent, next);
+}
+
+/** Marks `entity` a humanoid (e05.6); keeps its region state. */
+export function markHumanoid(world: World<never>, entity: EntityId): void {
+  const current = world.get(entity, RegionStateComponent);
+  const next = Object.freeze({ humanoid: true, state: current?.state ?? 'default' });
+  if (current === undefined) world.add(entity, RegionStateComponent, next);
+  else world.set(entity, RegionStateComponent, next);
+}
+
+/**
+ * The hurtbox as a hit resolves against it: a weakpoint outside its `enabledIn` states becomes its
+ * underlying region (torso ×1 by default); anything else is itself.
+ */
+export function effectiveHurtbox(hurtbox: Hurtbox, state: string): Hurtbox {
+  if (hurtbox.region !== 'weakpoint' || hurtbox.enabledIn?.includes(state) !== false) {
+    return hurtbox;
+  }
+  const { region, multiplier } = hurtbox.underlying ?? { region: 'torso', multiplier: 1 };
+  return Object.freeze({ ...hurtbox, region, multiplier });
 }
 
 /**

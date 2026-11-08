@@ -32,7 +32,15 @@ export const DAMAGE_TAGS = Object.freeze({
   critical: 'critical',
   /** A thief backstab (e10.4). */
   backstab: 'backstab',
-  /** Struck a weak point (e05). */
+  /** Struck the head (e05.6): added by the region stage. */
+  headshot: 'headshot',
+  /** An arrow that cannot pierce the struck armour ricocheted: 0 damage (e05.6, region stage). */
+  deflected: 'deflected',
+  /** A blunt arrow head (e05.6): ignores deflection, deals half damage to armour. */
+  blunt: 'blunt',
+  /** Staggers the target whatever its poise: a head hit on an unaware humanoid (e05.6). */
+  staggering: 'staggering',
+  /** Struck a weak point (e05.6): added by the region stage. */
   weakpoint: 'weakpoint',
   /** A riposte after a parry (e04.12). */
   riposte: 'riposte',
@@ -76,6 +84,8 @@ export interface DamagePacketInput {
   readonly direction?: Vec3;
   readonly region?: string;
   readonly regionMultiplier?: number;
+  readonly armor?: number;
+  readonly penetration?: number;
   readonly tags?: readonly string[];
 }
 
@@ -101,6 +111,10 @@ export interface DamagePacket {
   readonly region?: string;
   /** Damage multiplier of that region (the region stage applies it); 1 when there is none. */
   readonly regionMultiplier: number;
+  /** Armour value of the struck hurtbox (e05.6); absent or 0 = unarmoured. */
+  readonly armor?: number;
+  /** Penetration rating of the arrow that struck (e05.6); absent for melee, which never deflects. */
+  readonly penetration?: number;
   /** Tags such as `critical`, `backstab`, `environment` (see DAMAGE_TAGS); sorted, no duplicates. */
   readonly tags: readonly string[];
 }
@@ -125,6 +139,12 @@ function amount(what: string, value: number | undefined): number {
 function multiplier(value: number | undefined): number {
   if (value === undefined) return 1;
   const problem = nonNegativeProblem('regionMultiplier', value);
+  if (problem !== undefined) throw new RangeError(problem);
+  return value;
+}
+
+function rating(what: string, value: number): number {
+  const problem = nonNegativeProblem(what, value);
   if (problem !== undefined) throw new RangeError(problem);
   return value;
 }
@@ -175,6 +195,10 @@ export function createDamagePacket(input: DamagePacketInput): DamagePacket {
     ...(input.direction !== undefined && { direction: vector('direction', input.direction) }),
     ...(input.region !== undefined && { region: input.region }),
     regionMultiplier: multiplier(input.regionMultiplier),
+    ...(input.armor !== undefined && { armor: rating('armor', input.armor) }),
+    ...(input.penetration !== undefined && {
+      penetration: rating('penetration', input.penetration),
+    }),
     tags: normalizeTags(input.tags ?? []),
   };
   return Object.freeze(packet);

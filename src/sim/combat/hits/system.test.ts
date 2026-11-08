@@ -26,6 +26,7 @@ import {
   liveHitboxes,
   openHitbox,
   setHurtboxFacing,
+  setRegionState,
   type HitboxSpec,
   type Hurtbox,
   type LiveHitbox,
@@ -144,6 +145,29 @@ function shapeAt(
   const live = { shape: spec.shape, track: spec.track } as LiveHitbox;
   return hitboxShapeAt(frame, live, key);
 }
+
+describe('region state (mw-e05.6)', () => {
+  it('AC-2: a weakpoint struck outside its enabling state reports its underlying region', () => {
+    const { world, hits, attacker, target, steps } = setup();
+    const a = attacker();
+    const core = torso({
+      id: 'core',
+      region: 'weakpoint',
+      multiplier: 3,
+      enabledIn: ['roaring'],
+      underlying: { region: 'limb', multiplier: 0.5 },
+    });
+    const t = target(midArc(1.0), [core]);
+    openHitbox(world, a, swing());
+    steps(4);
+    expect(hits[0]).toMatchObject({ target: t, hurtbox: 'core', region: 'limb', multiplier: 0.5 });
+    hits.length = 0;
+    setRegionState(world, t, 'roaring');
+    openHitbox(world, a, swing({ id: 'again' }));
+    steps(4);
+    expect(hits[0]).toMatchObject({ region: 'weakpoint', multiplier: 3 });
+  });
+});
 
 describe('hit volumes (mw-e04.2)', () => {
   it('AC-1: a 2.0 m arc over 4 ticks strikes a 0.4 m-radius capsule no tick pose touches, once, on the tick whose sweep crosses it', () => {

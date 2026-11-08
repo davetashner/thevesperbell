@@ -97,6 +97,7 @@ describe('creature schema', () => {
       locomotion: walker,
       attacks: [],
       properties: [],
+      regions: [],
       resistances: {},
       poiseRegen: { delayTicks: 120, percentPerSecond: 25 },
       reactions: { knockbackImpulse: 300, knockdownImpulse: 900, launchSpeed: 2, replace: {} },

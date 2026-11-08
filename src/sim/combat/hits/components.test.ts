@@ -92,6 +92,14 @@ describe('hit-volume components (mw-e04.2)', () => {
     expect(
       bad([{ ...chest, shape: { kind: 'box', center: v3(0, 0, 0), halfExtents: v3(1, 0, 1) } }]),
     ).toThrow(/half extents/);
+    expect(bad([{ ...chest, armor: -1 }])).toThrow(/armor/);
+    expect(bad([{ ...chest, armor: Number.NaN }])).toThrow(/armor/);
+    expect(
+      bad([{ ...chest, underlying: { region: 'weakpoint' as never, multiplier: 1 } }]),
+    ).toThrow(/underlying region/);
+    expect(bad([{ ...chest, underlying: { region: 'torso', multiplier: -1 } }])).toThrow(
+      /underlying multiplier/,
+    );
     expect(bad([], { sockets: { root: IDENTITY_POSE } })).toThrow(/implicit/);
     expect(bad([], { sockets: { neck: at(v3(Infinity, 0, 0)) } })).toThrow(/finite/);
     expect(bad([], { facing: v3(0, 1, 0) })).toThrow(/horizontal/);

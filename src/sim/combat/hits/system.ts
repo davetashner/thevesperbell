@@ -48,6 +48,8 @@ import {
   HIT_REGIONS,
   HitboxComponent,
   HurtboxComponent,
+  effectiveHurtbox,
+  regionStateOf,
   socketPose,
   type HitboxSpec,
   type HitRegion,
@@ -136,10 +138,11 @@ export function hurtboxShapes(world: World<never>, entity: EntityId): readonly P
   if (set === undefined) return [];
   const frame = entityFrame(world, entity, set.facing);
   if (frame === undefined) return [];
-  return set.boxes.map((hurtbox) => ({
+  const state = regionStateOf(world, entity);
+  return set.boxes.map((box) => ({
     entity,
-    hurtbox,
-    shape: placeShape(hurtbox.shape, composePose(frame, socketPose(set, hurtbox.socket))),
+    hurtbox: effectiveHurtbox(box, state),
+    shape: placeShape(box.shape, composePose(frame, socketPose(set, box.socket))),
   }));
 }
 
