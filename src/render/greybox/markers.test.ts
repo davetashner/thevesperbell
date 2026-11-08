@@ -3,16 +3,20 @@ import { Mesh, Scene, type WebGLRenderer } from 'three';
 import type { SceneSpawnPlacement } from '@sim/index';
 import { createGreyboxView } from './index';
 
-function spawn(id: string, tags: string[], extra: Partial<SceneSpawnPlacement> = {}) {
+function spawn(
+  id: string,
+  tags: string[],
+  extra: Partial<SceneSpawnPlacement> = {},
+): SceneSpawnPlacement {
   return {
     id,
     position: { x: 0, y: 3.25, z: 0 },
-    yaw: 0,
+    yaw: 0 as const,
     rotation: { x: 0, y: 0, z: 0, w: 1 },
     prop: undefined,
     tags,
     ...extra,
-  } as SceneSpawnPlacement;
+  };
 }
 
 function drawn(placement: SceneSpawnPlacement) {
