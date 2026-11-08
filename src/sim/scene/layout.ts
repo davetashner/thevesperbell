@@ -637,12 +637,11 @@ function switchOf(spec: SceneSwitchSpec): SceneSwitchSpec {
   });
 }
 
-/** `spec` without its absent fields, frozen (colours and vectors are copied, they are arrays). */
+/** A frozen copy of `spec` (zod leaves absent fields out), its vectors and colours copied too. */
 function definedOf<T extends object>(spec: T): T {
   const copy: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(spec)) {
-    if (value !== undefined)
-      copy[key] = Array.isArray(value) ? Object.freeze([...(value as unknown[])]) : value;
+    copy[key] = Array.isArray(value) ? Object.freeze([...(value as unknown[])]) : value;
   }
   return Object.freeze(copy) as T;
 }

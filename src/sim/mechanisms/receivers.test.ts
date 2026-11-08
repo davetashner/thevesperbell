@@ -147,6 +147,25 @@ describe('light receivers (mw-e03.17)', () => {
     syncLightReceiverNodes(r.world, r.world.spawn()); // not a receiver: nothing
   });
 
+  it('drives only the lever nodes bound to it, not buttons', () => {
+    const r = rig();
+    const eye = r.receiver();
+    const graph: SignalGraphDef = {
+      id: 'both',
+      nodes: [
+        { id: 'level', kind: 'lever', entity: 'p', observed: true },
+        { id: 'tap', kind: 'button', entity: 'p', observed: true },
+      ],
+      wires: [],
+    };
+    const g = addSignalGraph(r.world, graph, { bindings: { p: eye } });
+    syncLightReceiverNodes(r.world, eye);
+    r.beam(1);
+    r.steps(3);
+    expect(signalOutput(r.world, g, 'level')).toBe(true);
+    expect(signalOutput(r.world, g, 'tap')).toBe(false);
+  });
+
   it('a player stepping into the beam turns a momentary receiver off', () => {
     const r = rig();
     const eye = r.receiver();
