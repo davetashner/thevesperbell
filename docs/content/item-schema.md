@@ -37,6 +37,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `worldProperties.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `worldProperties.liftable` | boolean | — | Can be picked up and carried. |
 | `worldProperties.pushable` | boolean | — | Can be pushed or dragged. |
+| `worldProperties.remoteActuatable` | boolean | — | Can be operated from a distance by magic (remote actuation). |
 | `worldProperties.hideable` | boolean | — | An actor can hide in or behind it. |
 | `worldProperties.reflective` | boolean | — | Reflects light beams and bolts. |
 | `worldProperties.transparent` | boolean | — | Light and sight pass through it. |
@@ -109,6 +110,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `use[].properties.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
 | `use[].properties.liftable` | boolean | — | Can be picked up and carried. |
 | `use[].properties.pushable` | boolean | — | Can be pushed or dragged. |
+| `use[].properties.remoteActuatable` | boolean | — | Can be operated from a distance by magic (remote actuation). |
 | `use[].properties.hideable` | boolean | — | An actor can hide in or behind it. |
 | `use[].properties.reflective` | boolean | — | Reflects light beams and bolts. |
 | `use[].properties.transparent` | boolean | — | Light and sight pass through it. |

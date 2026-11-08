@@ -10,6 +10,7 @@ import {
   PlayerClassComponent,
   RecoveryAnchorComponent,
   settleHeldObjects,
+  settleRemoteHolds,
   SpellHotbarComponent,
   StatsComponent,
 } from '@sim/index';
@@ -53,6 +54,7 @@ export function createGameSaveRegistry(options: GameSaveOptions = {}): SaveRegis
     // A save never stores a carried object's hold: it is set down at the carrier's feet (mw-e17.14).
     beforeWrite: (world) => {
       settleHeldObjects(world);
+      settleRemoteHolds(world);
     },
   })
     .register(inventorySaveSection(options))

@@ -141,6 +141,10 @@
           "type": "boolean",
           "description": "Can be pushed or dragged."
         },
+        "remoteActuatable": {
+          "type": "boolean",
+          "description": "Can be operated from a distance by magic (remote actuation)."
+        },
         "hideable": {
           "type": "boolean",
           "description": "An actor can hide in or behind it."
