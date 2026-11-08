@@ -31,5 +31,14 @@
   },
   "needs": {},
   "behaviour": { "profile": "fixture-sentinel" },
+  "audio": {
+    "idleLoop": "sfx-fixture-sentinel-idle",
+    "footsteps": "sfx-fixture-sentinel-step",
+    "alertBark": "sfx-fixture-sentinel-bark-alert",
+    "telegraph": "sfx-fixture-sentinel-telegraph",
+    "hurt": "sfx-fixture-sentinel-hurt",
+    "poiseBreak": "sfx-fixture-sentinel-stagger",
+    "death": "sfx-fixture-sentinel-death"
+  },
   "presentation": { "mesh": "placeholder-capsule", "sfx": "placeholder" }
 }

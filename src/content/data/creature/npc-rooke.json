@@ -27,6 +27,15 @@
   "behaviour": {
     "profile": "shopkeeper"
   },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
   "presentation": {
     "mesh": "npc-rooke",
     "sfx": "placeholder"

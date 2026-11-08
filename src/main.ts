@@ -52,6 +52,7 @@ import {
   creatureReadout,
   CreatureTelegraphs,
   formatPerceptionStats,
+  CreatureIdleLoops,
   prepareCreatures,
   SceneNavigation,
   sceneCreatureErrors,
@@ -891,6 +892,8 @@ function startRenderer(
       moves: content.all('move'),
       // Arrows layer their own impact sounds (a water splash) over the surface's (mw-e05.19).
       arrows: content.all('arrow'),
+      // Creatures' own sounds: barks, hurt, death, footsteps and telegraphs (mw-e28.8).
+      creatures: content.all('creature'),
       now: () => performance.now(),
       onPlay: (cue) => {
         recentCues.push(cue);
@@ -1240,6 +1243,12 @@ function startRenderer(
       // (mw-ju8.40). The scene's creatures spawn later in this setup, and the hum finds hers by spawn
       // point, so it starts on the first frame after they exist.
       const hums = new SceneHums({ world, engine: audio, scene: scene.id });
+      // Each creature's idle loop follows it until it dies (mw-e28.8).
+      const idleLoops = new CreatureIdleLoops({
+        world,
+        engine: audio,
+        creatures: content.all('creature'),
+      });
       // Marsh's General Store plays one music bed, its shop theme, on both floors (mw-ju8.11).
       const beds = new SceneBeds({ engine: audio, scene: scene.id });
       const shopStingers = new ShopStingers({ engine: audio, now: () => performance.now() });
@@ -1254,6 +1263,7 @@ function startRenderer(
       afterStep.push(() => {
         music?.update();
         hums.update();
+        idleLoops.update();
         beds.update();
         ambience.update(camera.position, performance.now() / 1000);
       });

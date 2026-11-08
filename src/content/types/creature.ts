@@ -14,6 +14,7 @@
 import { z } from 'zod';
 import type { Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
+import { creatureAudioSchema } from './creature-audio.ts';
 import { hitReactionsSchema, poiseRegenSchema, resistancesSchema } from './damage.ts';
 import {
   creatureLocomotionSchema,
@@ -178,6 +179,9 @@ export const creatureSchema = z.strictObject({
     .describe(
       'Shield (or shieldless guard) it carries, mw-ju8.19: it blocks frontal hits like the knight’s while its behaviour holds a `guard` step; absent = it has no guard.',
     ),
+  audio: creatureAudioSchema
+    .optional()
+    .describe('Audio slots (mw-e28.8): idle loop, footsteps, barks, telegraphs, hurt, death.'),
   presentation: z
     .strictObject({
       mesh: contentId.default('placeholder-capsule').describe('Mesh id; grey-box capsule default.'),

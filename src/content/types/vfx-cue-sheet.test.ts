@@ -79,7 +79,7 @@ describe('VFX cue sheet schema (mw-e29.3)', () => {
     ]);
     // The match check is the shared cue rule check.
     expect(problems(sheet([{ event: 'Died', effect: 'vfx-x', match: { x: 'y' } }]))).toEqual([
-      'rules.0.match.x: Died has no fact "x"; it has: target, targetMaterial, tags',
+      'rules.0.match.x: Died has no fact "x"; it has: target, targetMaterial, tags, creatureDeath',
     ]);
   });
 

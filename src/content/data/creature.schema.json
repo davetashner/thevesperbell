@@ -918,6 +918,53 @@
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
       "x-contentRef": "shield"
     },
+    "audio": {
+      "description": "Audio slots (mw-e28.8): idle loop, footsteps, barks, telegraphs, hurt, death.",
+      "type": "object",
+      "properties": {
+        "idleLoop": {
+          "description": "Looping ambient sound that follows the creature while it lives (stops on death).",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "footsteps": {
+          "description": "Footstep set layered over the ground surface’s own step sound.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "alertBark": {
+          "description": "Bark played where the creature stands when it becomes Alerted or enters Combat.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "telegraph": {
+          "description": "Attack telegraph played on TelegraphStarted when the move declares no telegraph cue of its own.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "unblockableTelegraph": {
+          "description": "Distinct, high-priority telegraph for unblockable moves and grabs; required when the creature has one, and different from `telegraph`.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "hurt": {
+          "description": "Played where a clean hit that did not kill it lands.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "poiseBreak": {
+          "description": "Played when its poise breaks and it staggers.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        },
+        "death": {
+          "description": "Played where it dies; its idle loop stops at the same time.",
+          "type": "string",
+          "pattern": "^(?:sfx|amb)(?:-[a-z0-9]+)+$"
+        }
+      },
+      "additionalProperties": false
+    },
     "presentation": {
       "description": "Render and audio bindings.",
       "default": {},

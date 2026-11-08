@@ -16,6 +16,7 @@
 import { checkAnimation } from './anim-checks.ts';
 import { checkCreatureAttacks } from './attack-checks.ts';
 import { checkBehaviours } from './behaviour-checks.ts';
+import { checkCreatureAudio } from './creature-audio-checks.ts';
 import { checkConditions } from './condition-checks.ts';
 import { checkFacts } from './fact-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
@@ -134,6 +135,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkCapabilities,
   checkPuzzles,
   checkCreatureAttacks,
+  checkCreatureAudio,
   checkBehaviours,
   checkUnlocks,
   checkItems,

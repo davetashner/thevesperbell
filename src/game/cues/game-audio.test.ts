@@ -4,8 +4,10 @@ import {
   ActionPhaseChanged,
   addProperties,
   arrowImpact,
+  CreatureComponent,
   Died,
   LocomotionEvents,
+  registerCreatureComponents,
   registerWorldProperties,
   World,
   type EntityId,
@@ -82,6 +84,30 @@ describe('game audio wiring (mw-e28.2)', () => {
     detach();
     die(world.spawn());
     expect(play).toHaveBeenCalledTimes(2);
+  });
+
+  it('mw-e28.8: plays the death slot of the creature that died when given the creatures', () => {
+    const world = registerCreatureComponents(registerWorldProperties(new World({ seed: 1 })));
+    const play = vi.fn<(cue: string, options: unknown) => null>(() => null);
+    attachGameAudio({
+      world,
+      engine: { context: { state: 'running' }, play },
+      registry: { get: () => undefined },
+      sheets: [{ rules: [cueRuleSchema.parse({ event: 'Died', cue: '{creatureDeath}' })] }],
+      materials: [],
+      creatures: [{ id: 'skeleton', audio: { death: 'sfx-skel-death' } }],
+      now: () => 0,
+    });
+    const skeleton = world.spawn();
+    world.add(skeleton, CreatureComponent, {
+      origin: { creature: 'skeleton', at: { x: 0, y: 0, z: 0 }, facing: { x: 0, y: 0, z: 1 } },
+      behaviour: 'x',
+      tuning: {},
+      needs: {},
+    });
+    world.events.emit(Died, { tick: 0, target: skeleton, killer: null, source: null, tags: [] });
+    world.step();
+    expect(play.mock.calls.map((c) => c[0])).toEqual(['sfx-skel-death']);
   });
 
   it('reports captioned cues with their position, even before the audio context runs', () => {

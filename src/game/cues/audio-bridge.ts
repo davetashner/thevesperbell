@@ -12,6 +12,8 @@ import type { PlayOptions } from '@audio/index';
 import { dbToGain, type CaptionTrigger, type Vec3 } from '@audio/index';
 import {
   CUE_DEDUPE_MS,
+  type CreatureAudio,
+  type CreatureDef,
   cueEventSpec,
   type CueEventName,
   type ArrowDefinition,
@@ -21,6 +23,7 @@ import {
 } from '@content/index';
 import {
   CharacterController,
+  CreatureComponent,
   CombatFacingComponent,
   GuardComponent,
   PhysicsColliderComponent,
@@ -281,6 +284,8 @@ export interface WorldCueLookupOptions {
   readonly moves?: readonly Pick<MoveDef, 'id' | 'presentation'>[];
   /** Arrows, for their own cues (impact sounds, trails). */
   readonly arrows?: readonly Pick<ArrowDefinition, 'id' | 'cues'>[];
+  /** Creatures, for their audio slots (barks, hurt, death, creature footsteps, telegraphs). */
+  readonly creatures?: readonly Pick<CreatureDef, 'id' | 'audio'>[];
   /** Armour weight class of a character (e04.16 will own it); none by default. */
   readonly armorOf?: (entity: EntityId) => string | undefined;
   /** Dev warnings (an unknown footstep surface, once per surface). */
@@ -306,6 +311,9 @@ export function worldCueLookups(
   for (const m of materials) if (m.footstepSurface !== undefined) known.add(m.footstepSurface);
   const sounds = new Map((options.moves ?? []).map((m) => [m.id, m.presentation.audioCue]));
   const arrowCues = new Map((options.arrows ?? []).map((a) => [a.id, a.cues]));
+  const creatureAudio = new Map<string, CreatureAudio | undefined>(
+    (options.creatures ?? []).map((c) => [c.id, c.audio]),
+  );
   const warned = new Set<string>();
   const warn =
     options.warn ??
@@ -337,6 +345,10 @@ export function worldCueLookups(
     impactClassOf: (material) => classes.get(material),
     shieldOf: (entity) => read(entity, GuardComponent)?.shield.id,
     facingOf: (entity) => read(entity, CombatFacingComponent)?.facing,
+    creatureAudioOf: (entity) => {
+      const creature = read(entity, CreatureComponent)?.origin.creature;
+      return creature === undefined ? undefined : creatureAudio.get(creature);
+    },
     moveSoundOf: (move) => sounds.get(move),
     arrowCuesOf: (arrow) => arrowCues.get(arrow),
     surfaceOfMaterial: (material) => {

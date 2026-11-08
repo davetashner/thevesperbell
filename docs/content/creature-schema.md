@@ -122,6 +122,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `interactions` | list of id | `[]` | Non-hostile affordances offered to the player, e.g. "feed", "talk", "pet". |
 | `loot` | id | — | Loot table id (E18); absent = drops only what it carries. |
 | `shield` | ref → shield | — | Shield (or shieldless guard) it carries, mw-ju8.19: it blocks frontal hits like the knight’s while its behaviour holds a `guard` step; absent = it has no guard. |
+| `audio` | object | — | Audio slots (mw-e28.8): idle loop, footsteps, barks, telegraphs, hurt, death. |
+| `audio.idleLoop` | string | — | Looping ambient sound that follows the creature while it lives (stops on death). |
+| `audio.footsteps` | string | — | Footstep set layered over the ground surface’s own step sound. |
+| `audio.alertBark` | string | — | Bark played where the creature stands when it becomes Alerted or enters Combat. |
+| `audio.telegraph` | string | — | Attack telegraph played on TelegraphStarted when the move declares no telegraph cue of its own. |
+| `audio.unblockableTelegraph` | string | — | Distinct, high-priority telegraph for unblockable moves and grabs; required when the creature has one, and different from `telegraph`. |
+| `audio.hurt` | string | — | Played where a clean hit that did not kill it lands. |
+| `audio.poiseBreak` | string | — | Played when its poise breaks and it staggers. |
+| `audio.death` | string | — | Played where it dies; its idle loop stops at the same time. |
 | `presentation` | object | `{}` | Render and audio bindings. |
 | `presentation.mesh` | id | `"placeholder-capsule"` | Mesh id; grey-box capsule default. |
 | `presentation.sfx` | id | `"placeholder"` | SFX set id. |

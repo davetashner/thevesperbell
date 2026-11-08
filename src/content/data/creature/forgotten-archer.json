@@ -29,6 +29,15 @@
   "behaviour": {
     "profile": "forgotten-archer"
   },
+  "audio": {
+    "idleLoop": "sfx-forgotten-idle",
+    "footsteps": "sfx-forgotten-step",
+    "alertBark": "sfx-forgotten-bark-alert",
+    "telegraph": "sfx-telegraph-forgotten-windup",
+    "hurt": "sfx-forgotten-hurt",
+    "poiseBreak": "sfx-forgotten-stagger",
+    "death": "sfx-forgotten-death"
+  },
   "presentation": {
     "mesh": "placeholder-capsule-bones",
     "sfx": "placeholder"
