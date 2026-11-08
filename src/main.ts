@@ -120,6 +120,7 @@ import {
   debugSpellLearner,
   givePlayerMagic,
   installGameMagic,
+  statusLookup,
   previewRadius,
   readBoltTransform,
   SpellCaster,
@@ -742,6 +743,7 @@ function startRenderer(
       beforeStimuli: (sim) => {
         magic = installGameMagic(sim, {
           spells: content.all('spell'),
+          statuses: content.all('status'),
           damage: combat.damage,
           collision: new RapierCollisionWorld(physics),
           invulnerable: invulnerabilityRule(combat.moves),
@@ -1213,6 +1215,7 @@ function startRenderer(
           // The knight's moves: the dodge roll and backstep (mw-e04.8), the light chain and the
           // shield (mw-e04.6) are playable.
           moves: combat.moves,
+          statuses: statusLookup(content.all('status')),
           melee: combat.melee,
           // The shortbow and a quiver (mw-e05.21): 4 takes it out, hold the attack button to draw.
           bow: combat.bow,

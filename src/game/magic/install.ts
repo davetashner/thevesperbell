@@ -12,7 +12,7 @@
 // else: what it can cast is what it has learned (`learn-spell`, from the console until books and
 // scrolls teach, mw-ju8.17).
 
-import type { GameContent, SpellEntry } from '@content/index';
+import type { GameContent, SpellEntry, StatusEntry } from '@content/index';
 import { createCapabilityRegistry } from '../capabilities';
 import {
   DEFAULT_MANA_PROFILE,
@@ -35,6 +35,7 @@ import {
   type EntityId,
   type InvulnerabilityRule,
   type SpellLookup,
+  type StatusLookup,
   type SightWorld,
   type SpellPipeline,
   type TetherController,
@@ -45,6 +46,8 @@ import {
 export interface GameMagicOptions {
   /** Every spell in the game's content. */
   readonly spells: readonly SpellEntry[];
+  /** Every status in the game's content (stack, break and expiry rules); omitted: none defined. */
+  readonly statuses?: readonly StatusEntry[];
   /** The damage model every hit resolves through (the shield rule registered). */
   readonly damage: DamageModel;
   /** The level projectiles hit: RapierCollisionWorld over the sim's physics. */
@@ -70,6 +73,12 @@ export interface GameMagic {
   readonly spellIds: readonly string[];
 }
 
+/** The content's statuses by id (mw-e06.24): what the pipeline, the player and creatures read. */
+export function statusLookup(statuses: readonly StatusEntry[]): StatusLookup {
+  const byId = new Map(statuses.map((status) => [status.id, status] as const));
+  return (id) => byId.get(id);
+}
+
 /** Installs the spell pipeline and its systems in `world` (see the file header). Once, outside a step. */
 export function installGameMagic<TInput>(
   world: World<TInput>,
@@ -77,7 +86,11 @@ export function installGameMagic<TInput>(
 ): GameMagic {
   const byId = new Map(options.spells.map((spell) => [spell.id, spell] as const));
   const spells: SpellLookup = (id) => byId.get(id);
-  const pipeline = installSpells(world, { spells, damage: options.damage });
+  const pipeline = installSpells(world, {
+    spells,
+    damage: options.damage,
+    ...(options.statuses !== undefined && { statuses: statusLookup(options.statuses) }),
+  });
   installSpellLearning(world, pipeline, options.learn);
   installSpellHotbar(world);
   installMana(world, pipeline);
