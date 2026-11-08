@@ -122,12 +122,15 @@ const torso: Hurtbox = {
 };
 
 interface Options {
+  /** The kick move, when not the shipped one. */
+  readonly kickMove?: RuntimeMove;
   /** Size class `sizeOf` reports for every creature. */
   readonly size?: string;
 }
 
 function setup(options: Options = {}) {
-  const moves: MoveTable = new Map([[KICK.id, KICK]]);
+  const kickDef = options.kickMove ?? KICK;
+  const moves: MoveTable = new Map([[kickDef.id, kickDef]]);
   const world = installStimuli(
     registerWorldProperties(
       new World<ActionFrame>({ seed: 1 }).register(
@@ -252,6 +255,25 @@ describe('kicking a door (mw-e04.18)', () => {
     expect(s.world.get(door, DoorComponent)?.openness).toBe(0);
     expect(s.log.resisted.map((e) => e.entity)).toEqual([door]);
     expect(s.log.noises).toHaveLength(1);
+  });
+
+  it('a kick without a listed force or weight limit resists with an empty push', () => {
+    const plain = kickMove({ worldImpact: { blunt: 5 } } as never);
+    const s = setup({ kickMove: plain });
+    s.placeDoor(1, { lock: LOCK });
+    s.kick();
+    expect(s.log.resisted).toMatchObject([{ maxWeight: 0, impulse: v3(0, 0, 0) }]);
+  });
+
+  it('a kicker with no place in the world kicks nothing', () => {
+    const s = setup();
+    const door = s.placeDoor(1);
+    const loner = s.world.spawn();
+    giveActionTimeline(s.world, loner);
+    giveFacing(s.world, loner);
+    requestMove(s.world, loner, 'kick');
+    for (let i = 0; i < 40; i++) s.world.step([]);
+    expect(s.world.get(door, DoorComponent)?.openness).toBe(0);
   });
 
   it('leaves an open door and a door out of reach alone', () => {

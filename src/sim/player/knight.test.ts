@@ -453,6 +453,17 @@ describe('the knight’s shield bash (mw-e04.14)', () => {
     expect(plain.started.map((e) => e.move)).toEqual(['sword-light-1']);
   });
 
+  it('the kick button (mw-e04.18) starts the kick, with or without a shield, and only when given', () => {
+    for (const noShield of [false, true]) {
+      const k = knight({ kick: KNIGHT_KICK, ...(noShield && { noShield: true as const }) });
+      k.run(1, frame(['kick']));
+      expect(k.started.map((e) => e.move)).toEqual(['kick']);
+    }
+    const none = knight();
+    none.run(1, frame(['kick']));
+    expect(none.started).toEqual([]);
+  });
+
   it('AC-4: with no shield equipped, block + attack kicks (and nothing blocks)', () => {
     const k = knight({ noShield: true, bash: 'bash', bashFallback: 'kick' });
     expect(guardOf(k.world, k.player)).toBeUndefined();

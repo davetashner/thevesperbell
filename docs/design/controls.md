@@ -29,7 +29,7 @@ Defaults: `DEFAULT_BINDINGS` and `DEFAULT_PAD_BINDINGS`.
 | Left-hand action / parry (knight) | LB (L1)           | 3                        |
 | Hold shield / block | LT (L2)                         | Right click              |
 | Shield bash (knight) | Hold LT/L2, press RB/R1        | Hold right click, left click |
-| Kick (knight)    | (unbound: block + attack kicks without a shield) | F                        |
+| Kick (knight)    | (unbound: block + attack kicks without a shield) | K                        |
 | Ability 2        | D-pad Right                        | 2                        |
 | Ability 4        | D-pad Left                         | 4                        |
 | Cast spell       | D-pad Up                           | V                        |

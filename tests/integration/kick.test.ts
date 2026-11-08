@@ -1,5 +1,5 @@
 // mw-e04.18: the knight's kick in the game world — the testbed as src/main.ts and the replay world wire
-// it (Rapier physics, stimuli, fire, the player with the kick on F, startTestbedCombat), headless,
+// it (Rapier physics, stimuli, fire, the player with the kick on K, startTestbedCombat), headless,
 // driven through the ActionSampler. A kick shoves objects up to 40 kg by physics, tips a burning
 // brazier into the rug beside it (fire spreads by properties, never by a brazier-and-rug rule), slams
 // a door open onto the creature behind it, and knocks a small creature off a ledge.
@@ -80,7 +80,7 @@ function testbed() {
   const feet = world.get(player, CharacterController)?.position ?? expect.fail('no player');
   /** Presses the kick button and runs on for `after` ticks. */
   const kick = (after = 120) => {
-    step(['KeyF']);
+    step(['KeyK']);
     run(after);
   };
   return { ...game, sampler, started, resisted, hits, reactions, step, run, feet, kick };
@@ -136,10 +136,10 @@ describe('the kick in the testbed (mw-e04.18)', () => {
     expect(game.resisted).toMatchObject([{ entity: crate, weight: 50, maxWeight: 40 }]);
   });
 
-  it('the kick costs 8 stamina on its own button (F)', () => {
+  it('the kick costs 8 stamina on its own button (K)', () => {
     const game = testbed();
     const before = staminaOf(game.world, game.player)?.current ?? 0;
-    game.step(['KeyF']);
+    game.step(['KeyK']);
     expect(before - (staminaOf(game.world, game.player)?.current ?? 0)).toBe(8);
     game.run(40);
     expect(game.started.map((e) => e.move)).toEqual(['kick']);
@@ -179,7 +179,7 @@ describe('the kick in the testbed (mw-e04.18)', () => {
     const game = testbed();
     const { rug, brazier } = brazierAndRug(game);
     const start = positionOf(game, brazier);
-    game.step(['KeyF']);
+    game.step(['KeyK']);
     let litAfter = -1;
     for (let tick = 0; tick < 300 && litAfter < 0; tick++) {
       game.step();

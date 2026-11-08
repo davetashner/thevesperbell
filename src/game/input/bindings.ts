@@ -77,7 +77,7 @@ export const DEFAULT_BINDINGS: Bindings = freezeBindings({
   crouch: ['KeyC'],
   slowWalk: ['KeyX'],
   dodge: ['KeyR'],
-  kick: ['KeyF'],
+  kick: ['KeyK'],
   interact: ['KeyE'],
   lockOn: ['KeyQ', mouseCode(1)],
   cycleTarget: ['Tab'],
