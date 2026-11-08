@@ -21,7 +21,7 @@ import type { BodyId } from '../character/collision-world';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
-import { affordancesOf, interactRemotely, physicsBodiesOf } from '../interaction';
+import { affordancesOf, interactRemotely, physicsBodiesOf, remoteAffordance } from '../interaction';
 import { teleportPhysicsObject, PhysicsObjectComponent } from '../physics/objects';
 import { PlayerLook } from '../player/player';
 import { readProperty } from '../properties/components';
@@ -143,6 +143,8 @@ export interface TetherController {
   tetherOf(caster: EntityId): Tether | undefined;
   /** Uses the held object's primary affordance; false when nothing held, out of reach, or unusable. */
   use(caster: EntityId): boolean;
+  /** Whether `use` would work now: something held, in reach and in sight, with a usable affordance. */
+  canUse(caster: EntityId): boolean;
   /** Lets go (ends the caster's channel too); false when nothing was held. */
   release(caster: EntityId): boolean;
 }
@@ -303,15 +305,22 @@ export function installSpellTether<TInput>(
     return { kind: 'hits', hits: [{ target, point: { x: at.x, y: at.y, z: at.z } }] };
   });
 
-  const use = (caster: EntityId): boolean => {
+  /** The held tether, when its target is in reach and sight. */
+  const usableTether = (caster: EntityId): Tether | undefined => {
     const held = tetherOf(caster);
-    if (held === undefined) return false;
+    if (held === undefined) return undefined;
     const eye = eyeOf(w, caster);
     const at = placementOf(w, held.target);
-    if (eye === undefined || at === undefined) return false;
+    if (eye === undefined || at === undefined) return undefined;
     if (distanceBetween(eye, at) - at.radius > held.range || !clear(held.target, eye, at)) {
-      return false;
+      return undefined;
     }
+    return held;
+  };
+
+  const use = (caster: EntityId): boolean => {
+    const held = usableTether(caster);
+    if (held === undefined) return false;
     const done = interactRemotely(w, caster, held.target);
     if (done === undefined) return false;
     w.events.emit(TetherUsed, {
@@ -404,6 +413,10 @@ export function installSpellTether<TInput>(
     heldBy: (caster) => tetherOf(caster)?.target ?? null,
     tetherOf,
     use,
+    canUse: (caster) => {
+      const held = usableTether(caster);
+      return held !== undefined && remoteAffordance(w, caster, held.target) !== undefined;
+    },
     release: (caster) => release(caster, 'player'),
   };
 }
