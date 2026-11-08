@@ -40,6 +40,9 @@ export function isFlammableNow(world: World<never>, entity: EntityId): boolean {
   );
 }
 
+/** Divisor of a frozen thing's `fragile` threshold: ice is brittle (mw-e03.7). */
+export const FROZEN_FRAGILITY = 3;
+
 /** Whether `entity` floats in water (density below water's). */
 export function floats(world: World<never>, entity: EntityId): boolean {
   return readProperty(world, entity, 'density') < WATER_DENSITY;
@@ -47,7 +50,7 @@ export function floats(world: World<never>, entity: EntityId): boolean {
 
 /**
  * Whether a single hit of kind `type` delivering `energy` J breaks `entity`: it reaches the object's
- * `fragile` threshold (any kind of hit), or the object is `breakable` and the energy reaches its
+ * `fragile` threshold (any kind of hit; a frozen object's is divided by FROZEN_FRAGILITY), or the object is `breakable` and the energy reaches its
  * `toughness` for that kind (a kind without a toughness never breaks it).
  */
 export function breaksUnder(
@@ -56,7 +59,10 @@ export function breaksUnder(
   type: BreakType,
   energy: number,
 ): boolean {
-  if (energy >= readProperty(world, entity, 'fragile')) return true;
+  const fragile = readProperty(world, entity, 'fragile');
+  if (energy >= (readProperty(world, entity, 'frozen') ? fragile / FROZEN_FRAGILITY : fragile)) {
+    return true;
+  }
   if (!readProperty(world, entity, 'breakable')) return false;
   const toughness = readProperty(world, entity, 'toughness')[type];
   return toughness !== undefined && energy >= toughness;

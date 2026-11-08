@@ -12,6 +12,7 @@ import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
 import {
   LIQUID_COMPONENTS,
+  LiquidIceComponent,
   LiquidLayerComponent,
   LiquidVolumeComponent,
   RainZoneComponent,
@@ -222,6 +223,7 @@ export function createVolume(
     ...(spec.fill === undefined ? {} : { fill: spec.fill }),
   };
   world.add(volume, LiquidVolumeComponent, value);
+  world.add(volume, LiquidIceComponent, { cells: [], pending: [] });
   const slabs = layerSlabs(value);
   for (const [i, layer] of layers.entries()) {
     placeLayer(world, config, value, layer, slabs[i] as { bottom: number; top: number });

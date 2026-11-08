@@ -14,8 +14,10 @@ import {
   elementFieldSystem,
   elementRulesSystem,
   fireRules,
+  freezeRules,
   liquidRules,
   installElementField,
+  installIce,
   installLiquids,
   LightSourceComponent,
   type World,
@@ -30,6 +32,7 @@ export function installGameFire<TInput>(
   const presets = materialPresets(materials);
   installElementField(world);
   installLiquids(world);
+  installIce(world);
   world
     .addSystem(
       elementRulesSystem(
@@ -39,6 +42,7 @@ export function installGameFire<TInput>(
             burnt: burntMaterials(materials),
             keepWhenSpent: (world, entity) => world.has(entity, LightSourceComponent),
           }),
+          ...freezeRules(),
           ...liquidRules({ presets }),
         ]),
       ),
