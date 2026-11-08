@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 // A loaded scene's doors, switches and signal graphs (mw-e03.18).
 import { describe, expect, it } from 'vitest';
 import { World } from '../core/world';
@@ -256,13 +257,11 @@ describe('scene mechanisms (mw-e03.18)', () => {
       .filter(({ spawn }) => spawn.lightSource !== undefined)
       .map(({ entity }) => entity);
     expect(made.lights).toEqual([torch, hearth]);
-    expect(readProperty(world, torch as number, 'burning')).toBe(false);
-    expect(world.get(torch as number, LightSourceComponent)?.infiniteFuel).toBe(false);
-    expect(readProperty(world, hearth as number, 'burning')).toBe(true);
-    expect(world.get(hearth as number, LightSourceComponent)?.infiniteFuel).toBe(true);
-    expect(world.get(hearth as number, InteractableComponent)?.affordances[0]?.verb).toBe(
-      'extinguish',
-    );
+    expect(readProperty(world, torch!, 'burning')).toBe(false);
+    expect(world.get(torch!, LightSourceComponent)?.infiniteFuel).toBe(false);
+    expect(readProperty(world, hearth!, 'burning')).toBe(true);
+    expect(world.get(hearth!, LightSourceComponent)?.infiniteFuel).toBe(true);
+    expect(world.get(hearth!, InteractableComponent)?.affordances[0]?.verb).toBe('extinguish');
   });
 
   it('makes impact switch spawns from their prefab with the scene overrides (mw-e03.20)', () => {

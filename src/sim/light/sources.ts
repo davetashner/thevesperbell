@@ -42,15 +42,10 @@ import {
   setProperty,
   WorldProperties,
 } from '../properties/components';
-import {
-  placeEntity,
-  PlacementComponent,
-  placementOf,
-  type Placement,
-} from '../stimulus/placement';
+import { placeEntity, PlacementComponent, placementOf } from '../stimulus/placement';
 import { shapeFalloff, type Vec3 } from '../stimulus/shapes';
 import { stimulusResolved } from '../stimulus/stimulus';
-import { LightSourceComponent, type LightSourceData } from './components';
+import { LightSourceComponent } from './components';
 
 /** The light source prefabs. */
 export const LIGHT_SOURCE_VARIANTS = [
@@ -262,7 +257,8 @@ export function spawnLightSource(
 /** The moves a light source makes every tick: it follows its carrier and tops up infinite fuel. */
 export function updateLightSources(world: World<never>): void {
   for (const entity of [...world.query(LightSourceComponent).ids()]) {
-    const source = world.get(entity, LightSourceComponent) as LightSourceData;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const source = world.get(entity, LightSourceComponent)!;
     if (source.infiniteFuel && readProperty(world, entity, 'burning')) {
       assignProperty(world, entity, 'fuel', FULL_FUEL);
     }
@@ -270,7 +266,8 @@ export function updateLightSources(world: World<never>): void {
     const at = world.get(source.carrier, PlacementComponent);
     if (at === undefined) continue;
     const { offset } = source;
-    const own = world.get(entity, PlacementComponent) as Placement;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const own = world.get(entity, PlacementComponent)!;
     placeEntity(
       world,
       entity,
@@ -365,7 +362,8 @@ export function installLightSources<TInput>(world: World<TInput>): () => void {
     world.events.on(interacted, ({ actor, target, verb }) => {
       if (verb !== 'extinguish' || !isSource(target) || !readProperty(w, target, 'burning')) return;
       putOut(w, target, 'snuff', actor);
-      const at = placementOf(w, target) as Placement;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const at = placementOf(w, target)!;
       world.events.emit(noiseEmitted, {
         tick: w.tick,
         position: { x: at.x, y: at.y, z: at.z },

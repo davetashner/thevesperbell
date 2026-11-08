@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, it } from 'vitest';
 import { initialCharacterState } from '../character/controller';
 import { CharacterController } from '../character/system';
@@ -42,7 +43,6 @@ import {
   installLightSources,
   spawnLightSource,
   type LightChange,
-  type LightSourceVariant,
 } from './sources';
 
 const PRESETS = new Map<string, WorldPropertyInit>([
@@ -117,7 +117,7 @@ describe('light sources (mw-e03.16)', () => {
     const entities = LIGHT_SOURCE_VARIANTS.map((v, i) => spawnLightSource(world, v, at(i - 3, 0)));
     run(world, 2);
     for (const [i, entity] of entities.entries()) {
-      const variant = LIGHT_SOURCE_VARIANTS[i] as LightSourceVariant;
+      const variant = LIGHT_SOURCE_VARIANTS[i]!;
       expect(readProperty(world, entity, 'flammable')).toBe(true);
       expect(readProperty(world, entity, 'extinguishable')).toBe(true);
       expect(readProperty(world, entity, 'windResistance')).toBe(
@@ -148,7 +148,7 @@ describe('light sources (mw-e03.16)', () => {
     run(world, 2);
     for (const [i, entity] of all.entries()) {
       expect(burning(world, entity)).toBe(false);
-      expect(field.levelAt(at(i - 3))).toBeLessThan(before[i] as number);
+      expect(field.levelAt(at(i - 3))).toBeLessThan(before[i]!);
     }
     expect(changes.filter((c) => !c.lit && c.cause === 'water')).toHaveLength(6);
   });
@@ -164,7 +164,13 @@ describe('light sources (mw-e03.16)', () => {
     expect(burning(world, candle)).toBe(false);
     expect(burning(world, brazier)).toBe(true);
     expect(changes).toEqual([
-      { tick: expect.any(Number), entity: candle, lit: false, cause: 'force', source: attacker },
+      {
+        tick: expect.any(Number) as number,
+        entity: candle,
+        lit: false,
+        cause: 'force',
+        source: attacker,
+      },
     ]);
     // Its heat was carried off with the flame: it stays out for seconds, not a tick.
     run(world, hz * 3);
@@ -253,7 +259,13 @@ describe('light sources (mw-e03.16)', () => {
     expect(burning(world, torch)).toBe(true);
     expect(field.levelAt(at(0))).toBeGreaterThan(0);
     expect(changes).toEqual([
-      { tick: expect.any(Number), entity: torch, lit: true, cause: 'heat', source: arsonist },
+      {
+        tick: expect.any(Number) as number,
+        entity: torch,
+        lit: true,
+        cause: 'heat',
+        source: arsonist,
+      },
     ]);
   });
 
@@ -265,7 +277,13 @@ describe('light sources (mw-e03.16)', () => {
     run(world, 2);
     expect(burning(world, torch)).toBe(true);
     expect(changes).toEqual([
-      { tick: expect.any(Number), entity: torch, lit: true, cause: 'heat', source: arsonist },
+      {
+        tick: expect.any(Number) as number,
+        entity: torch,
+        lit: true,
+        cause: 'heat',
+        source: arsonist,
+      },
     ]);
   });
 
@@ -312,7 +330,13 @@ describe('light sources (mw-e03.16)', () => {
     expect(readProperty(world, torch, 'fuel')).toBe(0);
     expect(world.isAlive(straw)).toBe(false);
     expect(changes.filter((c) => c.entity === torch)).toEqual([
-      { tick: expect.any(Number), entity: torch, lit: false, cause: 'fuel', source: null },
+      {
+        tick: expect.any(Number) as number,
+        entity: torch,
+        lit: false,
+        cause: 'fuel',
+        source: null,
+      },
     ]);
   });
 
@@ -434,9 +458,15 @@ describe('smothering by hand (mw-e03.16)', () => {
     expect(burning(w, torch)).toBe(false);
     expect(noises).toHaveLength(1);
     expect(noises[0]).toMatchObject({ kind: 'snuff', entity: torch, source: actor });
-    expect(normalizedLoudness((noises[0] as NoiseEvent).loudness)).toBeLessThanOrEqual(0.05);
+    expect(normalizedLoudness(noises[0]!.loudness)).toBeLessThanOrEqual(0.05);
     expect(changes).toEqual([
-      { tick: expect.any(Number), entity: torch, lit: false, cause: 'snuff', source: actor },
+      {
+        tick: expect.any(Number) as number,
+        entity: torch,
+        lit: false,
+        cause: 'snuff',
+        source: actor,
+      },
     ]);
     // Out already: the prompt says so, and a stray interaction does nothing more.
     world.step([IDLE]);
