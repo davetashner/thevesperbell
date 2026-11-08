@@ -88,6 +88,16 @@ import {
 import { closedBox, contactOpenness, leafBox, leafCentre, type Obstacle } from './geometry';
 import type { Keyring } from './keys';
 
+/** How much faster than by hand a kicked door swings open (mw-e04.18). */
+export const SLAM_SPEED = 4;
+
+/** `door` without its slam (the key is absent, not undefined, so snapshots match ordinary doors). */
+function unslammed(door: Door): Door {
+  const plain: { -readonly [K in keyof Door]: Door[K] } = { ...door };
+  delete plain.slam;
+  return plain;
+}
+
 /** Noise of a switch moving, dB 1 m away. */
 export const SWITCH_LOUDNESS = 45;
 
@@ -369,8 +379,29 @@ export function moveDoor(
   const lock = lockOf(world, entity);
   if (lock?.locked === true) return refuse(world, entity, lock, 'locked', source);
   if (stuck(world, entity, door)) return jam(world, entity, source);
-  writeDoor(world, entity, door, { ...door, target, blockedBy: null }, source);
+  writeDoor(world, entity, door, { ...unslammed(door), target, blockedBy: null }, source);
   refreshAffordances(world, entity);
+  return true;
+}
+
+/**
+ * Slams `entity`'s closed door open (a kick, mw-e04.18): it opens like `moveDoor` but swings `speed`
+ * times as fast until it is open or stops against something, and what it hits while slamming is
+ * reported as `doorBlocked` with `slammedBy`. Returns whether it set off: a locked, stuck, broken or
+ * already moving door does not (a locked one reports `lockRefused`, a stuck one `mechanismJammed`).
+ */
+export function slamDoor(
+  world: World<never>,
+  entity: EntityId,
+  source: EntityId | null = null,
+  speed = SLAM_SPEED,
+): boolean {
+  const door = world.get(entity, DoorComponent);
+  if (door === undefined || doorState(door) !== 'closed' || !moveDoor(world, entity, 1, source)) {
+    return false;
+  }
+  const moving = known(world.get(entity, DoorComponent)); // moveDoor just wrote it
+  world.set(entity, DoorComponent, { ...moving, slam: { speed, source } });
   return true;
 }
 
@@ -686,7 +717,7 @@ function obstacles(world: World<never>, self: EntityId): InTheWay[] {
 function stepDoor(world: World<never>, entity: EntityId, door: Door): void {
   if (door.broken || door.openness === door.target) return;
   if (frozen(world, entity)) return; // frozen mid-motion: it waits for the thaw
-  const step = 1 / (door.seconds * world.clock.hz);
+  const step = (door.slam?.speed ?? 1) / (door.seconds * world.clock.hz);
   const from = door.openness;
   const to = door.target === 1 ? Math.min(1, from + step) : Math.max(0, from - step);
   let stop = to;
@@ -701,7 +732,9 @@ function stepDoor(world: World<never>, entity: EntityId, door: Door): void {
     }
   }
   const blockedBy = by?.entity ?? null;
-  const after: Door = { ...door, openness: stop, blockedBy };
+  // A slam is over once the door is open or has met something.
+  const spent = blockedBy !== null || stop === door.target;
+  const after: Door = { ...(spent ? unslammed(door) : door), openness: stop, blockedBy };
   writeDoor(world, entity, door, after, null);
   if (by === undefined || blockedBy === door.blockedBy) return;
   const crushed = door.target === 0 && door.crush > 0 && world.isRegistered(StimulusQueueComponent);
@@ -721,6 +754,7 @@ function stepDoor(world: World<never>, entity: EntityId, door: Door): void {
     openness: stop,
     crushed,
     position: { x: by.at.x, y: by.at.y, z: by.at.z },
+    ...(door.slam !== undefined && { slammedBy: door.slam.source }),
   });
 }
 

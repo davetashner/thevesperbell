@@ -39,6 +39,8 @@ export interface DoorBlocked {
   readonly crushed: boolean;
   /** The centre of what it met, metres. */
   readonly position: Vec3;
+  /** Present when it met it while being slammed open (a kick, mw-e04.18): who slammed it, or null. */
+  readonly slammedBy?: EntityId | null;
 }
 
 export const doorBlocked = defineEvent<DoorBlocked>('doorBlocked');

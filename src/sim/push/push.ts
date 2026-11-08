@@ -19,7 +19,8 @@
 // - Rotate: a rotatable object (`rotateStep` > 0) turns by that step each time rotate is used, and
 //   `rotationChanged` fires.
 //
-// Edge cases (as for carrying, mw-e17.14): a pusher who is staggered or knocked back lets go, leaving
+// Edge cases (as for carrying, mw-e17.14): a pusher who is staggered or knocked back lets go, so does
+// one who starts any move (a kick, mw-e04.18: it never kicks what it holds), leaving
 // the scene lets go, a save lets go of everything first (`settlePushes`; a grid glide completes), and
 // a pusher more than PUSH_REACH from the object loses it.
 
@@ -27,6 +28,7 @@ import type { CollisionWorld } from '../character/collision-world';
 import { PoiseBroken } from '../combat/damage/events';
 import { reactionRank } from '../combat/reactions/components';
 import { HitReaction } from '../combat/reactions/events';
+import { ActionStarted } from '../combat/timeline/events';
 import type { EntityId } from '../core/component';
 import type { System, World } from '../core/world';
 import { actionFrameOf } from '../input/action-frame';
@@ -479,6 +481,12 @@ export function installPush<TInput>(
   });
   w.events.on(HitReaction, ({ entity, reaction }) => {
     if (reactionRank(reaction) >= reactionRank('stagger')) staggered(entity);
+  });
+  // A grabber that starts a move (a kick, a swing, a roll) has its hands free for it: it lets go
+  // first, so it never kicks the thing it holds (mw-e04.18).
+  w.events.on(ActionStarted, ({ entity }) => {
+    const held = grabOf(w, entity);
+    if (held !== undefined) release(held, 'acted', false);
   });
   w.events.on(areaTransition, ({ entity }) => {
     const held = grabOf(w, entity);

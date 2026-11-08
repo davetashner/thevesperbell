@@ -80,10 +80,12 @@ import {
   installCombatSandbox,
   installEnvironmentDamage,
   installHitReactions,
+  installKick,
   installArrows,
   installHitStop,
   installMeleeStrikes,
   installParry,
+  CreatureComponent,
   KNIGHT_HEAVY_ATTACK,
   KNIGHT_KICK,
   KNIGHT_PARRY,
@@ -174,6 +176,8 @@ export interface TestbedCombat {
   readonly environment: Frozen<EnvironmentDamageTuning>;
   /** The player's shortbow and quiver (mw-e05.21), for setupTestbedPlayer. */
   readonly bow: TestbedBow;
+  /** Each creature's size class, by creature id (the kick knocks back small ones, mw-e04.18). */
+  readonly creatureSizes: ReadonlyMap<string, string>;
 }
 
 /** Compiles the knight's combat from `content` (see the file header, step 1). */
@@ -198,6 +202,7 @@ export function prepareTestbedCombat(content: GameContent): TestbedCombat {
       riposte: KNIGHT_RIPOSTE,
       bash: KNIGHT_SHIELD_BASH,
       bashFallback: KNIGHT_KICK,
+      kick: KNIGHT_KICK,
     },
     damage,
     hitStop: compileHitStop(content.get('hit-stop', HIT_STOP_ID)),
@@ -206,6 +211,7 @@ export function prepareTestbedCombat(content: GameContent): TestbedCombat {
     targetable,
     character: content.get('controller', PLAYER_CONTROLLER_ID),
     environment: content.get('environment-damage', DEFAULT_ENVIRONMENT_DAMAGE_ID),
+    creatureSizes: new Map(content.all('creature').map((c) => [c.id, c.stats.size])),
     bow: {
       bows: bowLookup(content.all('bow').map(compileBow)),
       arrows: arrowLookup(content.all('arrow')),
@@ -326,11 +332,22 @@ export function startTestbedCombat<TInput>(
   const pushers: Pusher[] = [];
   if (world.isRegistered(CharacterController)) pushers.push(pushCharacter);
   if (world.isRegistered(PhysicsObjectComponent)) pushers.push(pushPhysicsObject);
-  installHitReactions(world, {
+  const reactions = { moves: combat.moves, damage: combat.damage, pushers, facing: bodyFacing };
+  installHitReactions(world, reactions);
+  installKick(world, {
     moves: combat.moves,
+    tracks: combat.tracks,
     damage: combat.damage,
-    pushers,
-    facing: bodyFacing,
+    reactions,
+    move: KNIGHT_KICK,
+    sizeOf: (w, entity) => {
+      const creature = w.isRegistered(CreatureComponent)
+        ? w.get(entity, CreatureComponent)
+        : undefined;
+      return creature === undefined
+        ? undefined
+        : combat.creatureSizes.get(creature.origin.creature);
+    },
   });
   if (!world.isRegistered(ArrowComponent)) {
     installArrows(world, {

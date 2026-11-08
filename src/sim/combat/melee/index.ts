@@ -5,4 +5,5 @@ export * from './components';
 export * from './events';
 export * from './facing';
 export * from './guard';
+export * from './kick';
 export * from './strikes';

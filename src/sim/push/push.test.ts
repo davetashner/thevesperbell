@@ -7,6 +7,7 @@ import { FakeCollisionWorld } from '../character/fake-collision-world';
 import { CharacterController } from '../character/system';
 import { PoiseBroken } from '../combat/damage/events';
 import { HitReaction } from '../combat/reactions/events';
+import { ActionStarted } from '../combat/timeline/events';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
 import {
@@ -376,6 +377,20 @@ describe('grab and release (mw-e02.18)', () => {
     s.world.events.emit(HitReaction, { entity: s.actor, reaction: 'flinch' } as never);
     s.world.events.flush();
     expect(grabOf(s.sim, s.actor)?.target).toBe(target);
+  });
+
+  it('lets go when the pusher starts a move, so a kick never hits what it holds (mw-e04.18)', () => {
+    const s = setup();
+    const target = crate(s, 20);
+    grab(s, target);
+    // Someone else's move changes nothing.
+    s.world.events.emit(ActionStarted, { entity: s.world.spawn(), move: 'kick' } as never);
+    s.world.events.flush();
+    expect(grabOf(s.sim, s.actor)?.target).toBe(target);
+    s.world.events.emit(ActionStarted, { entity: s.actor, move: 'kick' } as never);
+    s.world.events.flush();
+    expect(grabOf(s.sim, s.actor)).toBeUndefined();
+    expect(s.released.at(-1)).toMatchObject({ actor: s.actor, target, reason: 'acted' });
   });
 
   it('a save lets go of everything and completes a grid glide', () => {

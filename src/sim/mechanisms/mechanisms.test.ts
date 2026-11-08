@@ -78,6 +78,8 @@ import {
   openDoor,
   refreshAffordances,
   setSwitch,
+  slamDoor,
+  SLAM_SPEED,
   switchPositions,
   syncSwitchNodes,
   unlockDoor,
@@ -993,5 +995,78 @@ describe('door colliders on Rapier', () => {
     expect(physics.count()).toBe(1);
     off();
     expect(doorState(doorOf(world, door(world)))).toBe('closed');
+  });
+});
+
+describe('slamming a door open (a kick, mw-e04.18)', () => {
+  it('swings the door open several times faster than by hand, then it is an ordinary door again', () => {
+    const { world, log } = setup();
+    const gate = door(world);
+    const slammer = world.spawn();
+    expect(slamDoor(world, gate, slammer)).toBe(true);
+    world.events.flush();
+    expect(doorOf(world, gate).slam).toEqual({ speed: SLAM_SPEED, source: slammer });
+    expect(log.states.map((e) => [e.from, e.to, e.source])).toEqual([
+      ['closed', 'opening', slammer],
+    ]);
+    expect(log.noises).toHaveLength(1);
+    steps(world, Math.ceil(60 / SLAM_SPEED) + 1);
+    expect(doorState(doorOf(world, gate))).toBe('open');
+    expect(doorOf(world, gate)).not.toHaveProperty('slam');
+    // The same swing by hand takes the full second.
+    const other = door(world);
+    openDoor(world, other);
+    steps(world, Math.ceil(60 / SLAM_SPEED) + 1);
+    expect(doorState(doorOf(world, other))).toBe('opening');
+  });
+
+  it('a slammed door that meets something stops against it and says who slammed it', () => {
+    const { world, log } = setup();
+    const gate = door(world);
+    const slammer = world.spawn();
+    body(world, { x: 0.2, y: 0.3, z: 0.5 });
+    slamDoor(world, gate, slammer);
+    steps(world, 30);
+    expect(log.blocked).toHaveLength(1);
+    expect(log.blocked[0]).toMatchObject({ entity: gate, crushed: false, slammedBy: slammer });
+    expect(doorState(doorOf(world, gate))).toBe('blocked');
+    expect(doorOf(world, gate)).not.toHaveProperty('slam');
+    // Opened by hand against the same body, it carries no slammer.
+    const { world: calm, log: quiet } = setup();
+    const hand = door(calm);
+    body(calm, { x: 0.2, y: 0.3, z: 0.5 });
+    openDoor(calm, hand);
+    steps(calm, 60);
+    expect(quiet.blocked[0]).not.toHaveProperty('slammedBy');
+  });
+
+  it('a slam can be unsourced, and closing the door drops it', () => {
+    const { world } = setup();
+    const gate = door(world);
+    expect(slamDoor(world, gate)).toBe(true);
+    expect(doorOf(world, gate).slam?.source).toBeNull();
+    steps(world, 3);
+    expect(closeDoor(world, gate)).toBe(true);
+    expect(doorOf(world, gate)).not.toHaveProperty('slam');
+  });
+
+  it('does nothing to a locked, jammed, broken or already open door, or to a thing that is no door', () => {
+    const { world, log } = setup();
+    const locked = door(world, WOODEN_DOOR, { lock: TOWER_LOCK });
+    const stuck = door(world, WOODEN_DOOR, { state: 'jammed' });
+    const open = door(world, WOODEN_DOOR, { state: 'open' });
+    expect(slamDoor(world, locked)).toBe(false);
+    world.events.flush();
+    expect(log.refused.map((e) => e.reason)).toEqual(['locked']);
+    expect(slamDoor(world, stuck)).toBe(false);
+    world.events.flush();
+    expect(log.jammed).toHaveLength(1);
+    expect(slamDoor(world, open)).toBe(false);
+    world.events.emit(fireBurntOut, { entity: locked, becomes: 'charred' });
+    world.step();
+    expect(slamDoor(world, locked)).toBe(false);
+    expect(slamDoor(world, world.spawn())).toBe(false);
+    for (const gate of [locked, stuck, open])
+      expect(doorOf(world, gate)).not.toHaveProperty('slam');
   });
 });
