@@ -211,6 +211,40 @@ describe('scene placement properties (mw-e03.22)', () => {
     expect(placementProperties(undefined)).toEqual({});
   });
 
+  it('mw-e03.49: a lit spawn tagged lantern is enclosed (flameRadius 0) unless it says otherwise', () => {
+    const physics = new RapierPhysics(RAPIER);
+    const world = registerWorldProperties(
+      registerSceneComponents(new World<never>({ seed: 5, physics })),
+    );
+    world.register(PlacementComponent);
+    installPhysicsObjects(world);
+    const lit = { flammable: true, burning: true };
+    const scene = {
+      ...TEST_SCENE,
+      spawns: [
+        { id: 'lamp', at: [0, 2.5, 0], yaw: 0, tags: ['lantern'], properties: lit },
+        {
+          id: 'open',
+          at: [1, 2.5, 0],
+          yaw: 0,
+          tags: ['lantern'],
+          properties: { ...lit, flameRadius: 0.3 },
+        },
+        { id: 'dark', at: [2, 2.5, 0], yaw: 0, tags: ['lantern'], properties: { flammable: true } },
+        { id: 'fire', at: [3, 0.5, 0], yaw: 0, tags: ['hearth'], properties: lit },
+      ],
+    } as unknown as SceneSpec;
+    const loaded = loadScene(world, scene, testKit, physics);
+    addScenePhysics(world, loaded, { props: () => undefined, materials: MATERIALS });
+    const entity = (i: number) => at(loaded.spawns, i).entity;
+    const [lamp, open, dark, fire] = [entity(0), entity(1), entity(2), entity(3)] as const;
+    expect(readProperty(world, lamp, 'flameRadius')).toBe(0);
+    expect(hasProperty(world, lamp, 'flameRadius')).toBe(true);
+    expect(readProperty(world, open, 'flameRadius')).toBe(0.3);
+    expect(hasProperty(world, dark, 'flameRadius')).toBe(false);
+    expect(hasProperty(world, fire, 'flameRadius')).toBe(false);
+  });
+
   it('mw-e17.14: a prop spawn with a recovery anchor gets it, in metres, and one without gets none', () => {
     const physics = new RapierPhysics(RAPIER);
     const world = registerWorldProperties(

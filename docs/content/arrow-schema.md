@@ -61,6 +61,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
 | `properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `properties.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
 | `properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |

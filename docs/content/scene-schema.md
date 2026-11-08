@@ -55,6 +55,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `placements[].properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `placements[].properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
 | `placements[].properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `placements[].properties.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
 | `placements[].properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `placements[].properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `placements[].properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
@@ -159,6 +160,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
 | `spawns[].properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
 | `spawns[].properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `spawns[].properties.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
 | `spawns[].properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
 | `spawns[].properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
 | `spawns[].properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
