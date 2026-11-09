@@ -99,6 +99,10 @@ export class RapierCollisionWorld implements CollisionWorld {
     return this.physics.velocityOf(body as ColliderHandle);
   }
 
+  isStatic(body: BodyId): boolean {
+    return this.physics.isFixed(body as ColliderHandle);
+  }
+
   private hit(
     collider: Rapier.Collider,
     distance: number,

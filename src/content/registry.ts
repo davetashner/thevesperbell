@@ -15,6 +15,7 @@
 
 import { checkAnimation } from './anim-checks.ts';
 import { checkCreatureAttacks } from './attack-checks.ts';
+import { checkWeapons } from './weapon-checks.ts';
 import { checkBehaviours } from './behaviour-checks.ts';
 import { checkCreatureAudio } from './creature-audio-checks.ts';
 import { checkConditions } from './condition-checks.ts';
@@ -51,6 +52,7 @@ import { factionSchema } from './types/faction.ts';
 import { gameSchema } from './types/game.ts';
 import { checkItems, itemSchema } from './types/item.ts';
 import { hitStopSchema } from './types/hit-stop.ts';
+import { reachClassSchema } from './types/reach-class.ts';
 import { kitSchema } from './types/kit.ts';
 import { lockSchema } from './types/lock.ts';
 import { lockOnSchema } from './types/lock-on.ts';
@@ -113,6 +115,7 @@ export const contentTypes = {
   move: moveSchema,
   navmesh: navmeshSchema,
   puzzle: puzzleSchema,
+  'reach-class': reachClassSchema,
   'respawn-rules': respawnRulesSchema,
   sandbox: sandboxSchema,
   scene: sceneSchema,
@@ -140,6 +143,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkCapabilities,
   checkPuzzles,
   checkCreatureAttacks,
+  checkWeapons,
   checkCreatureAudio,
   checkBehaviours,
   checkUnlocks,

@@ -155,6 +155,16 @@
         "weapon": {
           "type": "object",
           "properties": {
+            "reach": {
+              "type": "string",
+              "enum": [
+                "close",
+                "short",
+                "medium",
+                "long"
+              ],
+              "description": "Reach class of the weapon (mw-e04.15): metres and wall recoil come from the reach-class table. Bows and staves, which do not strike, still declare one."
+            },
             "moves": {
               "description": "Moves it adds to the wielder’s moveset; its heft lives there (mw-e04).",
               "type": "array",
@@ -165,6 +175,9 @@
               }
             }
           },
+          "required": [
+            "reach"
+          ],
           "additionalProperties": false,
           "description": "Weapon data."
         }

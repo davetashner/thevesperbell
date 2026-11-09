@@ -31,7 +31,15 @@
       }
     ]
   },
-  "proficiencies": ["blades", "maces", "shields", "light-armor", "medium-armor", "heavy-armor"],
+  "proficiencies": [
+    "blades",
+    "maces",
+    "polearms",
+    "shields",
+    "light-armor",
+    "medium-armor",
+    "heavy-armor"
+  ],
   "armorCapacityKg": 30,
   "carryLimitKg": 25,
   "stats": {

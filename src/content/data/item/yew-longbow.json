@@ -15,5 +15,7 @@
     "slot": "both-hands",
     "proficiencies": ["bows"]
   },
-  "weapon": {}
+  "weapon": {
+    "reach": "close"
+  }
 }

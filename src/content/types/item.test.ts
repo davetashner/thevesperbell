@@ -199,8 +199,13 @@ describe('item schema: weight (ADR-0003)', () => {
     expect(problems({ ...armor, armor: { weightKg: 0 } })).toHaveLength(1);
     expect(problems({ ...armor, armor: { weightKg: 21 } })).toHaveLength(1);
     expect(problems({ ...misc, weightKg: 1 })).toEqual([': Unrecognized key: "weightKg"']);
-    const weapon = { ...misc, category: 'weapon', equip: { slot: 'main-hand' }, weapon: {} };
-    expect(problems({ ...weapon, weapon: { weightKg: 2 } })).toEqual([
+    const weapon = {
+      ...misc,
+      category: 'weapon',
+      equip: { slot: 'main-hand' },
+      weapon: { reach: 'medium' },
+    };
+    expect(problems({ ...weapon, weapon: { reach: 'medium', weightKg: 2 } })).toEqual([
       'weapon: Unrecognized key: "weightKg"',
     ]);
   });

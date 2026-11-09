@@ -57,6 +57,13 @@ export interface CollisionWorld {
   /** Whether `capsule` with its feet at `feet` intersects any collider (e.g. room to stand up). */
   overlapCapsule(capsule: Capsule, feet: Vec3): boolean;
 
+  /**
+   * Whether `body` is level geometry that never moves (not a crate, a door or a moving platform).
+   * Optional: a world that cannot tell treats everything as static. Wall recoil (mw-e04.15) uses it
+   * so a swing that meets a crate clangs off nothing.
+   */
+  isStatic?(body: BodyId): boolean;
+
   /** Linear velocity of `body` this tick, m/s (zero for static colliders): moving-platform carry. */
   bodyVelocity(body: BodyId): Vec3;
 }

@@ -14,6 +14,7 @@
     "proficiencies": ["blades"]
   },
   "weapon": {
+    "reach": "medium",
     "moves": ["sword-light-1", "sword-light-2", "sword-light-3"]
   }
 }

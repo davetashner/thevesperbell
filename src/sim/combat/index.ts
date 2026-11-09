@@ -14,6 +14,7 @@ export * from './hitstop';
 export * from './invulnerability';
 export * from './melee';
 export * from './parry';
+export * from './recoil';
 export * from './reactions';
 export * from './sandbox';
 export * from './stamina';

@@ -1,0 +1,22 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "halberd",
+  "category": "weapon",
+  "name": "Halberd",
+  "description": "Axe blade, spear point and a hook for the unwary. Rules a hall; apologises to the corridor.",
+  "notes": "A two-handed halberd (mw-e04.15): long reach, a wide sweep that clangs off corridor walls and a vertical chop that does not. Not placed anywhere yet (weapon loot is e18); no model yet (art).",
+  "icon": "icon-item-halberd-01",
+  "value": 90,
+  "weightClass": "heavy",
+  "worldProperties": {
+    "material": "iron"
+  },
+  "equip": {
+    "slot": "both-hands",
+    "proficiencies": ["polearms"]
+  },
+  "weapon": {
+    "reach": "long",
+    "moves": ["halberd-sweep", "halberd-chop"]
+  }
+}

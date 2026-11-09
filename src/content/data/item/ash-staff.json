@@ -15,5 +15,7 @@
     "slot": "both-hands",
     "proficiencies": ["staves"]
   },
-  "weapon": {}
+  "weapon": {
+    "reach": "medium"
+  }
 }

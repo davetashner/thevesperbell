@@ -179,6 +179,7 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `equip.nonProficient.staminaCostMultiplier` | number 1–3 | `1.25` | Multiplier on the stamina its moves cost (combat reads it, mw-e04). 1 = no penalty; default 1.25. |
 | `equip.nonProficient.noiseMultiplier` | number 1–3 | `1` | Multiplier on the wearer’s noise, on top of the load class (clamped with it, ADR-0003). 1 = no penalty; default 1. |
 | `weapon` | object | required | Weapon data. |
+| `weapon.reach` | `"close"` \| `"short"` \| `"medium"` \| `"long"` | required | Reach class of the weapon (mw-e04.15): metres and wall recoil come from the reach-class table. Bows and staves, which do not strike, still declare one. |
 | `weapon.moves` | list of ref → move | — | Moves it adds to the wielder’s moveset; its heft lives there (mw-e04). |
 
 ## 2. An armor piece for the head, body, hands or feet.
