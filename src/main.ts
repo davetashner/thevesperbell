@@ -327,6 +327,7 @@ import {
   installDebugCommands,
   installGameClock,
   installPlayerDeath,
+  isFriendlyToPlayer,
   isPlayerDead,
   LineOfSight,
   LEDGE_HANG_CAPABILITY,
@@ -932,6 +933,8 @@ function startRenderer(
       now: () => performance.now(),
       ghostEnabled: () => settings.get('gameplay.lastKnownMarker'),
       ripplesEnabled: () => settings.get('gameplay.noiseRipples'),
+      // Shopkeepers and the Watch are friends: they greet, they do not hunt (mw-e09.5).
+      friendly: (entity) => isFriendlyToPlayer(world, creatures.spawn.factions, entity),
       reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
       listener: () =>
         player === undefined ? undefined : world.get(player.entity, PlacementComponent),

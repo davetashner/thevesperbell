@@ -69,7 +69,13 @@ function reading(over: Partial<AgentReading> = {}): AgentReading {
 
 function setup(
   agents: () => AgentReading[],
-  opts: { ghost?: boolean; ripples?: boolean; reduced?: boolean; at?: Vec3 | undefined } = {},
+  opts: {
+    ghost?: boolean;
+    ripples?: boolean;
+    reduced?: boolean;
+    at?: Vec3 | undefined;
+    friendly?: (entity: EntityId) => boolean;
+  } = {},
 ) {
   const world = new World<never>({ seed: 1 });
   let now = 10_000;
@@ -85,13 +91,14 @@ function setup(
     ripplesEnabled: () => opts.ripples === true,
     reducedMotion: () => opts.reduced === true,
     listener: () => opts.at,
+    ...(opts.friendly !== undefined && { friendly: opts.friendly }),
   });
-  const noise = (p: Vec3, loudness = 70): void => {
+  const noise = (p: Vec3, loudness = 70, kind = 'break'): void => {
     world.events.emit(noiseEmitted, {
       tick: 1,
       position: p,
       loudness,
-      kind: 'break',
+      kind,
       entity: null,
       source: null,
     } satisfies NoiseEvent);
@@ -203,6 +210,18 @@ describe('AwarenessFx', () => {
     expect(i?.y).toBeCloseTo(1.8 + INDICATOR_LIFT_M);
   });
 
+  it('mw-e09.5: a friend of the player shows no indicator and no ghost, a stranger still does', () => {
+    const agents = [
+      reading({ entity: 1, lkp: { x: 1, y: 0, z: 1 } }),
+      reading({ entity: 2, lkp: { x: 2, y: 0, z: 2 } }),
+    ];
+    const { fx } = setup(() => agents, { ghost: true, friendly: (e) => e === 1 });
+    fx.frame(CAMERA);
+    expect(fx.view.indicators.map((i) => i.entity)).toEqual([2]);
+    expect(fx.view.ghosts).toHaveLength(1);
+    expect(fx.view.ghosts[0]?.entity).toBe(2);
+  });
+
   it('pops in on a state change only, and resets after the creature stands down', () => {
     let state: AgentReading['state'] = 'suspicious';
     const { fx, advance } = setup(() => [reading({ state })]);
@@ -280,6 +299,34 @@ describe('AwarenessFx', () => {
     off();
     noise({ x: 3, y: 0, z: 4 });
     expect(fx.ripplesStarted).toBe(1);
+  });
+
+  it('mw-e09.5: footsteps ring only when heard at the player, and steady steps stay at the pulse ceiling', () => {
+    const at = { x: 0, y: 0, z: 0 };
+    const quiet = setup(() => [], { ripples: true, at });
+    quiet.fx.attach();
+    quiet.noise({ x: 0, y: 0, z: 0 }, 15, 'footstep'); // your own sneak
+    quiet.noise({ x: 5, y: 0, z: 0 }, 40, 'footstep'); // a guard's walk 5 m off: 26 dB
+    quiet.noise({ x: 5, y: 0, z: 0 }, 29, 'landing');
+    expect(quiet.fx.ripplesStarted).toBe(0);
+    quiet.noise({ x: 0, y: 0, z: 0 }, 55, 'footstep'); // your own run
+    expect(quiet.fx.ripplesStarted).toBe(1);
+    quiet.advance(1000);
+    quiet.noise({ x: 2, y: 0, z: 0 }, 40, 'footstep'); // a guard's walk 2 m off: 34 dB
+    expect(quiet.fx.ripplesStarted).toBe(2);
+    quiet.advance(1000);
+    quiet.noise({ x: 5, y: 0, z: 0 }, 40, 'break'); // other noises are untouched
+    expect(quiet.fx.ripplesStarted).toBe(3);
+
+    // Ten seconds of a walk, a step every 0.4 s, is about two rings a second, never a flood.
+    const walk = setup(() => [], { ripples: true, at });
+    walk.fx.attach();
+    for (let i = 0; i < 25; i++) {
+      walk.noise({ x: 0, y: 0, z: 0 }, 40, 'footstep');
+      walk.advance(400);
+    }
+    expect(walk.fx.ripplesStarted).toBeGreaterThanOrEqual(15);
+    expect(walk.fx.ripplesStarted).toBeLessThanOrEqual(21);
   });
 
   it('attaching twice listens once', () => {

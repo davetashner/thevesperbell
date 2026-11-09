@@ -355,8 +355,11 @@ describe('perception: hearing (mw-e11.5)', () => {
   // Through the doorway: two legs of √(25 + 1 + 64) m, −20·log10 of their sum; the wall loses 30 dB.
   const ROUTE_LOSS = -distanceGainDb(2 * Math.sqrt(90));
 
-  function hearingWorld(trace: PerceptionOptions['trace'] = {}) {
-    const s = setup({ trace });
+  function hearingWorld(
+    trace: PerceptionOptions['trace'] = {},
+    noticesMovement?: PerceptionOptions['noticesMovement'],
+  ) {
+    const s = setup({ trace, ...(noticesMovement !== undefined && { noticesMovement }) });
     installNoisePropagation(s.world, { graph: GRAPH });
     return s;
   }
@@ -393,6 +396,56 @@ describe('perception: hearing (mw-e11.5)', () => {
     expect(perceptsOf(reports, guard).map((p) => [p.source, p.certainty])).toEqual([
       ['sound:step', 1],
       ['sound:cough', 1],
+    ]);
+  });
+
+  it('mw-e09.5: it notices its target’s footsteps and landings, never another creature’s', () => {
+    const { world, reports, step } = hearingWorld();
+    const guard = addAgent(world, HUMANOID, LISTENER);
+    const colleague = addAgent(world, HUMANOID, { x: 6, y: 0, z: -4 });
+    const player = addPlayer(world, { x: 8, y: 0, z: -4 });
+    step(1);
+    const at = { x: 6, y: 0, z: -4 };
+    const walker = (who: EntityId | null, kind: string): void => {
+      emitNoise(world, { position: at, loudness: 60, kind, entity: who, source: who });
+    };
+    walker(colleague, 'footstep');
+    walker(colleague, 'landing');
+    walker(null, 'footstep');
+    walker(colleague, 'door');
+    walker(player, 'footstep');
+    walker(player, 'landing');
+    step();
+    expect(perceptsOf(reports, guard).map((p) => p.source)).toEqual([
+      'entity:' + String(colleague), // the door it slammed is still a sound
+      'entity:' + String(player),
+      'entity:' + String(player),
+    ]);
+  });
+
+  it('mw-e09.5: an agent that does not notice movement still hears every other noise', () => {
+    const quiet: PerceptionOptions['noticesMovement'] = (agent) => agent !== guards.friend;
+    const guards = { friend: -1 };
+    const { world, reports, step } = hearingWorld({}, quiet);
+    const friend = addAgent(world, HUMANOID, LISTENER);
+    const watcher = addAgent(world, HUMANOID, { x: 5, y: 0, z: -3 });
+    guards.friend = friend;
+    const player = addPlayer(world, { x: 8, y: 0, z: -4 });
+    step(1);
+    const at = { x: 6, y: 0, z: -4 };
+    emitNoise(world, {
+      position: at,
+      loudness: 60,
+      kind: 'footstep',
+      entity: player,
+      source: player,
+    });
+    emitNoise(world, { position: at, loudness: 60, kind: 'break' });
+    step();
+    expect(perceptsOf(reports, friend).map((p) => p.source)).toEqual(['sound:break']);
+    expect(perceptsOf(reports, watcher).map((p) => p.source)).toEqual([
+      'entity:' + String(player),
+      'sound:break',
     ]);
   });
 

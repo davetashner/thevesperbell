@@ -56,3 +56,22 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `noise.impact.refDb` | number 0–120 | required | Loudness, dB at 1 m, of a `refEnergy` impact on stone. |
 | `noise.impact.dbPerDecade` | number > 0 ≤ 40 | required | dB gained for ten times the energy. |
 | `noise.impact.maxDb` | number 0–120 | required | Loudest an impact gets, dB at 1 m. |
+| `noise.footsteps` | object | required | Footstep noise (mw-e09.5): loudness = gait dB + the surface’s offset + the wearer’s equipment dB (20·log10 of the noise multiplier, ADR-0003) + a creak when the board has one. |
+| `noise.footsteps.gaitDb` | object | required | Base loudness of one step by gait, before surface and equipment. |
+| `noise.footsteps.gaitDb.sneak` | number 0–120 | required | Crouched or slow-walking step, dB at 1 m on stone (25). |
+| `noise.footsteps.gaitDb.walk` | number 0–120 | required | Walking step, dB at 1 m on stone (40). |
+| `noise.footsteps.gaitDb.run` | number 0–120 | required | Running step, dB at 1 m on stone (55). |
+| `noise.footsteps.gaitDb.sprint` | number 0–120 | required | Sprinting step, dB at 1 m on stone (65). |
+| `noise.footsteps.creatureGait` | object | required | A creature has no controller: its gait is read from the speed it moves at (patrols walk, chases run). |
+| `noise.footsteps.creatureGait.walkFrom` | number 0–20 | required | Speed, m/s, at which a creature steps. |
+| `noise.footsteps.creatureGait.runFrom` | number 0–20 | required | Speed, m/s, a creature steps as a run. |
+| `noise.footsteps.creatureGait.sprintFrom` | number 0–30 | required | Speed, m/s, a creature steps as a sprint. |
+| `noise.footsteps.creatureGait.stride` | object | required | Ground distance between steps per gait (the player’s: 0.75, 1.6, 2.05). |
+| `noise.footsteps.creatureGait.stride.walk` | number > 0 ≤ 5 | required | Metres between a walking creature’s steps. |
+| `noise.footsteps.creatureGait.stride.run` | number > 0 ≤ 5 | required | Metres between a running creature’s steps. |
+| `noise.footsteps.creatureGait.stride.sprint` | number > 0 ≤ 5 | required | Metres between a sprinting creature’s steps. |
+| `noise.footsteps.landing` | object | required | Landing impulse by fall height (the height whose free fall reaches the speed). |
+| `noise.footsteps.landing.minHeight` | number 0–10 | required | Fall height, m, below which a landing is just a step: silent. |
+| `noise.footsteps.landing.curve` | list of object (at least 2) | required | Piecewise-linear loudness by fall height, flat beyond its ends. |
+| `noise.footsteps.landing.curve[].height` | number 0–100 | required | Fall height, m. |
+| `noise.footsteps.landing.curve[].db` | number 0–120 | required | Loudness, dB at 1 m on stone, of a landing from it. |

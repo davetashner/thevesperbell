@@ -388,13 +388,168 @@
           ],
           "additionalProperties": false,
           "description": "Impact noise (mw-e03.25): loudness = refDb + dbPerDecade·log10(energy / refEnergy) plus the louder of the two materials’ surface loudness offsets, capped at maxDb; below minEnergy, silence."
+        },
+        "footsteps": {
+          "type": "object",
+          "properties": {
+            "gaitDb": {
+              "type": "object",
+              "properties": {
+                "sneak": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 120,
+                  "description": "Crouched or slow-walking step, dB at 1 m on stone (25)."
+                },
+                "walk": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 120,
+                  "description": "Walking step, dB at 1 m on stone (40)."
+                },
+                "run": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 120,
+                  "description": "Running step, dB at 1 m on stone (55)."
+                },
+                "sprint": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 120,
+                  "description": "Sprinting step, dB at 1 m on stone (65)."
+                }
+              },
+              "required": [
+                "sneak",
+                "walk",
+                "run",
+                "sprint"
+              ],
+              "additionalProperties": false,
+              "description": "Base loudness of one step by gait, before surface and equipment."
+            },
+            "creatureGait": {
+              "type": "object",
+              "properties": {
+                "walkFrom": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 20,
+                  "description": "Speed, m/s, at which a creature steps."
+                },
+                "runFrom": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 20,
+                  "description": "Speed, m/s, a creature steps as a run."
+                },
+                "sprintFrom": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 30,
+                  "description": "Speed, m/s, a creature steps as a sprint."
+                },
+                "stride": {
+                  "type": "object",
+                  "properties": {
+                    "walk": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 5,
+                      "description": "Metres between a walking creature’s steps."
+                    },
+                    "run": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 5,
+                      "description": "Metres between a running creature’s steps."
+                    },
+                    "sprint": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 5,
+                      "description": "Metres between a sprinting creature’s steps."
+                    }
+                  },
+                  "required": [
+                    "walk",
+                    "run",
+                    "sprint"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Ground distance between steps per gait (the player’s: 0.75, 1.6, 2.05)."
+                }
+              },
+              "required": [
+                "walkFrom",
+                "runFrom",
+                "sprintFrom",
+                "stride"
+              ],
+              "additionalProperties": false,
+              "description": "A creature has no controller: its gait is read from the speed it moves at (patrols walk, chases run)."
+            },
+            "landing": {
+              "type": "object",
+              "properties": {
+                "minHeight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Fall height, m, below which a landing is just a step: silent."
+                },
+                "curve": {
+                  "minItems": 2,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "height": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "description": "Fall height, m."
+                      },
+                      "db": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 120,
+                        "description": "Loudness, dB at 1 m on stone, of a landing from it."
+                      }
+                    },
+                    "required": [
+                      "height",
+                      "db"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "description": "Piecewise-linear loudness by fall height, flat beyond its ends."
+                }
+              },
+              "required": [
+                "minHeight",
+                "curve"
+              ],
+              "additionalProperties": false,
+              "description": "Landing impulse by fall height (the height whose free fall reaches the speed)."
+            }
+          },
+          "required": [
+            "gaitDb",
+            "creatureGait",
+            "landing"
+          ],
+          "additionalProperties": false,
+          "description": "Footstep noise (mw-e09.5): loudness = gait dB + the surface’s offset + the wearer’s equipment dB (20·log10 of the noise multiplier, ADR-0003) + a creak when the board has one."
         }
       },
       "required": [
         "audibleFloor",
         "doors",
         "partitions",
-        "impact"
+        "impact",
+        "footsteps"
       ],
       "additionalProperties": false,
       "description": "Sound propagation (mw-e09.3): a noise loses 20·log10(d) dB over a path of d metres (none within 1 m) plus the gain of every door, wall and floor it passes."

@@ -50,6 +50,26 @@ export const DEFAULT_NOISE_TUNING: NoiseTuning = Object.freeze({
     ]),
   }),
   impact: Object.freeze({ minEnergy: 1, refEnergy: 10, refDb: 60, dbPerDecade: 10, maxDb: 100 }),
+  footsteps: Object.freeze({
+    gaitDb: Object.freeze({ sneak: 25, walk: 40, run: 55, sprint: 65 }),
+    creatureGait: Object.freeze({
+      walkFrom: 0.2,
+      runFrom: 2.5,
+      sprintFrom: 6,
+      stride: Object.freeze({ walk: 0.75, run: 1.6, sprint: 2.05 }),
+    }),
+    landing: Object.freeze({
+      minHeight: 0.5,
+      curve: Object.freeze([
+        Object.freeze({ height: 0.5, db: 30 }),
+        Object.freeze({ height: 1, db: 45 }),
+        Object.freeze({ height: 2, db: 60 }),
+        Object.freeze({ height: 3, db: 70 }),
+        Object.freeze({ height: 5, db: 82 }),
+        Object.freeze({ height: 10, db: 95 }),
+      ]),
+    }),
+  }),
 });
 
 /** The gain, dB (≤ 0), of `metres` of travel: −20·log10(metres), none within 1 m. */
