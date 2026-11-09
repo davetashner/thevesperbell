@@ -28,6 +28,8 @@
 //                                  boots, a bell charm) and every non-proficiency noise penalty,
 //                                  clamped to [0.5, 2.0]. CharacterEncumbrance (mw-e02.10) and noise
 //                                  propagation (mw-e09.5) read it.
+//   absorption, poiseBonus         the equipped armor pieces' flat absorption per damage type and added
+//                                  maximum poise, summed (mw-e04.16; combat/load.ts applies them).
 //   light                          the strongest light an equipped item emits (a lantern on the belt).
 //   capabilities                   what equipped items grant `while: equipped` (sorted). Granting
 //                                  them through the capability registry is mw-e17.9.
@@ -41,7 +43,7 @@
 // hash carry it like any component. The component is added once (`addEquipment`, at install), and
 // operations then replace its value immediately.
 
-import type { EquipSlot, ItemCategory } from '@content/index';
+import type { DamageTypeName, EquipSlot, ItemCategory } from '@content/index';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
@@ -147,7 +149,13 @@ export interface EquipmentItemDef {
         readonly nonProficient: ProficiencyPenalty;
       }
     | undefined;
-  readonly armor?: { readonly weightKg: number };
+  readonly armor?: {
+    readonly weightKg: number;
+    /** Flat points off each hit, per damage type (mw-e04.16). */
+    readonly absorption?: Readonly<Partial<Record<DamageTypeName, number>>> | undefined;
+    /** Added to the wearer's maximum poise (mw-e04.16). */
+    readonly poise?: number | undefined;
+  };
   readonly shield?: { readonly weightKg: number };
   readonly worldProperties?:
     | {
@@ -194,6 +202,10 @@ export interface EquipmentState {
   readonly loadClass: LoadClass;
   /** The load class's noise multiplier. */
   readonly loadNoiseMultiplier: number;
+  /** Flat absorption of the equipped armor pieces, per damage type (summed; mw-e04.16). */
+  readonly absorption: Readonly<Partial<Record<DamageTypeName, number>>>;
+  /** Poise the equipped armor pieces add to the wearer's maximum (summed; mw-e04.16). */
+  readonly poiseBonus: number;
   /** The actor's total equipment noise multiplier, clamped to the tuning's range. */
   readonly noiseModifier: number;
   /** The strongest light an equipped item emits; null when none does. */
@@ -401,6 +413,8 @@ export class EquipmentRules {
     const proficient = new Set(wearer.proficiencies);
     let armorKg = 0;
     let itemNoise = 1;
+    let poiseBonus = 0;
+    const absorption: Partial<Record<DamageTypeName, number>> = {};
     let light: LightEmitted | null = null;
     const capabilities = new Set<string>();
     const penalties: EquippedPenalty[] = [];
@@ -408,6 +422,13 @@ export class EquipmentRules {
       if (this.#instance(world, actor, ref.instanceId) === undefined) continue;
       const def = this.def(ref.defId);
       if (LOAD_SLOTS.has(slot)) armorKg += def.armor?.weightKg ?? def.shield?.weightKg ?? 0;
+      if (LOAD_SLOTS.has(slot) && def.armor !== undefined) {
+        poiseBonus += def.armor.poise ?? 0;
+        for (const [type, points] of Object.entries(def.armor.absorption ?? {})) {
+          const name = type as DamageTypeName;
+          absorption[name] = (absorption[name] ?? 0) + points;
+        }
+      }
       itemNoise *= def.worldProperties?.noiseMultiplier ?? 1;
       const emitter = def.worldProperties?.lightEmitter;
       if (emitter !== undefined && (light === null || emitter.intensity > light.intensity)) {
@@ -435,6 +456,8 @@ export class EquipmentRules {
       loadRatio,
       loadClass,
       loadNoiseMultiplier,
+      absorption,
+      poiseBonus,
       noiseModifier: Math.min(maxNoise, Math.max(minNoise, loadNoiseMultiplier * itemNoise)),
       light,
       capabilities: [...capabilities].sort(),

@@ -133,6 +133,11 @@ export type LocomotionEventKind =
       readonly burning: boolean;
       /** The movement profile's noise, 0–1: stance × gait × encumbrance (1 when none is read). */
       readonly profileNoise: number;
+      /**
+       * The walker's armor-load noise multiplier (ADR-0003: 1.0 / 1.3 / 1.6 / 1.8; 1 when it wears
+       * none), unclamped: the value stealth (mw-e09.5) scales this step's noise by.
+       */
+      readonly encumbrance: number;
       /** The surface's loudness offset, dB relative to stone (material, wet and frozen). */
       readonly surfaceDb: number;
       /** Normalised loudness: profileNoise × 10^(surfaceDb / 20). */
@@ -254,6 +259,8 @@ export interface LocomotionTick {
   readonly surface?: FootSurface | undefined;
   /** The movement profile's noise this tick, 0–1; undefined = 1. */
   readonly noise?: number | undefined;
+  /** The armor-load noise multiplier this tick; undefined = 1. */
+  readonly encumbrance?: number | undefined;
   /** Facing yaw this tick, radians, or undefined without one. */
   readonly yaw: number | undefined;
 }
@@ -329,6 +336,7 @@ export function stepLocomotion(
         frozen: surface?.frozen ?? false,
         burning: surface?.burning ?? false,
         profileNoise,
+        encumbrance: tick.encumbrance ?? 1,
         surfaceDb,
         loudness: footstepLoudness(profileNoise, surfaceDb),
       });
@@ -369,6 +377,8 @@ export interface LocomotionSystemOptions<TInput> {
   readonly surface?: (entity: EntityId) => FootSurface | undefined;
   /** `entity`'s movement profile noise this tick, 0–1; undefined = 1. */
   readonly noise?: (entity: EntityId) => number | undefined;
+  /** `entity`'s armor-load noise multiplier (its CharacterEncumbrance); undefined = 1. */
+  readonly encumbrance?: (entity: EntityId) => number | undefined;
 }
 
 /**
@@ -395,6 +405,7 @@ export function locomotionSystem<TInput>(options: LocomotionSystemOptions<TInput
             yaw: options.facing?.(entity),
             surface: options.surface?.(entity),
             noise: options.noise?.(entity),
+            encumbrance: options.encumbrance?.(entity),
           },
           context,
         );

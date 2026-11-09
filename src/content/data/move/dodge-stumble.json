@@ -1,0 +1,15 @@
+{
+  "$schema": "../move.schema.json",
+  "id": "dodge-stumble",
+  "notes": "What a dodge press does in an Overloaded armor load (mw-e04.16, ADR-0003): a 20-tick stumble on the spot, no i-frames, no travel, no stamina cost. Used for the backstep too.",
+  "verb": "dodge",
+  "frames": {
+    "startup": 20,
+    "active": 0,
+    "recovery": 0
+  },
+  "presentation": {
+    "anim": "anim-knight-dodge-roll",
+    "audioCue": "sfx-knight-dodge-roll-armor"
+  }
+}

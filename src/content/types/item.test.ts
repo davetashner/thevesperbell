@@ -205,6 +205,16 @@ describe('item schema: weight (ADR-0003)', () => {
     ]);
   });
 
+  it('AC-4: armor takes flat absorption per damage type and a poise bonus, both optional', () => {
+    const plate = { ...armor, armor: { weightKg: 12, absorption: { slash: 12 }, poise: 20 } };
+    expect(problems(plate)).toEqual([]);
+    expect(problems({ ...armor, armor: { weightKg: 4, absorption: { slash: 0 } } })).toHaveLength(
+      1,
+    );
+    expect(problems({ ...armor, armor: { weightKg: 4, absorption: { rust: 2 } } })).toHaveLength(1);
+    expect(problems({ ...armor, armor: { weightKg: 4, poise: -1 } })).toHaveLength(1);
+  });
+
   it('armor goes in an armor slot and sets no noise multiplier of its own', () => {
     expect(problems({ ...armor, equip: { slot: 'off-hand' } })).toHaveLength(1);
     expect(problems({ ...armor, worldProperties: { noiseMultiplier: 1.6 } })).toEqual([

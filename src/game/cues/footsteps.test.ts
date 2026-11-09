@@ -227,6 +227,7 @@ describe('surface-aware footsteps (mw-e28.6)', () => {
         frozen: false,
         burning: false,
         profileNoise: 0.3,
+        encumbrance: 1,
         surfaceDb: 0,
         loudness: 0.3,
       });
