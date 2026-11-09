@@ -1,0 +1,10 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-summon-swirl",
+  "slot": "summon",
+  "notes": "A ring pulse and a column of motes where a summoned thing arrives or leaves; its body dissolves over 1.2 s. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 1,
+  "effect": "vfx-spell-summon-swirl",
+  "dissolveSeconds": 1.2
+}

@@ -1,0 +1,90 @@
+{
+  "id": "vfx-spell-beam-end",
+  "notes": "Beam end: a pulsing flare and sparks where the beam lands. Part of the spell VFX template library (mw-e29.10): drawn in neutral light greys so a spell's tint recolours it (src/game/spell-vfx/tint.ts); built from the existing base textures, no new art.",
+  "priority": 50,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "flare",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 18,
+      "lifetime": {
+        "min": 0.15,
+        "max": 0.25
+      },
+      "coneDeg": 180,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.4
+        },
+        {
+          "t": 1,
+          "v": 0.15
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 1,
+          "color": "#B0B0B0"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0.8
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    },
+    {
+      "id": "sparks",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 26,
+      "lifetime": {
+        "min": 0.2,
+        "max": 0.45
+      },
+      "speed": {
+        "min": 0.8,
+        "max": 2.2
+      },
+      "coneDeg": 90,
+      "drag": 1.5,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.06
+        },
+        {
+          "t": 1,
+          "v": 0.01
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 0.3,
+          "color": "#D9D9D9"
+        },
+        {
+          "t": 1,
+          "color": "#9A9A9A"
+        }
+      ]
+    }
+  ]
+}

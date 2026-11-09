@@ -1,0 +1,9 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-sustain-aura",
+  "slot": "sustainOnTarget",
+  "notes": "Motes orbit up around the target while a status or channel holds. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 1,
+  "effect": "vfx-spell-sustain-motes"
+}

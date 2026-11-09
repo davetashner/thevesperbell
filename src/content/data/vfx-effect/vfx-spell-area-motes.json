@@ -1,0 +1,68 @@
+{
+  "id": "vfx-spell-area-motes",
+  "notes": "Area centre: motes rise from the ground across the whole radius (scaled by the radius when spawned). Part of the spell VFX template library (mw-e29.10): drawn in neutral light greys so a spell's tint recolours it (src/game/spell-vfx/tint.ts); built from the existing base textures, no new art.",
+  "priority": 40,
+  "duration": 1.5,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "motes",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 34,
+      "lifetime": {
+        "min": 1,
+        "max": 1.5
+      },
+      "speed": {
+        "min": 0.05,
+        "max": 0.25
+      },
+      "coneDeg": 25,
+      "spawnRadius": 0.9,
+      "gravity": -0.3,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.01
+        },
+        {
+          "t": 0.3,
+          "v": 0.05
+        },
+        {
+          "t": 1,
+          "v": 0.01
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 0.3,
+          "color": "#D9D9D9"
+        },
+        {
+          "t": 1,
+          "color": "#9A9A9A"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0
+        },
+        {
+          "t": 0.3,
+          "v": 0.9
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    }
+  ]
+}

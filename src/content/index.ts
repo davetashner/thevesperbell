@@ -714,6 +714,18 @@ export {
   type SpellStimulusElement,
 } from './types/spell.ts';
 export {
+  SPELL_VFX_MAX_PULSE_HZ,
+  SPELL_VFX_SLOTS,
+  spellVfxBlockSchema,
+  spellVfxTemplateSchema,
+  type SpellVfxBlock,
+  type SpellVfxBlockInput,
+  type SpellVfxSlot,
+  type SpellVfxTemplateDef,
+  type SpellVfxTemplateDefInput,
+} from './types/spell-vfx.ts';
+export { checkSpellVfx } from './spell-vfx-checks.ts';
+export {
   HEX_COLOUR_PATTERN,
   VFX_BLEND_MODES,
   VFX_QUALITY_TIERS,

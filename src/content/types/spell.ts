@@ -22,6 +22,7 @@ import type { Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
 import { canonicalPropertyKey, worldPropertiesSchema } from '../world-properties.ts';
 import { AUDIO_CUE_PATTERN, damageTemplateSchema, VFX_CUE_PATTERN } from './move.ts';
+import { spellVfxBlockSchema } from './spell-vfx.ts';
 
 /** Current SpellDefinition schema version; bump it (and add a migration) on breaking changes. */
 export const SPELL_SCHEMA_VERSION = 1;
@@ -531,6 +532,7 @@ export const spellSchema = z
       .prefault([])
       .describe('Free tags for queries and dispel rules, e.g. "fire", "control".'),
     vfxCue: cueSchema(VFX_CUE_PATTERN, 'vfx-spell-fire-ember', 'VFX cue id (style bible §15.1).'),
+    vfx: spellVfxBlockSchema.optional(),
     sfxCue: cueSchema(
       AUDIO_CUE_PATTERN,
       'sfx-spell-fire-ember-cast',
