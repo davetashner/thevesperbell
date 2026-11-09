@@ -245,6 +245,12 @@ export interface AwarenessFxOptions {
   readonly agents?: (into: AgentReading[]) => AgentReading[];
   readonly ghostEnabled?: () => boolean;
   readonly ripplesEnabled?: () => boolean;
+  /**
+   * Whether a creature is a friend of the player (a shopkeeper, the Watch): friends show no indicator
+   * and no ghost, so a villager greeting you never flashes a disc over its head (mw-e09.5). Without
+   * it every creature shows.
+   */
+  readonly friendly?: (entity: EntityId) => boolean;
   readonly reducedMotion?: () => boolean;
   /** The player's position, to keep far noises off the ground; omitted = every noise counts. */
   readonly listener?: () => Vec3 | undefined;
@@ -348,7 +354,7 @@ export class AwarenessFx {
     const seen = new Set<EntityId>();
     const ghostOn = this.#o.ghostEnabled?.() === true;
     for (const agent of read(this.#readings)) {
-      if (!showsIndicator(agent.state)) continue;
+      if (!showsIndicator(agent.state) || this.#o.friendly?.(agent.entity) === true) continue;
       seen.add(agent.entity);
       let shown = this.#shown.get(agent.entity);
       if (shown?.state !== agent.state) {

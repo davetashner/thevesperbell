@@ -44,6 +44,7 @@ import {
   installAi,
   installAwareness,
   installFootstepNoise,
+  isFriendlyToPlayer,
   installNoisePropagation,
   LineOfSight,
   NavMesh,
@@ -62,6 +63,7 @@ import {
   type AttackLookup,
   type BehaviourTable,
   type EntityId,
+  type FactionTable,
   type LightField,
   type LoadedScene,
   type NavmeshNavigation,
@@ -200,6 +202,11 @@ export interface CreatureAiOptions {
   readonly sight: SightWorld;
   /** How AI travels (`SceneNavigation`). */
   readonly navigation: AiNavigation;
+  /**
+   * The factions: creatures that are friends of the player (shopkeepers, the Watch) do not notice
+   * its footsteps (mw-e09.5). Without it every creature does.
+   */
+  readonly factions?: FactionTable;
 }
 
 /** Installed creature senses and AI. */
@@ -218,12 +225,15 @@ export function installCreatureAi<TInput>(
   options: CreatureAiOptions,
 ): CreatureAi {
   const w: World<never> = world;
-  const { content, player } = options;
+  const { content, player, factions } = options;
   const perception = perceptionSystem<unknown>(w, {
     lineOfSight: new LineOfSight({ world: options.sight }),
     light: options.light,
     visibility: content.get('stealth', STEALTH_ID).visibility,
     ...(player !== undefined && { targets: () => [player] }),
+    ...(factions !== undefined && {
+      noticesMovement: (agent: EntityId) => !isFriendlyToPlayer(w, factions, agent),
+    }),
   });
   world.addSystem(perception);
   installAwareness(w, {

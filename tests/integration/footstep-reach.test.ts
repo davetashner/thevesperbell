@@ -3,7 +3,7 @@
 // 72 directions: open air must match 20·log10 falloff to the creature's threshold exactly, and the
 // slice's walls must cut it. The shipped numbers (starting knight in Medium armour, stone): the
 // undead (45 dB) never hear a sneak or a walk, hear a run within 4 m and a sprint within 13 m;
-// townsfolk and watchmen (30 dB) hear a walk within 4 m, a run within 23 m and a sprint to 25 m.
+// townsfolk and watchmen (30 dB) would hear a walk within 4 m, a run within 23 m and a sprint to 25 m (friends of the player ignore it: see footstep-stealth.test.ts).
 import { loadGameContent } from '@content/game-content';
 import { compileCreatures, materialPresets, STEALTH_ID } from '@content/index';
 import { startMechanisms } from '@game/mechanisms/index';

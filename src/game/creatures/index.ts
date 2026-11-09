@@ -121,7 +121,13 @@ export function startCreatures<TInput>(
   // Once per world: nothing else installs the creature attack executor or factions yet.
   installFactions(registerCreatureComponents(w).register(...ATTACK_COMPONENTS));
   // Senses and AI before the attack executor (a think's attack starts that tick) and the spawns.
-  const installed = ai === undefined ? undefined : installCreatureAi(world, creatures.attacks, ai);
+  const installed =
+    ai === undefined
+      ? undefined
+      : installCreatureAi(world, creatures.attacks, {
+          ...ai,
+          factions: creatures.spawn.factions,
+        });
   // Allies in a fight hear where each other's target is (mw-e11.13).
   if (installed !== undefined) installTargetSharing(w, { factions: creatures.spawn.factions });
   installAttacks(world, {

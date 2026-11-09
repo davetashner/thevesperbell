@@ -106,7 +106,12 @@ landing = curve(fallHeight) + surfaceDb + equipmentDb                   (silent 
   read, a creature's feet use the scene's tagged surface regions, else stone. The state is a `noise.stride`
   component per creature.
 - **Who notices.** Perception drops a footstep or landing whose source is not one of its targets, so a
-  patrol never turns suspicious of its own colleagues. The noise ripple assist (`gameplay.noiseRipples`)
+  patrol never turns suspicious of its own colleagues, and the game's `noticesMovement` rule drops the
+  player's footsteps for creatures that are friends of the player (stance `ally` or `friendly`: the
+  townsfolk and the Bridge Watch today). They still hear a crash, a break or a shout like anyone, and
+  hear footsteps again as soon as their regard turns (the stance machinery moves it: a theft they
+  witness, a faction-wide change). Awareness indicators and last-known-position ghosts are likewise not
+  drawn over friends, so a villager greeting you never flashes a disc. The noise ripple assist (`gameplay.noiseRipples`)
   draws a footstep or landing only when it would be heard (30 dB) where the player stands: your own sneak
   and a far guard's walk stay quiet, a run rings, still at two rings a second at most.
 
@@ -114,7 +119,7 @@ How far it carries (starting knight in Medium armour, stone, open air; `tests/in
 
 | Hearing | Sneak (27 dB) | Walk (42 dB) | Run (57 dB) | Sprint (67 dB) |
 |---|---|---|---|---|
-| Humanoid, 30 dB / 25 m (townsfolk, watch, guards) | not heard | 4 m | 23 m | 25 m |
+| Humanoid, 30 dB / 25 m (carries to hostile or neutral humanoids; friends ignore it) | not heard | 4 m | 23 m | 25 m |
 | Undead, 45 dB / 20 m (the Forgotten) | not heard | not heard | 4 m | 13 m |
 
 The player's ordinary movement is a run, so a skeleton hears you at 4 m and a person at 23 m; creeping

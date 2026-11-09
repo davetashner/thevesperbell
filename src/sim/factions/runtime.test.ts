@@ -12,11 +12,13 @@ import {
   factionStance,
   FactionStancesComponent,
   improveFactionStance,
+  isFriendlyToPlayer,
   installFactions,
   joinFaction,
   membershipFromCreature,
   relation,
   setFactionStance,
+  stanceTowardPlayer,
   WITNESSED_KILL,
   worsenFactionStance,
   type FactionRelationChange,
@@ -87,6 +89,36 @@ function inStep(w: World<never>, fn: () => void): void {
   });
   w.step();
 }
+
+describe('stance toward the player (mw-e09.5)', () => {
+  it('is the creature’s own override, else its faction’s current stance, else unknown', () => {
+    const w = world();
+    const goblin = member(w, 'goblins');
+    const friend = member(w, 'goblins', { [PLAYER_FACTION]: 'friendly' });
+    const crate = w.spawn();
+    w.step();
+    expect(stanceTowardPlayer(w, table, goblin)).toBe('wary');
+    expect(stanceTowardPlayer(w, table, friend)).toBe('friendly');
+    expect(stanceTowardPlayer(w, table, crate)).toBeUndefined();
+    setFactionStance(w, table, 'goblins', PLAYER_FACTION, 'ally', 'test');
+    expect(stanceTowardPlayer(w, table, goblin)).toBe('ally');
+    expect(stanceTowardPlayer(w, table, friend)).toBe('friendly');
+  });
+
+  it('only allies and friends are friendly to the player', () => {
+    const w = world();
+    const ally = member(w, 'sheep', { [PLAYER_FACTION]: 'ally' });
+    const friend = member(w, 'sheep', { [PLAYER_FACTION]: 'friendly' });
+    const neutral = member(w, 'sheep');
+    const wary = member(w, 'goblins');
+    const hostile = member(w, 'spiders');
+    const crate = w.spawn();
+    w.step();
+    expect(
+      [ally, friend, neutral, wary, hostile, crate].map((e) => isFriendlyToPlayer(w, table, e)),
+    ).toEqual([true, true, false, false, false, false]);
+  });
+});
 
 describe('relation queries', () => {
   it('AC-1: members of a faction hostile to another are hostile to its members', () => {

@@ -35,7 +35,10 @@ import {
   installAi,
   installAwareness,
   installFactions,
+  emitNoise,
   installFootstepNoise,
+  isFriendlyToPlayer,
+  joinFaction,
   installNoisePropagation,
   LineOfSight,
   locomotionSystem,
@@ -50,6 +53,7 @@ import {
   surfaceAt,
   World,
   type CharacterInput,
+  type FactionTable,
   type NoiseEvent,
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
@@ -94,7 +98,16 @@ interface Passing {
   /** Use the shipped creatures and behaviours instead of the frozen fixtures'. */
   readonly shipped?: boolean;
   readonly z?: number;
+  /** Which way the creature faces along z: -1 (away from the player, the default) or 1. */
+  readonly facing?: number;
   readonly encumbrance?: number;
+  /** Called before every tick, to make a noise or change a stance. */
+  readonly each?: (
+    world: World<CharacterInput>,
+    tick: number,
+    table: FactionTable,
+    guard: number,
+  ) => void;
 }
 
 function pass(
@@ -105,6 +118,7 @@ function pass(
 ) {
   const source = who.shipped === true ? game : fixtures;
   const z = who.z ?? 6;
+  const table = buildFactionTable(source.all('faction').map(factionSpecFromDef));
   const world = installFactions(
     registerCreatureComponents(new World<CharacterInput>({ seed: 5, hz: HZ })),
   );
@@ -158,6 +172,7 @@ function pass(
       light: { levelAt: () => 1 },
       visibility: stealth.visibility,
       targets: () => [player],
+      noticesMovement: (agent) => !isFriendlyToPlayer(world, table, agent),
     }),
   );
   installAi(world, { behaviours: compileBehaviours(source.all('behaviour')) });
@@ -170,12 +185,12 @@ function pass(
     world,
     {
       creatures: compileCreatures(source.all('creature'), source),
-      factions: buildFactionTable(source.all('faction').map(factionSpecFromDef)),
+      factions: table,
     },
     {
       creature: who.creature ?? 'fixture-guard',
       at: { x: 0, y: 0, z: 0 },
-      facing: { x: 0, y: 0, z: -1 },
+      facing: { x: 0, y: 0, z: who.facing ?? -1 },
     },
   );
   if (!spawned.ok) throw new Error('the guard did not spawn');
@@ -193,9 +208,14 @@ function pass(
       suspiciousFrom = at === undefined ? -1 : Math.hypot(at.x, at.z);
     }
   });
-  for (let i = 0; i < seconds * HZ; i++) world.step();
+  for (let i = 0; i < seconds * HZ; i++) {
+    who.each?.(world, i, table, guard);
+    world.step();
+  }
   const brain = brainOf(world, guard);
   return {
+    world,
+    table,
     player,
     guard,
     state: brain?.state,
@@ -229,5 +249,45 @@ describe('footstep noise wakes a guard by how you move (mw-e09.5)', () => {
     expect(new Set(steps.map((n) => Math.round(n.loudness)))).toEqual(new Set([73]));
     expect(r.states[0]).toBe('unaware>suspicious');
     expect(r.suspiciousAt).toBeLessThanOrEqual(HZ);
+  });
+});
+
+describe('friends of the player ignore its footsteps (mw-e09.5)', () => {
+  const KNIGHT = 1.3;
+  for (const creature of ['npc-garrick', 'npc-watchman-day']) {
+    it(`${creature} never turns suspicious of a knight running or sprinting past`, ({ task }) => {
+      markExercised(task, 'creature', creature);
+      for (const how of [null, 'sprint'] as const) {
+        const r = pass('stone', how, 6, { creature, shipped: true, z: 3, encumbrance: KNIGHT });
+        expect(r.noises.filter((n) => n.entity === r.player).length).toBeGreaterThan(10);
+        expect(r.states).toEqual([]);
+        expect(r.state).toBe('unaware');
+      }
+    });
+  }
+
+  it('they still turn to a crash, and hear footsteps again once they stop being friends', () => {
+    const crash = (world: World<CharacterInput>, tick: number): void => {
+      if (tick === 30) {
+        emitNoise(world, { position: { x: 3, y: 0, z: 0 }, loudness: 80, kind: 'break' });
+      }
+    };
+    const heardCrash = pass('stone', 'crouch', 3, {
+      creature: 'npc-garrick',
+      shipped: true,
+      each: crash,
+    });
+    expect(heardCrash.states[0]).toBe('unaware>suspicious');
+
+    const turned = pass('stone', null, 4, {
+      creature: 'npc-garrick',
+      shipped: true,
+      z: 3,
+      each: (world, tick, table, guard) => {
+        // His own regard for the knight turns (a theft he saw), not the whole town's.
+        if (tick === 0) joinFaction(world, table, guard, 'townsfolk', { player: 'wary' });
+      },
+    });
+    expect(turned.states[0]).toBe('unaware>suspicious');
   });
 });

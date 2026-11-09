@@ -148,6 +148,12 @@ export interface PerceptionOptions {
   readonly anomalies?: (world: World<never>) => readonly AnomalySighting[];
   /** Occlusion volumes in the level right now (smoke, foliage); none by default. */
   readonly volumes?: (world: World<never>) => readonly OcclusionVolume[];
+  /**
+   * Whether `agent` pays attention to the footsteps and landings of `target` at all (default: it
+   * does). The game says no for creatures that are friends of the player (shopkeepers, the Watch),
+   * so running past them never makes them suspicious (mw-e09.5); other noises still reach them.
+   */
+  readonly noticesMovement?: (agent: EntityId, target: EntityId) => boolean;
   /** Controller tuning for targets without their own (`movementProfileOf`'s fallback). */
   readonly controller?: Frozen<ControllerTuning>;
   readonly trace?: PerceptionTrace;
@@ -221,15 +227,18 @@ export function perceptionSystem<TInput>(
     return w.isRegistered(CharacterController) ? w.query(CharacterController).ids() : EMPTY;
   };
 
-  const isTarget = (source: EntityId | null): boolean =>
+  const isTarget = (source: EntityId | null): source is EntityId =>
     source !== null && (options.targets?.(w) ?? defaultTargets()).includes(source);
 
   const unsubscribe = w.events.on(noiseHeard, (heard) => {
     const senses = w.get(heard.listener, CreatureSensesComponent);
     if (senses?.hearing === undefined) return;
-    // Creatures notice the footfalls of their targets (the player), never each other's: a patrol
-    // does not become suspicious of its own colleagues' steps (mw-e09.5).
-    if (isMovementNoise(heard.noise.kind) && !isTarget(heard.noise.source)) return;
+    // Creatures notice the footfalls of their targets (the player), never each other's, and only if
+    // they pay attention to them: a patrol is not suspicious of its colleagues' steps (mw-e09.5).
+    if (isMovementNoise(heard.noise.kind)) {
+      const { source } = heard.noise;
+      if (!isTarget(source) || options.noticesMovement?.(heard.listener, source) === false) return;
+    }
     // An agent hears only once perception has given it a listener, which comes with its bookkeeping.
     w.get(heard.listener, PerceptionAgentComponent)?.heard.push(heard);
   });

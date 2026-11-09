@@ -69,7 +69,13 @@ function reading(over: Partial<AgentReading> = {}): AgentReading {
 
 function setup(
   agents: () => AgentReading[],
-  opts: { ghost?: boolean; ripples?: boolean; reduced?: boolean; at?: Vec3 | undefined } = {},
+  opts: {
+    ghost?: boolean;
+    ripples?: boolean;
+    reduced?: boolean;
+    at?: Vec3 | undefined;
+    friendly?: (entity: EntityId) => boolean;
+  } = {},
 ) {
   const world = new World<never>({ seed: 1 });
   let now = 10_000;
@@ -85,6 +91,7 @@ function setup(
     ripplesEnabled: () => opts.ripples === true,
     reducedMotion: () => opts.reduced === true,
     listener: () => opts.at,
+    ...(opts.friendly !== undefined && { friendly: opts.friendly }),
   });
   const noise = (p: Vec3, loudness = 70, kind = 'break'): void => {
     world.events.emit(noiseEmitted, {
@@ -201,6 +208,18 @@ describe('AwarenessFx', () => {
     const [i] = fx.view.indicators;
     expect(i).toMatchObject({ entity: 1, state: 'suspicious', shape: 'disc', fill: 0.4 });
     expect(i?.y).toBeCloseTo(1.8 + INDICATOR_LIFT_M);
+  });
+
+  it('mw-e09.5: a friend of the player shows no indicator and no ghost, a stranger still does', () => {
+    const agents = [
+      reading({ entity: 1, lkp: { x: 1, y: 0, z: 1 } }),
+      reading({ entity: 2, lkp: { x: 2, y: 0, z: 2 } }),
+    ];
+    const { fx } = setup(() => agents, { ghost: true, friendly: (e) => e === 1 });
+    fx.frame(CAMERA);
+    expect(fx.view.indicators.map((i) => i.entity)).toEqual([2]);
+    expect(fx.view.ghosts).toHaveLength(1);
+    expect(fx.view.ghosts[0]?.entity).toBe(2);
   });
 
   it('pops in on a state change only, and resets after the creature stands down', () => {
