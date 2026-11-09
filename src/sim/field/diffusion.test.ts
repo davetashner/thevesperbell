@@ -191,3 +191,80 @@ describe('stepField diffusion', () => {
     expect(dump(b, 12, 'moisture')).toEqual(dump(a, 12, 'moisture'));
   });
 });
+
+describe('stepField kernel', () => {
+  /** The textbook form of one tick on a single sealed chunk: every face from its own definition. */
+  function reference(values: number[], rate: number, conductivity: number): number[] {
+    const delta = new Array<number>(512).fill(0);
+    const at = (x: number, y: number, z: number): number => x + 8 * (y + 8 * z);
+    for (let x = 0; x < 8; x++) {
+      for (let y = 0; y < 8; y++) {
+        for (let z = 0; z < 8; z++) {
+          for (const [dx, dy, dz] of [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+          ] as const) {
+            if (x + dx > 7 || y + dy > 7 || z + dz > 7) continue;
+            const i = at(x, y, z);
+            const j = at(x + dx, y + dy, z + dz);
+            const a = values[i] ?? 0;
+            const b = values[j] ?? 0;
+            const flux = Math.trunc(((a - b) * rate * conductivity) / (4096 * 256));
+            delta[i] = (delta[i] ?? 0) - flux;
+            delta[j] = (delta[j] ?? 0) + flux;
+          }
+        }
+      }
+    }
+    return values.map((v, i) => v + (delta[i] ?? 0));
+  }
+
+  it('matches the face-by-face definition on a sealed chunk, and conserves with a wall in it', () => {
+    for (const walled of [false, true]) {
+      // A sealed chunk (the cap walls it in), no loss, so one tick is only the interior kernel.
+      const field = new ElementField({
+        maxChunks: 1,
+        temperature: {
+          ambient: 0,
+          min: -10000,
+          max: 10000,
+          diffusion: 0.1,
+          decay: 0,
+          epsilon: 1000,
+        },
+      });
+      const cellAt = (i: number): CellCoord => c(i % 8, (i >> 3) % 8, i >> 6);
+      const read = (): number[] =>
+        Array.from({ length: 512 }, (_, i) =>
+          Math.round(field.read('temperature', cellAt(i)) * 65536),
+        );
+      for (let i = 0; i < 512; i++) {
+        // A lumpy, signed field with ties and sub-unit remainders.
+        field.set(
+          'temperature',
+          cellAt(i),
+          ((i * 7919) % 211) - 105 + (((i * 31) % 997) - 498) / 65536,
+        );
+      }
+      if (walled) field.setConductivity(cells(field, c(3, 3, 3), c(3, 3, 3)), 0);
+      const start = read();
+      stepField(field);
+      const after = read();
+      if (walled) expect(after.reduce((x, y) => x + y, 0)).toBe(start.reduce((x, y) => x + y, 0));
+      else expect(after).toEqual(reference(start, 410, 256));
+    }
+  });
+
+  it('steps more chunks than the spare delta buffers it keeps', () => {
+    // 2,100 chunks of two channels: 4,200 buffers in one tick, past the pool's limit of 4,096.
+    const field = new ElementField({ maxChunks: 2100 });
+    for (let i = 0; i < 2100; i++) {
+      field.add('temperature', c(i * 8, 0, 0), 100);
+      field.add('moisture', c(i * 8, 0, 0), 0.5);
+    }
+    const report = stepField(field);
+    expect(report.activeChunks).toBe(2100);
+    expect(stepField(field).activeChunks).toBe(2100); // and the next tick reuses what was kept
+  });
+});
