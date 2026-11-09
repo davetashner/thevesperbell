@@ -26,6 +26,7 @@ import {
   budgetsFor,
   evaluateAll,
   loadBudgets,
+  measures,
   type Measurement,
   type PerfMetric,
   type PerfMode,
@@ -115,11 +116,7 @@ export async function enforce(
     contentType: 'application/json',
   });
   // The budgets this test measured: same metric, and same scene when the budget names one.
-  const measured = budgets(mode).filter((b) =>
-    attachment.measurements.some(
-      (m) => m.metric === b.metric && (b.scene === undefined || m.scene === b.scene),
-    ),
-  );
+  const measured = budgets(mode).filter((b) => attachment.measurements.some((m) => measures(b, m)));
   const results = evaluateAll(measured, attachment.measurements);
   for (const result of results) {
     testInfo.annotations.push({
@@ -279,11 +276,19 @@ export interface FrameSample {
  */
 export async function sampleFrames(
   page: Page,
-  options: { scene: string; capS: number; minSamples: number; viewport: string },
+  options: {
+    scene: string;
+    capS: number;
+    minSamples: number;
+    viewport: string;
+    /** Quality preset to run at (`?quality=low` for Low). Omitted: High, the default. */
+    preset?: 'low' | 'high';
+  },
 ): Promise<FrameSample> {
-  const { scene, capS, minSamples } = options;
+  const { scene, capS, minSamples, preset } = options;
   await page.goto(
-    `/?scene=${scene}&perf=${String(capS)}&perfFrames=${String(SAMPLE_FRAMES)}&perfWarmup=${String(WARMUP_S)}`,
+    `/?scene=${scene}&perf=${String(capS)}&perfFrames=${String(SAMPLE_FRAMES)}&perfWarmup=${String(WARMUP_S)}` +
+      (preset === 'low' ? '&quality=low' : ''),
   );
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-scene', scene, { timeout: 60_000 });
@@ -302,6 +307,7 @@ export async function sampleFrames(
   return {
     run: {
       scene,
+      ...(preset === undefined ? {} : { preset }),
       frame: percentiles(probe.samples),
       work: probe.work,
       viewport: options.viewport,
@@ -312,10 +318,11 @@ export async function sampleFrames(
   };
 }
 
-/** The frame-time measurements of a sample (frameP50Ms, frameP95Ms) in its scene. */
+/** The frame-time measurements of a sample (frameP50Ms, frameP95Ms) in its scene and preset. */
 export function frameMeasurements({ run }: FrameSample): Measurement[] {
+  const preset = run.preset === undefined ? {} : { preset: run.preset };
   return [
-    { metric: 'frameP50Ms', value: run.frame.p50, scene: run.scene },
-    { metric: 'frameP95Ms', value: run.frame.p95, scene: run.scene },
+    { metric: 'frameP50Ms', value: run.frame.p50, scene: run.scene, ...preset },
+    { metric: 'frameP95Ms', value: run.frame.p95, scene: run.scene, ...preset },
   ];
 }
