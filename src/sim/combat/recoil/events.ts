@@ -24,7 +24,7 @@ export interface WallRecoilInfo {
 }
 
 /**
- * A horizontal swing of a medium or long weapon struck solid level geometry in the first half of its
+ * A horizontal swing of a weapon whose reach class the table lists for recoil (long today) struck solid level geometry in the first half of its
  * active window, before it struck any creature: the move ends now and the fighter cannot act for
  * `ticks`. Vertical swings, thrusts and short weapons never emit it.
  */

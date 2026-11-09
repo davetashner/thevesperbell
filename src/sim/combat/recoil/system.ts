@@ -3,7 +3,7 @@
 // level geometry. A hitbox recoils when all of these hold (the numbers are the `reach-class` table's):
 //
 // - its move is a horizontal swing (vertical swings and thrusts never recoil) of a reach class the
-//   table lists for recoil (medium and long: a dagger or mace never clangs);
+//   table lists for recoil (long today, medium once the owner decides, mw-d4n: a dagger or mace never clangs);
 // - it is still in the first half of its active window: active ticks 1 … ceil(active / 2);
 // - it has struck no creature, now or on an earlier tick. The hit-volume system runs first, so a
 //   creature struck on the very tick the blade meets the wall wins and the swing carries on; a

@@ -43,6 +43,7 @@ import {
   placeEntity,
   PlayerLook,
   teleportCommand,
+  actCommand,
   RapierCollisionWorld,
   RapierPhysics,
   recoilWindowTicks,
@@ -69,6 +70,14 @@ const content = loadGameContent();
 const MOVES = compileMoves(content.all('move'));
 const TRACKS = compileSocketTracks(content.all('socket-track'));
 const REACH = compileReachClasses(content.get('reach-class', REACH_CLASS_TABLE_ID));
+/** The shipped table with the medium class recoiling too: what turning the sword's clang on would do. */
+const WITH_MEDIUM: ReachTable = Object.freeze({
+  ...REACH,
+  wallRecoil: Object.freeze({
+    ticks: REACH.wallRecoil.ticks,
+    reaches: new Set([...REACH.wallRecoil.reaches, 'medium' as const]),
+  }),
+});
 
 /** A 2 m-wide corridor running along +z: walls 1 m either side of the knight, and a floor. */
 const FLOOR = box(v3(-5, -1, -5), v3(5, 0, 12));
@@ -181,7 +190,8 @@ describe('weapon reach (mw-e04.15)', () => {
   it('reach class metres are the table’s: short 1.2, medium 2.0, long 3.0', () => {
     expect(REACH.metres).toMatchObject({ short: 1.2, medium: 2.0, long: 3.0 });
     expect(REACH.wallRecoil).toMatchObject({ ticks: 30 });
-    expect([...REACH.wallRecoil.reaches]).toEqual(['medium', 'long']);
+    // Long only, pending the owner's decision on the sword (mw-d4n).
+    expect([...REACH.wallRecoil.reaches]).toEqual(['long']);
   });
 
   it('the mace is a fast short swing: 8/3/12 ticks', ({ task }) => {
@@ -234,14 +244,18 @@ describe('wall recoil (mw-e04.15)', () => {
     expect(s.ended.at(-1)).toMatchObject({ move: 'halberd-sweep', reason: 'completed' });
   });
 
-  it('a medium sword swing clangs off a corridor wall too, but a short mace swing does not', ({
+  it('the shipped sword does not clang off a corridor wall; with medium enabled in an injected table it does, and a short mace still does not', ({
     task,
   }) => {
     markExercised(task, 'move', 'sword-light-1');
-    const sword = setup();
+    const shipped = setup();
+    shipped.swing('sword-light-1');
+    expect(shipped.recoils).toEqual([]);
+    expect(shipped.ended.at(-1)).toMatchObject({ move: 'sword-light-1', reason: 'completed' });
+    const sword = setup({ reach: WITH_MEDIUM });
     sword.swing('sword-light-1');
     expect(sword.recoils.map((r) => r.move)).toEqual(['sword-light-1']);
-    const mace = setup();
+    const mace = setup({ reach: WITH_MEDIUM });
     mace.swing('mace-light');
     expect(mace.recoils).toEqual([]);
     expect(mace.ended.at(-1)).toMatchObject({ move: 'mace-light', reason: 'completed' });
@@ -526,26 +540,21 @@ describe('wall recoil in the game’s testbed (mw-e04.15)', () => {
     return { recoils, player, lock: world.get(player, ActionTimelineComponent)?.lockTicks };
   }
 
-  it('the knight’s own sword swing clangs off the back wall right in front of him, not in the open', ({
+  it('the knight’s own sword swing, shipped, does not clang off the wall right in front of him', ({
     task,
   }) => {
     markExercised(task, 'move', 'sword-light-1');
-    // Facing the back wall (its face is at z = -4.5) from 0.5 m away, then from the room's middle.
+    // Facing the back wall (its face is at z = -4.5) from 0.5 m away: the sword is medium reach.
     const wall = swingAt(v3(0, 0, -4), 0);
-    expect(wall.recoils).toHaveLength(1);
-    expect(wall.recoils[0]).toMatchObject({
-      entity: wall.player,
-      move: 'sword-light-1',
-      ticks: 30,
-    });
-    const open = swingAt(v3(0, 0, 1), 0);
-    expect(open.recoils).toEqual([]);
+    expect(wall.recoils).toEqual([]);
+    expect(wall.lock).toBe(0);
   });
 
-  it('the recoil corridor scene: the sword clangs off a side wall at its surface, the normal facing the knight', ({
+  it('the recoil corridor scene: the halberd sweep (debug `act halberd-sweep`) clangs off a side wall at its surface, the normal facing the knight', ({
     task,
   }) => {
     markExercised(task, 'scene', 'recoil-corridor');
+    markExercised(task, 'move', 'halberd-sweep');
     const { world } = createGameWorld<ActionFrame>(RAPIER, {
       seed: 1,
       hz: 60,
@@ -557,14 +566,33 @@ describe('wall recoil in the game’s testbed (mw-e04.15)', () => {
     const recoils: WallRecoilInfo[] = [];
     world.events.on(WallRecoil, (e) => recoils.push(e));
     for (let i = 0; i < 40; i++) world.step(sampler.sampleCommands(world.tick));
+    world.step([
+      ...sampler.sampleCommands(world.tick),
+      actCommand(player, 'halberd-sweep') as never,
+    ]);
+    for (let i = 0; i < 60; i++) world.step(sampler.sampleCommands(world.tick));
+    expect(recoils).toHaveLength(1);
+    const [recoil] = recoils;
+    expect(recoil).toMatchObject({ entity: player, move: 'halberd-sweep', ticks: 30 });
+    // The side walls' faces are at x = ±1.15; the normal points back into the corridor.
+    expect(Math.abs(recoil?.point.x ?? 0)).toBeCloseTo(1.15, 2);
+    expect(recoil?.normal.x).toBe(-Math.sign(recoil?.point.x ?? 0));
+  });
+
+  it('the sword in the recoil corridor, shipped, swings through without a recoil', () => {
+    const { world } = createGameWorld<ActionFrame>(RAPIER, {
+      seed: 1,
+      hz: 60,
+      scene: 'recoil-corridor',
+    });
+    const sampler = new ActionSampler();
+    const recoils: WallRecoilInfo[] = [];
+    world.events.on(WallRecoil, (e) => recoils.push(e));
+    for (let i = 0; i < 40; i++) world.step(sampler.sampleCommands(world.tick));
     sampler.down('Mouse0');
     world.step(sampler.sampleCommands(world.tick));
     sampler.up('Mouse0');
     for (let i = 0; i < 40; i++) world.step(sampler.sampleCommands(world.tick));
-    expect(recoils).toHaveLength(1);
-    const [recoil] = recoils;
-    // The side walls' faces are at x = ±1.15; the normal points back into the corridor.
-    expect(Math.abs(recoil?.point.x ?? 0)).toBeCloseTo(1.15, 2);
-    expect(recoil?.normal.x).toBe(-Math.sign(recoil?.point.x ?? 0));
+    expect(recoils).toEqual([]);
   });
 });

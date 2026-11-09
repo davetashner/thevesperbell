@@ -44,5 +44,6 @@ describeContent('reach-class', 'AC-5: the game table is the bead’s numbers', (
   expect(table.id).toBe(REACH_CLASS_TABLE_ID);
   expect(table.metres).toEqual({ close: 0.6, short: 1.2, medium: 2, long: 3 });
   expect(table.wallRecoil.ticks).toBe(30);
-  expect(table.wallRecoil.reaches).toEqual(['medium', 'long']);
+  // Long only for now: the sword's clang is the owner's call (mw-d4n).
+  expect(table.wallRecoil.reaches).toEqual(['long']);
 });

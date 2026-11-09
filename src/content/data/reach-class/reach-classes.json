@@ -1,7 +1,7 @@
 {
   "$schema": "../reach-class.schema.json",
   "id": "reach-classes",
-  "notes": "Weapon reach classes and the wall recoil rule (mw-e04.15). Short 1.2 m (dagger, mace), medium 2.0 m (sword), long 3.0 m (spear thrust, halberd sweep) are the bead's numbers; close 0.6 m is a placeholder for bites and shoves. A medium or long horizontal swing that meets a wall in the first half of its active window, before any creature, clangs off it and locks the fighter for 30 ticks (500 ms): a halberd rules a hall but is a liability in a corridor.",
+  "notes": "Weapon reach classes and the wall recoil rule (mw-e04.15). Short 1.2 m (dagger, mace), medium 2.0 m (sword), long 3.0 m (spear thrust, halberd sweep) are the bead's numbers; close 0.6 m is a placeholder for bites and shoves. A medium or long horizontal swing that meets a wall in the first half of its active window, before any creature, clangs off it and locks the fighter for 30 ticks (500 ms): a halberd rules a hall but is a liability in a corridor. Wall recoil is on for the long class only, pending the owner's decision (mw-d4n): with medium on, the knight's opening sword swing clangs off any corridor under 2.7 m wide and loses a swing at a creature straight ahead. Turning medium back on is one word in wallRecoil.reaches.",
   "metres": {
     "close": 0.6,
     "short": 1.2,
@@ -10,6 +10,6 @@
   },
   "wallRecoil": {
     "ticks": 30,
-    "reaches": ["medium", "long"]
+    "reaches": ["long"]
   }
 }
