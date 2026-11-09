@@ -17,6 +17,7 @@
 import type { ArrowDefinition } from '@content/index';
 import { MAX_MAGIC_PULSE_HZ } from '@render/magic-materials/rules';
 import {
+  arrowBroken,
   arrowImpact,
   type ArrowImpactInfo,
   type EntityId,
@@ -99,13 +100,13 @@ export function ropeLengthOf(def: Pick<ArrowFxDef, 'payload'>): number | undefin
   return undefined;
 }
 
-/** Does the arrow end up broken: it shattered, or it came to rest and cannot be picked up again? */
-export function arrowBreaks(
-  def: Pick<ArrowFxDef, 'retrievable'>,
-  outcome: ArrowImpactInfo['outcome'],
-): boolean {
-  if (outcome === 'shatter') return true;
-  return outcome !== 'ricochet' && !def.retrievable;
+/**
+ * Does the arrow end up broken: it shattered, or it came to rest and the sim's roll left it broken
+ * (`intact`, mw-e05.7: by what it landed in, fire, or a kind that cannot be picked up again)?
+ */
+export function arrowBreaks(impact: Pick<ArrowImpactInfo, 'outcome' | 'intact'>): boolean {
+  if (impact.outcome === 'shatter') return true;
+  return impact.intact === false;
 }
 
 /** How far a ring of a noise arrow reaches, metres: louder sounds carry further, up to 6 m. */
@@ -297,9 +298,18 @@ export class ArrowFx {
   /** Starts listening for arrow impacts; returns the function that stops. */
   attach(): () => void {
     this.#off?.();
-    this.#off = this.#o.world.events.on(arrowImpact, (impact) => {
+    const stopImpacts = this.#o.world.events.on(arrowImpact, (impact) => {
       this.#impact(impact);
     });
+    // An arrow that breaks after it came to rest (it burned) swaps to the broken shaft too.
+    const stopBreaks = this.#o.world.events.on(arrowBroken, ({ entity }) => {
+      this.#wobbling.delete(entity);
+      this.#breaking.add(entity);
+    });
+    this.#off = () => {
+      stopImpacts();
+      stopBreaks();
+    };
     return () => {
       this.#off?.();
       this.#off = undefined;
@@ -365,7 +375,7 @@ export class ArrowFx {
       room(this.#ropes, MAX_ROPES);
       this.#ropes.push({ x: p.x, y: p.y, z: p.z, length: rope, start: now });
     }
-    if (arrowBreaks(def, impact.outcome)) {
+    if (arrowBreaks(impact)) {
       if (impact.outcome === 'shatter') {
         if (onSurface) {
           room(this.#pieces, MAX_BROKEN);

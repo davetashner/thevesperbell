@@ -343,7 +343,9 @@ import {
   LineOfSight,
   LEDGE_HANG_CAPABILITY,
   levelDeltasOf,
+  arrowSpawner,
   persistDroppedItems,
+  persistRestingArrows,
   physicsBodiesOf,
   PhysicsObjectComponent,
   playerRespawned,
@@ -403,7 +405,7 @@ import { bindDebugCameraInput, DebugCamera } from '@tools/debug-camera/index';
 import { layer as tools } from '@tools/index';
 import { sceneAgitator } from '@tools/perf/agitator';
 import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
-import { ArrowDemo, parseArrowDemoParam } from '@tools/arrow-demo/index';
+import { ArrowDemo, parseArrowDemoLane, parseArrowDemoParam } from '@tools/arrow-demo/index';
 import {
   AWARENESS_DEMO_NOISE_MS,
   awarenessDemoAgents,
@@ -2493,7 +2495,12 @@ function startRenderer(
         vfxDemo = new VfxDemo(vfx, vfxMode, centre);
       }
       if (arrowDemoOrder !== undefined) {
-        arrowDemo = new ArrowDemo(world, combat.bow.arrows, arrowDemoOrder);
+        arrowDemo = new ArrowDemo(
+          world,
+          combat.bow.arrows,
+          arrowDemoOrder,
+          parseArrowDemoLane(location.search),
+        );
       }
       if (magicMode !== undefined) {
         magicDemo = new MagicDemo(
@@ -2531,7 +2538,7 @@ function startRenderer(
       levelDeltasOf(world).enter(
         world,
         new WorldPersistence({
-          spawners: [worldItemSpawner(worldItems)],
+          spawners: [worldItemSpawner(worldItems), arrowSpawner()],
           warn: (message) => {
             console.warn(message);
           },
@@ -2540,6 +2547,8 @@ function startRenderer(
         sceneAuthoredEntities(world, loaded),
       );
       persistDroppedItems(world, () => scene.id);
+      // Arrows that stick in the level stay with it (mw-e05.7).
+      persistRestingArrows(world, () => scene.id);
       // The scene's ways into other scenes (mw-e01.11); answered by `transitions` below.
       if (player !== undefined) installSceneTransitions(world, loaded.layout, player.entity);
       label.textContent = sceneLabel(scene, __BUILD_SHA__);

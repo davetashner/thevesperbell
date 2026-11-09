@@ -176,6 +176,7 @@ describe('arrows on screen (mw-e05.21)', () => {
       direction: { x: 1, y: 0, z: 0 },
       in: null,
       tick: 0,
+      intact: true,
     });
     const both = arrowReadout(world, () => true);
     expect(both).toMatchObject({ flying: 1, stuck: 1, dropped: 1 });
@@ -270,6 +271,7 @@ describe('stuck arrow wobble on screen (mw-e29.11)', () => {
       direction: { x: 0, y: 0, z: 1 },
       in: null,
       tick: 0,
+      intact: true,
     });
     const still = readWobbledArrowTransform(world, arrow, () => 0);
     expect(still).toEqual(readArrowTransform(world, arrow));

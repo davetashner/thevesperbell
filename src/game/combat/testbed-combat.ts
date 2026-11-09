@@ -57,6 +57,7 @@ import {
   type GameContent,
   type HitStopTable,
   type MoveTable,
+  materialPresets,
 } from '@content/index';
 import {
   ACTION_TIMELINE_COMPONENTS,
@@ -82,6 +83,7 @@ import {
   installHitReactions,
   installKick,
   installArrows,
+  installArrowRetrieval,
   installHitStop,
   installMeleeStrikes,
   installParry,
@@ -93,7 +95,9 @@ import {
   KNIGHT_SHIELD_BASH,
   makePushable,
   MELEE_COMPONENTS,
+  type MaterialPresets,
   noAllies,
+  playerViewRule,
   PhysicsObjectComponent,
   PlacementComponent,
   pushCharacter,
@@ -178,6 +182,8 @@ export interface TestbedCombat {
   readonly bow: TestbedBow;
   /** Each creature's size class, by creature id (the kick knocks back small ones, mw-e04.18). */
   readonly creatureSizes: ReadonlyMap<string, string>;
+  /** Material presets, which make an arrow at rest a wooden thing that can burn (mw-e05.7). */
+  readonly materials: MaterialPresets;
 }
 
 /** Compiles the knight's combat from `content` (see the file header, step 1). */
@@ -212,6 +218,7 @@ export function prepareTestbedCombat(content: GameContent): TestbedCombat {
     character: content.get('controller', PLAYER_CONTROLLER_ID),
     environment: content.get('environment-damage', DEFAULT_ENVIRONMENT_DAMAGE_ID),
     creatureSizes: new Map(content.all('creature').map((c) => [c.id, c.stats.size])),
+    materials: materialPresets(content.all('material')),
     bow: {
       bows: bowLookup(content.all('bow').map(compileBow)),
       arrows: arrowLookup(content.all('arrow')),
@@ -349,6 +356,14 @@ export function startTestbedCombat<TInput>(
       arrows: combat.bow.arrows,
       damage: combat.damage,
       invulnerable: invulnerabilityRule(combat.moves),
+      ...(collision !== undefined && { collision }),
+    });
+    // Arrows stay where they land and can be taken back (mw-e05.7). What counts as in view for the
+    // 64-arrow cap is read from the player's position and look, never from the camera (view.ts).
+    installArrowRetrieval(world, {
+      arrows: combat.bow.arrows,
+      inView: playerViewRule(),
+      materials: combat.materials,
       ...(collision !== undefined && { collision }),
     });
   }

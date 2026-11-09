@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameContent } from '@content/index';
 import {
+  ArrowComponent,
   arrowLookup,
   box,
   DAMAGE_COMPONENTS,
@@ -18,6 +19,7 @@ import {
   ARROW_DEMO_ORDER,
   ArrowDemo,
   demoVelocity,
+  parseArrowDemoLane,
   parseArrowDemoParam,
 } from './index';
 
@@ -52,6 +54,18 @@ describe('?arrows demo (mw-e29.11)', () => {
     const v = demoVelocity();
     expect(v.z).toBeLessThan(0);
     expect(v.y).toBeGreaterThan(0);
+  });
+
+  it('&lane aims every shot at that x instead of the type’s lane; junk is ignored', () => {
+    expect(parseArrowDemoLane('?arrows=standard&lane=-2.5')).toBe(-2.5);
+    expect(parseArrowDemoLane('?arrows=standard')).toBeUndefined();
+    expect(parseArrowDemoLane('?lane=')).toBeUndefined();
+    expect(parseArrowDemoLane('?lane=left')).toBeUndefined();
+    const world = room();
+    const demo = new ArrowDemo(world, ARROWS, ['standard'], -2.5);
+    const arrow = demo.update(0);
+    if (arrow === undefined) throw new Error('no arrow was loosed');
+    expect(world.get(arrow, ArrowComponent)?.position.x).toBe(-2.5);
   });
 
   it('looses one arrow every 2.5 s, in order, and records where each lands', () => {

@@ -163,6 +163,7 @@ export function affordancesOf(world: World<never>, entity: EntityId): readonly A
 }
 
 const NO_FILTERS: readonly FocusFilter[] = Object.freeze([]);
+const NO_DEMOTIONS: readonly FocusDemotion[] = Object.freeze([]);
 
 const NO_KIT: InteractorKit = Object.freeze({ capabilities: [], items: [] });
 
@@ -212,6 +213,75 @@ export function addFocusFilter<TInput>(world: World<TInput>, filter: FocusFilter
   list.push(filter);
   return () => {
     const at = list.indexOf(filter);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
+/**
+ * A rule that words an affordance's prompt for the actor's focus: the label to show for `affordance`
+ * of `target` ("Take arrows (3)"), or undefined to keep the affordance's own. The first rule that
+ * answers wins. Rules are not state and must only read the world.
+ */
+export type AffordanceLabel = (
+  world: World<never>,
+  actor: EntityId,
+  target: EntityId,
+  affordance: Affordance,
+) => string | undefined;
+
+const labelRules = new WeakMap<World<never>, AffordanceLabel[]>();
+
+/** Adds `rule` to `world`'s prompts (see `AffordanceLabel`). Returns a function that removes it. */
+export function addAffordanceLabel<TInput>(
+  world: World<TInput>,
+  rule: AffordanceLabel,
+): () => void {
+  const w: World<never> = world;
+  let own = labelRules.get(w);
+  if (own === undefined) labelRules.set(w, (own = []));
+  const list = own;
+  list.push(rule);
+  return () => {
+    const at = list.indexOf(rule);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
+/** The prompt text of `affordance` of `target` for `actor`. */
+function labelFor(
+  world: World<never>,
+  actor: EntityId,
+  target: EntityId,
+  affordance: Affordance,
+): string {
+  for (const rule of labelRules.get(world) ?? []) {
+    const label = rule(world, actor, target, affordance);
+    if (label !== undefined) return label;
+  }
+  return affordance.label;
+}
+
+/**
+ * A rule that makes `target` yield to anything else `actor` could focus: while it holds, the object is
+ * focused only when no other candidate is in reach (a stuck arrow in a chest must never keep the chest
+ * from opening). Like filters, demotions are rules, not state, and must only read the world.
+ */
+export type FocusDemotion = (world: World<never>, actor: EntityId, target: EntityId) => boolean;
+
+const focusDemotions = new WeakMap<World<never>, FocusDemotion[]>();
+
+/** Adds `demotion` to `world`'s focus (see `FocusDemotion`). Returns a function that removes it. */
+export function addFocusDemotion<TInput>(
+  world: World<TInput>,
+  demotion: FocusDemotion,
+): () => void {
+  const w: World<never> = world;
+  let own = focusDemotions.get(w);
+  if (own === undefined) focusDemotions.set(w, (own = []));
+  const list = own;
+  list.push(demotion);
+  return () => {
+    const at = list.indexOf(demotion);
     if (at >= 0) list.splice(at, 1);
   };
 }
@@ -370,7 +440,9 @@ export function interactionSystem<TInput>(
     current: EntityId | null,
   ): ScoredFocus | undefined => {
     const filters = focusFilters.get(world) ?? NO_FILTERS;
+    const demotions = focusDemotions.get(world) ?? NO_DEMOTIONS;
     const scored: ScoredFocus[] = [];
+    const yielding: ScoredFocus[] = [];
     for (const entity of all) {
       if (entity === actor || !isRevealed(world, entity)) continue;
       if (filters.some((excluded) => excluded(world, actor, entity))) continue;
@@ -383,9 +455,10 @@ export function interactionSystem<TInput>(
         settings,
       );
       if (score === undefined || !reachable(world, entity, view.origin, placement)) continue;
-      scored.push({ entity, score });
+      const yields = demotions.some((demoted) => demoted(world, actor, entity));
+      (yields ? yielding : scored).push({ entity, score });
     }
-    return selectFocus(scored, current, settings);
+    return selectFocus(scored.length > 0 ? scored : yielding, current, settings);
   };
 
   return {
@@ -505,7 +578,7 @@ export function interactionPrompt(
     const reason = reasonFor(world, actor, kit, target, affordance);
     return {
       verb: affordance.verb,
-      label: affordance.label,
+      label: labelFor(world, actor, target, affordance),
       available: reason === undefined,
       reason: reason ?? '',
     };

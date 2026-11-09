@@ -17,6 +17,8 @@
 // (taking it fills the gold counter). The sim never imports content: the game passes the items, the
 // loot tables, each creature's table and each spawn point's carried items in.
 
+import { returnsAs, takeStuckArrows } from '../combat/arrows/retrieval';
+import type { ArrowLookup } from '../combat/arrows/system';
 import { Died } from '../combat/damage/events';
 import type { EntityId } from '../core/component';
 import type { World } from '../core/world';
@@ -42,6 +44,16 @@ export interface CreatureDropsOptions {
   readonly tableOf?: (creature: string) => string | undefined;
   /** What the creature placed at a scene spawn point carries, by spawn point id. */
   readonly carried?: (point: string) => readonly LootStack[] | undefined;
+  /**
+   * Arrows stuck in a creature when it dies (mw-e05.7): the intact ones drop with its loot, as the
+   * item `itemOf` names for the arrow they come back as; the broken ones go with the body. Without
+   * it, arrows stay stuck in the corpse.
+   */
+  readonly arrows?: {
+    readonly lookup: ArrowLookup;
+    /** The world item of an arrow type, or undefined for an arrow with none (it is not dropped). */
+    readonly itemOf: (arrow: string) => string | undefined;
+  };
   /** The killer's class, which class-conditioned loot entries read (none: those never drop). */
   readonly classOf?: (world: World<never>, killer: EntityId) => string | undefined;
 }
@@ -88,24 +100,37 @@ function dropsOf(
   return [...stacks, ...rolled.stacks];
 }
 
-/**
- * Drops what creature `entity` carries and rolls where it stands (see the file header). Returns the
- * world items, in order (none for something that is not a placed creature).
- */
-export function dropCreatureLoot(
+/** The intact arrows stuck in `entity` as loot stacks (and every arrow in it removed). */
+function arrowStacks(
   world: World<never>,
   options: CreatureDropsOptions,
   entity: EntityId,
-  killer: EntityId | null = null,
+): LootStack[] {
+  const { arrows } = options;
+  if (arrows === undefined) return [];
+  const comesBack = (arrow: string): string => returnsAs({ arrows: arrows.lookup }, arrow);
+  const stacks: LootStack[] = [];
+  for (const { arrow, count } of takeStuckArrows(world, entity, comesBack)) {
+    const item = arrows.itemOf(arrow);
+    if (item !== undefined) stacks.push({ item, count });
+  }
+  return stacks;
+}
+
+/** Lays `stacks` at `feet` as world items (the `first`-th of `total` drop spots on), dropped by `entity`. */
+function placeStacks(
+  world: World<never>,
+  options: CreatureDropsOptions,
+  entity: EntityId,
+  feet: Vec3,
+  stacks: readonly LootStack[],
+  first: number,
+  total: number,
 ): EntityId[] {
-  const origin = originOf(world, entity);
-  const feet = origin === undefined ? undefined : world.get(entity, PlacementComponent);
-  if (origin === undefined || feet === undefined) return [];
-  const stacks = dropsOf(world, options, entity, origin, killer);
   const { items } = options;
   return stacks.map(({ item, count }, index) => {
     const half = ITEM_HALF_EXTENTS[items.def(item).category];
-    const spot = dropSpot(feet, index, stacks.length);
+    const spot = dropSpot(feet, first + index, total);
     const position = { x: spot.x, y: spot.y + half.y, z: spot.z };
     const dropped = items.spawn(world, { defId: item, count, position, by: entity });
     world.events.emit(itemDropped, {
@@ -123,14 +148,62 @@ export function dropCreatureLoot(
 }
 
 /**
+ * Drops what creature `entity` carries and rolls where it stands (see the file header), and the
+ * intact arrows already stuck in it (those landing this very tick, the killing arrow among them, are
+ * not yet visible: `installCreatureDrops` drops them a tick later). Returns the world items, in
+ * order (none for something that is not a placed creature).
+ */
+export function dropCreatureLoot(
+  world: World<never>,
+  options: CreatureDropsOptions,
+  entity: EntityId,
+  killer: EntityId | null = null,
+): EntityId[] {
+  const origin = originOf(world, entity);
+  const feet = origin === undefined ? undefined : world.get(entity, PlacementComponent);
+  if (origin === undefined || feet === undefined) return [];
+  const stacks = [
+    ...dropsOf(world, options, entity, origin, killer),
+    ...arrowStacks(world, options, entity),
+  ];
+  return placeStacks(world, options, entity, feet, stacks, 0, stacks.length);
+}
+
+/**
  * Makes every creature that dies in `world` drop its loot (see the file header). Needs world items
- * installed (`installWorldItems`). Returns a function that uninstalls it.
+ * installed (`installWorldItems`). With `arrows`, the arrows that land in a creature on the tick it
+ * dies (the killing one) drop the next tick, beside its other loot. Returns a function that
+ * uninstalls it.
  */
 export function installCreatureDrops(
   world: World<never>,
   options: CreatureDropsOptions,
 ): () => void {
-  return world.events.on(Died, ({ target, killer }) => {
+  const late = new Set<EntityId>();
+  if (options.arrows !== undefined) {
+    world.addSystem({
+      name: 'creature-arrow-drops',
+      run: () => {
+        for (const entity of [...late]) {
+          late.delete(entity);
+          // A creature that is gone leaves its arrows to fall where it stood (arrows/retrieval.ts).
+          const feet = world.isAlive(entity) ? world.get(entity, PlacementComponent) : undefined;
+          if (feet === undefined) continue;
+          const stacks = arrowStacks(world, options, entity);
+          if (stacks.length > 0) {
+            // Beside whatever else it dropped, never on top of the first drop spot.
+            placeStacks(world, options, entity, feet, stacks, 1, stacks.length + 1);
+          }
+        }
+      },
+    });
+  }
+  const off = world.events.on(Died, ({ target, killer }) => {
     dropCreatureLoot(world, options, target, killer);
+    if (options.arrows !== undefined && originOf(world, target) !== undefined) late.add(target);
   });
+  return () => {
+    late.clear();
+    off();
+  };
 }

@@ -45,6 +45,11 @@ export interface ArrowImpactInfo {
   /** Surface hardness of what it hit. */
   readonly hardness: SurfaceHardness;
   readonly outcome: ArrowImpactOutcome;
+  /**
+   * Whether the arrow came to rest whole; present only when this impact brought it to rest (a stick,
+   * or a drop that rests), absent for a ricochet, a fall or a shatter (mw-e05.7).
+   */
+  readonly intact?: boolean;
   /** Speed at impact, m/s. */
   readonly speed: number;
   /** Kinetic energy at impact, J. */
@@ -76,3 +81,21 @@ export interface ArrowExpiredInfo {
 
 /** An arrow flew its whole airborne lifetime without coming to rest and left the world. */
 export const ArrowExpired = defineEvent<ArrowExpiredInfo>('ArrowExpired');
+
+/** Payload of ArrowRested. */
+export interface ArrowRestedInfo {
+  readonly tick: number;
+  /** The arrow entity, now an arrow at rest. */
+  readonly entity: EntityId;
+  readonly arrow: string;
+  readonly state: 'stuck' | 'dropped';
+  /** Whether it came to rest whole (see ArrowRest.intact). */
+  readonly intact: boolean;
+  /** What it is stuck in or lying on, or null for unbound level geometry. */
+  readonly in: EntityId | null;
+  /** Where its tip came to rest, metres. */
+  readonly position: Vec3;
+}
+
+/** An arrow came to rest (mw-e05.7): fired once, the tick it happens, after its arrowImpact. */
+export const ArrowRested = defineEvent<ArrowRestedInfo>('ArrowRested');

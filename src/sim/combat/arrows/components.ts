@@ -7,7 +7,8 @@
 //
 // When it lands, an arrow either leaves the world (it shattered, or its airborne lifetime ran out) or
 // comes to rest: its `combat.arrow` component is replaced by `combat.arrow-rest`, stuck in what it hit
-// or dropped on the ground. Keeping or retrieving rested arrows is mw-e05.7's.
+// or dropped on the ground. A rested arrow stays (mw-e05.7): it is intact or broken (decided at
+// impact), follows what it is stuck in when that moves, and can be taken back (retrieval.ts).
 
 import { defineComponent, type EntityId } from '../../core/component';
 import type { Vec3 } from '../../stimulus/shapes';
@@ -53,6 +54,17 @@ export interface ArrowRest {
   readonly in: EntityId | null;
   /** World tick it came to rest. */
   readonly tick: number;
+  /**
+   * Whether it came through the impact whole (the roll decided at impact, ballistics.ts). Intact arrows
+   * can be taken back and drop into the loot of a creature they are stuck in; broken ones cannot, and
+   * an intact one breaks when it or what holds it burns.
+   */
+  readonly intact: boolean;
+  /**
+   * Where its tip is relative to what it is stuck in (`in`), metres, so it follows that body as it
+   * moves. Absent for an arrow in unbound geometry, or in something with no placement.
+   */
+  readonly local?: Vec3;
 }
 
 /** The arrow-in-flight component (`combat.arrow`; a snapshot and save key, never renamed). */
