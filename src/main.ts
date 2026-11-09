@@ -851,7 +851,7 @@ function startRenderer(
       // Spells (mw-e06.15): the pipeline and its systems, before the stimulus system so a spell's
       // heat and light resolve in the tick it is cast.
       afterStimuli: (sim) => {
-        installGameFire(sim, content, { damage: combat.damage });
+        installGameFire(sim, content, { damage: combat.damage, focus: focus.read });
       },
       beforeStimuli: (sim) => {
         magic = installGameMagic(sim, {

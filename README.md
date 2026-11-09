@@ -213,6 +213,13 @@ has two modes:
   there). CI mode adds no relative or ceiling guard for them; its throttled testbed load and warm
   reload budgets remain. PR e2e specs keep only functional assertions and hang-protection timeouts.
 
+The sim's own per-tick cost has budgets too (mw-e03.30), in vitest benches (`pnpm bench`, nightly):
+`tests/bench/sim-stress.bench.ts` times fire spread over 2,000 active cells (p95 ≤ 2.0 ms on the
+reference machine, ≤ 3.5 ms low preset), a flooded room freezing, and a gas explosion over 200
+physics bodies (no tick over 8 ms), next to `physics-objects.bench.ts` and `light-field.bench.ts`.
+Far from the player the element field steps at a reduced rate (chunks over 40 m away every 4th
+tick, keyed by distance and tick number only, `FieldLod` in `src/sim/field/diffusion.ts`).
+
 Every run writes `test-results/perf-report.json` and prints a per-budget table. `perf-baseline`
 (`/?scene=perf-baseline`) is the stress scene: 64 crates kept tumbling by force blasts at its
 `perf-agitator` markers, eight lamps and moonlight, fixed camera.
