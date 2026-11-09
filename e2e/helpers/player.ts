@@ -58,7 +58,11 @@ export async function takeControl(page: Page): Promise<void> {
   const viewport = page.viewportSize();
   if (viewport === null) throw new Error('takeControl needs a fixed viewport');
   await page.mouse.click(viewport.width / 2, viewport.height / 2);
-  await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(true);
+  // One evaluate can itself take 4-5 s on such a runner (mw-8qo: a check that answered true after
+  // 4.4 s still lost to the default 5 s poll), so the timeout has to outlast a few slow answers.
+  await expect
+    .poll(() => page.evaluate(() => document.pointerLockElement !== null), { timeout: 30_000 })
+    .toBe(true);
 }
 
 /**

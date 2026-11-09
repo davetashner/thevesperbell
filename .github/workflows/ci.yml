@@ -48,7 +48,7 @@ jobs:
   # The only job that runs the unit and integration tests (mw-e41.2); a failing test fails it.
   coverage-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
