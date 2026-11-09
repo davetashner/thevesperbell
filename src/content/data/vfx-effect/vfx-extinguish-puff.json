@@ -1,0 +1,29 @@
+{
+  "id": "vfx-extinguish-puff",
+  "notes": "Extinguish puff (mw-e29.12): the short grey curl of smoke and steam when a burning thing goes out, a torch snuffed, a brazier doused or a fire put out by water (style bible §8: alpha-blended, environment palette so it sits in the world; soft, no flash). Played once where the entity is by the world VFX cue sheet on fireExtinguished; the burning loop itself is stopped by the element-state bridge.",
+  "priority": 32,
+  "duration": 0.9,
+  "emitters": [
+    {
+      "id": "smoke",
+      "texture": "vfx-base-smoke-noise-01",
+      "blend": "alpha",
+      "bursts": [{ "at": 0, "count": 7 }],
+      "lifetime": { "min": 0.6, "max": 0.9 },
+      "speed": { "min": 0.35, "max": 0.7 },
+      "coneDeg": 25,
+      "spawnRadius": 0.08,
+      "gravity": -0.6,
+      "drag": 1.5,
+      "size": [
+        { "t": 0, "v": 0.14 },
+        { "t": 1, "v": 0.42 }
+      ],
+      "color": "#9A938A",
+      "alpha": [
+        { "t": 0, "v": 0.5 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

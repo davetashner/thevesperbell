@@ -289,6 +289,24 @@ describe('VFX cue sheets on the game’s events (mw-e29.3)', () => {
     expect(bridge.loops()).toBe(0);
   });
 
+  it('mw-e29.12: a burning thing going out exhales a short smoke puff where it stood, once, and it finishes', ({
+    task,
+  }) => {
+    markExercised(task, 'vfx-cue-sheet', 'world');
+    markExercised(task, 'vfx-effect', 'vfx-extinguish-puff');
+    const { world, vfx, spawned, spawn, run } = game();
+    const torch = spawn('dry-wood', { x: 2, y: 1.5, z: -1 });
+    world.events.emit(fireExtinguished, { entity: torch, cause: 'water' });
+    world.events.flush();
+    expect(spawned).toEqual([
+      { effect: 'vfx-extinguish-puff', options: { position: { x: 2, y: 1.5, z: -1 } } },
+    ]);
+    run(0.2);
+    expect(vfx.stats().particles).toBeGreaterThan(0);
+    run(2);
+    expect(vfx.stats()).toMatchObject({ particles: 0, effects: 0 });
+  });
+
   it('a fire loop stops when its entity is extinguished (stopOn), and only that entity’s', () => {
     const { world, vfx, bridge, spawn, run } = game();
     const crate = spawn('dry-wood');

@@ -237,6 +237,7 @@ import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
 import {
   ArrowFx,
+  AwarenessFx,
   attachCorpseDissolves,
   type CorpseGlue,
   DamageVignette,
@@ -264,6 +265,7 @@ import {
   createTrainingDummy,
   disposeArrowShaft,
 } from '@render/combat/index';
+import { createAwarenessRenderer } from '@render/stealth/awareness';
 import {
   createCreatureProxy,
   CreatureDeaths,
@@ -384,6 +386,12 @@ import { layer as tools } from '@tools/index';
 import { sceneAgitator } from '@tools/perf/agitator';
 import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
 import { ArrowDemo, parseArrowDemoParam } from '@tools/arrow-demo/index';
+import {
+  AWARENESS_DEMO_NOISE_MS,
+  awarenessDemoAgents,
+  awarenessDemoNoise,
+  parseAwarenessDemoParam,
+} from '@tools/awareness-demo/index';
 import { formatVfxStats, parseVfxParam, VfxDemo } from '@tools/vfx-demo/index';
 import {
   CombatHud,
@@ -904,6 +912,36 @@ function startRenderer(
     });
     arrowFx.attach();
     const arrowFxView = createArrowFxRenderer(view.scene);
+    // Awareness feedback (mw-e29.12): the indicator over each alerted creature, and the two assists
+    // (last-known-position ghost, noise ripple), both off unless the player turns them on. Read-only
+    // over the sim; `?awareness=demo` lines up stand-ins in every state for the e2e and screenshots.
+    const awarenessDemo = parseAwarenessDemoParam(location.search);
+    const awarenessFx = new AwarenessFx({
+      world,
+      now: () => performance.now(),
+      ghostEnabled: () => settings.get('gameplay.lastKnownMarker'),
+      ripplesEnabled: () => settings.get('gameplay.noiseRipples'),
+      reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+      listener: () =>
+        player === undefined ? undefined : world.get(player.entity, PlacementComponent),
+      ...(awarenessDemo && {
+        agents: (into) => {
+          const at =
+            player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+          const origin = at ?? view.camera.position;
+          // The camera's forward (0, 0, -1) turned by its rotation, flattened to a heading.
+          const q = view.camera.quaternion;
+          const forwardX = -2 * (q.x * q.z + q.w * q.y);
+          const forwardZ = -(1 - 2 * (q.x * q.x + q.y * q.y));
+          return awarenessDemoAgents(origin, Math.atan2(-forwardX, -forwardZ), into);
+        },
+      }),
+    });
+    awarenessFx.attach();
+    const awarenessView = createAwarenessRenderer(view.scene);
+    let publishedAwareness = '';
+    let lastDemoNoise = -Infinity;
+    let demoNoises = 0;
     // Element state feedback (mw-e03.28): burning, wet, frozen and charged things get their VFX,
     // mesh look and cue from the element-feedback table, by property, never entity type. Gas in
     // the element field (smoke, steam) is drawn as clouds. Both read the sim and never write to it.
@@ -1376,6 +1414,31 @@ function startRenderer(
         }
         arrowFx.frame();
         arrowFxView.draw(arrowFx.view);
+        if (awarenessDemo && performance.now() - lastDemoNoise >= AWARENESS_DEMO_NOISE_MS) {
+          lastDemoNoise = performance.now();
+          demoNoises++;
+          const at =
+            player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+          awarenessFx.ripple(awarenessDemoNoise(at ?? camera.position, world.tick));
+        }
+        awarenessFx.frame(camera.position);
+        awarenessView.draw(awarenessFx.view, camera);
+        {
+          const { view: fx } = awarenessFx;
+          const json = JSON.stringify({
+            indicators: fx.indicators.map((i) => [
+              i.entity,
+              i.state,
+              i.shape,
+              Math.round(i.fill * 100),
+            ]),
+            ghosts: fx.ghosts.length,
+            ripples: fx.ripples.length,
+            started: awarenessFx.ripplesStarted,
+            demoNoises,
+          });
+          if (json !== publishedAwareness) root.dataset['awareness'] = publishedAwareness = json;
+        }
         if (arrowDemo !== undefined) {
           const { view: fxView } = arrowFx;
           const json = JSON.stringify({

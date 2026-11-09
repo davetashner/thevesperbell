@@ -263,6 +263,16 @@ export const SETTINGS_SCHEMA = {
         help: 'Shows the damage you deal over your target and the damage you take.',
         default: true,
       }),
+      lastKnownMarker: toggle({
+        label: 'Last-known-position marker',
+        help: 'Shows a faint ghost where a creature that lost sight of you believes you are.',
+        default: false,
+      }),
+      noiseRipples: toggle({
+        label: 'Noise ripples',
+        help: 'Draws a ring on the ground showing how far a noise carries.',
+        default: false,
+      }),
     },
   },
 } as const satisfies Readonly<
