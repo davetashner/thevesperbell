@@ -215,6 +215,16 @@ export function debugCommandSystem<TInput>(options: DebugCommandOptions): System
           });
           continue;
         }
+        if (command.op === 'stim') {
+          if (!world.isRegistered(StimulusQueueComponent)) continue;
+          const { at, radius, intensity, element } = command;
+          applyStimulus(world, {
+            shape: { kind: 'sphere', center: at, radius },
+            element,
+            intensity,
+          });
+          continue;
+        }
         if (command.op === 'time') {
           const clock = gameClockOf(world);
           if (clock === undefined) continue; // a world without the game clock has no time to move

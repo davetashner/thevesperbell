@@ -84,6 +84,31 @@ export interface BlastCommand {
   readonly intensity: number;
 }
 
+/** The elements `stim` can deliver: the ones that move a temperature, wetness or charge. */
+export const DEBUG_STIM_ELEMENTS = ['heat', 'cold', 'water', 'charge'] as const;
+
+export type DebugStimElement = (typeof DEBUG_STIM_ELEMENTS)[number];
+
+/** Largest `stim` radius, metres. */
+export const MAX_STIM_RADIUS = 10;
+/** Largest `stim` intensity, in the element's unit. */
+export const MAX_STIM_INTENSITY = 10_000;
+
+/**
+ * Delivers a stimulus of `element` at `at` (mw-e03.29: `stim heat 500 2` to see the temperature
+ * field respond): a sphere of `radius` metres, `intensity` at its centre, falling off linearly, with
+ * no source. It goes through the one stimulus API, so it heats the element field and reaches every
+ * entity in the sphere exactly as a torch or a spell would.
+ */
+export interface StimCommand {
+  readonly kind: typeof DEBUG_COMMAND;
+  readonly op: 'stim';
+  readonly element: DebugStimElement;
+  readonly at: Vec3;
+  readonly radius: number;
+  readonly intensity: number;
+}
+
 /** Removes every spawned creature (mw-e12.4: the console's `despawn all`). */
 export interface DespawnCommand {
   readonly kind: typeof DEBUG_COMMAND;
@@ -156,6 +181,7 @@ export type DebugCommand =
   | TeleportCommand
   | KillCommand
   | BlastCommand
+  | StimCommand
   | DespawnCommand
   | PropertyCommand;
 
@@ -246,6 +272,39 @@ export function blastCommand(at: Vec3, radius: number, intensity: number): Blast
     kind: DEBUG_COMMAND,
     op: 'blast',
     at: position('blast position', at),
+    radius,
+    intensity,
+  };
+}
+
+/**
+ * A stimulus. @throws RangeError for an element `stim` does not deliver, a non-finite position, a
+ * radius outside (0, MAX_STIM_RADIUS] or an intensity outside (0, MAX_STIM_INTENSITY].
+ */
+export function stimCommand(
+  element: string,
+  at: Vec3,
+  radius: number,
+  intensity: number,
+): StimCommand {
+  if (!(DEBUG_STIM_ELEMENTS as readonly string[]).includes(element)) {
+    throw new RangeError(`stim element must be one of ${DEBUG_STIM_ELEMENTS.join(', ')}`);
+  }
+  if (!(radius > 0 && radius <= MAX_STIM_RADIUS)) {
+    throw new RangeError(
+      `stim radius must be above 0 and at most ${String(MAX_STIM_RADIUS)}, got ${String(radius)}`,
+    );
+  }
+  if (!(intensity > 0 && intensity <= MAX_STIM_INTENSITY)) {
+    throw new RangeError(
+      `stim intensity must be above 0 and at most ${String(MAX_STIM_INTENSITY)}, got ${String(intensity)}`,
+    );
+  }
+  return {
+    kind: DEBUG_COMMAND,
+    op: 'stim',
+    element: element as DebugStimElement,
+    at: position('stim position', at),
     radius,
     intensity,
   };

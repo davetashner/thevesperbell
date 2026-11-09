@@ -1307,6 +1307,8 @@ function startRenderer(
     // The AI debug overlay (mw-e11.17): loaded with the debug console (below), so release builds
     // never have it. `ai.freeze` holds the sim through simPaused; it draws before each render.
     let aiDebug: { held(): boolean; frame(): void } | undefined;
+    // The field debug overlay (mw-e03.29): loaded with the console too; undefined in release builds.
+    let fieldDebug: { frame(): void } | undefined;
     // Debug pages only (mw-e01.9): the input log's recorder or replay runs just before each sample.
     let beforeSample: ((tick: number) => void) | undefined;
     // While a replay still has inputs to play, the slice-complete card stays shut: its opening (in a
@@ -1535,6 +1537,7 @@ function startRenderer(
         publishAudio();
         drawLights();
         aiDebug?.frame();
+        fieldDebug?.frame();
         view.renderFrame(timeMs);
         // A save's thumbnail (mw-e30.11) is read straight after a render, while the frame is still
         // in the drawing buffer.
@@ -2968,8 +2971,12 @@ function startRenderer(
       };
     }
     if (debugPage) {
-      void Promise.all([import('@tools/console/start'), import('@tools/ai-debug/start')]).then(
-        ([{ startDebugConsole, unboundDebugSpawns }, { startAiDebug }]) => {
+      void Promise.all([
+        import('@tools/console/start'),
+        import('@tools/ai-debug/start'),
+        import('@tools/field-debug/start'),
+      ]).then(
+        ([{ startDebugConsole, unboundDebugSpawns }, { startAiDebug }, { startFieldDebug }]) => {
           const bookmarks = new Map(
             (scenes.current?.layout.spawns ?? []).map(
               (spawn) => [spawn.id, spawn.position] as const,
@@ -3050,6 +3057,24 @@ function startRenderer(
               }),
             publish: (json) => {
               root.dataset['aiDebug'] = json;
+            },
+          });
+          // fields / inspect / stim (mw-e03.29): element-field and light heatmaps, the property
+          // inspector and the stimulus timeline. Off until a command turns it on; it only reads.
+          fieldDebug = startFieldDebug({
+            world,
+            registry: debugConsole.registry,
+            scene: view.scene,
+            camera,
+            root,
+            light: light.field,
+            cursorPoint: () =>
+              viewCentrePoint(physics, {
+                position: camera.position,
+                quaternion: camera.quaternion,
+              }),
+            publish: (json) => {
+              root.dataset['fieldDebug'] = json;
             },
           });
           // Props the console spawned get grey-box objects like the scene's own props: a movable one
