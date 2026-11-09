@@ -56,9 +56,25 @@ export default defineConfig({
     // The debug console (mw-e33.1) is built in unless VESPER_DEBUG_CONSOLE=off (a release build);
     // even then it only loads in dev builds or with ?debug=1 (src/game/debug-console-gate.ts).
     __DEBUG_CONSOLE__: JSON.stringify(process.env['VESPER_DEBUG_CONSOLE'] !== 'off'),
+    // The input latency and controller cost probe (mw-e02.8): built in with VESPER_LATENCY_PROBE=on
+    // (the perf suite's build); the dev server has it too (src/main.ts also checks import.meta.env.DEV).
+    // Any other build drops the probe's code (tests/toolchain/latency-probe-stripped.test.ts).
+    __LATENCY_PROBE__: JSON.stringify(process.env['VESPER_LATENCY_PROBE'] === 'on'),
   },
   resolve: {
     tsconfigPaths: true,
+  },
+  // The perf build is served cross-origin isolated (mw-e02.8): performance.now() then ticks every
+  // 5 µs instead of 100 µs, which the controller and camera cost samples (tens of microseconds each)
+  // need. Only for the probe build; nothing else sets these headers.
+  preview: {
+    headers:
+      process.env['VESPER_LATENCY_PROBE'] === 'on'
+        ? {
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+          }
+        : {},
   },
   server: {
     watch: {

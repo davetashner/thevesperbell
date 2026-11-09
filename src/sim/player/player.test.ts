@@ -140,6 +140,20 @@ describe('wrapYaw', () => {
   });
 });
 
+describe('player controller timing hook (mw-e02.8)', () => {
+  it('measure wraps the controller system once per tick', () => {
+    let wrapped = 0;
+    const { world } = setup(undefined, {
+      measure: (run: () => void) => {
+        wrapped += 1;
+        run();
+      },
+    });
+    for (let i = 0; i < 5; i++) world.step([frame({ move: [0, 1] })]);
+    expect(wrapped).toBe(5);
+  });
+});
+
 describe('player spawn (mw-e02.23)', () => {
   it('faces the spawn direction: scene yaw 0 looks along +z, 90 along +x', () => {
     expect(spawnYaw({ yaw: 0 })).toBe(Math.PI);
