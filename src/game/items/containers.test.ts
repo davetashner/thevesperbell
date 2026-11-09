@@ -58,8 +58,8 @@ describe('containers in the game (mw-e18.3)', () => {
   it('places the testbed’s supply chest, which rolls content’s supply-crate table into the readout', () => {
     const { world, loaded, containers, actor } = testbed();
     const made = startContainers(world, containers, loaded, content);
-    expect(made).toHaveLength(2); // the supply chest and the chest with room for bodies
-    const [chest] = made as [number, number];
+    expect(made).toHaveLength(1);
+    const [chest] = made as [number];
     expect(world.get(chest, ContainerComponent)).toEqual({
       loot: 'testbed-supply-crate',
       level: 'testbed',
@@ -67,10 +67,7 @@ describe('containers in the game (mw-e18.3)', () => {
     });
     expect(world.has(chest, LockComponent)).toBe(false);
     const watch = new ContainerWatch(world, made);
-    expect(watch.readout()).toEqual({
-      'supply-chest': { opened: false, items: [], gold: 0 },
-      'body-chest': { opened: false, items: [], gold: 0 },
-    });
+    expect(watch.readout()).toEqual({ 'supply-chest': { opened: false, items: [], gold: 0 } });
 
     containers.open(world, chest, actor);
     const opened = watch.readout()['supply-chest'];
@@ -80,7 +77,7 @@ describe('containers in the game (mw-e18.3)', () => {
     expect(opened?.items.length).toBeGreaterThan(1);
 
     containers.takeAll(world, chest, actor);
-    expect(watch.readout()['supply-chest']).toEqual({ opened: true, items: [], gold: 0 });
+    expect(watch.readout()).toEqual({ 'supply-chest': { opened: true, items: [], gold: 0 } });
   });
 
   it('names containers that are not scene spawns by entity, and leaves out what is gone', () => {

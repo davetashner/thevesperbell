@@ -53,9 +53,9 @@ test('a thief hides in the wardrobe, peeks out, leaves, and a burning haystack e
 }) => {
   const problems = collectProblems(page);
   await stubPointerLock(page);
-  await page.goto('/?scene=testbed&debug=1');
+  await page.goto('/?scene=hiding-room&debug=1');
   const app = page.locator('#app');
-  await expect(app).toHaveAttribute('data-scene', 'testbed', { timeout: 10_000 });
+  await expect(app).toHaveAttribute('data-scene', 'hiding-room', { timeout: 10_000 });
   await expect(app).toHaveAttribute('data-player', /"grounded":true/, { timeout: 10_000 });
   await takeControl(page);
 

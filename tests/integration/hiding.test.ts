@@ -1,6 +1,6 @@
 // mw-e03.23: hiding in wardrobes, barrels and haystacks, as the game wires it (createGameWorld: Rapier
 // physics, the player with interaction, carrying, containers, hiding, fire), driven by ActionFrames. The
-// player slips into the testbed's wardrobe with Interact and out again; a burning haystack evicts them
+// player slips into the hiding room's wardrobe with Interact and out again; a burning haystack evicts them
 // the tick it ignites; they cannot attack or move from inside; death inside lets them out; a save written
 // while hidden loads with the player outside, and a save with an item and a body in a chest brings both
 // back (AC-6).
@@ -71,13 +71,18 @@ const PRESS = frame({ interact: 'press' });
 const FACE = { east: -Math.PI / 2, west: Math.PI / 2, south: Math.PI, north: 0 };
 
 function game() {
-  const g = createGameWorld<ActionFrame>(RAPIER, { seed: 1, hz: HZ, magic: true });
+  const g = createGameWorld<ActionFrame>(RAPIER, {
+    seed: 1,
+    hz: HZ,
+    magic: true,
+    scene: 'hiding-room',
+  });
   const world = g.world;
   const sim = world as unknown as World<never>;
   const spots = g.hiding?.spots ?? [];
   const [wardrobe, haystack, barrel] = spots;
   if (wardrobe === undefined || haystack === undefined || barrel === undefined) {
-    throw new Error('the testbed has no hiding spots');
+    throw new Error('the hiding room has no hiding spots');
   }
   for (let i = 0; i < 4; i++) world.step([IDLE]);
   const feet = () => (world.get(g.player, CharacterController) ?? { position: null }).position;
@@ -105,7 +110,7 @@ function intoTheWardrobe(t: Game): void {
   t.world.step([IDLE]);
 }
 
-describe('hiding in the testbed (mw-e03.23)', () => {
+describe('hiding in the hiding room (mw-e03.23)', () => {
   it('Interact on the wardrobe hides the player inside it, with the spot’s concealment, noise and prompt; Interact again steps out', () => {
     const t = game();
     const entered: unknown[] = [];
@@ -239,8 +244,6 @@ describe('hiding in the testbed (mw-e03.23)', () => {
 
   it('a spot cannot be entered with the hands full: the body must be set down first', () => {
     const t = game();
-    const [, body] = t.g.containers;
-    expect(body).toBeDefined();
     t.stand(-0.5, 1.25, FACE.south); // the first body lies at (-0.5, 2.25)
     t.world.step([PRESS]);
     expect(holdOf(t.sim, t.g.player)).toBeDefined();
@@ -251,10 +254,10 @@ describe('hiding in the testbed (mw-e03.23)', () => {
   });
 });
 
-describe('bodies in the testbed’s chest (mw-e03.23)', () => {
+describe('bodies in the hiding room’s chest (mw-e03.23)', () => {
   /** The player carries limp-body-a to the chest at (-2, 3.5) and stashes it. */
   function stashABody(t: Game): { chest: EntityId } {
-    const chest = must(t.g.containers[1]);
+    const chest = must(t.g.containers[0]);
     t.stand(-0.5, 1.25, FACE.south);
     expect(prompt(t)).toMatchObject({ verb: 'pick-up' });
     t.world.step([PRESS]);
@@ -269,7 +272,7 @@ describe('bodies in the testbed’s chest (mw-e03.23)', () => {
 
   it('AC-5, AC-6: a carried body goes into the chest if it fits; the chest, its item and its body survive a save and reload', () => {
     const t = game();
-    const chest = must(t.g.containers[1]);
+    const chest = must(t.g.containers[0]);
     t.g.items.inventory.add(t.sim, chest, 'healing-draught', 1);
     stashABody(t);
     expect(prompt(t)).toMatchObject({
@@ -289,7 +292,7 @@ describe('bodies in the testbed’s chest (mw-e03.23)', () => {
       wallClockSavedAt: 1_790_000_000_000,
     });
     const back = game();
-    const backChest = must(back.g.containers[1]);
+    const backChest = must(back.g.containers[0]);
     expect(back.sim.get(backChest, StashComponent)?.bodies).toEqual([]);
     expect(createGameSaveRegistry().read(back.world, bytes)).toMatchObject({ ok: true });
     expect(back.sim.get(backChest, StashComponent)?.bodies).toEqual([{ kind: 'body', weight: 45 }]);
@@ -301,7 +304,7 @@ describe('bodies in the testbed’s chest (mw-e03.23)', () => {
 
   it('AC-5: a second 45 kg body does not fit in the 60 kg chest: the prompt says "Too heavy"', () => {
     const t = game();
-    const chest = must(t.g.containers[1]);
+    const chest = must(t.g.containers[0]);
     stashABody(t);
     t.world.step([PRESS]);
     for (let i = 0; i < 4; i++) t.world.step([IDLE]);

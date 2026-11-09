@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-// Hiding spots in the game (mw-e03.23): the testbed's spots as the game makes them, their greybox
+// Hiding spots in the game (mw-e03.23): the hiding room's spots as the game makes them, their greybox
 // looks and poses, the peek view and the readout the e2e reads.
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import {
@@ -45,7 +45,7 @@ const PRESS: ActionFrame = actionFrame({
 });
 
 function game() {
-  const g = createGameWorld<ActionFrame>(RAPIER, { seed: 1, hz: 60 });
+  const g = createGameWorld<ActionFrame>(RAPIER, { seed: 1, hz: 60, scene: 'hiding-room' });
   const sim = g.world as unknown as World<never>;
   for (let i = 0; i < 4; i++) g.world.step([IDLE]);
   return { g, sim };
@@ -58,7 +58,7 @@ function must<T>(value: T | undefined): T {
 }
 
 describe('hiding in the game (mw-e03.23)', () => {
-  it('the testbed has hiding spots, the shipped scenes do not', () => {
+  it('the hiding room has hiding spots, and without them a scene has none', () => {
     const { g } = game();
     expect(hasHiding(g.scene.layout)).toBe(true);
     expect(g.hiding?.spots).toHaveLength(3);

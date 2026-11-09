@@ -244,9 +244,9 @@ describe('scene hiding spots and bodies (mw-e03.23)', () => {
     ).toHaveLength(1);
   });
 
-  it('places the testbed’s wardrobe, haystack and barrel, its body chest and its two bodies', () => {
+  it('places the hiding room’s wardrobe, haystack and barrel, its body chest and its two bodies', () => {
     const content = loadContent(contentTypes, gameContentSources(), contentChecks);
-    const spawns = content.get('scene', 'testbed').spawns;
+    const spawns = content.get('scene', 'hiding-room').spawns;
     const named = (id: string) => spawns.find((s) => s.id === id);
     expect(named('hiding-wardrobe')?.hiding?.concealment).toBe(1);
     expect(named('hiding-haystack')?.hiding?.look).toBe('hay');
@@ -921,6 +921,7 @@ describe('scene content', () => {
       'bridgeward-college',
       'chandelier-room',
       'combat-sandbox',
+      'hiding-room',
       'kit-gallery',
       'lighting-room',
       'marsh-store',
