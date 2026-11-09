@@ -53,7 +53,11 @@ quieter than either. "At least 3 times as loud" is read in sound pressure, not i
 
 Breaks (breakable profile loudness), kicks, switches and bells, spells and light sources, AI noises
 (`emit-noise`) and the debug scenario emit directly with their own authored loudness.
-Footsteps and landings (`footstep`, `landing`) come from the footstep rule below. Not yet: noise arrows
+Footsteps and landings (`footstep`, `landing`) come from the footstep rule below. Getting into and out
+of a hiding spot (`hide-enter`, `hide-exit`; mw-e03.23) makes the spot's own authored noise (30 and 24
+dB at 1 m by default, a wardrobe's door being quieter than a haystack's rustle if its data says so),
+attributed to whoever moved, at the spot. They are not movement noise: everyone listening hears them,
+which is how a guard turns round to a wardrobe that clicks shut. Not yet: noise arrows
 (mw-e05 payloads), ice cracking, electrical crackle and rope snaps.
 
 ## Footsteps

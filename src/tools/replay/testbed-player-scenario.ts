@@ -51,6 +51,7 @@ import {
   startCarry,
   startWorldItems,
 } from '@game/items/index';
+import { hasHiding, startHiding } from '@game/hiding/index';
 import { hasContainers, prepareContainers, startContainers } from '@game/items/containers';
 import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
@@ -197,6 +198,8 @@ export interface HeadlessGame<TInput> {
   readonly mechanisms: SceneMechanisms | undefined;
   /** The scene's containers (mw-e18.3), in scene order. */
   readonly containers: readonly EntityId[];
+  /** The scene's hiding spots (mw-e03.23), when it has any. */
+  readonly hiding: ReturnType<typeof startHiding> | undefined;
   /** The creatures content has, and what the scene's creature spawns spawned (mw-e12.4). */
   readonly creatures: GameCreatures;
   readonly sceneCreatures: SceneCreatures;
@@ -359,7 +362,7 @@ export function createGameWorld<TInput>(
   const items = prepareWorldItems(content);
   startWorldItems(world, items, scene.spawns, player);
   // Carrying (mw-e02.17): liftable objects, as src/main.ts starts them.
-  startCarry(world, content, collision);
+  startCarry(world, content, collision, scene.spawns);
   // Consumables (mw-e17.6): the use pipeline and the player's quick slots.
   const consumables = prepareConsumables(content, items);
   startConsumables(world, consumables, player);
@@ -377,8 +380,15 @@ export function createGameWorld<TInput>(
     : undefined;
   // Containers (mw-e18.3) in scenes that have them, after mechanisms (which unlock a locked chest).
   const containers = hasContainers(scene.layout)
-    ? startContainers(world, prepareContainers(content, items.inventory), scene, content)
+    ? startContainers(world, prepareContainers(content, items.inventory, items), scene, content)
     : [];
+  // Hiding spots (mw-e03.23) in scenes that have them, as src/main.ts starts them.
+  const hiding = hasHiding(scene.layout)
+    ? startHiding(world, scene, {
+        collision,
+        capsule: controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID)).capsule,
+      })
+    : undefined;
   // Creatures (mw-e12.4) with senses and AI (mw-e11.21, mw-e11.23): perception sees the player by
   // the light field over the sim's Rapier world; AI walks the scene's navmesh.
   if (phase !== undefined) {
@@ -408,6 +418,7 @@ export function createGameWorld<TInput>(
     consumables,
     mechanisms,
     containers,
+    hiding,
     creatures,
     sceneCreatures,
     sync,

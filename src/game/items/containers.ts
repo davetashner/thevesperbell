@@ -23,6 +23,7 @@ import {
   SceneSpawnComponent,
   type EntityId,
   type InventoryRules,
+  type ItemSpawner,
   type LoadedScene,
   type SceneLayout,
   type World,
@@ -37,9 +38,15 @@ export function hasContainers(layout: SceneLayout): boolean {
 }
 
 /** Container rules over content's loot tables and items, moving items through `inventory`. */
-export function prepareContainers(content: Content, inventory: InventoryRules): Containers {
+export function prepareContainers(
+  content: Content,
+  inventory: InventoryRules,
+  spawner?: ItemSpawner,
+): Containers {
   return new Containers(inventory, new LootTables(content.all('loot-table'), content.all('item')), {
     classOf,
+    // A container that breaks spills what it holds as pickups (mw-e03.23).
+    ...(spawner !== undefined && { items: spawner }),
   });
 }
 

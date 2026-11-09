@@ -96,7 +96,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].tags` | list of string | `[]` | Free-form tags for systems and tools. |
 | `spawns[].interact` | object | — | Makes the spawned entity interactable: its affordances (mw-e02.5). |
 | `spawns[].interact.affordances` | list of object (at least 1) | required | In priority order: Interact uses the first one the actor can. |
-| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"hide"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
+| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"stash"` \| `"hide"` \| `"leave"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
 | `spawns[].interact.affordances[].label` | string | — | Prompt text; defaults to the verb (e.g. "Pull"). |
 | `spawns[].interact.affordances[].hold` | number 0–10 | — | Seconds Interact must be held; 0 or omitted fires on press. |
 | `spawns[].interact.affordances[].requires` | list of object | — | Every one must hold for the actor to use it (else shown greyed with the reason). |
@@ -277,6 +277,20 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].container.contents[].count` | integer 1–9999 | `1` | Units of it; default 1. |
 | `spawns[].container.lock` | ref → lock | — | The lock it carries: unlocked and picked like a door’s (mw-e03.18). |
 | `spawns[].container.locked` | boolean | — | Starts locked; defaults to true when it has a lock (needs one). |
+| `spawns[].container.stash` | object | — | Room for bodies (mw-e03.23): a carried body goes in if it fits. |
+| `spawns[].container.stash.capacityKg` | number > 0 ≤ 1000 | required | Most the bodies stashed in it may weigh together, kg. |
+| `spawns[].bulky` | id | — | Makes a movable prop a shoulder-carry (a body, a statue part; mw-e03.23): heavier than a hand-carry, and it fits in a container with room for bodies. The id says what it is. |
+| `spawns[].hiding` | object | — | Makes the spawned entity a hiding spot an actor can slip into (mw-e03.23). |
+| `spawns[].hiding.capacity` | integer 1–8 | `1` | Actors that fit at once; default 1. |
+| `spawns[].hiding.concealment` | number 0–1 | `1` | How well it hides whoever is inside, 0–1; 1 takes them out of every sight query. |
+| `spawns[].hiding.peek` | boolean | `true` | The occupant may look out through the opening. |
+| `spawns[].hiding.enterDb` | number 0–120 | — | Noise of getting in, dB at 1 m; 30. |
+| `spawns[].hiding.exitDb` | number 0–120 | — | Noise of getting out, dB at 1 m; 24. |
+| `spawns[].hiding.size` | list of any (at least 3) | — | Greybox box drawn for it, metres along x, y, z, standing on the spawn point. |
+| `spawns[].hiding.look` | `"wood"` \| `"hay"` | `"wood"` | Colour of that box. |
+| `spawns[].hiding.inside` | list of any (at least 3) | — | Where an occupant stands; the spot’s origin. |
+| `spawns[].hiding.eye` | list of any (at least 3) | — | Where the peek camera sits; 1.5 m above `inside`. |
+| `spawns[].hiding.exits` | list of list of any (at least 3) (at least 1) | — | Exit points in order of preference; one 0.9 m out of the opening. |
 | `waypoints` | list of object | `[]` | Named points patrol routes walk through (mw-e11.9). |
 | `waypoints[].id` | id | required | Name of the waypoint, unique in the scene, e.g. yard-gate. |
 | `waypoints[].at` | list of any (at least 3) | required | Position in grid cells (x, y, z), snapped to SCENE_SNAP_STEP. |

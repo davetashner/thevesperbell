@@ -30,7 +30,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `solutions[].steps[].target` | id or `"player"` | required | Id of the listed entity that moves, or "player". |
 | `solutions[].steps[].to` | id | required | Id of the listed entity it ends up on or at (a plate, a ledge). |
 | `solutions[].steps[].do` | `"interact"` | required | Step kind: the player uses an affordance. |
-| `solutions[].steps[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"hide"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | Affordance verb used on it, e.g. "pull". |
+| `solutions[].steps[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"stash"` \| `"hide"` \| `"leave"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | Affordance verb used on it, e.g. "pull". |
 | `solutions[].steps[].do` | `"reach"` | required | Step kind: the player gets to the target. |
 | `solutions[].steps[].do` | `"wait"` | required | Step kind: time passes. |
 | `solutions[].steps[].seconds` | number > 0 | required | Seconds to wait (water freezes, a timer runs). |

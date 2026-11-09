@@ -511,6 +511,46 @@ describe('scene layout (mw-e00.21)', () => {
     );
   });
 
+  it('lays out hiding spots, room for bodies and bulky props as plain data (mw-e03.23)', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        {
+          id: 'wardrobe',
+          at: [1, 0, 1],
+          yaw: 90,
+          tags: [],
+          hiding: { capacity: 2, concealment: 0.5, peek: false, exits: [[0, 0, 1]] },
+        },
+        { id: 'hay', at: [2, 0, 1], yaw: 0, tags: [], hiding: { size: [1, 1, 1], look: 'hay' } },
+        {
+          id: 'chest',
+          at: [3, 0, 1],
+          yaw: 0,
+          tags: [],
+          container: { stash: { capacityKg: 60 } },
+        },
+        { id: 'body', at: [4, 0, 1], yaw: 0, tags: [], prop: { id: 'crate' }, bulky: 'body' },
+      ],
+    };
+    const [wardrobe, hay, chest, body] = layoutScene(scene, testKit).spawns;
+    expect(wardrobe?.hiding).toEqual({
+      capacity: 2,
+      concealment: 0.5,
+      peek: false,
+      exits: [[0, 0, 1]],
+    });
+    expect(Object.isFrozen(wardrobe?.hiding)).toBe(true);
+    expect(hay?.hiding).toEqual({ size: [1, 1, 1], look: 'hay' });
+    expect(chest?.container?.stashKg).toBe(60);
+    expect(body?.bulky).toBe('body');
+    expect(
+      layoutScene(TEST_SCENE, testKit).spawns.every(
+        (s) => s.hiding === undefined && s.bulky === undefined,
+      ),
+    ).toBe(true);
+  });
+
   it('lays out placed signal graphs with their bindings and checkpoints (mw-e01.4)', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,

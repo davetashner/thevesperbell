@@ -329,7 +329,9 @@ export function installCarry<TInput>(
     options.input ??
     ((inputs: readonly TInput[]): CarryButtons | undefined => actionFrameOf(inputs));
   if (!w.isRegistered(StimulusQueueComponent)) throw new Error('install stimuli before carrying');
-  w.register(CarryLedgerComponent, CarryBulkyComponent);
+  // Containers register the bulky marker too (a stashed body, mw-e03.23): whichever comes first.
+  if (!w.isRegistered(CarryLedgerComponent)) w.register(CarryLedgerComponent);
+  if (!w.isRegistered(CarryBulkyComponent)) w.register(CarryBulkyComponent);
   if (!w.isRegistered(WorldItemComponent)) w.register(WorldItemComponent);
   const ledgerId = w.spawn();
   w.add(ledgerId, CarryLedgerComponent, { holds: [] });

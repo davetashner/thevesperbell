@@ -10,6 +10,7 @@ import {
   PlayerClassComponent,
   RecoveryAnchorComponent,
   settleHeldObjects,
+  settleHidden,
   settlePushes,
   settleRemoteHolds,
   SpellHotbarComponent,
@@ -57,6 +58,8 @@ export function createGameSaveRegistry(options: GameSaveOptions = {}): SaveRegis
       settleHeldObjects(world);
       settleRemoteHolds(world);
       settlePushes(world);
+      // Nor a hide: whoever is inside a wardrobe steps out first (mw-e03.23).
+      settleHidden(world);
     },
   })
     .register(inventorySaveSection(options))

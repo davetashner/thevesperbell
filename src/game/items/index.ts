@@ -21,6 +21,7 @@ import {
 } from '@content/index';
 import {
   addInventory,
+  CarryBulkyComponent,
   addQuickSlots,
   addSceneItems,
   Consumables,
@@ -121,6 +122,12 @@ export function startWorldItems<T>(
   return addSceneItems(sim, items, spawns);
 }
 
+/** A scene spawn that may be a shoulder-carry, and its entity (as `LoadedScene.spawns` lists them). */
+export interface BulkySpawn {
+  readonly entity: EntityId;
+  readonly spawn: { readonly bulky?: string | undefined };
+}
+
 /**
  * Installs carrying (mw-e02.17) after the world items: Interact picks up a liftable object up to the
  * class's carry limit (class data, 25 kg by default), Drop and Throw (held to charge) let it go.
@@ -130,9 +137,10 @@ export function startCarry<T>(
   world: World<T>,
   content: Pick<GameContent, 'get' | 'has'>,
   collision: CollisionWorld,
+  spawns: readonly BulkySpawn[] = [],
 ): CarryController {
   installPush(world, { collision });
-  return installCarry(world, {
+  const carry = installCarry(world, {
     collision,
     limit: (w, actor) => {
       const id = classOf(w, actor);
@@ -141,6 +149,11 @@ export function startCarry<T>(
         : DEFAULT_CARRY_LIMIT_KG;
     },
   });
+  // Props the scene calls bulky (a body) are shoulder-carries (mw-e03.23).
+  for (const { entity, spawn } of spawns) {
+    if (spawn.bulky !== undefined) world.add(entity, CarryBulkyComponent, { kind: spawn.bulky });
+  }
+  return carry;
 }
 
 /**

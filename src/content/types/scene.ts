@@ -381,6 +381,54 @@ export const sceneContainerSchema = z.strictObject({
     .boolean()
     .optional()
     .describe('Starts locked; defaults to true when it has a lock (needs one).'),
+  stash: z
+    .strictObject({
+      capacityKg: z
+        .number()
+        .positive()
+        .max(1000)
+        .describe('Most the bodies stashed in it may weigh together, kg.'),
+    })
+    .optional()
+    .describe('Room for bodies (mw-e03.23): a carried body goes in if it fits.'),
+});
+
+const localOffset = z
+  .tuple([z.number().min(-5).max(5), z.number().min(-1).max(5), z.number().min(-5).max(5)])
+  .describe('Metres in the spot’s frame: x right of the opening, y up, z out of it.');
+
+/**
+ * Makes a spawn a hiding spot (mw-e03.23): a wardrobe, barrel or haystack an actor can slip into to
+ * break line of sight. The spawn's `yaw` is which way its opening faces.
+ */
+export const sceneHidingSchema = z.strictObject({
+  capacity: z.int().min(1).max(8).default(1).describe('Actors that fit at once; default 1.'),
+  concealment: z
+    .number()
+    .min(0)
+    .max(1)
+    .default(1)
+    .describe('How well it hides whoever is inside, 0–1; 1 takes them out of every sight query.'),
+  peek: z.boolean().default(true).describe('The occupant may look out through the opening.'),
+  enterDb: z.number().min(0).max(120).optional().describe('Noise of getting in, dB at 1 m; 30.'),
+  exitDb: z.number().min(0).max(120).optional().describe('Noise of getting out, dB at 1 m; 24.'),
+  size: z
+    .tuple([
+      z.number().positive().max(6),
+      z.number().positive().max(6),
+      z.number().positive().max(6),
+    ])
+    .optional()
+    .describe('Greybox box drawn for it, metres along x, y, z, standing on the spawn point.'),
+  look: z.enum(['wood', 'hay']).default('wood').describe('Colour of that box.'),
+  inside: localOffset.optional().describe('Where an occupant stands; the spot’s origin.'),
+  eye: localOffset.optional().describe('Where the peek camera sits; 1.5 m above `inside`.'),
+  exits: z
+    .array(localOffset)
+    .min(1)
+    .max(6)
+    .optional()
+    .describe('Exit points in order of preference; one 0.9 m out of the opening.'),
 });
 
 /**
@@ -684,6 +732,14 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3).',
     ),
+  bulky: contentId
+    .optional()
+    .describe(
+      'Makes a movable prop a shoulder-carry (a body, a statue part; mw-e03.23): heavier than a hand-carry, and it fits in a container with room for bodies. The id says what it is.',
+    ),
+  hiding: sceneHidingSchema
+    .optional()
+    .describe('Makes the spawned entity a hiding spot an actor can slip into (mw-e03.23).'),
 });
 
 const lightLevel = z.number().min(0).max(1);
@@ -1278,6 +1334,27 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     }
     if (container.locked === true && container.lock === undefined) {
       issue('container', 'starts locked but has no lock');
+    }
+  }
+  if (spawn.bulky !== undefined && spawn.prop === undefined) {
+    issue('bulky', 'is carried but is not a movable prop');
+  }
+  if (spawn.hiding !== undefined) {
+    for (const [key, what] of [
+      ['container', 'a container'],
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a hiding spot and ${what}`);
+    }
+    if (spawn.interact !== undefined) {
+      issue(
+        'interact',
+        'is a hiding spot: its affordances follow who is inside, so it declares none',
+      );
     }
   }
   const { plate } = spawn;

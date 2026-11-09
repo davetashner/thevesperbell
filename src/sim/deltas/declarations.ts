@@ -19,6 +19,7 @@
 //   mechanisms system syncs them); a switch's bound lever nodes follow at once.
 // - `container`: an entity's whole pack (`inventory.pack`): a looted chest stays empty, and what was
 //   put in one stays inside (mw-e18.3; that its loot table was rolled is a world fact, saved apart).
+// - `stash`: the bodies stashed in a container (mw-e03.23), by kind and weight.
 // - `actor.life`, `actor.disposition`: an actor's current hit points (0: dead, and it stays dead)
 //   and its faction membership, the hooks actor persistence builds on (AI state is mw-e11's).
 //
@@ -31,6 +32,7 @@ import type { World } from '../core/world';
 import { FactionMemberComponent } from '../factions/runtime';
 import { InventoryComponent } from '../inventory/inventory';
 import { refreshContainerAffordances } from '../loot/containers';
+import { StashComponent } from '../loot/stash';
 import { hypot } from '../math';
 import { DoorComponent, LockComponent, SwitchComponent } from '../mechanisms/components';
 import { refreshAffordances, syncSwitchNodes } from '../mechanisms/system';
@@ -311,6 +313,14 @@ export const containerPersistence = componentPersistence('container', InventoryC
   },
 });
 
+/** What a container's stash holds (mw-e03.23): its bodies, by kind and weight. */
+export const stashPersistence = componentPersistence('stash', StashComponent, {
+  pick: ({ bodies }) => ({ bodies: bodies.map((body) => ({ ...body })) }),
+  restore: (world, entity, stash, delta) => {
+    world.set(entity, StashComponent, { ...stash, bodies: delta.bodies.map((b) => ({ ...b })) });
+  },
+});
+
 export const actorLifePersistence = componentPersistence('actor.life', HealthComponent, {
   pick: ({ current }) => ({ current }),
   restore: (world, entity, health, delta) => {
@@ -337,6 +347,7 @@ export const DEFAULT_PERSISTENCE: readonly PersistenceDeclaration[] = Object.fre
   lockPersistence,
   switchPersistence,
   containerPersistence,
+  stashPersistence,
   actorLifePersistence,
   actorDispositionPersistence,
 ] as readonly PersistenceDeclaration[]);

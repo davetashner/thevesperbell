@@ -78,6 +78,20 @@ describe('World scheduler', () => {
     );
   });
 
+  it('mw-e03.23: an input filter may rewrite the inputs it keeps', () => {
+    const seen: string[][] = [];
+    const world = new World<string>({ seed: 1 })
+      .addInputFilter({ name: 'plain', keep: () => true })
+      .addInputFilter({
+        name: 'shout',
+        keep: (input) => input !== 'drop',
+        map: (input) => input.toUpperCase(),
+      })
+      .addSystem(system<string>('probe', ({ inputs }) => void seen.push([...inputs])));
+    world.step(['a', 'drop', 'b']);
+    expect(seen).toEqual([['A', 'B']]);
+  });
+
   it('defaults to 60 Hz', () => {
     expect(new World({ seed: 1 }).clock.hz).toBe(60);
   });
