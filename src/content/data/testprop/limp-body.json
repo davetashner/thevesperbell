@@ -1,0 +1,9 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "limp-body",
+  "name": "Limp body",
+  "mass": 45,
+  "flammable": false,
+  "tags": ["body"],
+  "body": { "size": [1.2, 0.35, 0.5], "material": "flesh" }
+}

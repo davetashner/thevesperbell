@@ -30,6 +30,7 @@ describe('testprop content', () => {
       'clay-pot',
       'crate',
       'lever',
+      'limp-body',
       'plank',
     ]);
     expect(content.get('testprop', 'crate').breaksInto?.toString()).toBe('testprop:plank');

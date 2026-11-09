@@ -101,6 +101,7 @@ import {
   AimZoom,
   applyOrbitPose,
   LockFraming,
+  lookForward,
   lookSettings,
   nearPlaneClear,
   OrbitCamera,
@@ -324,6 +325,22 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly statuses?: StatusLookup;
   /** Equipment rules whose armor load shapes the player's combat and noise (mw-e04.16). */
   readonly equipment?: EquipmentRules;
+  /**
+   * The peek hook (mw-e03.23): while `view` answers for the player (it hides in a wardrobe), the
+   * camera sits at the view's eye and looks where it says instead of orbiting, and `body(false)`
+   * hides the player's own body; `body(true)` shows it again. Absent = the orbit camera always.
+   */
+  readonly peek?: {
+    readonly view: (entity: EntityId) => PeekView | undefined;
+    readonly body: (visible: boolean) => void;
+  };
+}
+
+/** Where the peek camera sits and which way it looks (the look yaw and pitch, radians). */
+export interface PeekView {
+  readonly eye: { readonly x: number; readonly y: number; readonly z: number };
+  readonly yaw: number;
+  readonly pitch: number;
 }
 
 /** The player's climbing (mw-e02.13). */
@@ -629,10 +646,29 @@ export function setupTestbedPlayer<TObject, TCommand>(
   let drivesCamera = true;
   let pulled = 0;
 
+  let bodyShown = true;
+  /** Puts the camera at the peek view's eye; returns whether the player is hiding. */
+  const peekCamera = (): boolean => {
+    const view = options.peek?.view(entity);
+    const visible = view === undefined;
+    if (visible !== bodyShown) {
+      bodyShown = visible;
+      options.peek?.body(visible);
+    }
+    if (view === undefined) return false;
+    const forward = lookForward(view.yaw, view.pitch);
+    const { eye } = view;
+    camera.position.set(eye.x, eye.y, eye.z);
+    camera.lookAt(eye.x + forward.x, eye.y + forward.y, eye.z + forward.z);
+    drove = false; // coming out is a cut back to the orbit camera
+    return true;
+  };
+
   const placeCamera = (alpha: number, dt: number): void => {
     const state = world.get(entity, CharacterController);
     const look = world.get(entity, PlayerLook);
     if (shown === undefined || state === undefined || look === undefined) return;
+    if (peekCamera()) return;
     const height = state.crouched ? tuning.capsule.crouchHeight : tuning.capsule.height;
     // Coming back from the debug camera is a cut: no recovery from wherever it last was.
     if (!drove) {

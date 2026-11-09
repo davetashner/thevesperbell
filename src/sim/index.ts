@@ -62,6 +62,7 @@ export * from './factions';
 export * from './facts';
 export * from './field';
 export * from './geom';
+export * from './hiding';
 export * from './input';
 export * from './interaction';
 export * from './light';

@@ -553,6 +553,32 @@ describe('testbed player wiring (mw-e02.23)', () => {
   });
 });
 
+describe('testbed peek camera (mw-e03.23)', () => {
+  it('while the peek hook answers the camera sits at its eye, looking where it says, with the body hidden', () => {
+    let view: { eye: { x: number; y: number; z: number }; yaw: number; pitch: number } | undefined;
+    const shown: boolean[] = [];
+    const { run, camera } = testbed({
+      peek: { view: () => view, body: (visible: boolean) => shown.push(visible) },
+    });
+    run(0.2);
+    const orbit = { ...camera.at };
+    expect(shown).toEqual([]); // nothing to change: the body was already shown
+    view = { eye: { x: 4.3, y: 1.5, z: 1.5 }, yaw: Math.PI / 2, pitch: 0 };
+    run(0.1);
+    expect(camera.at).toEqual({ x: 4.3, y: 1.5, z: 1.5 });
+    expect(camera.target.x).toBeCloseTo(3.3, 6); // looking west
+    expect(camera.target.z).toBeCloseTo(1.5, 6);
+    expect(shown).toEqual([false]);
+    run(0.1);
+    expect(shown).toEqual([false]); // told once
+    view = undefined;
+    run(0.2);
+    expect(shown).toEqual([false, true]);
+    expect(camera.at.x).not.toBe(4.3);
+    expect(camera.at).not.toEqual(orbit); // the orbit camera is back, from where the player stands
+  });
+});
+
 describe('testbed orbit camera (mw-e02.4)', () => {
   it('mouse up and down pitch the view within the limits, and the camera follows', () => {
     const { sampler, run, state, camera } = testbed({ sensitivity: 0.01 });

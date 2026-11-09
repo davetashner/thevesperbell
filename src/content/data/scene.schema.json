@@ -626,7 +626,9 @@
                         "pick-up",
                         "read",
                         "search",
+                        "stash",
                         "hide",
+                        "leave",
                         "climb",
                         "talk",
                         "push",
@@ -2023,6 +2025,176 @@
               "locked": {
                 "description": "Starts locked; defaults to true when it has a lock (needs one).",
                 "type": "boolean"
+              },
+              "stash": {
+                "description": "Room for bodies (mw-e03.23): a carried body goes in if it fits.",
+                "type": "object",
+                "properties": {
+                  "capacityKg": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000,
+                    "description": "Most the bodies stashed in it may weigh together, kg."
+                  }
+                },
+                "required": [
+                  "capacityKg"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "bulky": {
+            "description": "Makes a movable prop a shoulder-carry (a body, a statue part; mw-e03.23): heavier than a hand-carry, and it fits in a container with room for bodies. The id says what it is.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "hiding": {
+            "description": "Makes the spawned entity a hiding spot an actor can slip into (mw-e03.23).",
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "default": 1,
+                "description": "Actors that fit at once; default 1.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              },
+              "concealment": {
+                "default": 1,
+                "description": "How well it hides whoever is inside, 0–1; 1 takes them out of every sight query.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "peek": {
+                "default": true,
+                "description": "The occupant may look out through the opening.",
+                "type": "boolean"
+              },
+              "enterDb": {
+                "description": "Noise of getting in, dB at 1 m; 30.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 120
+              },
+              "exitDb": {
+                "description": "Noise of getting out, dB at 1 m; 24.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 120
+              },
+              "size": {
+                "description": "Greybox box drawn for it, metres along x, y, z, standing on the spawn point.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 6
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 6
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 6
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "look": {
+                "default": "wood",
+                "description": "Colour of that box.",
+                "type": "string",
+                "enum": [
+                  "wood",
+                  "hay"
+                ]
+              },
+              "inside": {
+                "description": "Where an occupant stands; the spot’s origin.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "eye": {
+                "description": "Where the peek camera sits; 1.5 m above `inside`.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "exits": {
+                "description": "Exit points in order of preference; one 0.9 m out of the opening.",
+                "minItems": 1,
+                "maxItems": 6,
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": -5,
+                      "maximum": 5
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 5
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -5,
+                      "maximum": 5
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "description": "Metres in the spot’s frame: x right of the opening, y up, z out of it."
+                }
               }
             },
             "additionalProperties": false

@@ -20,6 +20,7 @@ import { InMemoryColliderSink } from '../physics/static-colliders';
 import { registerWorldProperties } from '../properties/components';
 import { sceneLedges } from '../climb/ledges';
 import { LEDGE_HANG_CAPABILITY } from '../climb/mantle';
+import { HiddenComponent } from '../hiding/state';
 import { layoutScene, type SceneSpawnPlacement } from '../scene/layout';
 import { hashWorld } from '../snapshot';
 import { addCapabilities, CapabilityRegistry } from '../progression/capabilities';
@@ -114,6 +115,18 @@ function setup(sensitivity?: number, extra: Partial<PlayerOptions> = {}) {
 
 const spawn = (yaw: SceneSpawnPlacement['yaw'], tags: string[]) =>
   ({ ...LAYOUT.spawns[0], yaw, tags }) as SceneSpawnPlacement;
+
+describe('player hiding (mw-e03.23)', () => {
+  it('a player hidden in a spot is held where it is: movement input does nothing', () => {
+    const { world, player, state } = setup();
+    world.register(HiddenComponent);
+    world.step([frame({})]);
+    const at = state().position;
+    world.add(player, HiddenComponent, { spot: 999, concealment: 1, since: 0, from: at });
+    for (let i = 0; i < 30; i++) world.step([frame({ move: [0, 1], held: ['sprint'] })]);
+    expect(state().position).toEqual(at);
+  });
+});
 
 describe('wrapYaw', () => {
   it('keeps angles in (−π, π]', () => {

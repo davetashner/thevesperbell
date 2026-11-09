@@ -157,6 +157,105 @@ describe('scene containers (mw-e18.3)', () => {
   });
 });
 
+describe('scene hiding spots and bodies (mw-e03.23)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
+
+  it('fills a hiding spot’s defaults and takes its greybox, noise and exit points', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('wardrobe', { yaw: 90, hiding: {} }),
+        spawn('hay', {
+          hiding: {
+            capacity: 2,
+            concealment: 0.5,
+            peek: false,
+            enterDb: 40,
+            exitDb: 30,
+            size: [1, 1, 1],
+            look: 'hay',
+            inside: [0, 0, 0.1],
+            eye: [0, 1.2, 0.2],
+            exits: [[0, 0, 1]],
+          },
+        }),
+      ],
+    });
+    expect(scene.spawns[0]?.hiding).toEqual({
+      capacity: 1,
+      concealment: 1,
+      peek: true,
+      look: 'wood',
+    });
+    expect(scene.spawns[1]?.hiding?.exits).toEqual([[0, 0, 1]]);
+  });
+
+  it('rejects a hiding spot that is also a container, door, switch, plate, item or creature, or declares a prompt', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('mimic', {
+            hiding: {},
+            container: {},
+            door: { profile: 'wooden-door' },
+            interact: { affordances: [{ verb: 'hide' }] },
+          }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.container: spawn "mimic" cannot be both a hiding spot and a container',
+        'spawns.0.door: spawn "mimic" cannot be both a hiding spot and a door',
+        'spawns.0.interact: spawn "mimic" is a hiding spot: its affordances follow who is inside, so it declares none',
+      ]),
+    );
+  });
+
+  it('rejects a spot with no capacity, a concealment over 1, no exits or an exit far away', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('a', { hiding: { capacity: 0 } }),
+          spawn('b', { hiding: { concealment: 1.5 } }),
+          spawn('c', { hiding: { exits: [] } }),
+          spawn('d', { hiding: { exits: [[0, 0, 9]] } }),
+        ],
+      }),
+    ).toHaveLength(4);
+  });
+
+  it('takes room for bodies on a container and a bulky mark on a prop, but not on a spawn that is no prop', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('chest', { container: { stash: { capacityKg: 60 } } }),
+        spawn('body', { prop: 'limp-body', bulky: 'body' }),
+      ],
+    });
+    expect(scene.spawns[0]?.container?.stash).toEqual({ capacityKg: 60 });
+    expect(scene.spawns[1]?.bulky).toBe('body');
+    expect(problems({ ...room, spawns: [spawn('lump', { bulky: 'body' })] })).toEqual([
+      'spawns.0.bulky: spawn "lump" is carried but is not a movable prop',
+    ]);
+    expect(
+      problems({ ...room, spawns: [spawn('c', { container: { stash: { capacityKg: 0 } } })] }),
+    ).toHaveLength(1);
+  });
+
+  it('places the hiding room’s wardrobe, haystack and barrel, its body chest and its two bodies', () => {
+    const content = loadContent(contentTypes, gameContentSources(), contentChecks);
+    const spawns = content.get('scene', 'hiding-room').spawns;
+    const named = (id: string) => spawns.find((s) => s.id === id);
+    expect(named('hiding-wardrobe')?.hiding?.concealment).toBe(1);
+    expect(named('hiding-haystack')?.hiding?.look).toBe('hay');
+    expect(named('hiding-barrel')?.hiding?.peek).toBe(false);
+    expect(named('body-chest')?.container?.stash?.capacityKg).toBe(60);
+    expect(named('limp-body-a')?.bulky).toBe('body');
+  });
+});
+
 describe('scene pressure plates (mw-e03.19)', () => {
   const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
 
@@ -822,6 +921,7 @@ describe('scene content', () => {
       'bridgeward-college',
       'chandelier-room',
       'combat-sandbox',
+      'hiding-room',
       'kit-gallery',
       'lighting-room',
       'marsh-store',

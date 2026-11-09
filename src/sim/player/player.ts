@@ -49,6 +49,7 @@ import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
 import { carryRestraint, refuseGrab } from '../carry/state';
+import { isHidden } from '../hiding/state';
 import { pushRestraint } from '../push/state';
 import { radians } from '../character/greybox';
 import {
@@ -856,6 +857,8 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         };
       },
       noclip: (entity) => hasCheat(world, entity, 'noclip'),
+      // Hiding in a wardrobe holds the player where the hiding rules put it (mw-e03.23).
+      held: (entity) => isHidden(world, entity),
     }),
   );
   if (climb !== undefined && combat !== undefined) {

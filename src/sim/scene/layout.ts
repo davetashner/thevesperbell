@@ -233,6 +233,8 @@ export interface SceneBridgeSpec {
 
 /** A container spawn as written in data (mw-e18.3): its loot table, contents and lock. */
 export interface SceneContainerSpec {
+  /** Room for bodies, kg (mw-e03.23). */
+  readonly stash?: { readonly capacityKg: number } | undefined;
   readonly loot?: { readonly id: string } | undefined;
   readonly contents?:
     readonly { readonly item: { readonly id: string }; readonly count: number }[] | undefined;
@@ -246,7 +248,32 @@ export interface SceneContainer {
   readonly contents: readonly { readonly item: string; readonly count: number }[];
   readonly lock?: string;
   readonly locked?: boolean;
+  /** Room for bodies, kg (mw-e03.23). */
+  readonly stashKg?: number;
 }
+
+/**
+ * A hiding spot spawn as written in data (mw-e03.23). The spawn's `yaw` is which way its opening
+ * faces; offsets are in metres in the spot's frame (x right of the opening, y up, z out of it).
+ */
+export interface SceneHidingSpec {
+  readonly capacity?: number | undefined;
+  readonly concealment?: number | undefined;
+  readonly peek?: boolean | undefined;
+  readonly enterDb?: number | undefined;
+  readonly exitDb?: number | undefined;
+  /** Greybox box drawn for it, metres, and its colour (glue; the sim never reads them). */
+  readonly size?: Triple | undefined;
+  readonly look?: 'wood' | 'hay' | undefined;
+  readonly inside?: Triple | undefined;
+  readonly eye?: Triple | undefined;
+  readonly exits?: readonly Triple[] | undefined;
+}
+
+/** A hiding spot as laid out: the same data, only what the file set. */
+export type SceneHiding = {
+  readonly [K in keyof SceneHidingSpec]?: Exclude<SceneHidingSpec[K], undefined>;
+};
 
 /** A signal graph placed in a scene (mw-e03.18): its id and binding renames. */
 export interface SceneSignalSpec {
@@ -394,6 +421,10 @@ export interface SceneSpawnSpec {
   readonly lightReceiver?: SceneLightReceiverSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
+  /** Makes the spawned entity a hiding spot (mw-e03.23). */
+  readonly hiding?: SceneHidingSpec | undefined;
+  /** Makes a movable prop a shoulder-carry of this kind (mw-e03.23). */
+  readonly bulky?: string | undefined;
   /** Makes the spawned entity a rope from its position (mw-e05.13, mw-e03.13). */
   readonly rope?: SceneRopeSpec | undefined;
   /** Makes the spawn one end of a rope bridge: its ropes and planks (mw-e03.13). */
@@ -567,6 +598,10 @@ export interface SceneSpawnPlacement {
   readonly lightReceiver?: SceneLightReceiverSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
+  /** Its hiding spot data, when it is one (mw-e03.23). */
+  readonly hiding?: SceneHiding;
+  /** What kind of shoulder-carry it is, when it is one (mw-e03.23). */
+  readonly bulky?: string;
   /** Its rope data, when it is a rope (mw-e05.13, mw-e03.13). */
   readonly rope?: SceneRope;
   /** The rope spawn it hangs from, when it hangs (mw-e05.13). */
@@ -839,7 +874,14 @@ function containerOf(spec: SceneContainerSpec): SceneContainer {
     ),
     ...(spec.lock !== undefined && { lock: spec.lock.id }),
     ...(spec.locked !== undefined && { locked: spec.locked }),
+    ...(spec.stash !== undefined && { stashKg: spec.stash.capacityKg }),
   });
+}
+
+/** A hiding spot's data-file form: only what the file set. */
+function hidingOf(spec: SceneHidingSpec): SceneHiding {
+  const set = Object.entries(spec).filter(([, value]) => value !== undefined);
+  return Object.freeze(Object.fromEntries(set));
 }
 
 /**
@@ -1019,6 +1061,8 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         ...(spawn.optic !== undefined && { optic: definedOf(spawn.optic) }),
         ...(spawn.lightReceiver !== undefined && { lightReceiver: definedOf(spawn.lightReceiver) }),
         ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
+        ...(spawn.hiding !== undefined && { hiding: hidingOf(spawn.hiding) }),
+        ...(spawn.bulky !== undefined && { bulky: spawn.bulky }),
         ...(spawn.rope !== undefined && { rope: ropeOf(spawn, scene.grid) }),
         ...(spawn.suspendedFrom !== undefined && { suspendedFrom: spawn.suspendedFrom }),
       }),

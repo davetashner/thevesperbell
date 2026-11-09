@@ -75,6 +75,11 @@ export interface InputFilter<TInput> {
   readonly name: string;
   /** Whether the systems see `input` this tick. */
   keep(input: TInput, world: World<TInput>): boolean;
+  /**
+   * What the systems see of an input that was kept (mw-e03.23: a player hiding in a wardrobe keeps
+   * only their look and Interact). Absent: the input as it was. Must be deterministic and pure.
+   */
+  map?(input: TInput, world: World<TInput>): unknown;
 }
 
 /**
@@ -348,7 +353,11 @@ export class World<TInput = unknown> {
       const filtered =
         filters.length === 0
           ? inputs
-          : inputs.filter((input) => filters.every((filter) => filter.keep(input, this)));
+          : inputs
+              .filter((input) => filters.every((filter) => filter.keep(input, this)))
+              .map((input) =>
+                filters.reduce((seen, f) => (f.map ? (f.map(seen, this) as TInput) : seen), input),
+              );
       const ctx: TickContext<TInput> = {
         world: this,
         inputs: filtered,

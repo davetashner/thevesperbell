@@ -261,6 +261,17 @@ import { createLeftover, disposeLeftover } from '@render/breakables/index';
 import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
 import { createThrowArc } from '@render/player/index';
 import { createDoorLeaf, disposeDoorLeaf } from '@render/mechanisms/index';
+import { createHidingSpotMesh, disposeHidingSpotMesh } from '@render/hiding/index';
+import {
+  hasHiding,
+  HIDING_VETO_ID,
+  hidingVeto,
+  HidingWatch,
+  peekView,
+  readHidingSpot,
+  spotLooks,
+  startHiding,
+} from '@game/hiding/index';
 import {
   breakArrowShaft,
   createArrowFxRenderer,
@@ -1712,6 +1723,13 @@ function startRenderer(
           publishCamera: (readout) => {
             root.dataset['orbitCamera'] = JSON.stringify(readout);
           },
+          // Hiding in a wardrobe (mw-e03.23): the camera looks out of it and the body is hidden.
+          peek: {
+            view: (entity) => peekView(world, entity),
+            body: (visible) => {
+              body.root.visible = visible;
+            },
+          },
           // Focus and Interact (mw-e02.5): reach is blocked by anything solid in the sim's Rapier
           // world. The e2e reads the player's interactions (latest last) from #app[data-interactions].
           interaction: {
@@ -1987,7 +2005,7 @@ function startRenderer(
       // Carrying (mw-e02.17): Interact lifts a liftable object up to the class's carry limit; Drop
       // (G) lets go, Drop with crouch places it, and Throw (T), held and released, throws it. The
       // arc a charged throw would fly is drawn while the button is held.
-      const carry = startCarry(world, content, new RapierCollisionWorld(physics));
+      const carry = startCarry(world, content, new RapierCollisionWorld(physics), loaded.spawns);
       const throwArc = createThrowArc();
       view.scene.add(throwArc.object);
       afterStep.push(() => {
@@ -2230,7 +2248,7 @@ function startRenderer(
       if (hasContainers(loaded.layout)) {
         const made = startContainers(
           world,
-          prepareContainers(content, worldItems.inventory),
+          prepareContainers(content, worldItems.inventory, worldItems),
           loaded,
           content,
         );
@@ -2242,6 +2260,30 @@ function startRenderer(
         };
         drawContainers();
         afterStep.push(drawContainers);
+      }
+      // Hiding spots (mw-e03.23): only in scenes that have them. Each is a grey box that follows its
+      // sim pose; the e2e reads who hides where from #app[data-hiding].
+      if (hasHiding(loaded.layout)) {
+        const { spots } = startHiding(world, loaded, {
+          collision,
+          capsule: controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID)).capsule,
+        });
+        for (const { entity, size, look } of spotLooks(loaded)) {
+          const object = createHidingSpotMesh(size, look);
+          view.scene.add(object);
+          sync.bind(entity, {
+            ...object3DBinding(object, (v, e) => readHidingSpot(v, e, size.y)),
+            dispose: disposeHidingSpotMesh,
+          });
+        }
+        const watch = new HidingWatch(world, spots, player?.entity);
+        let publishedHiding = '';
+        const drawHiding = (): void => {
+          const json = JSON.stringify(watch.readout());
+          if (json !== publishedHiding) root.dataset['hiding'] = publishedHiding = json;
+        };
+        drawHiding();
+        afterStep.push(drawHiding);
       }
       // World facts (mw-e01.4): the e2e reads the set facts, e.g. the slice's pass slice.complete
       // (docs/design/vertical-slice.md §5), from #app[data-facts], rewritten when one changes.
@@ -2515,7 +2557,11 @@ function startRenderer(
     const progress = new SaveProgress(() => world.tick);
     // The "not safe to save now" checks (mw-e01.7): they hold back autosaves and disable the pause
     // menu's Save with their reason (mw-e01.3). In m1, a creature in Combat.
-    const saveVetoes = { [COMBAT_VETO_ID]: combatVeto(world) };
+    const saveVetoes = {
+      [COMBAT_VETO_ID]: combatVeto(world),
+      // Nor while the player hides in a wardrobe (mw-e03.23).
+      [HIDING_VETO_ID]: hidingVeto(world, () => player?.entity),
+    };
     const safety = new SafetyVetoes();
     for (const [id, veto] of Object.entries(saveVetoes)) safety.register(id, veto);
     // Items no longer in content are dropped from a loaded save with a warning (mw-e17.8).

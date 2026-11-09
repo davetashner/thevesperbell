@@ -71,6 +71,11 @@ export interface CharacterSystemOptions<TInput> {
   readonly input: (inputs: readonly TInput[], entity: EntityId) => CharacterInput | undefined;
   /** Whether `entity` flies free of collision and gravity this tick (the noclip cheat, mw-e33.1). */
   readonly noclip?: (entity: EntityId) => boolean;
+  /**
+   * Whether `entity` is held where it is this tick (hiding inside a wardrobe, mw-e03.23): its state
+   * is not stepped at all, so no gravity, input or depenetration moves it.
+   */
+  readonly held?: (entity: EntityId) => boolean;
 }
 
 /** A system stepping every CharacterController once per tick. */
@@ -83,6 +88,7 @@ export function characterControllerSystem<TInput>(
     run({ world, inputs, clock, tick }) {
       const shared = controllerParams(tuning, clock);
       world.query(CharacterController).forEach((entity, state) => {
+        if (options.held?.(entity) === true) return;
         const own = characterTuning(world, entity, tuning);
         const params = own === tuning ? shared : controllerParams(own, clock);
         const context = { world: collision, tuning: own, params, hooks, entity };

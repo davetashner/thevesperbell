@@ -18,6 +18,7 @@ describe('content test harness', () => {
       'clay-pot',
       'crate',
       'lever',
+      'limp-body',
       'plank',
     ]);
   });

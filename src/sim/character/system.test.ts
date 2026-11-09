@@ -67,6 +67,31 @@ describe('character controller system', () => {
     });
   });
 
+  it('mw-e03.23: a character that is held is not stepped at all: no input, gravity or depenetration', () => {
+    const collision = new FakeCollisionWorld([
+      box({ x: -50, y: -1, z: -50 }, { x: 50, y: 0, z: 50 }),
+    ]);
+    const world = new World<Command>({ seed: 1 }).register(CharacterController);
+    const held = new Set<number>();
+    world.addSystem(
+      characterControllerSystem({
+        collision,
+        tuning: TUNING,
+        input: (inputs, entity) => inputs.find((c) => c.entity === entity)?.input,
+        held: (entity) => held.has(entity),
+      }),
+    );
+    const a = spawnCharacter(world, { x: 0, y: 3, z: 0 });
+    const b = spawnCharacter(world, { x: 5, y: 3, z: 0 });
+    held.add(a);
+    for (let i = 0; i < 30; i++) world.step([{ entity: a, input: forward }]);
+    expect(world.get(a, CharacterController)?.position).toEqual({ x: 0, y: 3, z: 0 });
+    expect(world.get(b, CharacterController)?.position.y).toBeLessThan(3); // the other one fell
+    held.delete(a);
+    for (let i = 0; i < 30; i++) world.step([{ entity: a, input: forward }]);
+    expect(world.get(a, CharacterController)?.position.y).toBeLessThan(3);
+  });
+
   it('snapshots controller state, so identical input gives identical hashes', () => {
     const run = () => {
       const { world, a } = makeWorld();
