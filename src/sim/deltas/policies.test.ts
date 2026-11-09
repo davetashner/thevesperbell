@@ -336,6 +336,64 @@ describe('declaration policies', () => {
   });
 });
 
+describe('policies and fact-gated (dormant) entities, mw-e27.8', () => {
+  const deltaFor = (aspects: Record<string, unknown>): LevelDeltas => ({
+    level: 'meadow',
+    entities: [{ id: 'spawn:variant', aspects }],
+    spawned: [],
+  });
+
+  it('a rest-reset aspect carried for a dormant spawn is reset on rest, the rest is kept', () => {
+    const { world } = meadow();
+    const baseline = policied.baseline(world, 'meadow', [], ['spawn:variant']);
+    policied.apply(
+      world,
+      baseline,
+      deltaFor({ herb: { picked: true }, lid: { open: true }, scratch: 5 }),
+    );
+    expect([...baseline.carried.keys()]).toEqual(['spawn:variant']);
+    expect(policied.restLive(world, baseline)).toBe(0);
+    expect(baseline.carried.get('spawn:variant')?.aspects).toEqual({
+      lid: { open: true },
+      scratch: 5,
+    });
+    // Nothing left to reset: untouched. An entry with only rest-reset state disappears.
+    expect(policied.restLive(world, baseline)).toBe(0);
+    policied.apply(world, baseline, {
+      level: 'meadow',
+      entities: [{ id: 'spawn:variant', aspects: { herb: { picked: true } } }],
+      spawned: [],
+    });
+    policied.restLive(world, baseline);
+    expect(baseline.carried.size).toBe(0);
+  });
+
+  it('a variant that wakes with carried state gets it applied (transient aspects skipped) and its authored wetness recorded', () => {
+    const { world } = meadow();
+    const baseline = policied.baseline(world, 'meadow', [], ['spawn:variant']);
+    policied.apply(world, baseline, deltaFor({ lid: { open: true }, scratch: 5 }));
+    const variant = world.spawn();
+    world.add(variant, Lid, { open: false });
+    addProperties(world, variant, { material: 'wood', wetness: 0.9 });
+    const report = policied.activate(world, baseline, [['spawn:variant', variant]]);
+    expect(report.skipped).toEqual([]);
+    expect(world.get(variant, Lid)).toEqual({ open: true });
+    expect(readProperty(world, variant, 'wetness')).toBe(0.9); // authored damp is kept
+    expect(baseline.transient.get('spawn:variant')).toEqual({ wetness: 0.9 });
+    // Retiring it again forgets its authored transients and keeps what it changed.
+    policied.retire(world, baseline, ['spawn:variant']);
+    expect(baseline.transient.has('spawn:variant')).toBe(false);
+    expect(baseline.carried.get('spawn:variant')?.aspects).toEqual({ lid: { open: true } });
+  });
+
+  it('stored deltas of a level with a dormant spawn rest and settle through the store', () => {
+    const { world, authored } = meadow();
+    const levels = levelDeltasOf(world);
+    levels.enter(world, policied, 'meadow', authored, ['spawn:variant']);
+    expect(levels.rest(world)).toEqual({ stored: [], live: 0 });
+  });
+});
+
 describe('rest-reset that cannot apply', () => {
   it('counts only the aspects that went back', () => {
     const { world, plant, authored } = meadow();

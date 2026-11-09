@@ -936,6 +936,7 @@ describe('scene content', () => {
       'valley-01',
       'valley-02',
       'valley-03',
+      'variant-room',
       'weak-wall-room',
     ]);
   });

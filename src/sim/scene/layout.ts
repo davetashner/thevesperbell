@@ -10,6 +10,7 @@
 import type { KitPurpose, KitShape, RouteKind, SceneYaw } from '@content/index';
 import type { PatrolRoute, PatrolRoutine, PatrolWaypoint } from '../ai/routes';
 import type { RampRise } from '../character/greybox';
+import type { Condition } from '../facts/conditions';
 import type { CreatureLeash } from '../creatures/components';
 import type { InteractableSpec } from '../interaction/affordance';
 import type { LightEnvironment } from '../light/field';
@@ -392,6 +393,14 @@ export interface SceneSpawnSpec {
   readonly repopulate?: { readonly afterDays: number } | undefined;
   /** The clock phases the spawn's creature and interaction are there for (mw-ju8.14); absent = always. */
   readonly presence?: { readonly phases: readonly string[] } | undefined;
+  /** The spawn exists only while this holds (mw-e27.8). */
+  readonly spawnIf?: Condition | undefined;
+  /** The spawn is absent while this holds (mw-e27.8). */
+  readonly despawnIf?: Condition | undefined;
+  /** One variant of a group: the first whose `when` holds is the active one (mw-e27.8). */
+  readonly variant?: { readonly group: string; readonly when?: Condition | undefined } | undefined;
+  /** Changes may happen while the spawn is on screen (mw-e27.8); default: wait until it is not. */
+  readonly swapInView?: boolean | undefined;
   /** What the creature carries and drops where it dies (mw-e01.5). */
   readonly carries?:
     readonly { readonly item: { readonly id: string }; readonly count: number }[] | undefined;
@@ -546,6 +555,15 @@ export interface ScenePiecePlacement {
   readonly breakable?: SceneBreakable;
 }
 
+/** The world conditions that decide whether a spawn exists (mw-e27.8; see ./variants.ts). */
+export interface SpawnGate {
+  readonly spawnIf?: Condition;
+  readonly despawnIf?: Condition;
+  readonly variant?: { readonly group: string; readonly when?: Condition };
+  /** Changes may happen on screen; default: they wait until the spawn is out of view. */
+  readonly swapInView?: boolean;
+}
+
 /** One spawn in world space. */
 export interface SceneSpawnPlacement {
   readonly id: string;
@@ -574,6 +592,8 @@ export interface SceneSpawnPlacement {
   readonly repopulate?: { readonly afterDays: number };
   /** The clock phases that spawn's creature and interaction are there for (mw-ju8.14); absent = always. */
   readonly presence?: { readonly phases: readonly string[] };
+  /** Which world conditions decide whether the spawn exists (mw-e27.8); absent = always there. */
+  readonly gate?: SpawnGate;
   /** What that creature carries and drops where it dies (mw-e01.5), in order. */
   readonly carries?: readonly { readonly item: string; readonly count: number }[];
   /** Its world properties, when the spawn sets any (mw-e03.37). */
@@ -944,6 +964,24 @@ function sceneRoutes(scene: SceneSpec): Map<string, PatrolRoute> {
   return routes;
 }
 
+/** The conditions that gate a spawn, when it has any (mw-e27.8), as a spread for the placement. */
+function gateOf(spawn: SceneSpawnSpec): { readonly gate: SpawnGate } | undefined {
+  const { spawnIf, despawnIf, variant, swapInView } = spawn;
+  if (spawnIf === undefined && despawnIf === undefined && variant === undefined) return undefined;
+  const gate: SpawnGate = Object.freeze({
+    ...(spawnIf !== undefined && { spawnIf }),
+    ...(despawnIf !== undefined && { despawnIf }),
+    ...(variant !== undefined && {
+      variant: Object.freeze({
+        group: variant.group,
+        ...(variant.when !== undefined && { when: variant.when }),
+      }),
+    }),
+    ...(swapInView === true && { swapInView }),
+  });
+  return { gate };
+}
+
 /** A spawn's routine with its routes resolved (mw-e11.9). */
 function routineOf(
   scene: SceneSpec,
@@ -1040,6 +1078,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         ...(spawn.presence !== undefined && {
           presence: Object.freeze({ phases: Object.freeze([...spawn.presence.phases]) }),
         }),
+        ...gateOf(spawn),
         ...(spawn.carries !== undefined && {
           carries: Object.freeze(
             spawn.carries.map(({ item, count }) => Object.freeze({ item: item.id, count })),

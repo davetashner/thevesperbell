@@ -18,6 +18,7 @@
 import { z } from 'zod';
 import { contentId, ref } from '../schema.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
+import { conditionSchema } from './condition.ts';
 import { interactableSchema } from './interaction.ts';
 import { ITEM_STACK_GUARD } from './item.ts';
 import { KIT_PURPOSES, vec3Schema } from './kit.ts';
@@ -648,6 +649,35 @@ export const sceneSpawnSchema = z.strictObject({
     .optional()
     .describe(
       'The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene.',
+    ),
+  spawnIf: conditionSchema
+    .optional()
+    .describe(
+      'The spawn exists only while this world condition holds (mw-e27.8): checked when the scene loads and again when a fact it reads changes, so the world reacts to what the player did (e.g. { "fact": "miller.rescued" }).',
+    ),
+  despawnIf: conditionSchema
+    .optional()
+    .describe(
+      'The spawn is removed while this world condition holds (mw-e27.8); the opposite of spawnIf. With both, it exists only when spawnIf holds and despawnIf does not.',
+    ),
+  variant: z
+    .strictObject({
+      group: contentId.describe('Variant group id: the spawns of the scene that share it.'),
+      when: conditionSchema
+        .optional()
+        .describe(
+          'This variant is chosen while the condition holds; absent = the default, chosen when no variant listed before it matches.',
+        ),
+    })
+    .optional()
+    .describe(
+      'Makes the spawn one variant of a group (mw-e27.8): exactly one variant of the group is active, the first listed in the scene whose `when` holds (a variant without `when` always matches, so list it last as the fallback). A group with no fallback warns (variantWarnings) because nothing spawns when none matches.',
+    ),
+  swapInView: z
+    .boolean()
+    .optional()
+    .describe(
+      'Lets spawnIf, despawnIf and variant changes happen while the spawn is on the player’s screen (mw-e27.8). By default a change waits until the spawn is out of view, so nothing pops in or out in front of the player.',
     ),
   carries: z
     .array(

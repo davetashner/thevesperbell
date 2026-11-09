@@ -8,6 +8,7 @@ import { resolve } from 'node:path';
 import { readContentSources } from '../src/content/fs-sources.ts';
 import { ContentLoadError, loadContent } from '../src/content/loader.ts';
 import { contentChecks, contentTypes, type ContentType } from '../src/content/registry.ts';
+import { variantWarnings } from '../src/content/variant-checks.ts';
 import { CONTENT_COVERAGE_REPORT } from './content-coverage-reporter.ts';
 
 const TITLE = 'Content coverage';
@@ -42,6 +43,7 @@ export function main(argv: readonly string[], root: string = process.cwd()): num
   }
 
   let all: string[];
+  let warnings: string[];
   try {
     const content = loadContent(
       contentTypes,
@@ -51,6 +53,7 @@ export function main(argv: readonly string[], root: string = process.cwd()): num
     all = (Object.keys(contentTypes) as ContentType[]).flatMap((type) =>
       content.all(type).map((entry) => `${type}:${entry.id}`),
     );
+    warnings = variantWarnings(content.all('scene'));
   } catch (error) {
     if (!(error instanceof ContentLoadError)) throw error;
     for (const i of error.issues)
@@ -58,6 +61,8 @@ export function main(argv: readonly string[], root: string = process.cwd()): num
     return 1;
   }
 
+  // Variant groups with no default leave a case uncovered (mw-e27.8): a warning, not a failure.
+  for (const warning of warnings) console.log(`::warning title=${TITLE}::${warning}`);
   const missing = unexercised(all, exercised);
   for (const entry of missing) {
     console.log(

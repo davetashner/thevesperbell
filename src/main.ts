@@ -206,8 +206,10 @@ import {
 import {
   readPhysicsObjectTransform,
   readSceneTransform,
+  ndcInView,
   resolveSceneRequest,
   SceneLoader,
+  watchSpawnVariants,
 } from '@game/scene/index';
 import {
   applyCarriedPlayer,
@@ -366,6 +368,7 @@ import {
   registerSceneComponents,
   RespawnRules,
   sceneAuthoredEntities,
+  sceneDormantEntities,
   SceneSpawnComponent,
   SpilledComponent,
   testPropSpawners,
@@ -2625,9 +2628,24 @@ function startRenderer(
         }),
         scene.id,
         sceneAuthoredEntities(world, loaded),
+        sceneDormantEntities(loaded),
       );
       // Rest-reset policies (mw-e27.7): resting puts back what is declared to reset on rest.
       installRestPolicies(world);
+      // Fact-gated spawns (mw-e27.8): spawnIf, despawnIf and variant groups were settled when the
+      // scene loaded; now they follow the facts, swapping only while the spawn is out of view.
+      const variants = watchSpawnVariants({
+        world,
+        loader: scenes,
+        content,
+        creatures: creatures.spawn,
+        inView: (point) => ndcInView(projectToNdc(camera, point)),
+      });
+      if (variants !== undefined) {
+        afterStep.push(() => {
+          variants.step();
+        });
+      }
       persistDroppedItems(world, () => scene.id);
       // Arrows that stick in the level stay with it (mw-e05.7).
       persistRestingArrows(world, () => scene.id);

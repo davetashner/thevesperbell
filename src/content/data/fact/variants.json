@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "variants",
+  "name": "Variant room facts",
+  "notes": "Grey-box facts for the variant room (src/content/data/scene/variant-room.json, mw-e27.8): they gate its fact-variant spawns. Not story canon.",
+  "facts": [
+    {
+      "key": "variants.cellar.sealed",
+      "type": "bool",
+      "default": false,
+      "description": "The variant room's cellar has been boarded up (the example for \"cellar.sealed_by_guard\"): its boards spawn once this is true. Set by tools and tests until a guard does it.",
+      "owner": "variants"
+    },
+    {
+      "key": "variants.miller.rescued",
+      "type": "bool",
+      "default": false,
+      "description": "The variant room's miller has been rescued: the miller (npc-hollis stands in) is there while this is true, and a crate of his things stands in his place otherwise.",
+      "owner": "variants"
+    }
+  ]
+}
