@@ -1,0 +1,15 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-beam-stream",
+  "slot": "beam",
+  "notes": "A bright streaming strip from the cast socket to its end, with a flare where it lands. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 1,
+  "beam": {
+    "width": 0.5,
+    "alpha": 0.9,
+    "scrollSpeed": 1.5,
+    "pulseHz": 2
+  },
+  "endEffect": "vfx-spell-beam-end"
+}

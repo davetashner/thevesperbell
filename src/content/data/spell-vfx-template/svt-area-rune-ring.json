@@ -1,0 +1,15 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-area-rune-ring",
+  "slot": "area",
+  "notes": "A rune ring (the magical material library's ground decal) whose edge is the spell radius, with rising motes across it. The ring expands out from the centre in half a second and breathes at 1 Hz. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 1,
+  "ring": {
+    "intensity": 1.2,
+    "spin": 0.05,
+    "growSeconds": 0.5,
+    "pulseHz": 1
+  },
+  "effect": "vfx-spell-area-motes"
+}

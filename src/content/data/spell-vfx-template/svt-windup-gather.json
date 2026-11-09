@@ -1,0 +1,9 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-windup-gather",
+  "slot": "castWindup",
+  "notes": "Motes gather and drift up around the caster while the spell charges. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 1,
+  "effect": "vfx-spell-windup-motes"
+}

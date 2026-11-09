@@ -1,0 +1,9 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-projectile-head-only",
+  "slot": "projectile",
+  "notes": "A bright flickering head with no trail, for quick or small bolts. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 0.7,
+  "head": "vfx-spell-projectile-head"
+}
