@@ -1,3 +1,4 @@
+import 'fake-indexeddb/auto';
 // Hiding spots in the game (mw-e03.23): the testbed's spots as the game makes them, their greybox
 // looks and poses, the peek view and the readout the e2e reads.
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
@@ -13,9 +14,24 @@ import {
   type EntityId,
   type World,
 } from '@sim/index';
+import { createGameSaveRegistry } from '@game/save/sections';
+import { AutosaveScheduler } from '@game/save/autosave/scheduler';
+import { SaveSlots } from '@game/save/slots/index';
+import { IndexedDbSaveStore } from '@game/save/storage/index';
+import { IDBFactory } from 'fake-indexeddb';
+import { isHidden } from '@sim/index';
 import { createGameWorld } from '@tools/replay/testbed-player-scenario';
 import { describe, expect, it } from 'vitest';
-import { hasHiding, HidingWatch, peekView, readHidingSpot, spotLooks } from '@game/hiding/index';
+import {
+  HIDING_VETO_ID,
+  hidingVeto,
+  HIDING_VETO_REASON,
+  hasHiding,
+  HidingWatch,
+  peekView,
+  readHidingSpot,
+  spotLooks,
+} from '@game/hiding/index';
 
 const IDLE: ActionFrame = actionFrame({
   move: actionVector(0, 0),
@@ -138,5 +154,49 @@ describe('hiding in the game (mw-e03.23)', () => {
     g.world.destroy(g.player);
     g.world.step([IDLE]);
     expect(watch.readout().player).toBeNull();
+  });
+});
+
+describe('saving while hiding (mw-e03.23)', () => {
+  it('an autosave is held back while the player hides, they stay inside, and it is written once they leave', async () => {
+    const { g, sim } = game();
+    const store = await IndexedDbSaveStore.open(new IDBFactory());
+    const scheduler = new AutosaveScheduler({
+      slots: new SaveSlots({
+        store,
+        registry: createGameSaveRegistry(),
+        build: { gameVersion: '0.2.0', buildSha: 'abc1234', contentHash: 'c0ffee' },
+        now: () => 1_790_000_000_000,
+      }),
+      describe: () => ({ characterName: 'Aldric', classId: 'thief', areaId: 'testbed' }),
+      minGapSeconds: 0,
+    });
+    scheduler.vetoes.register(
+      HIDING_VETO_ID,
+      hidingVeto(sim, () => g.player),
+    );
+    expect(HIDING_VETO_REASON).toBe("Can't save while hiding");
+    scheduler.request({ kind: 'checkpoint' });
+    expect(await scheduler.update(g.world)).not.toBeNull(); // in the open: saves
+    g.world.step([teleportCommand(g.player, { x: 3.3, y: 0, z: 1.5 }) as unknown as ActionFrame]);
+    g.world.set(g.player, PlayerLook, { yaw: -Math.PI / 2, pitch: 0 });
+    for (let i = 0; i < 12; i++) g.world.step([IDLE]);
+    g.world.step([PRESS]);
+    g.world.step([IDLE]);
+    expect(isHidden(sim, g.player)).toBe(true);
+    scheduler.request({ kind: 'checkpoint' });
+    expect(scheduler.vetoes.active()).toEqual([{ id: HIDING_VETO_ID, reason: HIDING_VETO_REASON }]);
+    for (let i = 0; i < 3; i++) {
+      expect(await scheduler.update(g.world)).toBeNull();
+      g.world.step([IDLE]);
+    }
+    expect(isHidden(sim, g.player)).toBe(true);
+    g.world.step([PRESS]);
+    g.world.step([IDLE]);
+    expect(isHidden(sim, g.player)).toBe(false);
+    expect(await scheduler.update(g.world)).toMatchObject({ type: 'saved' });
+    // A player that is gone objects to nothing.
+    expect(hidingVeto(sim, () => undefined)()).toBeNull();
+    expect(hidingVeto(sim, () => 999999)()).toBeNull();
   });
 });

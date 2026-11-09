@@ -264,6 +264,8 @@ import { createDoorLeaf, disposeDoorLeaf } from '@render/mechanisms/index';
 import { createHidingSpotMesh, disposeHidingSpotMesh } from '@render/hiding/index';
 import {
   hasHiding,
+  HIDING_VETO_ID,
+  hidingVeto,
   HidingWatch,
   peekView,
   readHidingSpot,
@@ -2555,7 +2557,11 @@ function startRenderer(
     const progress = new SaveProgress(() => world.tick);
     // The "not safe to save now" checks (mw-e01.7): they hold back autosaves and disable the pause
     // menu's Save with their reason (mw-e01.3). In m1, a creature in Combat.
-    const saveVetoes = { [COMBAT_VETO_ID]: combatVeto(world) };
+    const saveVetoes = {
+      [COMBAT_VETO_ID]: combatVeto(world),
+      // Nor while the player hides in a wardrobe (mw-e03.23).
+      [HIDING_VETO_ID]: hidingVeto(world, () => player?.entity),
+    };
     const safety = new SafetyVetoes();
     for (const [id, veto] of Object.entries(saveVetoes)) safety.register(id, veto);
     // Items no longer in content are dropped from a loaded save with a warning (mw-e17.8).

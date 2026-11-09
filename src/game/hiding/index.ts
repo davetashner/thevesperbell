@@ -15,6 +15,7 @@ import {
   hiddenOf,
   HidingSpotComponent,
   installHiding,
+  isHidden,
   isOccupied,
   peekOf,
   PlayerLook,
@@ -30,6 +31,29 @@ import {
 import type { Capsule } from '@sim/index';
 import type { SimView, Transform } from '../loop/render-sync';
 import type { PeekView } from '../player/testbed-player';
+
+/** The id the hiding veto is registered under in the saves' safety vetoes. */
+export const HIDING_VETO_ID = 'hiding';
+
+/** Why saving is unsafe while the player hides (the pause menu's Save shows it too). */
+export const HIDING_VETO_REASON = "Can't save while hiding";
+
+/**
+ * The safety veto (mw-e03.23): HIDING_VETO_REASON while `player` hides in a spot, so an autosave or a
+ * requested save never steps them out of a wardrobe in front of a guard. `settleHidden` stays in the
+ * save's `beforeWrite` as the safety net for routes that skip the vetoes (the debug console).
+ */
+export function hidingVeto(
+  world: World<never>,
+  player: () => EntityId | undefined,
+): () => string | null {
+  return () => {
+    const hero = player();
+    return hero !== undefined && world.isAlive(hero) && isHidden(world, hero)
+      ? HIDING_VETO_REASON
+      : null;
+  };
+}
 
 /** Whether a scene has hiding spots. */
 export function hasHiding(layout: SceneLayout): boolean {
