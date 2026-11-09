@@ -213,6 +213,8 @@ export function rippleAt(
 /** Every creature with a living brain in `world`, as the rules read them. */
 export function readAgents(world: World<never>, into: AgentReading[] = []): AgentReading[] {
   into.length = 0;
+  // A world with no creature rules at all (an unknown scene's error page) has nothing to read.
+  if (!world.isRegistered(BrainComponent)) return into;
   world.query(BrainComponent, PlacementComponent).forEach((entity, brain, at) => {
     if (isDead(world, entity)) return;
     const nav = world.get(entity, CreatureNavComponent);

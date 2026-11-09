@@ -330,6 +330,10 @@ describe('AwarenessFx', () => {
 });
 
 describe('readAgents', () => {
+  it('reads nothing from a world with no creature rules (an unknown scene)', () => {
+    expect(readAgents(new World<never>({ seed: 1 }))).toEqual([]);
+  });
+
   const memory = (source: string, confidence: number): MemoryRecord =>
     ({
       source,
