@@ -14,6 +14,7 @@ import {
   ELEMENT_FEEDBACK_ID,
   GAME_CONFIG_ID,
   loadGameContent,
+  materialLoudness,
   materialPresets,
   PLAYER_CAMERA_ID,
   PLAYER_CONTROLLER_ID,
@@ -1607,6 +1608,7 @@ function startRenderer(
       if (playerStart(loaded.layout.spawns) !== undefined) {
         // No class is chosen yet (mw-e19.5), so the player moves on the base profile.
         const tuning = controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID));
+        const footstepOffsets = materialLoudness(content.all('material'));
         const cameraTuning = content.get('camera', PLAYER_CAMERA_ID);
         camera.fov = cameraTuning.fov;
         camera.near = cameraTuning.near;
@@ -1645,6 +1647,8 @@ function startRenderer(
           // Wading, swimming and sinking in the scene's water regions (mw-e02.14): the armor load
           // class decides swim or sink; breath running out is drowning damage.
           water: playerWater({ content, world, damage: combat.damage }),
+          // Footsteps say how loud the ground is: each material's footstepLoudness (mw-e02.11).
+          footstepOffsets: (material) => footstepOffsets.get(material),
           object: body.root,
           animation: {
             controller: new AnimationController(graph),

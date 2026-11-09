@@ -807,6 +807,36 @@
           ],
           "additionalProperties": false,
           "description": "Noise and visibility for every stance × gait (every combination must be defined)."
+        },
+        "surfaces": {
+          "description": "How wet and frozen ground changes footstep loudness; absent = the sim’s defaults.",
+          "type": "object",
+          "properties": {
+            "wetFrom": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Wetness at or above which a step on the ground counts as wet, 0–1."
+            },
+            "wetDb": {
+              "type": "number",
+              "minimum": -20,
+              "maximum": 20,
+              "description": "What a wet surface adds to the material’s footstep loudness (splash, slap), dB."
+            },
+            "frozenDb": {
+              "type": "number",
+              "minimum": -20,
+              "maximum": 20,
+              "description": "What frozen ground adds to the material’s footstep loudness (crunch), dB."
+            }
+          },
+          "required": [
+            "wetFrom",
+            "wetDb",
+            "frozenDb"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -1631,6 +1661,30 @@
                       }
                     },
                     "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "surfaces": {
+                "type": "object",
+                "properties": {
+                  "wetFrom": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Wetness at or above which a step on the ground counts as wet, 0–1."
+                  },
+                  "wetDb": {
+                    "type": "number",
+                    "minimum": -20,
+                    "maximum": 20,
+                    "description": "What a wet surface adds to the material’s footstep loudness (splash, slap), dB."
+                  },
+                  "frozenDb": {
+                    "type": "number",
+                    "minimum": -20,
+                    "maximum": 20,
+                    "description": "What frozen ground adds to the material’s footstep loudness (crunch), dB."
                   }
                 },
                 "additionalProperties": false

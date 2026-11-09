@@ -165,6 +165,8 @@ export {
   MOVEMENT_STANCES,
   STEALTH_GAITS,
   stealthTuningSchema,
+  footstepSurfacesSchema,
+  type FootstepSurfaces,
   type MovementStance,
   type StealthGait,
   type StealthTuning,

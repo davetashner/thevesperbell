@@ -187,6 +187,32 @@ describe('controller schema', () => {
     expect(thief?.profiles.standing).toEqual(row);
   });
 
+  it('mw-e02.11: stealth.surfaces holds the wet and frozen footstep modifiers, merged per class', () => {
+    const row = {
+      still: { noise: 0, visibility: 0.8 },
+      slowWalk: { noise: 0.08, visibility: 0.85 },
+      walk: { noise: 0.3, visibility: 0.9 },
+      run: { noise: 0.6, visibility: 1 },
+      sprint: { noise: 1, visibility: 1 },
+    };
+    const surfaces = { wetFrom: 0.5, wetDb: 3, frozenDb: 2 };
+    const stealth = {
+      slowWalk: { speed: 1.2, deflection: 0.3 },
+      profiles: { standing: row, crouched: row },
+      surfaces,
+    };
+    expect(controllerSchema.parse({ ...valid, stealth }).stealth?.surfaces).toEqual(surfaces);
+    expect(
+      problems({ ...valid, stealth: { ...stealth, surfaces: { ...surfaces, wetFrom: 2 } } }),
+    ).toEqual(['stealth.surfaces.wetFrom: Too big: expected number to be <=1']);
+    const def = controllerSchema.parse({
+      ...valid,
+      stealth,
+      classes: { thief: { stealth: { surfaces: { wetDb: 1 } } } },
+    });
+    expect(controllerTuningFor(def, 'thief').stealth?.surfaces).toEqual({ ...surfaces, wetDb: 1 });
+  });
+
   it('mw-e02.12: takes optional ledge tuning; heights ordered from auto-mantle to hang reach', () => {
     const ledge = {
       autoMantleHeight: 1,
@@ -243,7 +269,7 @@ function numberFields(node: unknown, path: readonly string[] = []): NumberField[
 }
 
 /** How a description declares its unit: `…, m.`, `…, m/s;`, `…, whole ms (≤ 120)`, `…, 0–1;`… */
-const UNIT = /[,:;] (?:whole ms|m\/s²|m\/s|m|s|kg|degrees|0–1|stamina\/s|points)(?=[.;:,) ]|$)/;
+const UNIT = /[,:;] (?:whole ms|m\/s²|m\/s|m|s|kg|degrees|dB|0–1|stamina\/s|points)(?=[.;:,) ]|$)/;
 
 describe('controller data (mw-e02.3)', () => {
   const fields = numberFields(contentJsonSchema(controllerSchema));

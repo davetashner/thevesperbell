@@ -39,6 +39,7 @@ import {
   zeroHealth,
   type ActionFrame,
   type Interaction,
+  LocomotionEvents,
 } from '@sim/index';
 import { ActionSampler } from '../input';
 import { prepareTestbedCombat, startTestbedCombat, TRAINING_DUMMY } from '../combat';
@@ -383,6 +384,24 @@ describe('testbed player wiring (mw-e02.23)', () => {
     expect(camera.target.x - camera.at.x).toBeCloseTo(forward.x, 6);
     expect(camera.target.y - camera.at.y).toBeCloseTo(forward.y, 6);
     expect(camera.target.z - camera.at.z).toBeCloseTo(forward.z, 6);
+  });
+
+  it('mw-e02.11: footstep events carry the ground material and the supplied loudness offset', () => {
+    const { world, sampler, run } = testbed({
+      footstepOffsets: (material) => (material === 'generic' ? 6 : 0),
+    });
+    const steps: { material?: string; surfaceDb: number }[] = [];
+    world.events.on(LocomotionEvents, (e) => {
+      if (e.kind === 'footstep') steps.push(e);
+    });
+    run(0.2);
+    sampler.down('KeyW');
+    run(1);
+    sampler.up('KeyW');
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material !== undefined)).toBe(true);
+    const flat = steps.filter((s) => s.material === 'generic');
+    expect(flat.every((s) => s.surfaceDb === 6)).toBe(true);
   });
 
   it('holding W for 1 s moves the player at least 4 m forward (+z), and the camera follows', () => {

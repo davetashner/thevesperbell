@@ -53,5 +53,22 @@ quieter than either. "At least 3 times as loud" is read in sound pressure, not i
 
 Breaks (breakable profile loudness), kicks, switches and bells, spells and light sources, AI noises
 (`emit-noise`) and the debug scenario emit directly with their own authored loudness.
-Not yet: noise arrows (mw-e05 payloads), player footsteps (mw-e09.5, mw-e02.11), ice cracking,
+Not yet: noise arrows (mw-e05 payloads), footstep noise (mw-e09.5, below), ice cracking,
 electrical crackle and rope snaps.
+
+## Footsteps
+
+The character controller's one footstep event, `LocomotionEvents` kind `footstep` (mw-e02.11), is what
+footstep noise (mw-e09.5) will read; it is not itself a noise and nothing propagates from it. It comes
+from ground distance travelled at each gait's stride (never from animation), only while grounded and
+moving, and carries: `position` (feet), `foot`, `gait`, `material` (the ground's material, `water` while
+wading), `wet`, `frozen`, `burning`, `profileNoise` (the movement profile: stance x gait x encumbrance,
+0-1), `surfaceDb` and `loudness`.
+
+```
+surfaceDb = material footstepLoudness + wetDb if wet + frozenDb if frozen      (dB relative to stone)
+loudness  = profileNoise x 10^(surfaceDb / 20)                                  (normalised, 1 = sprint on stone)
+```
+
+`wetFrom`, `wetDb` and `frozenDb` are the controller profile's `stealth.surfaces`. Landings are the
+separate `land` event (with `impactSpeed`). Audio plays the same event, so footsteps have one detector.
