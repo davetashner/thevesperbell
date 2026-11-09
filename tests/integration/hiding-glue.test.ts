@@ -6,6 +6,7 @@ import {
   actionFrame,
   actionVector,
   hidingOf,
+  makeHidingSpot,
   PlayerLook,
   teleportCommand,
   type ActionFrame,
@@ -72,6 +73,18 @@ describe('hiding in the game (mw-e03.23)', () => {
       })),
     };
     expect(spotLooks(sizeless as never)).toEqual([]);
+    // A spot whose data leaves out its look is drawn as wood.
+    const bare = {
+      ...g.scene,
+      spawns: g.scene.spawns.map((s) => ({
+        ...s,
+        spawn: {
+          ...s.spawn,
+          ...(s.spawn.hiding && { hiding: { size: [1, 1, 1] as const } }),
+        },
+      })),
+    };
+    expect(spotLooks(bare as never).map((l) => l.look)).toEqual(['wood', 'wood', 'wood']);
   });
 
   it('the peek view is the spot’s eye while hiding, and nothing otherwise', () => {
@@ -113,6 +126,13 @@ describe('hiding in the game (mw-e03.23)', () => {
     g.world.destroy(must(haystack));
     g.world.step([IDLE]);
     expect(Object.keys(watch.readout().spots)).toEqual(['hiding-wardrobe', 'hiding-barrel']);
+    // A spot that is not a scene spawn is named by its entity.
+    const loose = g.world.spawn();
+    makeHidingSpot(sim, loose, { origin: { x: 0, y: 0, z: 0 } });
+    g.world.step([IDLE]);
+    expect(Object.keys(new HidingWatch(sim, [loose], undefined).readout().spots)).toEqual([
+      String(loose),
+    ]);
     // No player, or a player that is gone, is hiding nowhere.
     expect(new HidingWatch(sim, [], undefined).readout().player).toBeNull();
     g.world.destroy(g.player);
