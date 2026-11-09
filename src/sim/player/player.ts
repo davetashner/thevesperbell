@@ -596,6 +596,11 @@ export interface PlayerOptions {
   readonly look?: Partial<LookSettings>;
   /** The pitch the player starts with, radians (clamped to the limits); defaults to level (0). */
   readonly pitch?: number;
+  /**
+   * Wraps each tick's run of the character controller system so glue can time it (mw-e02.8). It
+   * must call `run` once; the sim itself reads no clock.
+   */
+  readonly measure?: (run: () => void) => void;
   /** Falling below this world-space height resets position and look to `player-start`. */
   readonly fallResetY?: number;
   /** Stamina, the action timeline and the dodge (see the file header); absent = movement only. */
@@ -813,6 +818,7 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
       collision: options.collision,
       tuning: options.tuning,
       ...(hooks.length > 0 && { hooks }),
+      ...(options.measure !== undefined && { measure: options.measure }),
       input: (inputs, entity) => {
         const frame = actionFrameOf(inputs);
         const look = world.get(entity, PlayerLook);

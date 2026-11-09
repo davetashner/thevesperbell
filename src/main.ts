@@ -405,6 +405,7 @@ import { bindDebugCameraInput, DebugCamera } from '@tools/debug-camera/index';
 import { layer as tools } from '@tools/index';
 import { sceneAgitator } from '@tools/perf/agitator';
 import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
+import { installLatencyProbe } from '@tools/perf/latency-probe';
 import { ArrowDemo, parseArrowDemoLane, parseArrowDemoParam } from '@tools/arrow-demo/index';
 import { SpellVfxLibrary, SpellVfxPlayer } from '@game/spell-vfx/index';
 import { SpellVfxView } from '@render/spell-vfx/index';
@@ -825,6 +826,13 @@ function startRenderer(
     let wheelShape: ((frame: ActionFrame) => ActionFrame) | undefined;
     let spellBar: { frame(): void } | undefined;
     const afterStep: (() => void)[] = [];
+    // The input latency and controller cost probe (mw-e02.8): dev server and perf builds only, on a
+    // page with ?latency. In any other build `__LATENCY_PROBE__` is false and all of it is dropped.
+    const latency =
+      (__LATENCY_PROBE__ || import.meta.env.DEV) &&
+      new URLSearchParams(location.search).has('latency')
+        ? installLatencyProbe(globalThis)
+        : undefined;
     // Swept hitboxes and region-tagged hurtboxes (mw-e04.2). No faction table is loaded yet, so
     // nobody counts as an ally; ?hitboxes draws what the system tests each tick. The hit-volume
     // system itself joins after the player (startTestbedCombat), so swings sweep on their first
@@ -1541,6 +1549,10 @@ function startRenderer(
         fieldDebug?.frame();
         worldState?.frame();
         view.renderFrame(timeMs);
+        if (latency !== undefined && player !== undefined) {
+          const drawn = (sync.objectOf(player.entity) as Object3D | undefined)?.position;
+          if (drawn !== undefined) latency.frame(performance.now(), drawn.x, drawn.y, drawn.z);
+        }
         // A save's thumbnail (mw-e30.11) is read straight after a render, while the frame is still
         // in the drawing buffer.
         const capture = captureAfterRender;
@@ -1710,6 +1722,17 @@ function startRenderer(
         let publishedSword = '';
         player = setupTestbedPlayer({
           world,
+          ...(latency !== undefined && {
+            timing: {
+              now: () => performance.now(),
+              controller: (ms) => {
+                latency.controllerTick(ms);
+              },
+              camera: (ms) => {
+                latency.cameraFrame(ms);
+              },
+            },
+          }),
           scene: loaded,
           ...(arrivalSpawn !== undefined && { startSpawn: arrivalSpawn }),
           sync,

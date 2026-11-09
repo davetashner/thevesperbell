@@ -249,8 +249,23 @@ export interface PlayerAnimationView {
   readonly publish?: (probe: CharacterProbe) => void;
 }
 
+/**
+ * Times the player's per-tick controller and per-frame camera cost (mw-e02.8). Present only in
+ * builds with the latency probe (src/tools/perf/latency-probe.ts), so a release build times nothing.
+ */
+export interface PlayerTiming {
+  /** A millisecond clock (performance.now in the page). */
+  readonly now: () => number;
+  /** Receives the wall time of one controller system run, ms. */
+  readonly controller: (ms: number) => void;
+  /** Receives the wall time of one camera placement, ms. */
+  readonly camera: (ms: number) => void;
+}
+
 export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly world: World<TCommand>;
+  /** Times the controller and camera (the perf suite's latency probe); absent = untimed. */
+  readonly timing?: PlayerTiming;
   /** The loaded scene; the player spawns at its `player-start` spawn, or at `startSpawn`. */
   readonly scene: LoadedScene;
   /** The spawn to start at instead of `player-start`: an area transition's arrival (mw-e01.11). */
@@ -466,8 +481,16 @@ export function setupTestbedPlayer<TObject, TCommand>(
     options.melee === undefined || lockOn === undefined
       ? options.melee
       : { ...options.melee, target: lockedTarget, locate: lockOn.locate ?? placedTargetPosition };
+  const { timing } = options;
   const entity = installPlayer(world, {
     spawns: scene.layout.spawns,
+    ...(timing !== undefined && {
+      measure: (run: () => void) => {
+        const start = timing.now();
+        run();
+        timing.controller(timing.now() - start);
+      },
+    }),
     ...(options.startSpawn !== undefined && { startSpawn: options.startSpawn }),
     collision,
     tuning,
@@ -730,7 +753,12 @@ export function setupTestbedPlayer<TObject, TCommand>(
     frame(info) {
       const dt = info === undefined ? 0 : secondsSince(lastMs, info.timeMs);
       if (info !== undefined) lastMs = info.timeMs;
-      if (drivesCamera) placeCamera(info?.alpha ?? 1, dt);
+      if (drivesCamera && timing === undefined) placeCamera(info?.alpha ?? 1, dt);
+      else if (drivesCamera && timing !== undefined) {
+        const start = timing.now();
+        placeCamera(info?.alpha ?? 1, dt);
+        timing.camera(timing.now() - start);
+      }
       body?.frame(info?.alpha ?? 1, dt);
       if (publish === undefined || world.tick === publishedTick) return;
       const current = readout();

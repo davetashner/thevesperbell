@@ -92,6 +92,36 @@ describe('character controller system', () => {
     expect(world.get(a, CharacterController)?.position.y).toBeLessThan(3);
   });
 
+  it('mw-e02.8: measure wraps each tick of the system once and changes nothing about the result', () => {
+    const collision = new FakeCollisionWorld([
+      box({ x: -50, y: -1, z: -50 }, { x: 50, y: 0, z: 50 }),
+    ]);
+    let wrapped = 0;
+    const build = (measure?: (run: () => void) => void) => {
+      const world = new World<Command>({ seed: 1 }).register(CharacterController);
+      world.addSystem(
+        characterControllerSystem({
+          collision,
+          tuning: TUNING,
+          input: (inputs, entity) => inputs.find((c) => c.entity === entity)?.input,
+          ...(measure !== undefined && { measure }),
+        }),
+      );
+      return { world, id: spawnCharacter(world, { x: 0, y: 0, z: 0 }) };
+    };
+    const plain = build();
+    const timed = build((run) => {
+      wrapped += 1;
+      run();
+    });
+    for (let i = 0; i < 20; i++) {
+      plain.world.step([{ entity: plain.id, input: forward }]);
+      timed.world.step([{ entity: timed.id, input: forward }]);
+    }
+    expect(wrapped).toBe(20);
+    expect(hashWorld(timed.world)).toBe(hashWorld(plain.world));
+  });
+
   it('snapshots controller state, so identical input gives identical hashes', () => {
     const run = () => {
       const { world, a } = makeWorld();

@@ -65,6 +65,36 @@ describe('perf budgets (mw-e32.1)', () => {
     });
   });
 
+  it('mw-e02.8: input-to-motion latency (100 ms High, 133 ms Low at 30 fps) and controller and camera cost budgets', () => {
+    const result = validateBudgets(committed, contract);
+    const budgets = result.ok ? result.budgets : [];
+    const pick = (id: string) => budgets.find((b) => b.id === id);
+    expect(pick('input-to-motion-high')).toMatchObject({
+      metric: 'inputToMotionP95Ms',
+      mode: 'reference',
+      max: 100,
+      scene: 'testbed',
+      preset: 'high',
+    });
+    expect(pick('input-to-motion-low-30fps')).toMatchObject({
+      metric: 'inputToMotionP95Ms',
+      max: 133,
+      preset: 'low',
+    });
+    expect(pick('controller-tick-p95')).toMatchObject({ metric: 'controllerTickP95Ms', max: 0.3 });
+    expect(pick('camera-frame-p95')).toMatchObject({ metric: 'cameraFrameP95Ms', max: 0.2 });
+    // A High latency does not pass the Low budget, nor the reverse.
+    const [high, low] = [pick('input-to-motion-high'), pick('input-to-motion-low-30fps')];
+    const at = (preset: 'low' | 'high') => ({
+      metric: 'inputToMotionP95Ms' as const,
+      value: 1,
+      scene: 'testbed',
+      preset,
+    });
+    expect(high && measures(high, at('low'))).toBe(false);
+    expect(low && measures(low, at('low'))).toBe(true);
+  });
+
   it('AC-6: a budget lacking a source citing the baseline fails validation', () => {
     const unsourced: Record<string, unknown> = { ...budget() };
     delete unsourced['source'];

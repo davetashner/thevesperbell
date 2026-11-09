@@ -28,6 +28,28 @@ function collectProblems(page: Page): string[] {
   return problems;
 }
 
+/**
+ * Records every toast the page shows from now on (window.__toasts, in order). A toast removes itself
+ * after a wall-clock timer (6 s for the night's), and a runner drawing a frame a second spends longer
+ * than that on the awaits between the booking and a check of the toast itself, so the spec reads the
+ * record instead of racing the timer (mw-vvo).
+ */
+async function recordToasts(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const seen: string[] = [];
+    (window as unknown as { __toasts: string[] }).__toasts = seen;
+    new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node instanceof HTMLElement && node.classList.contains('vb-toast')) {
+            seen.push(node.textContent);
+          }
+        }
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+}
+
 async function data<T>(page: Page, key: string): Promise<T | null> {
   const json = await page.locator('#app').getAttribute(`data-${key}`);
   return JSON.parse(json ?? 'null') as T | null;
@@ -87,6 +109,7 @@ test('booking the room takes the crowns, sleeps until morning, toasts and autosa
 
   await runConsole(page, 'tp -2 0 -0.25');
   await turnTo(page, { x: -2, z: 1 });
+  await recordToasts(page);
   await page.keyboard.press('KeyE');
   await expect(page.locator('#app')).toHaveAttribute('data-shop', /"open":true/);
   await page.locator('[data-screen="shop"] [data-tab="services"]').dispatchEvent('click');
@@ -106,7 +129,11 @@ test('booking the room takes the crowns, sleeps until morning, toasts and autosa
     'data-rest',
     /"kind":"inn".*"point":"sleeping-ox".*"day":2,"minute":360/,
   );
-  await expect(page.getByText('You sleep until morning.')).toBeVisible();
+  // The toast, from the record: it is gone after 6 s of wall-clock time, which a slow runner can
+  // spend before this line (mw-vvo).
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __toasts: string[] }).__toasts))
+    .toContain('You sleep until morning.');
   // One `rest` autosave, written once it is safe.
   await expect
     .poll(() => data<{ type: string; kind: string }>(page, 'autosave'), { timeout: 30_000 })

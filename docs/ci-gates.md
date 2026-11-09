@@ -54,6 +54,7 @@ one definition.
 | `webkit` (playwright.config.ts) | nightly, release | Audio testbed only; run by `e2e-audio`. |
 | `ci` (playwright.perf.config.ts) | nightly, release (and `main` pushes for the baseline) | Perf budget suite in CI mode, including the wall-clock load budgets. |
 | `reference` (playwright.perf.config.ts) | manual | Absolute frame-time budgets on the reference machine; not runnable on CI hardware. |
+| `latency` (playwright.perf.config.ts) | manual (`pnpm perf:ref`, `pnpm perf:latency`) | Input-to-motion latency (≤ 100 ms p95 High, ≤ 133 ms Low at 30 fps) and controller (≤ 0.3 ms/tick) and camera (≤ 0.2 ms/frame) cost on the reference machine, headed Chrome with vsync on (mw-e02.8); not runnable on CI hardware. |
 | vitest unit and integration (`vite.config.ts`) | per-PR | Run once, inside `coverage-gate`. |
 | vitest bench (`pnpm bench`) | nightly, release | See `bench` above. |
 

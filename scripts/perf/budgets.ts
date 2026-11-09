@@ -45,6 +45,12 @@ export const PERF_METRICS = {
    * GC, parsing, timers. What CI can judge, where software rendering makes every frame a long task.
    */
   nonFrameLongTasksOver200ms: 'count',
+  /** Move key's keydown to the end of the first frame the player's drawn transform changed, p95 of 50 presses (mw-e02.8). */
+  inputToMotionP95Ms: 'ms',
+  /** Wall time of one character controller system run (one sim tick), p95 over 60 s of traversal. */
+  controllerTickP95Ms: 'ms',
+  /** Wall time of one orbit camera placement (one drawn frame), p95 over 60 s of traversal. */
+  cameraFrameP95Ms: 'ms',
   /** Frame interval percentiles in a scene, ms. */
   frameP50Ms: 'ms',
   frameP95Ms: 'ms',
