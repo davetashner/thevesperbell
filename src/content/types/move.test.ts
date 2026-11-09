@@ -23,6 +23,10 @@ import {
 const REQUIRED_MOVES = [
   'backstep',
   'dodge-roll',
+  'dodge-roll-heavy',
+  'dodge-roll-light',
+  'dodge-roll-medium',
+  'dodge-stumble',
   'forgotten-archer-shot',
   'forgotten-archer-shove',
   'forgotten-brute-overhead',

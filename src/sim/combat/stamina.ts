@@ -37,6 +37,11 @@ export interface StaminaProfile {
   readonly sprintDrainPerSecond: number;
   /** Stamina at which Exhausted ends and sprint is allowed again (0 < threshold ≤ max). */
   readonly sprintRecoverThreshold: number;
+  /**
+   * Sprint is never allowed (an Overloaded armor load, mw-e04.16). Absent = allowed; only ever set
+   * to true, so profiles that never carried it keep their snapshots.
+   */
+  readonly noSprint?: true;
 }
 
 /**
@@ -109,6 +114,9 @@ export function validateStaminaProfile(value: unknown): string | undefined {
   ) {
     return 'stamina profile delays must be whole ticks';
   }
+  if (fields['noSprint'] !== undefined && fields['noSprint'] !== true) {
+    return 'stamina profile noSprint must be true or absent';
+  }
   if (profile.blockingRegenMultiplier > 1) {
     return 'stamina profile blockingRegenMultiplier must be ≤ 1';
   }
@@ -124,7 +132,9 @@ function frozenProfile(value: unknown): StaminaProfile {
   const fields = value as StaminaProfile;
   const profile: Record<string, number> = {};
   for (const key of PROFILE_KEYS) profile[key] = fields[key];
-  return Object.freeze(profile as unknown as StaminaProfile);
+  return Object.freeze(
+    fields.noSprint === true ? { ...profile, noSprint: true } : profile,
+  ) as StaminaProfile;
 }
 
 function restoreStamina(data: unknown): Stamina {
@@ -284,9 +294,9 @@ export function drainStamina(world: World<never>, entity: EntityId, amount: numb
   return commitDrain(world, entity, pool, drained(pool, amount, tick), tick);
 }
 
-/** Whether `pool` may start or keep sprinting: not Exhausted and not empty. */
+/** Whether `pool` may start or keep sprinting: not Exhausted, not empty and not forbidden. */
 export function canSprint(pool: Stamina): boolean {
-  return !pool.exhausted && pool.current > 0;
+  return !pool.exhausted && pool.current > 0 && pool.profile.noSprint !== true;
 }
 
 /** Records whether the shield is raised; regen runs at `blockingRegenMultiplier` while it is. */
@@ -308,7 +318,7 @@ export function setSprintHeld(world: World<never>, entity: EntityId, held: boole
     world.events.emit(ActionRejected, {
       entity,
       action: 'sprint',
-      reason: 'stamina',
+      reason: pool.profile.noSprint === true ? 'overloaded' : 'stamina',
       tick: world.tick,
     });
   }

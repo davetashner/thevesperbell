@@ -282,6 +282,22 @@ describe('stamina pool', () => {
     expect(pool().current).toBeCloseTo(40, 9);
   });
 
+  it('AC-3 (mw-e04.16): a noSprint profile never sprints, survives a snapshot and is validated', () => {
+    const profile = { ...DEFAULT_STAMINA_PROFILE, noSprint: true as const };
+    expect(validateStaminaProfile(profile)).toBeUndefined();
+    expect(validateStaminaProfile({ ...profile, noSprint: false })).toMatch(/noSprint/);
+    const s = setup(profile);
+    expect(canSprint(s.pool())).toBe(false);
+    expect(setSprintHeld(s.world, s.knight, true)).toBe(false);
+    s.world.events.flush();
+    expect(s.rejected.map((r) => [r.action, r.reason])).toEqual([['sprint', 'overloaded']]);
+    s.steps(3);
+    expect(s.pool().sprinting).toBe(false);
+    const copy = setup().world;
+    copy.restore(s.world.snapshot());
+    expect(staminaOf(copy, s.knight)?.profile.noSprint).toBe(true);
+  });
+
   it('round-trips through a snapshot deterministically and rejects invalid saved pools', () => {
     const run = () => {
       const s = setup();

@@ -85,6 +85,7 @@ import {
   type InteractionPrompt,
   type InteractorKit,
   type LineOfSight,
+  type EquipmentRules,
   type LoadClass,
   type LoadedScene,
   type SightWorld,
@@ -321,6 +322,8 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly bow?: TestbedBow;
   /** Status definitions: slowed and rooted scale the player's speed (mw-e06.24). */
   readonly statuses?: StatusLookup;
+  /** Equipment rules whose armor load shapes the player's combat and noise (mw-e04.16). */
+  readonly equipment?: EquipmentRules;
 }
 
 /** The player's climbing (mw-e02.13). */
@@ -476,6 +479,7 @@ export function setupTestbedPlayer<TObject, TCommand>(
         moves: options.moves,
         ...(melee !== undefined && { melee }),
         ...(options.bow !== undefined && { bow: options.bow }),
+        ...(options.equipment !== undefined && { equipment: options.equipment }),
       },
     }),
   });

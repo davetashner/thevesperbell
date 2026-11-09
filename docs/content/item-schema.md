@@ -195,6 +195,8 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `equip.nonProficient.noiseMultiplier` | number 1–3 | `1` | Multiplier on the wearer’s noise, on top of the load class (clamped with it, ADR-0003). 1 = no penalty; default 1. |
 | `armor` | object | required | Armor data. |
 | `armor.weightKg` | number > 0 ≤ 20 | required | Weight counted towards the wearer’s load. Kilograms (ADR-0003). |
+| `armor.absorption` | map of `"slash"` \| `"pierce"` \| `"blunt"` \| `"fire"` \| `"frost"` \| `"shock"` \| `"arcane"` \| `"poison"` → number > 0 | `{}` | Flat points of each damage type this piece takes off every hit (mw-e04.16); the wearer’s absorption is the sum over its armor pieces. Unlisted types: 0. |
+| `armor.poise` | number ≥ 0 | `0` | Poise this piece adds to the wearer’s maximum poise (mw-e04.16). |
 
 ## 3. A shield, held in the off hand.
 

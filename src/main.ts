@@ -378,6 +378,7 @@ import {
   type LightEmitterView,
   type RapierPhysics,
   type Vec3,
+  EquipmentRules,
   createSurfaceMap,
 } from '@sim/index';
 import {
@@ -1612,6 +1613,7 @@ function startRenderer(
         // No class is chosen yet (mw-e19.5), so the player moves on the base profile.
         const tuning = controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID));
         const footstepOffsets = materialLoudness(content.all('material'));
+        const armorRules = new EquipmentRules(content.all('item'), content.all('class'));
         // Tagged surface regions (a carpet on a wooden floor) replace the collider's material in
         // footstep events (mw-e09.4); an untagged position warns once in dev.
         const surfaces = createSurfaceMap({
@@ -1658,7 +1660,10 @@ function startRenderer(
           climb: {},
           // Wading, swimming and sinking in the scene's water regions (mw-e02.14): the armor load
           // class decides swim or sink; breath running out is drowning damage.
-          water: playerWater({ content, world, damage: combat.damage }),
+          water: playerWater({ content, world, damage: combat.damage, equipment: armorRules }),
+          // Armor weight shapes the roll, stamina regen, sprint, absorption, poise and footstep
+          // noise through the same load class the water rules read (mw-e04.16).
+          equipment: armorRules,
           // Footsteps say how loud the ground is: each material's footstepLoudness (mw-e02.11).
           footstepOffsets: (material) => footstepOffsets.get(material),
           surfaces,

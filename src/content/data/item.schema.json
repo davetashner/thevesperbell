@@ -341,6 +341,34 @@
               "exclusiveMinimum": 0,
               "maximum": 20,
               "description": "Weight counted towards the wearer’s load. Kilograms (ADR-0003)."
+            },
+            "absorption": {
+              "default": {},
+              "description": "Flat points of each damage type this piece takes off every hit (mw-e04.16); the wearer’s absorption is the sum over its armor pieces. Unlisted types: 0.",
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "slash",
+                  "pierce",
+                  "blunt",
+                  "fire",
+                  "frost",
+                  "shock",
+                  "arcane",
+                  "poison"
+                ]
+              },
+              "additionalProperties": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "poise": {
+              "default": 0,
+              "description": "Poise this piece adds to the wearer’s maximum poise (mw-e04.16).",
+              "type": "number",
+              "minimum": 0
             }
           },
           "required": [

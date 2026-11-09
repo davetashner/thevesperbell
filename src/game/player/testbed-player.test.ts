@@ -12,6 +12,11 @@ import {
 import { markExercised } from '@content/testing';
 import { AnimationController, compileGraph } from '@render/animation/index';
 import {
+  ActionTimelineComponent,
+  addEquipment,
+  addInventory,
+  EquipmentRules,
+  InventoryRules,
   box,
   BowComponent,
   createSurfaceMap,
@@ -820,6 +825,28 @@ describe('testbed player animation (mw-e02.6)', () => {
       expect.arrayContaining(['anim-humanoid-run', 'anim-humanoid-jump', 'anim-humanoid-fall']),
     );
     expect(body.poses.length).toBeGreaterThan(100);
+  });
+
+  it('AC-1 (mw-e04.16): with equipment rules, the player rolls by its armor load class', () => {
+    const equipment = new EquipmentRules(content.all('item'), content.all('class'));
+    const { sampler, run, world, player } = testbed({ moves, equipment });
+    addInventory(world, player.entity);
+    addEquipment(world, player.entity, 'knight');
+    const inventory = new InventoryRules(content.all('item'));
+    for (const id of ['mail-hauberk', 'wooden-shield']) {
+      const added = inventory.add(world, player.entity, id, 1);
+      if (!added.ok) throw new Error('add failed');
+      equipment.equip(world, player.entity, added.instanceIds[0] ?? 0);
+    }
+    run(0.2);
+    sampler.down('KeyW');
+    run(0.1);
+    sampler.down('KeyR');
+    run(0.05);
+    sampler.up('KeyR');
+    expect(world.get(player.entity, ActionTimelineComponent)?.current?.move).toBe(
+      'dodge-roll-medium',
+    );
   });
 
   it('a dodge plays its move clip on the whole body, then locomotion takes over again', () => {

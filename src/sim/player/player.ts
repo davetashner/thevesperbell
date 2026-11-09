@@ -66,7 +66,7 @@ import {
 } from '../character/footsteps';
 import { surfaceAt, type SurfaceMap } from '../surfaces/surfaces';
 import { CharacterLocomotion, giveLocomotion, locomotionSystem } from '../character/locomotion';
-import { movementProfileOf } from '../character/profile';
+import { CharacterEncumbrance, movementProfileOf } from '../character/profile';
 import { DEFAULT_ARROW_RULES } from '../combat/arrows/ballistics';
 import type { ArrowLookup } from '../combat/arrows/system';
 import { giveBow, type BowLoadout } from '../combat/bow/components';
@@ -79,6 +79,7 @@ import {
 } from '../combat/bow/system';
 import { DodgeComponent, giveDodge, type DodgeMoves } from '../combat/dodge/components';
 import { dodgeInputSystem, dodgeMotionSystem, type DodgeFacing } from '../combat/dodge/dodge';
+import { ArmorLoadComponent, armorLoadSystem, loadClassReader } from '../combat/load';
 import {
   DEFAULT_STAMINA_PROFILE,
   drainStamina,
@@ -137,7 +138,7 @@ import {
   WATER_MATERIAL,
   type WaterVolume,
 } from '../character/water';
-import type { LoadClass } from '../inventory/equipment';
+import type { EquipmentRules, LoadClass } from '../inventory/equipment';
 import { capabilitiesOf } from '../progression/capabilities';
 import type { TraversalHook } from '../character/traversal';
 import type { SceneSpawnPlacement } from '../scene/layout';
@@ -484,6 +485,11 @@ export interface PlayerCombatOptions {
   readonly melee?: PlayerMeleeOptions;
   /** A bow and quiver (mw-e05.3); absent = none. */
   readonly bow?: PlayerBowOptions;
+  /**
+   * The equipment rules whose armor load (ADR-0003) shapes the player's roll, stamina regen,
+   * sprint, absorption, poise and footstep noise (mw-e04.16); absent = armor changes nothing.
+   */
+  readonly equipment?: EquipmentRules;
 }
 
 /** The horizontal direction a look yaw faces (yaw 0 faces −z). */
@@ -705,7 +711,23 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   if (combat !== undefined) {
     const { moves } = combat;
     world.register(StaminaComponent, ...ACTION_TIMELINE_COMPONENTS, DodgeComponent);
-    world.addSystem(staminaSystem()).addSystem(dodgeInputSystem({ facing: lookFacing }));
+    const { equipment } = combat;
+    if (equipment !== undefined) {
+      world.register(ArmorLoadComponent);
+      world.register(CharacterEncumbrance);
+      world.addSystem(
+        armorLoadSystem({
+          equipment,
+          ...(combat.stamina !== undefined && { stamina: combat.stamina }),
+        }),
+      );
+    }
+    world.addSystem(staminaSystem()).addSystem(
+      dodgeInputSystem({
+        facing: lookFacing,
+        ...(equipment !== undefined && { loadClass: loadClassReader(equipment) }),
+      }),
+    );
     if (melee !== undefined) {
       world.register(...MELEE_COMPONENTS);
       world.addSystem(blockSystem({ moves }));
@@ -810,11 +832,17 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
               };
         // Statuses and combat take the slower of the two; what the carrier holds slows it on top
         // (ADR-0003: carry stacks with other restraints).
+        // An Overloaded wearer walks: sprint is stripped from what the controller sees (mw-e04.16).
+        const loaded =
+          combat?.equipment !== undefined &&
+          loadClassReader(combat.equipment)(world, entity) === 'overloaded'
+            ? { ...frame, sprint: UP }
+            : frame;
         const actions =
           fought === undefined && carrying === undefined && statusScale === 1
-            ? frame
+            ? loaded
             : restrainMovement(
-                frame,
+                loaded,
                 Math.min(fought?.scale ?? 1, statusScale) * (carrying?.scale ?? 1),
                 fought?.noJump === true || carrying?.noJump === true ? true : undefined,
               );
@@ -869,6 +897,10 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         return surfaceAt(options.surfaces, state.position, surfaces, ground, offsetOf);
       },
       noise: (entity: EntityId) => movementProfileOf(world, entity, options.tuning)?.noise,
+      encumbrance: (entity: EntityId) =>
+        world.isRegistered(CharacterEncumbrance)
+          ? world.get(entity, CharacterEncumbrance)?.noise
+          : undefined,
       moving: (inputs, entity) => {
         const move = actionFrameOf(inputs)?.move;
         const held = move !== undefined && (move.x !== 0 || move.y !== 0);

@@ -14,6 +14,8 @@ export interface PlayerWaterOptions {
   readonly world: World<never>;
   /** The damage model drowning resolves through. */
   readonly damage: DamageModel;
+  /** The equipment rules the load class is read through; default: built from `content`. */
+  readonly equipment?: EquipmentRules;
 }
 
 /**
@@ -23,7 +25,7 @@ export interface PlayerWaterOptions {
  */
 export function playerWater(options: PlayerWaterOptions): TestbedWaterOptions {
   const { content, world, damage } = options;
-  let rules: EquipmentRules | undefined;
+  let rules: EquipmentRules | undefined = options.equipment;
   return {
     loadClass: (entity) => {
       if (equipmentOf(world, entity) === undefined) return undefined;

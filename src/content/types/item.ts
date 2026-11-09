@@ -37,6 +37,7 @@ import type { ContentCheck, ContentIssue, Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
 import { capabilityId, capabilityIds, localisationKey } from './capability.ts';
+import { DAMAGE_TYPES } from './damage.ts';
 import type { LockDef } from './lock.ts';
 import { SPELL_SCHOOLS, type SpellDefinition, type SpellSchool } from './spell.ts';
 
@@ -539,7 +540,21 @@ const itemOptions = [
       category: z.literal('armor'),
       equip: equipSchema(ARMOR_SLOTS),
       armor: z
-        .strictObject({ weightKg: kilograms('Weight counted towards the wearer’s load.') })
+        .strictObject({
+          weightKg: kilograms('Weight counted towards the wearer’s load.'),
+          absorption: z
+            .partialRecord(z.enum(DAMAGE_TYPES), z.number().positive())
+            .default({})
+            .describe(
+              'Flat points of each damage type this piece takes off every hit (mw-e04.16); the ' +
+                'wearer’s absorption is the sum over its armor pieces. Unlisted types: 0.',
+            ),
+          poise: z
+            .number()
+            .nonnegative()
+            .default(0)
+            .describe('Poise this piece adds to the wearer’s maximum poise (mw-e04.16).'),
+        })
         .describe('Armor data.'),
     })
     .describe('An armor piece for the head, body, hands or feet.'),
