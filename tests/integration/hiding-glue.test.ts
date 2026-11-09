@@ -14,7 +14,7 @@ import {
 } from '@sim/index';
 import { createGameWorld } from '@tools/replay/testbed-player-scenario';
 import { describe, expect, it } from 'vitest';
-import { hasHiding, HidingWatch, peekView, readHidingSpot, spotLooks } from './index';
+import { hasHiding, HidingWatch, peekView, readHidingSpot, spotLooks } from '@game/hiding/index';
 
 const IDLE: ActionFrame = actionFrame({
   move: actionVector(0, 0),
@@ -34,6 +34,12 @@ function game() {
   return { g, sim };
 }
 
+/** A value the test knows is there. */
+function must<T>(value: T | undefined): T {
+  if (value === undefined) throw new Error('missing');
+  return value;
+}
+
 describe('hiding in the game (mw-e03.23)', () => {
   it('the testbed has hiding spots, the shipped scenes do not', () => {
     const { g } = game();
@@ -50,7 +56,7 @@ describe('hiding in the game (mw-e03.23)', () => {
     expect(looks.map((l) => l.look)).toEqual(['wood', 'hay', 'wood']);
     const [wardrobe] = looks;
     const view = { get: (entity: EntityId, type: never) => sim.get(entity, type) } as never;
-    const pose = readHidingSpot(view, (wardrobe as { entity: EntityId }).entity, 1.9);
+    const pose = readHidingSpot(view, must(wardrobe).entity, 1.9);
     expect(pose?.position).toMatchObject({ x: 4.5, z: 1.5 });
     expect(pose?.position.y).toBeCloseTo(0.95, 9);
     expect(readHidingSpot(view, 99999, 1)).toBeUndefined();
@@ -96,15 +102,15 @@ describe('hiding in the game (mw-e03.23)', () => {
       occupied: false,
       occupants: [],
     });
-    g.hiding?.hiding.enter(sim, g.player, wardrobe as EntityId);
+    g.hiding?.hiding.enter(sim, g.player, must(wardrobe));
     const other = g.world.spawn();
     g.world.step([IDLE]);
-    g.hiding?.hiding.enter(sim, other, haystack as EntityId);
+    g.hiding?.hiding.enter(sim, other, must(haystack));
     const busy = watch.readout();
     expect(busy.player).toBe('hiding-wardrobe');
     expect(busy.spots['hiding-wardrobe']?.occupants).toEqual(['player']);
     expect(busy.spots['hiding-haystack']?.occupants).toEqual([String(other)]);
-    g.world.destroy(haystack as EntityId);
+    g.world.destroy(must(haystack));
     g.world.step([IDLE]);
     expect(Object.keys(watch.readout().spots)).toEqual(['hiding-wardrobe', 'hiding-barrel']);
     // No player, or a player that is gone, is hiding nowhere.
