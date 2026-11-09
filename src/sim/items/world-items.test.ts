@@ -24,6 +24,8 @@ import {
   type BreakableProfile,
 } from '../breakables/components';
 import { noiseEmitted, type NoiseEvent } from '../noise/events';
+import { installImpactNoise, ITEM_IMPACT_NOISE } from '../noise/impacts';
+import { DEFAULT_NOISE_TUNING } from '../noise/propagation';
 import { installPhysicsObjects, PhysicsObjectComponent, physicsImpact } from '../physics/objects';
 import { RapierPhysics } from '../physics/rapier';
 import { PlayerLook } from '../player/player';
@@ -37,10 +39,8 @@ import {
   DROP_DISTANCE,
   DROP_HEIGHT,
   handlerView,
-  IMPACT_LOUDNESS_DB,
   installWorldItems,
   ITEM_HALF_EXTENTS,
-  ITEM_IMPACT_NOISE,
   itemDropped,
   itemDropRefused,
   itemPickedUp,
@@ -297,13 +297,10 @@ describe('world items (mw-e17.7)', () => {
     expect(placementOf(s.sim, entity)?.y).toBeCloseTo(ITEM_HALF_EXTENTS.weapon.y, 2);
   });
 
-  it('AC-3: a thrown item that hits a surface makes a noise as loud as its weight class', () => {
-    for (const [defId, weightClass] of [
-      ['healing-draught', 'light'],
-      ['arming-sword', 'medium'],
-      ['anvil', 'heavy'],
-    ] as const) {
+  it('AC-3: a thrown item that hits a surface makes a noise attributed to the thrower', () => {
+    for (const defId of ['healing-draught', 'arming-sword', 'anvil']) {
       const s = setup();
+      installImpactNoise(s.world, { curve: DEFAULT_NOISE_TUNING.impact });
       s.items.inventory.add(s.sim, s.actor, defId, 1);
       s.world.step([frame('throw')]);
       expect(s.dropped).toMatchObject([{ defId, count: 1, thrown: true }]);
@@ -316,14 +313,11 @@ describe('world items (mw-e17.7)', () => {
       expect(impacts.length).toBeGreaterThan(0);
       expect(s.noises[0]).toMatchObject({
         tick: impacts[0],
-        loudness: IMPACT_LOUDNESS_DB[weightClass],
         kind: ITEM_IMPACT_NOISE,
         entity,
         source: s.actor,
       });
     }
-    expect(IMPACT_LOUDNESS_DB.light).toBeLessThan(IMPACT_LOUDNESS_DB.medium);
-    expect(IMPACT_LOUDNESS_DB.medium).toBeLessThan(IMPACT_LOUDNESS_DB.heavy);
   });
 
   it('a throw takes one unit and leaves at shoulder height along the look, lofted, at its class speed', () => {
@@ -507,22 +501,6 @@ describe('world items (mw-e17.7)', () => {
     s.world.events.flush();
     expect(s.picked).toEqual([]);
     expect(s.world.isAlive(entity)).toBe(true);
-  });
-
-  it('an impact of something that is not a world item makes no item noise', () => {
-    const s = setup();
-    s.world.events.emit(physicsImpact, {
-      entity: s.actor,
-      other: null,
-      materials: ['stone', 'stone'],
-      energy: 1,
-      impulse: 1,
-      speed: 2,
-      normal: v(0, 1, 0),
-      position: v(0, 0, 0),
-    });
-    s.world.events.flush();
-    expect(s.noises).toEqual([]);
   });
 
   it('actors without a view or a press do nothing; views and buttons can come from elsewhere', () => {

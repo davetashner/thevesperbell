@@ -296,6 +296,15 @@ export function setPhysicsObjectVelocity(
   });
 }
 
+/** Kinetic energy of physics object `entity` now, J (0 when it is not a physics object). */
+export function kineticEnergyOf(world: World<never>, entity: EntityId): number {
+  const object = world.get(entity, PhysicsObjectComponent);
+  if (object === undefined) return 0;
+  const { linvel, mass } = rigidBodiesOf(world).motionOf(object.body as ColliderHandle);
+  const v = speed(linvel);
+  return 0.5 * mass * v * v;
+}
+
 /**
  * Makes static collider `collider` (e.g. from `loadScene`) part of `entity`: impacts name the entity
  * and its material, and the collider takes the entity's friction and bounciness, now and whenever

@@ -346,12 +346,55 @@
           ],
           "additionalProperties": false,
           "description": "Transmission through walls and floors between adjacent rooms."
+        },
+        "impact": {
+          "type": "object",
+          "properties": {
+            "minEnergy": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Least impact energy, J, that makes a noise: softer settling stays silent."
+            },
+            "refEnergy": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Energy, J, at which the curve reads `refDb`."
+            },
+            "refDb": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 120,
+              "description": "Loudness, dB at 1 m, of a `refEnergy` impact on stone."
+            },
+            "dbPerDecade": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 40,
+              "description": "dB gained for ten times the energy."
+            },
+            "maxDb": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 120,
+              "description": "Loudest an impact gets, dB at 1 m."
+            }
+          },
+          "required": [
+            "minEnergy",
+            "refEnergy",
+            "refDb",
+            "dbPerDecade",
+            "maxDb"
+          ],
+          "additionalProperties": false,
+          "description": "Impact noise (mw-e03.25): loudness = refDb + dbPerDecade·log10(energy / refEnergy) plus the louder of the two materials’ surface loudness offsets, capped at maxDb; below minEnergy, silence."
         }
       },
       "required": [
         "audibleFloor",
         "doors",
-        "partitions"
+        "partitions",
+        "impact"
       ],
       "additionalProperties": false,
       "description": "Sound propagation (mw-e09.3): a noise loses 20·log10(d) dB over a path of d metres (none within 1 m) plus the gain of every door, wall and floor it passes."

@@ -142,7 +142,7 @@ function straightDistance(a: Vec3, b: Vec3): number {
 
 /**
  * Propagates every `noiseEmitted` to the world's listeners as `noiseHeard`. A listener does not hear
- * a noise it is the source of.
+ * a noise it is the source of or the sounding entity of (a creature never chases its own footfall).
  */
 export function installNoisePropagation<T>(
   world: World<T>,
@@ -159,7 +159,7 @@ export function installNoisePropagation<T>(
   const unsubscribe = w.events.on(noiseEmitted, (noise) => {
     let field: NoiseField | null = null;
     listeners.forEach((listener, hearing, placement) => {
-      if (listener === noise.source) return;
+      if (listener === noise.source || listener === noise.entity) return;
       if (straightDistance(noise.position, placement) > hearing.range) return;
       field ??= propagate(noise.position, noise.loudness);
       const heard = field.hear(placement);
