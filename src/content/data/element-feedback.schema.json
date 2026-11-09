@@ -22,6 +22,18 @@
       "maximum": 256,
       "description": "Most element effects live at once; beyond it the farthest from the camera go."
     },
+    "fullDetailCap": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 256,
+      "description": "Most element effects drawn at full detail. Beyond it the farthest drop to low LOD (`lowLodIntensity`) and only beyond `handleCap` are they culled."
+    },
+    "lowLodIntensity": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "description": "Emission multiplier of a low-LOD effect (fewer particles, same look and size)."
+    },
     "hysteresis": {
       "type": "number",
       "minimum": 0,
@@ -72,6 +84,12 @@
               }
             ],
             "description": "When the property counts as on."
+          },
+          "precedence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Look precedence, higher wins. An entity in several states has their looks layered lowest first: the highest precedence tints last (on top), and takes the roughness when several states set one. Glows add. Order used: wet 10 < burning 20 < charged 30 < frozen 40, so a wet and frozen thing reads iced."
           },
           "effect": {
             "description": "VFX effect played on the entity while the state is on.",
@@ -166,6 +184,7 @@
           "id",
           "property",
           "when",
+          "precedence",
           "effect",
           "referenceRadius",
           "scale"
@@ -173,6 +192,72 @@
         "additionalProperties": false
       },
       "description": "The states, in the order looks combine."
+    },
+    "transitions": {
+      "description": "One-shot effects when an entity moves between states (burning to wet: steam).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "State id the entity leaves."
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "State id the entity enters (in either order within one tick)."
+          },
+          "effect": {
+            "description": "One-shot effect spawned once at the entity per transition.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "vfx-effect"
+          },
+          "referenceRadius": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Bounding radius, metres, the effect is authored for."
+          },
+          "scale": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Smallest effect scale."
+              },
+              "max": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Largest effect scale."
+              }
+            },
+            "required": [
+              "min",
+              "max"
+            ],
+            "additionalProperties": false,
+            "description": "Limits on bounds-driven effect scale (1 = as authored)."
+          },
+          "reducedIntensity": {
+            "default": 1,
+            "description": "Emission multiplier while reduced motion is on.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "effect",
+          "referenceRadius",
+          "scale"
+        ],
+        "additionalProperties": false
+      }
     },
     "fields": {
       "description": "Gases of the element field drawn as clouds (smoke, steam).",
@@ -224,6 +309,8 @@
     "id",
     "notes",
     "handleCap",
+    "fullDetailCap",
+    "lowLodIntensity",
     "hysteresis",
     "states"
   ],

@@ -10,6 +10,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `id` | id | required | Unique table id; the game reads "element-feedback". |
 | `notes` | string | required | Where the looks come from and what is placeholder. |
 | `handleCap` | integer 1–256 | required | Most element effects live at once; beyond it the farthest from the camera go. |
+| `fullDetailCap` | integer 1–256 | required | Most element effects drawn at full detail. Beyond it the farthest drop to low LOD (`lowLodIntensity`) and only beyond `handleCap` are they culled. |
+| `lowLodIntensity` | number > 0 ≤ 1 | required | Emission multiplier of a low-LOD effect (fewer particles, same look and size). |
 | `hysteresis` | number ≥ 0 | required | Metres of preference an effect that is already live gets over a rival at the cap, so two things at the same distance do not trade places every frame. |
 | `states` | list of object (at least 1) | required | The states, in the order looks combine. |
 | `states[].id` | id | required | State id, e.g. "burning". |
@@ -17,6 +19,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `states[].when` | object | required | When the property counts as on. |
 | `states[].when.is` | boolean | required | A flag property equals this. |
 | `states[].when.atLeast` | number | required | A number property is at least this (and the state is on). |
+| `states[].precedence` | integer ≥ 0 | required | Look precedence, higher wins. An entity in several states has their looks layered lowest first: the highest precedence tints last (on top), and takes the roughness when several states set one. Glows add. Order used: wet 10 < burning 20 < charged 30 < frozen 40, so a wet and frozen thing reads iced. |
 | `states[].effect` | ref → vfx-effect | required | VFX effect played on the entity while the state is on. |
 | `states[].referenceRadius` | number > 0 | required | Bounding radius, metres, the effect is authored for; larger things scale it up. |
 | `states[].scale` | object | required | Limits on bounds-driven effect scale (1 = as authored). |
@@ -31,6 +34,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `states[].look.roughness` | number 0–1 | — | Roughness the surface takes (low = a specular sheen, as wet or iced things have). |
 | `states[].look.pulseHz` | number 0–3 | `0` | Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady. |
 | `states[].audioCue` | string | — | One-shot sound cue played where the entity is when it enters the state; only cues in the sound manifest play. Absent while no cue exists. |
+| `transitions` | list of object | — | One-shot effects when an entity moves between states (burning to wet: steam). |
+| `transitions[].from` | id | required | State id the entity leaves. |
+| `transitions[].to` | id | required | State id the entity enters (in either order within one tick). |
+| `transitions[].effect` | ref → vfx-effect | required | One-shot effect spawned once at the entity per transition. |
+| `transitions[].referenceRadius` | number > 0 | required | Bounding radius, metres, the effect is authored for. |
+| `transitions[].scale` | object | required | Limits on bounds-driven effect scale (1 = as authored). |
+| `transitions[].scale.min` | number > 0 | required | Smallest effect scale. |
+| `transitions[].scale.max` | number > 0 | required | Largest effect scale. |
+| `transitions[].reducedIntensity` | number 0–1 | `1` | Emission multiplier while reduced motion is on. |
 | `fields` | list of object | — | Gases of the element field drawn as clouds (smoke, steam). |
 | `fields[].gas` | id | required | Gas id in the element field, e.g. "smoke" or "steam". |
 | `fields[].effect` | ref → vfx-effect | required | Looping cloud effect held on each dense cell. |

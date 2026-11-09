@@ -66,6 +66,12 @@ export const elementStateSchema = z.strictObject({
     .refine(isWorldPropertyName, 'must be a world property (docs/design/world-properties.md)')
     .describe('World property that drives the state (burning, wetness, frozen, charge…).'),
   when: whenSchema.describe('When the property counts as on.'),
+  precedence: z
+    .int()
+    .min(0)
+    .describe(
+      'Look precedence, higher wins. An entity in several states has their looks layered lowest first: the highest precedence tints last (on top), and takes the roughness when several states set one. Glows add. Order used: wet 10 < burning 20 < charged 30 < frozen 40, so a wet and frozen thing reads iced.',
+    ),
   effect: ref('vfx-effect').describe('VFX effect played on the entity while the state is on.'),
   referenceRadius: z
     .number()
@@ -116,6 +122,30 @@ export const elementFieldRuleSchema = z.strictObject({
     ),
 });
 
+/** A one-shot effect when an entity moves from one state to another (e.g. burning to wet: steam). */
+export const elementTransitionSchema = z.strictObject({
+  from: contentId.describe('State id the entity leaves.'),
+  to: contentId.describe('State id the entity enters (in either order within one tick).'),
+  effect: ref('vfx-effect').describe('One-shot effect spawned once at the entity per transition.'),
+  referenceRadius: z
+    .number()
+    .positive()
+    .describe('Bounding radius, metres, the effect is authored for.'),
+  scale: z
+    .strictObject({
+      min: z.number().positive().describe('Smallest effect scale.'),
+      max: z.number().positive().describe('Largest effect scale.'),
+    })
+    .refine((s) => s.max >= s.min, { message: 'max must not be less than min', path: ['max'] })
+    .describe('Limits on bounds-driven effect scale (1 = as authored).'),
+  reducedIntensity: z
+    .number()
+    .min(0)
+    .max(1)
+    .default(1)
+    .describe('Emission multiplier while reduced motion is on.'),
+});
+
 /** Schema of the table, `src/content/data/element-feedback/<id>.json`. */
 export const elementFeedbackSchema = z
   .strictObject({
@@ -126,6 +156,18 @@ export const elementFeedbackSchema = z
       .min(1)
       .max(MAX_ELEMENT_HANDLES)
       .describe('Most element effects live at once; beyond it the farthest from the camera go.'),
+    fullDetailCap: z
+      .int()
+      .min(1)
+      .max(MAX_ELEMENT_HANDLES)
+      .describe(
+        'Most element effects drawn at full detail. Beyond it the farthest drop to low LOD (`lowLodIntensity`) and only beyond `handleCap` are they culled.',
+      ),
+    lowLodIntensity: z
+      .number()
+      .gt(0)
+      .max(1)
+      .describe('Emission multiplier of a low-LOD effect (fewer particles, same look and size).'),
     hysteresis: z
       .number()
       .min(0)
@@ -133,6 +175,10 @@ export const elementFeedbackSchema = z
         'Metres of preference an effect that is already live gets over a rival at the cap, so two things at the same distance do not trade places every frame.',
       ),
     states: z.array(elementStateSchema).min(1).describe('The states, in the order looks combine.'),
+    transitions: z
+      .array(elementTransitionSchema)
+      .default([])
+      .describe('One-shot effects when an entity moves between states (burning to wet: steam).'),
     fields: z
       .array(elementFieldRuleSchema)
       .default([])
@@ -140,6 +186,13 @@ export const elementFeedbackSchema = z
   })
   .superRefine((table, ctx) => {
     const seen = new Set<string>();
+    if (table.fullDetailCap > table.handleCap) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['fullDetailCap'],
+        message: 'fullDetailCap must not exceed handleCap',
+      });
+    }
     table.states.forEach((state, index) => {
       if (seen.has(state.id)) {
         ctx.addIssue({
@@ -149,6 +202,17 @@ export const elementFeedbackSchema = z
         });
       }
       seen.add(state.id);
+    });
+    table.transitions.forEach((t, index) => {
+      for (const side of ['from', 'to'] as const) {
+        if (!seen.has(t[side])) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['transitions', index, side],
+            message: `unknown state id "${t[side]}"`,
+          });
+        }
+      }
     });
   });
 
@@ -170,10 +234,21 @@ export interface ElementFieldRule {
 /** A mesh look as loaded. */
 export type ElementLookDef = z.output<typeof elementLookSchema>;
 
+/** A transition as the bridge reads it (state ids resolved to table indices). */
+export interface ElementTransitionRule {
+  readonly from: number;
+  readonly to: number;
+  readonly effect: string;
+  readonly referenceRadius: number;
+  readonly scale: { readonly min: number; readonly max: number };
+  readonly reducedIntensity: number;
+}
+
 /** One state as the bridge reads it: the effect id is plain and the condition is a function. */
 export interface ElementStateRule {
   readonly id: string;
   readonly property: string;
+  readonly precedence: number;
   /** Whether a property value puts the entity in the state (other types never do). */
   readonly matches: (value: unknown) => boolean;
   readonly effect: string;
@@ -188,6 +263,9 @@ export interface ElementStateRule {
 export interface ElementFeedbackTable {
   readonly handleCap: number;
   readonly hysteresis: number;
+  readonly fullDetailCap: number;
+  readonly lowLodIntensity: number;
+  readonly transitions: readonly ElementTransitionRule[];
   readonly states: readonly ElementStateRule[];
   readonly fields: readonly ElementFieldRule[];
 }
@@ -197,6 +275,20 @@ export function compileElementFeedback(entry: ElementFeedbackEntry): ElementFeed
   return Object.freeze({
     handleCap: entry.handleCap,
     hysteresis: entry.hysteresis,
+    fullDetailCap: entry.fullDetailCap,
+    lowLodIntensity: entry.lowLodIntensity,
+    transitions: Object.freeze(
+      entry.transitions.map((t) =>
+        Object.freeze({
+          from: entry.states.findIndex((state) => state.id === t.from),
+          to: entry.states.findIndex((state) => state.id === t.to),
+          effect: t.effect.id,
+          referenceRadius: t.referenceRadius,
+          scale: t.scale,
+          reducedIntensity: t.reducedIntensity,
+        }),
+      ),
+    ),
     fields: Object.freeze(entry.fields.map((f) => Object.freeze({ ...f, effect: f.effect.id }))),
     states: Object.freeze(
       entry.states.map((state): ElementStateRule => {
@@ -208,6 +300,7 @@ export function compileElementFeedback(entry: ElementFeedbackEntry): ElementFeed
         return Object.freeze({
           id: state.id,
           property: state.property,
+          precedence: state.precedence,
           matches,
           effect: state.effect.id,
           referenceRadius: state.referenceRadius,

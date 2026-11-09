@@ -3,10 +3,23 @@
   "id": "element-feedback",
   "notes": "Grey-box element state feedback (mw-e03.28). Burning, wet, frozen and charged read by colour AND motion (style bible \u00a72.3, \u00a77): fire rises and flickers orange, wet drips downward with a darker glossy surface, frozen hangs still and pale with an icy sheen, charged throws short jagged yellow arcs and shimmers at 2 Hz (under the 3 Hz limit). Looks follow the bible: wet is about a quarter darker with a sheen. Effects scale to the entity's bounding radius over the reference radius. No sound cues exist yet for crackle, sizzle, freeze crack or zap (mw-e38), so audioCue is left off every state. Final art: mw-e29 asset beads; final SFX: mw-e38.",
   "handleCap": 64,
+  "fullDetailCap": 16,
+  "lowLodIntensity": 0.3,
   "hysteresis": 2,
+  "transitions": [
+    {
+      "from": "burning",
+      "to": "wet",
+      "effect": "vfx-element-steam-puff",
+      "referenceRadius": 0.25,
+      "scale": { "min": 0.6, "max": 3 },
+      "reducedIntensity": 0.5
+    }
+  ],
   "states": [
     {
       "id": "burning",
+      "precedence": 20,
       "property": "burning",
       "when": {
         "is": true
@@ -26,6 +39,7 @@
     },
     {
       "id": "wet",
+      "precedence": 10,
       "property": "wetness",
       "when": {
         "atLeast": 0.35
@@ -44,6 +58,7 @@
     },
     {
       "id": "frozen",
+      "precedence": 40,
       "property": "frozen",
       "when": {
         "is": true
@@ -64,6 +79,7 @@
     },
     {
       "id": "charged",
+      "precedence": 30,
       "property": "charge",
       "when": {
         "atLeast": 1

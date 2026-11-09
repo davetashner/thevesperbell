@@ -17,7 +17,11 @@ const table = compileElementFeedback(content.get('element-feedback', 'element-fe
 const CAMERA: Vec3 = { x: 0, y: 0, z: 0 };
 
 function setup(
-  over: { reduced?: boolean; bounds?: (e: EntityId) => ElementBounds | undefined } = {},
+  over: {
+    reduced?: boolean;
+    bounds?: (e: EntityId) => ElementBounds | undefined;
+    table?: typeof table;
+  } = {},
 ) {
   const world = registerWorldProperties(new World({ seed: 1 }));
   const spawns: { effect: string; options: VfxSpawnOptions; handle: number }[] = [];
@@ -27,7 +31,7 @@ function setup(
   const places = new Map<EntityId, ElementBounds>();
   let next = 1;
   const bridge = new ElementFeedbackBridge({
-    table,
+    table: over.table ?? table,
     vfx: {
       spawn: (effect, options) => {
         const handle = next++;
@@ -342,5 +346,176 @@ describe('element feedback bridge (mw-e03.28)', () => {
       source: null,
     });
     quiet.events.flush();
+  });
+
+  it('AC-1: the flame attaches on the first update after the change and stops on losing burning', () => {
+    const s = setup();
+    const hay = s.thing(3, 0.25);
+    s.change(hay, 'burning', true);
+    s.flush();
+    s.bridge.update(CAMERA); // one frame
+    expect(s.spawns.map((x) => x.effect)).toEqual(['vfx-fire-burn-loop']);
+    expect(s.live.size).toBe(1);
+    s.change(hay, 'burning', false);
+    s.flush();
+    s.bridge.update(CAMERA);
+    expect(s.live.size).toBe(0);
+  });
+
+  describe('AC-2: burning to wet', () => {
+    const steam = (s: ReturnType<typeof setup>) =>
+      s.spawns.filter((x) => x.effect === 'vfx-element-steam-puff');
+
+    it('spawns one steam puff sized to bounds, whichever property change arrives first', () => {
+      for (const wetFirst of [false, true]) {
+        const s = setup();
+        const torch = s.thing(3, 0.5);
+        s.change(torch, 'burning', true);
+        s.flush();
+        s.bridge.update(CAMERA);
+        expect(steam(s)).toHaveLength(0);
+        const douse = (): void => {
+          s.change(torch, 'burning', false);
+        };
+        const soak = (): void => {
+          s.change(torch, 'wetness', 1);
+        };
+        if (wetFirst) {
+          soak();
+          douse();
+        } else {
+          douse();
+          soak();
+        }
+        s.flush();
+        s.bridge.update(CAMERA);
+        s.bridge.update(CAMERA);
+        expect(steam(s)).toHaveLength(1);
+        expect(steam(s)[0]?.options).toMatchObject({ entity: torch, scale: 2 });
+        // Staying wet or drying does not puff again.
+        s.change(torch, 'wetness', 0.8);
+        s.change(torch, 'wetness', 0);
+        s.flush();
+        expect(steam(s)).toHaveLength(1);
+      }
+    });
+
+    it('a burn ending dry, or wetting a thing that was not burning, makes no steam; reduced motion halves it', () => {
+      const s = setup({ reduced: true });
+      const a = s.thing();
+      s.change(a, 'burning', true);
+      s.change(a, 'burning', false);
+      const b = s.thing();
+      s.change(b, 'wetness', 1);
+      s.flush();
+      s.bridge.update(CAMERA);
+      expect(steam(s)).toHaveLength(0);
+      const c = s.thing();
+      s.change(c, 'burning', true);
+      s.change(c, 'burning', false);
+      s.change(c, 'wetness', 1);
+      s.flush();
+      expect(steam(s)[0]?.options.params?.intensity).toBe(0.5);
+    });
+
+    it('an entity with no bounds gets no puff', () => {
+      const s = setup({ bounds: () => undefined });
+      const e = s.world.spawn();
+      s.change(e, 'burning', true);
+      s.change(e, 'burning', false);
+      s.change(e, 'wetness', 1);
+      s.flush();
+      expect(s.spawns).toHaveLength(0);
+    });
+  });
+
+  it('AC-3: 30 burning objects over the full-detail budget: the farthest go low LOD, none are culled', () => {
+    const s = setup();
+    const full = table.fullDetailCap;
+    const things = Array.from({ length: 30 }, (_, i) => s.thing(1 + i));
+    for (const entity of things) s.change(entity, 'burning', true);
+    s.flush();
+    s.bridge.update(CAMERA);
+    expect(s.spawns).toHaveLength(30);
+    expect(s.bridge.stats()).toMatchObject({ live: 30, culled: 0, lowLod: 30 - full });
+    things.forEach((entity, i) => {
+      const spawn = s.spawns.find((x) => x.options.entity === entity);
+      const want = i < full ? 1 : table.lowLodIntensity;
+      expect(spawn?.options.params?.intensity).toBeCloseTo(want);
+    });
+  });
+
+  it('AC-3: LOD drops before culling, and a thing that moves between full and low is respawned at the new detail', () => {
+    const s = setup();
+    const full = table.fullDetailCap;
+    const total = table.handleCap + 4;
+    const things = Array.from({ length: total }, (_, i) => s.thing(1 + i));
+    for (const entity of things) s.change(entity, 'burning', true);
+    s.flush();
+    s.bridge.update(CAMERA);
+    expect(s.bridge.stats()).toMatchObject({ live: 64, culled: 4, lowLod: 64 - full });
+    // Walk to the far end: the previously far things are now near and take full detail.
+    const far = { x: total, y: 0, z: 0 };
+    s.bridge.update(far);
+    const after = s.spawns.slice(total - 4);
+    expect(after.some((x) => x.options.params?.intensity === 1)).toBe(true);
+    expect(s.bridge.stats()).toMatchObject({ live: 64, culled: 4, lowLod: 64 - full });
+    // Nearest to the new camera is full detail.
+    const last = s.spawns.filter((x) => x.options.entity === things[total - 1]).at(-1);
+    expect(last?.options.params?.intensity).toBe(1);
+  });
+
+  it('AC-4: wet and frozen resolve to the frozen look, whichever arrived first, and even when wet is the shinier one', () => {
+    for (const frozenFirst of [false, true]) {
+      const s = setup();
+      const e = s.thing();
+      if (frozenFirst) {
+        s.change(e, 'frozen', true);
+        s.change(e, 'wetness', 1);
+      } else {
+        s.change(e, 'wetness', 1);
+        s.change(e, 'frozen', true);
+      }
+      s.flush();
+      const look = s.bridge.looks().get(e);
+      const frozenDef = table.states.find((x) => x.id === 'frozen')?.look;
+      expect(look?.roughness).toBe(frozenDef?.roughness);
+      // Iced on top of wet: the tint is pulled further towards the frost colour than wet alone.
+      expect(look?.tint[2]).toBeGreaterThan(0.6);
+      expect(look?.emissive[2]).toBeGreaterThan(0);
+    }
+    // Precedence, not the shinier roughness, decides: make wet shinier than frozen.
+    const shinyWet = {
+      ...table,
+      states: table.states.map((x) =>
+        x.id === 'wet' && x.look !== undefined ? { ...x, look: { ...x.look, roughness: 0.01 } } : x,
+      ),
+    };
+    const s = setup({ table: shinyWet });
+    const e = s.thing();
+    s.change(e, 'wetness', 1);
+    s.change(e, 'frozen', true);
+    s.flush();
+    expect(s.bridge.looks().get(e)?.roughness).toBe(
+      table.states.find((x) => x.id === 'frozen')?.look?.roughness,
+    );
+  });
+
+  it('states of equal precedence layer in table order, whichever arrived first', () => {
+    const flat = { ...table, states: table.states.map((x) => ({ ...x, precedence: 1 })) };
+    const looks = [true, false].map((wetFirst) => {
+      const s = setup({ table: flat });
+      const e = s.thing();
+      if (wetFirst) {
+        s.change(e, 'wetness', 1);
+        s.change(e, 'frozen', true);
+      } else {
+        s.change(e, 'frozen', true);
+        s.change(e, 'wetness', 1);
+      }
+      s.flush();
+      return s.bridge.looks().get(e);
+    });
+    expect(looks[0]).toEqual(looks[1]);
   });
 });

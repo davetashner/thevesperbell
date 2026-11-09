@@ -14,7 +14,7 @@ describe('element looks (mw-e03.28)', () => {
     expect(combineLooks([])).toBeUndefined();
   });
 
-  it('a tint mixes the albedo, a glow adds, the shiniest roughness wins and a pulse needs a glow', () => {
+  it('a tint mixes the albedo, a glow adds, the last (highest precedence) roughness wins and a pulse needs a glow', () => {
     const combined = combineLooks([
       look({ tint: '#000000', tintMix: 0.5, roughness: 0.4, pulseHz: 2 }),
       look({
@@ -25,6 +25,7 @@ describe('element looks (mw-e03.28)', () => {
         roughness: 0.1,
         pulseHz: 1,
       }),
+      look({ roughness: 0.6 }),
       look({ emissive: '#FF0000', emissiveIntensity: 0.25, pulseHz: 0.5 }),
     ]);
     // black at half then white at half: 0.5 of white over 0.5 of black-mix = 0.5 of the total pull.
@@ -32,7 +33,7 @@ describe('element looks (mw-e03.28)', () => {
     expect(combined?.tint[0]).toBeCloseTo(0.5 / 0.75);
     expect(combined?.emissive[0]).toBeCloseTo(0.75);
     expect(combined?.emissive[1]).toBe(0);
-    expect(combined?.roughness).toBe(0.1);
+    expect(combined?.roughness).toBe(0.6);
     expect(combined?.pulseHz).toBe(1);
   });
 

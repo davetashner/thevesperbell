@@ -3,8 +3,10 @@
 // renderer: an albedo tint, an emissive glow, a roughness and a pulse rate. Pure arithmetic; the
 // Three.js side (src/render/element-look.ts) only applies the result to the entity's materials.
 //
-// Looks combine in table order as sequential mixes, so a wet frozen thing is darkened and then iced,
-// glows add, the shiniest surface wins and a pulse needs a glow to pulse.
+// Precedence (mw-e29.8): looks are passed lowest precedence first (the bridge sorts by each state's
+// `precedence`: wet 10 < burning 20 < charged 30 < frozen 40). They combine as sequential mixes, so
+// a wet frozen thing is darkened and then iced; the highest precedence that sets a roughness wins
+// it (frozen beats wet whatever their numbers); glows add; a pulse needs a glow to pulse.
 
 import type { ElementLookDef } from '@content/index';
 import { parseHexColour } from './curves.ts';
@@ -31,7 +33,7 @@ const mixRgb = (a: LookRgb, b: LookRgb, t: number): LookRgb => [
   a[2] * (1 - t) + b[2] * t,
 ];
 
-/** Combines looks in order; undefined when there are none (the entity keeps its own look). */
+/** Combines looks, lowest precedence first (later layers win); undefined when there are none (the entity keeps its own look). */
 export function combineLooks(looks: readonly ElementLookDef[]): CombinedLook | undefined {
   if (looks.length === 0) return undefined;
   let keep = 1;
@@ -50,9 +52,7 @@ export function combineLooks(looks: readonly ElementLookDef[]): CombinedLook | u
       glow = [glow[0] + colour[0] * k, glow[1] + colour[1] * k, glow[2] + colour[2] * k];
       pulseHz = Math.max(pulseHz, look.pulseHz);
     }
-    if (look.roughness !== undefined) {
-      roughness = roughness === undefined ? look.roughness : Math.min(roughness, look.roughness);
-    }
+    if (look.roughness !== undefined) roughness = look.roughness;
   }
   const tintMix = 1 - keep;
   const tint: LookRgb =
