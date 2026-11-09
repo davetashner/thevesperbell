@@ -297,6 +297,24 @@ export interface SceneRegionSpec {
   readonly tags: readonly string[];
 }
 
+/** A box tagged with an acoustic surface, as authored (mw-e09.4). */
+export interface SceneSurfaceSpec {
+  readonly id: string;
+  readonly min: Triple;
+  readonly max: Triple;
+  readonly surface: string;
+  readonly priority: number;
+}
+
+/** A surface region as laid out: its corners in metres (read by `surfaceAt`, src/sim/surfaces). */
+export interface SceneSurface {
+  readonly id: string;
+  readonly min: Vec3;
+  readonly max: Vec3;
+  readonly surface: string;
+  readonly priority: number;
+}
+
 /** A tagged box as laid out: its corners in metres (water: wading and swimming, mw-e02.14). */
 export interface SceneRegion {
   readonly id: string;
@@ -452,6 +470,8 @@ export interface SceneSpec {
   readonly transitions?: readonly SceneTransitionSpec[] | undefined;
   /** Tagged boxes: rivers and pools (mw-ju8.1). */
   readonly regions?: readonly SceneRegionSpec[] | undefined;
+  /** Boxes tagged with a footstep surface (mw-e09.4). */
+  readonly surfaces?: readonly SceneSurfaceSpec[] | undefined;
 }
 
 /** Finds a kit piece by id (undefined when there is none). */
@@ -566,6 +586,8 @@ export interface SceneLayout {
   readonly transitions: readonly SceneTransition[];
   /** Its tagged boxes (water), in scene order, in metres. */
   readonly regions: readonly SceneRegion[];
+  /** Its footstep surface boxes, in scene order, in metres (mw-e09.4). */
+  readonly surfaces: readonly SceneSurface[];
 }
 
 /** Thrown when a scene names a kit piece the lookup does not have. */
@@ -1023,6 +1045,17 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           min: gridToWorld(r.min, scene.grid),
           max: gridToWorld(r.max, scene.grid),
           tags: Object.freeze([...r.tags]),
+        }),
+      ),
+    ),
+    surfaces: Object.freeze(
+      (scene.surfaces ?? []).map((r) =>
+        Object.freeze({
+          id: r.id,
+          min: gridToWorld(r.min, scene.grid),
+          max: gridToWorld(r.max, scene.grid),
+          surface: r.surface,
+          priority: r.priority,
         }),
       ),
     ),

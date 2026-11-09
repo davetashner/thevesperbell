@@ -45,6 +45,8 @@ import { applyStatus } from '../magic/statuses';
 import { installStimuli } from '../stimulus/stimulus';
 import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import { LockOnComponent, NO_LOCK } from '../targeting/components';
+import { LocomotionEvents } from '../character/locomotion';
+import { createSurfaceMap } from '../surfaces/surfaces';
 
 const TUNING: Frozen<ControllerTuning> = {
   capsule: { radius: 0.35, height: 1.8, crouchHeight: 1.0 },
@@ -578,5 +580,53 @@ describe('right-stick look through the ActionFrame (mw-e02.9)', () => {
       return hashWorld(world);
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('footstep surfaces (mw-e09.4)', () => {
+  const rug = {
+    id: 'rug',
+    surface: 'carpet',
+    priority: 0,
+    min: { x: -50, y: -5, z: -50 },
+    max: { x: 50, y: 5, z: 50 },
+  };
+  const table = new Map(
+    [
+      ['stone', 0],
+      ['carpet', -10],
+    ].map(([id, offsetDb]) => [
+      id as string,
+      {
+        id: id as string,
+        offsetDb: offsetDb as number,
+        varianceDb: 0,
+        sfx: `sfx-foot-${id as string}`,
+      },
+    ]),
+  );
+
+  function walk(regions: (typeof rug)[]) {
+    const { world } = setup(undefined, {
+      surfaces: createSurfaceMap({ table, regions }),
+    });
+    const steps: { material?: string; surfaceDb: number }[] = [];
+    world.events.on(LocomotionEvents, (e) => {
+      if (e.kind === 'footstep') steps.push(e);
+    });
+    for (let i = 0; i < 120; i++) world.step([frame({ move: [0, 1] })]);
+    return steps;
+  }
+
+  it('AC-1: a carpet region under the feet tags footsteps carpet at -10 dB', () => {
+    const steps = walk([rug]);
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material === 'carpet' && s.surfaceDb === -10)).toBe(true);
+  });
+
+  it('with no region at the feet, the ground collider still says what it is', () => {
+    const steps = walk([{ ...rug, min: { x: 40, y: -5, z: 40 } }]);
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material !== 'carpet')).toBe(true);
   });
 });

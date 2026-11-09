@@ -64,6 +64,7 @@ import {
   groundUnder,
   type SurfaceOffsets,
 } from '../character/footsteps';
+import { surfaceAt, type SurfaceMap } from '../surfaces/surfaces';
 import { CharacterLocomotion, giveLocomotion, locomotionSystem } from '../character/locomotion';
 import { CharacterEncumbrance, movementProfileOf } from '../character/profile';
 import { DEFAULT_ARROW_RULES } from '../combat/arrows/ballistics';
@@ -610,6 +611,11 @@ export interface PlayerOptions {
    */
   readonly footstepOffsets?: SurfaceOffsets;
   /**
+   * The scene's tagged surface regions (mw-e09.4): where one holds the feet, its surface (carpet,
+   * gravel…) replaces the ground collider's material in footstep events. Absent = the collider's.
+   */
+  readonly surfaces?: SurfaceMap;
+  /**
    * Status definitions (mw-e06.24): the player's `moveSpeed` statuses (slowed, rooted) scale its
    * speed, read through `modifiedStat`; absent = statuses leave movement alone.
    */
@@ -884,7 +890,11 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         const ground = wading
           ? { material: WATER_MATERIAL, wetness: 1, frozen: false, burning: false }
           : groundUnder(world, entity);
-        return ground === undefined ? undefined : footSurface(ground, offsetOf, surfaces);
+        if (ground === undefined) return undefined;
+        if (wading || options.surfaces === undefined || state === undefined) {
+          return footSurface(ground, offsetOf, surfaces);
+        }
+        return surfaceAt(options.surfaces, state.position, surfaces, ground, offsetOf);
       },
       noise: (entity: EntityId) => movementProfileOf(world, entity, options.tuning)?.noise,
       encumbrance: (entity: EntityId) =>

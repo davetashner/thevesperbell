@@ -14,7 +14,9 @@ import {
   ELEMENT_FEEDBACK_ID,
   GAME_CONFIG_ID,
   loadGameContent,
+  compileSurfaceTable,
   materialLoudness,
+  SURFACE_TABLE_ID,
   materialPresets,
   PLAYER_CAMERA_ID,
   PLAYER_CONTROLLER_ID,
@@ -377,6 +379,7 @@ import {
   type RapierPhysics,
   type Vec3,
   EquipmentRules,
+  createSurfaceMap,
 } from '@sim/index';
 import {
   compactProbe,
@@ -1611,6 +1614,15 @@ function startRenderer(
         const tuning = controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID));
         const footstepOffsets = materialLoudness(content.all('material'));
         const armorRules = new EquipmentRules(content.all('item'), content.all('class'));
+        // Tagged surface regions (a carpet on a wooden floor) replace the collider's material in
+        // footstep events (mw-e09.4); an untagged position warns once in dev.
+        const surfaces = createSurfaceMap({
+          table: compileSurfaceTable(content.get('surface-table', SURFACE_TABLE_ID)),
+          regions: loaded.layout.surfaces,
+          warn: (message) => {
+            console.warn(message);
+          },
+        });
         const cameraTuning = content.get('camera', PLAYER_CAMERA_ID);
         camera.fov = cameraTuning.fov;
         camera.near = cameraTuning.near;
@@ -1654,6 +1666,7 @@ function startRenderer(
           equipment: armorRules,
           // Footsteps say how loud the ground is: each material's footstepLoudness (mw-e02.11).
           footstepOffsets: (material) => footstepOffsets.get(material),
+          surfaces,
           object: body.root,
           animation: {
             controller: new AnimationController(graph),
