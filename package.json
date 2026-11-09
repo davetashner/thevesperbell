@@ -33,6 +33,7 @@
     "content:loot": "node scripts/loot-check-cli.ts",
     "content:schemas": "node scripts/content-schemas-cli.ts",
     "content:docs": "node scripts/content-docs-cli.ts",
+    "content:matrix": "ELEMENT_MATRIX_WRITE=1 vitest run tests/integration/element-matrix-doc.test.ts",
     "nav:bake": "node scripts/nav-bake-cli.ts bake",
     "nav:check": "node scripts/nav-bake-cli.ts check",
     "audio:placeholders": "node scripts/audio/gen-placeholders-cli.ts",

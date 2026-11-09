@@ -19,6 +19,10 @@ on:
         description: Run the perf budget suite (mw-e32.1) with its wall-clock load budgets (mw-e41.8).
         type: boolean
         default: true
+      matrix:
+        description: Run the long interaction matrix property run with a fresh seed each night (mw-e03.26).
+        type: boolean
+        default: true
       ref:
         description: Git ref to test; empty means the calling workflow's own ref.
         type: string
@@ -28,6 +32,24 @@ permissions:
   contents: read
 
 jobs:
+  # Many more generated worlds than the per-PR job, from a seed that changes daily (the seed is
+  # printed, and a failure prints the shrunk world and replays from it with ELEMENT_MATRIX_SEED).
+  element-matrix:
+    if: inputs.matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: ./.github/actions/setup
+      - name: 8000 worlds x 300 ticks, daily seed
+        run: |
+          export ELEMENT_MATRIX_SEED=$(date -u +%Y%m%d)
+          export ELEMENT_MATRIX_WORLDS=8000
+          echo "seed $ELEMENT_MATRIX_SEED"
+          pnpm exec vitest run tests/integration/element-matrix-run.test.ts
+
   bench:
     if: inputs.bench
     runs-on: ubuntu-latest

@@ -80,7 +80,7 @@ describe('CI gate tiers', () => {
 
     const slow = read(`${WORKFLOWS}/slow-gates.yml`);
     expect(slow).toMatch(/^ {2}workflow_call:/m);
-    expect(jobsOf(slow)).toEqual(['bench', 'e2e-audio', 'perf-budget']);
+    expect(jobsOf(slow)).toEqual(['element-matrix', 'bench', 'e2e-audio', 'perf-budget']);
     expect(slow).toContain('--project=firefox --project=webkit');
     expect(slow).toContain('pnpm perf');
     expect(slow).toContain('pnpm bench');

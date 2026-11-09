@@ -2,7 +2,7 @@ name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
 # lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
-# e2e-playthrough jobs), build, beads-validate.
+# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26) is not a required context yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
 # main pushes still run the perf suite here, to publish the baseline.
@@ -215,6 +215,7 @@ jobs:
       bench: false
       audio: false
       perf: true
+      matrix: false
 
   build:
     runs-on: ubuntu-latest
@@ -223,6 +224,55 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm build
+
+  # The interaction matrix (mw-e03.26): 500 generated worlds of 300 ticks from a fixed seed must keep
+  # every invariant (budget 60 s), and the committed matrix must match the sim. On a pull request the
+  # regenerated matrix is diffed against the base branch and the diff goes to the job summary, so a
+  # rule change that alters what an element does is visible to reviewers. A failure prints the seed
+  # and the shrunk world. The coverage run only samples 20 worlds; the 500-world run is skipped there
+  # and runs here, outside coverage, where it takes about 10 s.
+  interaction-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - name: 500 worlds x 300 ticks, fixed seed
+        env:
+          ELEMENT_MATRIX_WORLDS: '500'
+        run: pnpm exec vitest run tests/integration/element-matrix-run.test.ts
+      - name: Regenerate the matrix and attach its diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          pnpm content:matrix
+          doc=docs/design/interaction-matrix.md
+          stale=0
+          git diff --quiet -- "$doc" || stale=1
+          if [ "$EVENT" = pull_request ]; then
+            git fetch --no-tags origin "$BASE"
+            since=$(git merge-base "origin/$BASE" HEAD)
+            {
+              echo '## Interaction matrix'
+              echo
+              if git diff --quiet "$since" -- "$doc"; then
+                echo 'No element rule changed what an element does: the matrix is unchanged.'
+              else
+                echo "Regenerated matrix against \`$BASE\`:"
+                echo
+                echo '```diff'
+                git diff "$since" -- "$doc"
+                echo '```'
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ "$stale" = 1 ]; then
+            echo "::error title=Interaction matrix::$doc is stale; run pnpm content:matrix and commit it."
+            exit 1
+          fi
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.
