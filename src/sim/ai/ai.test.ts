@@ -21,6 +21,8 @@ import {
   ResistancesComponent,
 } from '../combat/damage/components';
 import { CombatFacingComponent } from '../combat/melee/components';
+import { ActorElementsComponent } from '../elements/actors';
+import { addProperties, registerWorldProperties } from '../properties/components';
 import type { EntityId } from '../core/component';
 import { World, type WorldSnapshot } from '../core/world';
 import { CreatureComponent, type Creature } from '../creatures/components';
@@ -317,6 +319,35 @@ describe('think scheduling', () => {
     world.set(entity, HealthComponent, { max: 10, current: 0 });
     run(world, 60);
     expect(brain(world, entity).thoughtTick).toBe(thought);
+  });
+
+  it('a creature frozen solid does not think until it thaws (mw-e03.24)', () => {
+    const world = aiWorld([idle]);
+    registerWorldProperties(world);
+    world.register(ActorElementsComponent);
+    const entity = agent(world);
+    world.add(entity, ActorElementsComponent, {
+      fireResistance: 0,
+      coldResistance: 0,
+      shockResistance: 0,
+      aflame: false,
+      baseFuel: 6,
+      baseFragile: 0,
+      baseConductive: false,
+      heatInertia: 1,
+      chillBelow: 10,
+      chillSlowest: 0.4,
+      frozenUntil: 0,
+      soaked: false,
+    });
+    addProperties(world, entity, { frozen: true });
+    run(world, 2);
+    const thought = brain(world, entity).thoughtTick;
+    run(world, 60);
+    expect(brain(world, entity).thoughtTick).toBe(thought);
+    addProperties(world, entity, { frozen: false });
+    run(world, 60);
+    expect(brain(world, entity).thoughtTick).toBeGreaterThan(thought);
   });
 
   it('rejects a second install and a think budget below one', () => {

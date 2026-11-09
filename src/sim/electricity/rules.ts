@@ -23,6 +23,7 @@
 import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
+import { shockIntensity } from '../elements/actors';
 import type { ElementRule } from '../elements/rules';
 import { LiquidLayerComponent } from '../liquids/components';
 import {
@@ -188,12 +189,14 @@ function shockRule(config: ConductionConfig, result: Flood): ElementRule {
     phase: 'transition',
     run: ({ world }) => {
       for (const [entity, charge] of chargedEntities(world)) {
-        if (charge < config.shockCharge || world.has(entity, LiquidLayerComponent)) continue;
+        // A soaked actor takes the wet factor's share more (mw-e03.24).
+        const intensity = shockIntensity(world, entity, charge, config.wetActorFactor);
+        if (intensity < config.shockCharge || world.has(entity, LiquidLayerComponent)) continue;
         const reached = result.hops.get(entity);
         world.events.emit(shocked, {
           tick: world.tick,
           entity,
-          intensity: charge,
+          intensity,
           hops: reached?.hops ?? 0,
           origin: reached?.origin ?? entity,
         });

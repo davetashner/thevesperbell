@@ -14,6 +14,7 @@
 import { z } from 'zod';
 import type { Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
+import { worldPropertiesSchema } from '../world-properties.ts';
 import { creatureAudioSchema } from './creature-audio.ts';
 import { hitReactionsSchema, poiseRegenSchema, resistancesSchema } from './damage.ts';
 import {
@@ -176,10 +177,17 @@ export const creatureSchema = z.strictObject({
     .describe(
       'Hit regions beyond the body (mw-e05.6): head, weak points, armoured plates. Shapes come with the rig.',
     ),
-  properties: z
-    .array(contentId)
-    .prefault([])
-    .describe('World-property tags (e03), e.g. "flammable", "conductive".'),
+  properties: worldPropertiesSchema
+    .prefault({})
+    .describe(
+      "World properties of its body (e03, mw-e03.24): the same ones objects have, so it burns, soaks, freezes and conducts by the same rules. Omitted ones take the flesh material's, then the actor defaults (flammable, ignites at 450 °C, burns 6 s).",
+    ),
+  aflame: z
+    .boolean()
+    .prefault(false)
+    .describe(
+      'Permanently on fire (a fire elemental): it burns whatever it touches and nothing puts it out; its fire resistance only spares it the damage (mw-e03.24).',
+    ),
   resistances: resistancesSchema,
   poiseRegen: poiseRegenSchema,
   reactions: hitReactionsSchema,
