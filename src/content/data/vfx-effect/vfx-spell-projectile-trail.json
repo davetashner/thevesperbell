@@ -1,0 +1,90 @@
+{
+  "id": "vfx-spell-projectile-trail",
+  "notes": "Projectile trail: a fading smear of glow left along the flight path. Part of the spell VFX template library (mw-e29.10): drawn in neutral light greys so a spell's tint recolours it (src/game/spell-vfx/tint.ts); built from the existing base textures, no new art.",
+  "priority": 45,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "smear",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 70,
+      "lifetime": {
+        "min": 0.3,
+        "max": 0.5
+      },
+      "speed": {
+        "min": 0,
+        "max": 0.2
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.03,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.16
+        },
+        {
+          "t": 1,
+          "v": 0.01
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#EDEDED"
+        },
+        {
+          "t": 0.4,
+          "color": "#BDBDBD"
+        },
+        {
+          "t": 1,
+          "color": "#6E6E6E"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0.8
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    },
+    {
+      "id": "glints",
+      "texture": "vfx-base-spark-streak-01",
+      "blend": "additive",
+      "rate": 14,
+      "lifetime": {
+        "min": 0.2,
+        "max": 0.35
+      },
+      "speed": {
+        "min": 0.3,
+        "max": 0.9
+      },
+      "coneDeg": 180,
+      "size": 0.1,
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 0.3,
+          "color": "#D9D9D9"
+        },
+        {
+          "t": 1,
+          "color": "#9A9A9A"
+        }
+      ],
+      "minTier": "high"
+    }
+  ]
+}

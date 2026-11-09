@@ -406,6 +406,10 @@ import { layer as tools } from '@tools/index';
 import { sceneAgitator } from '@tools/perf/agitator';
 import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
 import { ArrowDemo, parseArrowDemoLane, parseArrowDemoParam } from '@tools/arrow-demo/index';
+import { SpellVfxLibrary, SpellVfxPlayer } from '@game/spell-vfx/index';
+import { SpellVfxView } from '@render/spell-vfx/index';
+import { SpellDemoFigures } from '@render/spell-vfx/demo';
+import { parseSpellDemoParam, spellDemoBlocks, SpellVfxDemo } from '@tools/spell-vfx-demo/index';
 import {
   AWARENESS_DEMO_NOISE_MS,
   awarenessDemoAgents,
@@ -904,7 +908,23 @@ function startRenderer(
       readDummyTransform(world, entity) ?? // any placed entity: the dummies and the player
       readSceneTransform(world, entity) ??
       readArrowTransform(world, entity); // arrows in flight and at rest: their trails follow them
-    const vfx = new VfxSystem({ effects: content.all('vfx-effect'), anchors: vfxAnchor });
+    // Spell VFX (mw-e29.10): templates by slot, tinted. Each spell's `vfx` block is resolved up front
+    // so the tinted effects it needs exist when the VfxSystem is built; with no spell using the
+    // block (and no `?spells=demo|<slot>`) this adds no effects and nothing runs per frame.
+    const spellLibrary = new SpellVfxLibrary(
+      content.all('spell-vfx-template'),
+      content.all('vfx-effect'),
+    );
+    for (const spell of content.all('spell')) spellLibrary.resolve(spell.vfx);
+    const spellDemoSteps = parseSpellDemoParam(location.search);
+    if (spellDemoSteps !== undefined) {
+      for (const block of Object.values(spellDemoBlocks())) spellLibrary.resolve(block);
+    }
+    let spellDemo: SpellVfxDemo | undefined;
+    const vfx = new VfxSystem({
+      effects: [...content.all('vfx-effect'), ...spellLibrary.derivedEffects()],
+      anchors: (entity, socket) => spellDemo?.anchor(entity, socket) ?? vfxAnchor(entity),
+    });
     // VFX cue sheets (mw-e29.3): the same sim events as the audio cue sheets spawn effects — hit
     // dust and sparks, the parry flash, impact puffs, break debris, burning loops. Event-driven, so
     // nothing runs per frame while no effect is live.
@@ -1034,6 +1054,19 @@ function startRenderer(
     const elementsProbe = new URLSearchParams(location.search).has('elements');
     // Textures load by asset id from the texture manifest: generated placeholders (mw-e29.2) until
     // approved art replaces them under the same ids.
+    // The spell ring and beam drawings, and the testbed that shows every slot (?spells=...).
+    const spellView = new SpellVfxView(view.scene, magicLooks, motionReduced);
+    const spellPlayer = new SpellVfxPlayer({
+      vfx,
+      anchors: (entity, socket) => spellDemo?.anchor(entity, socket) ?? vfxAnchor(entity),
+      surfaces: spellView,
+    });
+    let spellDemoFigures: SpellDemoFigures | undefined;
+    let publishedSpellVfx = '';
+    if (spellDemoSteps !== undefined) {
+      spellDemo = new SpellVfxDemo(spellPlayer, spellLibrary, spellDemoSteps);
+      spellDemoFigures = new SpellDemoFigures(view.scene, magicLooks);
+    }
     const vfxView = createVfxRenderer(view.scene, {
       textureUrl: vfxTextureUrls(vfxTextureManifest()),
     });
@@ -1379,6 +1412,23 @@ function startRenderer(
         showControls();
         vfxDemo?.update(elapsedMs / 1000);
         arrowDemo?.update(Math.max(0, elapsedMs) / 1000);
+        if (spellDemo !== undefined) {
+          // Feet and heading of the player, as the awareness demo reads them.
+          const at =
+            player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+          const q = camera.quaternion;
+          const forwardX = -2 * (q.x * q.z + q.w * q.y);
+          const forwardZ = -(1 - 2 * (q.x * q.x + q.y * q.y));
+          spellDemo.update(Math.max(0, elapsedMs) / 1000, {
+            origin: at ?? camera.position,
+            yaw: Math.atan2(-forwardX, -forwardZ),
+          });
+          spellDemoFigures?.update(spellDemo.figures());
+          const json = JSON.stringify({ ...spellDemo.stats, ...spellView.drawn });
+          if (json !== publishedSpellVfx) root.dataset['spellVfx'] = publishedSpellVfx = json;
+        }
+        spellPlayer.update(); // live beams follow their cast sockets; nothing with none alive
+        if (spellView.active) spellView.update(Math.max(0, elapsedMs) / 1000);
         elements.update(camera.position);
         gasClouds.update(elapsedMs / 1000, camera.position);
         const looked = new Map<Object3D, CombinedLook>();

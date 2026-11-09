@@ -1,0 +1,118 @@
+{
+  "id": "vfx-spell-summon-swirl",
+  "notes": "Summon and dissolve: a ring pulse and a column of motes where a summoned thing arrives or leaves. Part of the spell VFX template library (mw-e29.10): drawn in neutral light greys so a spell's tint recolours it (src/game/spell-vfx/tint.ts); built from the existing base textures, no new art.",
+  "priority": 55,
+  "duration": 1.4,
+  "emitters": [
+    {
+      "id": "ring",
+      "texture": "vfx-base-ring-01",
+      "blend": "additive",
+      "bursts": [
+        {
+          "at": 0,
+          "count": 1
+        }
+      ],
+      "lifetime": {
+        "min": 0.6,
+        "max": 0.6
+      },
+      "size": [
+        {
+          "t": 0,
+          "v": 0.2
+        },
+        {
+          "t": 1,
+          "v": 1.6
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 1,
+          "color": "#A8A8A8"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 1
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    },
+    {
+      "id": "column",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 40,
+      "bursts": [
+        {
+          "at": 0,
+          "count": 14
+        }
+      ],
+      "lifetime": {
+        "min": 0.6,
+        "max": 1.1
+      },
+      "speed": {
+        "min": 0.2,
+        "max": 0.8
+      },
+      "coneDeg": 20,
+      "spawnRadius": 0.35,
+      "gravity": -0.6,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.02
+        },
+        {
+          "t": 0.3,
+          "v": 0.08
+        },
+        {
+          "t": 1,
+          "v": 0.01
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 0.3,
+          "color": "#D9D9D9"
+        },
+        {
+          "t": 1,
+          "color": "#9A9A9A"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0
+        },
+        {
+          "t": 0.3,
+          "v": 1
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    }
+  ]
+}

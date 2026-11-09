@@ -71,6 +71,8 @@ import { shieldSchema } from './types/shield.ts';
 import { signalGraphSchema } from './types/signal-graph.ts';
 import { checkSocketTracks, socketTrackSchema } from './types/socket-track.ts';
 import { spellSchema } from './types/spell.ts';
+import { spellVfxTemplateSchema } from './types/spell-vfx.ts';
+import { checkSpellVfx } from './spell-vfx-checks.ts';
 import { statusSchema } from './types/status.ts';
 import { stealthSchema } from './types/stealth.ts';
 import { surfaceTableSchema } from './types/surface-table.ts';
@@ -124,6 +126,7 @@ export const contentTypes = {
   'signal-graph': signalGraphSchema,
   'socket-track': socketTrackSchema,
   spell: spellSchema,
+  'spell-vfx-template': spellVfxTemplateSchema,
   status: statusSchema,
   stealth: stealthSchema,
   'surface-table': surfaceTableSchema,
@@ -158,6 +161,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkRespawnRules,
   checkRepopulation,
   checkSpellStatuses,
+  checkSpellVfx,
   checkWeakpoints,
 ];
 

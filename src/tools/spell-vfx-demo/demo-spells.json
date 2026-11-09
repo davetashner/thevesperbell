@@ -1,0 +1,22 @@
+{
+  "arcane": {
+    "castWindup": { "template": "svt-windup-gather" },
+    "castRelease": { "template": "svt-release-burst" },
+    "projectile": { "template": "svt-projectile-bolt" },
+    "impact": { "template": "svt-impact-burst" },
+    "area": { "template": "svt-area-rune-ring" },
+    "beam": { "template": "svt-beam-stream" },
+    "sustainOnTarget": { "template": "svt-sustain-aura" },
+    "summon": { "template": "svt-summon-swirl" }
+  },
+  "ember": {
+    "castWindup": { "template": "svt-windup-gather", "tint": "#FF7A1A" },
+    "castRelease": { "template": "svt-release-burst", "tint": "#FF7A1A" },
+    "projectile": { "template": "svt-projectile-bolt", "tint": "#FF7A1A" },
+    "impact": { "template": "svt-impact-burst", "tint": "#FF7A1A", "scale": 1.3 },
+    "area": { "template": "svt-area-rune-ring", "tint": "#FF7A1A" },
+    "beam": { "template": "svt-beam-stream", "tint": "#FF7A1A", "scale": 1.4 },
+    "sustainOnTarget": { "template": "svt-sustain-aura", "tint": "#FF7A1A" },
+    "summon": { "template": "svt-summon-swirl", "tint": "#FF7A1A" }
+  }
+}

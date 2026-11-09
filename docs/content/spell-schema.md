@@ -210,6 +210,39 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `effects[].loudness` | number ≥ 0 | required | NoiseEvent level 1 m from the source, dB (a door slam is about 85); sound propagation attenuates it. 0 = silent. |
 | `tags` | list of id | `[]` | Free tags for queries and dispel rules, e.g. "fire", "control". |
 | `vfxCue` | string | required | VFX cue id (style bible §15.1). |
+| `vfx` | object | — | Visuals by template (docs/vfx/spell-hooks.md): a template per slot, an optional tint and scale. A slot left out is not drawn. |
+| `vfx.castWindup` | object | — |  |
+| `vfx.castWindup.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.castWindup.tint` | string | — | Overrides the template tint. |
+| `vfx.castWindup.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.castRelease` | object | — |  |
+| `vfx.castRelease.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.castRelease.tint` | string | — | Overrides the template tint. |
+| `vfx.castRelease.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.projectile` | object | — |  |
+| `vfx.projectile.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.projectile.tint` | string | — | Overrides the template tint. |
+| `vfx.projectile.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.impact` | object | — |  |
+| `vfx.impact.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.impact.tint` | string | — | Overrides the template tint. |
+| `vfx.impact.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.area` | object | — |  |
+| `vfx.area.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.area.tint` | string | — | Overrides the template tint. |
+| `vfx.area.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.beam` | object | — |  |
+| `vfx.beam.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.beam.tint` | string | — | Overrides the template tint. |
+| `vfx.beam.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.sustainOnTarget` | object | — |  |
+| `vfx.sustainOnTarget.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.sustainOnTarget.tint` | string | — | Overrides the template tint. |
+| `vfx.sustainOnTarget.scale` | number 0.1–10 | — | Overrides the template scale. |
+| `vfx.summon` | object | — |  |
+| `vfx.summon.template` | ref → spell-vfx-template | required | The template to use; it must fill this slot. |
+| `vfx.summon.tint` | string | — | Overrides the template tint. |
+| `vfx.summon.scale` | number 0.1–10 | — | Overrides the template scale. |
 | `sfxCue` | string | required | Audio cue id (audio bible §6), without the round-robin number. |
 | `bookId` | id | — | Book that teaches it (book items: e07.1); absent for spells no book teaches. |
 | `flags` | object | `{}` | Design flags. |

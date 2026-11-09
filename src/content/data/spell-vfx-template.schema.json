@@ -1,0 +1,488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "castWindup"
+        },
+        "effect": {
+          "description": "The `vfx-effect` it plays (recoloured by the tint).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "effect"
+      ],
+      "additionalProperties": false,
+      "description": "Plays on the caster while the spell charges."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "castRelease"
+        },
+        "effect": {
+          "description": "The `vfx-effect` it plays (recoloured by the tint).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "effect"
+      ],
+      "additionalProperties": false,
+      "description": "Plays on the caster the moment the spell leaves."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "projectile"
+        },
+        "head": {
+          "description": "Rides the projectile for its whole flight (a looping effect).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        },
+        "trail": {
+          "description": "Follows the projectile (a looping effect); optional.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "head"
+      ],
+      "additionalProperties": false,
+      "description": "A head that rides the bolt and an optional trail."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "impact"
+        },
+        "effect": {
+          "description": "The `vfx-effect` it plays (recoloured by the tint).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "effect"
+      ],
+      "additionalProperties": false,
+      "description": "Plays where the spell lands, turned to the surface."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "area"
+        },
+        "ring": {
+          "type": "object",
+          "properties": {
+            "intensity": {
+              "default": 1,
+              "description": "Glow strength of the rune ring (magical materials intensity).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "spin": {
+              "default": 0.04,
+              "description": "Turns per second; 0 holds it still.",
+              "type": "number",
+              "minimum": 0
+            },
+            "growSeconds": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The ring expands from its centre to the radius over this long."
+            },
+            "pulseHz": {
+              "default": 0,
+              "description": "Brightness pulses this many times a second, at most 2 (photosensitivity); 0 = steady. Reduced motion holds it steady.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            }
+          },
+          "required": [
+            "growSeconds"
+          ],
+          "additionalProperties": false,
+          "description": "The rune ring from the magical material library, laid flat on the ground: its plane reaches exactly the spell radius."
+        },
+        "effect": {
+          "description": "Motes played at the centre, scaled with the radius (a looping effect).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "ring"
+      ],
+      "additionalProperties": false,
+      "description": "A rune ring (and optional motes) sized to the spell radius."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "beam"
+        },
+        "beam": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Beam width in metres."
+            },
+            "alpha": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Peak opacity of the beam core."
+            },
+            "scrollSpeed": {
+              "type": "number",
+              "minimum": 0,
+              "description": "How fast the energy streams along the beam, in lengths per second."
+            },
+            "pulseHz": {
+              "default": 0,
+              "description": "Brightness pulses this many times a second, at most 2 (photosensitivity); 0 = steady. Reduced motion holds it steady.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            }
+          },
+          "required": [
+            "width",
+            "alpha",
+            "scrollSpeed"
+          ],
+          "additionalProperties": false,
+          "description": "The beam strip between its start and end sockets."
+        },
+        "endEffect": {
+          "description": "Plays where the beam ends (a looping effect); optional.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "beam"
+      ],
+      "additionalProperties": false,
+      "description": "A beam between a start socket and an end point, with a width."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "sustainOnTarget"
+        },
+        "effect": {
+          "description": "The `vfx-effect` it plays (recoloured by the tint).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "effect"
+      ],
+      "additionalProperties": false,
+      "description": "A looping effect on the target while a status or channel holds."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Editor hint only; ignored by the loader."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Template id, e.g. \"svt-area-rune-ring\"."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the template shows and where it suits, for review."
+        },
+        "tint": {
+          "default": "#FFFFFF",
+          "description": "Default tint: particle colours are recoloured to it, keeping their brightness.",
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "scale": {
+          "default": 1,
+          "description": "Default size multiplier (particle size, speed and spawn radius, or ring/beam detail).",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "slot": {
+          "type": "string",
+          "const": "summon"
+        },
+        "effect": {
+          "description": "Plays where the summoned thing arrives or leaves.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "vfx-effect"
+        },
+        "dissolveSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "How long its body takes to dissolve in (or out), magical materials dissolve."
+        }
+      },
+      "required": [
+        "id",
+        "notes",
+        "slot",
+        "effect",
+        "dissolveSeconds"
+      ],
+      "additionalProperties": false,
+      "description": "Arrival and departure of a summoned thing."
+    }
+  ],
+  "$defs": {}
+}
