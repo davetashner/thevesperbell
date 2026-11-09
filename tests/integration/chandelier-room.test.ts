@@ -8,11 +8,14 @@ import { describe, expect, it } from 'vitest';
 import { markExercised } from '@content/testing';
 import {
   applyStimulus,
+  CreatureComponent,
   DamageApplied,
+  Died,
   fireArrow,
   healthOf,
   PhysicsObjectComponent,
   PlacementComponent,
+  placeEntity,
   readProperty,
   setProperty,
   SceneSpawnComponent,
@@ -45,6 +48,15 @@ function room(options: { magic?: boolean } = {}) {
     return entity;
   };
   const { player } = game;
+  // A creature spawned from a scene point is its own entity, found by the point it came from.
+  const creatureAt = (point: string): EntityId => {
+    let found: EntityId | undefined;
+    sim.query(CreatureComponent).forEach((entity, creature) => {
+      if (creature.origin.point === point) found = entity;
+    });
+    if (found === undefined) throw new Error(`no creature at ${point}`);
+    return found;
+  };
   const released: SupportRelease[] = [];
   sim.events.on(supportReleased, (e) => released.push(e));
   const dropped: EntityId[] = [];
@@ -57,7 +69,7 @@ function room(options: { magic?: boolean } = {}) {
   const heightOf = (name: string) => sim.get(id(name), PhysicsObjectComponent)?.position.y ?? NaN;
   const planks = [...byId.keys()].filter((name) => name.startsWith('rope-bridge-plank-'));
   steps(10); // settle
-  return { game, sim, id, player, released, dropped, hits, steps, heightOf, planks };
+  return { game, sim, id, creatureAt, player, released, dropped, hits, steps, heightOf, planks };
 }
 
 describe('the chandelier room (mw-e03.13)', () => {
@@ -92,11 +104,70 @@ describe('the chandelier room (mw-e03.13)', () => {
     expect(readProperty(r.sim, chandelier, 'suspended')).toBe(false);
     expect(r.heightOf('chandelier')).toBeLessThan(before - 4);
     // The impact: blunt damage on the player, blamed on whoever shot the rope.
-    const crush = r.hits.filter((h) => h.packet.tags.includes('crush'));
+    const crush = r.hits.filter((h) => h.packet.tags.includes('crush') && h.target === player);
     expect(crush).toHaveLength(1);
     expect(crush[0]?.packet).toMatchObject({ instigator: r.game.player, source: chandelier });
     expect(crush[0]?.amounts.blunt).toBeGreaterThan(30);
     expect(healthOf(r.sim, player)?.current).toBeLessThan(health);
+  });
+
+  it('AC-1 (mw-aps): the chandelier crushes a Forgotten miner standing under it, blamed on whoever shot the rope', () => {
+    const r = room();
+    const miner = r.creatureAt('chandelier-miner');
+    const chandelier = r.id('chandelier');
+    const spot = v(-4, 0, 0);
+    const stand = () => {
+      const at = r.sim.get(miner, PlacementComponent);
+      if (at !== undefined) placeEntity(r.sim, miner, spot, at.radius);
+    };
+    const max = healthOf(r.sim, miner)?.max ?? 0;
+    expect(max).toBeGreaterThan(0);
+    expect(healthOf(r.sim, miner)?.current).toBe(max);
+    // The miner's own wandering is none of this test's business: hold it under the chandelier.
+    stand();
+    r.steps(1);
+    const deaths: { target: EntityId; killer: EntityId | null }[] = [];
+    r.sim.events.on(Died, (e) => deaths.push({ target: e.target, killer: e.killer }));
+    applyStimulus(r.sim, {
+      shape: { kind: 'contact', target: r.id('chandelier-rope') },
+      element: 'pierce',
+      intensity: 60,
+      source: r.player,
+    });
+    for (let i = 0; i < 240; i++) {
+      stand();
+      r.steps(1);
+    }
+    expect(r.released).toMatchObject([{ cause: 'damage', held: [chandelier] }]);
+    const crush = r.hits.filter((h) => h.packet.tags.includes('crush') && h.target === miner);
+    expect(crush).toHaveLength(1);
+    expect(crush[0]?.packet).toMatchObject({ instigator: r.player, source: chandelier });
+    expect(crush[0]?.amounts.blunt).toBeGreaterThan(30);
+    const left = healthOf(r.sim, miner)?.current ?? 0;
+    expect(left).toBeLessThan(max);
+    // 120 kg of iron kills it, and the death is an ordinary one: Died fired once, crediting the archer.
+    expect(left).toBe(0);
+    expect(deaths).toEqual([{ target: miner, killer: r.player }]);
+  });
+
+  it('a Forgotten miner beside the chandelier, not under it, is not hurt by it', () => {
+    const r = room();
+    const miner = r.creatureAt('chandelier-miner');
+    const max = healthOf(r.sim, miner)?.max ?? 0;
+    const aside = v(-8, 0, 4);
+    applyStimulus(r.sim, {
+      shape: { kind: 'contact', target: r.id('chandelier-rope') },
+      element: 'pierce',
+      intensity: 60,
+      source: r.player,
+    });
+    for (let i = 0; i < 240; i++) {
+      placeEntity(r.sim, miner, aside, r.sim.get(miner, PlacementComponent)?.radius ?? 0);
+      r.steps(1);
+    }
+    expect(r.released).toHaveLength(1);
+    expect(r.hits.filter((h) => h.target === miner)).toEqual([]);
+    expect(healthOf(r.sim, miner)?.current).toBe(max);
   });
 
   it('an arrow through the rope does the same (the broadhead is not required)', ({ task }) => {
@@ -129,7 +200,7 @@ describe('the chandelier room (mw-e03.13)', () => {
     r.steps(60 * 6);
     expect(r.released).toMatchObject([{ cause: 'burnt', source: null, held: [chandelier] }]);
     expect(r.sim.get(chandelier, SceneSpawnComponent)?.id).toBe('chandelier');
-    const crush = r.hits.filter((h) => h.packet.tags.includes('crush'));
+    const crush = r.hits.filter((h) => h.packet.tags.includes('crush') && h.target === r.player);
     expect(crush).toHaveLength(1);
   }, 30_000);
 
