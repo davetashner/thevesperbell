@@ -58,7 +58,14 @@ import {
   characterTuning,
   spawnCharacter,
 } from '../character/system';
+import {
+  DEFAULT_FOOTSTEP_SURFACES,
+  footSurface,
+  groundUnder,
+  type SurfaceOffsets,
+} from '../character/footsteps';
 import { CharacterLocomotion, giveLocomotion, locomotionSystem } from '../character/locomotion';
+import { movementProfileOf } from '../character/profile';
 import { DEFAULT_ARROW_RULES } from '../combat/arrows/ballistics';
 import type { ArrowLookup } from '../combat/arrows/system';
 import { giveBow, type BowLoadout } from '../combat/bow/components';
@@ -592,6 +599,11 @@ export interface PlayerOptions {
   /** Wading, swimming, sinking and breath in the scene's water (mw-e02.14); absent = none. */
   readonly water?: PlayerWaterOptions;
   /**
+   * Material id → footstep loudness offset, dB relative to stone (`materialLoudness` of the
+   * content's materials, mw-e02.11); absent = every surface is as loud as stone.
+   */
+  readonly footstepOffsets?: SurfaceOffsets;
+  /**
    * Status definitions (mw-e06.24): the player's `moveSpeed` statuses (slowed, rooted) scale its
    * speed, read through `modifiedStat`; absent = statuses leave movement alone.
    */
@@ -724,6 +736,7 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
     world.addSystem(dodgeMotionSystem({ moves, facing: lookFacing }));
   }
   const { ledges, climb, water } = options;
+  const offsetOf: SurfaceOffsets = options.footstepOffsets ?? (() => undefined);
   // The options' fixed list plus whatever the capability registry grants the player (mw-e19.2), read
   // live so a grant or revoke changes traversal from the next check.
   const fixed = [...(ledges?.capabilities ?? []), ...(climb?.capabilities ?? [])];
@@ -830,17 +843,22 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   world.addSystem(
     locomotionSystem<TInput>({
       tuning: options.tuning,
-      ...(water !== undefined && {
-        material: (entity: EntityId) => {
-          const state = world.get(entity, CharacterController);
-          const tuning =
-            characterTuning(world, entity, options.tuning).water ?? DEFAULT_WATER_TUNING;
-          return state !== undefined &&
-            waterDepthAt(water.volumes, state.position) >= tuning.wadeDepth
-            ? WATER_MATERIAL
-            : undefined;
-        },
-      }),
+      // Footsteps carry the ground's material and wet / frozen state, or water while wading (mw-e02.11).
+      surface: (entity: EntityId) => {
+        const own = characterTuning(world, entity, options.tuning);
+        const surfaces = own.stealth?.surfaces ?? DEFAULT_FOOTSTEP_SURFACES;
+        const state = world.get(entity, CharacterController);
+        const wading =
+          water !== undefined &&
+          state !== undefined &&
+          waterDepthAt(water.volumes, state.position) >=
+            (own.water ?? DEFAULT_WATER_TUNING).wadeDepth;
+        const ground = wading
+          ? { material: WATER_MATERIAL, wetness: 1, frozen: false, burning: false }
+          : groundUnder(world, entity);
+        return ground === undefined ? undefined : footSurface(ground, offsetOf, surfaces);
+      },
+      noise: (entity: EntityId) => movementProfileOf(world, entity, options.tuning)?.noise,
       moving: (inputs, entity) => {
         const move = actionFrameOf(inputs)?.move;
         const held = move !== undefined && (move.x !== 0 || move.y !== 0);

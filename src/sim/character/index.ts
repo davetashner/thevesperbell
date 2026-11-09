@@ -125,3 +125,12 @@ export {
   type WaterSystemOptions,
   type WaterVolume,
 } from './water';
+export {
+  DEFAULT_FOOTSTEP_SURFACES,
+  footSurface,
+  footstepLoudness,
+  groundUnder,
+  type FootSurface,
+  type GroundReading,
+  type SurfaceOffsets,
+} from './footsteps';

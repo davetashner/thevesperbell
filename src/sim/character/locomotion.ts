@@ -3,7 +3,7 @@
 // character controller has moved a character, `locomotionSystem` classifies the tick into one
 // locomotion state, records its speed, normalised speed, vertical speed and turn rate, and emits
 // discrete events on the world's bus: jumpStart, land (with the impact speed), footstep (which foot,
-// which gait), mantleStart and ledgeGrab.
+// which gait, where, on which material, how loud), mantleStart and ledgeGrab.
 //
 // States, first match wins:
 //   climb / mantle / hang / swim   a traversal mode has the character
@@ -21,6 +21,11 @@
 // depend on where in the tick the feet met the ground. Footsteps come from ground distance travelled
 // (gait spacing from content), never from animation curves, so they are deterministic and replay.
 //
+// A footstep says what it fell on and how loud it is (mw-e02.11, footsteps.ts): the ground's material
+// and wet / frozen / burning state, the movement profile's noise, and loudness = noise × the
+// surface's pressure ratio. It is the one footstep event: audio plays it and stealth (mw-e09.5)
+// reads it; nothing else detects footsteps.
+//
 // Animation only reads the snapshot: nothing here reads presentation, and nothing reads it back.
 
 import type { ControllerTuning, Frozen, GaitTuning } from '@content/index';
@@ -28,7 +33,9 @@ import type { ReadonlyClock } from '../clock';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
+import type { Vec3 } from '../stimulus/shapes';
 import type { CharacterState } from './controller';
+import { footstepLoudness, type FootSurface } from './footsteps';
 import { CharacterController, characterTuning } from './system';
 import type { TraversalMode } from './traversal';
 
@@ -113,8 +120,23 @@ export type LocomotionEventKind =
       readonly kind: 'footstep';
       readonly foot: Foot;
       readonly gait: FootstepGait;
-      /** The material under the feet when it is not the ground's (`water`: wading, mw-e02.14). */
+      /** Where the foot came down: the character's feet, m. */
+      readonly position: Vec3;
+      /**
+       * The material under the feet: the ground's, or `water` while wading (mw-e02.14); absent when
+       * the game reads no ground (a world without surfaces).
+       */
       readonly material?: string;
+      /** The ground is wet enough to splash, or the foot is in water. */
+      readonly wet: boolean;
+      readonly frozen: boolean;
+      readonly burning: boolean;
+      /** The movement profile's noise, 0–1: stance × gait × encumbrance (1 when none is read). */
+      readonly profileNoise: number;
+      /** The surface's loudness offset, dB relative to stone (material, wet and frozen). */
+      readonly surfaceDb: number;
+      /** Normalised loudness: profileNoise × 10^(surfaceDb / 20). */
+      readonly loudness: number;
     }
   | { readonly kind: 'mantleStart' }
   | { readonly kind: 'ledgeGrab' };
@@ -228,8 +250,10 @@ export interface LocomotionTick {
   readonly character: CharacterState;
   /** Move input or root motion drives it this tick. */
   readonly moving: boolean;
-  /** A material the feet stand in besides the ground's (`water`), reported on footsteps. */
-  readonly material?: string | undefined;
+  /** The ground (or water) under the feet, tagged on footsteps; undefined reads no surface. */
+  readonly surface?: FootSurface | undefined;
+  /** The movement profile's noise this tick, 0–1; undefined = 1. */
+  readonly noise?: number | undefined;
   /** Facing yaw this tick, radians, or undefined without one. */
   readonly yaw: number | undefined;
 }
@@ -292,11 +316,21 @@ export function stepLocomotion(
     const spacing = gait.footstep[stepGait];
     stride += speed * dt;
     if (stride >= spacing) {
+      const { surface } = tick;
+      const profileNoise = tick.noise ?? 1;
+      const surfaceDb = surface?.surfaceDb ?? 0;
       events.push({
         kind: 'footstep',
         foot: nextFoot,
         gait: stepGait,
-        ...(tick.material !== undefined && { material: tick.material }),
+        position,
+        ...(surface !== undefined && { material: surface.material }),
+        wet: surface?.wet ?? false,
+        frozen: surface?.frozen ?? false,
+        burning: surface?.burning ?? false,
+        profileNoise,
+        surfaceDb,
+        loudness: footstepLoudness(profileNoise, surfaceDb),
       });
       stride -= spacing;
       nextFoot = nextFoot === 'left' ? 'right' : 'left';
@@ -331,8 +365,10 @@ export interface LocomotionSystemOptions<TInput> {
   readonly moving: (inputs: readonly TInput[], entity: EntityId) => boolean;
   /** `entity`'s facing yaw, radians (0 faces −z, positive turns left); undefined = no facing. */
   readonly facing?: (entity: EntityId) => number | undefined;
-  /** The material `entity` stands in besides the ground (`water` while wading), or undefined. */
-  readonly material?: (entity: EntityId) => string | undefined;
+  /** The ground (or water, while wading) under `entity`'s feet; undefined = no surface read. */
+  readonly surface?: (entity: EntityId) => FootSurface | undefined;
+  /** `entity`'s movement profile noise this tick, 0–1; undefined = 1. */
+  readonly noise?: (entity: EntityId) => number | undefined;
 }
 
 /**
@@ -357,7 +393,8 @@ export function locomotionSystem<TInput>(options: LocomotionSystemOptions<TInput
             character,
             moving: options.moving(inputs, entity),
             yaw: options.facing?.(entity),
-            material: options.material?.(entity),
+            surface: options.surface?.(entity),
+            noise: options.noise?.(entity),
           },
           context,
         );
