@@ -106,7 +106,7 @@ async function aimAt(page: Page, target: Point, tolerance = 0.003): Promise<numb
           });
           const dyaw = wrap(want.yaw - now.yaw);
           const dpitch = want.pitch - now.pitch;
-          if ((Math.abs(dyaw) <= tol && Math.abs(dpitch) <= tol) || moves >= 30) {
+          if ((Math.abs(dyaw) <= tol && Math.abs(dpitch) <= tol) || moves >= 40) {
             resolve(Math.max(Math.abs(dyaw), Math.abs(dpitch)));
             return;
           }
@@ -119,12 +119,23 @@ async function aimAt(page: Page, target: Point, tolerance = 0.003): Promise<numb
               movementY: Math.round((dpitch * ease) / gainY),
             }),
           );
+          // Settled: the published camera has moved and then held still for three frames (a loaded
+          // runner draws frames slowly, and the camera eases in), or after a long wait.
+          const started = app?.dataset['camera'];
+          let last = started;
+          let still = 0;
+          let frames = 0;
           const settle = () => {
-            if (player().tick < before + 3) {
-              requestAnimationFrame(settle);
+            frames += 1;
+            const now = app?.dataset['camera'];
+            still = now === last ? still + 1 : 0;
+            last = now;
+            const moved = now !== started;
+            if (player().tick >= before + 3 && ((moved && still >= 3) || frames > 300)) {
+              step();
               return;
             }
-            step();
+            requestAnimationFrame(settle);
           };
           requestAnimationFrame(settle);
         };
