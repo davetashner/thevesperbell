@@ -32,6 +32,15 @@ export interface ArrowRules {
   readonly minDamageFactor: number;
   /** Tuning default: radius of the arrow's swept segment against hurtboxes, metres. */
   readonly radius: number;
+  /**
+   * Chance an arrow comes to rest intact, by what it landed in (mw-e05.7): soft and medium surfaces
+   * (soil, wood, flesh) 90%, hard non-conductive ones (stone) 40%, hard conductive ones (metal) 20%.
+   */
+  readonly intactChance: Readonly<{ organic: number; stone: number; metal: number }>;
+  /** Most arrows at rest in a world at once (64): the oldest not in view go first (retrieval.ts). */
+  readonly maxResting: number;
+  /** Arrows within this distance of the one taken are gathered with it, metres (1.0). */
+  readonly gatherRadius: number;
 }
 
 /** The rules of mw-e05.2 (see ArrowRules for which numbers are tuning defaults). */
@@ -43,7 +52,23 @@ export const DEFAULT_ARROW_RULES: ArrowRules = Object.freeze({
   lifetimeSeconds: 10,
   minDamageFactor: 0.3,
   radius: 0.01,
+  intactChance: Object.freeze({ organic: 0.9, stone: 0.4, metal: 0.2 }),
+  maxResting: 64,
+  gatherRadius: 1,
 });
+
+/**
+ * The chance an arrow lands intact in a surface of `hardness` (conductive: metal when hard). Reads
+ * properties, never material names, so a new material gets the right odds from its data.
+ */
+export function intactChanceOf(
+  rules: Pick<ArrowRules, 'intactChance'>,
+  hardness: SurfaceHardness,
+  conductive: boolean,
+): number {
+  if (hardness !== 'hard') return rules.intactChance.organic;
+  return conductive ? rules.intactChance.metal : rules.intactChance.stone;
+}
 
 /**
  * Penetration an arrow needs to stick in each surface hardness (soft: soil, flesh; medium: wood,

@@ -15,6 +15,8 @@ import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import type { InteractableSpec, InteractorKit } from './affordance';
 import {
   addAffordanceGate,
+  addAffordanceLabel,
+  addFocusDemotion,
   addFocusFilter,
   addInteractable,
   addInteractor,
@@ -495,5 +497,46 @@ describe('interactRemotely (mw-e08.10)', () => {
     expect(interactRemotely(world, stranger, lever)).toBeUndefined();
     world.step([IDLE]);
     expect(events).toHaveLength(1);
+  });
+});
+
+describe('prompt wording and focus demotion (mw-e05.7)', () => {
+  it('a label rule words the prompt for the object it knows; the first to answer wins; removable', () => {
+    const { world, actor } = setup();
+    const lever = place(world, 1, 0);
+    const other = place(world, 3, 90); // out of reach angle: never focused
+    world.step([IDLE]);
+    expect(interactionPrompt(world, actor)?.label).toBe('Pull');
+    const off = addAffordanceLabel(world, (_w, _who, target) =>
+      target === lever ? 'Pull hard' : undefined,
+    );
+    addAffordanceLabel(world, () => 'never reached for the lever');
+    expect(interactionPrompt(world, actor)).toMatchObject({
+      label: 'Pull hard',
+      options: [{ label: 'Pull hard' }],
+    });
+    off();
+    off(); // already removed
+    expect(interactionPrompt(world, actor)?.label).toBe('never reached for the lever');
+    expect(other).not.toBe(lever);
+  });
+
+  it('a demoted object is focused only when nothing else is in reach, however well it scores', () => {
+    const { world, actor } = setup();
+    const best = place(world, 1, 0);
+    const worse = place(world, 2, 40);
+    addFocusDemotion(world, () => false); // a second rule that demotes nothing
+    const off = addFocusDemotion(world, (_w, _who, target) => target === best);
+    world.step([IDLE]);
+    expect(focusOf(world, actor)?.target).toBe(worse); // the demoted best yields to a lesser one
+    world.destroy(worse);
+    world.step([IDLE]);
+    expect(focusOf(world, actor)?.target).toBe(best); // alone, it is focused after all
+    off();
+    off();
+    const again = place(world, 2, 40);
+    world.step([IDLE]);
+    expect(focusOf(world, actor)?.target).toBe(best);
+    expect(again).not.toBe(best);
   });
 });

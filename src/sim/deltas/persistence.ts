@@ -23,6 +23,9 @@
 // Everything is plain data in a fixed order (baseline order, then ascending entity order), so equal
 // worlds give equal deltas, and saves (mw-e27.4) can carry them.
 
+import { ArrowRestComponent } from '../combat/arrows/components';
+import { ArrowRested } from '../combat/arrows/events';
+import { arrowRetrievalOf, type PersistedArrow } from '../combat/arrows/retrieval';
 import { defineComponent, type EntityId } from '../core/component';
 import type { World } from '../core/world';
 import { CreatureComponent } from '../creatures/components';
@@ -369,5 +372,49 @@ export function persistDroppedItems(
   return world.events.on(itemDropped, ({ entity }) => {
     const id = level();
     if (id !== undefined) markPersistent(world, entity, 'item', id);
+  });
+}
+
+/**
+ * The spawner of arrows at rest in a level (kind `arrow`, mw-e05.7): type, whether it is whole, where
+ * it is and which way it points, and its age so the despawn order survives. The shooter is not kept
+ * (entity ids are not stable across saves). Re-creating needs the arrow retrieval rules installed.
+ */
+export function arrowSpawner(): PersistentSpawner<PersistedArrow> {
+  return Object.freeze({
+    kind: 'arrow',
+    capture: (world: World<never>, entity: EntityId) => {
+      const rest = world.isRegistered(ArrowRestComponent)
+        ? world.get(entity, ArrowRestComponent)
+        : undefined;
+      if (rest === undefined) return undefined;
+      return {
+        arrow: rest.arrow,
+        state: rest.state,
+        intact: rest.intact,
+        position: { ...rest.position },
+        direction: { ...rest.direction },
+        age: world.tick - rest.tick,
+      };
+    },
+    spawn: (world: World<never>, data: PersistedArrow) =>
+      arrowRetrievalOf(world)?.restore(world, data),
+  });
+}
+
+/**
+ * Marks every arrow that comes to rest in level geometry from now on persistent (kind `arrow`) in
+ * the level `level()` names (none: not persisted). An arrow in a creature or a physics object is not:
+ * its body is not a stable entity (a creature's arrows drop into its loot when it dies). The world
+ * holds at most 64 resting arrows, so a level's delta carries at most 64 small records. Returns a
+ * function that stops it.
+ */
+export function persistRestingArrows(
+  world: World<never>,
+  level: () => string | undefined,
+): () => void {
+  return world.events.on(ArrowRested, ({ entity, in: host }) => {
+    const id = level();
+    if (id !== undefined && host === null) markPersistent(world, entity, 'arrow', id);
   });
 }

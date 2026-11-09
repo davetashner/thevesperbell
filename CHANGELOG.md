@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Arrows that stick in a wall or a body now stay there: press Interact near them to take back every whole arrow within a metre (the prompt reads "Take arrows (3)"), some break on landing (more often on stone and metal, always in fire), a creature's whole arrows drop with its loot, and at most 64 arrows lie about at once (the oldest out of sight go first).
 - You can slip into a wardrobe, barrel or haystack to break line of sight (guards can't see you inside, and a burning haystack throws you out), stash bodies in a chest that has room, and broken chests spill their contents; for now this only exists in a new test scene, `?scene=hiding-room`, not in the shipped levels.
 - The Sleeping Ox, Marsh's General Store and the riverbank under the bridge now have different floors you can see: carpet rugs muffle your steps, boards and creaky upstairs floorboards carry, and shingle crunches loudly.
 - Your footsteps now make noise that guards can hear: creeping (crouched or slow-walking) is silent to them, running carries a few metres to the undead and across a street to anyone who is not your friend (shopkeepers and the watch do not mind you running past), sprinting carries further, gravel and plate armour make it worse, carpet makes it better, and a long fall is loud (mw-e09.5).

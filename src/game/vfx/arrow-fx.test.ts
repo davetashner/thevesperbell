@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameContent } from '@content/index';
 import { MAX_MAGIC_PULSE_HZ } from '@render/magic-materials/rules';
-import { arrowImpact, World, type ArrowImpactInfo, type EntityId } from '@sim/index';
+import { arrowBroken, arrowImpact, World, type ArrowImpactInfo, type EntityId } from '@sim/index';
 import {
   arrowBreaks,
   ArrowFx,
@@ -61,6 +61,7 @@ function setup(options: { reduced?: boolean; breakShaft?: (e: EntityId) => boole
       material: 'stone',
       hardness: 'hard',
       outcome,
+      ...(outcome === 'stick' || outcome === 'drop' ? { intact: true } : {}),
       speed: 30,
       energy: 20,
       impulse: 1,
@@ -102,12 +103,13 @@ describe('arrow payload readers (mw-e29.11)', () => {
     expect(ropeLengthOf({ payload: [{ op: 'spawn', entity: 'torch' }] })).toBeUndefined();
   });
 
-  it('an arrow breaks when it shattered, or rests and cannot be picked up; never on a ricochet', () => {
-    expect(arrowBreaks({ retrievable: true }, 'shatter')).toBe(true);
-    expect(arrowBreaks({ retrievable: true }, 'stick')).toBe(false);
-    expect(arrowBreaks({ retrievable: false }, 'stick')).toBe(true);
-    expect(arrowBreaks({ retrievable: false }, 'drop')).toBe(true);
-    expect(arrowBreaks({ retrievable: false }, 'ricochet')).toBe(false);
+  it('an arrow breaks when it shattered, or rests broken by the sim roll; never on a ricochet or a fall', () => {
+    expect(arrowBreaks({ outcome: 'shatter' })).toBe(true);
+    expect(arrowBreaks({ outcome: 'stick', intact: true })).toBe(false);
+    expect(arrowBreaks({ outcome: 'stick', intact: false })).toBe(true);
+    expect(arrowBreaks({ outcome: 'drop', intact: false })).toBe(true);
+    expect(arrowBreaks({ outcome: 'drop' })).toBe(false);
+    expect(arrowBreaks({ outcome: 'ricochet' })).toBe(false);
   });
 });
 
@@ -311,7 +313,7 @@ describe('ArrowFx (mw-e29.11)', () => {
       },
     });
     fx2.attach();
-    impact('brittle', 'stick'); // both listeners hear it; only fx2 knows this arrow
+    impact('brittle', 'stick', { intact: false }); // both listeners hear it; only fx2 knows this arrow
     expect(fx2.breaking).toBe(1);
     expect(fx2.wobbling).toBe(0);
     fx2.frame();
@@ -321,6 +323,30 @@ describe('ArrowFx (mw-e29.11)', () => {
     fx2.frame();
     expect(swapped).toEqual([arrowEntity]);
     expect(fx2.breaking).toBe(0);
+    expect(fx.breaking).toBe(0);
+  });
+
+  it('AC-5: an arrow that breaks after it came to rest (it burned) stops quivering and swaps to the broken shaft', () => {
+    const swapped: EntityId[] = [];
+    const { world, fx, impact, arrowEntity } = setup({
+      breakShaft: (entity) => {
+        swapped.push(entity);
+        return true;
+      },
+    });
+    impact('standard', 'stick');
+    expect(fx.wobbling).toBe(1);
+    world.events.emit(arrowBroken, {
+      tick: 1,
+      entity: arrowEntity,
+      arrow: 'standard',
+      cause: 'fire',
+    });
+    world.events.flush();
+    expect(fx.wobbling).toBe(0);
+    expect(fx.breaking).toBe(1);
+    fx.frame();
+    expect(swapped).toEqual([arrowEntity]);
     expect(fx.breaking).toBe(0);
   });
 
@@ -341,6 +367,7 @@ describe('ArrowFx (mw-e29.11)', () => {
         material: 'stone',
         hardness: 'hard',
         outcome: 'stick',
+        intact: false,
         speed: 1,
         energy: 1,
         impulse: 1,
