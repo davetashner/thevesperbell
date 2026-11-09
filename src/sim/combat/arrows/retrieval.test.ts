@@ -1,6 +1,5 @@
 // Arrows that stay (mw-e05.7): the intact roll at impact, taking arrows back with Interact, the
 // 64-arrow cap, arrows that follow their body or fall when it goes, fire, and the view stand-in.
-import { loadGameContent, type ArrowEntry } from '@content/index';
 import { describe, expect, it } from 'vitest';
 import { FakeCollisionWorld } from '../../character/fake-collision-world';
 import { box, type GreyboxShape } from '../../character/greybox';
@@ -8,7 +7,6 @@ import { initialCharacterState } from '../../character/controller';
 import { CharacterController } from '../../character/system';
 import type { EntityId } from '../../core/component';
 import { World } from '../../core/world';
-import { ElementField } from '../../field/grid';
 import { elementFieldOf, elementFieldSystem, installElementField } from '../../field/install';
 import { fireRules, type BurntMaterials } from '../../elements/fire';
 import { ElementRuleSet, elementRulesSystem } from '../../elements/rules';
@@ -67,10 +65,16 @@ import {
   type ArrowViewRule,
   type ArrowsTaken,
 } from './retrieval';
-import { arrowLookup, fireArrow, installArrows } from './system';
+import { TEST_ARROWS } from '../../testing/arrows';
+import { fireArrow, installArrows, type ArrowLookup } from './system';
 
 const v3 = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
-const ARROWS = arrowLookup(loadGameContent().all('arrow'));
+const ARROWS = TEST_ARROWS;
+
+function must<T>(value: T | undefined): T {
+  if (value === undefined) throw new Error('expected a value');
+  return value;
+}
 const ZERO = v3(0, 0, 0);
 
 const IDLE = actionFrame({
@@ -92,11 +96,12 @@ interface Options {
   readonly maxResting?: number;
   readonly materials?: MaterialPresets;
   readonly quiver?: boolean;
-  readonly arrows?: ReturnType<typeof arrowLookup>;
+  readonly arrows?: ArrowLookup;
 }
 
 /** A world with a player at the origin facing −z, a quiver of 5 standard arrows, and the arrow rules. */
 function setup(options: Options = {}) {
+  const rollValue = options.roll ?? 0;
   const world = registerWorldProperties(new World<ActionFrame>({ seed: 1 }));
   world.register(
     CharacterController,
@@ -113,7 +118,7 @@ function setup(options: Options = {}) {
     arrows: options.arrows ?? ARROWS,
     damage: new DamageModel(),
     collision,
-    ...(options.roll !== undefined && { roll: () => options.roll as number }),
+    ...(options.roll !== undefined && { roll: () => rollValue }),
   });
   const retrieval = installArrowRetrieval(world, {
     arrows: options.arrows ?? ARROWS,
@@ -224,7 +229,7 @@ describe('intact roll at impact (mw-e05.7)', () => {
     const land = (properties: Partial<WorldPropertyValues>) => {
       // An arrow that pierces hard surfaces, so it sticks in stone and metal.
       const piercing = new Map(ARROWS).set('piercing', {
-        ...(ARROWS.get('standard') as ArrowEntry),
+        ...must(ARROWS.get('standard')),
         id: 'piercing',
         penetration: 50,
       });
@@ -282,7 +287,7 @@ describe('intact roll at impact (mw-e05.7)', () => {
     expect(run()).toEqual(run());
     // retrievable: false is a data flag: whatever the roll says, such an arrow comes to rest broken.
     const brittle = new Map(ARROWS);
-    brittle.set('standard', { ...(ARROWS.get('standard') as ArrowEntry), retrievable: false });
+    brittle.set('standard', { ...must(ARROWS.get('standard')), retrievable: false });
     const world = registerWorldProperties(new World<never>({ seed: 1 }));
     world.register(PlacementComponent, ...DAMAGE_COMPONENTS, ...HIT_VOLUME_COMPONENTS);
     installArrows(world, {
@@ -355,7 +360,7 @@ describe('taking arrows back (mw-e05.7)', () => {
     const [a] = near(t);
     const tooFar = restArrow(t, v3(0, 1, -2.9));
     const broken = restArrow(t, v3(0.2, 1, -1.4), { intact: false });
-    expect(gatherable(t.world, a as EntityId, 1).length).toBe(3);
+    expect(gatherable(t.world, must(a), 1).length).toBe(3);
     expect(gatherable(t.world, tooFar)).toEqual([tooFar]);
     expect(gatherable(t.world, broken)).toEqual([]); // not an intact arrow: nothing to take
     expect(gatherable(t.world, t.player)).toEqual([]);
@@ -472,7 +477,7 @@ describe('the 64-arrow cap (mw-e05.7)', () => {
     stepsUntilRest(t, last);
     t.world.step([IDLE]);
     t.world.step([IDLE]);
-    const [oldestSeen, oldestUnseen] = [placed[0] as EntityId, placed[1] as EntityId];
+    const [oldestSeen, oldestUnseen] = [must(placed[0]), must(placed[1])];
     expect(t.world.isAlive(last)).toBe(true);
     expect(t.world.isAlive(oldestSeen)).toBe(true); // older, but in view
     expect(t.world.isAlive(oldestUnseen)).toBe(false); // the oldest not in view goes
@@ -660,7 +665,9 @@ describe('fire and arrows (mw-e05.7)', () => {
   it('a worldless-of-arrows world installs and steps cheaply', () => {
     const world = new World<never>({ seed: 1 });
     installArrowRetrieval(world, { arrows: ARROWS });
-    expect(() => world.step()).not.toThrow();
+    expect(() => {
+      world.step();
+    }).not.toThrow();
   });
 });
 
@@ -695,7 +702,7 @@ describe('arrows in the real fire rules (mw-e05.7 AC-5)', () => {
     const crate = world.spawn();
     addMaterialProperties(world, crate, PRESETS, { material: 'wood', temperature: 20 });
     placeEntity(world, crate, v3(0, 0.5, 0), 0.5);
-    return { world, crate, field: elementFieldOf(world) as ElementField };
+    return { world, crate, field: elementFieldOf(world) };
   }
   const settle = (t: ReturnType<typeof burningWorld>, position: Vec3, over: Partial<ArrowRest>) => {
     const entity = t.world.spawn();
@@ -776,7 +783,7 @@ describe('saving arrows (mw-e05.7)', () => {
       direction: v3(0, 0, -1),
       age: 4,
     });
-    expect(restOf(t, entity as EntityId)).toMatchObject({
+    expect(restOf(t, must(entity))).toMatchObject({
       arrow: 'rope',
       state: 'stuck',
       intact: true,
@@ -784,7 +791,7 @@ describe('saving arrows (mw-e05.7)', () => {
       tick: 6,
       position: v3(1, 2, -3),
     });
-    expect(t.world.has(entity as EntityId, InteractableComponent)).toBe(true);
+    expect(t.world.has(must(entity), InteractableComponent)).toBe(true);
     expect(
       t.retrieval.restore(t.world, {
         arrow: 'ghost',
@@ -803,8 +810,8 @@ describe('saving arrows (mw-e05.7)', () => {
       direction: v3(0, 0, 1),
       age: 999,
     });
-    expect(restOf(t, young as EntityId)?.tick).toBe(0);
-    expect(t.world.has(young as EntityId, InteractableComponent)).toBe(false);
+    expect(restOf(t, must(young))?.tick).toBe(0);
+    expect(t.world.has(must(young), InteractableComponent)).toBe(false);
     expect(arrowRetrievalOf(t.world)).toBe(t.retrieval);
     expect(arrowRetrievalOf(new World<never>({ seed: 1 }))).toBeUndefined();
   });
@@ -821,7 +828,7 @@ describe('saving arrows (mw-e05.7)', () => {
       direction: v3(0, 0, 1),
       age: 0,
     });
-    expect(world.has(entity as EntityId, ArrowRestComponent)).toBe(true);
+    expect(world.has(must(entity), ArrowRestComponent)).toBe(true);
     const bare = new World<never>({ seed: 1 });
     bare.register(ArrowRestComponent, PlacementComponent);
     const plain = installArrowRetrieval(bare, { arrows: ARROWS });
@@ -834,7 +841,7 @@ describe('saving arrows (mw-e05.7)', () => {
       age: 0,
     });
     // Placed (so heat and the cap can see it) but not takeable: nothing interactive is registered.
-    expect(bare.get(arrow as EntityId, PlacementComponent)).toMatchObject({ x: 1, y: 1, z: 1 });
+    expect(bare.get(must(arrow), PlacementComponent)).toMatchObject({ x: 1, y: 1, z: 1 });
     expect(hashWorld(bare)).toBeTypeOf('string');
   });
 });

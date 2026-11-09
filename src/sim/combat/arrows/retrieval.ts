@@ -157,6 +157,10 @@ export function returnsAs(options: Pick<ArrowRetrievalOptions, 'arrows'>, arrow:
   return def.payload.some((op) => op.op === 'spawn') ? arrow : SPENT_ARROW;
 }
 
+/** Orders [arrow type, n] pairs by type, in UTF-16 code unit order (the same everywhere; types are unique). */
+const byType = (a: readonly [string, number], b: readonly [string, number]): number =>
+  Number(a[0] > b[0]) - Number(a[0] < b[0]);
+
 const frozen = (v: Vec3): Vec3 => Object.freeze({ x: v.x, y: v.y, z: v.z });
 const distanceSq = (a: Vec3, b: Vec3): number =>
   (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z);
@@ -173,16 +177,25 @@ export function restingArrows(world: World<never>): { entity: EntityId; rest: Ar
  * The intact arrows `actor` gathers by interacting with `target`: those at rest within `radius` of
  * it, `target` itself included, ascending entity order. Empty when `target` is not an intact arrow.
  */
+function gathered(
+  world: World<never>,
+  target: EntityId,
+  radius: number,
+): { entity: EntityId; rest: ArrowRest }[] {
+  const at = world.get(target, ArrowRestComponent);
+  if (!at?.intact) return [];
+  return restingArrows(world).filter(
+    ({ rest }) => rest.intact && distanceSq(rest.position, at.position) <= radius * radius,
+  );
+}
+
+/** The entities `gathered` finds (see there). */
 export function gatherable(
   world: World<never>,
   target: EntityId,
   radius: number = DEFAULT_ARROW_RULES.gatherRadius,
 ): EntityId[] {
-  const at = world.get(target, ArrowRestComponent);
-  if (at === undefined || !at.intact) return [];
-  return restingArrows(world)
-    .filter(({ rest }) => rest.intact && distanceSq(rest.position, at.position) <= radius * radius)
-    .map(({ entity }) => entity);
+  return gathered(world, target, radius).map(({ entity }) => entity);
 }
 
 /**
@@ -203,8 +216,7 @@ export function takeStuckArrows(
     }
     world.destroy(entity);
   }
-  // Plain sort: by UTF-16 code unit, the same everywhere.
-  return [...counts.keys()].sort().map((arrow) => ({ arrow, count: counts.get(arrow) as number }));
+  return [...counts].sort(byType).map(([arrow, count]) => ({ arrow, count }));
 }
 
 /**
@@ -272,23 +284,20 @@ export function installArrowRetrieval<TInput>(
   w.events.on(interacted, ({ actor, target, verb }) => {
     if (verb !== 'pick-up' || !isTakeable(target) || !w.has(actor, QuiverComponent)) return;
     const taken = new Map<string, number>();
-    const gathered = gatherable(w, target, rules.gatherRadius);
-    for (const entity of gathered) {
-      const rest = w.get(entity, ArrowRestComponent) as ArrowRest; // gatherable lists arrows at rest
+    const found = gathered(w, target, rules.gatherRadius);
+    for (const { entity, rest } of found) {
       const type = returnsAs(options, rest.arrow);
       taken.set(type, (taken.get(type) ?? 0) + 1);
       w.destroy(entity);
     }
-    const ordered = [...taken.keys()]
-      .sort()
-      .map((type) => [type, taken.get(type) as number] as const);
+    const ordered = [...taken].sort(byType);
     for (const [type, count] of ordered) addArrows(w, actor, type, count);
     w.events.emit(arrowsTaken, {
       tick: w.tick,
       actor,
       target,
       taken: Object.fromEntries(ordered),
-      count: gathered.length,
+      count: found.length,
     });
   });
 
@@ -316,9 +325,12 @@ export function installArrowRetrieval<TInput>(
     const host = rest.in;
     if (host !== null) {
       if (!w.isAlive(host)) {
-        const { local: _gone, ...loose } = rest;
         current = Object.freeze({
-          ...loose,
+          arrow: rest.arrow,
+          shooter: rest.shooter,
+          direction: rest.direction,
+          tick: rest.tick,
+          intact: rest.intact,
           state: 'dropped' as const,
           in: null,
           position: frozen(groundBelow(rest.position)),

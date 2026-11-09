@@ -1,14 +1,13 @@
 // Arrows at rest and level deltas (mw-e05.7): an arrow stuck in the level stays with the level, so it
 // is still there when the player comes back; arrows in moving bodies do not persist; and at most 64
 // arrows rest in a world, so the delta stays small.
-import { loadGameContent } from '@content/index';
 import { describe, expect, it } from 'vitest';
 import { ArrowRestComponent } from '../combat/arrows/components';
 import { ArrowRested } from '../combat/arrows/events';
 import { gatherable, installArrowRetrieval } from '../combat/arrows/retrieval';
-import { arrowLookup } from '../combat/arrows/system';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
+import { TEST_ARROWS } from '../testing/arrows';
 import { InteractableComponent, installInteraction } from '../interaction/system';
 import { registerWorldProperties } from '../properties/components';
 import { PlacementComponent } from '../stimulus/placement';
@@ -22,7 +21,7 @@ import {
 } from './persistence';
 
 const v3 = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
-const ARROWS = arrowLookup(loadGameContent().all('arrow'));
+const ARROWS = TEST_ARROWS;
 const LEVEL = 'inn';
 
 function level() {

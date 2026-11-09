@@ -2,12 +2,10 @@
 // roll, as world items lying at its body, each with an `item.dropped` from the creature; the roll
 // draws from the creature's own sub-stream of the loot stream; nothing else drops anything.
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
-import { loadGameContent } from '@content/index';
 import { describe, expect, it } from 'vitest';
 import { box } from '../character/greybox';
 import { ArrowRestComponent, type ArrowRest } from '../combat/arrows/components';
 import { Died } from '../combat/damage/events';
-import { arrowLookup } from '../combat/arrows/system';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
 import { CREATURE_COMPONENTS, CreatureComponent, type Creature } from '../creatures/components';
@@ -33,6 +31,7 @@ import {
   installCreatureDrops,
   type CreatureDropsOptions,
 } from './drops';
+import { TEST_ARROWS } from '../testing/arrows';
 import { LootTables, type LootStack, type LootTableDef } from './tables';
 
 const v = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
@@ -253,7 +252,7 @@ describe('creature drops (mw-e01.5)', () => {
 });
 
 describe('arrows in a dying creature (mw-e05.7)', () => {
-  const ARROWS = arrowLookup(loadGameContent().all('arrow'));
+  const ARROWS = TEST_ARROWS;
   const ITEM_OF = new Map([
     ['standard', 'standard-arrow'],
     ['rope', 'rope-arrow'],
