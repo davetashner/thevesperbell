@@ -4,6 +4,8 @@
 //
 //   ?arrows=demo      every arrow type in turn, one every 2.5 s, repeating
 //   ?arrows=<id>      that arrow type alone, e.g. ?arrows=water
+//   &lane=<x>         aim every shot at x (metres) along the back wall instead of the type's lane,
+//                     e.g. a clear stretch of wall away from the target board
 //
 // The shots are real: `fireArrow` through the sim's arrow system, so the trail, impact, cue sheets,
 // decals and wobble all run exactly as they do for a player's shot. Nothing here runs without the
@@ -60,6 +62,14 @@ export function parseArrowDemoParam(search: string): readonly string[] | undefin
   return value === 'demo' ? ARROW_DEMO_ORDER : [value];
 }
 
+/** `?lane=<x>` → that lane in metres; absent or not a finite number → undefined (each type's own). */
+export function parseArrowDemoLane(search: string): number | undefined {
+  const value = new URLSearchParams(search).get('lane');
+  if (value === null || value === '') return undefined;
+  const lane = Number(value);
+  return Number.isFinite(lane) ? lane : undefined;
+}
+
 /** Launch velocity that carries an arrow level from FROM_Z to the wall, ignoring drag. */
 export function demoVelocity(): Vec3 {
   const distance = FROM_Z - WALL_Z;
@@ -80,12 +90,14 @@ export class ArrowDemo {
   readonly #world: World<never>;
   readonly #arrows: ArrowLookup;
   readonly #order: readonly string[];
+  readonly #lane: number | undefined;
   readonly #impacts: { arrow: string; outcome: ArrowImpactOutcome }[] = [];
   #since = ARROW_DEMO_INTERVAL;
   #shots = 0;
   #off: () => void;
 
-  constructor(world: World<never>, arrows: ArrowLookup, order: readonly string[]) {
+  constructor(world: World<never>, arrows: ArrowLookup, order: readonly string[], lane?: number) {
+    this.#lane = lane;
     this.#world = world;
     this.#arrows = arrows;
     this.#order = order;
@@ -112,7 +124,7 @@ export class ArrowDemo {
     const arrow = this.#order[this.#shots % this.#order.length];
     if (arrow === undefined) return undefined;
     this.#shots++;
-    const lane = ARROW_DEMO_LANES[arrow] ?? 0;
+    const lane = this.#lane ?? ARROW_DEMO_LANES[arrow] ?? 0;
     return fireArrow(this.#world, this.#arrows, {
       arrow,
       origin: { x: lane, y: HEIGHT, z: FROM_Z },

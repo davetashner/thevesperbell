@@ -405,7 +405,7 @@ import { bindDebugCameraInput, DebugCamera } from '@tools/debug-camera/index';
 import { layer as tools } from '@tools/index';
 import { sceneAgitator } from '@tools/perf/agitator';
 import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
-import { ArrowDemo, parseArrowDemoParam } from '@tools/arrow-demo/index';
+import { ArrowDemo, parseArrowDemoLane, parseArrowDemoParam } from '@tools/arrow-demo/index';
 import {
   AWARENESS_DEMO_NOISE_MS,
   awarenessDemoAgents,
@@ -2495,7 +2495,12 @@ function startRenderer(
         vfxDemo = new VfxDemo(vfx, vfxMode, centre);
       }
       if (arrowDemoOrder !== undefined) {
-        arrowDemo = new ArrowDemo(world, combat.bow.arrows, arrowDemoOrder);
+        arrowDemo = new ArrowDemo(
+          world,
+          combat.bow.arrows,
+          arrowDemoOrder,
+          parseArrowDemoLane(location.search),
+        );
       }
       if (magicMode !== undefined) {
         magicDemo = new MagicDemo(

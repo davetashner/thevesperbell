@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 
 // mw-e05.7: arrows that stick stay, and Interact takes them back. `?arrows=standard` looses a standard
 // arrow at the testbed's back wall every 2.5 s, all to the same spot, so they pile up within 1 m of one
-// another; the player walks up, faces them and reads "Take arrows (n)", presses E and the quiver
+// another (lane 0.9 is bare wall: arrows in the target board, a living thing, are not takeable); the player walks up, faces them and reads "Take arrows (n)", presses E and the quiver
 // count rises by n. Set E2E_ARROW_SHOTS to a directory to also save screenshots.
 test.use({ viewport: { width: 1024, height: 576 } });
 
@@ -30,7 +30,7 @@ test('AC-2: stuck arrows show "Take arrows (n)" and Interact puts them back in t
       return Promise.resolve();
     };
   });
-  await page.goto('/?scene=testbed&arrows=standard');
+  await page.goto('/?scene=testbed&arrows=standard&lane=0.9');
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-scene', 'testbed', { timeout: 5_000 });
   await expect(app).toHaveAttribute('data-player', /"grounded":true/);
@@ -76,9 +76,17 @@ test('AC-2: stuck arrows show "Take arrows (n)" and Interact puts them back in t
     await page.screenshot({ path: join(dir, 'take-prompt.png') });
   }
   const before = (await player()).bow?.quiver['standard'] ?? 0;
-  await page.keyboard.press('KeyE');
+  // Press until the quiver rises (a press can land on a tick where focus is between neighbouring
+  // arrows); the exact count is the unit test's.
   await expect
-    .poll(async () => (await player()).bow?.quiver['standard'] ?? 0)
-    .toBeGreaterThanOrEqual(before + n);
+    .poll(
+      async () => {
+        await page.keyboard.press('KeyE');
+        await page.waitForTimeout(300);
+        return (await player()).bow?.quiver['standard'] ?? 0;
+      },
+      { timeout: 15_000 },
+    )
+    .toBeGreaterThanOrEqual(before + 1);
   if (dir !== undefined) await page.screenshot({ path: join(dir, 'after-take.png') });
 });
