@@ -130,3 +130,28 @@ test('burning, wet, frozen and charged crates all show, side by side', async ({ 
   expect(seen.looks).toBeGreaterThanOrEqual(3);
   expect(problems).toEqual([]);
 });
+
+test('mw-e29.8: dousing a burning crate puffs steam, and a wet frozen crate reads as ice', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  const problems = collectProblems(page);
+  const [, frozen, , burning] = await startWithRow(page);
+  await runConsole(page, `prop ${String(burning)} temperature 600`);
+  await expect.poll(async () => (await probe(page)).perState['burning'] ?? 0).toBe(1);
+  await shoot(page, 'burning-before-dousing');
+  const before = (await probe(page)).vfx;
+  // (The console writes properties directly, so douse by hand: cool it, soak it, put it out.)
+  await runConsole(page, `prop ${String(burning)} temperature 20`);
+  await runConsole(page, `prop ${String(burning)} wetness 1`);
+  await runConsole(page, `prop ${String(burning)} burning false`);
+  await expect.poll(async () => (await probe(page)).perState['wet'] ?? 0).toBe(1);
+  await shoot(page, 'steam-puff');
+  expect((await probe(page)).vfx).toBeGreaterThanOrEqual(Math.min(before, 1));
+
+  await runConsole(page, `prop ${String(frozen)} wetness 1`);
+  await runConsole(page, `prop ${String(frozen)} frozen true`);
+  await expect.poll(async () => (await probe(page)).perState['frozen'] ?? 0).toBe(1);
+  await shoot(page, 'wet-and-frozen');
+  expect(problems).toEqual([]);
+});

@@ -12,10 +12,13 @@ const valid = {
   id: 'test-table',
   notes: 'For tests.',
   handleCap: 4,
+  fullDetailCap: 2,
+  lowLodIntensity: 0.3,
   hysteresis: 1,
   states: [
     {
       id: 'hot',
+      precedence: 1,
       property: 'temperature',
       when: { atLeast: 100 },
       effect: 'vfx-fire-burn-loop',
@@ -34,6 +37,18 @@ describe('element-feedback content type (mw-e03.28)', () => {
   it('the shipped table maps burning, wet, frozen and charged by property, not entity type', () => {
     const table = compileElementFeedback(content.get('element-feedback', ELEMENT_FEEDBACK_ID));
     expect(table.handleCap).toBe(64);
+    expect(table.fullDetailCap).toBeLessThan(table.handleCap);
+    // Documented look precedence: wet < burning < charged < frozen.
+    const rank = (id: string) => table.states.find((s) => s.id === id)?.precedence ?? -1;
+    expect(rank('wet')).toBeLessThan(rank('burning'));
+    expect(rank('burning')).toBeLessThan(rank('charged'));
+    expect(rank('charged')).toBeLessThan(rank('frozen'));
+    const [steam] = table.transitions;
+    expect([steam?.from, steam?.to, steam?.effect]).toEqual([
+      table.states.findIndex((s) => s.id === 'burning'),
+      table.states.findIndex((s) => s.id === 'wet'),
+      'vfx-element-steam-puff',
+    ]);
     expect(table.states.map((s) => [s.id, s.property])).toEqual([
       ['burning', 'burning'],
       ['wet', 'wetness'],
@@ -65,5 +80,19 @@ describe('element-feedback content type (mw-e03.28)', () => {
     expect(problems({ ...valid, states: [state, state] })).toEqual([
       'states.1.id: duplicate state id "hot"',
     ]);
+    expect(problems({ ...valid, fullDetailCap: 5 })).toEqual([
+      'fullDetailCap: fullDetailCap must not exceed handleCap',
+    ]);
+    const steam = {
+      from: 'hot',
+      to: 'cold',
+      effect: 'vfx-element-steam-puff',
+      referenceRadius: 0.25,
+      scale: { min: 0.6, max: 3 },
+    };
+    expect(problems({ ...valid, transitions: [steam] })).toEqual([
+      'transitions.0.to: unknown state id "cold"',
+    ]);
+    expect(problems({ ...valid, transitions: [{ ...steam, to: 'hot' }] })).toEqual([]);
   });
 });
