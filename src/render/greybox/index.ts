@@ -23,6 +23,7 @@ import type {
   Vec3,
 } from '@sim/index';
 import { renderIntensity } from '../light/index.ts';
+import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
 import {
   CRATE_URL,
@@ -35,6 +36,7 @@ import {
 } from '../props/surfaces';
 import {
   BoxGeometry,
+  PlaneGeometry,
   BufferGeometry,
   Color,
   ConeGeometry,
@@ -448,6 +450,26 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         const mesh = new Mesh(merged, material);
         mesh.name = purpose;
         mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+      }
+      // Tagged surface regions (mw-1jm): a flat patch of the surface's colour on the floor it covers.
+      const patches = surfacePatches(layout.parts, layout.surfaces);
+      const bySurface = new Map<string, BufferGeometry[]>();
+      for (const patch of patches) {
+        const plane = new PlaneGeometry(patch.maxX - patch.minX, patch.maxZ - patch.minZ);
+        plane.rotateX(-Math.PI / 2);
+        plane.translate((patch.minX + patch.maxX) / 2, patch.y, (patch.minZ + patch.maxZ) / 2);
+        const list = bySurface.get(patch.surface) ?? [];
+        list.push(plane);
+        bySurface.set(patch.surface, list);
+      }
+      for (const [surface, geometries] of bySurface) {
+        const merged = mergeGeometries(geometries);
+        for (const geometry of geometries) geometry.dispose();
+        const colour = SURFACE_COLOURS[surface as keyof typeof SURFACE_COLOURS];
+        const mesh = new Mesh(merged, gridMaterial(colour));
+        mesh.name = `surface:${surface}`;
         mesh.receiveShadow = true;
         group.add(mesh);
       }

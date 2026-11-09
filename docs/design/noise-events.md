@@ -145,5 +145,19 @@ region still adds `frozenDb`. The surface table is content, `surface-table/surfa
 each audio bible §7.3 surface id (a test fails on any id in only one list) with `offsetDb` (-20..+20, dB
 relative to stone; carpet -10), `varianceDb`, the sound set id `sfx-foot-<surface>` and an optional
 `creak` (seeded chance of an extra loud step; hollow wood 10% for +12 dB). Variance and creak are data
-for the footstep noise rule (mw-e09.5), which rolls them from the seeded stream. Audio still reads the
-surface from materials' `footstepSurface`; a surface no material declares falls back as before.
+for the footstep noise rule (mw-e09.5), which rolls them from the seeded stream. One number per floor
+(mw-1jm): a material that names a `footstepSurface` has that surface's table offset as its `footstepLoudness`
+(wood 2, dirt -3, water 6; `tests/integration/scene-surfaces.test.ts` fails on a mismatch), so wood is 2 dB
+whether it is a collider's material or a tagged region. The material rows remain the source for impacts
+(`installImpactNoise` reads `footstepLoudness`) and for the ground; the table is the source for regions. Dry
+wood used to be 4 dB; it is now 2, and creaking is the `wood-hollow` region. Audio plays a region's
+surface when the manifest has its walking set (`sfx-foot-<surface>-walk`: stone, wood, dirt, grass, gravel,
+water-shallow today); a region with no set yet (carpet, wood-hollow, mud) sounds as the ground under it does,
+so a carpet still plays stone footsteps while its noise is -10 dB.
+
+Tagged scenes (mw-1jm; the greybox draws each region as a flat patch of its surface's colour on the floor it
+covers, `src/render/greybox/surface-patches.ts`, so a region is only tagged where the player can see it):
+sleeping-ox (wood boards, door runner and hearth rug and rented-room rug in carpet), marsh-store (wood boards
+down, creaky wood-hollow boards and a carpet rug in the home upstairs) and under-the-bridge (gravel shingle
+bank). The slice, the lane (cobbles are stone) and the valleys are untagged; `tests/integration/scene-surfaces.test.ts`
+checks every region uses a table surface, lies inside its scene and covers a visible floor.
