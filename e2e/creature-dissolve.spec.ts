@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
-import { stubPointerLock } from './helpers/player';
+import { steadyFrameClock, stubPointerLock } from './helpers/player';
 
 // mw-e29.7 AC-3 in play (Chromium): a skeleton killed in the skeleton pen falls, dissolves over 1.2 s
 // and its drawn body is taken out of the scene, while the other creatures (which share its materials)
@@ -44,9 +44,12 @@ async function corpses(page: Page): Promise<Corpses> {
 test('AC-3: a killed skeleton dissolves over 1.2 s and its drawn body is removed afterwards', async ({
   page,
 }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
   const problems = collectProblems(page);
   await stubPointerLock(page);
+  // The dissolve runs on frame time (mw-y7t): without a cap on it, one slow frame on a loaded runner
+  // can carry it from 0 to gone with no frame in between. 64 ms is four sim ticks.
+  await steadyFrameClock(page, 64);
   await page.goto('/?scene=skeleton-pen&debug=1&corpses');
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-scene', 'skeleton-pen', { timeout: 20_000 });
@@ -128,7 +131,8 @@ test('AC-3: a killed skeleton dissolves over 1.2 s and its drawn body is removed
   const killedAt = Date.now();
 
   // ... and when it is over the drawn body is gone: 4 bodies stay, the sim still counts 5 creatures.
-  await expect.poll(async () => (await corpses(page)).gone, { timeout: 30_000 }).toBe(1);
+  // (collapse and dissolve are 1.9 s of game time, at most 64 ms a frame: 30 frames, a minute at 1 fps)
+  await expect.poll(async () => (await corpses(page)).gone, { timeout: 120_000 }).toBe(1);
   const after = await corpses(page);
   expect(after).toMatchObject({ dying: 0, gone: 1, proxies: 4 });
   // Seen from the page's own frames: only the killed creature dissolved, it was still drawn (5
@@ -152,7 +156,9 @@ test('AC-3: a killed skeleton dissolves over 1.2 s and its drawn body is removed
   );
   expect(trace.dyingMax).toBe(1);
   expect(trace.onlyVictimProgressing).toBe(true);
-  expect(trace.midFrames).toBeGreaterThan(0);
+  // 1.2 s at up to 64 ms a frame is up to 18 frames in the middle of it; a runner whose frames are
+  // slower than the page's own sampling still shows several (9 with every frame stalled 1.4 s).
+  expect(trace.midFrames).toBeGreaterThanOrEqual(5);
   expect(trace.proxiesWhileMid).toBe(5);
   expect(trace.goneAt - trace.firstAt).toBeGreaterThanOrEqual(
     (1 - trace.firstProgress) * 1200 - 100,

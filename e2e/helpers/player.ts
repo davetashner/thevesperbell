@@ -48,6 +48,34 @@ export async function stubPointerLock(page: Page): Promise<void> {
 }
 
 /**
+ * Gives the page a game clock that never jumps more than `maxFrameMs` in one frame (mw-y7t). The
+ * game advances wall-clock effects (a corpse's 1.2 s dissolve) by the time between frames, so on a
+ * runner that draws a frame a second the whole effect can pass between two frames and a spec that
+ * samples it sees nothing in the middle, however long it waits. Here performance.now() stands still
+ * between frames and moves by the real time since the last frame, at most `maxFrameMs`: a fast
+ * machine runs in real time, a slow one in slow motion, and every effect is drawn in steps. The
+ * game's sim and effects both read this clock, so a duration measured with it in the page is the
+ * game's own time (never more than the real time). Call before navigating; keep `maxFrameMs` under
+ * five sim ticks (83 ms) so the loop does not drop steps.
+ */
+export async function steadyFrameClock(page: Page, maxFrameMs: number): Promise<void> {
+  await page.addInitScript((max) => {
+    const realNow = performance.now.bind(performance);
+    const request = window.requestAnimationFrame.bind(window);
+    let game = realNow();
+    let lastReal = game;
+    performance.now = () => game;
+    window.requestAnimationFrame = (callback) =>
+      request(() => {
+        const real = realNow();
+        game += Math.min(real - lastReal, max);
+        lastReal = real;
+        callback(game);
+      });
+  }, maxFrameMs);
+}
+
+/**
  * Takes pointer lock by clicking the game, as a player does. The game canvas fills the window, so
  * this is a real mouse click at the window's centre, hit-tested by the browser like any click (a
  * HUD element over that point would take it, and the lock would not come). A locator click would

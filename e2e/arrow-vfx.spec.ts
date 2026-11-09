@@ -115,6 +115,12 @@ async function watch(page: Page, arrow: string, shots: number): Promise<Seen> {
       const saved: string[] = [];
       let sinceShot = -1;
       let seenShots = 0;
+      // The shots and impacts the page had already published when the watch began: the watch ends on
+      // `wanted` arrows loosed after it, and the frames and time that follow their last impact.
+      let baseShots = -1;
+      let baseImpacts = 0;
+      let impactAt = -1;
+      let framesAfter = 0;
       const deadline = performance.now() + 60_000;
       return await new Promise<{ max: typeof zero; last: typeof zero | null; saved: string[] }>(
         (resolve) => {
@@ -142,7 +148,27 @@ async function watch(page: Page, arrow: string, shots: number): Promise<Seen> {
                 );
               }
               if (sinceShot >= 0) sinceShot++;
-              if (p.shots >= wanted && sinceShot > 60) {
+              if (baseShots < 0) {
+                baseShots = p.shots;
+                baseImpacts = p.impacts.length;
+              }
+              // Paced by what the page published, not by a frame count: a frame count is a minute of
+              // waiting at the one frame a second a software-GL runner draws (mw-2ui). Every counter
+              // that is read below is set by the sim tick of the impact and published with it; the
+              // frames and half second after it only let the effects play, so a slow runner that
+              // draws few frames still ends the watch within a few of them.
+              if (
+                impactAt < 0 &&
+                p.shots - baseShots >= wanted &&
+                p.impacts.length - baseImpacts >= wanted
+              ) {
+                impactAt = performance.now();
+              }
+              if (impactAt >= 0) framesAfter++;
+              if (
+                impactAt >= 0 &&
+                (save ? sinceShot > 60 : framesAfter >= 6 && performance.now() - impactAt >= 500)
+              ) {
                 resolve({ max, last, saved });
                 return;
               }
