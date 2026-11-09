@@ -31,6 +31,7 @@ import {
   addAffordanceGate,
   addAffordanceLabel,
   addFocusDemotion,
+  addFocusFilter,
   addInteractable,
   affordancesOf,
   InteractableComponent,
@@ -41,6 +42,7 @@ import { addMaterialProperties, type MaterialPresets } from '../../properties/ma
 import { PlacementComponent, placeEntity } from '../../stimulus/placement';
 import type { Vec3 } from '../../stimulus/shapes';
 import { addArrows, QuiverComponent } from '../bow/components';
+import { HealthComponent } from '../damage/components';
 import { DEFAULT_ARROW_RULES, type ArrowRules } from './ballistics';
 import { ArrowRested } from './events';
 import { ArrowRestComponent, type ArrowRest } from './components';
@@ -174,6 +176,17 @@ export function restingArrows(world: World<never>): { entity: EntityId; rest: Ar
 }
 
 /**
+ * Whether `rest` is stuck in something alive (it has health above 0: a creature, the player). Such an
+ * arrow is part of the fight, not something lying about: it cannot be focused or taken, and a
+ * creature's arrows come back through its loot when it dies (loot/drops.ts).
+ */
+function inLivingBody(world: World<never>, rest: ArrowRest): boolean {
+  if (rest.in === null || !world.isRegistered(HealthComponent)) return false;
+  const health = world.get(rest.in, HealthComponent);
+  return health !== undefined && health.current > 0;
+}
+
+/**
  * The intact arrows `actor` gathers by interacting with `target`: those at rest within `radius` of
  * it, `target` itself included, ascending entity order. Empty when `target` is not an intact arrow.
  */
@@ -183,9 +196,12 @@ function gathered(
   radius: number,
 ): { entity: EntityId; rest: ArrowRest }[] {
   const at = world.get(target, ArrowRestComponent);
-  if (!at?.intact) return [];
+  if (!at?.intact || inLivingBody(world, at)) return [];
   return restingArrows(world).filter(
-    ({ rest }) => rest.intact && distanceSq(rest.position, at.position) <= radius * radius,
+    ({ rest }) =>
+      rest.intact &&
+      !inLivingBody(world, rest) &&
+      distanceSq(rest.position, at.position) <= radius * radius,
   );
 }
 
@@ -257,8 +273,18 @@ export function installArrowRetrieval<TInput>(
     }
   }
 
-  const isTakeable = (target: EntityId): boolean =>
-    w.isRegistered(ArrowRestComponent) && w.get(target, ArrowRestComponent)?.intact === true;
+  /** `target`'s arrow-at-rest state, or undefined (not an arrow, or a world with no arrows). */
+  const arrowAt = (target: EntityId): ArrowRest | undefined =>
+    w.isRegistered(ArrowRestComponent) ? w.get(target, ArrowRestComponent) : undefined;
+  const isTakeable = (target: EntityId): boolean => {
+    const rest = arrowAt(target);
+    return rest?.intact === true && !inLivingBody(w, rest);
+  };
+  // An arrow stuck in a living body is never a focus target, however close it is.
+  addFocusFilter(world, (_w, _actor, target) => {
+    const rest = arrowAt(target);
+    return rest !== undefined && inLivingBody(w, rest);
+  });
 
   // Interact on an arrow needs somewhere to put it.
   addAffordanceGate(world, (_w, actor, target, affordance) => {
@@ -272,7 +298,7 @@ export function installArrowRetrieval<TInput>(
   });
   // An arrow in a chest or a door must not take the chest's or the door's Interact.
   addFocusDemotion(world, (_w, _actor, target) => {
-    const host = w.get(target, ArrowRestComponent)?.in;
+    const host = arrowAt(target)?.in;
     return (
       host !== undefined && host !== null && w.isAlive(host) && affordancesOf(w, host).length > 0
     );

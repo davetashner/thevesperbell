@@ -42,9 +42,9 @@ import { PlacementComponent, placeEntity } from '../../stimulus/placement';
 import type { Vec3 } from '../../stimulus/shapes';
 import { applyStimulus, installStimuli, stimulusSystem } from '../../stimulus/stimulus';
 import { BOW_COMPONENTS, QuiverComponent, quiverCount } from '../bow/components';
-import { DAMAGE_COMPONENTS } from '../damage/components';
+import { DAMAGE_COMPONENTS, giveCombatant, HealthComponent } from '../damage/components';
 import { DamageModel } from '../damage/model';
-import { HIT_VOLUME_COMPONENTS } from '../hits/components';
+import { giveHurtboxes, HIT_VOLUME_COMPONENTS } from '../hits/components';
 import { DEFAULT_ARROW_RULES, intactChanceOf } from './ballistics';
 import { ArrowRestComponent, type ArrowRest } from './components';
 import { ArrowRested, arrowImpact, type ArrowImpactInfo } from './events';
@@ -918,5 +918,121 @@ describe('edges of the retrieval rules (mw-e05.7)', () => {
     expect(t.taken).toEqual([]);
     expect(t.world.isAlive(arrow)).toBe(true);
     expect(quiverCount(t.world, t.player, 'standard')).toBe(5);
+  });
+});
+
+describe('arrows in living bodies are not takeable (mw-e05.7 review)', () => {
+  /** A combatant with a body-sized hurtbox, health 100, standing at `at`. */
+  function body(t: Setup, at: Vec3): EntityId {
+    const entity = t.world.spawn();
+    placeEntity(t.world, entity, at, 0.5);
+    giveCombatant(t.world, entity, { health: 100 });
+    giveHurtboxes(t.world, entity, {
+      boxes: [
+        {
+          id: 'torso',
+          socket: 'root',
+          region: 'torso',
+          armored: false,
+          multiplier: 1,
+          shape: { kind: 'sphere', center: v3(0, 1, 0), radius: 0.5 },
+        },
+      ],
+    });
+    return entity;
+  }
+  /** Looses a real arrow along +z or -z at height 1 until it comes to rest. */
+  function shoot(t: Setup, from: Vec3, dir: number): EntityId {
+    const arrow = fireArrow(t.world, ARROWS, {
+      arrow: 'standard',
+      origin: from,
+      velocity: v3(0, 0, 60 * dir),
+    });
+    stepsUntilRest(t, arrow);
+    for (let i = 0; i < 2; i++) t.world.step([IDLE]);
+    return arrow;
+  }
+
+  it('an arrow in a living creature is not focused, prompted or taken', () => {
+    const t = setup({ roll: 0.5 });
+    const creature = body(t, v3(0, 0, -3));
+    const arrow = shoot(t, v3(0, 1, 0.5), -1);
+    expect(restOf(t, arrow)).toMatchObject({ in: creature, intact: true });
+    expect(t.world.get(t.player, InteractionFocusComponent)?.target).not.toBe(arrow);
+    expect(interactionPrompt(t.world, t.player)).toBeUndefined();
+    t.world.step([PRESS]);
+    expect(t.world.isAlive(arrow)).toBe(true);
+    expect(quiverCount(t.world, t.player, 'standard')).toBe(5);
+  });
+
+  it('an arrow a creature shot into the player is not focusable or takeable', () => {
+    const t = setup({ roll: 0.5 });
+    giveCombatant(t.world, t.player, { health: 100 });
+    giveHurtboxes(t.world, t.player, {
+      boxes: [
+        {
+          id: 'torso',
+          socket: 'root',
+          region: 'torso',
+          armored: false,
+          multiplier: 1,
+          shape: { kind: 'sphere', center: v3(0, 1, 0), radius: 0.5 },
+        },
+      ],
+    });
+    placeEntity(t.world, t.player, ZERO, 0.5);
+    const arrow = shoot(t, v3(0, 1, -6), 1);
+    expect(restOf(t, arrow)).toMatchObject({ in: t.player, intact: true });
+    expect(t.world.get(t.player, InteractionFocusComponent)?.target).not.toBe(arrow);
+    t.world.step([PRESS]);
+    expect(t.world.isAlive(arrow)).toBe(true);
+    expect(quiverCount(t.world, t.player, 'standard')).toBe(5);
+  });
+
+  it('a wall arrow beside a living creature gathers only what is in the wall, and the prompt agrees', () => {
+    const t = setup({ roll: 0.5 });
+    const creature = body(t, v3(0, 0, -3));
+    const inBody = shoot(t, v3(0, 1, 0.5), -1);
+    const wall = restArrow(t, v3(0.4, 1, -2.5));
+    expect(restOf(t, inBody)?.in).toBe(creature);
+    expect(gatherable(t.world, wall)).toEqual([wall]);
+    t.world.step([IDLE]);
+    expect(interactionPrompt(t.world, t.player)?.label).toBe('Take arrow');
+    t.world.step([PRESS]);
+    expect(t.world.isAlive(inBody)).toBe(true);
+    expect(t.world.isAlive(wall)).toBe(false);
+  });
+
+  it('once the creature is dead its arrows are takeable again, and arrows in crates still are', () => {
+    const t = setup({ roll: 0.5 });
+    const creature = body(t, v3(0, 0, -3));
+    const arrow = shoot(t, v3(0, 1, 0.5), -1);
+    t.world.set(creature, HealthComponent, { max: 100, current: 0 });
+    const crate = t.world.spawn();
+    placeEntity(t.world, crate, v3(2, 0, -2), 0.5);
+    const crateArrow = restArrow(t, v3(2, 1, -2), { in: crate });
+    t.world.step([IDLE]);
+    expect(gatherable(t.world, arrow)).toEqual([arrow]);
+    expect(gatherable(t.world, crateArrow)).toEqual([crateArrow]);
+  });
+});
+
+describe('retrieval in a world with no arrows registered (mw-e05.7 review)', () => {
+  it('leaves Interact on other things alone', () => {
+    const world = registerWorldProperties(new World<ActionFrame>({ seed: 1 }));
+    world.register(CharacterController, PlayerLook, PlacementComponent);
+    installInteraction(world);
+    installArrowRetrieval(world, { arrows: ARROWS });
+    const player = world.spawn();
+    world.add(player, CharacterController, initialCharacterState(ZERO));
+    world.add(player, PlayerLook, { yaw: 0, pitch: 0 });
+    addInteractor(world, player);
+    const lever = world.spawn();
+    addInteractable(world, lever, { affordances: [{ verb: 'pull' }] }, v3(0, 0, -1.5));
+    world.step([IDLE]);
+    expect(world.get(player, InteractionFocusComponent)?.target).toBe(lever);
+    world.events.emit(interacted, { actor: player, target: lever, verb: 'pick-up', affordance: 0 });
+    world.events.flush();
+    expect(world.isAlive(lever)).toBe(true);
   });
 });
