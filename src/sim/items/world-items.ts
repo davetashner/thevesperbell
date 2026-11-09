@@ -15,9 +15,8 @@
 //   lofted a little, at a speed by weight class.
 // - No-drop items (quest items by default, mw-e17.2 AC-5) are refused with reason `no-drop` for both
 //   (AC-4), so the slice's gallery key can never be lost.
-// - Impact noise: each `physicsImpact` of a world item emits one `noiseEmitted` whose loudness comes
-//   from the item's weight class (AC-3), attributed to whoever dropped or threw it. What it sounds
-//   like is the cue sheets' (physicsImpact plays the material's impact set), never this module's.
+// - Impact noise: a world item's impacts are noises like any physics object's (src/sim/noise/impacts.ts:
+//   energy × material, attributed to whoever dropped or threw it, mw-e03.25).
 //
 // Everything a world item does physically comes from properties, never from its type: its body's
 // mass is its `weight` (from the weight class unless its world properties say otherwise), its
@@ -47,8 +46,7 @@ import {
 import { cos, sin } from '../math';
 import type { BreakableProfileLookup } from '../breakables/components';
 import { makeBreakable } from '../breakables/system';
-import { noiseEmitted } from '../noise/events';
-import { addPhysicsObject, physicsImpact } from '../physics/objects';
+import { addPhysicsObject } from '../physics/objects';
 import { PlayerLook } from '../player/player';
 import {
   addMaterialProperties,
@@ -67,25 +65,12 @@ export const WEIGHT_CLASS_KG: Readonly<Record<WeightClass, number>> = Object.fre
   heavy: 8,
 });
 
-/**
- * Loudness of a world item's impact by weight class, dB at 1 m (AC-3): a dropped key ticks, a
- * dropped shield clangs. For scale, breakables break at 70–85 dB.
- */
-export const IMPACT_LOUDNESS_DB: Readonly<Record<WeightClass, number>> = Object.freeze({
-  light: 50,
-  medium: 60,
-  heavy: 70,
-});
-
 /** Throw speed by weight class, m/s. */
 export const THROW_SPEED: Readonly<Record<WeightClass, number>> = Object.freeze({
   light: 9,
   medium: 7,
   heavy: 5,
 });
-
-/** The noise kind of a world item's impact. */
-export const ITEM_IMPACT_NOISE = 'item-impact';
 
 /** How far in front of the actor's feet a dropped item appears, m (clear of the 0.35 m capsule). */
 export const DROP_DISTANCE = 0.6;
@@ -622,18 +607,6 @@ export function installWorldItems<TInput>(
     }
     if (taken.has(target)) return;
     if (items.pickUp(sim, actor, target).ok) taken.add(target);
-  });
-  world.events.on(physicsImpact, ({ entity, position }) => {
-    const item = world.get(entity, WorldItemComponent);
-    if (item === undefined) return;
-    world.events.emit(noiseEmitted, {
-      tick: world.tick,
-      position,
-      loudness: IMPACT_LOUDNESS_DB[items.def(item.defId).weightClass],
-      kind: ITEM_IMPACT_NOISE,
-      entity,
-      source: item.by,
-    });
   });
   world.addSystem(worldItemsSystem(items, options));
 }

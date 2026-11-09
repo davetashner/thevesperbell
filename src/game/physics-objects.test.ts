@@ -6,14 +6,18 @@ import {
   addProperties,
   CharacterController,
   initialCharacterState,
+  noiseEmitted,
+  physicsImpact,
   RapierPhysics,
   World,
+  type NoiseEvent,
   type PhysicsBudgetExceeded,
   type Vec3,
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
 import {
   formatBudgetWarning,
+  impactNoiseOptions,
   installGamePhysics,
   playerFocus,
   propBodies,
@@ -74,6 +78,31 @@ describe('game physics objects (mw-e03.39)', () => {
     expect(focus.read()).toBeUndefined(); // no controller yet
     world.add(player, CharacterController, initialCharacterState({ x: 1, y: 2, z: 3 }));
     expect(focus.read()).toEqual({ x: 1, y: 2, z: 3 });
+  });
+
+  it('mw-e03.25: impactNoise turns physics impacts into noises from the shipped curve and materials', () => {
+    const content = loadGameContent();
+    const world = installGamePhysics(new World({ seed: 2, physics: new RapierPhysics(RAPIER) }), {
+      impactNoise: impactNoiseOptions(content),
+    });
+    const noises: NoiseEvent[] = [];
+    world.events.on(noiseEmitted, (n) => noises.push(n));
+    const stone = world.spawn();
+    const glass = world.spawn();
+    const impact = (entity: number, materials: readonly [string, string]) => ({
+      entity,
+      other: null,
+      materials,
+      energy: 100,
+      impulse: 1,
+      speed: 3,
+      normal: { x: 0, y: 1, z: 0 },
+      position: { x: 0, y: 0, z: 0 },
+    });
+    world.events.emit(physicsImpact, impact(stone, ['stone', 'stone']));
+    world.events.emit(physicsImpact, impact(glass, ['glass', 'stone']));
+    world.events.flush();
+    expect(noises.map((n) => Math.round(n.loudness))).toEqual([70, 82]);
   });
 
   it('installs without a focus or a log hook', () => {

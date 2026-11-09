@@ -50,3 +50,9 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `noise.partitions.materials[].material` | id | required | Material id of the partition. |
 | `noise.partitions.materials[].wall` | number -120–0 | — | Gain through a wall of it, dB (≤ 0); omitted: the default. |
 | `noise.partitions.materials[].floor` | number -120–0 | — | Gain through a floor or ceiling of it, dB (≤ 0); omitted: the default. |
+| `noise.impact` | object | required | Impact noise (mw-e03.25): loudness = refDb + dbPerDecade·log10(energy / refEnergy) plus the louder of the two materials’ surface loudness offsets, capped at maxDb; below minEnergy, silence. |
+| `noise.impact.minEnergy` | number > 0 | required | Least impact energy, J, that makes a noise: softer settling stays silent. |
+| `noise.impact.refEnergy` | number > 0 | required | Energy, J, at which the curve reads `refDb`. |
+| `noise.impact.refDb` | number 0–120 | required | Loudness, dB at 1 m, of a `refEnergy` impact on stone. |
+| `noise.impact.dbPerDecade` | number > 0 ≤ 40 | required | dB gained for ten times the energy. |
+| `noise.impact.maxDb` | number 0–120 | required | Loudest an impact gets, dB at 1 m. |

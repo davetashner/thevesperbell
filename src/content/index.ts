@@ -489,6 +489,7 @@ export {
   BURNT_DESTROYED,
   burntMaterials,
   burntStateSchema,
+  materialLoudness,
   materialPresets,
   materialPropertiesSchema,
   materialSchema,

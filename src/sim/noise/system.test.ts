@@ -136,6 +136,8 @@ describe('noise propagation in a world (mw-e09.3)', () => {
   it('skips the source itself, listeners out of range and noises below their threshold', () => {
     const { world, guard, heard } = setup(WOODEN_DOOR, 'closed');
     emitNoise(world, { position: v(15, 1, 5), loudness: 60, kind: 'bottle', source: guard });
+    // Nor the thing that sounded when it is the listener itself (its own arrow, its own footfall).
+    emitNoise(world, { position: v(15, 1, 5), loudness: 60, kind: 'bottle', entity: guard });
     const far = world.spawn();
     placeEntity(world, far, v(20, 1, 9), 0.4);
     world.add(far, NoiseListenerComponent, { thresholdDb: 0, range: 5 });

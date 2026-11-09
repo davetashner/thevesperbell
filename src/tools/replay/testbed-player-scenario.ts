@@ -63,7 +63,7 @@ import {
   statusLookup,
   type GameMagic,
 } from '@game/magic/index';
-import { installGamePhysics, playerFocus } from '@game/physics-objects';
+import { impactNoiseOptions, installGamePhysics, playerFocus } from '@game/physics-objects';
 import { setupTestbedPlayer, type TransformReader } from '@game/player/index';
 import { SceneLoader } from '@game/scene/index';
 import {
@@ -283,6 +283,7 @@ export function createGameWorld<TInput>(
   const collisionWorld = new RapierCollisionWorld(physics);
   let magic: GameMagic | undefined;
   installGamePhysics(world, {
+    impactNoise: impactNoiseOptions(content),
     focus: focus.read,
     levelColliders: light.colliders,
     ...(withMagic && {

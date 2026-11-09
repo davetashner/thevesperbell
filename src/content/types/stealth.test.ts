@@ -45,6 +45,7 @@ const valid = {
       floor: -25,
       materials: [{ material: 'wood', floor: -15 }],
     },
+    impact: { minEnergy: 1, refEnergy: 10, refDb: 60, dbPerDecade: 10, maxDb: 100 },
   },
 } satisfies StealthDefInput;
 
@@ -233,6 +234,14 @@ describe('stealth noise tuning (mw-e09.3)', () => {
     expect(problems(withNoise({ doors: { ...valid.noise.doors, materials } }))).toEqual([
       'noise.doors.materials.0: door gains must never rise from open to ajar to closed',
     ]);
+  });
+
+  it('mw-e03.25: the impact curve needs its minimum energy at or below its reference energy', () => {
+    const impact = { ...valid.noise.impact, minEnergy: 20 };
+    expect(problems(withNoise({ impact }))).toEqual([
+      'noise.impact.minEnergy: minEnergy must not exceed refEnergy',
+    ]);
+    expect(problems(withNoise({ impact: { ...valid.noise.impact, minEnergy: 10 } }))).toEqual([]);
   });
 
   it('names a material listed twice', () => {
