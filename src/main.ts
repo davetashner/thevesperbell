@@ -235,6 +235,8 @@ import { SaveSlots } from '@game/save/slots/index';
 import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
 import {
+  attachCorpseDissolves,
+  type CorpseGlue,
   DamageVignette,
   type CombinedLook,
   ElementFeedbackBridge,
@@ -285,6 +287,14 @@ import {
 import { anyHiddenByBody, CameraShake } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
 import { ElementLooks } from '@render/element-look';
+import { DEATH_TINT, MagicDemo } from '@render/magic-materials/demo';
+import {
+  parseFocusParam,
+  parseMagicParam,
+  parseQualityParam,
+} from '@render/magic-materials/demo-layout';
+import { DEATH_DISSOLVE_SECONDS } from '@render/magic-materials/rules';
+import { MagicMaterials } from '@render/magic-materials/index';
 import { createTrailRenderer } from '@render/vfx/trails';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
@@ -914,6 +924,23 @@ function startRenderer(
       reducedMotion: motionReduced,
     });
     const elementLooks = new ElementLooks();
+    // The magical material library (mw-e29.7): dissolve, fresnel glow, heat haze, rune decals,
+    // emissive pulse and soft particles in one look. Heat haze is High only; ?quality=low forces
+    // Low, otherwise the Graphics quality setting decides. ?magic lays the materials out as a testbed.
+    const magicLooks = new MagicMaterials({
+      renderer: view.renderer,
+      tier: parseQualityParam(location.search) ?? settings.get('display.quality'),
+      reducedMotion: motionReduced,
+    });
+    settings.on('display.quality', (tier) => {
+      if (parseQualityParam(location.search) === undefined) magicLooks.setTier(tier);
+    });
+    const magicMode = parseMagicParam(location.search);
+    let magicDemo: MagicDemo | undefined;
+    let publishedMagic = '';
+    // ?corpses publishes how many creature corpses are dissolving and how many have gone.
+    const corpsesProbe = new URLSearchParams(location.search).has('corpses');
+    let publishedCorpses = '';
     let publishedElements = '';
     // ?elements publishes the element feedback counters on #app[data-elements] (the e2e probe).
     const elementsProbe = new URLSearchParams(location.search).has('elements');
@@ -1136,6 +1163,8 @@ function startRenderer(
     let animation: AnimDemo | undefined;
     let creatureAnimation: AnimationDriver | undefined;
     let creatureDeaths: CreatureDeaths | undefined;
+    let corpseDissolves: CorpseGlue | undefined;
+    let creatureIds: (() => number[]) | undefined;
     let hitFlashes: HitFlashes | undefined;
     let frameClock: ((ms: number) => void) | undefined;
     let playerFade: OcclusionFade | undefined;
@@ -1252,12 +1281,38 @@ function startRenderer(
         const looked = new Map<Object3D, CombinedLook>();
         for (const [entity, look] of elements.looks()) {
           const object = sync.objectOf(entity) as Object3D | undefined;
-          if (object !== undefined) looked.set(object, look);
+          // A dying body is dressed by its dissolve alone (the element look would put the
+          // originals back over the dissolve's copies).
+          if (object !== undefined && corpseDissolves?.dying(entity) !== true) {
+            looked.set(object, look);
+          }
         }
         const reducedLooks = motionReduced();
         elementLooks.sync(looked, (look) =>
           pulseFactor((look as CombinedLook).pulseHz, timeMs / 1000, reducedLooks),
         );
+        // Creature corpses dissolve and are removed (mw-e29.7 AC-3); after the element looks have
+        // settled, so the dissolve's material copies are the last thing on a dying body.
+        corpseDissolves?.update(Math.max(0, elapsedMs) / 1000);
+        if (corpsesProbe) {
+          const json = JSON.stringify({
+            dying: corpseDissolves?.size ?? 0,
+            gone: corpseDissolves?.removed ?? 0,
+            ids: creatureIds?.() ?? [],
+            progress: creatureIds?.().map((id) => corpseDissolves?.progressOf(id) ?? null) ?? [],
+            // Creature bodies still in the scene (a corpse that has dissolved is taken out of it).
+            proxies: view.scene.children.filter((child) => child.name.startsWith('creature:'))
+              .length,
+            seconds: DEATH_DISSOLVE_SECONDS,
+          });
+          if (json !== publishedCorpses) root.dataset['corpses'] = publishedCorpses = json;
+        }
+        if (magicDemo !== undefined) magicDemo.update(Math.max(0, elapsedMs) / 1000, camera);
+        else magicLooks.update(Math.max(0, elapsedMs) / 1000);
+        if (magicMode !== undefined) {
+          const json = JSON.stringify({ ...magicLooks.stats(), demo: magicDemo?.stats() });
+          if (json !== publishedMagic) root.dataset['magic'] = publishedMagic = json;
+        }
         if (elementsProbe) {
           const json = JSON.stringify({
             ...elements.stats(),
@@ -2164,6 +2219,29 @@ function startRenderer(
       };
       drawCreatures();
       afterStep.push(drawCreatures);
+      // A creature's death: it falls, then dissolves over 1.2 s and its render entity is removed
+      // (mw-e29.7). Render-only: the sim keeps the entity (its health carries through saves), so
+      // its binding stays and only the drawn proxy goes.
+      corpseDissolves = attachCorpseDissolves({
+        events: world.events,
+        proxyOf: (entity) => creatureProxies.get(entity),
+        dissolve: (entity, proxy) =>
+          magicLooks.dissolve(proxy, {
+            tint: DEATH_TINT,
+            intensity: 1,
+            feet: proxy.position.y,
+            height: creatureHeights.get(entity) ?? 1.8,
+            seed: entity,
+          }),
+        progress: (dissolve, progress) => {
+          dissolve.setProgress(progress);
+        },
+        remove: (_entity, proxy, dissolve) => {
+          dissolve.dispose();
+          proxy.removeFromParent();
+        },
+      });
+      creatureIds = () => [...creatureProxies.keys()].map(Number);
       world.events.on(Died, ({ target }) => {
         const proxy = creatureProxies.get(target);
         if (proxy === undefined) return;
@@ -2223,6 +2301,14 @@ function startRenderer(
         const [x, y, z] = scene.camera.target;
         const centre = playerStart(loaded.layout.spawns)?.position ?? { x, y, z };
         vfxDemo = new VfxDemo(vfx, vfxMode, centre);
+      }
+      if (magicMode !== undefined) {
+        magicDemo = new MagicDemo(
+          view.scene,
+          magicLooks,
+          magicMode,
+          parseFocusParam(location.search),
+        );
       }
       // Level deltas (mw-e27.3, mw-e27.4): with everything the scene spawned in place, before the
       // first tick, the level's baseline is taken and any changes stored for it are applied. Saves
