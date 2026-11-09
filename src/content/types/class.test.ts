@@ -319,7 +319,7 @@ describe('class content checks (mw-e19.4)', () => {
       icon: 'icon-item-zz-flail-01',
       value: 1,
       equip: { slot: 'main-hand', proficiencies: ['blades', 'flails'] },
-      weapon: {},
+      weapon: { reach: 'medium' },
     };
     const file = 'src/content/data/item/zz-flail.json';
     expect(loadIssues(thief(), [source(file, item)])).toEqual([

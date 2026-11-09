@@ -15,5 +15,7 @@
     "slot": "main-hand",
     "proficiencies": ["daggers"]
   },
-  "weapon": {}
+  "weapon": {
+    "reach": "short"
+  }
 }

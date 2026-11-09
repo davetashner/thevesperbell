@@ -1,0 +1,59 @@
+{
+  "$schema": "../socket-track.schema.json",
+  "id": "mace-arc",
+  "notes": "Mace swing (move mace-light, 3 active ticks, mw-e04.15): a short flat arc about the body, yaw +50 to -50 degrees, so the head stays inside the short class's 1.2 m.",
+  "keys": [
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.422618,
+        "z": 0.0,
+        "w": 0.906308
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.147809,
+        "z": 0.0,
+        "w": 0.989016
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": -0.147809,
+        "z": 0.0,
+        "w": 0.989016
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": -0.422618,
+        "z": 0.0,
+        "w": 0.906308
+      }
+    }
+  ]
+}

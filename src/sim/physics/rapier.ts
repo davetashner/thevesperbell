@@ -474,6 +474,15 @@ export class RapierPhysics implements RigidBodyPort {
     return this.entries.get(handle)?.collider;
   }
 
+  /**
+   * Whether `handle` is level geometry: a fixed collider with no body of its own. A dynamic body
+   * (a crate) and a kinematic one (a moving platform) are not; neither is a handle this port lacks.
+   */
+  isFixed(handle: ColliderHandle): boolean {
+    const entry = this.entries.get(handle);
+    return entry !== undefined && entry.body === undefined;
+  }
+
   /** Linear velocity of a collider, m/s: zero for a fixed one or a handle this port does not have. */
   velocityOf(handle: ColliderHandle): Vec3 {
     const body = this.entries.get(handle)?.body;

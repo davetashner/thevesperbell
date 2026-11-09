@@ -1,0 +1,22 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "spear",
+  "category": "weapon",
+  "name": "Spear",
+  "description": "Ash shaft, iron point and a great deal of opinion about personal space.",
+  "notes": "A one-handed starter spear (mw-e04.15): long reach, a single thrust that hits at about 2.9 m and never clangs off a wall. Not placed anywhere yet (weapon loot is e18); no model yet (art).",
+  "icon": "icon-item-spear-01",
+  "value": 45,
+  "weightClass": "medium",
+  "worldProperties": {
+    "material": "wood"
+  },
+  "equip": {
+    "slot": "main-hand",
+    "proficiencies": ["polearms"]
+  },
+  "weapon": {
+    "reach": "long",
+    "moves": ["spear-thrust"]
+  }
+}

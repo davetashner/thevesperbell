@@ -121,6 +121,13 @@ export const CUE_EVENTS = {
     anchors: ['entity', 'instigator', 'source'],
     facts: { shield: 'string' },
   },
+  WallRecoil: {
+    /** `entity` is the fighter whose swing clanged off a wall, `at` the contact point (mw-e04.15). */
+    anchors: ['at', 'entity'],
+    /** Out of the wall, back towards the fighter. */
+    directions: ['hitNormal'],
+    facts: { move: 'string' },
+  },
   DodgedHit: {
     /** `target` is the dodger (the swing whiffed through its i-frames), `attacker` who swung. */
     anchors: ['target', 'attacker'],

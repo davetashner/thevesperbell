@@ -1,0 +1,58 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "recoil-corridor",
+  "name": "Recoil corridor",
+  "description": "A bare 2.3 m clear greybox corridor for wall recoil (mw-e04.15): swing the sword (left click) and the blade clangs off a side wall, throwing sparks and ringing a clang, and the knight is locked for half a second. Nothing else is in it, so the testbed keeps its props.",
+  "grid": 1,
+  "camera": {
+    "position": [0, 5, 6],
+    "target": [0, 0, 0]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [1.25, 1, 5.25]
+    },
+    {
+      "piece": "wall",
+      "at": [-1.25, 0, 0],
+      "yaw": 90,
+      "scale": [5.25, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1.25, 0, 0],
+      "yaw": 90,
+      "scale": [5.25, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -5.25],
+      "scale": [1.25, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 5.25],
+      "scale": [1.25, 1, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, 1],
+      "tags": ["player-start"]
+    }
+  ],
+  "light": {
+    "ambient": 0.5,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.45, -1, 0.3],
+        "level": 0.6,
+        "reach": 60
+      }
+    ]
+  }
+}

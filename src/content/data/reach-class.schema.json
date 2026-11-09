@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique table id; the game reads \"reach-classes\"."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Where the numbers come from (bead, tuning status)."
+    },
+    "metres": {
+      "type": "object",
+      "properties": {
+        "close": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Close: a bite, a shove, a bash."
+        },
+        "short": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Short: daggers and maces."
+        },
+        "medium": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Medium: swords."
+        },
+        "long": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Long: spears and halberds."
+        }
+      },
+      "required": [
+        "close",
+        "short",
+        "medium",
+        "long"
+      ],
+      "additionalProperties": false,
+      "description": "Reach in metres per class, strictly increasing."
+    },
+    "wallRecoil": {
+      "type": "object",
+      "properties": {
+        "ticks": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991,
+          "description": "Ticks the fighter is locked out of acting after clanging off a wall."
+        },
+        "reaches": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "close",
+              "short",
+              "medium",
+              "long"
+            ]
+          },
+          "description": "Reach classes whose horizontal swings recoil when the blade meets a wall in the first half of its active window, before it strikes a creature. Vertical and thrust swings never recoil."
+        }
+      },
+      "required": [
+        "ticks",
+        "reaches"
+      ],
+      "additionalProperties": false,
+      "description": "The wall recoil rule (mw-e04.15)."
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "metres",
+    "wallRecoil"
+  ],
+  "additionalProperties": false
+}

@@ -1,6 +1,6 @@
 {
   "id": "combat",
-  "notes": "Combat cue rules (mw-e28.3, impact matrix mw-e28.4). Every hit plays one impact-layer rule, the most specific that matches: a clean hit (contact hit) picks the attacker side by its dominant damage type (slash = blade, blunt = club or shield bash, pierce = point) and the struck material's impact class, so a sword on a skeleton plays sfx-blade-impact-bone; a pair without its own sound plays the attacker's generic strike (sfx-blade-impact), and a hit with no known damage type plays the struck material's own impact set (sfx-impact-<class>), so no hit is silent. Hits are louder the more damage they dealt (light < heavy < critical). A hit on a raised shield (contact blocked) plays the shield block instead of flesh, at a high voice priority, and a guard break adds its own clang at higher priority still; a critical or riposte adds an accent. Each move plays its own sound (the swing whoosh) as its active phase starts, and a swing that passes through a dodge's i-frames whiffs past the dodger. A parry (HitParried, mw-e04.12 / mw-e28.16) rings sfx-knight-parry-metal at voice priority 100, the highest, so no other voice ever steals it; the deflected hit's own DamageApplied (contact parried) names the same cue on the same parrier instead of an impact, so the bridge's de-dupe plays the ring once. Not yet: wall recoil and charge-ready (no sim events yet), claw and bone attackers (creature damage types map through the same slash/blunt/pierce sides). Final assets arrive through the placeholder pack (e28.2) and the SFX asset groups.",
+  "notes": "Combat cue rules (mw-e28.3, impact matrix mw-e28.4). Every hit plays one impact-layer rule, the most specific that matches: a clean hit (contact hit) picks the attacker side by its dominant damage type (slash = blade, blunt = club or shield bash, pierce = point) and the struck material's impact class, so a sword on a skeleton plays sfx-blade-impact-bone; a pair without its own sound plays the attacker's generic strike (sfx-blade-impact), and a hit with no known damage type plays the struck material's own impact set (sfx-impact-<class>), so no hit is silent. Hits are louder the more damage they dealt (light < heavy < critical). A hit on a raised shield (contact blocked) plays the shield block instead of flesh, at a high voice priority, and a guard break adds its own clang at higher priority still; a critical or riposte adds an accent. Each move plays its own sound (the swing whoosh) as its active phase starts, and a swing that passes through a dodge's i-frames whiffs past the dodger. A parry (HitParried, mw-e04.12 / mw-e28.16) rings sfx-knight-parry-metal at voice priority 100, the highest, so no other voice ever steals it; the deflected hit's own DamageApplied (contact parried) names the same cue on the same parrier instead of an impact, so the bridge's de-dupe plays the ring once. A swing that clangs off a wall (WallRecoil, mw-e04.15) rings sfx-knight-wall-recoil-clang at the contact point at priority 90 (its asset is still the generated placeholder, mw-e28.2). Not yet: charge-ready (no sim event yet, mw-e28.19), claw and bone attackers (creature damage types map through the same slash/blunt/pierce sides). Final assets arrive through the placeholder pack (e28.2) and the SFX asset groups.",
   "rules": [
     {
       "event": "DamageApplied",
@@ -394,6 +394,13 @@
       "cue": "sfx-knight-parry-metal",
       "pitchJitter": 0.03,
       "priority": 100
+    },
+    {
+      "event": "WallRecoil",
+      "at": "at",
+      "cue": "sfx-knight-wall-recoil-clang",
+      "pitchJitter": 0.03,
+      "priority": 90
     },
     {
       "event": "GuardBroken",
