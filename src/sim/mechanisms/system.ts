@@ -95,6 +95,7 @@ import {
   resetImpactSwitch,
 } from './impacts';
 import { CuttableComponent, ropeFeeds, ropesSystem, SuspendedComponent } from './ropes';
+import { SupportComponent, supportFeeds, supportsSystem } from './supports';
 import { PlateComponent, platesSystem, resetPlate, type PlateOptions } from './plates';
 import {
   BeamEmitterComponent,
@@ -825,6 +826,7 @@ export function installMechanisms<TInput>(
     ImpactSwitchComponent,
     CuttableComponent,
     SuspendedComponent,
+    SupportComponent,
     BeamEmitterComponent,
     OpticComponent,
     LightReceiverComponent,
@@ -843,6 +845,7 @@ export function installMechanisms<TInput>(
   world.addSystem(impactSwitchesSystem());
   world.addSystem(beamsSystem(tracer));
   world.addSystem(lightReceiversSystem(tracer));
+  world.addSystem(supportsSystem());
   world.addSystem(ropesSystem());
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
@@ -856,9 +859,13 @@ export function installMechanisms<TInput>(
   world.onRemove(CuttableComponent, (_entity, rope) => {
     removeFrom(rules.colliders, rope.collider);
   });
+  world.onRemove(SupportComponent, (_entity, support) => {
+    removeFrom(rules.colliders, support.collider);
+  });
   const offs = [
     impactFeeds(world),
     ropeFeeds(world),
+    supportFeeds(world),
     addAffordanceGate(world, keyGate(rules)),
     world.events.on(interacted, ({ actor, target, verb }) => {
       if (w.has(target, SwitchComponent)) {

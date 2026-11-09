@@ -156,7 +156,7 @@ export function makePlate(
 }
 
 /** Whether a thing is something a plate weighs: a physics object or an actor. */
-function weighable(world: World<never>, entity: EntityId): boolean {
+export function weighable(world: World<never>, entity: EntityId): boolean {
   return (
     (world.isRegistered(PhysicsObjectComponent) && world.has(entity, PhysicsObjectComponent)) ||
     (world.isRegistered(CreatureComponent) && world.has(entity, CreatureComponent)) ||

@@ -100,6 +100,7 @@ Load any scene with `?scene=<id>` (an unknown id lists the available ones):
 | `combat-sandbox`  | Arena with a training dummy and an attacker dummy for practising block, parry and dodge (see [Combat sandbox](#combat-sandbox)). |
 | `mechanism-room`  | Every mechanism: lever and portcullis, burnable wooden door, locked iron door, timed button door, crank and trapdoor. |
 | `weak-wall-room`  | A cracked wall to smash with a heavy attack and a breakable crate. |
+| `chandelier-room` | A chandelier and an anvil hanging from ropes, and a rope bridge rated for 150 kg: shoot or burn a rope, or load the bridge too heavily. |
 | `lighting-room`   | Torches, a burning crate and moonlight, with dark corners to hide in. |
 | `kit-gallery`     | Every grey-box kit piece in a row (an art check, not gameplay). |
 | `skeleton-pen`    | A walled yard with the Forgotten roster at their posts - miner, archer, shield-bearer and brute - to fight one at a time (mw-ju8.19). |

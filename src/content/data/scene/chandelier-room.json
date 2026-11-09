@@ -1,0 +1,86 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "chandelier-room",
+  "name": "Chandelier room",
+  "description": "Grey-box room for hanging things that fall (mw-e03.13). West: an iron chandelier hangs from a hemp rope under a beam, over the spot at x -4; stand under it, then shoot or burn the rope and the chandelier drops on whoever is there (a frayed rope: 20 hp, and a pierce hit has to be 29 or more to get through its 30% resistance, so a half-drawn arrow only frays it). East: a rope bridge of twelve planks between two stone platforms, rated for 150 kg, with a 160 kg anvil hanging from its own rope over the middle; cut the anvil's rope and the weight snaps the bridge's weaker rope, which takes the whole span down. A knight crossing it weighs next to nothing. Reach it with ?scene=chandelier-room; the beams are floating stand-ins for a ceiling, and the two hanging ropes are a chunky 16 cm so a bow can find them from across the room.",
+  "grid": 1,
+  "camera": {
+    "position": [1, 9, -14],
+    "target": [1, 2.5, 0]
+  },
+  "placements": [
+    { "piece": "floor", "at": [1, 0, 0], "scale": [10, 1, 5] },
+    { "piece": "wall", "at": [1, 0, 5], "scale": [10, 1, 1] },
+    { "piece": "wall", "at": [1, 0, -5], "scale": [10, 1, 1] },
+    { "piece": "wall", "at": [-9, 0, 0], "yaw": 90, "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [11, 0, 0], "yaw": 90, "scale": [5, 1, 1] },
+    { "piece": "platform", "at": [2, 0, 0], "scale": [1, 1, 1] },
+    { "piece": "platform", "at": [10, 0, 0], "scale": [1, 1, 1] },
+    { "piece": "platform", "at": [-4, 9, 0], "scale": [1.5, 1, 0.25] },
+    { "piece": "platform", "at": [6, 5, 0], "scale": [1, 1, 0.25] }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -3],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "chandelier-rope",
+      "at": [-4, 9, 0],
+      "tags": ["rope", "chandelier"],
+      "rope": {
+        "length": 2,
+        "radius": 0.08,
+        "support": {
+          "resistances": { "blunt": 1, "force": 1, "pierce": 0.3 }
+        }
+      },
+      "properties": { "material": "rope", "hp": 20 }
+    },
+    {
+      "id": "chandelier",
+      "at": [-4, 6.75, 0],
+      "tags": ["prop", "chandelier"],
+      "prop": "chandelier",
+      "suspendedFrom": "chandelier-rope"
+    },
+    {
+      "id": "rope-bridge",
+      "at": [3, 1, 0],
+      "tags": ["bridge"],
+      "bridge": {
+        "to": [9, 1, 0],
+        "planks": 12,
+        "plank": "bridge-plank",
+        "width": 1.2,
+        "rating": 150,
+        "resistances": { "blunt": 1, "force": 1, "pierce": 0.3 }
+      }
+    },
+    {
+      "id": "anvil-rope",
+      "at": [6, 5, 0],
+      "tags": ["rope", "anvil"],
+      "rope": {
+        "length": 2,
+        "radius": 0.08,
+        "support": {
+          "resistances": { "blunt": 1, "force": 1, "pierce": 0.3 }
+        }
+      },
+      "properties": { "material": "rope", "hp": 20 }
+    },
+    {
+      "id": "anvil",
+      "at": [6, 2.75, 0],
+      "tags": ["prop", "anvil"],
+      "prop": "anvil",
+      "suspendedFrom": "anvil-rope"
+    }
+  ],
+  "light": {
+    "ambient": 0.45,
+    "directional": [{ "id": "sun", "direction": [0.3, -1, 0.4], "level": 0.5, "reach": 40 }]
+  }
+}

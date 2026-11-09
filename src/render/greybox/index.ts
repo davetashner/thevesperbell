@@ -68,6 +68,11 @@ export const PURPOSE_COLOURS: Readonly<Record<KitPurpose, number>> = {
   hazard: 0xc4462f,
 };
 
+/** A rope (mw-e03.13): hemp, or grey iron when it ignores pierce and slash (a chain). */
+const ROPE_COLOUR = 0x9b7b4a;
+const CHAIN_COLOUR = 0x6b7078;
+/** Thinnest a rope is drawn, metres across, so a 0.05 m cord still reads from the camera. */
+const MIN_ROPE_WIDTH = 0.06;
 const MARKER_COLOUR = 0xe8c547;
 /** Spawn tags whose marker keeps the facing cone: they stand on the ground (mw-ju8.42). */
 export const MARKER_CONE_TAGS: readonly string[] = ['arrival', 'player-start'];
@@ -466,6 +471,35 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         // A container (mw-e18.3): a chest-sized box standing on the spawn point.
         mesh = new Mesh(new BoxGeometry(0.9, 0.6, 0.6), gridMaterial(PURPOSE_COLOURS.interactive));
         mesh.position.y = 0.3;
+      } else if (spawn.prop === undefined && spawn.rope !== undefined) {
+        // A rope or chain (mw-e03.13): a thin cylinder from the spawn point to its other anchor, or
+        // straight down. It leaves with the entity, so a burnt or snapped rope vanishes.
+        const { rope } = spawn;
+        const to = rope.to ?? {
+          x: spawn.position.x,
+          y: spawn.position.y - rope.length,
+          z: spawn.position.z,
+        };
+        const along = new Vector3(
+          to.x - spawn.position.x,
+          to.y - spawn.position.y,
+          to.z - spawn.position.z,
+        );
+        const width = Math.max(MIN_ROPE_WIDTH, (rope.radius ?? 0.05) * 2) / 2;
+        mesh = new Mesh(
+          new CylinderGeometry(width, width, along.length(), 6),
+          new MeshStandardMaterial({
+            color: new Color(rope.support?.resistances.pierce === 1 ? CHAIN_COLOUR : ROPE_COLOUR),
+            // A little glow, so a thin rope still reads across a dim room.
+            emissive: new Color(
+              rope.support?.resistances.pierce === 1 ? CHAIN_COLOUR : ROPE_COLOUR,
+            ),
+            emissiveIntensity: 0.4,
+            roughness: 0.9,
+          }),
+        );
+        mesh.position.copy(along).multiplyScalar(0.5);
+        mesh.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), along.normalize());
       } else if (
         spawn.prop === undefined &&
         (spawn.properties !== undefined || spawn.lightSource !== undefined)
@@ -510,9 +544,11 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         spawn.prop ??
         (spawn.container !== undefined
           ? 'container'
-          : spawn.tags.includes('sign')
-            ? 'sign'
-            : 'marker');
+          : spawn.rope !== undefined
+            ? 'rope'
+            : spawn.tags.includes('sign')
+              ? 'sign'
+              : 'marker');
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);

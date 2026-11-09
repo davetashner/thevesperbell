@@ -20,8 +20,20 @@
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
-import { PhysicsObjectComponent, teleportPhysicsObject, bindCollider } from '../physics/objects';
-import { assignProperty, hasProperty, readProperty, setProperty } from '../properties/components';
+import {
+  PhysicsObjectComponent,
+  bindCollider,
+  MIN_BODY_MASS,
+  rigidBodiesOf,
+  teleportPhysicsObject,
+} from '../physics/objects';
+import {
+  assignProperty,
+  hasProperty,
+  propertyChanged,
+  readProperty,
+  setProperty,
+} from '../properties/components';
 import { supportOf } from '../properties/derived';
 import type { ColliderHandle, StaticColliderSink } from '../physics/static-colliders';
 import { placeEntity } from '../stimulus/placement';
@@ -71,6 +83,13 @@ export interface SuspensionReleased {
 }
 
 export const suspensionReleased = defineEvent<SuspensionReleased>('suspensionReleased');
+
+/**
+ * Mass a held body is given while it hangs, kg (mw-e03.13): the pin teleports it back each tick, which
+ * keeps a light plank from bearing a crate that would push it aside; at this mass nothing resting on
+ * or hitting a hanging body moves it. Its own mass (its `weight`) is restored the tick it is let go.
+ */
+export const PINNED_MASS = 1_000_000;
 
 /** Default half thickness of a cord, metres. */
 export const DEFAULT_ROPE_RADIUS = 0.05;
@@ -138,6 +157,7 @@ export function makeCuttable(
 export function suspendFrom(world: World<never>, entity: EntityId, support: EntityId): void {
   const object = world.get(entity, PhysicsObjectComponent);
   if (object === undefined) throw new Error(`entity ${String(entity)} is not a physics object`);
+  rigidBodiesOf(world).setMass(object.body as ColliderHandle, PINNED_MASS);
   assignProperty(world, entity, 'suspended', true);
   assignProperty(world, entity, 'support', support);
   world.add(entity, SuspendedComponent, {
@@ -164,6 +184,11 @@ export function releaseSuspended(
     setProperty(world, entity, 'suspended', false, source === null ? {} : { source });
   }
   world.remove(entity, SuspendedComponent);
+  const object = world.get(entity, PhysicsObjectComponent);
+  if (object !== undefined) {
+    const kilos = Math.max(MIN_BODY_MASS, readProperty(world, entity, 'weight'));
+    rigidBodiesOf(world).setMass(object.body as ColliderHandle, kilos);
+  }
   if (world.has(entity, ImpactSwitchComponent)) releaseImpactSwitch(world, entity, source);
   world.events.emit(suspensionReleased, {
     tick: world.tick,
@@ -236,23 +261,35 @@ export function ropesSystem<TInput>(): System<TInput> {
  */
 export function ropeFeeds<TInput>(world: World<TInput>): () => void {
   const w: World<never> = world;
-  return world.events.on(stimulusResolved, ({ stimulus, amount }) => {
-    const { element, shape, source } = stimulus;
-    if ((element !== 'slash' && element !== 'pierce') || !(amount > 0)) return;
-    if (shape.kind === 'contact') {
-      severCuttable(w, shape.target, source);
-      return;
-    }
-    for (const entity of [...w.query(CuttableComponent).ids()]) {
-      const rope = known(w.get(entity, CuttableComponent));
-      if (
-        reaches(
-          rope,
-          (point, radius) => shapeFalloff(shape, stimulus.falloff, point, radius) !== undefined,
-        )
-      ) {
-        severCuttable(w, entity, source);
+  const offs = [
+    world.events.on(stimulusResolved, ({ stimulus, amount }) => {
+      const { element, shape, source } = stimulus;
+      if ((element !== 'slash' && element !== 'pierce') || !(amount > 0)) return;
+      if (shape.kind === 'contact') {
+        severCuttable(w, shape.target, source);
+        return;
       }
-    }
-  });
+      for (const entity of [...w.query(CuttableComponent).ids()]) {
+        const rope = known(w.get(entity, CuttableComponent));
+        if (
+          reaches(
+            rope,
+            (point, radius) => shapeFalloff(shape, stimulus.falloff, point, radius) !== undefined,
+          )
+        ) {
+          severCuttable(w, entity, source);
+        }
+      }
+    }),
+    // A change of a hanging body's weight (a soaked bridge) must not make it light again: the
+    // physics layer sets its mass from the property, so it is pinned again straight after.
+    world.events.on(propertyChanged, ({ entity, key }) => {
+      const object = key === 'weight' && w.has(entity, SuspendedComponent);
+      const body = object ? w.get(entity, PhysicsObjectComponent)?.body : undefined;
+      if (body !== undefined) rigidBodiesOf(w).setMass(body as ColliderHandle, PINNED_MASS);
+    }),
+  ];
+  return () => {
+    for (const off of offs) off();
+  };
 }

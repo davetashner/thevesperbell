@@ -177,15 +177,74 @@ export const scenePlateSchema = z.strictObject({
  * its spherical hit zone. Signal graphs read it through lever nodes bound to the spawn; a signal into
  * a `mechanism` receiver bound to it resets it.
  */
+const supportShare = z.number().min(0).max(1);
+
 /**
- * Makes a spawn a cuttable rope (mw-e05.13): a cord hanging straight down from the spawn point that
- * slash or pierce damage (an arrow with a cutting head, a thrown blade, a spell) severs. Whatever names
- * it in `suspendedFrom` hangs from it and falls as a physics object when it is cut or burnt. It gets
- * the `cuttable` world property.
+ * Makes a rope hold its span to hit points (mw-e03.13): hits wear its `hp` down instead of severing
+ * it at once, and the load of what hangs from its span can snap it.
+ */
+export const sceneSupportSchema = z.strictObject({
+  rating: z
+    .number()
+    .positive()
+    .optional()
+    .describe(
+      'Heaviest load its span carries, kg: what hangs from it and rests on that. Over it, the weakest rope of the span snaps. Omit: never overloads.',
+    ),
+  resistances: z
+    .strictObject({
+      blunt: supportShare.optional().describe('Share of blunt damage ignored.'),
+      slash: supportShare.optional().describe('Share of slash damage ignored.'),
+      pierce: supportShare.optional().describe('Share of pierce damage ignored (1: a chain).'),
+      force: supportShare.optional().describe('Share of a shove (force) ignored.'),
+    })
+    .default({})
+    .describe('Share of each kind of hit it ignores; a kind left out is 0.'),
+  span: contentId
+    .optional()
+    .describe(
+      'Ropes of a scene with the same span share one load and fail together (a bridge’s two ropes); what hangs from one hangs from the span.',
+    ),
+});
+
+/**
+ * Makes a spawn a rope (mw-e05.13, mw-e03.13): a cord from the spawn point straight down `length`
+ * metres, or to `to`. By default slash or pierce damage (an arrow with a cutting head, a thrown blade,
+ * a spell) severs it at once; with `support` it has hit points and a load rating instead. Whatever
+ * names it in `suspendedFrom` hangs from it and falls as a physics object when it is cut, burnt or
+ * snapped. It gets the `cuttable` world property.
  */
 export const sceneRopeSchema = z.strictObject({
-  length: z.number().positive().describe('How far it hangs straight down, metres.'),
+  length: z
+    .number()
+    .positive()
+    .optional()
+    .describe('How far it hangs straight down, metres (or give `to`).'),
+  to: gridPosition.optional().describe('Its other anchor, grid cells (or give `length`).'),
   radius: z.number().positive().optional().describe('Half its thickness, metres (default 0.05).'),
+  support: sceneSupportSchema
+    .optional()
+    .describe('Gives it hit points and a load rating (mw-e03.13): see the support fields.'),
+});
+
+/** Rope bridge prefab (mw-e03.13): planks hung between two ropes, expanded into spawns. */
+export const sceneBridgeSchema = z.strictObject({
+  to: gridPosition.describe(
+    'The far end, grid cells: level with the spawn and along x or z, so a bridge runs straight.',
+  ),
+  planks: z.int().min(1).max(64).describe('How many planks, evenly spaced from end to end.'),
+  plank: ref('testprop').describe('The plank prop: its first size axis is the bridge’s width.'),
+  rating: z
+    .number()
+    .positive()
+    .describe('Heaviest load the bridge carries, kg: planks, what rests on them, and who walks.'),
+  resistances: sceneSupportSchema.shape.resistances.describe(
+    'Share of each kind of hit its two ropes ignore.',
+  ),
+  width: z
+    .number()
+    .positive()
+    .describe('Distance between the two ropes, metres: the plank prop’s width.'),
 });
 
 const colourSchema = z
@@ -589,6 +648,11 @@ export const sceneSpawnSchema = z.strictObject({
     .optional()
     .describe(
       'Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13).',
+    ),
+  bridge: sceneBridgeSchema
+    .optional()
+    .describe(
+      'Makes the spawn one end of a rope bridge (mw-e03.13): two support ropes and their planks, hung level from the spawn to `to`.',
     ),
   suspendedFrom: z
     .string()
@@ -1192,6 +1256,15 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     }
   }
   if (spawn.rope !== undefined) {
+    if ((spawn.rope.length === undefined) === (spawn.rope.to === undefined)) {
+      issue('rope', 'needs exactly one of length and to');
+    }
+    if (spawn.rope.to !== undefined && spawn.rope.support === undefined) {
+      issue(
+        'rope',
+        'runs to another point but has no support: a cuttable rope hangs straight down',
+      );
+    }
     for (const [key, what] of [
       ['door', 'a door'],
       ['switch', 'a switch'],
@@ -1207,6 +1280,29 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
   }
   if (spawn.suspendedFrom !== undefined) {
     if (spawn.prop === undefined) issue('suspendedFrom', 'hangs but is not a movable prop');
+  }
+  const { bridge } = spawn;
+  if (bridge !== undefined) {
+    const [x0, y0, z0] = spawn.at;
+    const [x1, y1, z1] = bridge.to;
+    if (y1 !== y0) issue('bridge', 'must run level: `to` is at another height');
+    if ((x1 === x0) === (z1 === z0)) {
+      issue('bridge', 'must run along x or z, and be longer than nothing');
+    }
+    for (const [key, what] of [
+      ['rope', 'a rope'],
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['impactSwitch', 'an impact switch'],
+      ['container', 'a container'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+      ['prop', 'a prop'],
+      ['suspendedFrom', 'hanging from a rope'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a rope bridge and ${what}`);
+    }
   }
   const { impactSwitch } = spawn;
   if (impactSwitch !== undefined) {

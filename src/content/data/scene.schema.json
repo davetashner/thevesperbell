@@ -1458,18 +1458,168 @@
             "type": "object",
             "properties": {
               "length": {
+                "description": "How far it hangs straight down, metres (or give `to`).",
                 "type": "number",
-                "exclusiveMinimum": 0,
-                "description": "How far it hangs straight down, metres."
+                "exclusiveMinimum": 0
+              },
+              "to": {
+                "description": "Its other anchor, grid cells (or give `length`).",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
               },
               "radius": {
                 "description": "Half its thickness, metres (default 0.05).",
                 "type": "number",
                 "exclusiveMinimum": 0
+              },
+              "support": {
+                "description": "Gives it hit points and a load rating (mw-e03.13): see the support fields.",
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "description": "Heaviest load its span carries, kg: what hangs from it and rests on that. Over it, the weakest rope of the span snaps. Omit: never overloads.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "resistances": {
+                    "default": {},
+                    "description": "Share of each kind of hit it ignores; a kind left out is 0.",
+                    "type": "object",
+                    "properties": {
+                      "blunt": {
+                        "description": "Share of blunt damage ignored.",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "slash": {
+                        "description": "Share of slash damage ignored.",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "pierce": {
+                        "description": "Share of pierce damage ignored (1: a chain).",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "force": {
+                        "description": "Share of a shove (force) ignored.",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "span": {
+                    "description": "Ropes of a scene with the same span share one load and fail together (a bridge’s two ropes); what hangs from one hangs from the span.",
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "bridge": {
+            "description": "Makes the spawn one end of a rope bridge (mw-e03.13): two support ropes and their planks, hung level from the spawn to `to`.",
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "The far end, grid cells: level with the spawn and along x or z, so a bridge runs straight."
+              },
+              "planks": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 64,
+                "description": "How many planks, evenly spaced from end to end."
+              },
+              "plank": {
+                "description": "The plank prop: its first size axis is the bridge’s width.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "testprop"
+              },
+              "rating": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Heaviest load the bridge carries, kg: planks, what rests on them, and who walks."
+              },
+              "resistances": {
+                "default": {},
+                "description": "Share of each kind of hit its two ropes ignore.",
+                "type": "object",
+                "properties": {
+                  "blunt": {
+                    "description": "Share of blunt damage ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "slash": {
+                    "description": "Share of slash damage ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "pierce": {
+                    "description": "Share of pierce damage ignored (1: a chain).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "force": {
+                    "description": "Share of a shove (force) ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Distance between the two ropes, metres: the plank prop’s width."
               }
             },
             "required": [
-              "length"
+              "to",
+              "planks",
+              "plank",
+              "rating",
+              "width"
             ],
             "additionalProperties": false
           },

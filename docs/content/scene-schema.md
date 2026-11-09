@@ -213,8 +213,28 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].plate.depth` | number > 0 | `1` | Footprint along z, metres. |
 | `spawns[].plate.hidden` | boolean | `false` | The trap variant: nothing to see or prompt; wire it to trap signals. |
 | `spawns[].rope` | object | — | Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). |
-| `spawns[].rope.length` | number > 0 | required | How far it hangs straight down, metres. |
+| `spawns[].rope.length` | number > 0 | — | How far it hangs straight down, metres (or give `to`). |
+| `spawns[].rope.to` | list of any (at least 3) | — | Its other anchor, grid cells (or give `length`). |
 | `spawns[].rope.radius` | number > 0 | — | Half its thickness, metres (default 0.05). |
+| `spawns[].rope.support` | object | — | Gives it hit points and a load rating (mw-e03.13): see the support fields. |
+| `spawns[].rope.support.rating` | number > 0 | — | Heaviest load its span carries, kg: what hangs from it and rests on that. Over it, the weakest rope of the span snaps. Omit: never overloads. |
+| `spawns[].rope.support.resistances` | object | `{}` | Share of each kind of hit it ignores; a kind left out is 0. |
+| `spawns[].rope.support.resistances.blunt` | number 0–1 | — | Share of blunt damage ignored. |
+| `spawns[].rope.support.resistances.slash` | number 0–1 | — | Share of slash damage ignored. |
+| `spawns[].rope.support.resistances.pierce` | number 0–1 | — | Share of pierce damage ignored (1: a chain). |
+| `spawns[].rope.support.resistances.force` | number 0–1 | — | Share of a shove (force) ignored. |
+| `spawns[].rope.support.span` | id | — | Ropes of a scene with the same span share one load and fail together (a bridge’s two ropes); what hangs from one hangs from the span. |
+| `spawns[].bridge` | object | — | Makes the spawn one end of a rope bridge (mw-e03.13): two support ropes and their planks, hung level from the spawn to `to`. |
+| `spawns[].bridge.to` | list of any (at least 3) | required | The far end, grid cells: level with the spawn and along x or z, so a bridge runs straight. |
+| `spawns[].bridge.planks` | integer 1–64 | required | How many planks, evenly spaced from end to end. |
+| `spawns[].bridge.plank` | ref → testprop | required | The plank prop: its first size axis is the bridge’s width. |
+| `spawns[].bridge.rating` | number > 0 | required | Heaviest load the bridge carries, kg: planks, what rests on them, and who walks. |
+| `spawns[].bridge.resistances` | object | `{}` | Share of each kind of hit its two ropes ignore. |
+| `spawns[].bridge.resistances.blunt` | number 0–1 | — | Share of blunt damage ignored. |
+| `spawns[].bridge.resistances.slash` | number 0–1 | — | Share of slash damage ignored. |
+| `spawns[].bridge.resistances.pierce` | number 0–1 | — | Share of pierce damage ignored (1: a chain). |
+| `spawns[].bridge.resistances.force` | number 0–1 | — | Share of a shove (force) ignored. |
+| `spawns[].bridge.width` | number > 0 | required | Distance between the two ropes, metres: the plank prop’s width. |
 | `spawns[].suspendedFrom` | string | — | Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls. |
 | `spawns[].lightSource` | object | — | Makes the spawned entity a light source that can be put out and relit (mw-e03.16). |
 | `spawns[].lightSource.variant` | `"candle"` \| `"torch"` \| `"sconce"` \| `"brazier"` \| `"lantern"` \| `"fireplace"` | required | Prefab: its fuel, light, ignition point and how much wind it takes to blow it out. |

@@ -13,6 +13,8 @@ import {
   SceneSpawnComponent,
   signalSystem,
   stimulusSystem,
+  makeSupport,
+  releaseSupport,
   useSwitch,
   World,
   type EntityId,
@@ -128,6 +130,7 @@ describe('mechanisms in the game (mw-e03.18)', () => {
         trapdoor: { status: 'closed', openness: 0 },
       },
       switches: { 'north-lever': 0, 'east-button': 0, 'floor-crank': 0 },
+      ropes: {},
     });
     world.step();
     // Closed doors that shut out light occlude it; the grille does not.
@@ -190,6 +193,34 @@ describe('mechanisms in the game (mw-e03.18)', () => {
       graphs: [],
     });
     expect(watch.readout().switches).toEqual({ [String(spawn('east-button'))]: 0 });
+  });
+});
+
+describe('the ropes readout (mw-e03.13)', () => {
+  it('reports each rope by spawn id as holding, then gone once it lets go or is destroyed', () => {
+    const { world, made, spawn } = room();
+    const [a, b, c] = [spawn('north-lever'), spawn('east-button'), spawn('floor-crank')] as const;
+    for (const entity of [a, b, c]) {
+      makeSupport(world, entity, { x: 0, y: 3, z: 0 }, { x: 0, y: 2, z: 0 });
+    }
+    world.step();
+    world.remove(c, SceneSpawnComponent); // a rope with no name reports by id
+    const watch = new MechanismWatch(world, { ...made, ropes: [a, b, c] });
+    expect(watch.readout().ropes).toEqual({
+      'north-lever': 'holding',
+      'east-button': 'holding',
+      [String(c)]: 'holding',
+    });
+    releaseSupport(world, a, 'damage'); // let go, still in the world this tick
+    expect(watch.readout().ropes['north-lever']).toBe('gone');
+    world.destroy(b); // burnt away
+    world.step();
+    world.step();
+    expect(watch.readout().ropes).toEqual({
+      'north-lever': 'gone',
+      'east-button': 'gone',
+      [String(c)]: 'holding',
+    });
   });
 });
 
