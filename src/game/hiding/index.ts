@@ -98,6 +98,8 @@ export function readHidingSpot(
 
 /** One spot, as the readout reports it. */
 export interface HidingReading {
+  /** The spot's entity id (the debug console's `prop <id> ...` takes it). */
+  readonly entity: number;
   readonly occupied: boolean;
   /** Who hides in it: `player` for the player, else the entity id. */
   readonly occupants: readonly string[];
@@ -126,6 +128,7 @@ export class HidingWatch {
       if (spot === undefined) continue; // gone (broken, burnt away)
       const name = world.get(entity, SceneSpawnComponent)?.id ?? String(entity);
       readings[name] = {
+        entity,
         occupied: isOccupied(world, entity),
         occupants: spot.occupants.map((who) => (who === this.player ? 'player' : String(who))),
       };

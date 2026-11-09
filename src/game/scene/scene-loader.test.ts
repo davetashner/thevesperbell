@@ -131,8 +131,14 @@ describe('scene loader glue (mw-e00.21)', () => {
       'spawn:testbed-bottle',
       'spawn:testbed-pot',
       'spawn:testbed-barrel',
+      'spawn:hiding-wardrobe',
+      'spawn:hiding-haystack',
+      'spawn:hiding-barrel',
+      'spawn:body-chest',
+      'spawn:limp-body-a',
+      'spawn:limp-body-b',
     ]);
-    expect(sync.size).toBe(14);
+    expect(sync.size).toBe(20);
     expect(built[0]?.transform?.position).toEqual({ x: 0, y: 0, z: 0 });
     expect(built[1]?.transform?.position).toEqual({ x: 0, y: 0, z: -1 });
   });

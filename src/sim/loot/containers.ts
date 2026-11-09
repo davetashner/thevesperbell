@@ -352,9 +352,7 @@ export class Containers {
    * Reads only: the prompt's gate asks it too.
    */
   stashRefusal(world: World<never>, entity: EntityId, body: EntityId): StashRefusal | undefined {
-    const stash = world.isRegistered(StashComponent)
-      ? world.get(entity, StashComponent)
-      : undefined;
+    const stash = world.get(entity, StashComponent);
     if (stash === undefined) return 'no-stash';
     if (lockOf(world, entity)?.locked === true) return 'locked';
     if (!world.has(body, CarryBulkyComponent)) return 'not-a-body';
@@ -398,9 +396,7 @@ export class Containers {
   spill(world: World<never>, entity: EntityId): void {
     const at = placementOf(world, entity);
     const pack = inventoryOf(world, entity);
-    const stash = world.isRegistered(StashComponent)
-      ? world.get(entity, StashComponent)
-      : undefined;
+    const stash = world.get(entity, StashComponent);
     if (at === undefined || pack === undefined) return;
     const stacks: LootStack[] = pack.items.map(({ defId, count }) => ({ item: defId, count }));
     if (pack.gold > 0) stacks.push({ item: 'gold', count: pack.gold });
