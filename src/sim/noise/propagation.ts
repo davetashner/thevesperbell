@@ -49,6 +49,7 @@ export const DEFAULT_NOISE_TUNING: NoiseTuning = Object.freeze({
       Object.freeze({ material: 'wood', wall: -18, floor: -15 }),
     ]),
   }),
+  impact: Object.freeze({ minEnergy: 1, refEnergy: 10, refDb: 60, dbPerDecade: 10, maxDb: 100 }),
 });
 
 /** The gain, dB (≤ 0), of `metres` of travel: −20·log10(metres), none within 1 m. */

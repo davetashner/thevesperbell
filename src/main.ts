@@ -154,6 +154,7 @@ import {
 import { bootPhysics } from '@game/physics-loader';
 import {
   formatBudgetWarning,
+  impactNoiseOptions,
   installGamePhysics,
   playerFocus,
   propBodies,
@@ -816,6 +817,8 @@ function startRenderer(
     installGamePhysics(world, {
       // Breaks spill their contents as props (mw-e03.11).
       breakables: { props, materials: materialPresets(content.all('material')) },
+      // Impacts are noises by energy and material (mw-e03.25).
+      impactNoise: impactNoiseOptions(content),
       focus: focus.read,
       onBudgetExceeded: (warning) => {
         console.warn(formatBudgetWarning(warning));

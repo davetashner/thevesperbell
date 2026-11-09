@@ -194,6 +194,25 @@ const noiseSchema = z
           .describe('Per material overrides; a scene names a partition’s material.'),
       } satisfies Record<PartitionKind, typeof gainDb> & { materials: unknown })
       .describe('Transmission through walls and floors between adjacent rooms.'),
+    impact: z
+      .strictObject({
+        minEnergy: z
+          .number()
+          .positive()
+          .describe('Least impact energy, J, that makes a noise: softer settling stays silent.'),
+        refEnergy: z.number().positive().describe('Energy, J, at which the curve reads `refDb`.'),
+        refDb: z
+          .number()
+          .min(0)
+          .max(120)
+          .describe('Loudness, dB at 1 m, of a `refEnergy` impact on stone.'),
+        dbPerDecade: z.number().positive().max(40).describe('dB gained for ten times the energy.'),
+        maxDb: z.number().min(0).max(120).describe('Loudest an impact gets, dB at 1 m.'),
+      })
+      .describe(
+        'Impact noise (mw-e03.25): loudness = refDb + dbPerDecade·log10(energy / refEnergy) plus the ' +
+          'louder of the two materials’ surface loudness offsets, capped at maxDb; below minEnergy, silence.',
+      ),
   })
   .describe(
     'Sound propagation (mw-e09.3): a noise loses 20·log10(d) dB over a path of d metres (none ' +
@@ -207,6 +226,9 @@ function checkNoise(n: NoiseFields, ctx: z.RefinementCtx): void {
   const issue = (path: (string | number)[], message: string) => {
     ctx.addIssue({ code: 'custom', path: ['noise', ...path], message });
   };
+  if (n.impact.minEnergy > n.impact.refEnergy) {
+    issue(['impact', 'minEnergy'], 'minEnergy must not exceed refEnergy');
+  }
   const { doors } = n;
   const ordered = (path: (string | number)[], gains: Record<DoorSoundState, number>) => {
     if (gains.ajar > gains.open || gains.closed > gains.ajar) {

@@ -48,6 +48,7 @@ import type { AffordanceSpec } from '../interaction/affordance';
 import { noiseEmitted } from '../noise/events';
 import { bodyMaterialOf, PhysicsColliderComponent, rigidBodiesOf } from '../physics/objects';
 import type { ColliderHandle, StaticColliderSink } from '../physics/static-colliders';
+import { log } from '../math';
 import { readProperty } from '../properties/components';
 import { ScenePieceComponent } from '../scene/loader';
 import { pressButton, setLever, signalReceived } from '../signals/runtime';
@@ -68,6 +69,7 @@ import {
   type Door,
   type DoorBlocks,
   type DoorProfile,
+  type DoorSlam,
   type Lock,
   type LockSpec,
   type Switch,
@@ -110,6 +112,17 @@ import { lightReceiversSystem, resetLightReceiver } from './receivers';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
 export const SLAM_SPEED = 4;
+
+/**
+ * Noise of `door` setting off, dB 1 m away: its profile's loudness (a hand-swung door) plus
+ * 20·log10 of how many times faster than that it swings, so a door slammed at 4× is 4× the
+ * sound pressure (+12 dB) of the same door eased shut (mw-e03.25).
+ */
+export function doorLoudness(door: Pick<Door, 'loudness' | 'slam'>): number {
+  return door.slam === undefined
+    ? door.loudness
+    : door.loudness + (20 * log(door.slam.speed)) / Math.LN10;
+}
 
 /** `door` without its slam (the key is absent, not undefined, so snapshots match ordinary doors). */
 function unslammed(door: Door): Door {
@@ -340,7 +353,7 @@ function emitState(
     world.events.emit(noiseEmitted, {
       tick: world.tick,
       position,
-      loudness: after.loudness,
+      loudness: doorLoudness(after),
       kind: 'door',
       entity,
       source,
@@ -397,13 +410,15 @@ export function moveDoor(
   entity: EntityId,
   target: 0 | 1,
   source: EntityId | null = null,
+  slam?: DoorSlam,
 ): boolean {
   const door = world.get(entity, DoorComponent);
   if (door === undefined || door.broken || door.target === target) return false;
   const lock = lockOf(world, entity);
   if (lock?.locked === true) return refuse(world, entity, lock, 'locked', source);
   if (stuck(world, entity, door)) return jam(world, entity, source);
-  writeDoor(world, entity, door, { ...unslammed(door), target, blockedBy: null }, source);
+  const moving = { ...unslammed(door), target, blockedBy: null };
+  writeDoor(world, entity, door, slam === undefined ? moving : { ...moving, slam }, source);
   refreshAffordances(world, entity);
   return true;
 }
@@ -421,12 +436,11 @@ export function slamDoor(
   speed = SLAM_SPEED,
 ): boolean {
   const door = world.get(entity, DoorComponent);
-  if (door === undefined || doorState(door) !== 'closed' || !moveDoor(world, entity, 1, source)) {
-    return false;
-  }
-  const moving = known(world.get(entity, DoorComponent)); // moveDoor just wrote it
-  world.set(entity, DoorComponent, { ...moving, slam: { speed, source } });
-  return true;
+  return (
+    door !== undefined &&
+    doorState(door) === 'closed' &&
+    moveDoor(world, entity, 1, source, { speed, source })
+  );
 }
 
 /** Opens `entity`'s door (see `moveDoor`). */

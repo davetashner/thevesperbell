@@ -18,15 +18,11 @@
 //   gently, and Throw, held and released, throws it along the aim at 4–14 m/s by how long it was
 //   charged (0.2–1.0 s). A thrown object is just a physics object from then on: it strikes creatures
 //   (environment damage), breaks if fragile and spills its contents (breakables), keeps burning if it
-//   was burning, and makes noise through `physicsImpact` like any liftable thing that hits something
-//   (below). The release blames the thrower, so a smashed pot or a struck guard is theirs.
+//   was burning, and makes noise through `physicsImpact` like any physics object that hits something
+//   (src/sim/noise/impacts.ts, by energy and material). The release blames the thrower, so a smashed pot or a struck guard is theirs.
 // - Fire: an object that burns in the hands for `burnSeconds` heats the carrier (a heat stimulus) and
 //   is dropped.
 // - The throw arc preview (`preview`) is the line a held throw would fly, for the UI to draw.
-//
-// Noise: any `liftable` (or `bulky`) physics object that hits something at or above the physics
-// layer's impact speed emits one noise whose loudness comes from its weight (a bottle ticks, a crate
-// thuds). World items keep their own impact noise by weight class (src/sim/items).
 //
 // Edge cases (mw-e17.14, ADR-0003): a carrier whose poise breaks or who is staggered, knocked back or
 // knocked down lets go at once, the object set down at its feet. Leaving the scene sets the object
@@ -50,11 +46,9 @@ import { addAffordanceGate, addFocusFilter, interacted } from '../interaction/sy
 import type { Affordance } from '../interaction/affordance';
 import { handlerView, WorldItemComponent, type ItemHandlerView } from '../items/world-items';
 import { cos, hypot, sin } from '../math';
-import { noiseEmitted } from '../noise/events';
 import type { BodyShape } from '../physics/bodies';
 import {
   PhysicsObjectComponent,
-  physicsImpact,
   type PhysicsObject,
   setPhysicsObjectVelocity,
   teleportPhysicsObject,
@@ -96,14 +90,6 @@ export interface ThrowTuning {
   readonly maxSpeed: number;
 }
 
-/** A weight band of the impact noise table. */
-export interface LoudnessBand {
-  /** Heaviest weight the band covers, kg (the last band covers everything above). */
-  readonly upToKg: number;
-  /** Level 1 m away, dB. */
-  readonly db: number;
-}
-
 /** Every carry number (game values; the carry limit itself is the class's, see `limit`). */
 export interface CarryTuning {
   /** Heaviest hand-carry when no class says otherwise, kg (ADR-0003: 25). */
@@ -125,8 +111,6 @@ export interface CarryTuning {
   readonly burnSeconds: number;
   /** The heat the carrier takes when a burning object is dropped, °C. */
   readonly burnHeat: number;
-  /** Impact noise by weight, ascending. */
-  readonly impactLoudness: readonly LoudnessBand[];
   /** Gravity the preview arc assumes, m/s² (the physics world's). */
   readonly gravity: number;
 }
@@ -144,16 +128,8 @@ export const DEFAULT_CARRY_TUNING: CarryTuning = Object.freeze({
   skin: 0.01,
   burnSeconds: 2,
   burnHeat: 60,
-  impactLoudness: Object.freeze([
-    Object.freeze({ upToKg: 1, db: 50 }),
-    Object.freeze({ upToKg: 8, db: 60 }),
-    Object.freeze({ upToKg: Infinity, db: 70 }),
-  ]),
   gravity: 9.81,
 });
-
-/** The noise kind of a carried object's impact. */
-export const CARRY_IMPACT_NOISE = 'object-impact';
 
 /** Why an object was let go. */
 export type ReleaseReason =
@@ -665,24 +641,6 @@ export function installCarry<TInput>(
     },
   };
   world.addSystem(system);
-
-  w.events.on(physicsImpact, ({ entity, position }) => {
-    if (w.has(entity, WorldItemComponent)) return;
-    if (!bulky(entity) && !readProperty(w, entity, 'liftable')) return;
-    const weight = readProperty(w, entity, 'weight');
-    const bands = tuning.impactLoudness;
-    const band = bands.find((b) => weight <= b.upToKg) ?? bands.at(-1);
-    w.events.emit(noiseEmitted, {
-      tick: w.tick,
-      position,
-      loudness: band?.db ?? 0,
-      kind: CARRY_IMPACT_NOISE,
-      entity,
-      source: w.isRegistered(BlameComponent)
-        ? (w.get(entity, BlameComponent)?.instigator ?? null)
-        : null,
-    });
-  });
 
   return controller;
 }
