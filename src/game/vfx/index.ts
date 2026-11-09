@@ -62,3 +62,4 @@ export * from './element-fields.ts';
 export * from './element-look.ts';
 export * from './magic-materials.ts';
 export * from './corpse-glue.ts';
+export * from './arrow-fx.ts';

@@ -1,0 +1,39 @@
+{
+  "id": "arrows",
+  "notes": "Arrow VFX cue rules (mw-e29.11) on the same events and facts as the arrow audio sheet. Every arrow plays its own trail (its `cues.trailVfx`: flames for the fire arrow, drops for water, fibres for rope) from the moment it is loosed; the trail stops at the first impact, except flames, which burn on a stuck fire arrow until the fire goes out. A blunt arrow's surface impact throws a heavier dust cloud than the generic arrow puff (the more specific rule wins the impact layer). An arrow that glances off armour or hard stone and flies on throws deflect sparks at the contact. The water burst is the arrow's own `cues.impactVfx` (world sheet). The wet decal, noise ring, rope unfurl, stuck-arrow wobble and broken shaft are not particles: src/game/vfx/arrow-fx.ts and src/render/combat/arrow-fx.ts draw them from the same arrowImpact event.",
+  "rules": [
+    {
+      "event": "ArrowFired",
+      "layer": "trail",
+      "match": { "arrow": "fire" },
+      "at": "arrow",
+      "effect": "{trail}",
+      "stopOn": ["fireExtinguished", "fireBurntOut"]
+    },
+    {
+      "event": "ArrowFired",
+      "layer": "trail",
+      "at": "arrow",
+      "effect": "{trail}",
+      "stopOn": ["arrowImpact"]
+    },
+    {
+      "event": "arrowImpact",
+      "layer": "impact",
+      "match": { "arrow": "blunt", "creature": false },
+      "at": "at",
+      "effect": "vfx-arrow-impact-blunt",
+      "orientTo": "hitNormal",
+      "scaleBy": { "fact": "energy", "min": 5, "max": 80, "floor": 0.5 }
+    },
+    {
+      "event": "arrowImpact",
+      "layer": "deflect",
+      "match": { "outcome": "ricochet" },
+      "at": "at",
+      "effect": "vfx-arrow-deflect-sparks",
+      "orientTo": "hitNormal",
+      "attach": false
+    }
+  ]
+}

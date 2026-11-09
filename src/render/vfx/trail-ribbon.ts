@@ -46,8 +46,8 @@ export function catmullRom(p0: number, p1: number, p2: number, p3: number, t: nu
 export class Trail {
   /** Whoever asked for it (an entity id), so an eviction can tell its owner. */
   owner = -1;
-  /** What it trails: a melee swing or an arrow. */
-  kind: 'swing' | 'arrow' = 'swing';
+  /** What it trails: a melee swing, an arrow, or the arrow of a focused shot (mw-e29.11). */
+  kind: 'swing' | 'arrow' | 'arrow-focused' = 'swing';
   r = 1;
   g = 1;
   b = 1;

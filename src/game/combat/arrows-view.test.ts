@@ -20,7 +20,13 @@ import {
 } from '@sim/index';
 import { ActionSampler } from '../input';
 import { RenderSync, type SceneBinding } from '../loop/render-sync';
-import { arrowReadout, bindArrows, pointAlong, readArrowTransform } from './arrows-view';
+import {
+  arrowReadout,
+  bindArrows,
+  pointAlong,
+  readArrowTransform,
+  readWobbledArrowTransform,
+} from './arrows-view';
 import { frameDataView, sandboxFrameData } from './frame-data';
 import {
   prepareTestbedCombat,
@@ -249,5 +255,29 @@ describe('creature projectiles on screen (mw-ju8.19)', () => {
     const bare = new World<never>({ seed: 1 });
     expect(bindArrows(bare, new RenderSync(bare), headless)).toBe(0);
     expect(readArrowTransform(bare, bare.spawn())).toBeUndefined();
+  });
+});
+
+describe('stuck arrow wobble on screen (mw-e29.11)', () => {
+  it('AC-2: the quiver turns the shaft about its tip and leaves a still arrow untouched', () => {
+    const world = new World<never>({ seed: 1 }).register(ArrowComponent, ArrowRestComponent);
+    const arrow = world.spawn();
+    world.add(arrow, ArrowRestComponent, {
+      arrow: 'standard',
+      shooter: null,
+      state: 'stuck',
+      position: { x: 1, y: 2, z: 3 },
+      direction: { x: 0, y: 0, z: 1 },
+      in: null,
+      tick: 0,
+    });
+    const still = readWobbledArrowTransform(world, arrow, () => 0);
+    expect(still).toEqual(readArrowTransform(world, arrow));
+    const quivering = readWobbledArrowTransform(world, arrow, () => 0.1);
+    expect(quivering?.position).toEqual({ x: 1, y: 2, z: 3 });
+    // The tip stays put and the shaft's far end swings to the side by about sin(0.1) of its length.
+    const tail = rotateZ(quivering?.rotation ?? { x: 0, y: 0, z: 0, w: 1 });
+    expect(Math.hypot(tail.x, tail.y)).toBeCloseTo(Math.sin(0.1), 6);
+    expect(readWobbledArrowTransform(world, world.spawn(), () => 0.1)).toBeUndefined();
   });
 });

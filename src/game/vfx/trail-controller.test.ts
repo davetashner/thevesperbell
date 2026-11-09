@@ -346,7 +346,7 @@ describe('swing trail sampling', () => {
   });
 });
 
-describe('focused arrow trails (mw-e29.6)', () => {
+describe('arrow trails (mw-e29.6, mw-e29.11)', () => {
   function arrows(options: Partial<SwingTrailsOptions> = {}) {
     const world = new World<ActionFrame>({ seed: 1 }).register(ArrowComponent);
     const focused = new Set<EntityId>();
@@ -376,10 +376,9 @@ describe('focused arrow trails (mw-e29.6)', () => {
     return { world, trails, shoot, focused };
   }
 
-  it('gives a focused arrow a faint trail sideways across its flight, and releases it on landing', () => {
+  it('gives an arrow a faint trail sideways across its flight, and releases it on landing', () => {
     const { world, trails, shoot } = arrows();
-    const plain = shoot(0, V(30, 0, 0), false);
-    const arrow = shoot(0);
+    const arrow = shoot(0, V(30, 0, 0), false);
     trails.frame();
     for (let i = 1; i <= 3; i++) {
       world.set(arrow, ArrowComponent, {
@@ -391,6 +390,7 @@ describe('focused arrow trails (mw-e29.6)', () => {
     const live = trails.set.trails.filter((t) => t.live);
     expect(live).toHaveLength(1);
     expect(live[0]?.kind).toBe('arrow');
+    expect(Math.abs(live[0]?.at(0, 2) ?? 0)).toBeCloseTo(0.025);
     expect(live[0]?.alpha).toBeCloseTo(trailTints().arrowAlpha);
     expect(live[0]?.alpha).toBeLessThan(trailTints().swingAlpha);
     // Flying along +x the ribbon is across z.
@@ -398,9 +398,32 @@ describe('focused arrow trails (mw-e29.6)', () => {
     expect(live[0]?.at(0, 0)).toBeCloseTo(live[0]?.at(0, 3) ?? NaN);
     expect(trails.visible).toBe(1);
     world.remove(arrow, ArrowComponent);
-    world.remove(plain, ArrowComponent);
     trails.frame();
     expect(trails.set.live).toBe(0);
+  });
+
+  it('AC-4: a focused shot gets the focused trail variant: brighter, wider, same hue', () => {
+    const { world, trails, shoot } = arrows();
+    const plain = shoot(0, V(30, 0, 0), false);
+    shoot(0, V(30, 0, 0), true);
+    trails.frame();
+    const live = trails.set.trails.filter((t) => t.live);
+    expect(live.map((t) => t.kind).sort()).toEqual(['arrow', 'arrow-focused']);
+    const [standard, focused] = [
+      live.find((t) => t.kind === 'arrow'),
+      live.find((t) => t.kind === 'arrow-focused'),
+    ];
+    expect(focused?.alpha).toBe(trailTints().arrowFocusedAlpha);
+    expect(focused?.alpha).toBeGreaterThan((standard?.alpha ?? 1) * 2);
+    expect(focused?.r).toBeGreaterThan(standard?.r ?? 1);
+    expect(focused?.b).toBeGreaterThan(standard?.b ?? 1);
+    expect(plain).toBeDefined();
+    world.set(plain, ArrowComponent, {
+      ...known(world.get(plain, ArrowComponent)),
+      position: V(1, 1, 0),
+    });
+    trails.frame();
+    expect(Math.abs((focused?.at(0, 2) ?? 0) - (focused?.at(0, 5) ?? 0))).toBeCloseTo(0.1);
   });
 
   it('copes with an arrow falling straight down', () => {
@@ -431,18 +454,18 @@ describe('focused arrow trails (mw-e29.6)', () => {
 
   it('halves trail opacity under reduced motion', () => {
     const { trails, shoot } = arrows({ reducedMotion: () => true });
-    shoot(0);
+    shoot(0, V(30, 0, 0), false);
     trails.frame();
     const live = trails.set.trails.find((t) => t.live);
     expect(live?.alpha).toBeCloseTo(trailTints().arrowAlpha * REDUCED_MOTION_ALPHA);
   });
 
-  it('draws no arrow trails without a focus rule, or in a world with no arrows', () => {
+  it('tints a trick arrow by its type and draws nothing in a world with no arrows', () => {
     const none = new World<ActionFrame>({ seed: 1 }).register(ArrowComponent);
     const a = new SwingTrails({ world: none, moves: MOVES, tracks: TRACKS, tints: trailTints() });
     const arrow = none.spawn();
     none.add(arrow, ArrowComponent, {
-      arrow: 'x',
+      arrow: 'fire',
       shooter: null,
       position: V(0, 0, 0),
       velocity: V(1, 0, 0),
@@ -452,7 +475,9 @@ describe('focused arrow trails (mw-e29.6)', () => {
       dodged: [],
     });
     a.frame();
-    expect(a.set.live).toBe(0);
+    expect(a.set.live).toBe(1);
+    expect(a.set.trails.find((t) => t.live)?.r).toBeCloseTo(1);
+    expect(a.set.trails.find((t) => t.live)?.b).toBeCloseTo(0x3c / 255);
     const empty = new World<ActionFrame>({ seed: 1 });
     const b = new SwingTrails({
       world: empty,

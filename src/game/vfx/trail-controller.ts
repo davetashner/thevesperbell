@@ -8,7 +8,8 @@
 //   performed (a charged swing's lerped numbers), looked up in the tint data.
 // - While a chargeable move is held, a glow at the weapon steps up at 33%, 66% and 100% of the full
 //   hold; `ChargeReady` spawns a burst effect at the weapon socket (skipped under reduced motion).
-// - Arrows the caller says are focused get a faint trail along their flight.
+// - Every arrow in flight gets a faint ribbon in its type's tint; arrows the caller says are focused
+//   (mw-e05.4) get the brighter, wider focused variant (arrowTrailLook, mw-e29.11).
 // - TRAIL_MAX trails at once, oldest released first (trail-ribbon.ts).
 //
 // `frame()` allocates nothing once running except while a charge is held (the weapon's rest pose).
@@ -37,7 +38,7 @@ import {
 import type { VfxSpawner } from '../cues/vfx-bridge.ts';
 import { Trail, TrailSet } from '@render/vfx/trail-ribbon';
 import { at, known } from './indexing.ts';
-import { swingTint, type Rgb, type TrailTints } from './trail-tints.ts';
+import { arrowTrailLook, swingTint, type Rgb, type TrailTints } from './trail-tints.ts';
 
 /** Glow steps: the fraction of the full hold at which step 1, 2 and 3 begin. */
 export const GLOW_STEPS = [0.33, 0.66, 1] as const;
@@ -84,7 +85,7 @@ export interface SwingTrailsOptions {
   readonly tints: TrailTints;
   /** The VFX runtime, for the ready burst; without it no burst. */
   readonly vfx?: VfxSpawner;
-  /** Whether an arrow in flight is focused (gets a faint trail); default: none are. */
+  /** Whether an arrow in flight is a focused shot (gets the brighter trail variant); default: none are. */
   readonly arrowFocused?: (arrow: EntityId) => boolean;
   /** Reduced-motion preference, read when a trail or burst starts; default: off. */
   readonly reducedMotion?: () => boolean;
@@ -97,6 +98,8 @@ interface Slot {
   last: GeomShape | null;
   /** Arrow slots: the frame it was last seen flying. */
   seen: number;
+  /** Arrow slots: half the ribbon's width, metres (set when the trail starts). */
+  half: number;
 }
 
 /** The ribbon's base edge of a hit volume: a capsule's start; anything else, its centre. */
@@ -156,7 +159,7 @@ export class SwingTrails {
       };
       glows.push(glow);
       this.#glowOf.set(entity, glow);
-      this.#slots.set(entity, { entity, trail: null, last: null, seen: 0 });
+      this.#slots.set(entity, { entity, trail: null, last: null, seen: 0, half: 0 });
     }
     this.glows = glows;
     this.#off = options.world.events.on(ChargeReady, ({ entity, move }) => {
@@ -184,8 +187,7 @@ export class SwingTrails {
       this.#swing(entity);
       this.#charge(entity);
     }
-    const focused = this.#o.arrowFocused;
-    if (focused !== undefined && this.#o.world.isRegistered(ArrowComponent)) {
+    if (this.#o.world.isRegistered(ArrowComponent)) {
       this.#o.world.query(ArrowComponent).forEach(this.#visit);
       for (const [entity, slot] of this.#arrowSlots) {
         if (slot.seen === this.#frame) continue;
@@ -241,26 +243,35 @@ export class SwingTrails {
   }
 
   #arrow(entity: EntityId): void {
-    const focused = this.#o.arrowFocused as (arrow: EntityId) => boolean;
-    if (!focused(entity)) return;
     const flight = known(this.#o.world.get(entity, ArrowComponent));
     let slot = this.#arrowSlots.get(entity);
     if (slot === undefined) {
-      slot = { entity, trail: null, last: null, seen: 0 };
+      slot = { entity, trail: null, last: null, seen: 0, half: 0 };
       this.#arrowSlots.set(entity, slot);
       this.#slots.set(entity, slot);
     }
     slot.seen = this.#frame;
-    slot.trail ??= this.#start(slot, 'arrow', this.#o.tints.arrow, this.#o.tints.arrowAlpha);
+    let trail = slot.trail;
+    if (trail === null) {
+      const look = arrowTrailLook(
+        this.#o.tints,
+        flight.arrow,
+        this.#o.arrowFocused?.(entity) ?? false,
+      );
+      const kind = look.variant === 'focused' ? 'arrow-focused' : 'arrow';
+      trail = this.#start(slot, kind, look.rgb, look.alpha);
+      slot.half = look.halfWidth;
+    }
+    const half = slot.half;
     // The ribbon's width runs sideways across the flight, a hand's breadth.
     const d = arrowDirection(flight);
     const length = Math.hypot(d.z, d.x);
     const sx = length > 1e-6 ? d.z / length : 1;
     const sz = length > 1e-6 ? -d.x / length : 0;
     const p = flight.position;
-    slot.trail.push(
-      { x: p.x + sx * ARROW_HALF_WIDTH, y: p.y, z: p.z + sz * ARROW_HALF_WIDTH },
-      { x: p.x - sx * ARROW_HALF_WIDTH, y: p.y, z: p.z - sz * ARROW_HALF_WIDTH },
+    trail.push(
+      { x: p.x + sx * half, y: p.y, z: p.z + sz * half },
+      { x: p.x - sx * half, y: p.y, z: p.z - sz * half },
     );
   }
 
@@ -317,6 +328,3 @@ export class SwingTrails {
     if (at !== undefined) vfx.spawn(CHARGE_BURST_EFFECT, { position: at });
   }
 }
-
-/** Half the width of a focused arrow's ribbon, metres. */
-const ARROW_HALF_WIDTH = 0.025;
