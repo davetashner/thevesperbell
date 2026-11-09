@@ -11,6 +11,7 @@ import {
   fireExtinguished,
   fireIgnited,
   GuardBroken,
+  WallRecoil,
   HitParried,
   registerWorldProperties,
   World,
@@ -256,6 +257,28 @@ describe('VFX cue sheets on the game’s events (mw-e29.3)', () => {
     expect(effects).toContain('vfx-impact-critical');
     // The critical's burst rides on the accent layer beside the flesh impact.
     expect(effects).toContain('vfx-impact-ichor');
+  });
+
+  it('mw-e04.15: a wall recoil throws sparks at the contact, facing back along the wall normal', () => {
+    const { world, spawned, spawn } = game();
+    const knight = spawn('flesh');
+    const point = { x: 2, y: 1.2, z: -4.5 };
+    world.events.emit(WallRecoil, {
+      tick: 1,
+      entity: knight,
+      move: 'sword-light-1',
+      activeTick: 1,
+      point,
+      normal: { x: 0, y: 0, z: 1 },
+      ticks: 30,
+    });
+    world.events.flush();
+    expect(spawned).toHaveLength(1);
+    expect(spawned[0]?.effect).toBe('vfx-arrow-deflect-sparks');
+    expect(spawned[0]?.options).toMatchObject({ position: point, worldRotation: true });
+    // The sparks' up axis turns to the wall's normal (+z): a quarter turn about x from +y.
+    expect(spawned[0]?.options.rotation?.x).toBeCloseTo(Math.SQRT1_2, 6);
+    expect(spawned[0]?.options.rotation?.w).toBeCloseTo(Math.SQRT1_2, 6);
   });
 
   it('AC-2: a looping effect attached to an entity stops emitting when it is destroyed, and its particles finish within their lifetime', ({

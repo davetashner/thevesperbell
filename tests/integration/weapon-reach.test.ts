@@ -12,7 +12,7 @@ import { markExercised } from '@content/testing';
 import { describe, expect, it } from 'vitest';
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import { ActionSampler } from '@game/input/index';
-import { createTestbedWorld } from '@tools/replay/testbed-player-scenario';
+import { createGameWorld, createTestbedWorld } from '@tools/replay/testbed-player-scenario';
 import {
   ACTION_TIMELINE_COMPONENTS,
   ActionEnded,
@@ -53,6 +53,7 @@ import {
   WallRecoil,
   World,
   type CollisionWorld,
+  type ActionFrame,
   type EntityId,
   type GreyboxShape,
   type Hurtbox,
@@ -539,5 +540,31 @@ describe('wall recoil in the game’s testbed (mw-e04.15)', () => {
     });
     const open = swingAt(v3(0, 0, 1), 0);
     expect(open.recoils).toEqual([]);
+  });
+
+  it('the recoil corridor scene: the sword clangs off a side wall at its surface, the normal facing the knight', ({
+    task,
+  }) => {
+    markExercised(task, 'scene', 'recoil-corridor');
+    const { world } = createGameWorld<ActionFrame>(RAPIER, {
+      seed: 1,
+      hz: 60,
+      scene: 'recoil-corridor',
+    });
+    const [player] = world.query(PlayerLook).ids();
+    if (player === undefined) throw new Error('no player');
+    const sampler = new ActionSampler();
+    const recoils: WallRecoilInfo[] = [];
+    world.events.on(WallRecoil, (e) => recoils.push(e));
+    for (let i = 0; i < 40; i++) world.step(sampler.sampleCommands(world.tick));
+    sampler.down('Mouse0');
+    world.step(sampler.sampleCommands(world.tick));
+    sampler.up('Mouse0');
+    for (let i = 0; i < 40; i++) world.step(sampler.sampleCommands(world.tick));
+    expect(recoils).toHaveLength(1);
+    const [recoil] = recoils;
+    // The side walls' faces are at x = ±1.15; the normal points back into the corridor.
+    expect(Math.abs(recoil?.point.x ?? 0)).toBeCloseTo(1.15, 2);
+    expect(recoil?.normal.x).toBe(-Math.sign(recoil?.point.x ?? 0));
   });
 });

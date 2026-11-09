@@ -10,7 +10,8 @@
 //   creature a dodge made untouchable counts as struck, since the blade reached it first;
 // - its blade meets static geometry. The blade is probed with two rays through the collision world:
 //   along the blade's axis (handle to point, so a blade swung into a wall edge-on or begun inside
-//   one is caught) and along the path the point travelled this tick (so a fast arc cannot skip a
+//   one is caught) and along the path the point travelled this tick, cast back from where it is now so a wall it passed
+//   through is met at its surface (so a fast arc cannot skip a
 //   thin wall). Only level geometry counts: a collider the world says is not static (a crate, a
 //   door, a platform) never recoils a swing.
 //
@@ -90,7 +91,7 @@ function contactOf(
   const before = axisOf(sweptFrom);
   return (
     cast(collision, now[0], now[1]) ??
-    (before === undefined ? undefined : cast(collision, before[1], now[1]))
+    (before === undefined ? undefined : cast(collision, now[1], before[1]))
   );
 }
 
