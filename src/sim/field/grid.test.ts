@@ -71,6 +71,27 @@ describe('ElementField values', () => {
   });
 });
 
+describe('ElementField chunk links', () => {
+  it('links face neighbours both ways as chunks come and go', () => {
+    const field = new ElementField();
+    const a = field.allocate(0, 0, 0);
+    const east = field.allocate(1, 0, 0);
+    const up = field.allocate(0, 1, 0);
+    const far = field.allocate(5, 5, 5);
+    if (!a || !east || !up || !far) throw new Error('allocation refused');
+    expect(a.links).toEqual([east, undefined, up, undefined, undefined, undefined]);
+    expect(east.links[1]).toBe(a); // -x of the east chunk is the first one
+    expect(up.links[3]).toBe(a); // -y of the upper chunk
+    expect(far.links.every((link) => link === undefined)).toBe(true);
+    field.release(a);
+    expect(east.links[1]).toBeUndefined();
+    expect(up.links[3]).toBeUndefined();
+    const again = field.allocate(0, 0, 0);
+    expect(again?.links[0]).toBe(east);
+    expect(east.links[1]).toBe(again);
+  });
+});
+
 describe('ElementField conductivity', () => {
   it('stores per-cell conductivity; walls drop what they held', () => {
     const field = new ElementField();

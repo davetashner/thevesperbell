@@ -59,8 +59,12 @@ interface Buffer {
 const value = <T>(items: ArrayLike<T>, index: number): T => items[index] as T;
 const level = <T>(items: ArrayLike<T>, index: number): T => items[index] as T;
 
-/** Every cell open air: the conductivity table of a chunk without walls. */
-const OPEN = new Uint16Array(CHUNK_CELLS).fill(CONDUCTIVITY_ONE);
+/**
+ * Delta buffers returned by finished ticks, all zero, so a tick over thousands of chunks does not
+ * allocate and collect megabytes every tick. Bounded; nothing about them is observable.
+ */
+const SPARE_LIMIT = 4096;
+const spare: Float64Array[] = [];
 
 /** Per-tick working state: every buffer, participating or receiving, by its values array. */
 class Tick {
@@ -69,7 +73,8 @@ class Tick {
   constructor(readonly field: ElementField) {}
 
   buffer(chunk: Chunk, channel: FieldChannel, values: Float64Array, participating: boolean) {
-    const buffer = { chunk, channel, values, delta: new Float64Array(CHUNK_CELLS), participating };
+    const delta = spare.pop() ?? new Float64Array(CHUNK_CELLS);
+    const buffer = { chunk, channel, values, delta, participating };
     this.buffers.set(values, buffer);
     return buffer;
   }
@@ -94,7 +99,7 @@ interface Side {
 }
 
 function side(tick: Tick, chunk: Chunk, face: number, channel: FieldChannel): Side {
-  const other = tick.field.chunkAtCoords(...tick.across(chunk, face));
+  const other = chunk.links[face];
   const values = other?.layers.get(channel);
   return { other, values, target: values === undefined ? undefined : tick.buffers.get(values) };
 }
@@ -135,19 +140,30 @@ function boundary(tick: Tick, source: Buffer, face: number, rate: number, epsilo
   const ownBase = positive ? LAST * stride : 0;
   const otherBase = positive ? 0 : LAST * stride;
   const s = side(tick, chunk, face, channel);
-  if (s.target?.participating === true && !positive) return; // counted from the other side
+  const shared = s.target?.participating === true;
+  if (shared && !positive) return; // counted from the other side
+  const ownTable = chunk.conductivity;
+  // Without walls on either side every pair has conductivity one, so the rate is the only factor.
+  const gain = ownTable === undefined && s.other?.conductivity === undefined ? rate : undefined;
   for (let u = 0; u < CHUNK_SIZE; u++) {
     for (let v = 0; v < CHUNK_SIZE; v++) {
       const offset = u * s1 + v * s2;
       const index = ownBase + offset;
       const a = value(values, index);
       // Calm cells never spill into a chunk that doesn't hold the channel.
-      if (s.target?.participating !== true && a <= epsilon && a >= -epsilon) continue;
+      if (!shared && a <= epsilon && a >= -epsilon) continue;
       const nIndex = otherBase + offset;
       const b = s.values === undefined ? 0 : value(s.values, nIndex);
       if (a === b) continue;
-      const own = conductivityAt(chunk, index);
-      const flux = fluxOf(a, b, rate, Math.min(own, conductivityAt(s.other, nIndex)));
+      const flux =
+        gain === undefined
+          ? fluxOf(
+              a,
+              b,
+              rate,
+              Math.min(conductivityAt(chunk, index), conductivityAt(s.other, nIndex)),
+            )
+          : Math.trunc(((a - b) * gain * CONDUCTIVITY_ONE) / SCALE);
       if (flux === 0) continue;
       const target = s.target ?? receive(tick, chunk, face, s, channel);
       if (target === undefined) return; // the chunk cap refused the neighbour: a wall
@@ -157,10 +173,51 @@ function boundary(tick: Tick, source: Buffer, face: number, rate: number, epsilo
   }
 }
 
-/** Computes every face flux of `source`'s cells into the tick's delta buffers. */
-function diffuse(tick: Tick, source: Buffer, rate: number, epsilon: number): number {
-  const { values, delta } = source;
-  const table = source.chunk.conductivity ?? OPEN;
+/**
+ * The interior faces of a chunk with no walls: every cell open, so each face's conductivity is
+ * CONDUCTIVITY_ONE and the rate × conductivity product is one constant. Each of a cell's +x, +y and
+ * +z faces inside the chunk is counted once, here.
+ */
+function interiorOpen(values: Float64Array, delta: Float64Array, rate: number): void {
+  const gain = (rate * CONDUCTIVITY_ONE) / SCALE; // exact: SCALE is a power of two
+  const plane = CHUNK_SIZE * CHUNK_SIZE;
+  for (let z = 0; z < CHUNK_SIZE; z++) {
+    for (let y = 0; y < CHUNK_SIZE; y++) {
+      const row = (z * CHUNK_SIZE + y) * CHUNK_SIZE;
+      let fromLeft = 0; // what the -x face brought into the cell
+      for (let x = 0; x < CHUNK_SIZE; x++) {
+        const index = row + x;
+        const a = value(values, index);
+        let out = 0; // what the +x, +y and +z faces take out of the cell
+        let toRight = 0;
+        if (x < LAST) {
+          toRight = Math.trunc((a - value(values, index + 1)) * gain);
+          out += toRight;
+        }
+        if (y < LAST) {
+          const flux = Math.trunc((a - value(values, index + CHUNK_SIZE)) * gain);
+          delta[index + CHUNK_SIZE] = value(delta, index + CHUNK_SIZE) + flux;
+          out += flux;
+        }
+        if (z < LAST) {
+          const flux = Math.trunc((a - value(values, index + plane)) * gain);
+          delta[index + plane] = value(delta, index + plane) + flux;
+          out += flux;
+        }
+        delta[index] = value(delta, index) + fromLeft - out;
+        fromLeft = toRight;
+      }
+    }
+  }
+}
+
+/** The interior faces of a chunk with a conductivity table; returns the cells that are not walls. */
+function interiorWalled(
+  values: Float64Array,
+  delta: Float64Array,
+  table: Uint16Array,
+  rate: number,
+): number {
   let updated = 0;
   for (let index = 0; index < CHUNK_CELLS; index++) {
     const own = level(table, index);
@@ -179,6 +236,16 @@ function diffuse(tick: Tick, source: Buffer, rate: number, epsilon: number): num
       delta[next] = value(delta, next) + flux;
     }
   }
+  return updated;
+}
+
+/** Computes every face flux of `source`'s cells into the tick's delta buffers. */
+function diffuse(tick: Tick, source: Buffer, rate: number, epsilon: number): number {
+  const { values, delta } = source;
+  const table = source.chunk.conductivity;
+  let updated = CHUNK_CELLS;
+  if (table === undefined) interiorOpen(values, delta, rate);
+  else updated = interiorWalled(values, delta, table, rate);
   for (let face = 0; face < FACES.length; face++) boundary(tick, source, face, rate, epsilon);
   return updated;
 }
@@ -188,17 +255,34 @@ function account(lost: Map<string, number>, channel: FieldChannel, amount: numbe
   lost.set(channel, (lost.get(channel) ?? 0) + amount);
 }
 
-/** Applies deltas and ambient loss to every buffer. */
+/**
+ * Applies deltas and ambient loss to every buffer, zeroing each delta and handing it back to the
+ * spare pool for the next tick.
+ */
 function apply(tick: Tick, lost: Map<string, number>): void {
   for (const { channel, values, delta } of tick.buffers.values()) {
     const { decay } = tick.field.channel(channel);
+    const keep = decay / RATE_ONE; // exact: RATE_ONE is a power of two
     let removed = 0;
-    for (let i = 0; i < CHUNK_CELLS; i++) {
-      const next = value(values, i) + value(delta, i);
-      const loss = decay === 0 ? 0 : Math.trunc((next * decay) / RATE_ONE);
-      values[i] = next - loss;
-      removed += loss;
+    if (decay === 0) {
+      for (let i = 0; i < CHUNK_CELLS; i++) {
+        values[i] = value(values, i) + value(delta, i);
+        delta[i] = 0;
+      }
+    } else {
+      for (let i = 0; i < CHUNK_CELLS; i++) {
+        const next = value(values, i) + value(delta, i);
+        delta[i] = 0;
+        if (next === 0) {
+          values[i] = 0;
+          continue;
+        }
+        const loss = Math.trunc(next * keep);
+        values[i] = next - loss;
+        removed += loss;
+      }
     }
+    if (spare.length < SPARE_LIMIT) spare.push(delta);
     if (removed !== 0) account(lost, channel, removed);
   }
 }

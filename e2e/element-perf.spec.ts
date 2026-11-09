@@ -6,8 +6,10 @@ import { runConsole, stubPointerLock, takeControl } from './helpers/player';
 //
 //   VESPER_PERF=1 pnpm exec playwright test e2e/element-perf.spec.ts --headed
 //
-// In the testbed, five rows of eight crates are spawned ahead of the player and heated past their
-// ignition point from the debug console; once 40 are burning and the smoke they make is drawn, the
+// In the testbed, five rows of eight crates are spawned ahead of the player, inside the room (a crate
+// that slips past the room's edge falls for ever, burning, and drags a heat trail through the void:
+// the first version of this spec measured that, mw-e03.52), and heated past their ignition point
+// from the debug console; once 40 are burning and the smoke they make is drawn, the
 // page's own animation frames are timed for VESPER_PERF_SECONDS (default 15). Budget: frame
 // interval p95 ≤ 16.7 ms (60 fps). VESPER_PERF_CHANNEL=chrome uses installed Chrome.
 
@@ -21,7 +23,7 @@ interface Probe {
   live: number;
   culled: number;
   vfx: number;
-  objects: { id: number; x: number; z: number }[];
+  objects: { id: number; x: number; y: number; z: number }[];
 }
 
 test.skip(process.env['VESPER_PERF'] !== '1', 'set VESPER_PERF=1 (and run headed) to measure');
@@ -47,7 +49,7 @@ test('AC-4: 40 burning entities and a smoke cloud keep frame time p95 ≤ 16.7 m
   await takeControl(page);
   const before = new Set((await probe(page)).objects.map((o) => o.id));
   for (let row = 0; row < 5; row++) {
-    await runConsole(page, `tp -3.5 0 ${String(0.5 + row * 1.5)}`);
+    await runConsole(page, `tp -4 0 ${String(-4.2 + row * 1.5)}`);
     await runConsole(page, 'spawn testprop-crate 8');
   }
   await runConsole(page, 'tp 0 0 -1');
@@ -83,5 +85,8 @@ test('AC-4: 40 burning entities and a smoke cloud keep frame time p95 ≤ 16.7 m
   const summary = `frame p50/p95/p99 ${q(0.5).toFixed(2)}/${q(0.95).toFixed(2)}/${q(0.99).toFixed(2)} ms over ${String(frames.length)} frames; ${String(at.perState['burning'])} burning, ${String(after.clouds)} smoke clouds, ${String(after.live)} live handles, ${String(after.vfx)} effects`;
   console.log(`[perf] ${summary}`);
   test.info().annotations.push({ type: 'perf', description: summary });
+  // Every crate still stands on the floor: none has fallen out of the world.
+  const fallen = after.objects.filter((o) => crates.includes(o.id) && o.y < -1);
+  expect(fallen).toHaveLength(0);
   expect(q(0.95)).toBeLessThanOrEqual(BUDGET_MS);
 });
