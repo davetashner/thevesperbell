@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = Number(process.env['E2E_PORT'] ?? '4173');
 const PLAYTHROUGH = 'slice-playthrough.spec.ts';
+const CROSS_BROWSER = ['audio.spec.ts', 'magic-materials.spec.ts'];
 
 // Smoke tests run against the production build served by `vite preview`.
 export default defineConfig({
@@ -30,8 +31,10 @@ export default defineConfig({
     { name: 'playthrough', use: { ...devices['Desktop Chrome'] }, testMatch: PLAYTHROUGH },
     // Web Audio differs per engine (autoplay policy, AudioListener params, codecs), so the audio
     // testbed also runs in Firefox and WebKit (mw-e28.1 AC-6).
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] }, testMatch: 'audio.spec.ts' },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] }, testMatch: 'audio.spec.ts' },
+    // The magical materials are raw GLSL, which compiles differently per engine, so their material
+    // test scene also runs in Firefox and WebKit (mw-e29.7 AC-1).
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] }, testMatch: CROSS_BROWSER },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] }, testMatch: CROSS_BROWSER },
   ],
   webServer: {
     // Call vite directly (not via `pnpm preview`): pnpm's wrapper doesn't forward SIGTERM,

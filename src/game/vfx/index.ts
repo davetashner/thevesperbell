@@ -60,3 +60,5 @@ export * from './trail-tints.ts';
 export * from './element-feedback.ts';
 export * from './element-fields.ts';
 export * from './element-look.ts';
+export * from './magic-materials.ts';
+export * from './corpse-glue.ts';

@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Creatures that die now collapse and then dissolve away over a second and a bit, their bones breaking up along a cold cyan edge instead of lying where they fell for ever. The game also gains a shared set of magical looks for spells, summons and deaths: dissolve, rim glow, heat haze (on High graphics only), rune circles on the ground, pulsing glow and soft-edged puffs; nothing in them flashes faster than twice a second, and reduced motion holds them still.
 - Burning, wet, frozen and charged things now read at a glance: flames rise off burning objects, soaked ones darken and drip, frozen ones turn icy with drifting frost, charged ones shimmer and throw sparks, and smoke and steam hang in the air as clouds.
 - The knight now carries his sword at the low-ready, elbow bent and the blade angled out and away from his body, instead of hanging straight down beside his leg; attacks, blocks and dodges start from and return to it (mw-a6t).
 - The battle music now begins on the first strong hit, 1.75 seconds into the track, instead of from its very start (mw-03t).
