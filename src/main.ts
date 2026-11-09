@@ -26,6 +26,7 @@ import {
 import {
   arrowReadout,
   bindArrows,
+  readWobbledArrowTransform,
   bindSandboxDummies,
   createSandboxHud,
   dummyReadout,
@@ -235,6 +236,7 @@ import { SaveSlots } from '@game/save/slots/index';
 import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
 import {
+  ArrowFx,
   attachCorpseDissolves,
   type CorpseGlue,
   DamageVignette,
@@ -255,6 +257,8 @@ import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
 import { createThrowArc } from '@render/player/index';
 import { createDoorLeaf, disposeDoorLeaf } from '@render/mechanisms/index';
 import {
+  breakArrowShaft,
+  createArrowFxRenderer,
   createArrowShaft,
   createSandboxDummy,
   createTrainingDummy,
@@ -379,6 +383,7 @@ import { bindDebugCameraInput, DebugCamera } from '@tools/debug-camera/index';
 import { layer as tools } from '@tools/index';
 import { sceneAgitator } from '@tools/perf/agitator';
 import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
+import { ArrowDemo, parseArrowDemoParam } from '@tools/arrow-demo/index';
 import { formatVfxStats, parseVfxParam, VfxDemo } from '@tools/vfx-demo/index';
 import {
   CombatHud,
@@ -867,7 +872,8 @@ function startRenderer(
     const vfxAnchor = (entity: EntityId) =>
       readPhysicsObjectTransform(world, entity) ??
       readDummyTransform(world, entity) ?? // any placed entity: the dummies and the player
-      readSceneTransform(world, entity);
+      readSceneTransform(world, entity) ??
+      readArrowTransform(world, entity); // arrows in flight and at rest: their trails follow them
     const vfx = new VfxSystem({ effects: content.all('vfx-effect'), anchors: vfxAnchor });
     // VFX cue sheets (mw-e29.3): the same sim events as the audio cue sheets spawn effects — hit
     // dust and sparks, the parry flash, impact puffs, break debris, burning loops. Event-driven, so
@@ -881,6 +887,23 @@ function startRenderer(
       locate: vfxAnchor,
       now: () => performance.now(),
     });
+    // Arrow effects (mw-e29.11) that are not particles: the wet decal, noise ring, rope unfurl,
+    // stuck-arrow wobble and broken shaft, from the same arrowImpact event as the cue sheets.
+    const arrowShafts = new Map<EntityId, Object3D>();
+    const arrowFx = new ArrowFx({
+      world,
+      arrows: content.all('arrow'),
+      now: () => performance.now(),
+      reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+      breakShaft: (entity) => {
+        const shaft = arrowShafts.get(entity);
+        if (shaft === undefined) return false;
+        breakArrowShaft(shaft);
+        return true;
+      },
+    });
+    arrowFx.attach();
+    const arrowFxView = createArrowFxRenderer(view.scene);
     // Element state feedback (mw-e03.28): burning, wet, frozen and charged things get their VFX,
     // mesh look and cue from the element-feedback table, by property, never entity type. Gas in
     // the element field (smoke, steam) is drawn as clouds. Both read the sim and never write to it.
@@ -1018,6 +1041,11 @@ function startRenderer(
     };
     const vfxMode = parseVfxParam(location.search);
     let vfxDemo: VfxDemo | undefined;
+    // ?arrows=demo|<id> looses the shipped arrows at the back wall and publishes what the arrow
+    // effects are doing on #app[data-arrow-fx] (the e2e probe, mw-e29.11).
+    const arrowDemoOrder = parseArrowDemoParam(location.search);
+    let arrowDemo: ArrowDemo | undefined;
+    let publishedArrowFx = '';
     let vfxStats: HTMLElement | undefined;
     let vfxStatsAgeMs = Infinity;
     if (vfxMode !== undefined) {
@@ -1109,10 +1137,19 @@ function startRenderer(
     let arrowsSeen = false;
     let publishedArrows = '';
     const drawArrows = (): void => {
-      const bound = bindArrows(world, sync, () => {
+      const bound = bindArrows(world, sync, (entity) => {
         const shaft = createArrowShaft();
         view.scene.add(shaft);
-        return { ...object3DBinding(shaft, readArrowTransform), dispose: disposeArrowShaft };
+        arrowShafts.set(entity, shaft);
+        return {
+          ...object3DBinding(shaft, (v, e) =>
+            readWobbledArrowTransform(v, e, arrowFx.wobble.bind(arrowFx)),
+          ),
+          dispose: (object: Object3D) => {
+            arrowShafts.delete(entity);
+            disposeArrowShaft(object);
+          },
+        };
       });
       if (bound > 0) arrowsSeen = true;
     };
@@ -1276,6 +1313,7 @@ function startRenderer(
         }
         showControls();
         vfxDemo?.update(elapsedMs / 1000);
+        arrowDemo?.update(Math.max(0, elapsedMs) / 1000);
         elements.update(camera.position);
         gasClouds.update(elapsedMs / 1000, camera.position);
         const looked = new Map<Object3D, CombinedLook>();
@@ -1335,6 +1373,22 @@ function startRenderer(
         if (swingTrails !== undefined) {
           swingTrails.frame();
           trailView.draw(swingTrails);
+        }
+        arrowFx.frame();
+        arrowFxView.draw(arrowFx.view);
+        if (arrowDemo !== undefined) {
+          const { view: fxView } = arrowFx;
+          const json = JSON.stringify({
+            ...arrowDemo.stats,
+            decals: fxView.decals.map((d) => d.radius),
+            rings: fxView.rings.length,
+            ropes: fxView.ropes.length,
+            broken: fxView.broken.length,
+            wobbling: arrowFx.wobbling,
+            wobbles: arrowFx.wobblesStarted,
+            particles: vfx.stats().particles,
+          });
+          if (json !== publishedArrowFx) root.dataset['arrowFx'] = publishedArrowFx = json;
         }
         showVfxStats(elapsedMs);
         audio.update(listenerPose(camera.position, camera.quaternion));
@@ -2301,6 +2355,9 @@ function startRenderer(
         const [x, y, z] = scene.camera.target;
         const centre = playerStart(loaded.layout.spawns)?.position ?? { x, y, z };
         vfxDemo = new VfxDemo(vfx, vfxMode, centre);
+      }
+      if (arrowDemoOrder !== undefined) {
+        arrowDemo = new ArrowDemo(world, combat.bow.arrows, arrowDemoOrder);
       }
       if (magicMode !== undefined) {
         magicDemo = new MagicDemo(

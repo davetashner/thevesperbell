@@ -1,0 +1,28 @@
+{
+  "id": "vfx-arrow-trail-standard",
+  "notes": "Arrow flight (mw-e29.11), the plain arrow's own trail cue and the one noise and blunt arrows share: a few pale motes shed along the flight so a shot reads as it crosses the room. The ribbon behind the shaft (src/game/vfx trail-controller) does the streak; this only adds grain. Plays while the arrow flies and stops at its first impact. Style bible §8: alpha-blended, small, no flashing.",
+  "priority": 25,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "motes",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "alpha",
+      "rate": 22,
+      "lifetime": { "min": 0.2, "max": 0.35 },
+      "speed": { "min": 0, "max": 0.2 },
+      "coneDeg": 180,
+      "spawnRadius": 0.02,
+      "size": [
+        { "t": 0, "v": 0.04 },
+        { "t": 1, "v": 0.015 }
+      ],
+      "color": "#F3E7C4",
+      "alpha": [
+        { "t": 0, "v": 0.5 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

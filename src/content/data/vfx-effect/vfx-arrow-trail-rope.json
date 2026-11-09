@@ -1,0 +1,29 @@
+{
+  "id": "vfx-arrow-trail-rope",
+  "notes": "Rope arrow (mw-e29.11): tan fibres shed behind the trailing line, drifting down slowly, so the rope arrow reads as the one that carries a cord (hemp #C9A26B). Plays while it flies and stops at its impact; the unfurling ribbon at the landing is drawn by the arrow effects (src/game/vfx/arrow-fx.ts).",
+  "priority": 28,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "fibres",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "alpha",
+      "rate": 18,
+      "lifetime": { "min": 0.4, "max": 0.7 },
+      "speed": { "min": 0, "max": 0.15 },
+      "coneDeg": 180,
+      "spawnRadius": 0.04,
+      "gravity": 1.2,
+      "size": [
+        { "t": 0, "v": 0.05 },
+        { "t": 1, "v": 0.02 }
+      ],
+      "color": "#C9A26B",
+      "alpha": [
+        { "t": 0, "v": 0.7 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

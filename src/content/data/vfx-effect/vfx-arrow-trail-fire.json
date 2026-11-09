@@ -1,0 +1,49 @@
+{
+  "id": "vfx-arrow-trail-fire",
+  "notes": "Fire arrow (mw-e29.11): a streak of teardrop flames and a few rising embers behind the burning head, style bible §2.3 Fire (core #FF7A1A, highlight #FFD36B, accent #C8331A; rising and licking, 8-12 Hz flicker from the 24 fps flipbook, never a full-flash). Follows the arrow in flight and keeps burning while it sticks, until the fire goes out (fireExtinguished, fireBurntOut) or the arrow leaves the world.",
+  "priority": 45,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "flames",
+      "texture": "vfx-base-flame-8x8-01",
+      "flipbook": { "cols": 8, "rows": 8, "fps": 24 },
+      "blend": "additive",
+      "rate": 34,
+      "lifetime": { "min": 0.25, "max": 0.45 },
+      "speed": { "min": 0.1, "max": 0.4 },
+      "coneDeg": 25,
+      "spawnRadius": 0.04,
+      "gravity": -1.8,
+      "size": [
+        { "t": 0, "v": 0.2 },
+        { "t": 1, "v": 0.06 }
+      ],
+      "color": [
+        { "t": 0, "color": "#FFD36B" },
+        { "t": 0.5, "color": "#FF7A1A" },
+        { "t": 1, "color": "#C8331A" }
+      ]
+    },
+    {
+      "id": "embers",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 9,
+      "lifetime": { "min": 0.4, "max": 0.8 },
+      "speed": { "min": 0.2, "max": 0.7 },
+      "coneDeg": 90,
+      "spawnRadius": 0.05,
+      "gravity": -0.6,
+      "size": [
+        { "t": 0, "v": 0.035 },
+        { "t": 1, "v": 0.01 }
+      ],
+      "color": [
+        { "t": 0, "color": "#FFD36B" },
+        { "t": 1, "color": "#C8331A" }
+      ]
+    }
+  ]
+}

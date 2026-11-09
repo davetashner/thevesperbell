@@ -1,0 +1,28 @@
+{
+  "id": "vfx-arrow-deflect-sparks",
+  "notes": "Deflected arrow (mw-e29.11): a quick fan of hot sparks at the contact where an arrow glanced off armour or hard stone and flew on, thrown out along the surface normal. Shorter and tighter than the blade-on-metal sparks so an arrow reads as a skipped shot, not a sword clash. Under 0.3 s, additive but small, so it is never a flash.",
+  "priority": 55,
+  "duration": 0.35,
+  "emitters": [
+    {
+      "id": "sparks",
+      "texture": "vfx-base-spark-streak-01",
+      "blend": "additive",
+      "bursts": [{ "at": 0, "count": 22 }],
+      "lifetime": { "min": 0.2, "max": 0.35 },
+      "speed": { "min": 3, "max": 7 },
+      "coneDeg": 50,
+      "gravity": 9.8,
+      "drag": 1.5,
+      "size": [
+        { "t": 0, "v": 0.11 },
+        { "t": 1, "v": 0.03 }
+      ],
+      "color": [
+        { "t": 0, "color": "#FFE7A8" },
+        { "t": 0.5, "color": "#FF9A3C" },
+        { "t": 1, "color": "#C8331A" }
+      ]
+    }
+  ]
+}

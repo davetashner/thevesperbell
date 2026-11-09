@@ -26,6 +26,7 @@ import {
 } from '@sim/index';
 import type { ProjectToNdc } from '../creatures';
 import type { Quat, RenderSync, SceneBinding, SimView, Transform } from '../loop/render-sync';
+import { withWobble } from '../vfx/arrow-fx.ts';
 
 /** The rotation that turns +z onto unit direction `d`. */
 export function pointAlong(d: Vec3): Quat {
@@ -55,6 +56,22 @@ export function readArrowTransform(view: SimView, entity: EntityId): Transform |
     : undefined;
   if (rest === undefined) return undefined;
   return { position: rest.position, rotation: pointAlong(rest.direction) };
+}
+
+/**
+ * `readArrowTransform` with the quiver of an arrow that just stuck (mw-e29.11): `wobble` gives the
+ * angle in radians (0 when the arrow is still), applied about the shaft's own sideways axis at its tip.
+ */
+export function readWobbledArrowTransform(
+  view: SimView,
+  entity: EntityId,
+  wobble: (arrow: EntityId) => number,
+): Transform | undefined {
+  const transform = readArrowTransform(view, entity);
+  if (transform === undefined) return undefined;
+  const angle = wobble(entity);
+  if (angle === 0) return transform;
+  return { position: transform.position, rotation: withWobble(transform.rotation, angle) };
 }
 
 /**
