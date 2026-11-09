@@ -10,8 +10,8 @@ release candidate.
 | **nightly** | `nightly.yml`, 03:43 UTC on `main` and on `workflow_dispatch` | one GitHub issue labelled `nightly-failure` is opened, or commented on if already open; a green run closes it |
 | **release** | the whole nightly set against a release candidate (mw-e41.12), via the reusable `slow-gates.yml` | the release does not ship |
 
-Nightly gates are release gates too: `slow-gates.yml` is a `workflow_call` workflow with `bench`, `audio`
-and `perf` switches and an optional `ref`, so nightly, the main-push baseline and the release gate share
+Nightly gates are release gates too: `slow-gates.yml` is a `workflow_call` workflow with `bench`, `audio`,
+`perf` and `matrix` switches and an optional `ref`, so nightly, the main-push baseline and the release gate share
 one definition.
 
 ## Jobs
@@ -27,8 +27,10 @@ one definition.
 | `e2e-playthrough` (ci.yml) | per-PR | The slice playthrough replays a whole run; kept on every PR until path-aware selection lands (mw-e41.4). |
 | `e2e-smoke` (ci.yml) | per-PR | Aggregates the e2e jobs under the required check name. |
 | `perf-budget` (ci.yml) | per-PR tier skipped; runs on push to `main` | Publishes the `perf-report` baseline artifact. Warn-only on GPU-less runners, ~510 s, so it is off every PR's critical path. |
+| `interaction-matrix` (ci.yml) | per-PR | 500 generated worlds x 300 ticks from a fixed seed keep every invariant (about 20 s), and the interaction matrix is regenerated, checked against the committed file and diffed into the job summary (mw-e03.26). |
 | `build` (ci.yml) | per-PR | The production build must work; required. |
 | `beads-validate` (ci.yml) | per-PR | Seconds; validates the backlog export; required. |
+| `element-matrix` (slow-gates.yml) | nightly, release | The same property run over 8000 worlds from a daily seed: finds the rare combinations the fixed seed misses (mw-e03.26). |
 | `bench` (slow-gates.yml) | nightly, release | Vitest benchmark budgets (sim `step()` mean, mw-e00.15 AC-6); timing-sensitive and slow-moving. |
 | `e2e-audio` (slow-gates.yml) | nightly, release | Firefox and WebKit Web Audio testbed with PulseAudio; engine differences change with browser releases, not with our PRs. |
 | `perf-budget` (slow-gates.yml) | nightly, release | The perf budget suite including the wall-clock load budgets (mw-e41.8); noisy on shared runners. |
