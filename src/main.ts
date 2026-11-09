@@ -916,6 +916,9 @@ function startRenderer(
     // (last-known-position ghost, noise ripple), both off unless the player turns them on. Read-only
     // over the sim; `?awareness=demo` lines up stand-ins in every state for the e2e and screenshots.
     const awarenessDemo = parseAwarenessDemoParam(location.search);
+    // Publishes #app[data-awareness] for the e2e only: this is built every frame otherwise.
+    const awarenessProbe =
+      awarenessDemo || new URLSearchParams(location.search).get('debug') === '1';
     const awarenessFx = new AwarenessFx({
       world,
       now: () => performance.now(),
@@ -1423,7 +1426,7 @@ function startRenderer(
         }
         awarenessFx.frame(camera.position);
         awarenessView.draw(awarenessFx.view, camera);
-        {
+        if (awarenessProbe) {
           const { view: fx } = awarenessFx;
           const json = JSON.stringify({
             indicators: fx.indicators.map((i) => [
