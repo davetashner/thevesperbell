@@ -14,6 +14,7 @@ import {
   DepthTexture,
   FramebufferTexture,
   LinearFilter,
+  NearestFilter,
   MeshDepthMaterial,
   Vector2,
   WebGLRenderTarget,
@@ -164,10 +165,12 @@ export class SoftDepthPass {
     if (target?.width !== width || target.height !== height) {
       target?.depthTexture?.dispose();
       target?.dispose();
-      target = new WebGLRenderTarget(width, height, {
-        depthBuffer: true,
-        depthTexture: new DepthTexture(width, height),
-      });
+      // Depth is read texel for texel: a linear filter on a depth texture is implementation-defined
+      // (Firefox warns about it).
+      const depthTexture = new DepthTexture(width, height);
+      depthTexture.minFilter = NearestFilter;
+      depthTexture.magFilter = NearestFilter;
+      target = new WebGLRenderTarget(width, height, { depthBuffer: true, depthTexture });
       this.#target = target;
     }
     // Only what writes depth: particles, ribbons, hazes and other see-through things stay out.

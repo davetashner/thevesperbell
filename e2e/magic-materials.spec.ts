@@ -14,6 +14,11 @@ import { attachFrame, captureFrame, distinct } from './helpers/canvas';
 // Driver performance notices from the GPU process are not our errors (see e2e/render-boot.spec.ts).
 const DRIVER_PERF_NOTICE = /^\[\.WebGL-[^\]]+\]GL Driver Message \([^)]*\bPerformance\b/;
 
+// Firefox warns once on every scene (the plain testbed too, with none of the magical materials) that
+// the shadow map is sampled with a linear filter on a depth texture. That is the game's soft shadows,
+// not these materials; it belongs to the cross-browser smoke (mw-e32.4), so it is let through here.
+const FIREFOX_SHADOW_NOTICE = 'Depth texture comparison requests';
+
 interface MagicProbe {
   tier: 'high' | 'low';
   hazes: number;
@@ -35,7 +40,7 @@ function collectProblems(page: Page): string[] {
   const problems: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() !== 'error' && msg.type() !== 'warning') return;
-    if (DRIVER_PERF_NOTICE.test(msg.text())) return;
+    if (DRIVER_PERF_NOTICE.test(msg.text()) || msg.text().includes(FIREFOX_SHADOW_NOTICE)) return;
     problems.push(`${msg.type()}: ${msg.text()}`);
   });
   page.on('pageerror', (err) => problems.push(`pageerror: ${err.message}`));
