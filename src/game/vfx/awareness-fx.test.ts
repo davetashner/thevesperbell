@@ -307,6 +307,9 @@ describe('AwarenessFx', () => {
     for (let i = 0; i < 10; i++) noise({ x: i, y: 0, z: 0 });
     // The first starts now, the second waits one interval, the rest would wait too long.
     expect(fx.ripplesStarted).toBe(2);
+    // The second is queued: until its turn comes only the first is drawn.
+    fx.frame(CAMERA);
+    expect(fx.view.ripples).toHaveLength(1);
     advance(RIPPLE_INTERVAL_S * 1000 * 2);
     for (let i = 0; i < MAX_RIPPLES + 3; i++) {
       noise({ x: i, y: 0, z: 0 });
