@@ -143,10 +143,14 @@ export interface DeltaApplyReport {
 /** A level's authored entities and their state as spawned. */
 export interface LevelBaseline {
   readonly level: string;
-  /** Stable id → entity, in authored order. */
-  readonly entities: ReadonlyMap<string, EntityId>;
+  /** Stable id → entity, in authored order (a fact-gated spawn leaves and joins it, mw-e27.8). */
+  readonly entities: Map<string, EntityId>;
   /** Stable id → declaration key → captured state (absent: not covered). */
-  readonly states: ReadonlyMap<string, Readonly<Record<string, unknown>>>;
+  readonly states: Map<string, Readonly<Record<string, unknown>>>;
+  /** Ids authored but not spawned now (their fact gate is closed): their deltas are kept (mw-e27.8). */
+  readonly dormant: ReadonlySet<string>;
+  /** The deltas of dormant entities, kept until they spawn and apply them (mw-e27.8). */
+  readonly carried: Map<string, EntityDelta>;
 }
 
 export interface WorldPersistenceOptions {
@@ -156,6 +160,21 @@ export interface WorldPersistenceOptions {
   readonly spawners?: readonly PersistentSpawner[];
   /** Told about every skipped part of a delta. */
   readonly warn?: (message: string) => void;
+}
+
+/**
+ * The stable ids of the authored entities a loaded scene did not spawn because their spawn's fact
+ * gate is closed (mw-e27.8): `spawn:<id>` and, for a creature spawn, `creature:<id>`.
+ */
+export function sceneDormantEntities(loaded: LoadedScene): string[] {
+  const present = new Set(loaded.spawns.map(({ spawn }) => spawn.id));
+  return loaded.authoredSpawns.flatMap(({ id, creature }) =>
+    present.has(id)
+      ? []
+      : creature === undefined
+        ? [`spawn:${id}`]
+        : [`spawn:${id}`, `creature:${id}`],
+  );
 }
 
 /** A spawn point's creature, scene spawns and pieces under their stable ids, in that order. */
@@ -205,12 +224,15 @@ export class WorldPersistence {
    * The baseline of `level`: its authored entities (`[stable id, entity]`, e.g. from
    * `sceneAuthoredEntities`) and their state now. Take it right after spawning the level, before
    * applying any delta.
+   * `dormant` names authored entities that are not spawned now (see `sceneDormantEntities`): deltas
+   * stored for them are kept, not dropped as unknown.
    * @throws RangeError when two authored entities share an id.
    */
   baseline(
     world: World<never>,
     level: string,
     authored: Iterable<readonly [string, EntityId]>,
+    dormant: Iterable<string> = [],
   ): LevelBaseline {
     const entities = new Map<string, EntityId>();
     const states = new Map<string, Readonly<Record<string, unknown>>>();
@@ -225,25 +247,26 @@ export class WorldPersistence {
       }
       states.set(id, state);
     }
-    return Object.freeze({ level, entities, states });
+    return Object.freeze({
+      level,
+      entities,
+      states,
+      dormant: new Set(dormant),
+      carried: new Map<string, EntityDelta>(),
+    });
   }
 
   /** How `world`'s level differs from `baseline` now (call between steps). */
   capture(world: World<never>, baseline: LevelBaseline): LevelDeltas {
     const entities: EntityDelta[] = [];
     for (const [id, entity] of baseline.entities) {
-      if (!world.isAlive(entity)) {
-        entities.push({ id, destroyed: true });
-        continue;
-      }
-      const before = baseline.states.get(id) ?? {};
-      const aspects: Record<string, unknown> = {};
-      for (const declaration of this.declarations) {
-        const delta = declaration.diff(before[declaration.key], declaration.capture(world, entity));
-        if (delta !== undefined) aspects[declaration.key] = delta;
-      }
-      if (Object.keys(aspects).length > 0) entities.push({ id, aspects });
+      const delta = this.#deltaOf(world, baseline, id, entity);
+      if (delta !== undefined) entities.push(delta);
     }
+    // Dormant entities keep what they had when they left (mw-e27.8), after the live ones, by id.
+    entities.push(
+      ...[...baseline.carried.values()].sort((a, b) => Number(a.id > b.id) - Number(a.id < b.id)),
+    );
     const spawned: SpawnedRecord[] = [];
     if (world.isRegistered(PersistentSpawnComponent)) {
       world.query(PersistentSpawnComponent).forEach((entity, { id, kind, level }) => {
@@ -253,6 +276,70 @@ export class WorldPersistence {
       });
     }
     return { level: baseline.level, entities, spawned };
+  }
+
+  /** How one authored entity differs from its baseline, or undefined when it does not. */
+  #deltaOf(
+    world: World<never>,
+    baseline: LevelBaseline,
+    id: string,
+    entity: EntityId,
+  ): EntityDelta | undefined {
+    if (!world.isAlive(entity)) return { id, destroyed: true };
+    const before = baseline.states.get(id) ?? {};
+    const aspects: Record<string, unknown> = {};
+    for (const declaration of this.declarations) {
+      const delta = declaration.diff(before[declaration.key], declaration.capture(world, entity));
+      if (delta !== undefined) aspects[declaration.key] = delta;
+    }
+    return Object.keys(aspects).length > 0 ? { id, aspects } : undefined;
+  }
+
+  /**
+   * Takes authored entities out of the level because their fact gate closed (mw-e27.8): what changed
+   * about each (`ids` that the baseline has) is kept in `baseline.carried` and comes back with
+   * `activate`. Call before the entities are destroyed (one already destroyed is kept as destroyed).
+   */
+  retire(world: World<never>, baseline: LevelBaseline, ids: readonly string[]): void {
+    for (const id of ids) {
+      const entity = baseline.entities.get(id);
+      if (entity === undefined) continue;
+      const delta = this.#deltaOf(world, baseline, id, entity);
+      if (delta === undefined) baseline.carried.delete(id);
+      else baseline.carried.set(id, delta);
+      baseline.entities.delete(id);
+      baseline.states.delete(id);
+    }
+  }
+
+  /**
+   * Puts authored entities back into the level because their fact gate opened (mw-e27.8): their
+   * state now becomes their baseline and the deltas kept for them are applied (AC-4: a respawned
+   * entity is as it was left). Call between steps, right after spawning them.
+   * @throws RangeError when the baseline already has one of the ids.
+   */
+  activate(
+    world: World<never>,
+    baseline: LevelBaseline,
+    entities: Iterable<readonly [string, EntityId]>,
+  ): DeltaApplyReport {
+    const kept: EntityDelta[] = [];
+    for (const [id, entity] of entities) {
+      if (baseline.entities.has(id)) {
+        throw new RangeError(`level "${baseline.level}" has two entities with id "${id}"`);
+      }
+      const state: Record<string, unknown> = {};
+      for (const declaration of this.declarations) {
+        const value = declaration.capture(world, entity);
+        if (value !== undefined) state[declaration.key] = value;
+      }
+      baseline.entities.set(id, entity);
+      baseline.states.set(id, state);
+      const delta = baseline.carried.get(id);
+      if (delta !== undefined) kept.push(delta);
+      baseline.carried.delete(id);
+    }
+    return this.apply(world, baseline, { level: baseline.level, entities: kept, spawned: [] });
   }
 
   /**
@@ -270,6 +357,11 @@ export class WorldPersistence {
     for (const delta of deltas.entities) {
       const { id } = delta;
       const entity = baseline.entities.get(id);
+      if (entity === undefined && baseline.dormant.has(id)) {
+        // Its fact gate is closed: keep the delta for when it spawns (mw-e27.8).
+        baseline.carried.set(id, delta);
+        continue;
+      }
       if (entity === undefined || !world.isAlive(entity)) {
         skip(id, 'unknown-entity', `${where} has no entity "${id}"; its changes are dropped`);
         continue;

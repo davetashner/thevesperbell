@@ -123,6 +123,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].repopulate.afterDays` | integer 1–365 | required | World days after the kill before the creature returns; 1 = once the player has slept through a night. |
 | `spawns[].presence` | object | — | The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene. |
 | `spawns[].presence.phases` | list of id (at least 1) | required | Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for. |
+| `spawns[].spawnIf` | `condition` | — | The spawn exists only while this world condition holds (mw-e27.8): checked when the scene loads and again when a fact it reads changes, so the world reacts to what the player did (e.g. { "fact": "miller.rescued" }). |
+| `spawns[].despawnIf` | `condition` | — | The spawn is removed while this world condition holds (mw-e27.8); the opposite of spawnIf. With both, it exists only when spawnIf holds and despawnIf does not. |
+| `spawns[].variant` | object | — | Makes the spawn one variant of a group (mw-e27.8): exactly one variant of the group is active, the first listed in the scene whose `when` holds (a variant without `when` always matches, so list it last as the fallback). A group with no fallback warns (variantWarnings) because nothing spawns when none matches. |
+| `spawns[].variant.group` | id | required | Variant group id: the spawns of the scene that share it. |
+| `spawns[].variant.when` | `condition` | — | This variant is chosen while the condition holds; absent = the default, chosen when no variant listed before it matches. |
+| `spawns[].swapInView` | boolean | — | Lets spawnIf, despawnIf and variant changes happen while the spawn is on the player’s screen (mw-e27.8). By default a change waits until the spawn is out of view, so nothing pops in or out in front of the player. |
 | `spawns[].carries` | list of object (at least 1) | — | What the spawned creature carries and drops where it dies, as world items (mw-e01.5), e.g. the slice skeleton’s key (needs creature). |
 | `spawns[].carries[].item` | ref → item | required | An item the creature carries. |
 | `spawns[].carries[].count` | integer 1–9999 | `1` | Units of it; default 1. |
@@ -376,3 +382,52 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `ambience` | list of object | — | Ambience zones placed over regions of the scene or all of it (mw-e28.13). |
 | `ambience[].zone` | ref → ambience | required | The ambience zone that plays here. |
 | `ambience[].region` | id | — | Id of one of the scene’s regions; leave out to cover the whole scene. |
+
+## `condition`
+
+A condition over world facts: one of fact, count, all, any, not (docs/design/conditions.md).
+
+A `condition` is exactly one of these objects:
+
+### 1. Tests one fact, with at most one operator.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fact` | string | required | Fact key to test. Alone: the (bool) fact is true. With one operator: that comparison holds. |
+| `eq` | boolean or integer or string | — | The fact equals this value. |
+| `neq` | boolean or integer or string | — | The fact does not equal this value (unset counts as unequal). |
+| `gt` | integer | — | The (int or tick) fact is greater than this. |
+| `gte` | integer | — | The (int or tick) fact is at least this. |
+| `lt` | integer | — | The (int or tick) fact is less than this. |
+| `lte` | integer | — | The (int or tick) fact is at most this. |
+| `has` | boolean | — | true: the fact holds a value (set, or declared with a non-null default); false: none. |
+
+### 2. Counts true entity facts matching a pattern, compared with exactly one operator.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `count` | string | required | Entity facts to count: `entity:<level>/*.<fact>` (one level) or `entity:*/*.<fact>` (every level). Counts those holding true. |
+| `eq` | integer | — | The count equals this. |
+| `neq` | integer | — | The count does not equal this. |
+| `gt` | integer | — | The count is greater than this. |
+| `gte` | integer | — | The count is at least this. |
+| `lt` | integer | — | The count is less than this. |
+| `lte` | integer | — | The count is at most this. |
+
+### 3. True when every condition in the list holds.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `all` | list of `condition` (at least 1) | required | Every condition holds. |
+
+### 4. True when at least one condition in the list holds.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `any` | list of `condition` (at least 1) | required | At least one holds. |
+
+### 5. True when the condition does not hold.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `not` | `condition` | required | The condition that must not hold. |

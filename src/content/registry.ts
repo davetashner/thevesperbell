@@ -25,6 +25,7 @@ import { checkSpellStatuses } from './spell-status-checks.ts';
 import { checkWeakpoints } from './weakpoint-checks.ts';
 import { checkSceneSignals } from './mechanism-checks.ts';
 import { checkRepopulation } from './repopulation-checks.ts';
+import { checkVariants } from './variant-checks.ts';
 import { checkRecoveryAnchors } from './recovery-checks.ts';
 import { checkSceneTransitions } from './transition-checks.ts';
 import { checkPuzzles } from './puzzle-checks.ts';
@@ -160,6 +161,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkNavmeshes,
   checkRespawnRules,
   checkRepopulation,
+  checkVariants,
   checkSpellStatuses,
   checkSpellVfx,
   checkWeakpoints,

@@ -73,17 +73,38 @@ export class LevelDeltaStore {
     persistence: WorldPersistence,
     level: string,
     authored: Iterable<readonly [string, EntityId]>,
+    dormant: Iterable<string> = [],
   ): EnteredLevel {
     if (this.#current !== undefined) {
       throw new Error(
         `level "${level}" entered while "${this.#current.baseline.level}" is still loaded`,
       );
     }
-    const baseline = persistence.baseline(world, level, authored);
+    const baseline = persistence.baseline(world, level, authored, dormant);
     this.#current = { persistence, baseline };
     const stored = this.#stored.get(level);
     this.#stored.delete(level);
     return { baseline, report: stored && persistence.apply(world, baseline, stored) };
+  }
+
+  /**
+   * Takes the current level's authored entities `ids` out because a fact gate closed on them (mw-e27.8),
+   * keeping their changes. Call before destroying them.
+   * @throws Error when no level is current.
+   */
+  retire(world: World<never>, ids: readonly string[]): void {
+    const { persistence, baseline } = this.#currentLevel();
+    persistence.retire(world, baseline, ids);
+  }
+
+  /**
+   * Puts authored entities (`[stable id, entity]`) back into the current level because a fact gate
+   * opened, applying the changes kept for them (mw-e27.8). Call between steps, right after spawning.
+   * @throws Error when no level is current.
+   */
+  activate(world: World<never>, entities: Iterable<readonly [string, EntityId]>): DeltaApplyReport {
+    const { persistence, baseline } = this.#currentLevel();
+    return persistence.activate(world, baseline, entities);
   }
 
   /**
@@ -123,9 +144,13 @@ export class LevelDeltaStore {
     }
   }
 
-  #captureCurrent(world: World<never>): LevelDeltas {
+  #currentLevel(): CurrentLevel {
     if (this.#current === undefined) throw new Error('no level is loaded');
-    const { persistence, baseline } = this.#current;
+    return this.#current;
+  }
+
+  #captureCurrent(world: World<never>): LevelDeltas {
+    const { persistence, baseline } = this.#currentLevel();
     return persistence.capture(world, baseline);
   }
 }

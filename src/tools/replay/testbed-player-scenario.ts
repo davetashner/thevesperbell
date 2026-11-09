@@ -207,6 +207,8 @@ export interface HeadlessGame<TInput> {
   readonly sync: RenderSync;
   /** The loaded scene. */
   readonly scene: LoadedScene;
+  /** The scene loader that loaded it (fact-gated spawns come and go through it, mw-e27.8). */
+  readonly scenes: SceneLoader<object, TInput>;
   /** The light field (mw-e03.37), as the game installs it. */
   readonly light: GameLight;
   /** The scene's noise propagation (mw-e09.22). */
@@ -423,6 +425,7 @@ export function createGameWorld<TInput>(
     sceneCreatures,
     sync,
     scene,
+    scenes,
     light,
     noise,
     navigation,

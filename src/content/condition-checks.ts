@@ -22,6 +22,7 @@ import type { FactDef, FactGroup } from './types/fact.ts';
 import type { LootTable } from './types/loot-table.ts';
 import type { Puzzle } from './types/puzzle.ts';
 import type { RespawnRules } from './types/respawn-rules.ts';
+import type { SceneDef } from './types/scene.ts';
 import type { UnlockGroup } from './types/unlock.ts';
 
 /** One condition in a content entry. */
@@ -54,6 +55,22 @@ export const CONDITION_USAGES: Readonly<
         condition: { fact, eq: value },
       })),
     ]),
+  // A spawn's gates and variants (mw-e27.8).
+  scene: (entry: SceneDef) =>
+    entry.spawns.flatMap((spawn, i) => {
+      const base = `/spawns/${String(i)}`;
+      return [
+        ...(spawn.spawnIf === undefined
+          ? []
+          : [{ pointer: `${base}/spawnIf`, condition: spawn.spawnIf }]),
+        ...(spawn.despawnIf === undefined
+          ? []
+          : [{ pointer: `${base}/despawnIf`, condition: spawn.despawnIf }]),
+        ...(spawn.variant?.when === undefined
+          ? []
+          : [{ pointer: `${base}/variant/when`, condition: spawn.variant.when }]),
+      ];
+    }),
   unlock: (entry: UnlockGroup) =>
     entry.unlocks.flatMap(({ requirements }, i) =>
       requirements === undefined
