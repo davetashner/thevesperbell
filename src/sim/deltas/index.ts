@@ -3,3 +3,4 @@
 export * from './declarations';
 export * from './persistence';
 export * from './store';
+export * from './rest';

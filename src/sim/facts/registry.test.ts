@@ -196,3 +196,41 @@ describe('declareFacts', () => {
     expect(() => world.facts.set('miller.found', true)).toThrow(UndeclaredFactError);
   });
 });
+
+describe('registry persistence policies (mw-e27.7)', () => {
+  it('carries a declaration’s persistence policy into its store spec', () => {
+    const base = { ...common, key: 'a.b', type: 'bool', default: false } as const;
+    expect(factSpecFromDef(base as FactDeclaration)).toEqual({ type: 'bool', default: false });
+    expect(
+      factSpecFromDef({
+        ...base,
+        persistence: 'reset-after',
+        resetAfter: 72_000,
+      }),
+    ).toEqual({ type: 'bool', default: false, persistence: 'reset-after', resetAfter: 72_000 });
+    expect(factSpecFromDef({ ...base, persistence: 'reset-on-rest' })).toEqual({
+      type: 'bool',
+      default: false,
+      persistence: 'reset-on-rest',
+    });
+    expect(
+      factSpecFromDef({
+        ...base,
+        persistence: 'decays-to',
+        decaysTo: { from: [true], to: false },
+      }),
+    ).toEqual({
+      type: 'bool',
+      default: false,
+      persistence: 'decays-to',
+      decaysTo: { from: [true], to: false },
+    });
+    const { world } = recorded();
+    declareFacts(
+      world.facts,
+      [{ id: 'g', facts: [{ ...base, persistence: 'transient' } as FactDeclaration] }] as never,
+      { mode: 'throw' },
+    );
+    expect(world.facts.persistenceOf('a.b')).toBe('transient');
+  });
+});

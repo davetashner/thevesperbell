@@ -23,6 +23,7 @@ import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
 import type { FieldChannel } from '../field/config';
 import {
+  addProperties,
   assignProperty,
   hasProperty,
   readProperty,
@@ -163,6 +164,68 @@ function assignAll(world: World<never>, entity: EntityId, init: WorldPropertyIni
   }
 }
 
+/** Material → the material it burns to and that material's preset (absent: it burns away). */
+export type BurntStates = ReadonlyMap<
+  string,
+  { readonly becomes: string; readonly preset: WorldPropertyInit }
+>;
+
+/**
+ * The burnt state of every material that has one.
+ * @throws RangeError for a burnt material that is not in `presets`.
+ */
+export function burntStatesOf(options: Pick<FireRulesOptions, 'presets' | 'burnt'>): BurntStates {
+  const states = new Map<string, { becomes: string; preset: WorldPropertyInit }>();
+  for (const [material, becomes] of options.burnt) {
+    if (becomes === null) continue;
+    const preset = options.presets.get(becomes);
+    if (preset === undefined) {
+      throw new RangeError(`material "${material}" burns to unknown material "${becomes}"`);
+    }
+    states.set(material, { becomes, preset });
+  }
+  return states;
+}
+
+/**
+ * Burns `entity` out now (the fire rules' settle step, and persistence policies when a level
+ * reloads: a fire that was burning at save time has finished by the time it loads). It stops
+ * burning; an actor's fire just goes out, and anything else becomes its material's burnt state or,
+ * with none, is destroyed unless `keepWhenSpent`. `silent` skips the events (loading is not play).
+ */
+export function burnOutEntity(
+  world: World<never>,
+  entity: EntityId,
+  states: BurntStates,
+  keepWhenSpent?: FireRulesOptions['keepWhenSpent'],
+  silent = false,
+): void {
+  const announce = (becomes: string | null): void => {
+    if (!silent) world.events.emit(fireBurntOut, { entity, becomes });
+  };
+  if (silent) addProperties(world, entity, { burning: false });
+  else setProperty(world, entity, 'burning', false);
+  if (isActor(world, entity)) {
+    // An actor's fire just goes out: it is not charred or destroyed (its fuel returns when it
+    // has cooled, actor.recover; mw-e03.24).
+    announce(null);
+    return;
+  }
+  const state = states.get(readProperty(world, entity, 'material'));
+  if (state === undefined) {
+    announce(null);
+    if (keepWhenSpent?.(world, entity) !== true) world.destroy(entity);
+    return;
+  }
+  announce(state.becomes);
+  if (silent)
+    addProperties(world, entity, { material: state.becomes, ...state.preset, burning: false });
+  else {
+    assignProperty(world, entity, 'material', state.becomes);
+    assignAll(world, entity, state.preset);
+  }
+}
+
 /** Breathable air around a placed entity; lazily lists the field's gas channels once per run. */
 class AirProbe {
   private gases: FieldChannel[] | undefined;
@@ -211,16 +274,7 @@ function burningEntities(world: World<never>): EntityId[] {
 export function fireRules(options: FireRulesOptions): ElementRule[] {
   const heat = resolveHeatConfig(options.heat);
   const fire = resolveFireConfig(options.fire);
-  /** Material → the material it burns to and that material's preset (absent: it burns away). */
-  const burntStates = new Map<string, { becomes: string; preset: WorldPropertyInit }>();
-  for (const [material, becomes] of options.burnt) {
-    if (becomes === null) continue;
-    const preset = options.presets.get(becomes);
-    if (preset === undefined) {
-      throw new RangeError(`material "${material}" burns to unknown material "${becomes}"`);
-    }
-    burntStates.set(material, { becomes, preset });
-  }
+  const burntStates = burntStatesOf(options);
   const smoke = `gas:${fire.smokeGas}` as const;
   /** Entities that caught fire this tick: they start burning (and spending fuel) next tick. */
   const ignited = new Set<EntityId>();
@@ -302,22 +356,7 @@ export function fireRules(options: FireRulesOptions): ElementRule[] {
     run: ({ world }) => {
       for (const entity of burningEntities(world)) {
         if (readProperty(world, entity, 'fuel') > 0) continue;
-        setProperty(world, entity, 'burning', false);
-        if (isActor(world, entity)) {
-          // An actor's fire just goes out: it is not charred or destroyed (its fuel returns when it
-          // has cooled, actor.recover; mw-e03.24).
-          world.events.emit(fireBurntOut, { entity, becomes: null });
-          continue;
-        }
-        const state = burntStates.get(readProperty(world, entity, 'material'));
-        if (state === undefined) {
-          world.events.emit(fireBurntOut, { entity, becomes: null });
-          if (options.keepWhenSpent?.(world, entity) !== true) world.destroy(entity);
-          continue;
-        }
-        world.events.emit(fireBurntOut, { entity, becomes: state.becomes });
-        assignProperty(world, entity, 'material', state.becomes);
-        assignAll(world, entity, state.preset);
+        burnOutEntity(world, entity, burntStates, options.keepWhenSpent);
       }
     },
   };

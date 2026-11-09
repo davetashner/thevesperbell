@@ -61,12 +61,22 @@ import type { Quat } from '../scene/layout';
 import type { Vec3 } from '../stimulus/shapes';
 
 /**
+ * How long a declaration's recorded state lasts (mw-e27.7):
+ * - `permanent` (default): kept in deltas and saves until something changes it.
+ * - `rest-reset`: back to its baseline when the player rests (herbs regrow, a camp restocks).
+ * - `transient`: never captured; a level loads with it as authored.
+ */
+export type EntityPolicy = 'permanent' | 'rest-reset' | 'transient';
+
+/**
  * One persisted part of an entity's state. `S` is what `capture` reads (for the baseline and now),
  * `D` what a delta records. Values must be plain, canonically encodable data (saves carry them).
  */
 export interface PersistenceDeclaration<S = unknown, D = unknown> {
   /** Its key in a delta's `aspects` (a save key, never renamed). */
   readonly key: string;
+  /** How long its state lasts (EntityPolicy); permanent when absent. */
+  readonly policy?: EntityPolicy;
   /** The entity's state now, or undefined when this declaration does not cover the entity. */
   capture(world: World<never>, entity: EntityId): S | undefined;
   /** What to record going from `baseline` to `current`, or undefined when nothing worth keeping. */
@@ -94,6 +104,8 @@ export function samePlain(a: unknown, b: unknown): boolean {
 
 /** What `componentPersistence` needs besides the component. */
 export interface ComponentPersistenceSpec<T, S> {
+  /** How long the picked fields last (EntityPolicy); permanent when absent. */
+  readonly policy?: EntityPolicy;
   /** The persisted fields of a value (detached plain data). */
   readonly pick: (value: T) => S;
   /** Writes `delta` over `value`, the entity's current component (between steps). */
@@ -113,6 +125,7 @@ export function componentPersistence<T, S>(
     world.isRegistered(type) ? world.get(entity, type) : undefined;
   return Object.freeze({
     key,
+    ...(spec.policy !== undefined && { policy: spec.policy }),
     capture: (world: World<never>, entity: EntityId) => {
       const value = valueOf(world, entity);
       return value === undefined ? undefined : spec.pick(value);
@@ -134,8 +147,8 @@ export const TRANSIENT_PROPERTIES: readonly WorldPropertyKey[] = Object.freeze([
 /** Stored property → value; null in a delta: the entity no longer has that property. */
 export type PropertyDelta = Readonly<Record<string, unknown>>;
 
-/** Gives a physics object's body, and an entity's bound colliders, its current body properties. */
-function refreshBody(world: World<never>, entity: EntityId): void {
+/** Gives a physics object's body, and an entity's bound colliders, its current body properties (call after changing material or weight). */
+export function refreshBody(world: World<never>, entity: EntityId): void {
   if (!world.isRegistered(PhysicsObjectComponent)) return; // installed with physics.collider
   const object = world.get(entity, PhysicsObjectComponent);
   const bound = world.get(entity, PhysicsColliderComponent);

@@ -135,7 +135,7 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
-import { installGameFire } from '@game/fire';
+import { fireSettleOptions, installGameFire } from '@game/fire';
 import {
   attachSpellBar,
   attachSpellHud,
@@ -344,6 +344,7 @@ import {
   LEDGE_HANG_CAPABILITY,
   levelDeltasOf,
   arrowSpawner,
+  installRestPolicies,
   persistDroppedItems,
   persistRestingArrows,
   physicsBodiesOf,
@@ -2594,6 +2595,7 @@ function startRenderer(
         world,
         new WorldPersistence({
           spawners: [worldItemSpawner(worldItems), arrowSpawner()],
+          settle: fireSettleOptions(content),
           warn: (message) => {
             console.warn(message);
           },
@@ -2601,6 +2603,8 @@ function startRenderer(
         scene.id,
         sceneAuthoredEntities(world, loaded),
       );
+      // Rest-reset policies (mw-e27.7): resting puts back what is declared to reset on rest.
+      installRestPolicies(world);
       persistDroppedItems(world, () => scene.id);
       // Arrows that stick in the level stay with it (mw-e05.7).
       persistRestingArrows(world, () => scene.id);

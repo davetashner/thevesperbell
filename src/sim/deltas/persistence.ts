@@ -20,6 +20,13 @@
 //   applies, a spawned kind without a spawner, or data a declaration rejects is skipped with a
 //   warning, and loading continues (AC-4).
 //
+// Persistence policies (mw-e27.7): a declaration's `policy` says how long its state lasts. `transient`
+// is never captured; `rest-reset` goes back to the baseline when the player rests (`resetOnRest` for
+// a level that is not loaded, `restLive` for the loaded one). Whatever is transient or in flux when a
+// level (re)loads settles (`settle`): world properties in `transient` (wetness) start dry again, and
+// a fire that was burning and was not lit by the level's data has burnt out by now (burning →
+// burnt, as the fire rules would have finished it), so the element field is never saved.
+//
 // Everything is plain data in a fixed order (baseline order, then ascending entity order), so equal
 // worlds give equal deltas, and saves (mw-e27.4) can carry them.
 
@@ -34,7 +41,22 @@ import { PhysicsObjectComponent } from '../physics/objects';
 import type { Quat } from '../scene/layout';
 import type { LoadedScene } from '../scene/loader';
 import type { Vec3 } from '../stimulus/shapes';
-import { DEFAULT_PERSISTENCE, type PersistenceDeclaration } from './declarations';
+import { burnOutEntity, type BurntStates } from '../elements/fire';
+import { isActor, isAflame } from '../elements/actors';
+import {
+  addProperties,
+  getProperty,
+  hasProperty,
+  readProperty,
+  WorldProperties,
+} from '../properties/components';
+import { WORLD_PROPERTY_SPECS, type WorldPropertyKey } from '../properties/spec';
+import {
+  DEFAULT_PERSISTENCE,
+  refreshBody,
+  TRANSIENT_PROPERTIES,
+  type PersistenceDeclaration,
+} from './declarations';
 
 /** A runtime entity that persists with its level (`persistence.spawned`; never renamed). */
 export interface PersistentSpawn {
@@ -147,6 +169,8 @@ export interface LevelBaseline {
   readonly entities: ReadonlyMap<string, EntityId>;
   /** Stable id → declaration key → captured state (absent: not covered). */
   readonly states: ReadonlyMap<string, Readonly<Record<string, unknown>>>;
+  /** Stable id → the authored value of each transient property it has (what a load settles it to). */
+  readonly transient: ReadonlyMap<string, Readonly<Record<string, unknown>>>;
 }
 
 export interface WorldPersistenceOptions {
@@ -156,6 +180,26 @@ export interface WorldPersistenceOptions {
   readonly spawners?: readonly PersistentSpawner[];
   /** Told about every skipped part of a delta. */
   readonly warn?: (message: string) => void;
+  /** What settles when a level (re)loads (see `WorldPersistence.settle`). */
+  readonly settle?: SettleOptions;
+}
+
+/** What `WorldPersistence.settle` does. */
+export interface SettleOptions {
+  /** Properties that start over (their default) on load; TRANSIENT_PROPERTIES when absent. */
+  readonly transient?: readonly WorldPropertyKey[];
+  /** What a fire that was burning burns out to; absent: burning things are left burning. */
+  readonly burnt?: BurntStates;
+  /** Objects that stay (unlit) when they burn out without a burnt material (see fireRules). */
+  readonly keepWhenSpent?: (world: World<never>, entity: EntityId) => boolean;
+}
+
+/** What `settle` changed. */
+export interface SettleReport {
+  /** Entities whose transient properties went back to their defaults. */
+  readonly dried: number;
+  /** Entities whose fire burnt out. */
+  readonly burnt: number;
 }
 
 /** A spawn point's creature, scene spawns and pieces under their stable ids, in that order. */
@@ -179,12 +223,19 @@ export function sceneAuthoredEntities(
   return authored;
 }
 
+/** Whether `entity` is a runtime entity that persists with its level. */
+const spawnedWithLevel = (world: World<never>, entity: EntityId): boolean =>
+  world.isRegistered(PersistentSpawnComponent) && world.has(entity, PersistentSpawnComponent);
+
 /** Captures and applies level deltas under one set of declarations and spawners (file header). */
 export class WorldPersistence {
   readonly declarations: readonly PersistenceDeclaration[];
   readonly #byKey: ReadonlyMap<string, PersistenceDeclaration>;
   readonly #spawners: ReadonlyMap<string, PersistentSpawner>;
   readonly #warn: (message: string) => void;
+  readonly #settle: SettleOptions;
+  /** The declarations that capture state (everything but the transient ones). */
+  readonly #captured: readonly PersistenceDeclaration[];
 
   /** @throws RangeError when two declarations share a key or two spawners a kind. */
   constructor(options: WorldPersistenceOptions = {}) {
@@ -199,6 +250,8 @@ export class WorldPersistence {
       throw new RangeError('two persistent spawners share a kind');
     }
     this.#warn = options.warn ?? (() => undefined);
+    this.#settle = options.settle ?? {};
+    this.#captured = this.declarations.filter((d) => d.policy !== 'transient');
   }
 
   /**
@@ -214,18 +267,28 @@ export class WorldPersistence {
   ): LevelBaseline {
     const entities = new Map<string, EntityId>();
     const states = new Map<string, Readonly<Record<string, unknown>>>();
+    const transient = new Map<string, Readonly<Record<string, unknown>>>();
+    const startOver = this.#settle.transient ?? TRANSIENT_PROPERTIES;
     for (const [id, entity] of authored) {
       if (entities.has(id))
         throw new RangeError(`level "${level}" has two entities with id "${id}"`);
       entities.set(id, entity);
       const state: Record<string, unknown> = {};
-      for (const declaration of this.declarations) {
+      for (const declaration of this.#captured) {
         const value = declaration.capture(world, entity);
         if (value !== undefined) state[declaration.key] = value;
       }
       states.set(id, state);
+      const authoredValues: Record<string, unknown> = {};
+      for (const key of startOver) {
+        const value = world.isRegistered(WorldProperties[key])
+          ? getProperty(world, entity, key)
+          : undefined;
+        if (value !== undefined) authoredValues[key] = value;
+      }
+      transient.set(id, authoredValues);
     }
-    return Object.freeze({ level, entities, states });
+    return Object.freeze({ level, entities, states, transient });
   }
 
   /** How `world`'s level differs from `baseline` now (call between steps). */
@@ -238,7 +301,7 @@ export class WorldPersistence {
       }
       const before = baseline.states.get(id) ?? {};
       const aspects: Record<string, unknown> = {};
-      for (const declaration of this.declarations) {
+      for (const declaration of this.#captured) {
         const delta = declaration.diff(before[declaration.key], declaration.capture(world, entity));
         if (delta !== undefined) aspects[declaration.key] = delta;
       }
@@ -267,6 +330,7 @@ export class WorldPersistence {
     };
     const where = `level "${baseline.level}"`;
     let applied = 0;
+    const touched: EntityId[] = [];
     for (const delta of deltas.entities) {
       const { id } = delta;
       const entity = baseline.entities.get(id);
@@ -279,6 +343,7 @@ export class WorldPersistence {
         applied++;
         continue;
       }
+      touched.push(entity);
       const aspects = delta.aspects ?? {};
       for (const key of Object.keys(aspects)) {
         if (!this.#byKey.has(key)) {
@@ -290,7 +355,7 @@ export class WorldPersistence {
           );
         }
       }
-      for (const declaration of this.declarations) {
+      for (const declaration of this.#captured) {
         const { key } = declaration;
         if (!Object.hasOwn(aspects, key)) continue;
         try {
@@ -323,7 +388,110 @@ export class WorldPersistence {
       spawned.set(id, entity);
       applied++;
     }
+    this.settle(world, baseline, touched);
     return { applied, skipped, spawned };
+  }
+
+  /**
+   * Settles what is transient or in flux after a level (re)loads (see the file header): the
+   * `transient` properties go back to their defaults and a fire that was not burning in `baseline`
+   * burns out. `entities` are the ones to look at (the ones a delta changed; every entity with the
+   * property when absent). Silent: loading is spawning from data, not play. Call between steps.
+   */
+  settle(
+    world: World<never>,
+    baseline: LevelBaseline,
+    entities?: Iterable<EntityId>,
+  ): SettleReport {
+    const { transient = TRANSIENT_PROPERTIES, burnt } = this.#settle;
+    const only = entities === undefined ? undefined : new Set(entities);
+    const among = (key: WorldPropertyKey): EntityId[] => {
+      if (!world.isRegistered(WorldProperties[key])) return [];
+      const found: EntityId[] = [];
+      world.query(WorldProperties[key]).forEach((entity) => {
+        if (only === undefined || only.has(entity)) found.push(entity);
+      });
+      return found;
+    };
+    const ids = new Map<EntityId, string>();
+    for (const [id, entity] of baseline.entities) ids.set(entity, id);
+    let dried = 0;
+    for (const key of transient) {
+      for (const entity of among(key)) {
+        // Down to what the level authored (an ivy ledge is damp from the start), else the default.
+        const id = ids.get(entity);
+        const authored = id === undefined ? undefined : baseline.transient.get(id)?.[key];
+        const target = authored ?? WORLD_PROPERTY_SPECS[key].default;
+        const now = readProperty(world, entity, key);
+        // Settling only ever takes away: ivy that dried while you played stays dry (numbers only).
+        if (now === target || Number(now) < Number(target)) continue;
+        addProperties(world, entity, { [key]: target });
+        dried++;
+      }
+    }
+    let burntOut = 0;
+    if (burnt !== undefined) {
+      for (const entity of among('burning')) {
+        if (!readProperty(world, entity, 'burning') || isAflame(world, entity)) continue;
+        const id = ids.get(entity);
+        if (id !== undefined) {
+          const lit = baseline.states.get(id)?.['properties'] as { burning?: unknown } | undefined;
+          if (lit?.burning === true) continue; // lit by the level's data
+        } else if (!isActor(world, entity) && !spawnedWithLevel(world, entity)) {
+          continue; // not the level's, nor saved with it: a light the scene lit, say
+        }
+        burnOutEntity(world, entity, burnt, this.#settle.keepWhenSpent, true);
+        if (world.isAlive(entity) && hasProperty(world, entity, 'material')) {
+          refreshBody(world, entity);
+        }
+        burntOut++;
+      }
+    }
+    return { dried, burnt: burntOut };
+  }
+
+  /**
+   * `deltas` without the `rest-reset` aspects (a level that is not loaded, when the player rests).
+   * Entries left with nothing are dropped; a destroyed entity stays destroyed.
+   */
+  resetOnRest(deltas: LevelDeltas): LevelDeltas {
+    const resting = new Set(
+      this.declarations.filter((d) => d.policy === 'rest-reset').map((d) => d.key),
+    );
+    if (resting.size === 0) return deltas;
+    const entities: EntityDelta[] = [];
+    let changed = false;
+    for (const delta of deltas.entities) {
+      const aspects = Object.entries(delta.aspects ?? {});
+      const kept = aspects.filter(([key]) => !resting.has(key));
+      if (delta.destroyed === true || kept.length === aspects.length) {
+        entities.push(delta);
+        continue;
+      }
+      changed = true;
+      if (kept.length > 0) entities.push({ id: delta.id, aspects: Object.fromEntries(kept) });
+    }
+    return changed ? { ...deltas, entities } : deltas;
+  }
+
+  /**
+   * Puts the `rest-reset` state of the loaded level's entities back to `baseline` (the player rests;
+   * call between steps). Returns how many aspects went back. A declaration's baseline state must be
+   * a delta it can apply (true of `componentPersistence`).
+   */
+  restLive(world: World<never>, baseline: LevelBaseline): number {
+    let reset = 0;
+    for (const declaration of this.declarations) {
+      if (declaration.policy !== 'rest-reset') continue;
+      for (const [id, entity] of baseline.entities) {
+        const before = baseline.states.get(id)?.[declaration.key];
+        if (before === undefined || !world.isAlive(entity)) continue;
+        const now = declaration.capture(world, entity);
+        if (now === undefined || declaration.diff(before, now) === undefined) continue;
+        if (declaration.apply(world, entity, before)) reset++;
+      }
+    }
+    return reset;
   }
 }
 

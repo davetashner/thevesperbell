@@ -17,6 +17,7 @@ import {
   type GameContent,
 } from '@content/index';
 import {
+  burntStatesOf,
   actorRules,
   conductionRules,
   installActorElements,
@@ -32,9 +33,23 @@ import {
   installIce,
   installLiquids,
   LightSourceComponent,
+  type SettleOptions,
   type Vec3,
   type World,
 } from '@sim/index';
+
+/**
+ * What persistence settles when a level loads (mw-e27.7): a fire burning at save time has burnt out
+ * to its material's burnt state, as the fire rules' own burn-out would have left it (so are objects
+ * that stay when spent, like lanterns, unlit). Wetness starts over too (the default).
+ */
+export function fireSettleOptions(content: Pick<GameContent, 'all'>): SettleOptions {
+  const materials = content.all('material');
+  return {
+    burnt: burntStatesOf({ presets: materialPresets(materials), burnt: burntMaterials(materials) }),
+    keepWhenSpent: (world, entity) => world.has(entity, LightSourceComponent),
+  };
+}
 
 /**
  * Installs the element field and the fire rules from the game's material data, and makes creatures
