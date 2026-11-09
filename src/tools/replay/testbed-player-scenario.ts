@@ -302,7 +302,7 @@ export function createGameWorld<TInput>(
         });
       },
       afterStimuli: (sim: World<never>) => {
-        installGameFire(sim, content, { damage: combat.damage });
+        installGameFire(sim, content, { damage: combat.damage, focus: focus.read });
       },
     }),
   });

@@ -21,6 +21,7 @@
 import * as config from './config';
 import type { FieldChannel } from './config';
 import type { Chunk, ElementField } from './grid';
+import type { Vec3 } from '../stimulus/shapes';
 
 // Local copies: hot loops should not reach through module bindings.
 const { CHUNK_CELLS, CHUNK_SIZE, CONDUCTIVITY_ONE, RATE_ONE } = config;
@@ -33,6 +34,44 @@ export interface FieldStepReport {
   readonly cellsUpdated: number;
   /** Per channel: deviation removed by ambient loss and settling this tick (units × cells). */
   readonly lost: Readonly<Record<string, number>>;
+}
+
+/**
+ * Sim-rate level of detail for the field (mw-e03.30): a chunk whose centre is farther than `radius`
+ * metres from `anchor` (the player) is stepped only every `stride`th tick. Keyed by distance and
+ * the tick number alone, never by measured time, so the same run is bit-identical on every machine.
+ */
+export interface FieldLod {
+  /** The tick being simulated (the world's tick). */
+  readonly tick: number;
+  /** Where detail is highest, metres (the player's feet). */
+  readonly anchor: Vec3;
+  /** Chunks farther than this from `anchor` are far. Default `LOD_RADIUS`. */
+  readonly radius?: number;
+  /** A far chunk is stepped on one tick in this many. Default `LOD_STRIDE`. */
+  readonly stride?: number;
+}
+
+/** Default distance beyond which a chunk is far, metres. */
+export const LOD_RADIUS = 40;
+/** Default: a far chunk is stepped every 4th tick. */
+export const LOD_STRIDE = 4;
+
+/**
+ * Whether `chunk` is stepped on `lod.tick`: near chunks always, far ones on one tick in `stride`.
+ * The phase is the chunk's coordinate sum, so the far chunks are spread across the ticks instead of
+ * all landing on one.
+ */
+export function chunkSteps(field: ElementField, chunk: Chunk, lod: FieldLod): boolean {
+  const radius = lod.radius ?? LOD_RADIUS;
+  const stride = lod.stride ?? LOD_STRIDE;
+  const edge = field.config.cellSize * CHUNK_SIZE;
+  const dx = (chunk.cx + 0.5) * edge - lod.anchor.x;
+  const dy = (chunk.cy + 0.5) * edge - lod.anchor.y;
+  const dz = (chunk.cz + 0.5) * edge - lod.anchor.z;
+  if (dx * dx + dy * dy + dz * dz <= radius * radius) return true;
+  const phase = (((chunk.cx + chunk.cy + chunk.cz) % stride) + stride) % stride;
+  return (((lod.tick + phase) % stride) + stride) % stride === 0;
 }
 
 /** Axis steps of the six faces, positive direction first on each axis. */
@@ -288,10 +327,10 @@ function apply(tick: Tick, lost: Map<string, number>): void {
 }
 
 /** Updates calm counts of awake chunks; settles and sleeps (or frees) the ones calm long enough. */
-function settle(field: ElementField, lost: Map<string, number>): void {
+function settle(field: ElementField, lost: Map<string, number>, skipped: ReadonlySet<Chunk>): void {
   const { sleepTicks } = field.config;
   for (const chunk of [...field.chunkList()]) {
-    if (chunk.asleep) continue;
+    if (chunk.asleep || skipped.has(chunk)) continue;
     let calm = true;
     for (const [channel, values] of chunk.layers) {
       const { epsilon } = field.channel(channel);
@@ -323,9 +362,16 @@ function settle(field: ElementField, lost: Map<string, number>): void {
  * Advances `field` one tick: diffusion, ambient loss, then sleep (see the file header). Returns what
  * it did; `lost` lets callers check conservation (initial total = final total + Σ lost).
  */
-export function stepField(field: ElementField): FieldStepReport {
+export function stepField(field: ElementField, lod?: FieldLod): FieldStepReport {
   const tick = new Tick(field);
-  const active = field.chunkList().filter((chunk) => !chunk.asleep);
+  const awake = field.chunkList().filter((chunk) => !chunk.asleep);
+  // With `lod`, far chunks off their tick sit out: they hold their values (a neighbour's flux may
+  // still reach them, which keeps every count conserved) and do not age toward sleep.
+  const skipped = new Set<Chunk>();
+  const active =
+    lod === undefined
+      ? awake
+      : awake.filter((chunk) => chunkSteps(field, chunk, lod) || !skipped.add(chunk));
   for (const chunk of active) {
     for (const [channel, values] of chunk.layers) tick.buffer(chunk, channel, values, true);
   }
@@ -336,7 +382,7 @@ export function stepField(field: ElementField): FieldStepReport {
   }
   const lost = new Map<string, number>();
   apply(tick, lost);
-  settle(field, lost);
+  settle(field, lost, skipped);
   const units = Object.fromEntries(
     [...lost].map(([channel, counts]) => [channel, config.toUnits(counts)]),
   );
