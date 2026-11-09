@@ -92,6 +92,7 @@ import {
   type TraversalMode,
   type World,
   type StatusLookup,
+  type SurfaceMap,
   type SurfaceOffsets,
 } from '@sim/index';
 import type { TestbedBow } from '../combat/testbed-combat';
@@ -311,6 +312,8 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
    * so footstep events carry how loud the ground is. Absent = every ground reads as stone.
    */
   readonly footstepOffsets?: SurfaceOffsets;
+  /** The scene's surface regions and table (mw-e09.4); footsteps read the region under the feet. */
+  readonly surfaces?: SurfaceMap;
   /**
    * A bow and quiver (mw-e05.21), with `moves`: drawn, the camera narrows to its aim. The world's
    * arrow system (startTestbedCombat) flies what it looses. Absent = none.
@@ -463,6 +466,7 @@ export function setupTestbedPlayer<TObject, TCommand>(
     }),
     ...(options.climb !== undefined && { climb: options.climb }),
     ...(options.footstepOffsets !== undefined && { footstepOffsets: options.footstepOffsets }),
+    ...(options.surfaces !== undefined && { surfaces: options.surfaces }),
     ...(options.statuses !== undefined && { statuses: options.statuses }),
     ...(options.water !== undefined && {
       water: { volumes: waterVolumes(scene.layout.regions), ...options.water },

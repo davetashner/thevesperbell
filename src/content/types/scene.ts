@@ -21,6 +21,7 @@ import { worldPropertiesSchema } from '../world-properties.ts';
 import { interactableSchema } from './interaction.ts';
 import { ITEM_STACK_GUARD } from './item.ts';
 import { KIT_PURPOSES, vec3Schema } from './kit.ts';
+import { FOOTSTEP_SURFACES } from './material.ts';
 
 /** Placements snap to this fraction of a grid cell. */
 export const SCENE_SNAP_STEP = 0.25;
@@ -897,6 +898,30 @@ export const sceneRegionSchema = z
   });
 
 /**
+ * A box of the scene tagged with an acoustic surface (mw-e09.4): a carpet on a wooden floor, a gravel
+ * path, a creaky bridge. `surfaceAt` (src/sim/surfaces) reads the highest `priority` box holding a
+ * position, whatever collider is underfoot; the first listed wins a tie. The box must reach the
+ * feet: its y range includes the floor height.
+ */
+export const sceneSurfaceSchema = z
+  .strictObject({
+    id: contentId.describe('Name of the surface region, unique in the scene, e.g. hall-carpet.'),
+    min: vec3Schema.describe('Lower corner, grid cells.'),
+    max: vec3Schema.describe('Upper corner, grid cells; above min on every axis.'),
+    surface: z
+      .enum(FOOTSTEP_SURFACES)
+      .describe('The footstep surface (audio bible §7.3) of everything inside, e.g. carpet.'),
+    priority: z
+      .int()
+      .default(0)
+      .describe('Where boxes overlap, the higher priority wins; the first listed wins a tie.'),
+  })
+  .refine(({ min, max }) => max[0] > min[0] && max[1] > min[1] && max[2] > min[2], {
+    message: 'max must be above min on every axis',
+    path: ['max'],
+  });
+
+/**
  * A way out of the scene into another (mw-e01.11): a box the player walks into, the scene it leads to
  * and the named spawn of that scene the player arrives at, facing the way the spawn's yaw says.
  * Arrival spawns are ordinary marker spawns by convention called `arrive-from-<this scene id>`; the
@@ -967,6 +992,10 @@ export const sceneSchema = z
       .array(sceneRegionSchema)
       .default([])
       .describe('Tagged boxes, e.g. a river (mw-ju8.1); data only until a system reads them.'),
+    surfaces: z
+      .array(sceneSurfaceSchema)
+      .default([])
+      .describe('Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4).'),
     transitions: z
       .array(sceneTransitionSchema)
       .default([])
@@ -994,6 +1023,17 @@ export const sceneSchema = z
           message: `transition "${transition.id}" leads back into its own scene`,
         });
       }
+    });
+    const surfaceIds = new Set<string>();
+    scene.surfaces.forEach((surface, index) => {
+      if (surfaceIds.has(surface.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['surfaces', index, 'id'],
+          message: `surface region id "${surface.id}" is used twice in this scene`,
+        });
+      }
+      surfaceIds.add(surface.id);
     });
     const regionIds = new Set<string>();
     scene.regions.forEach((region, index) => {

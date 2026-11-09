@@ -346,6 +346,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `regions[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
 | `regions[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
 | `regions[].tags` | list of string | `[]` | Free-form tags, e.g. water. |
+| `surfaces` | list of object | `[]` | Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4). |
+| `surfaces[].id` | id | required | Name of the surface region, unique in the scene, e.g. hall-carpet. |
+| `surfaces[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
+| `surfaces[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
+| `surfaces[].surface` | `"stone"` \| `"wood"` \| `"wood-hollow"` \| `"dirt"` \| `"grass"` \| `"gravel"` \| `"mud"` \| `"water-shallow"` \| `"snow-ice"` \| `"metal-grate"` \| `"straw"` \| `"carpet"` \| `"bone-litter"` \| `"leaves"` \| `"glass-shards"` | required | The footstep surface (audio bible §7.3) of everything inside, e.g. carpet. |
+| `surfaces[].priority` | integer | `0` | Where boxes overlap, the higher priority wins; the first listed wins a tie. |
 | `transitions` | list of object | — | Volumes that lead to another scene, and where the player arrives (mw-e01.11). |
 | `transitions[].id` | id | required | Name of the transition, unique in the scene, e.g. north-gate. |
 | `transitions[].min` | list of any (at least 3) | required | Lower corner of the volume, grid cells. |
