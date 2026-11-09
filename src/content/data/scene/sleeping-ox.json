@@ -304,6 +304,41 @@
   "environment": {
     "sky": "#1E1B2E"
   },
+  "surfaces": [
+    {
+      "id": "common-room-boards",
+      "min": [-5, -0.5, -4],
+      "max": [5, 1, 4],
+      "surface": "wood"
+    },
+    {
+      "id": "door-runner",
+      "min": [-0.75, -0.5, -3.75],
+      "max": [0.75, 1, 0.5],
+      "surface": "carpet",
+      "priority": 1
+    },
+    {
+      "id": "hearth-rug",
+      "min": [1.5, -0.5, 1],
+      "max": [4.5, 1, 3],
+      "surface": "carpet",
+      "priority": 1
+    },
+    {
+      "id": "rented-room-boards",
+      "min": [5, -0.5, -3],
+      "max": [9, 1, 1],
+      "surface": "wood"
+    },
+    {
+      "id": "rented-room-rug",
+      "min": [5.5, -0.5, -2.5],
+      "max": [7.5, 1, 0],
+      "surface": "carpet",
+      "priority": 1
+    }
+  ],
   "transitions": [
     {
       "id": "street-exit",

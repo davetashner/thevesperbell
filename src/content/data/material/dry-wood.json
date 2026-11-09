@@ -2,8 +2,8 @@
   "$schema": "../material.schema.json",
   "id": "dry-wood",
   "name": "Dry wood (tinder, kindling)",
-  "notes": "Old, dry, light timber: kindling, woodpiles, rotten boards, weathered fences. Catches earlier than seasoned wood (250 °C) and burns hotter and faster (90 s for a typical piece). Density 450 kg/m³ (dry pine). Weaker (60 hp) and creakier underfoot (+4 dB). Burns to charred remains (mw-e03.5). Medium surface that rope arrows embed in (softAnchor), like seasoned wood. (mw-e03.31)",
-  "footstepLoudness": 4,
+  "notes": "Old, dry, light timber: kindling, woodpiles, rotten boards, weathered fences. Catches earlier than seasoned wood (250 °C) and burns hotter and faster (90 s for a typical piece). Density 450 kg/m³ (dry pine). Weaker (60 hp) and a little creakier underfoot (creaking boards are the wood-hollow surface; footstepLoudness equals the wood surface row, 2 dB, so one floor has one number). Burns to charred remains (mw-e03.5). Medium surface that rope arrows embed in (softAnchor), like seasoned wood. (mw-e03.31)",
+  "footstepLoudness": 2,
   "footstepSurface": "wood",
   "impactSound": "sfx-impact-wood",
   "properties": {
