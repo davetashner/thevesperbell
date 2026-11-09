@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -59,6 +59,25 @@ describe('content-coverage main', () => {
     expect(run()).toBe(0);
     expect(console.log).toHaveBeenCalledWith(
       `Every content entry (${String(entries.length)}) is exercised by a test.`,
+    );
+  });
+
+  it('mw-e27.8 AC-3: warns, without failing, about a variant group with no default', () => {
+    const entries = everyEntry();
+    report(...entries);
+    const file = join(dir, 'data/scene/variant-room.json');
+    const room = JSON.parse(readFileSync(file, 'utf8')) as {
+      spawns: { id: string; variant?: unknown }[];
+    };
+    const missing = room.spawns.find((spawn) => spawn.id === 'miller-missing');
+    if (missing === undefined) throw new Error('no miller-missing');
+    missing.variant = { group: 'miller', when: { fact: 'variants.miller.rescued' } };
+    writeFileSync(file, JSON.stringify(room));
+    expect(run()).toBe(0);
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /^::warning title=Content coverage::scene:variant-room variant group "miller" has no default variant/,
+      ),
     );
   });
 

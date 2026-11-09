@@ -905,6 +905,37 @@
             ],
             "additionalProperties": false
           },
+          "spawnIf": {
+            "description": "The spawn exists only while this world condition holds (mw-e27.8): checked when the scene loads and again when a fact it reads changes, so the world reacts to what the player did (e.g. { \"fact\": \"miller.rescued\" }).",
+            "$ref": "#/$defs/condition"
+          },
+          "despawnIf": {
+            "description": "The spawn is removed while this world condition holds (mw-e27.8); the opposite of spawnIf. With both, it exists only when spawnIf holds and despawnIf does not.",
+            "$ref": "#/$defs/condition"
+          },
+          "variant": {
+            "description": "Makes the spawn one variant of a group (mw-e27.8): exactly one variant of the group is active, the first listed in the scene whose `when` holds (a variant without `when` always matches, so list it last as the fallback). A group with no fallback warns (variantWarnings) because nothing spawns when none matches.",
+            "type": "object",
+            "properties": {
+              "group": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Variant group id: the spawns of the scene that share it."
+              },
+              "when": {
+                "description": "This variant is chosen while the condition holds; absent = the default, chosen when no variant listed before it matches.",
+                "$ref": "#/$defs/condition"
+              }
+            },
+            "required": [
+              "group"
+            ],
+            "additionalProperties": false
+          },
+          "swapInView": {
+            "description": "Lets spawnIf, despawnIf and variant changes happen while the spawn is on the player’s screen (mw-e27.8). By default a change waits until the spawn is out of view, so nothing pops in or out in front of the player.",
+            "type": "boolean"
+          },
           "carries": {
             "description": "What the spawned creature carries and drops where it dies, as world items (mw-e01.5), e.g. the slice skeleton’s key (needs creature).",
             "minItems": 1,
@@ -3068,5 +3099,190 @@
     "camera",
     "placements"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "condition": {
+      "description": "A condition over world facts: one of fact, count, all, any, not (docs/design/conditions.md).",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "fact": {
+              "type": "string",
+              "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$",
+              "description": "Fact key to test. Alone: the (bool) fact is true. With one operator: that comparison holds."
+            },
+            "eq": {
+              "description": "The fact equals this value.",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "neq": {
+              "description": "The fact does not equal this value (unset counts as unequal).",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "gt": {
+              "description": "The (int or tick) fact is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "The (int or tick) fact is at least this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "The (int or tick) fact is less than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "The (int or tick) fact is at most this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "has": {
+              "description": "true: the fact holds a value (set, or declared with a non-null default); false: none.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "fact"
+          ],
+          "additionalProperties": false,
+          "description": "Tests one fact, with at most one operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "string",
+              "pattern": "^entity:([a-z0-9]+(?:-[a-z0-9]+)*|\\*)\\/\\*\\.([a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*)$",
+              "description": "Entity facts to count: `entity:<level>/*.<fact>` (one level) or `entity:*/*.<fact>` (every level). Counts those holding true."
+            },
+            "eq": {
+              "description": "The count equals this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "neq": {
+              "description": "The count does not equal this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gt": {
+              "description": "The count is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "The count is at least this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "The count is less than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "The count is at most this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "count"
+          ],
+          "additionalProperties": false,
+          "description": "Counts true entity facts matching a pattern, compared with exactly one operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "all": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/condition"
+              },
+              "description": "Every condition holds."
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "additionalProperties": false,
+          "description": "True when every condition in the list holds."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "any": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/condition"
+              },
+              "description": "At least one holds."
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "additionalProperties": false,
+          "description": "True when at least one condition in the list holds."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "not": {
+              "description": "The condition that must not hold.",
+              "$ref": "#/$defs/condition"
+            }
+          },
+          "required": [
+            "not"
+          ],
+          "additionalProperties": false,
+          "description": "True when the condition does not hold."
+        }
+      ]
+    }
+  }
 }

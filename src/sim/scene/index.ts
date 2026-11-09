@@ -4,3 +4,4 @@ export * from './layout';
 export * from './loader';
 export * from './physics';
 export * from './transitions';
+export * from './variants';
