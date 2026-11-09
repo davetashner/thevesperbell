@@ -1,0 +1,50 @@
+{
+  "$schema": "../move.schema.json",
+  "id": "spear-thrust",
+  "notes": "Spear thrust (mw-e04.15): the long reach class's thrust, 16/4/24 ticks, 18 stamina, 24 pierce, 20 poise. Reaches about 2.9 m, so it hits what a sword cannot; a thrust never recoils off a wall. PLACEHOLDER TUNING for the owner (the bead gives reach only): frames, stamina and damage. Its sound and trail reuse the sword's cues; its clip id is reserved for the weapon animation (art), so until then it has no clip.",
+  "verb": "attack",
+  "frames": {
+    "startup": 16,
+    "active": 4,
+    "recovery": 24
+  },
+  "staminaCost": 18,
+  "cancelWindows": [
+    {
+      "into": "dodge",
+      "from": 24,
+      "to": 43
+    }
+  ],
+  "damage": {
+    "amounts": {
+      "pierce": 24
+    },
+    "poiseDamage": 20,
+    "staminaDamage": 16
+  },
+  "hitbox": {
+    "track": "spear-thrust-lunge",
+    "shape": {
+      "kind": "capsule",
+      "from": {
+        "x": 0.1,
+        "y": 1.2,
+        "z": 0.5
+      },
+      "to": {
+        "x": 0.1,
+        "y": 1.2,
+        "z": 2.4
+      },
+      "radius": 0.08
+    },
+    "reach": "long",
+    "swing": "thrust"
+  },
+  "presentation": {
+    "anim": "anim-knight-spear-thrust",
+    "audioCue": "sfx-knight-sword-swing-light",
+    "vfxCue": "vfx-sword-trail-light"
+  }
+}

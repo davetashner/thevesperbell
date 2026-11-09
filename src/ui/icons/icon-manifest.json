@@ -128,6 +128,10 @@
     "placeholder": true
   },
   {
+    "id": "icon-item-halberd-01",
+    "placeholder": true
+  },
+  {
     "id": "icon-item-hard-cheese-wedge-01",
     "placeholder": true
   },
@@ -189,6 +193,10 @@
   },
   {
     "id": "icon-item-longsword-01",
+    "placeholder": true
+  },
+  {
+    "id": "icon-item-mace-01",
     "placeholder": true
   },
   {
@@ -297,6 +305,10 @@
   },
   {
     "id": "icon-item-smoked-sausage-01",
+    "placeholder": true
+  },
+  {
+    "id": "icon-item-spear-01",
     "placeholder": true
   },
   {

@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Weapon reach now matters: spears and halberds reach 3 m, swords 2 m and maces 1.2 m, and a halberd sweep that hits a corridor wall before anything alive clangs off it with sparks and a clang and locks you out for half a second, while thrusts, overhead chops and shorter weapons never do; swords do not clang for now. The spear, mace and halberd exist as data but are not in any shop or chest and the left click still swings the sword, so you can only see the clang by opening `?scene=recoil-corridor&debug=1` and running `act halberd-sweep` in the console; the clang is still a placeholder sound (mw-e04.15).
 - Arrows that stick in a wall or a body now stay there: press Interact near them to take back every whole arrow within a metre (the prompt reads "Take arrows (3)"), some break on landing (more often on stone and metal, always in fire), a creature's whole arrows drop with its loot, and at most 64 arrows lie about at once (the oldest out of sight go first).
 - You can slip into a wardrobe, barrel or haystack to break line of sight (guards can't see you inside, and a burning haystack throws you out), stash bodies in a chest that has room, and broken chests spill their contents; for now this only exists in a new test scene, `?scene=hiding-room`, not in the shipped levels.
 - The Sleeping Ox, Marsh's General Store and the riverbank under the bridge now have different floors you can see: carpet rugs muffle your steps, boards and creaky upstairs floorboards carry, and shingle crunches loudly.

@@ -378,6 +378,7 @@ export {
   CREATURE_MIN_WINDUP_TICKS,
   CREATURE_UNBLOCKABLE_WINDUP_TICKS,
 } from './attack-checks.ts';
+export { checkWeapons, hitboxExtent } from './weapon-checks.ts';
 export {
   CONDITION_USAGES,
   checkConditions,
@@ -537,6 +538,15 @@ export {
   type HitStopTable,
   type HitStopTier,
 } from './types/hit-stop.ts';
+export {
+  REACH_CLASS_TABLE_ID,
+  compileReachClasses,
+  reachClassSchema,
+  type ReachClassDef,
+  type ReachClassDefInput,
+  type ReachClassEntry,
+  type ReachTable,
+} from './types/reach-class.ts';
 export {
   DEFAULT_SURFACE,
   FOOTSTEP_SOUND_PATTERN,

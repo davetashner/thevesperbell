@@ -15,5 +15,7 @@
     "slot": "main-hand",
     "proficiencies": ["blades"]
   },
-  "weapon": {}
+  "weapon": {
+    "reach": "medium"
+  }
 }

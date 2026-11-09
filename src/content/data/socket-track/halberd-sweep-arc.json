@@ -1,0 +1,98 @@
+{
+  "$schema": "../socket-track.schema.json",
+  "id": "halberd-sweep-arc",
+  "notes": "Halberd sweep (move halberd-sweep, 6 active ticks, mw-e04.15): a wide flat arc about the body, yaw +60 to -60 degrees in 20 degree steps, so the head swings about 2.5 m to either side at full reach. In a hall that is the point; in a 2 m corridor the blade is in the wall from its first active tick.",
+  "keys": [
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.5,
+        "z": 0.0,
+        "w": 0.866025
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.34202,
+        "z": 0.0,
+        "w": 0.939693
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.173648,
+        "z": 0.0,
+        "w": 0.984808
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": -0.173648,
+        "z": 0.0,
+        "w": 0.984808
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": -0.34202,
+        "z": 0.0,
+        "w": 0.939693
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": -0.5,
+        "z": 0.0,
+        "w": 0.866025
+      }
+    }
+  ]
+}

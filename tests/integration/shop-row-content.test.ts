@@ -28,6 +28,10 @@ const NOT_FOR_SALE = new Set([
   'bent-pick-head',
   'rusted-lamp-hook',
   'rusted-knife',
+  // Starter weapons for the reach and wall recoil rules (mw-e04.15); weapon loot is e18.
+  'spear',
+  'mace',
+  'halberd',
   'rusted-arming-sword',
   'dented-iron-cap',
   'ember',

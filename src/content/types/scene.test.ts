@@ -911,7 +911,7 @@ describeContent(
 );
 
 describe('scene content', () => {
-  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College, the chandelier room and the skeleton pen', () => {
+  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College, the chandelier room, the skeleton pen and the recoil corridor', () => {
     expect(
       loadContent(contentTypes, gameContentSources(), contentChecks)
         .all('scene')
@@ -927,6 +927,7 @@ describe('scene content', () => {
       'marsh-store',
       'mechanism-room',
       'perf-baseline',
+      'recoil-corridor',
       'skeleton-pen',
       'sleeping-ox',
       'slice',

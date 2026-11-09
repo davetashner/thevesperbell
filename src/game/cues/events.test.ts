@@ -73,6 +73,15 @@ const SAMPLES: Record<CueEventName, unknown> = {
     to: 'alerted',
     cause: 'event:saw-target',
   },
+  WallRecoil: {
+    tick: 1,
+    entity: 1,
+    move: 'sword-light-1',
+    activeTick: 1,
+    point: { x: 2, y: 1.2, z: -4.5 },
+    normal: { x: 0, y: 0, z: 1 },
+    ticks: 30,
+  },
   GuardBroken: { tick: 1, entity: 1, instigator: 4, source: null, staggerTicks: 60 },
   HitParried: { tick: 1, entity: 1, attacker: 4, source: null, parriedTicks: 90 },
   DodgedHit: hitbox,
@@ -561,6 +570,17 @@ describe('cue event bindings', () => {
         directions: {},
       },
     );
+  });
+
+  it('mw-e04.15: reads a wall recoil at its contact point, facing out of the wall', () => {
+    const read1 = read('WallRecoil', SAMPLES.WallRecoil);
+    expect(read1).toEqual({
+      anchors: { at: { position: { x: 2, y: 1.2, z: -4.5 } }, entity: { entity: 1 } },
+      facts: { move: 'sword-light-1' },
+      directions: { hitNormal: { x: 0, y: 0, z: 1 } },
+    });
+    const inside = { ...(SAMPLES.WallRecoil as object), normal: { x: 0, y: 0, z: 0 } };
+    expect(read('WallRecoil', inside).directions).toEqual({});
   });
 
   it('mw-e28.4: read guard breaks, dodged swings and move phases (with the move’s own sound)', () => {

@@ -38,6 +38,7 @@ import { contentId, ref } from '../schema.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
 import { capabilityId, capabilityIds, localisationKey } from './capability.ts';
 import { DAMAGE_TYPES } from './damage.ts';
+import { REACH_CLASSES } from './move.ts';
 import type { LockDef } from './lock.ts';
 import { SPELL_SCHOOLS, type SpellDefinition, type SpellSchool } from './spell.ts';
 
@@ -526,6 +527,12 @@ const itemOptions = [
       equip: equipSchema(['main-hand', 'off-hand', 'both-hands']),
       weapon: z
         .strictObject({
+          reach: z
+            .enum(REACH_CLASSES)
+            .describe(
+              'Reach class of the weapon (mw-e04.15): metres and wall recoil come from the ' +
+                'reach-class table. Bows and staves, which do not strike, still declare one.',
+            ),
           moves: z
             .array(ref('move'))
             .default([])

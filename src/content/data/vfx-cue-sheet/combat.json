@@ -1,6 +1,6 @@
 {
   "id": "combat",
-  "notes": "Combat VFX cue rules (mw-e29.3), bound to the same sim events and facts as the combat audio sheet so a hit is seen where it is heard. A clean hit throws the generic dust puff; metal striking metal or stone throws sparks instead (the most specific rule wins its layer), and so does a blade glancing off a raised shield. Every impact is oriented to the hit normal (back along the blow) and emits more for harder hits. A parry flashes on the parrier, facing the attacker, instead of any impact (the deflected hit's DamageApplied reads contact \"parried\", which no impact rule matches). Impacts stay where they happened rather than following the struck body. The material matrix (mw-e29.4): a clean hit on bone throws bone chips and dust, on wood splinters, on stone grit, on flesh a stylised teal ichor puff (never blood); a block on the wooden shield throws wood chips; a guard break shatters a ring; a critical or riposte adds a bright burst on the accent layer over the impact. A creature move that declares its own telegraph VFX (mw-e04.20, e.g. the Forgotten's unparryable lunge) plays it on the attacker as its windup reads; until the effect exists (mw-e37.93) dev builds mark where it would play.",
+  "notes": "Combat VFX cue rules (mw-e29.3), a swing that clangs off a wall (WallRecoil, mw-e04.15) throws the arrow deflect sparks (bigger and brighter than the generic impact sparks, so a recoil reads) at the contact, facing back along the wall normal, bound to the same sim events and facts as the combat audio sheet so a hit is seen where it is heard. A clean hit throws the generic dust puff; metal striking metal or stone throws sparks instead (the most specific rule wins its layer), and so does a blade glancing off a raised shield. Every impact is oriented to the hit normal (back along the blow) and emits more for harder hits. A parry flashes on the parrier, facing the attacker, instead of any impact (the deflected hit's DamageApplied reads contact \"parried\", which no impact rule matches). Impacts stay where they happened rather than following the struck body. The material matrix (mw-e29.4): a clean hit on bone throws bone chips and dust, on wood splinters, on stone grit, on flesh a stylised teal ichor puff (never blood); a block on the wooden shield throws wood chips; a guard break shatters a ring; a critical or riposte adds a bright burst on the accent layer over the impact. A creature move that declares its own telegraph VFX (mw-e04.20, e.g. the Forgotten's unparryable lunge) plays it on the attacker as its windup reads; until the effect exists (mw-e37.93) dev builds mark where it would play.",
   "rules": [
     {
       "event": "TelegraphStarted",
@@ -71,6 +71,14 @@
         "max": 30,
         "floor": 0.4
       }
+    },
+    {
+      "event": "WallRecoil",
+      "layer": "impact",
+      "at": "at",
+      "effect": "vfx-arrow-deflect-sparks",
+      "attach": false,
+      "orientTo": "hitNormal"
     },
     {
       "event": "HitParried",

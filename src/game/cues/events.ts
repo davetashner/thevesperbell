@@ -43,6 +43,7 @@ import {
   TelegraphStarted,
   volumeEntered,
   volumeExited,
+  WallRecoil,
   WaterEntered,
   type DamageAmounts,
   type DamageResult,
@@ -214,6 +215,12 @@ function blowDirections(forward: Vec3 | undefined): CueDirections {
   return along === undefined ? {} : { attackerForward: along, hitNormal: negate(along) };
 }
 
+/** A wall's outward normal as the hit normal; none when the normal is zero. */
+function wallDirections(normal: Vec3): CueDirections {
+  const out = unit(normal);
+  return out === undefined ? {} : { hitNormal: out };
+}
+
 /** An entity's facing through the lookups, if both exist. */
 const facing = (look: CueLookups, entity: EntityId | null): Vec3 | undefined =>
   entity === null ? undefined : look.facingOf?.(entity);
@@ -292,6 +299,13 @@ export const CUE_EVENT_BINDINGS: Readonly<Record<CueEventName, CueEventBinding>>
   GuardBroken: bind(GuardBroken, (e, look) => ({
     anchors: { entity: { entity: e.entity }, instigator: at(e.instigator), source: at(e.source) },
     facts: { shield: look.shieldOf?.(e.entity) },
+  })),
+  // The blade met a wall at `point`; the normal already points out of the wall, back at the fighter
+  // (zero when the blade began inside it, then the sparks have no facing).
+  WallRecoil: bind(WallRecoil, (e) => ({
+    anchors: { at: { position: e.point }, entity: { entity: e.entity } },
+    facts: { move: e.move },
+    directions: wallDirections(e.normal),
   })),
   DodgedHit: bind(DodgedHit, (e) => ({
     anchors: { target: { entity: e.target }, attacker: { entity: e.attacker } },

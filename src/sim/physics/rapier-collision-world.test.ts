@@ -107,3 +107,23 @@ describe('RapierCollisionWorld (mw-e02.21)', () => {
     expect(physics.velocityOf(1 as ColliderHandle)).toEqual(v(0, 0, 0));
   });
 });
+
+describe('isStatic (mw-e04.15)', () => {
+  it('is true for level geometry and false for a dynamic body, which wall recoil must not clang off', () => {
+    const physics = new RapierPhysics(RAPIER);
+    const wall = physics.add(box(v(3, 0, -2), v(3.5, 2, 2)));
+    const ball = physics.addBody({
+      shape: { kind: 'sphere', radius: 0.3 },
+      position: v(0, 0.5, 0),
+      mass: 1,
+      friction: 0.5,
+      restitution: 0,
+    });
+    physics.step(0);
+    const collision = new RapierCollisionWorld(physics);
+    expect(collision.isStatic(wall)).toBe(true);
+    expect(collision.isStatic(ball)).toBe(false);
+    expect(physics.isFixed(wall)).toBe(true);
+    expect(physics.isFixed(999 as ColliderHandle)).toBe(false);
+  });
+});
