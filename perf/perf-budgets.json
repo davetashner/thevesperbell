@@ -94,6 +94,186 @@
       "note": "On the reference GPU a frame takes milliseconds, so every task of 200 ms or more in the sampling window counts, frame renders included. Same run as frame-p95-high."
     },
     {
+      "id": "valley-01-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-01",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-01",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-01",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-01-frame-p50-low",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-01",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-frame-p95-low",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-01",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-01",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-02-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-02",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-02",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-02",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-02-frame-p50-low",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-02",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-frame-p95-low",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-02",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-02",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-03-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-03",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-03",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-03",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-03-frame-p50-low",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-03",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-frame-p95-low",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-03",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-03",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
       "id": "load-to-playable-slice",
       "metric": "loadToPlayableMs",
       "mode": "reference",

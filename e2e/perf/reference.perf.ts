@@ -53,6 +53,56 @@ test('AC-1: perf-baseline at High, 1440p-equivalent: frame time p95 ≤ 16.7 ms 
   });
 });
 
+// The valley scenes (mw-ju8.2: the open-air levels with a backdrop card, the heaviest scenes in the
+// game today) at both presets. High is the baseline's 1280×720 viewport at DPR 2 (2560×1440 buffer).
+// Low is a 1920×1080 buffer at DPR 1 with `?quality=low`. That is the contract's Low resolution only:
+// this machine is not the integrated GPU class Low targets (Iris Xe, base M1 8 GB), so a pass here
+// says nothing about that class. The production build has no backdrop card (it loads only in dev
+// until the images are approved), so these frames do not include it.
+const VALLEYS = ['valley-01', 'valley-02', 'valley-03'] as const;
+const PRESETS = {
+  high: { viewport: { width: 1280, height: 720 }, deviceScaleFactor: 2, label: '1280×720 @2x' },
+  low: { viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, label: '1920×1080 @1x' },
+} as const;
+
+for (const preset of ['high', 'low'] as const) {
+  test.describe(`valleys at ${preset}`, () => {
+    test.use({
+      viewport: PRESETS[preset].viewport,
+      deviceScaleFactor: PRESETS[preset].deviceScaleFactor,
+    });
+    for (const scene of VALLEYS) {
+      test(`AC-1: ${scene} at ${preset}: frame time p95 ≤ 16.7 ms over 1,800 frames`, async ({
+        page,
+      }, testInfo) => {
+        test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+        await instrument(page);
+        const sample = await sampleFrames(page, {
+          scene,
+          preset,
+          capS: FRAME_CAP_S,
+          minSamples: SAMPLE_FRAMES,
+          viewport: PRESETS[preset].label,
+        });
+        console.log(describeLongTasks(`${scene} ${preset} sampling`, sample.longTasks));
+        await enforce(testInfo, 'reference', {
+          browser: browserName(page),
+          frames: sample.run,
+          measurements: [
+            ...frameMeasurements(sample),
+            {
+              metric: 'longTasksOver200ms',
+              value: sample.longTasks.over200,
+              scene,
+              preset,
+            },
+          ],
+        });
+      });
+    }
+  });
+}
+
 // The wall-clock load budgets that used to be PR e2e assertions (mw-e41.8): same moments, measured
 // in the page, enforced here against the reference machine. Budgets: perf/perf-budgets.json.
 test.describe('load budgets', () => {
