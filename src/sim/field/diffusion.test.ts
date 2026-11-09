@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { FieldConfigInput } from './config';
-import { stepField, type FieldStepReport } from './diffusion';
+import {
+  chunkSteps,
+  LOD_RADIUS,
+  LOD_STRIDE,
+  stepField,
+  type FieldLod,
+  type FieldStepReport,
+} from './diffusion';
 import { ElementField, type CellCoord } from './grid';
 
 const c = (x: number, y = 0, z = 0): CellCoord => ({ x, y, z });
@@ -266,5 +273,94 @@ describe('stepField kernel', () => {
     const report = stepField(field);
     expect(report.activeChunks).toBe(2100);
     expect(stepField(field).activeChunks).toBe(2100); // and the next tick reuses what was kept
+  });
+});
+
+describe('sim-rate level of detail (mw-e03.30)', () => {
+  // Cell size 0.5 m, so a chunk is 4 m: x = 0 and x = 120 cells (60 m) are in different chunks.
+  const NEAR = c(0);
+  const FAR = c(120);
+  const anchor = { x: 0, y: 0, z: 0 };
+
+  /** `maxChunks` 2 walls each hot chunk in (nothing spreads), so a chunk's steps are visible. */
+  function hotField(maxChunks = 2): ElementField {
+    const field = lossless({ maxChunks });
+    field.set('temperature', NEAR, 400);
+    field.set('temperature', FAR, 400);
+    return field;
+  }
+
+  /** The ticks (0-based) on which the cell's value moved. */
+  function movedOn(field: ElementField, cell: CellCoord, ticks: number, lod?: Partial<FieldLod>) {
+    const moved: number[] = [];
+    for (let tick = 0; tick < ticks; tick++) {
+      const before = field.read('temperature', cell);
+      stepField(field, { tick, anchor, ...lod });
+      if (field.read('temperature', cell) !== before) moved.push(tick);
+    }
+    return moved;
+  }
+
+  it('AC-3: a chunk farther than 40 m updates every 4th tick, a near one every tick', () => {
+    expect(LOD_RADIUS).toBe(40);
+    expect(LOD_STRIDE).toBe(4);
+    const field = hotField();
+    const far = movedOn(field, FAR, 12);
+    expect(far).toHaveLength(3);
+    expect(far.slice(1).map((tick, i) => tick - (far[i] ?? NaN))).toEqual([4, 4]);
+    const near = hotField();
+    expect(movedOn(near, NEAR, 12)).toHaveLength(12);
+  });
+
+  it('AC-3: results are deterministic across runs, and heat is still conserved', () => {
+    const run = () => {
+      const field = hotField(64);
+      let lost = 0;
+      for (let tick = 0; tick < 40; tick++) {
+        lost += stepField(field, { tick, anchor }).lost['temperature'] ?? 0;
+      }
+      return { data: JSON.stringify(field.serialize()), total: field.total('temperature') + lost };
+    };
+    const a = run();
+    expect(run()).toEqual(a);
+    expect(a.total).toBeCloseTo(760, 3); // two cells 380 °C above the ambient 20
+  });
+
+  it('skips only far chunks, so a field with no far chunk steps exactly as without LOD', () => {
+    const plain = lossless();
+    const lod = lossless();
+    for (const f of [plain, lod]) f.set('temperature', NEAR, 400);
+    for (let tick = 0; tick < 10; tick++) {
+      stepField(plain);
+      stepField(lod, { tick, anchor });
+    }
+    expect(lod.serialize()).toEqual(plain.serialize());
+  });
+
+  it('reports fewer active chunks while far chunks sit out', () => {
+    const field = hotField();
+    const counts = [0, 1, 2, 3].map((tick) => stepField(field, { tick, anchor }).activeChunks);
+    expect(Math.min(...counts)).toBe(1);
+    expect(Math.max(...counts)).toBe(2);
+  });
+
+  it('honours a custom radius and stride, and negative chunk coordinates', () => {
+    const field = hotField();
+    expect(movedOn(field, FAR, 12, { radius: 100 })).toHaveLength(12);
+    const slow = hotField();
+    expect(movedOn(slow, FAR, 16, { stride: 8 })).toHaveLength(2);
+    const west = lossless({ maxChunks: 1 });
+    west.set('temperature', c(-120), 400);
+    expect(movedOn(west, c(-120), 12)).toHaveLength(3);
+  });
+
+  it('a far chunk is stepped on exactly one tick in four', () => {
+    const field = hotField();
+    const chunk = field.chunkList().find((ch) => ch.cx > 10);
+    if (chunk === undefined) throw new Error('no far chunk');
+    const ticks = [0, 1, 2, 3, 4, 5, 6, 7].filter((tick) =>
+      chunkSteps(field, chunk, { tick, anchor }),
+    );
+    expect(ticks).toHaveLength(2);
   });
 });

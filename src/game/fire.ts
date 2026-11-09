@@ -32,6 +32,7 @@ import {
   installIce,
   installLiquids,
   LightSourceComponent,
+  type Vec3,
   type World,
 } from '@sim/index';
 
@@ -44,7 +45,11 @@ import {
 export function installGameFire<TInput>(
   world: World<TInput>,
   content: Pick<GameContent, 'all' | 'get'>,
-  options: { readonly damage?: DamageModel } = {},
+  options: {
+    readonly damage?: DamageModel;
+    /** The player's position: the field runs at a reduced rate far from it (mw-e03.30). */
+    readonly focus?: () => Vec3 | undefined;
+  } = {},
 ): void {
   const materials = content.all('material');
   const presets = materialPresets(materials);
@@ -99,5 +104,5 @@ export function installGameFire<TInput>(
         ]),
       ),
     )
-    .addSystem(elementFieldSystem());
+    .addSystem(elementFieldSystem(undefined, options.focus));
 }
