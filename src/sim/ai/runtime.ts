@@ -38,6 +38,7 @@
 import type { AlertState, BehaviourEvent } from '@content/index';
 import type { AttackLookup } from '../combat/attacks/executor';
 import { HealthComponent } from '../combat/damage/components';
+import { isFrozenSolid } from '../elements/actors';
 import { GuardComponent, setBlockHeld } from '../combat/melee/components';
 import type { EntityId } from '../core/component';
 import type { System, World } from '../core/world';
@@ -288,6 +289,8 @@ function aiSystem<TInput>(runtime: AiRuntime): System<TInput> {
         // A creature at zero health is dead: it does not think, move, leash or fight on.
         const health = getIf(world, entity, HealthComponent);
         if (health !== undefined && health.current <= 0) return undefined;
+        // Frozen solid, it does nothing until it thaws (mw-e03.24).
+        if (isFrozenSolid(world, entity)) return undefined;
         view.entity = entity;
         view.brain = brain;
         view.creature = getIf(world, entity, CreatureComponent);

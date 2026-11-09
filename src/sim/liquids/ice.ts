@@ -20,6 +20,7 @@ import { box } from '../character/greybox';
 import type { EntityId } from '../core/component';
 import type { World } from '../core/world';
 import type { ElementRule } from '../elements/rules';
+import { isActor } from '../elements/actors';
 import { clampTemperature } from '../elements/heat';
 import { PhysicsObjectComponent } from '../physics/objects';
 import { boundingRadius, type RigidBodyPort } from '../physics/bodies';
@@ -369,6 +370,7 @@ function thingsRule(config: FreezeConfig): ElementRule {
       const cold: EntityId[] = [];
       const warm: EntityId[] = [];
       world.query(WorldProperties.temperature).forEach((entity, temperature) => {
+        if (isActor(world, entity)) return; // actors freeze by their own rule (mw-e03.24)
         const freezePoint = readProperty(world, entity, 'freezePoint');
         if (readProperty(world, entity, 'frozen')) {
           const state = world.get(entity, FreezeStateComponent);

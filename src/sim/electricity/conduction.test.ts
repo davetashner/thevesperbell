@@ -384,6 +384,8 @@ describe('conduction (mw-e03.8)', () => {
       { maxNodes: 0 },
       { maxNodes: 2.5 },
       { contactGap: -1 },
+      { wetActorFactor: 0.5 },
+      { wetActorFactor: Infinity },
       { contactGap: Infinity },
       { minCharge: 0 },
       { halfLifeSeconds: -1 },

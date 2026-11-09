@@ -96,7 +96,67 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `regions[].armor` | number ≥ 0 | — | Armour value: arrows with less penetration ricochet off it for 0 damage. |
 | `regions[].enabledIn` | list of id | — | Weakpoints only (required for them): the creature states it is enabled in, e.g. ["roaring"]; outside them a hit resolves against `underlying`. |
 | `regions[].underlying` | `"head"` \| `"torso"` \| `"limb"` | — | Region a disabled weakpoint resolves as; absent = torso. |
-| `properties` | list of id | `[]` | World-property tags (e03), e.g. "flammable", "conductive". |
+| `properties` | object | `{}` | World properties of its body (e03, mw-e03.24): the same ones objects have, so it burns, soaks, freezes and conducts by the same rules. Omitted ones take the flesh material's, then the actor defaults (flammable, ignites at 450 °C, burns 6 s). |
+| `properties.material` | ref → material | — | Material preset id (a material content entry). |
+| `properties.temperature` | number -273.15–10000 | — | Current temperature, °C. |
+| `properties.flammable` | boolean | — | Fire can ignite it. |
+| `properties.ignitionPoint` | number -273.15–10000 | — | Temperature at which it ignites, °C. |
+| `properties.fuel` | number 0–86400 | — | Seconds of burning left. |
+| `properties.burning` | boolean | — | On fire right now. |
+| `properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
+| `properties.frozen` | boolean | — | Frozen solid. |
+| `properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
+| `properties.conductive` | boolean | — | Conducts electric charge. |
+| `properties.charge` | number 0–1000000 | — | Stored electric charge. |
+| `properties.weight` | number 0–1000000 | — | Mass, kg. |
+| `properties.fragile` | number 0–1000000000 | — | Impact energy that breaks it, J. |
+| `properties.hp` | number 0–1000000 | — | Structural hit points. |
+| `properties.density` | number 0.01–100000 | — | Density, kg/m³; below 1000 it floats in water. |
+| `properties.climbable` | `"none"` \| `"ladder"` \| `"rope"` \| `"ivy"` \| `"rough"` \| `"sheer"` | — | Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool). |
+| `properties.liftable` | boolean | — | Can be picked up and carried. |
+| `properties.pushable` | boolean | — | Can be pushed or dragged. |
+| `properties.remoteActuatable` | boolean | — | Can be operated from a distance by magic (remote actuation). |
+| `properties.hideable` | boolean | — | An actor can hide in or behind it. |
+| `properties.reflective` | boolean | — | Reflects light beams and bolts. |
+| `properties.transparent` | boolean | — | Light and sight pass through it. |
+| `properties.opaque` | boolean | — | Fully blocks light and sight. |
+| `properties.lightEmitter` | object | — | Emits light. |
+| `properties.lightEmitter.intensity` | number 0–100000 | required | Light output (a torch is about 100). |
+| `properties.lightEmitter.radius` | number 0–100 | required | Reach, m. |
+| `properties.soundDamping` | number 0–1 | — | Fraction of sound it absorbs, 0 … 1. |
+| `properties.friction` | number 0–2 | — | Surface friction coefficient. |
+| `properties.impactAbsorb` | number 0–1 | — | Fraction of impact energy it absorbs, 0 … 1. |
+| `properties.owner` | id | — | Ownership tag (faction or owner id). |
+| `properties.liquid` | boolean | — | A liquid: it pours, puddles and can have a water surface. |
+| `properties.flammableGas` | boolean | — | A gas that ignites (flares or explodes) when fire reaches it. |
+| `properties.extinguishable` | boolean | — | A fire or light source that water, force or an interaction puts out. |
+| `properties.windResistance` | number 0–1000000 | — | Force of one gust, blast or kick that blows its flame out, N·s. |
+| `properties.flameRadius` | number 0–5 | — | Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach. |
+| `properties.waterSurface` | boolean | — | Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material). |
+| `properties.unstable` | number 0–1000000000 | — | Force of one push, blast or quake that topples it, J. |
+| `properties.suspended` | boolean | — | Hangs from its support; falls when the support breaks, burns or is cut. |
+| `properties.support` | integer ≥ 0 | — | Entity a suspended object hangs from (0 = none); set when the level spawns. |
+| `properties.breakable` | boolean | — | A single hit at or above its toughness for that kind of hit breaks it. |
+| `properties.toughness` | object | — | Per kind of hit, the single-hit energy that breaks a breakable object; a kind left out never does. |
+| `properties.toughness.blunt` | number 0–1000000000 | — | Blunt hit energy that breaks it, J. |
+| `properties.toughness.slash` | number 0–1000000000 | — | Slash hit energy that breaks it, J. |
+| `properties.toughness.pierce` | number 0–1000000000 | — | Pierce hit energy that breaks it, J. |
+| `properties.toughness.force` | number 0–1000000000 | — | Force (blast, quake, boulder) energy that breaks it, J. |
+| `properties.bashable` | boolean | — | A shield bash or kick shoves it (or breaks it when breakable). |
+| `properties.cuttable` | boolean | — | Slash or pierce damage severs it. |
+| `properties.shootable` | number 0–1000000 | — | Projectile impulse that fires its signal, N·s. |
+| `properties.softAnchor` | boolean | — | Rope arrows and hooks embed in it. |
+| `properties.surfaceHardness` | `"soft"` \| `"medium"` \| `"hard"` | — | Footstep loudness and whether arrows stick (soft, medium) or ricochet (hard). |
+| `properties.chargeActivated` | number 0–1000000000 | — | Stored charge at which the mechanism fires. |
+| `properties.lightActivated` | number 0–1000000000 | — | Light level on it at which the mechanism fires. |
+| `properties.hidden` | boolean | — | Not perceivable or targetable until revealed. |
+| `properties.trapped` | boolean | — | Interacting with it triggers its trap unless disarmed first (needs a trap). |
+| `properties.trap` | id | — | Trap definition id a trapped object triggers. |
+| `properties.container` | boolean | — | Holds items (contents live in the e18 container component). |
+| `properties.remains` | boolean | — | Inert skeletal or corpse remains that summoning can raise. |
+| `properties.noiseMultiplier` | number 0.2–3 | — | Multiplier on its wearer's noise; an actor's is the product of its equipment's. |
+| `aflame` | boolean | `false` | Permanently on fire (a fire elemental): it burns whatever it touches and nothing puts it out; its fire resistance only spares it the damage (mw-e03.24). |
 | `resistances` | map of `"slash"` \| `"pierce"` \| `"blunt"` \| `"fire"` \| `"frost"` \| `"shock"` \| `"arcane"` \| `"poison"` → number 0–3 | `{}` | Damage multiplier per damage type, 0–3: 0 = immune, below 1 resists, above 1 vulnerable. Unlisted types take 1. |
 | `poiseRegen` | object | `{}` | How poise recovers after poise damage. |
 | `poiseRegen.delayTicks` | integer ≥ 0 | `120` | Sim ticks (60 Hz) without poise damage before poise starts to regenerate. |

@@ -683,13 +683,336 @@
       }
     },
     "properties": {
-      "description": "World-property tags (e03), e.g. \"flammable\", \"conductive\".",
-      "default": [],
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-      }
+      "description": "World properties of its body (e03, mw-e03.24): the same ones objects have, so it burns, soaks, freezes and conducts by the same rules. Omitted ones take the flesh material's, then the actor defaults (flammable, ignites at 450 °C, burns 6 s).",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "material": {
+          "description": "Material preset id (a material content entry).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "material"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": -273.15,
+          "maximum": 10000,
+          "description": "Current temperature, °C."
+        },
+        "flammable": {
+          "type": "boolean",
+          "description": "Fire can ignite it."
+        },
+        "ignitionPoint": {
+          "type": "number",
+          "minimum": -273.15,
+          "maximum": 10000,
+          "description": "Temperature at which it ignites, °C."
+        },
+        "fuel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 86400,
+          "description": "Seconds of burning left."
+        },
+        "burning": {
+          "type": "boolean",
+          "description": "On fire right now."
+        },
+        "wetness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How soaked it is (dry … saturated), 0 … 1."
+        },
+        "absorbency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1."
+        },
+        "frozen": {
+          "type": "boolean",
+          "description": "Frozen solid."
+        },
+        "freezePoint": {
+          "type": "number",
+          "minimum": -273.15,
+          "maximum": 10000,
+          "description": "Temperature at or below which it freezes, °C."
+        },
+        "conductive": {
+          "type": "boolean",
+          "description": "Conducts electric charge."
+        },
+        "charge": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Stored electric charge."
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Mass, kg."
+        },
+        "fragile": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000,
+          "description": "Impact energy that breaks it, J."
+        },
+        "hp": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Structural hit points."
+        },
+        "density": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100000,
+          "description": "Density, kg/m³; below 1000 it floats in water."
+        },
+        "climbable": {
+          "type": "string",
+          "enum": [
+            "none",
+            "ladder",
+            "rope",
+            "ivy",
+            "rough",
+            "sheer"
+          ],
+          "description": "Climbing grade: none, ladder, rope, ivy (easy), rough (needs a climber), sheer (needs a tool)."
+        },
+        "liftable": {
+          "type": "boolean",
+          "description": "Can be picked up and carried."
+        },
+        "pushable": {
+          "type": "boolean",
+          "description": "Can be pushed or dragged."
+        },
+        "remoteActuatable": {
+          "type": "boolean",
+          "description": "Can be operated from a distance by magic (remote actuation)."
+        },
+        "hideable": {
+          "type": "boolean",
+          "description": "An actor can hide in or behind it."
+        },
+        "reflective": {
+          "type": "boolean",
+          "description": "Reflects light beams and bolts."
+        },
+        "transparent": {
+          "type": "boolean",
+          "description": "Light and sight pass through it."
+        },
+        "opaque": {
+          "type": "boolean",
+          "description": "Fully blocks light and sight."
+        },
+        "lightEmitter": {
+          "type": "object",
+          "properties": {
+            "intensity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100000,
+              "description": "Light output (a torch is about 100)."
+            },
+            "radius": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Reach, m."
+            }
+          },
+          "required": [
+            "intensity",
+            "radius"
+          ],
+          "additionalProperties": false,
+          "description": "Emits light."
+        },
+        "soundDamping": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of sound it absorbs, 0 … 1."
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Surface friction coefficient."
+        },
+        "impactAbsorb": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of impact energy it absorbs, 0 … 1."
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Ownership tag (faction or owner id)."
+        },
+        "liquid": {
+          "type": "boolean",
+          "description": "A liquid: it pours, puddles and can have a water surface."
+        },
+        "flammableGas": {
+          "type": "boolean",
+          "description": "A gas that ignites (flares or explodes) when fire reaches it."
+        },
+        "extinguishable": {
+          "type": "boolean",
+          "description": "A fire or light source that water, force or an interaction puts out."
+        },
+        "windResistance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Force of one gust, blast or kick that blows its flame out, N·s."
+        },
+        "flameRadius": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Radius around its centre in which its flame burns a creature that touches it, m (0 = enclosed: a lantern never burns passers-by). Leave it off a loose burning object: that burns within its own radius plus the hazard reach."
+        },
+        "waterSurface": {
+          "type": "boolean",
+          "description": "Top surface of a body of liquid: cold freezes it into walkable ice (needs a liquid material)."
+        },
+        "unstable": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000,
+          "description": "Force of one push, blast or quake that topples it, J."
+        },
+        "suspended": {
+          "type": "boolean",
+          "description": "Hangs from its support; falls when the support breaks, burns or is cut."
+        },
+        "support": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "Entity a suspended object hangs from (0 = none); set when the level spawns."
+        },
+        "breakable": {
+          "type": "boolean",
+          "description": "A single hit at or above its toughness for that kind of hit breaks it."
+        },
+        "toughness": {
+          "type": "object",
+          "properties": {
+            "blunt": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000,
+              "description": "Blunt hit energy that breaks it, J."
+            },
+            "slash": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000,
+              "description": "Slash hit energy that breaks it, J."
+            },
+            "pierce": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000,
+              "description": "Pierce hit energy that breaks it, J."
+            },
+            "force": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000,
+              "description": "Force (blast, quake, boulder) energy that breaks it, J."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Per kind of hit, the single-hit energy that breaks a breakable object; a kind left out never does."
+        },
+        "bashable": {
+          "type": "boolean",
+          "description": "A shield bash or kick shoves it (or breaks it when breakable)."
+        },
+        "cuttable": {
+          "type": "boolean",
+          "description": "Slash or pierce damage severs it."
+        },
+        "shootable": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Projectile impulse that fires its signal, N·s."
+        },
+        "softAnchor": {
+          "type": "boolean",
+          "description": "Rope arrows and hooks embed in it."
+        },
+        "surfaceHardness": {
+          "type": "string",
+          "enum": [
+            "soft",
+            "medium",
+            "hard"
+          ],
+          "description": "Footstep loudness and whether arrows stick (soft, medium) or ricochet (hard)."
+        },
+        "chargeActivated": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000,
+          "description": "Stored charge at which the mechanism fires."
+        },
+        "lightActivated": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000,
+          "description": "Light level on it at which the mechanism fires."
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "Not perceivable or targetable until revealed."
+        },
+        "trapped": {
+          "type": "boolean",
+          "description": "Interacting with it triggers its trap unless disarmed first (needs a trap)."
+        },
+        "trap": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Trap definition id a trapped object triggers."
+        },
+        "container": {
+          "type": "boolean",
+          "description": "Holds items (contents live in the e18 container component)."
+        },
+        "remains": {
+          "type": "boolean",
+          "description": "Inert skeletal or corpse remains that summoning can raise."
+        },
+        "noiseMultiplier": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 3,
+          "description": "Multiplier on its wearer's noise; an actor's is the product of its equipment's."
+        }
+      },
+      "additionalProperties": false
+    },
+    "aflame": {
+      "description": "Permanently on fire (a fire elemental): it burns whatever it touches and nothing puts it out; its fire resistance only spares it the damage (mw-e03.24).",
+      "default": false,
+      "type": "boolean"
     },
     "resistances": {
       "description": "Damage multiplier per damage type, 0–3: 0 = immune, below 1 resists, above 1 vulnerable. Unlisted types take 1.",
