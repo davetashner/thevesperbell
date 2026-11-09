@@ -344,6 +344,44 @@
       "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
       "scene": "valley-02",
       "note": "Reference mode, warm: teleport into valley-01's north gate; #app[data-transit].ms of the arriving page is the wall-clock time from the crossing to the first sim step in valley-02 (mw-e01.11 AC-4: grey-box scene to scene ≤ 3 s)."
+    },
+    {
+      "id": "input-to-motion-high",
+      "metric": "inputToMotionP95Ms",
+      "mode": "reference",
+      "max": 100,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "scene": "testbed",
+      "preset": "high",
+      "note": "mw-e02.8 AC-1. Contract §5 writes \"responsive\" as input-to-motion latency ≤ 100 ms (target ≤ 50 ms). p95 of 50 synthetic move key presses in the greybox testbed at High, display paced to 60 fps, vsync on: keydown event to the end of the first frame callback that draws the player moved."
+    },
+    {
+      "id": "input-to-motion-low-30fps",
+      "metric": "inputToMotionP95Ms",
+      "mode": "reference",
+      "max": 133,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: 30 fps floor in worst-case combat",
+      "scene": "testbed",
+      "preset": "low",
+      "note": "mw-e02.8 AC-4. The same at the Low preset with the display paced to 30 fps, the Low worst case: two 33 ms frame intervals of slack, ≤ 133 ms."
+    },
+    {
+      "id": "controller-tick-p95",
+      "metric": "controllerTickP95Ms",
+      "mode": "reference",
+      "max": 0.3,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "scene": "testbed",
+      "note": "mw-e02.8 AC-2. Wall time of one character controller system run (one sim tick), p95 over 60 s of scripted traversal: a small slice of the 16.7 ms frame the 60 fps baseline leaves."
+    },
+    {
+      "id": "camera-frame-p95",
+      "metric": "cameraFrameP95Ms",
+      "mode": "reference",
+      "max": 0.2,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "scene": "testbed",
+      "note": "mw-e02.8 AC-2. Wall time of one orbit camera placement (collision boom, framing, clip probe and its readout), p95 per drawn frame over the same traversal."
     }
   ]
 }

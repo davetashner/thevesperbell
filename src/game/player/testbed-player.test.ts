@@ -453,6 +453,27 @@ describe('testbed player wiring (mw-e02.23)', () => {
     expect(camera.at.z).toBeLessThan(after.z - 2); // still behind it
   });
 
+  it('mw-e02.8: timing hands over one controller run per sim tick and one camera placement per frame', () => {
+    let clock = 0;
+    const controller: number[] = [];
+    const camera: number[] = [];
+    const { sampler, run, world } = testbed({
+      timing: {
+        now: () => (clock += 0.5),
+        controller: (ms) => controller.push(ms),
+        camera: (ms) => camera.push(ms),
+      },
+    });
+    const before = { controller: controller.length, camera: camera.length, tick: world.tick };
+    sampler.down('KeyW');
+    run(0.5);
+    sampler.up('KeyW');
+    expect(controller.length - before.controller).toBe(world.tick - before.tick);
+    expect(controller.length - before.controller).toBeGreaterThan(20);
+    expect(camera.length - before.camera).toBe(30);
+    expect([...controller, ...camera].every((ms) => ms === 0.5)).toBe(true);
+  });
+
   it('the back wall stops the player: it rests in front of it and never passes through', () => {
     const { sampler, run, state } = testbed();
     sampler.down('KeyS'); // back, towards the wall at z = −5 (its face is at −4.9)

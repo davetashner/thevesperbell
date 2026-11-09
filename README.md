@@ -163,7 +163,8 @@ Dying plays a death beat, then the death screen lets you reload a save or restar
 | `pnpm e2e:shards <n> <of>` | Spec files for CI shard n of `of` (weights in `e2e/shards.json`) |
 | `pnpm bench`         | Vitest benchmarks (`*.bench.ts`) that assert sim perf budgets    |
 | `pnpm perf`          | Perf budget suite, CI mode (see [Perf budgets](#perf-budgets)); `PERF_HEAP_IDLE_S=30` shortens the 5-minute heap idle |
-| `pnpm perf:ref`      | Perf budget suite, reference mode: absolute frame-time budgets on the reference machine only |
+| `pnpm perf:ref`      | Perf budget suite, reference mode: absolute frame-time, input-latency and controller-cost budgets on the reference machine only |
+| `pnpm perf:latency`  | Just the input-latency and controller/camera cost budgets (`latency` project, reference machine only) |
 | `pnpm perf:budgets`  | Validates `perf/perf-budgets.json`: every budget quotes the contract's hardware baseline |
 | `pnpm content:coverage` | After `pnpm test`: fails listing content entries no passing test exercised |
 | `pnpm content:schemas`  | Regenerates `src/content/data/<type>.schema.json` for editor autocompletion |
@@ -212,6 +213,20 @@ has two modes:
   mode, because software GL on shared runners makes absolute loads jitter (restarts measured 9–10 s
   there). CI mode adds no relative or ceiling guard for them; its throttled testbed load and warm
   reload budgets remain. PR e2e specs keep only functional assertions and hang-protection timeouts.
+
+Input latency and controller cost are budgeted too (mw-e02.8), by the `latency` project
+(`e2e/perf/latency.perf.ts`, `pnpm perf:latency`, part of `pnpm perf:ref`): headed Chrome with vsync on on the
+reference machine, the page's frames paced to 60 fps (30 fps for the Low case). In the greybox testbed,
+50 synthetic move key presses must show input-to-motion latency p95 ≤ 100 ms at High (target ≤ 50 ms) and ≤ 133 ms
+at Low paced to 30 fps: keydown event to the end of the first frame callback in which the player's drawn transform
+moved. During 60 s of scripted traversal the character controller system must cost ≤ 0.3 ms per sim tick and the
+orbit camera placement ≤ 0.2 ms per frame, both p95. The probe (`src/tools/perf/latency-probe.ts`, `?latency`) exists
+only in the dev server and in builds made with `VESPER_LATENCY_PROBE=on` (the latency project builds one into
+`test-results/latency-build`, served cross-origin isolated for a 5 µs `performance.now()`); a production build does not
+contain it (`tests/toolchain/latency-probe-stripped.test.ts`). The CI project keeps measuring the production build.
+These need a real display and GPU, so they run by hand on the reference machine, not on PRs or nightly. The controller's half
+also runs nightly as `tests/bench/controller-cost.bench.ts` (`pnpm bench`, the same ≤ 0.3 ms p95 over 60 s of the traversal
+course, timed through the controller system's `measure` hook; about 0.05 ms measured).
 
 The sim's own per-tick cost has budgets too (mw-e03.30), in vitest benches (`pnpm bench`, nightly):
 `tests/bench/sim-stress.bench.ts` times fire spread over 2,000 active cells (p95 ≤ 2.0 ms on the
