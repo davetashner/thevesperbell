@@ -250,6 +250,20 @@ each fighter — a fall, a wall strike, a crushing object or a hazard — with f
 `src/content/data/environment-damage/default.json`. `?frames` adds the overlay to any scene; the sandbox's sim seed is
 fixed, so e2e tests and replays see the same arena every time.
 
+### World state console (debug builds)
+
+Test a late-game branch without replaying the game. These commands ship only with the debug console
+(never in a `VESPER_DEBUG_CONSOLE=off` release build); changes go out as sim commands, so replays record them.
+
+| Command | What it does |
+| --- | --- |
+| `facts.list [prefix]`, `facts.get <key>` | Set facts (optionally under a prefix), or one fact's value, type and default |
+| `facts.set <key> <value>` | Write a declared fact from the next tick (undeclared keys and bad values print an error); dependent conditions re-evaluate |
+| `deltas.list [level]` | Levels with changes, or one level's changed entities and spawned records |
+| `state.snapshot [name]`, `state.restore [name]` | Keep the facts and level deltas in memory, and put them back (the loaded level's entities keep their state) |
+| `state.diff <a> <b>` | Facts and per-level deltas that differ between two of: a save slot (`manual-1`, `quick`...), `live`, a snapshot name |
+| `state.panel [on\|off]` | A panel over the game listing the facts and level deltas |
+
 ## Layout
 
 Code lives in `src/`, split into layers (contract §2), each importable through an alias (`@sim/*`,
