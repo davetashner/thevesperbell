@@ -123,6 +123,92 @@ describe('scene layout (mw-e00.21)', () => {
     ]);
   });
 
+  it('mw-e03.13: a rope lays out in metres, to its other anchor, with its support data', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      grid: 2,
+      spawns: [
+        { id: 'plain', at: [0, 3, 0], yaw: 0, tags: [], rope: { length: 1.5, radius: 0.1 } },
+        {
+          id: 'span',
+          at: [1, 2, 0],
+          yaw: 0,
+          tags: [],
+          rope: {
+            to: [4, 2, 0],
+            support: { rating: 150, resistances: { pierce: 0.3, slash: undefined }, span: 'b' },
+          },
+        },
+        { id: 'bare', at: [0, 3, 1], yaw: 0, tags: [], rope: { length: 1, support: {} } },
+      ],
+    };
+    const [plain, span, bare] = layoutScene(scene, testKit).spawns;
+    expect(plain?.rope).toEqual({ length: 1.5, radius: 0.1 });
+    expect(span?.rope).toEqual({
+      length: 6,
+      to: { x: 8, y: 4, z: 0 },
+      support: { rating: 150, resistances: { pierce: 0.3 }, span: 'b' },
+    });
+    expect(bare?.rope).toEqual({ length: 1, support: { resistances: {} } });
+  });
+
+  it.each([
+    ['z', [0, 1, 0], [0, 1, 4], 0, (i: number) => ({ x: 0, y: 1, z: 0.5 + i })],
+    ['x', [0, 1, 0], [4, 1, 0], 90, (i: number) => ({ x: 0.5 + i, y: 1, z: 0 })],
+  ] as const)(
+    'mw-e03.13: a rope bridge along %s becomes a marker, two support ropes and its planks',
+    (_axis, at, to, yaw, plankAt) => {
+      const scene: SceneSpec = {
+        ...TEST_SCENE,
+        grid: 1,
+        spawns: [
+          {
+            id: 'bridge',
+            at,
+            yaw: 0,
+            tags: ['bridge'],
+            bridge: {
+              to,
+              planks: 4,
+              plank: { id: 'plank' },
+              rating: 150,
+              width: 1.2,
+              resistances: { pierce: 0.3 },
+            },
+          },
+        ],
+      };
+      const spawns = layoutScene(scene, testKit).spawns;
+      expect(spawns.map((s) => s.id)).toEqual([
+        'bridge',
+        'bridge-rope-1',
+        'bridge-rope-2',
+        'bridge-plank-1',
+        'bridge-plank-2',
+        'bridge-plank-3',
+        'bridge-plank-4',
+      ]);
+      const [, a, b, ...planks] = spawns;
+      expect(a?.rope).toMatchObject({
+        length: 4,
+        support: { rating: 150, resistances: { pierce: 0.3 }, span: 'bridge' },
+      });
+      expect(a?.tags).toEqual(['rope', 'bridge']);
+      const ends = [a, b].map((rope) => [rope?.position, rope?.rope?.to]);
+      const side = (p: { x: number; z: number } | undefined) => (yaw === 0 ? p?.x : p?.z);
+      expect(side(ends[0]?.[0])).toBeCloseTo(-0.6);
+      expect(side(ends[1]?.[0])).toBeCloseTo(0.6);
+      expect(side(ends[0]?.[1])).toBeCloseTo(-0.6);
+      // The ropes run just under the planks, clear of them.
+      expect(a?.position.y).toBeCloseTo(0.94);
+      expect(a?.rope?.to?.y).toBeCloseTo(0.94);
+      expect(planks[0]?.position.y).toBe(1);
+      expect(planks.map((p) => p.position)).toEqual([0, 1, 2, 3].map(plankAt));
+      expect(planks.every((p) => p.yaw === yaw && p.prop === 'plank')).toBe(true);
+      expect(planks.every((p) => p.suspendedFrom === 'bridge-rope-1')).toBe(true);
+    },
+  );
+
   it('lays out a creature spawn with its faction override and patrol route in metres (mw-e12.4)', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,

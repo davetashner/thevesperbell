@@ -811,7 +811,7 @@ describeContent(
 );
 
 describe('scene content', () => {
-  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College and the skeleton pen', () => {
+  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College, the chandelier room and the skeleton pen', () => {
     expect(
       loadContent(contentTypes, gameContentSources(), contentChecks)
         .all('scene')
@@ -819,6 +819,7 @@ describe('scene content', () => {
     ).toEqual([
       'briar-glen-lane',
       'bridgeward-college',
+      'chandelier-room',
       'combat-sandbox',
       'kit-gallery',
       'lighting-room',
@@ -969,5 +970,106 @@ describe('scene ropes and hanging props (mw-e05.13)', () => {
         'spawns.2.suspendedFrom: spawn "ghost" hangs from "missing", which is not a rope spawn of this scene',
       ]),
     );
+  });
+});
+
+describe('scene supports and rope bridges (mw-e03.13)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 3, 0], ...extra });
+  const bridge = (extra: object = {}) => ({
+    to: [6, 3, 0],
+    planks: 12,
+    plank: 'plank',
+    rating: 150,
+    width: 1.2,
+    ...extra,
+  });
+
+  it('takes a rope with support: a rating, resistances and a span, over a second anchor', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('left', {
+          rope: {
+            to: [4, 3, 0],
+            support: { rating: 150, resistances: { pierce: 0.3 }, span: 'bridge' },
+          },
+        }),
+        spawn('chain', { rope: { length: 2, support: {} } }),
+      ],
+    });
+    expect(scene.spawns[0]?.rope?.support).toEqual({
+      rating: 150,
+      resistances: { pierce: 0.3 },
+      span: 'bridge',
+    });
+    expect(scene.spawns[1]?.rope?.support).toEqual({ resistances: {} });
+  });
+
+  it('rejects a rope with both or neither of length and to, a far anchor without support, a bad share', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('both', { rope: { length: 2, to: [1, 3, 0] } }),
+          spawn('neither', { rope: {} }),
+          spawn('loose', { rope: { to: [3, 3, 0] } }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.rope: spawn "both" needs exactly one of length and to',
+        'spawns.1.rope: spawn "neither" needs exactly one of length and to',
+        'spawns.2.rope: spawn "loose" runs to another point but has no support: a cuttable rope hangs straight down',
+      ]),
+    );
+    expect(
+      problems({
+        ...room,
+        spawns: [spawn('hot', { rope: { length: 2, support: { resistances: { pierce: 1.5 } } } })],
+      }),
+    ).toEqual([expect.stringMatching(/^spawns\.0\.rope\.support\.resistances\.pierce: /)]);
+  });
+
+  it('takes a rope bridge spawn, level and along x or z', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [spawn('span', { bridge: bridge({ resistances: { pierce: 0.3 } }) })],
+    });
+    expect(scene.spawns[0]?.bridge).toMatchObject({ planks: 12, rating: 150, width: 1.2 });
+    expect(scene.spawns[0]?.bridge?.resistances).toEqual({ pierce: 0.3 });
+  });
+
+  it('rejects a bridge that climbs, runs diagonally or nowhere, or is also something else', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('up', { bridge: bridge({ to: [6, 4, 0] }) }),
+          spawn('diagonal', { bridge: bridge({ to: [6, 3, 6] }) }),
+          spawn('nowhere', { bridge: bridge({ to: [0, 3, 0] }) }),
+          spawn('both', { bridge: bridge(), rope: { length: 1 }, prop: 'barrel' }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.bridge: spawn "up" must run level: `to` is at another height',
+        'spawns.1.bridge: spawn "diagonal" must run along x or z, and be longer than nothing',
+        'spawns.2.bridge: spawn "nowhere" must run along x or z, and be longer than nothing',
+        'spawns.3.rope: spawn "both" cannot be both a rope bridge and a rope',
+        'spawns.3.prop: spawn "both" cannot be both a rope bridge and a prop',
+      ]),
+    );
+  });
+
+  it('ships the chandelier room: a chandelier and an anvil on supports, over a rated rope bridge', () => {
+    const scene = loadContent(contentTypes, gameContentSources(), contentChecks).get(
+      'scene',
+      'chandelier-room',
+    );
+    const byId = new Map(scene.spawns.map((s) => [s.id, s]));
+    expect(byId.get('chandelier')?.suspendedFrom).toBe('chandelier-rope');
+    expect(byId.get('anvil')?.suspendedFrom).toBe('anvil-rope');
+    expect(byId.get('chandelier-rope')?.rope?.support?.resistances.pierce).toBe(0.3);
+    expect(byId.get('rope-bridge')?.bridge).toMatchObject({ planks: 12, rating: 150 });
   });
 });

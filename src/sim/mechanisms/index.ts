@@ -5,6 +5,7 @@ export * from './events';
 export * from './geometry';
 export * from './impacts';
 export * from './ropes';
+export * from './supports';
 export * from './keys';
 export * from './plates';
 export * from './receivers';

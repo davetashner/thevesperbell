@@ -181,10 +181,54 @@ export interface SceneImpactSwitchSpec {
   readonly loudness?: number | null | undefined;
 }
 
-/** A cuttable rope spawn (mw-e05.13): it hangs straight down from the spawn point. */
+/** Shares of each kind of hit a support ignores, 0 … 1 (mw-e03.13). */
+export interface SceneResistancesSpec {
+  readonly blunt?: number | undefined;
+  readonly slash?: number | undefined;
+  readonly pierce?: number | undefined;
+  readonly force?: number | undefined;
+}
+
+/** What makes a rope a support with hit points and a rating (mw-e03.13). */
+export interface SceneSupportSpec {
+  readonly rating?: number | undefined;
+  readonly resistances?: SceneResistancesSpec | undefined;
+  readonly span?: string | undefined;
+}
+
+/**
+ * A rope spawn (mw-e05.13): a cord from the spawn point straight down `length` metres, or to `to`
+ * (grid cells). With `support` it has hit points and a load rating (mw-e03.13).
+ */
 export interface SceneRopeSpec {
-  readonly length: number;
+  readonly length?: number | undefined;
+  readonly to?: Triple | undefined;
   readonly radius?: number | undefined;
+  readonly support?: SceneSupportSpec | undefined;
+}
+
+/** A rope as laid out, metres: where it ends and how long it is. */
+export interface SceneRope {
+  readonly length: number;
+  /** Its other anchor; absent: it hangs straight down from the spawn point. */
+  readonly to?: Vec3;
+  readonly radius?: number;
+  readonly support?: {
+    readonly rating?: number;
+    readonly resistances: Readonly<Partial<Record<'blunt' | 'slash' | 'pierce' | 'force', number>>>;
+    readonly span?: string;
+  };
+}
+
+/** A rope bridge prefab spawn (mw-e03.13): ropes and planks hung level from the spawn to `to`. */
+export interface SceneBridgeSpec {
+  readonly to: Triple;
+  readonly planks: number;
+  readonly plank: { readonly id: string };
+  readonly rating: number;
+  readonly resistances?: SceneResistancesSpec | undefined;
+  /** Distance between its two ropes, metres. */
+  readonly width: number;
 }
 
 /** A container spawn as written in data (mw-e18.3): its loot table, contents and lock. */
@@ -332,8 +376,10 @@ export interface SceneSpawnSpec {
   readonly lightReceiver?: SceneLightReceiverSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
-  /** Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). */
+  /** Makes the spawned entity a rope from its position (mw-e05.13, mw-e03.13). */
   readonly rope?: SceneRopeSpec | undefined;
+  /** Makes the spawn one end of a rope bridge: its ropes and planks (mw-e03.13). */
+  readonly bridge?: SceneBridgeSpec | undefined;
   /** Spawn id of the rope this spawned prop hangs from (mw-e05.13). */
   readonly suspendedFrom?: string | undefined;
 }
@@ -501,8 +547,8 @@ export interface SceneSpawnPlacement {
   readonly lightReceiver?: SceneLightReceiverSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
-  /** Its rope data, when it is a cuttable rope (mw-e05.13). */
-  readonly rope?: SceneRopeSpec;
+  /** Its rope data, when it is a rope (mw-e05.13, mw-e03.13). */
+  readonly rope?: SceneRope;
   /** The rope spawn it hangs from, when it hangs (mw-e05.13). */
   readonly suspendedFrom?: string;
 }
@@ -569,6 +615,92 @@ function maxOf(a: Vec3, b: Vec3): Vec3 {
 
 function gridToWorld(at: Triple, grid: number): Vec3 {
   return vec(at[0] * grid, at[1] * grid, at[2] * grid);
+}
+
+/** The shares a spec sets, without the absent ones. */
+function definedShares(
+  spec: SceneResistancesSpec | undefined,
+): Partial<Record<'blunt' | 'slash' | 'pierce' | 'force', number>> {
+  const shares: Partial<Record<'blunt' | 'slash' | 'pierce' | 'force', number>> = {};
+  for (const kind of ['blunt', 'slash', 'pierce', 'force'] as const) {
+    const share = spec?.[kind];
+    if (share !== undefined) shares[kind] = share;
+  }
+  return shares;
+}
+
+const known = <T>(value: T | undefined): T => value as T;
+
+/** A rope spawn as laid out (see `SceneRope`). */
+function ropeOf(spawn: SceneSpawnSpec, grid: number): SceneRope {
+  const rope = known(spawn.rope);
+  const from = gridToWorld(spawn.at, grid);
+  const to = rope.to === undefined ? undefined : gridToWorld(rope.to, grid);
+  const length =
+    to === undefined
+      ? known(rope.length)
+      : Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2 + (to.z - from.z) ** 2);
+  const { support } = rope;
+  return Object.freeze({
+    length,
+    ...(to !== undefined && { to }),
+    ...(rope.radius !== undefined && { radius: rope.radius }),
+    ...(support !== undefined && {
+      support: Object.freeze({
+        ...(support.rating !== undefined && { rating: support.rating }),
+        resistances: Object.freeze(definedShares(support.resistances)),
+        ...(support.span !== undefined && { span: support.span }),
+      }),
+    }),
+  });
+}
+
+/**
+ * How far a bridge's ropes run below the planks' undersides, metres: past a rope's collider (0.05 m
+ * either way), so a plank let go is never inside it.
+ */
+const BRIDGE_ROPE_DROP = 0.06;
+
+/** Rope bridges are prefabs: the spawn stays, joined by two support ropes and the planks they hold. */
+function expandBridge(spawn: SceneSpawnSpec, grid: number): readonly SceneSpawnSpec[] {
+  const { bridge } = spawn;
+  if (bridge === undefined) return [spawn];
+  const [x0, y0, z0] = spawn.at;
+  const [x1, , z1] = bridge.to;
+  const alongX = Math.abs(x1 - x0) > Math.abs(z1 - z0);
+  const run = alongX ? x1 - x0 : z1 - z0;
+  const span = spawn.id;
+  const ropeIds = [`${span}-rope-1`, `${span}-rope-2`] as const;
+  const out: SceneSpawnSpec[] = [spawn];
+  ropeIds.forEach((id, i) => {
+    // Each rope sits half the width (metres, here in cells) either side of the centre line.
+    const side = ((i === 0 ? -1 : 1) * bridge.width) / (2 * grid);
+    const offset = (cells: number) => cells + side;
+    const y = y0 - BRIDGE_ROPE_DROP / grid;
+    out.push({
+      id,
+      at: alongX ? [x0, y, offset(z0)] : [offset(x0), y, z0],
+      yaw: 0,
+      tags: ['rope', 'bridge'],
+      properties: { material: { id: 'rope' } },
+      rope: {
+        to: alongX ? [x1, y, offset(z0)] : [offset(x0), y, z1],
+        support: { rating: bridge.rating, resistances: bridge.resistances, span },
+      },
+    });
+  });
+  for (let i = 0; i < bridge.planks; i++) {
+    const along = (run * (i + 0.5)) / bridge.planks;
+    out.push({
+      id: `${span}-plank-${String(i + 1)}`,
+      at: alongX ? [x0 + along, y0, z0] : [x0, y0, z0 + along],
+      yaw: alongX ? 90 : 0,
+      prop: bridge.plank,
+      tags: ['bridge-plank'],
+      suspendedFrom: ropeIds[0],
+    });
+  }
+  return out;
 }
 
 function layoutPart(
@@ -809,67 +941,66 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
     );
   });
   const routes = sceneRoutes(scene);
-  const spawns = scene.spawns.map((spawn) =>
-    Object.freeze({
-      id: spawn.id,
-      position: gridToWorld(spawn.at, scene.grid),
-      yaw: spawn.yaw,
-      rotation: ROTATIONS[spawn.yaw],
-      prop: spawn.prop?.id,
-      tags: Object.freeze([...spawn.tags]),
-      interact: spawn.interact,
-      targetable: spawn.targetable?.id,
-      ...(spawn.item !== undefined && {
-        item: Object.freeze({ id: spawn.item.id.id, count: spawn.item.count }),
-      }),
-      ...(spawn.creature !== undefined && { creature: spawn.creature.id }),
-      ...(spawn.faction !== undefined && { faction: spawn.faction.id }),
-      ...(spawn.patrol !== undefined && {
-        patrol: Object.freeze(spawn.patrol.map((at) => gridToWorld(at, scene.grid))),
-      }),
-      ...(spawn.routine !== undefined && {
-        routine: routineOf(scene, routes, spawn, spawn.routine),
-      }),
-      ...(spawn.leash !== undefined && {
-        leash: Object.freeze({
-          radius: spawn.leash.radius,
-          post: gridToWorld(spawn.leash.post ?? spawn.at, scene.grid),
+  const spawns = scene.spawns
+    .flatMap((spawn) => expandBridge(spawn, scene.grid))
+    .map((spawn) =>
+      Object.freeze({
+        id: spawn.id,
+        position: gridToWorld(spawn.at, scene.grid),
+        yaw: spawn.yaw,
+        rotation: ROTATIONS[spawn.yaw],
+        prop: spawn.prop?.id,
+        tags: Object.freeze([...spawn.tags]),
+        interact: spawn.interact,
+        targetable: spawn.targetable?.id,
+        ...(spawn.item !== undefined && {
+          item: Object.freeze({ id: spawn.item.id.id, count: spawn.item.count }),
         }),
-      }),
-      ...(spawn.repopulate !== undefined && {
-        repopulate: Object.freeze({ afterDays: spawn.repopulate.afterDays }),
-      }),
-      ...(spawn.presence !== undefined && {
-        presence: Object.freeze({ phases: Object.freeze([...spawn.presence.phases]) }),
-      }),
-      ...(spawn.carries !== undefined && {
-        carries: Object.freeze(
-          spawn.carries.map(({ item, count }) => Object.freeze({ item: item.id, count })),
-        ),
-      }),
-      ...(spawn.properties !== undefined && { properties: spawn.properties }),
-      ...(spawn.recovery !== undefined && { recovery: gridToWorld(spawn.recovery, scene.grid) }),
-      ...(spawn.breakable !== undefined && { breakable: breakableOf(spawn.breakable) }),
-      ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
-      ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
-      ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
-      ...(spawn.lightSource !== undefined && {
-        lightSource: Object.freeze({ ...spawn.lightSource }),
-      }),
-      ...(spawn.impactSwitch !== undefined && { impactSwitch: impactSwitchOf(spawn.impactSwitch) }),
-      ...(spawn.beamEmitter !== undefined && { beamEmitter: definedOf(spawn.beamEmitter) }),
-      ...(spawn.optic !== undefined && { optic: definedOf(spawn.optic) }),
-      ...(spawn.lightReceiver !== undefined && { lightReceiver: definedOf(spawn.lightReceiver) }),
-      ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
-      ...(spawn.rope !== undefined && {
-        rope: Object.freeze({
-          length: spawn.rope.length,
-          ...(spawn.rope.radius !== undefined && { radius: spawn.rope.radius }),
+        ...(spawn.creature !== undefined && { creature: spawn.creature.id }),
+        ...(spawn.faction !== undefined && { faction: spawn.faction.id }),
+        ...(spawn.patrol !== undefined && {
+          patrol: Object.freeze(spawn.patrol.map((at) => gridToWorld(at, scene.grid))),
         }),
+        ...(spawn.routine !== undefined && {
+          routine: routineOf(scene, routes, spawn, spawn.routine),
+        }),
+        ...(spawn.leash !== undefined && {
+          leash: Object.freeze({
+            radius: spawn.leash.radius,
+            post: gridToWorld(spawn.leash.post ?? spawn.at, scene.grid),
+          }),
+        }),
+        ...(spawn.repopulate !== undefined && {
+          repopulate: Object.freeze({ afterDays: spawn.repopulate.afterDays }),
+        }),
+        ...(spawn.presence !== undefined && {
+          presence: Object.freeze({ phases: Object.freeze([...spawn.presence.phases]) }),
+        }),
+        ...(spawn.carries !== undefined && {
+          carries: Object.freeze(
+            spawn.carries.map(({ item, count }) => Object.freeze({ item: item.id, count })),
+          ),
+        }),
+        ...(spawn.properties !== undefined && { properties: spawn.properties }),
+        ...(spawn.recovery !== undefined && { recovery: gridToWorld(spawn.recovery, scene.grid) }),
+        ...(spawn.breakable !== undefined && { breakable: breakableOf(spawn.breakable) }),
+        ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
+        ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
+        ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
+        ...(spawn.lightSource !== undefined && {
+          lightSource: Object.freeze({ ...spawn.lightSource }),
+        }),
+        ...(spawn.impactSwitch !== undefined && {
+          impactSwitch: impactSwitchOf(spawn.impactSwitch),
+        }),
+        ...(spawn.beamEmitter !== undefined && { beamEmitter: definedOf(spawn.beamEmitter) }),
+        ...(spawn.optic !== undefined && { optic: definedOf(spawn.optic) }),
+        ...(spawn.lightReceiver !== undefined && { lightReceiver: definedOf(spawn.lightReceiver) }),
+        ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
+        ...(spawn.rope !== undefined && { rope: ropeOf(spawn, scene.grid) }),
+        ...(spawn.suspendedFrom !== undefined && { suspendedFrom: spawn.suspendedFrom }),
       }),
-      ...(spawn.suspendedFrom !== undefined && { suspendedFrom: spawn.suspendedFrom }),
-    }),
-  );
+    );
   return Object.freeze({
     id: scene.id,
     pieces: Object.freeze(pieces),

@@ -1,0 +1,9 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "anvil",
+  "name": "Iron anvil",
+  "mass": 160,
+  "flammable": false,
+  "tags": ["hanging"],
+  "body": { "size": [0.6, 0.4, 0.3], "material": "iron" }
+}

@@ -46,6 +46,7 @@ import {
   type SuspensionReleased,
 } from './ropes';
 import { addSceneMechanisms } from './scene';
+import { SupportComponent } from './supports';
 import { installMechanisms } from './system';
 
 const v = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
@@ -394,6 +395,68 @@ describe('scene authoring (mw-e05.13)', () => {
     const made = addSceneMechanisms(world, loaded, { ...options, colliders: physics });
     const [cord] = made.ropes as [EntityId];
     expect(world.get(cord, CuttableComponent)?.collider).not.toBeNull();
+  });
+
+  it('mw-e03.13: a rope spawn with support is a support, its ends in metres, its span linked', () => {
+    const { world, loaded } = load([
+      {
+        id: 'left',
+        at: [0, 2, 0],
+        yaw: 0,
+        tags: [],
+        rope: {
+          to: [4, 2, 0],
+          radius: 0.08,
+          support: { rating: 150, resistances: { pierce: 0.3 }, span: 'bridge' },
+        },
+      },
+      {
+        id: 'right',
+        at: [0, 2, 1],
+        yaw: 0,
+        tags: [],
+        rope: { to: [4, 2, 1], support: { span: 'bridge' } },
+      },
+      { id: 'chain', at: [0, 5, 3], yaw: 0, tags: [], rope: { length: 2, support: {} } },
+    ]);
+    const made = addSceneMechanisms(world, loaded, options);
+    const [left, right, chain] = made.ropes as [EntityId, EntityId, EntityId];
+    expect(world.get(left, SupportComponent)).toMatchObject({
+      from: { x: 0, y: 2, z: 0 },
+      to: { x: 4, y: 2, z: 0 },
+      radius: 0.08,
+      rating: 150,
+      resistances: { pierce: 0.3 },
+      peers: [right],
+    });
+    expect(world.get(right, SupportComponent)).toMatchObject({ rating: null, peers: [left] });
+    expect(world.get(chain, SupportComponent)).toMatchObject({
+      to: { x: 0, y: 3, z: 3 },
+      peers: [],
+    });
+    expect(world.has(left, CuttableComponent)).toBe(false);
+  });
+
+  it('mw-e03.13: a support spawn gets its collider in the sink the game gives', () => {
+    const physics = new RapierPhysics(RAPIER);
+    const world = installSignals(
+      installStimuli(
+        registerWorldProperties(
+          registerSceneComponents(new World<never>({ seed: 2, hz: 60, physics })),
+        ),
+      ),
+    );
+    installPhysicsObjects(world);
+    installMechanisms(world);
+    const loaded = loadScene(
+      world,
+      SCENE([{ id: 'cord', at: [0, 3, 0], yaw: 0, tags: [], rope: { length: 2, support: {} } }]),
+      kit,
+      new InMemoryColliderSink(),
+    );
+    const made = addSceneMechanisms(world, loaded, { ...options, colliders: physics });
+    const [cord] = made.ropes as [EntityId];
+    expect(world.get(cord, SupportComponent)?.collider).not.toBeNull();
   });
 
   it('a prop that hangs from a rope spawn the scene does not have is an error', () => {

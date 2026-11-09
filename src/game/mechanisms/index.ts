@@ -31,6 +31,7 @@ import {
   SceneSpawnComponent,
   SignalGraphComponent,
   signalSystem,
+  SupportComponent,
   SwitchComponent,
   tagEntity,
   type DoorProfile,
@@ -215,18 +216,27 @@ export interface DoorReading {
   readonly openness: number;
 }
 
-/** What the doors and switches are doing, by spawn id. */
+/** What the doors, switches and ropes are doing, by spawn id. */
 export interface MechanismReadout {
   readonly doors: Readonly<Record<string, DoorReading>>;
   readonly switches: Readonly<Record<string, number>>;
+  /** Each rope or chain: holding what hangs from it, or gone (cut, burnt, snapped; mw-e03.13). */
+  readonly ropes: Readonly<Record<string, 'holding' | 'gone'>>;
 }
 
-/** Reads a scene's doors and switches. */
+/** Reads a scene's doors, switches and ropes. */
 export class MechanismWatch {
+  /** The ropes' spawn ids, taken while they exist: a rope that goes takes its name with it. */
+  private readonly ropeNames: readonly (readonly [EntityId, string])[];
+
   constructor(
     private readonly world: World<never>,
     private readonly made: SceneMechanisms,
-  ) {}
+  ) {
+    this.ropeNames = made.ropes.map(
+      (entity) => [entity, world.get(entity, SceneSpawnComponent)?.id ?? String(entity)] as const,
+    );
+  }
 
   /** The readout now; entities that are gone (a door burnt away) are left out. */
   readout(): MechanismReadout {
@@ -244,7 +254,12 @@ export class MechanismWatch {
       const own = world.get(entity, SwitchComponent);
       if (own !== undefined) switches[name(entity)] = own.position;
     }
-    return { doors, switches };
+    const ropes: Record<string, 'holding' | 'gone'> = {};
+    for (const [entity, id] of this.ropeNames) {
+      const released = world.get(entity, SupportComponent)?.released === true;
+      ropes[id] = world.isAlive(entity) && !released ? 'holding' : 'gone';
+    }
+    return { doors, switches, ropes };
   }
 
   /** Whether a door is broken (its leaf is no longer drawn). */
