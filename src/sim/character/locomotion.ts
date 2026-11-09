@@ -115,7 +115,23 @@ export const CharacterLocomotion = defineComponent<Locomotion>('character.locomo
 /** What happened: a locomotion event without its entity and tick. */
 export type LocomotionEventKind =
   | { readonly kind: 'jumpStart' }
-  | { readonly kind: 'land'; /** Downward speed at touchdown, m/s. */ readonly impactSpeed: number }
+  | {
+      readonly kind: 'land';
+      /** Downward speed at touchdown, m/s. */
+      readonly impactSpeed: number;
+      /** The height, m, whose free fall under this character's gravity reaches `impactSpeed`. */
+      readonly fallHeight: number;
+      /** Where it touched down: the character's feet, m. */
+      readonly position: Vec3;
+      /** The material it landed on (as a footstep's); absent when the game reads no ground. */
+      readonly material?: string;
+      readonly wet: boolean;
+      readonly frozen: boolean;
+      /** The surface's loudness offset, dB relative to stone (as a footstep's). */
+      readonly surfaceDb: number;
+      /** The walker's armor-load noise multiplier (as a footstep's; 1 when it wears none). */
+      readonly encumbrance: number;
+    }
   | {
       readonly kind: 'footstep';
       readonly foot: Foot;
@@ -297,7 +313,18 @@ export function stepLocomotion(
   let landingTicks = Math.max(0, last.landingTicks - 1);
   if (grounded && last.fall !== null) {
     const impact = impactSpeed(last.fall, position.y, tuning);
-    events.push({ kind: 'land', impactSpeed: impact });
+    const { surface } = tick;
+    events.push({
+      kind: 'land',
+      impactSpeed: impact,
+      fallHeight: (impact * impact) / (2 * tuning.gravity),
+      position,
+      ...(surface !== undefined && { material: surface.material }),
+      wet: surface?.wet ?? false,
+      frozen: surface?.frozen ?? false,
+      surfaceDb: surface?.surfaceDb ?? 0,
+      encumbrance: tick.encumbrance ?? 1,
+    });
     if (impact >= gait.hardLanding) landingTicks = clock.ticksFor(gait.landingMs);
   }
   const state = classifyLocomotion(

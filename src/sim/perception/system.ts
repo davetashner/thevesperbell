@@ -45,6 +45,7 @@ import { defineComponent, type EntityId } from '../core/component';
 import type { System, World } from '../core/world';
 import { CreatureNavComponent, CreatureSensesComponent } from '../creatures/components';
 import type { LightField } from '../light/field';
+import { isMovementNoise } from '../noise/footsteps';
 import { NoiseListenerComponent, noiseHeard, type NoiseHeard } from '../noise/system';
 import {
   DEFAULT_SIGHT_SAMPLES,
@@ -216,9 +217,19 @@ export function perceptionSystem<TInput>(
   let installed = true;
   let lastUnits = 0;
 
+  const defaultTargets = (): readonly EntityId[] => {
+    return w.isRegistered(CharacterController) ? w.query(CharacterController).ids() : EMPTY;
+  };
+
+  const isTarget = (source: EntityId | null): boolean =>
+    source !== null && (options.targets?.(w) ?? defaultTargets()).includes(source);
+
   const unsubscribe = w.events.on(noiseHeard, (heard) => {
     const senses = w.get(heard.listener, CreatureSensesComponent);
     if (senses?.hearing === undefined) return;
+    // Creatures notice the footfalls of their targets (the player), never each other's: a patrol
+    // does not become suspicious of its own colleagues' steps (mw-e09.5).
+    if (isMovementNoise(heard.noise.kind) && !isTarget(heard.noise.source)) return;
     // An agent hears only once perception has given it a listener, which comes with its bookkeeping.
     w.get(heard.listener, PerceptionAgentComponent)?.heard.push(heard);
   });
@@ -234,10 +245,6 @@ export function perceptionSystem<TInput>(
     else if (current.thresholdDb !== wanted.thresholdDb || current.range !== wanted.range) {
       w.set(agent, NoiseListenerComponent, wanted);
     }
-  };
-
-  const defaultTargets = (): readonly EntityId[] => {
-    return w.isRegistered(CharacterController) ? w.query(CharacterController).ids() : EMPTY;
   };
 
   return {

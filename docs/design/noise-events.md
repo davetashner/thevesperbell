@@ -53,25 +53,72 @@ quieter than either. "At least 3 times as loud" is read in sound pressure, not i
 
 Breaks (breakable profile loudness), kicks, switches and bells, spells and light sources, AI noises
 (`emit-noise`) and the debug scenario emit directly with their own authored loudness.
-Not yet: noise arrows (mw-e05 payloads), footstep noise (mw-e09.5, below), ice cracking,
-electrical crackle and rope snaps.
+Footsteps and landings (`footstep`, `landing`) come from the footstep rule below. Not yet: noise arrows
+(mw-e05 payloads), ice cracking, electrical crackle and rope snaps.
 
 ## Footsteps
 
 The character controller's one footstep event, `LocomotionEvents` kind `footstep` (mw-e02.11), is what
-footstep noise (mw-e09.5) will read; it is not itself a noise and nothing propagates from it. It comes
+footstep noise (mw-e09.5, below) reads; it is not itself a noise and nothing propagates from it. It comes
 from ground distance travelled at each gait's stride (never from animation), only while grounded and
 moving, and carries: `position` (feet), `foot`, `gait`, `material` (the ground's material, `water` while
 wading), `wet`, `frozen`, `burning`, `profileNoise` (the movement profile: stance x gait x encumbrance,
-0-1), `surfaceDb` and `loudness`.
+0-1), `encumbrance` (the wearer's noise multiplier), `surfaceDb` and `loudness`.
 
 ```
 surfaceDb = material footstepLoudness + wetDb if wet + frozenDb if frozen      (dB relative to stone)
 loudness  = profileNoise x 10^(surfaceDb / 20)                                  (normalised, 1 = sprint on stone)
 ```
 
-`wetFrom`, `wetDb` and `frozenDb` are the controller profile's `stealth.surfaces`. Landings are the
-separate `land` event (with `impactSpeed`). Audio plays the same event, so footsteps have one detector.
+`wetFrom`, `wetDb` and `frozenDb` are the controller profile's `stealth.surfaces`. The `land` event adds
+`fallHeight`, `position`, `material`, `surfaceDb` and `encumbrance`. Audio plays the same events, so
+footsteps have one detector.
+
+### Footstep noise (mw-e09.5)
+
+`installFootstepNoise` (`src/sim/noise/footsteps.ts`; wired by `startSceneNoise`) turns every `footstep`
+and `land` into a `noiseEmitted` (kinds `footstep` and `landing`; `entity` and `source` are the walker,
+so it never hears itself). Levels are data, the stealth table's `noise.footsteps`:
+
+```
+step    = gaitDb + surfaceDb + equipmentDb + creak                      (dB at 1 m, never below 0)
+gaitDb  = sneak 25 | walk 40 | run 55 | sprint 65                       (crouched or slow-walking is a sneak)
+equipmentDb = 20 * log10(noise multiplier)
+landing = curve(fallHeight) + surfaceDb + equipmentDb                   (silent under 0.5 m)
+```
+
+- **Equipment.** ADR-0003 sets one noise multiplier per wearer: the armor load class (1.0 / 1.3 / 1.6 /
+  1.8) applied once, times each equipped item's own `noiseMultiplier` (soft boots 0.7), clamped to 0.5-2.0
+  (`EquipmentState.noiseModifier`, carried by `CharacterEncumbrance` and the event). A product of
+  multipliers is a sum of decibels, so `equipmentDb` is "the sum of the equipped items' noise values" the bead
+  asks for, in a form that does not count four armor pieces four times. Medium is +2.3 dB, Heavy +4.1 dB, and
+  the clamp caps the term at +6 dB.
+- **Surface.** The event's `surfaceDb`: carpet -10, gravel +8, wet +3, frozen +2.
+- **Creak.** A surface row's `creak` (hollow boards: 10% for +12 dB) is rolled from the world's
+  `footstep-creak` stream, so it replays and moves no other stream. The row's `varianceDb` is not rolled:
+  a step is exactly what the formula says (tests and tuning read dB), and variance stays a hint for audio.
+- **Landing.** The curve is `landing.curve` (0.5 m 30 dB, 1 m 45, 2 m 60, 3 m 70, 5 m 82, 10 m 95), by the
+  fall height whose free fall reaches the touchdown speed. The player's body is not a physics object, so a
+  landing raises no `physicsImpact` and no impact noise: the `landing` noise is the only one.
+- **Creatures** have no controller. Each tick the creature steps system reads how far a creature moved;
+  its speed picks the gait (`creatureGait`: 0.2 m/s walk, 2.5 run, 6 sprint) and its stride
+  (0.75 / 1.6 / 2.05 m) paces the steps, so a patrol steps and a standing guard is silent. Without a collider to
+  read, a creature's feet use the scene's tagged surface regions, else stone. The state is a `noise.stride`
+  component per creature.
+- **Who notices.** Perception drops a footstep or landing whose source is not one of its targets, so a
+  patrol never turns suspicious of its own colleagues. The noise ripple assist (`gameplay.noiseRipples`)
+  draws a footstep or landing only when it would be heard (30 dB) where the player stands: your own sneak
+  and a far guard's walk stay quiet, a run rings, still at two rings a second at most.
+
+How far it carries (starting knight in Medium armour, stone, open air; `tests/integration/footstep-reach.test.ts`):
+
+| Hearing | Sneak (27 dB) | Walk (42 dB) | Run (57 dB) | Sprint (67 dB) |
+|---|---|---|---|---|
+| Humanoid, 30 dB / 25 m (townsfolk, watch, guards) | not heard | 4 m | 23 m | 25 m |
+| Undead, 45 dB / 20 m (the Forgotten) | not heard | not heard | 4 m | 13 m |
+
+The player's ordinary movement is a run, so a skeleton hears you at 4 m and a person at 23 m; creeping
+(crouch or slow walk) is never heard, a sprint on gravel carries further still.
 
 ### Surfaces (mw-e09.4)
 

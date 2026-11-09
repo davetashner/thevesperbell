@@ -396,6 +396,30 @@ describe('perception: hearing (mw-e11.5)', () => {
     ]);
   });
 
+  it('mw-e09.5: it notices its target’s footsteps and landings, never another creature’s', () => {
+    const { world, reports, step } = hearingWorld();
+    const guard = addAgent(world, HUMANOID, LISTENER);
+    const colleague = addAgent(world, HUMANOID, { x: 6, y: 0, z: -4 });
+    const player = addPlayer(world, { x: 8, y: 0, z: -4 });
+    step(1);
+    const at = { x: 6, y: 0, z: -4 };
+    const walker = (who: EntityId | null, kind: string): void => {
+      emitNoise(world, { position: at, loudness: 60, kind, entity: who, source: who });
+    };
+    walker(colleague, 'footstep');
+    walker(colleague, 'landing');
+    walker(null, 'footstep');
+    walker(colleague, 'door');
+    walker(player, 'footstep');
+    walker(player, 'landing');
+    step();
+    expect(perceptsOf(reports, guard).map((p) => p.source)).toEqual([
+      'entity:' + String(colleague), // the door it slammed is still a sound
+      'entity:' + String(player),
+      'entity:' + String(player),
+    ]);
+  });
+
   it('keeps each agent’s listener in step with its hearing', () => {
     const { world, step } = hearingWorld();
     const guard = addAgent(world, HUMANOID, LISTENER);

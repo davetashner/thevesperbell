@@ -13,7 +13,8 @@
 //   the player was, nothing the player did not already know.
 // - Noise ripple (setting `gameplay.noiseRipples`): one ring on the ground per noise event, as far
 //   as the noise carries in open air before it falls under what a person hears (30 dB, capped for
-//   drawing), spaced at most MAX_MAGIC_PULSE_HZ apart. Off by default: with the setting off an event
+//   drawing), spaced at most MAX_MAGIC_PULSE_HZ apart. Footsteps and landings (mw-e09.5) ring only
+//   when they would be heard (30 dB) at the player, so sneaking draws nothing. Off by default: with the setting off an event
 //   draws nothing (the setting is read when the event arrives). Reduced motion holds the ring still
 //   and only fades it.
 //
@@ -27,6 +28,7 @@ import {
   BrainComponent,
   CreatureNavComponent,
   isDead,
+  isMovementNoise,
   noiseEmitted,
   PlacementComponent,
   recallTarget,
@@ -308,7 +310,16 @@ export class AwarenessFx {
     if (this.#o.ripplesEnabled?.() !== true) return;
     const at = this.#o.listener?.();
     const p = noise.position;
-    if (at !== undefined && Math.hypot(p.x - at.x, p.z - at.z) > RIPPLE_RANGE_M) return;
+    const distance = at === undefined ? 0 : Math.hypot(p.x - at.x, p.z - at.z);
+    if (distance > RIPPLE_RANGE_M) return;
+    // Footsteps are constant, so they draw only what a person would hear where the player stands:
+    // your own sneak (15 to 30 dB) and a far guard's walk stay quiet, a run or a near guard rings.
+    if (
+      isMovementNoise(noise.kind) &&
+      noise.loudness - 20 * Math.log10(Math.max(1, distance)) < RIPPLE_FLOOR_DB
+    ) {
+      return;
+    }
     const now = this.#o.now();
     // However many noises arrive, rings start no closer together than the pulse ceiling allows; one
     // that would have to wait too long is skipped.

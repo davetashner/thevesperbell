@@ -3,7 +3,7 @@
 // and the behaviour runtime (src/sim/ai) on the navmesh (src/sim/nav). src/main.ts and the headless
 // game world (src/tools/replay/testbed-player-scenario.ts) wire them the same way:
 //
-// - `startSceneNoise` (when a scene loads): builds the scene's sound graph from its acoustics and the
+// - `startSceneNoise` (when a scene loads; it also makes every footstep and landing a noise, mw-e09.5): builds the scene's sound graph from its acoustics and the
 //   loaded door spawns (`soundGraphFromScene`) and installs noise propagation with the shipped
 //   stealth noise tuning and each door profile's leaf material. A level change swaps the graph
 //   (`load`); `unload` leaves an empty graph (every noise falls off with distance alone).
@@ -27,15 +27,23 @@
 // position and whether it stands on the navmesh, how many times one was seen off it, and perception's
 // spend against its budget.
 
-import { STEALTH_ID, type GameContent } from '@content/index';
+import {
+  compileSurfaceTable,
+  STEALTH_ID,
+  SURFACE_TABLE_ID,
+  type GameContent,
+} from '@content/index';
 import {
   approach,
   BrainComponent,
   buildSoundGraph,
   compileBehaviours,
+  createSurfaceMap,
+  DEFAULT_FOOTSTEP_SURFACES,
   entitySource,
   installAi,
   installAwareness,
+  installFootstepNoise,
   installNoisePropagation,
   LineOfSight,
   NavMesh,
@@ -46,6 +54,7 @@ import {
   PlacementComponent,
   soundGraphFromScene,
   straightDistance,
+  surfaceAt,
   straightLineNavigation,
   worldNavDoors,
   type AiNavigation,
@@ -58,6 +67,7 @@ import {
   type NavmeshNavigation,
   type NoisePropagation,
   type PerceptionSystem,
+  type SurfaceMap,
   type SightWorld,
   type TravelRequest,
   type Vec3,
@@ -86,19 +96,33 @@ export function startSceneNoise<TInput>(
 ): SceneNoise {
   const graphOf = (scene: LoadedScene) =>
     soundGraphFromScene(content.get('scene', scene.id), scene);
+  const noise = content.get('stealth', STEALTH_ID).noise;
+  const surfaces = compileSurfaceTable(content.get('surface-table', SURFACE_TABLE_ID));
+  const mapOf = (scene: LoadedScene): SurfaceMap =>
+    createSurfaceMap({ table: surfaces, regions: scene.layout.surfaces });
+  let surfaceMap = mapOf(loaded);
   const propagation = installNoisePropagation(world, {
     graph: graphOf(loaded),
-    tuning: content.get('stealth', STEALTH_ID).noise,
+    tuning: noise,
     // Door entities exist only for door profiles content has (the mechanisms build them).
     doorMaterial: (profile) => content.get('door', profile).material.id,
+  });
+  // Every footstep and landing is a noise (mw-e09.5); creatures have no collider to read, so their
+  // steps sound by the scene's tagged surfaces (else stone).
+  installFootstepNoise(world, {
+    tuning: noise.footsteps,
+    surfaces,
+    creatureSurface: (position) => surfaceAt(surfaceMap, position, DEFAULT_FOOTSTEP_SURFACES),
   });
   return {
     propagation,
     load(scene) {
       propagation.setGraph(graphOf(scene));
+      surfaceMap = mapOf(scene);
     },
     unload() {
       propagation.setGraph(buildSoundGraph(EMPTY_GRAPH));
+      surfaceMap = createSurfaceMap({ table: surfaces });
     },
   };
 }

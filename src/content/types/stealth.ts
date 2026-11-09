@@ -32,6 +32,7 @@ export type VisibilityStance = (typeof VISIBILITY_STANCES)[number];
 
 const weight = z.number().min(0).max(MAX_STEALTH_WEIGHT);
 const level = z.number().min(0).max(1);
+const dbLevel = z.number().min(0).max(120);
 
 const lightPointSchema = z
   .strictObject({
@@ -213,6 +214,74 @@ const noiseSchema = z
         'Impact noise (mw-e03.25): loudness = refDb + dbPerDecade·log10(energy / refEnergy) plus the ' +
           'louder of the two materials’ surface loudness offsets, capped at maxDb; below minEnergy, silence.',
       ),
+    footsteps: z
+      .strictObject({
+        gaitDb: z
+          .strictObject({
+            sneak: dbLevel.describe('Crouched or slow-walking step, dB at 1 m on stone (25).'),
+            walk: dbLevel.describe('Walking step, dB at 1 m on stone (40).'),
+            run: dbLevel.describe('Running step, dB at 1 m on stone (55).'),
+            sprint: dbLevel.describe('Sprinting step, dB at 1 m on stone (65).'),
+          })
+          .describe('Base loudness of one step by gait, before surface and equipment.'),
+        creatureGait: z
+          .strictObject({
+            walkFrom: z.number().min(0).max(20).describe('Speed, m/s, at which a creature steps.'),
+            runFrom: z.number().min(0).max(20).describe('Speed, m/s, a creature steps as a run.'),
+            sprintFrom: z
+              .number()
+              .min(0)
+              .max(30)
+              .describe('Speed, m/s, a creature steps as a sprint.'),
+            stride: z
+              .strictObject({
+                walk: z
+                  .number()
+                  .positive()
+                  .max(5)
+                  .describe('Metres between a walking creature’s steps.'),
+                run: z
+                  .number()
+                  .positive()
+                  .max(5)
+                  .describe('Metres between a running creature’s steps.'),
+                sprint: z
+                  .number()
+                  .positive()
+                  .max(5)
+                  .describe('Metres between a sprinting creature’s steps.'),
+              })
+              .describe('Ground distance between steps per gait (the player’s: 0.75, 1.6, 2.05).'),
+          })
+          .describe(
+            'A creature has no controller: its gait is read from the speed it moves at (patrols ' +
+              'walk, chases run).',
+          ),
+        landing: z
+          .strictObject({
+            minHeight: z
+              .number()
+              .min(0)
+              .max(10)
+              .describe('Fall height, m, below which a landing is just a step: silent.'),
+            curve: z
+              .array(
+                z.strictObject({
+                  height: z.number().min(0).max(100).describe('Fall height, m.'),
+                  db: dbLevel.describe('Loudness, dB at 1 m on stone, of a landing from it.'),
+                }),
+              )
+              .min(2)
+              .describe('Piecewise-linear loudness by fall height, flat beyond its ends.'),
+          })
+          .describe(
+            'Landing impulse by fall height (the height whose free fall reaches the speed).',
+          ),
+      })
+      .describe(
+        'Footstep noise (mw-e09.5): loudness = gait dB + the surface’s offset + the wearer’s ' +
+          'equipment dB (20·log10 of the noise multiplier, ADR-0003) + a creak when the board has one.',
+      ),
   })
   .describe(
     'Sound propagation (mw-e09.3): a noise loses 20·log10(d) dB over a path of d metres (none ' +
@@ -228,6 +297,26 @@ function checkNoise(n: NoiseFields, ctx: z.RefinementCtx): void {
   };
   if (n.impact.minEnergy > n.impact.refEnergy) {
     issue(['impact', 'minEnergy'], 'minEnergy must not exceed refEnergy');
+  }
+  const { curve } = n.footsteps.landing;
+  curve.forEach((point, i) => {
+    const before = curve[i - 1];
+    if (before === undefined) return;
+    if (point.height <= before.height) {
+      issue(['footsteps', 'landing', 'curve', i, 'height'], 'landing heights must rise');
+    }
+    if (point.db < before.db) {
+      issue(['footsteps', 'landing', 'curve', i, 'db'], 'a landing never gets quieter with height');
+    }
+  });
+  const { gaitDb, creatureGait } = n.footsteps;
+  if (!(gaitDb.sneak <= gaitDb.walk && gaitDb.walk <= gaitDb.run && gaitDb.run <= gaitDb.sprint)) {
+    issue(['footsteps', 'gaitDb'], 'gaits must never get quieter: sneak ≤ walk ≤ run ≤ sprint');
+  }
+  if (!(
+    creatureGait.walkFrom <= creatureGait.runFrom && creatureGait.runFrom <= creatureGait.sprintFrom
+  )) {
+    issue(['footsteps', 'creatureGait'], 'creature gait speeds must rise: walk ≤ run ≤ sprint');
   }
   const { doors } = n;
   const ordered = (path: (string | number)[], gains: Record<DoorSoundState, number>) => {
