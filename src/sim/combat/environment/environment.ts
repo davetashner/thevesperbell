@@ -25,8 +25,14 @@
 // torch lighting a haystack) blames them; other rules call `blame` directly. A physics object's blame
 // lapses when it comes to rest (its body sleeps), a hazard's when the property switches off.
 //
-// Creatures are the entities with Health and a CharacterController: their feet position and velocity
-// come from the controller, their capsule from the options (the controller tuning's).
+// Creatures (what crush and hazards hurt) are the entities with Health that are either a character
+// (a CharacterController: feet and velocity from the controller) or a hittable body (a hurtbox: an AI
+// creature or a training dummy, which the navigation moves by its placement, mw-aps): their feet are
+// their placement and their velocity counts as 0 (nothing records one, and a walking creature's
+// speed is small beside a falling chandelier's). Either way the capsule is the options' (the
+// controller tuning's), and an entity with both a controller and a hurtbox is hit once, as a
+// character. Falls are the controller's: nothing but a controller lands or strikes a wall, and a
+// navigating creature cannot fall (it walks the navmesh), so no fall damage reaches one.
 
 import type { EnvironmentDamageTuning, Frozen } from '@content/index';
 import type { Capsule } from '../../character/collision-world';
@@ -57,6 +63,7 @@ import { applyStimulus, impulseApplied } from '../../stimulus/stimulus';
 import { HealthComponent } from '../damage/components';
 import type { DamageModel } from '../damage/model';
 import { DAMAGE_TAGS } from '../damage/packet';
+import { HurtboxComponent } from '../hits/components';
 import type { DamageAmounts, DamageType } from '../damage/types';
 
 /** Tags environmental packets carry besides `environment`. */
@@ -228,13 +235,27 @@ interface Creature {
   readonly velocity: Vec3;
 }
 
+const AT_REST: Vec3 = Object.freeze({ x: 0, y: 0, z: 0 });
+
 function creaturesOf(world: World<never>): Creature[] {
   const found: Creature[] = [];
-  world.query(CharacterController, HealthComponent).forEach((entity, character, health) => {
-    if (health.current > 0) {
-      found.push({ entity, feet: character.position, velocity: character.velocity });
-    }
-  });
+  const characters = world.isRegistered(CharacterController);
+  if (characters) {
+    world.query(CharacterController, HealthComponent).forEach((entity, character, health) => {
+      if (health.current > 0) {
+        found.push({ entity, feet: character.position, velocity: character.velocity });
+      }
+    });
+  }
+  // Worlds without hurtboxes (or placements) have no such bodies, and must not throw for it.
+  if (world.isRegistered(HurtboxComponent) && world.isRegistered(PlacementComponent)) {
+    world
+      .query(HurtboxComponent, PlacementComponent, HealthComponent)
+      .forEach((entity, _hurtboxes, feet, health) => {
+        if (health.current <= 0 || (characters && world.has(entity, CharacterController))) return;
+        found.push({ entity, feet, velocity: AT_REST });
+      });
+  }
   return found;
 }
 
@@ -286,7 +307,8 @@ export function kineticImpactSystem<TInput>(options: KineticDamageOptions): Syst
       if (memory === undefined) return;
       const touching = new Set(before.map(([o, c]) => `${String(o)}:${String(c)}`));
       const port = rigidBodiesOf(world);
-      const creatures = creaturesOf(world);
+      // Found when the first moving object needs them: a world of sleeping objects costs nothing.
+      let creatures: Creature[] | undefined;
       const contacts: (readonly [EntityId, EntityId])[] = [];
       world.query(PhysicsObjectComponent).forEach((object, body) => {
         if (body.sleeping) {
@@ -294,6 +316,7 @@ export function kineticImpactSystem<TInput>(options: KineticDamageOptions): Syst
           return;
         }
         const radius = boundingRadius(body.shape);
+        creatures ??= creaturesOf(world);
         for (const creature of creatures) {
           if (!sphereTouchesCapsule(body.position, radius, creature.feet, capsule)) continue;
           contacts.push([object, creature.entity]);

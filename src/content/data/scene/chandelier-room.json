@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "chandelier-room",
   "name": "Chandelier room",
-  "description": "Grey-box room for hanging things that fall (mw-e03.13). West: an iron chandelier hangs from a hemp rope under a beam, over the spot at x -4; stand under it, then shoot or burn the rope and the chandelier drops on whoever is there (a frayed rope: 20 hp, and a pierce hit has to be 29 or more to get through its 30% resistance, so a half-drawn arrow only frays it). East: a rope bridge of twelve planks between two stone platforms, rated for 150 kg, with a 160 kg anvil hanging from its own rope over the middle; cut the anvil's rope and the weight snaps the bridge's weaker rope, which takes the whole span down. A knight crossing it weighs next to nothing. Reach it with ?scene=chandelier-room; the beams are floating stand-ins for a ceiling, and the two hanging ropes are a chunky 16 cm so a bow can find them from across the room.",
+  "description": "Grey-box room for hanging things that fall (mw-e03.13). West: an iron chandelier hangs from a hemp rope under a beam, over the spot at x -4; stand under it, then shoot or burn the rope and the chandelier drops on whoever is there, the player or the Forgotten miner who shuffles about in the corner (a frayed rope: 20 hp, and a pierce hit has to be 29 or more to get through its 30% resistance, so a half-drawn arrow only frays it). East: a rope bridge of twelve planks between two stone platforms, rated for 150 kg, with a 160 kg anvil hanging from its own rope over the middle; cut the anvil's rope and the weight snaps the bridge's weaker rope, which takes the whole span down. A knight crossing it weighs next to nothing. Reach it with ?scene=chandelier-room; the beams are floating stand-ins for a ceiling, and the two hanging ropes are a chunky 16 cm so a bow can find them from across the room.",
   "grid": 1,
   "camera": {
     "position": [1, 9, -14],
@@ -24,6 +24,15 @@
       "id": "player-start",
       "at": [0, 0, -3],
       "tags": ["player-start"]
+    },
+    {
+      "id": "chandelier-miner",
+      "at": [-8, 0, 4],
+      "yaw": 180,
+      "creature": "forgotten-miner",
+      "leash": {
+        "radius": 1.5
+      }
     },
     {
       "id": "chandelier-rope",

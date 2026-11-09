@@ -29,6 +29,7 @@ import { placeEntity } from '../../stimulus/placement';
 import type { Vec3 } from '../../stimulus/shapes';
 import { applyStimulus, installStimuli, stimulusSystem } from '../../stimulus/stimulus';
 import { DAMAGE_COMPONENTS, giveCombatant, healthOf } from '../damage/components';
+import { giveHurtboxes, HurtboxComponent } from '../hits/components';
 import { DamageApplied, Died, type DamageResult } from '../damage/events';
 import { DamageModel } from '../damage/model';
 import {
@@ -599,5 +600,194 @@ describe('suspended objects (mw-e04.19)', () => {
     setProperty(s.world, lamp, 'suspended', true, { source: cutter });
     s.steps(2);
     expect(blameOf(s.world, lamp)).toBe(cutter);
+  });
+});
+
+describe('creatures that are not characters: AI creatures and training dummies (mw-aps)', () => {
+  /** A hittable body with health and a placement, as the spawners make creatures and dummies. */
+  function body(s: ReturnType<typeof env>, feet: Vec3, health = 100): EntityId {
+    if (!s.world.isRegistered(HurtboxComponent)) s.world.register(HurtboxComponent);
+    const e = s.world.spawn();
+    placeEntity(s.world, e, feet, 0.4);
+    giveHurtboxes(s.world, e, {
+      boxes: [
+        {
+          id: 'torso',
+          socket: 'root',
+          region: 'torso',
+          armored: false,
+          multiplier: 1,
+          shape: { kind: 'capsule', from: v(0, 0.3, 0), to: v(0, 1.5, 0), radius: 0.35 },
+        },
+      ],
+    });
+    giveCombatant(s.world, e, { health });
+    return e;
+  }
+
+  function drop(s: ReturnType<typeof env>, at: Vec3, speed: number, instigator: EntityId | null) {
+    const rock = s.world.spawn();
+    addProperties(s.world, rock, { weight: 100 });
+    addPhysicsObject(s.world, rock, {
+      shape: { kind: 'sphere', radius: 0.5 },
+      position: at,
+      velocity: v(0, -speed, 0),
+    });
+    s.steps(1);
+    if (instigator !== null) blame(s.world, rock, instigator);
+    return rock;
+  }
+
+  it('AC-1: an object striking a creature above the kinetic speed deals crush damage blamed on whoever released it', () => {
+    const s = env();
+    const miner = body(s, v(0, 0, 0));
+    const archer = s.world.spawn();
+    s.steps(2);
+    const iron = drop(s, v(0, 5, 0), 8, archer);
+    s.steps(60);
+    const crush = s.hits.filter((h) => h.target === miner);
+    expect(crush).toHaveLength(1);
+    expect(crush[0]?.packet).toMatchObject({
+      instigator: archer,
+      source: iron,
+      tags: ['crush', 'environment'],
+    });
+    expect(healthOf(s.world, miner)?.current).toBeLessThan(100);
+  });
+
+  it('AC-1: a lethal strike kills a creature through the ordinary Died event, crediting the instigator', () => {
+    const s = env();
+    const dummy = body(s, v(0, 0, 0), 5);
+    const archer = s.world.spawn();
+    const deaths: { target: EntityId; killer: EntityId | null }[] = [];
+    s.world.events.on(Died, (e) => deaths.push({ target: e.target, killer: e.killer }));
+    s.steps(2);
+    drop(s, v(0, 5, 0), 8, archer);
+    s.steps(60);
+    expect(healthOf(s.world, dummy)?.current).toBe(0);
+    expect(deaths).toEqual([{ target: dummy, killer: archer }]);
+  });
+
+  it('AC-1: a resting crate, a slow nudge and a crate underfoot do not hurt a creature', () => {
+    const s = env();
+    const miner = body(s, v(0, 0, 0));
+    const walker = body(s, v(3, 0, 0));
+    const stander = body(s, v(6, 0.6, 0));
+    s.steps(2);
+    // Resting beside the creature: asleep, so never a contact.
+    for (const x of [0.6, 3.6]) {
+      const crate = s.world.spawn();
+      addProperties(s.world, crate, { weight: 20, pushable: true });
+      addPhysicsObject(s.world, crate, {
+        shape: { kind: 'sphere', radius: 0.4 },
+        position: v(x, 0.4, 0),
+      });
+    }
+    // Under the creature's feet, a crate the creature stands on.
+    const under = s.world.spawn();
+    addProperties(s.world, under, { weight: 20, pushable: true });
+    addPhysicsObject(s.world, under, {
+      shape: { kind: 'sphere', radius: 0.6 },
+      position: v(6, 0, 0),
+    });
+    s.steps(120);
+    // A nudge below the threshold: a slow object drifting into a creature.
+    const slow = s.world.spawn();
+    addProperties(s.world, slow, { weight: 50, pushable: true });
+    addPhysicsObject(s.world, slow, {
+      shape: { kind: 'sphere', radius: 0.3 },
+      position: v(3, 0.5, -1.5),
+      velocity: v(0, 0, 4),
+    });
+    s.steps(60);
+    expect(s.hits).toEqual([]);
+    for (const e of [miner, walker, stander]) expect(healthOf(s.world, e)?.current).toBe(100);
+  });
+
+  it('a creature that is also a character is struck once, as a character', () => {
+    const s = env();
+    const knight = s.creature(v(0, SKIN, 0));
+    // A hurtbox as well: the player has one.
+    s.world.register(HurtboxComponent);
+    giveHurtboxes(s.world, knight, {
+      boxes: [
+        {
+          id: 'torso',
+          socket: 'root',
+          region: 'torso',
+          armored: false,
+          multiplier: 1,
+          shape: { kind: 'capsule', from: v(0, 0.3, 0), to: v(0, 1.5, 0), radius: 0.35 },
+        },
+      ],
+    });
+    placeEntity(s.world, knight, v(0, 0, 0), 0.4);
+    s.steps(2);
+    drop(s, v(0, 5, 0), 8, null);
+    s.steps(60);
+    expect(s.hits.filter((h) => h.target === knight)).toHaveLength(1);
+  });
+
+  it('a dead creature is not struck again', () => {
+    const s = env();
+    const dummy = body(s, v(0, 0, 0), 1);
+    s.steps(2);
+    drop(s, v(0, 5, 0), 8, null);
+    s.steps(60);
+    expect(healthOf(s.world, dummy)?.current).toBe(0);
+    const taken = s.hits.length;
+    drop(s, v(0, 5, 0), 8, null);
+    s.steps(60);
+    expect(s.hits.length).toBe(taken);
+  });
+
+  it('AC-1: a burning hazard hurts a creature in reach, in pulses, blamed on whoever lit it; far ones are spared', () => {
+    const s = env();
+    const miner = body(s, v(0.8, 0, 0));
+    const far = body(s, v(5, 0, 0));
+    const arsonist = s.world.spawn();
+    const brazier = s.world.spawn();
+    addProperties(s.world, brazier, { burning: false });
+    placeEntity(s.world, brazier, v(0, 0.5, 0), 0.5);
+    s.steps(1);
+    setProperty(s.world, brazier, 'burning', true, { source: arsonist });
+    s.steps(60);
+    const burns = s.hits.filter((h) => h.target === miner);
+    expect(burns).toHaveLength(4);
+    expect(burns[0]?.packet).toMatchObject({
+      amounts: { fire: 2 },
+      instigator: arsonist,
+      source: brazier,
+      tags: ['environment', 'hazard'],
+    });
+    expect(healthOf(s.world, miner)?.current).toBe(92);
+    expect(healthOf(s.world, far)?.current).toBe(100);
+  });
+
+  it('a world without characters or hurtboxes steps without throwing', () => {
+    const world = registerWorldProperties(new World<never>({ seed: 1 }));
+    world.register(EnvironmentContactsComponent, BlameComponent);
+    installStimuli(world);
+    world.addSystem(
+      hazardSystem({
+        damage: new DamageModel(),
+        hazards: RULES.hazards,
+        capsule: CAPSULE,
+      }),
+    );
+    const pyre = world.spawn();
+    addProperties(world, pyre, { burning: true });
+    placeEntity(world, pyre, v(0, 0.5, 0), 0.5);
+    expect(() => {
+      world.step();
+    }).not.toThrow();
+  });
+
+  it('no fall damage reaches a creature that has no controller to land: falls are the controller’s', () => {
+    const s = env();
+    const miner = body(s, v(0, 30, 0));
+    s.steps(120);
+    expect(s.hits).toEqual([]);
+    expect(healthOf(s.world, miner)?.current).toBe(100);
   });
 });
