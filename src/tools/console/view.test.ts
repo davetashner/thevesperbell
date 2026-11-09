@@ -124,6 +124,25 @@ describe('console view on the UI screen stack', () => {
     expect(s.onToggle).not.toHaveBeenCalled();
   });
 
+  it('prints what a slow command reports once it finishes (mw-e27.6)', async () => {
+    const s = setup();
+    const bad = Promise.resolve({ ok: false, lines: ['too late'] });
+    const good = Promise.resolve({ ok: true, lines: ['all done'] });
+    const view = mountConsoleView({
+      dom: { document, keys: window, screens: s.ui },
+      commands: {
+        execute: (line) => ({ ok: true, lines: ['working'], later: line === 'bad' ? bad : good }),
+        complete: (line) => ({ line, options: [] }),
+      },
+      history: new ConsoleHistory(),
+    });
+    view.open();
+    view.submit('bad');
+    view.submit('good');
+    await Promise.all([bad, good]);
+    expect(s.log()).toEqual(['> bad', 'working', '> good', 'working', 'too late', 'all done']);
+  });
+
   it('Enter runs the line, echoes it and prints the result; errors in the warning colour', () => {
     const s = setup();
     s.view.open();
