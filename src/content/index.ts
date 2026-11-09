@@ -538,6 +538,18 @@ export {
   type HitStopTier,
 } from './types/hit-stop.ts';
 export {
+  DEFAULT_SURFACE,
+  FOOTSTEP_SOUND_PATTERN,
+  MAX_SURFACE_VARIANCE_DB,
+  SURFACE_TABLE_ID,
+  compileSurfaceTable,
+  surfaceTableSchema,
+  type AcousticSurface,
+  type SurfaceTableDef,
+  type SurfaceTableDefInput,
+  type SurfaceTableEntry,
+} from './types/surface-table.ts';
+export {
   DOOR_SOUND_STATES,
   MAX_NOISE_LOSS_DB,
   MAX_STEALTH_WEIGHT,

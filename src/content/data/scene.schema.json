@@ -2705,6 +2705,92 @@
         "additionalProperties": false
       }
     },
+    "surfaces": {
+      "default": [],
+      "description": "Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the surface region, unique in the scene, e.g. hall-carpet."
+          },
+          "min": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Lower corner, grid cells."
+          },
+          "max": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Upper corner, grid cells; above min on every axis."
+          },
+          "surface": {
+            "type": "string",
+            "enum": [
+              "stone",
+              "wood",
+              "wood-hollow",
+              "dirt",
+              "grass",
+              "gravel",
+              "mud",
+              "water-shallow",
+              "snow-ice",
+              "metal-grate",
+              "straw",
+              "carpet",
+              "bone-litter",
+              "leaves",
+              "glass-shards"
+            ],
+            "description": "The footstep surface (audio bible §7.3) of everything inside, e.g. carpet."
+          },
+          "priority": {
+            "default": 0,
+            "description": "Where boxes overlap, the higher priority wins; the first listed wins a tie.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "min",
+          "max",
+          "surface"
+        ],
+        "additionalProperties": false
+      }
+    },
     "transitions": {
       "description": "Volumes that lead to another scene, and where the player arrives (mw-e01.11).",
       "type": "array",

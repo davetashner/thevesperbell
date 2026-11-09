@@ -1,0 +1,101 @@
+{
+  "$schema": "../surface-table.schema.json",
+  "id": "surfaces",
+  "notes": "PLACEHOLDER TUNING (mw-e09.4), to tune in play. Offsets are dB relative to stone (0), kept in the order the audio bible §7.3 requires: carpet < grass < dirt < stone < wood-hollow < gravel / water / metal-grate / bone < glass-shards. Carpet is −10 dB (the bead). Quiet and soft surfaces (carpet −10, grass −5, mud −4, straw −4, dirt −3, snow −2) muffle a step; wood is +2 and hollow wood (bridges, upper floors) +5; loose or ringing surfaces are loud: water-shallow +6, leaves +7, gravel and metal grates +8, bone litter +9, scattered glass +14. varianceDb is the step-to-step spread: smooth surfaces barely vary, loose ones (gravel, leaves, bone, glass) up to 3. Hollow boards creak: 10% of steps add 12 dB (the bead's creaky board; the seeded roll belongs to the footstep noise rule, mw-e09.5). Wet and frozen modifiers are the controller profile's stealth.surfaces. A material's own footstepLoudness still sets the ground collider's offset; this table is what a scene's tagged surface regions read.",
+  "surfaces": [
+    {
+      "id": "stone",
+      "offsetDb": 0,
+      "varianceDb": 1,
+      "sfx": "sfx-foot-stone"
+    },
+    {
+      "id": "wood",
+      "offsetDb": 2,
+      "varianceDb": 1.5,
+      "sfx": "sfx-foot-wood"
+    },
+    {
+      "id": "wood-hollow",
+      "offsetDb": 5,
+      "varianceDb": 2,
+      "sfx": "sfx-foot-wood-hollow",
+      "creak": {
+        "chance": 0.1,
+        "db": 12
+      }
+    },
+    {
+      "id": "dirt",
+      "offsetDb": -3,
+      "varianceDb": 1,
+      "sfx": "sfx-foot-dirt"
+    },
+    {
+      "id": "grass",
+      "offsetDb": -5,
+      "varianceDb": 1,
+      "sfx": "sfx-foot-grass"
+    },
+    {
+      "id": "gravel",
+      "offsetDb": 8,
+      "varianceDb": 3,
+      "sfx": "sfx-foot-gravel"
+    },
+    {
+      "id": "mud",
+      "offsetDb": -4,
+      "varianceDb": 1.5,
+      "sfx": "sfx-foot-mud"
+    },
+    {
+      "id": "water-shallow",
+      "offsetDb": 6,
+      "varianceDb": 2,
+      "sfx": "sfx-foot-water-shallow"
+    },
+    {
+      "id": "snow-ice",
+      "offsetDb": -2,
+      "varianceDb": 1.5,
+      "sfx": "sfx-foot-snow-ice"
+    },
+    {
+      "id": "metal-grate",
+      "offsetDb": 8,
+      "varianceDb": 2,
+      "sfx": "sfx-foot-metal-grate"
+    },
+    {
+      "id": "straw",
+      "offsetDb": -4,
+      "varianceDb": 1,
+      "sfx": "sfx-foot-straw"
+    },
+    {
+      "id": "carpet",
+      "offsetDb": -10,
+      "varianceDb": 0.5,
+      "sfx": "sfx-foot-carpet"
+    },
+    {
+      "id": "bone-litter",
+      "offsetDb": 9,
+      "varianceDb": 3,
+      "sfx": "sfx-foot-bone-litter"
+    },
+    {
+      "id": "leaves",
+      "offsetDb": 7,
+      "varianceDb": 3,
+      "sfx": "sfx-foot-leaves"
+    },
+    {
+      "id": "glass-shards",
+      "offsetDb": 14,
+      "varianceDb": 3,
+      "sfx": "sfx-foot-glass-shards"
+    }
+  ]
+}

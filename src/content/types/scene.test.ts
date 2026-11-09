@@ -600,6 +600,7 @@ describe('scene schema (mw-e00.21)', () => {
       waypoints: [],
       routes: [],
       regions: [],
+      surfaces: [],
       transitions: [],
     });
   });
@@ -880,6 +881,29 @@ describe('scene content', () => {
   it('mw-e03.11: rejects a breakable naming no profile or an unknown key', () => {
     expect(sceneBreakableSchema.safeParse({}).success).toBe(false);
     expect(sceneBreakableSchema.safeParse({ profile: 'old-wall', hp: 3 }).success).toBe(false);
+  });
+});
+
+describe('scene surface regions (mw-e09.4)', () => {
+  const rug = { id: 'rug', min: [0, 0, 0], max: [2, 1, 2], surface: 'carpet' };
+
+  it('accepts tagged surface boxes, defaulting the priority, and none at all', () => {
+    const scene = sceneSchema.parse({ ...room, surfaces: [rug, { ...rug, id: 'p', priority: 4 }] });
+    expect(scene.surfaces.map((r) => [r.surface, r.priority])).toEqual([
+      ['carpet', 0],
+      ['carpet', 4],
+    ]);
+    expect(sceneSchema.parse(room).surfaces).toEqual([]);
+  });
+
+  it('rejects an unknown surface, an empty box and a duplicate id', () => {
+    expect(problems({ ...room, surfaces: [{ ...rug, surface: 'marble' }] })).toHaveLength(1);
+    expect(problems({ ...room, surfaces: [{ ...rug, max: [0, 1, 2] }] })).toEqual([
+      'surfaces.0.max: max must be above min on every axis',
+    ]);
+    expect(problems({ ...room, surfaces: [rug, rug] })).toEqual([
+      'surfaces.1.id: surface region id "rug" is used twice in this scene',
+    ]);
   });
 });
 

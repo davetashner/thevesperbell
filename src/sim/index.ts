@@ -71,6 +71,7 @@ export * from './mechanisms';
 export * from './nav';
 export * as simMath from './math';
 export * from './noise';
+export * from './surfaces';
 export * from './perception';
 export * from './physics';
 export * from './player';

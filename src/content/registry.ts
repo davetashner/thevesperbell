@@ -71,6 +71,7 @@ import { checkSocketTracks, socketTrackSchema } from './types/socket-track.ts';
 import { spellSchema } from './types/spell.ts';
 import { statusSchema } from './types/status.ts';
 import { stealthSchema } from './types/stealth.ts';
+import { surfaceTableSchema } from './types/surface-table.ts';
 import { targetableSchema } from './types/targetable.ts';
 import { testPropSchema } from './types/testprop.ts';
 import { checkUnlocks, unlockSchema } from './types/unlock.ts';
@@ -122,6 +123,7 @@ export const contentTypes = {
   spell: spellSchema,
   status: statusSchema,
   stealth: stealthSchema,
+  'surface-table': surfaceTableSchema,
   targetable: targetableSchema,
   testprop: testPropSchema,
   unlock: unlockSchema,

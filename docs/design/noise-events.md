@@ -72,3 +72,22 @@ loudness  = profileNoise x 10^(surfaceDb / 20)                                  
 
 `wetFrom`, `wetDb` and `frozenDb` are the controller profile's `stealth.surfaces`. Landings are the
 separate `land` event (with `impactSpeed`). Audio plays the same event, so footsteps have one detector.
+
+### Surfaces (mw-e09.4)
+
+`surfaceAt(map, position, tuning, ground?, groundOffsets?)` (`src/sim/surfaces`) answers what a position
+sounds like. Scenes tag boxes with a footstep surface (`surfaces` in the scene: `min`, `max`, `surface`,
+`priority`; a carpet on a wooden floor), and the footstep rule asks `surfaceAt` for the feet:
+
+1. the highest-`priority` region holding the position wins (the first listed wins a tie); the event's
+   `material` is then the region's surface (`carpet`) and its offset is the surface table's;
+2. else the ground collider's material and that material's own `footstepLoudness`, as before;
+3. else the default, `stone` (0 dB), with a dev warning through the injected `warn`, once per map.
+
+Wet and frozen always come from the ground collider's properties, so a frozen board under a carpet
+region still adds `frozenDb`. The surface table is content, `surface-table/surfaces.json`: one row for
+each audio bible §7.3 surface id (a test fails on any id in only one list) with `offsetDb` (-20..+20, dB
+relative to stone; carpet -10), `varianceDb`, the sound set id `sfx-foot-<surface>` and an optional
+`creak` (seeded chance of an extra loud step; hollow wood 10% for +12 dB). Variance and creak are data
+for the footstep noise rule (mw-e09.5), which rolls them from the seeded stream. Audio still reads the
+surface from materials' `footstepSurface`; a surface no material declares falls back as before.

@@ -551,6 +551,35 @@ describe('scene layout (mw-e00.21)', () => {
     expect(layoutScene(TEST_SCENE, testKit).regions).toEqual([]);
   });
 
+  it('mw-e09.4: lays out surface regions as boxes in metres, in scene order', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      grid: 2,
+      surfaces: [
+        { id: 'rug', min: [0, 0, 0], max: [1, 1, 2], surface: 'carpet', priority: 3 },
+        { id: 'path', min: [-1, 0, 0], max: [0, 1, 1], surface: 'gravel', priority: 0 },
+      ],
+    };
+    const { surfaces } = layoutScene(scene, testKit);
+    expect(surfaces).toEqual([
+      {
+        id: 'rug',
+        min: { x: 0, y: 0, z: 0 },
+        max: { x: 2, y: 2, z: 4 },
+        surface: 'carpet',
+        priority: 3,
+      },
+      {
+        id: 'path',
+        min: { x: -2, y: 0, z: 0 },
+        max: { x: 0, y: 2, z: 2 },
+        surface: 'gravel',
+        priority: 0,
+      },
+    ]);
+    expect(layoutScene(TEST_SCENE, testKit).surfaces).toEqual([]);
+  });
+
   it('is deterministic and frozen', () => {
     const a = layoutScene(TEST_SCENE, testKit);
     expect(layoutScene(TEST_SCENE, testKit)).toEqual(a);
