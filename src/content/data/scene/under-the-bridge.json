@@ -179,6 +179,14 @@
   "environment": {
     "sky": "#1A1830"
   },
+  "surfaces": [
+    {
+      "id": "shingle-bank",
+      "min": [-7, -0.5, -2.5],
+      "max": [7, 1, 4],
+      "surface": "gravel"
+    }
+  ],
   "transitions": [
     {
       "id": "path-up",
