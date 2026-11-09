@@ -199,7 +199,10 @@ has two modes:
 - **Reference mode** (`pnpm perf:ref`, by hand on the reference machine — MacBook Pro M1 Pro, Chrome):
   headed Chrome, uncapped, 2560×1440 drawing buffer, 1,800 frames after a 3 s warm-up in the
   `perf-baseline` scene. It fails unless frame time p50 and p95 are ≤ 16.7 ms and no task of 200 ms or
-  more, frame renders included, runs while frames are sampled. Writes
+  more, frame renders included, runs while frames are sampled. The same is run for `valley-01`..`valley-03` at High and at Low (mw-ju8.2).
+  Low here is a 1920×1080 buffer at DPR 1 with `?quality=low`: the contract's Low resolution, not its
+  hardware (an integrated GPU), so it says nothing about that class. The production build has no
+  backdrop card (dev only until the images are approved). Writes
   `perf/results/<date>-<sha>.json`; commit it so results build a trend. Close other apps first.
   Reference mode also holds the wall-clock load budgets that PR e2e specs used to assert (mw-e41.8;
   `e2e/perf/flows.ts`, same in-page timing hooks): cold slice load and the title's New Game → Knight →
