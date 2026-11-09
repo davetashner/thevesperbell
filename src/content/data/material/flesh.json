@@ -2,9 +2,9 @@
   "$schema": "../material.schema.json",
   "id": "flesh",
   "name": "Flesh",
-  "notes": "Bodies, carcasses and meat. Not flammable: setting a creature alight is left to the fire rules (mw-e03.5), not its material. Conducts charge (salty tissue), which lets lightning hurt. Density 1060 kg/m³ (soft tissue), so bodies sink slowly unless their creature def says otherwise. Creatures set their own health, so no hp here. Soft impacts (0.4) and a muffled thump (audio bible §7.2: never wet gore). A body underfoot sounds like the muffled straw surface (-4 dB, the same offset). Soft surface; not a rope-arrow anchor. (mw-e03.31)",
-  "footstepLoudness": -4,
-  "footstepSurface": "straw",
+  "notes": "Bodies, carcasses and meat. Not flammable: setting a creature alight is left to the fire rules (mw-e03.5), not its material. Conducts charge (salty tissue), which lets lightning hurt. Density 1060 kg/m³ (soft tissue), so bodies sink slowly unless their creature def says otherwise. Creatures set their own health, so no hp here. Soft impacts (0.4) and a muffled thump (audio bible §7.2: never wet gore). A body underfoot sounds like the soft dirt surface (-3 dB, the table's offset for it; the only soft set with sounds yet). Soft surface; not a rope-arrow anchor. (mw-e03.31)",
+  "footstepLoudness": -3,
+  "footstepSurface": "dirt",
   "impactSound": "sfx-impact-flesh",
   "properties": {
     "conductive": true,
