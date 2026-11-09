@@ -34,6 +34,7 @@ import { isFlammableNow, SOAKED_WETNESS } from '../properties/derived';
 import type { MaterialPresets } from '../properties/materials';
 import { PROPERTY_ID_PATTERN, WORLD_PROPERTY_KEYS, WORLD_PROPERTY_SPECS } from '../properties/spec';
 import { PlacementComponent } from '../stimulus/placement';
+import { isActor, isAflame, isFireImmune } from './actors';
 import { airIn, cellsInSphere, cellsOf, gasChannels, holdAtLeast } from './cells';
 import { evaporationRule, heatExchangeRule, resolveHeatConfig, type HeatConfig } from './heat';
 import type { ElementRule, ElementRuleContext } from './rules';
@@ -230,6 +231,7 @@ export function fireRules(options: FireRulesOptions): ElementRule[] {
     run: (ctx) => {
       const air = new AirProbe(ctx);
       for (const entity of burningEntities(ctx.world)) {
+        if (isAflame(ctx.world, entity)) continue; // data-forced fire is never put out (mw-e03.24)
         const cause = extinguishCause(ctx.world, entity, air, fire.minAir);
         if (cause === undefined) continue;
         setProperty(ctx.world, entity, 'burning', false);
@@ -252,6 +254,7 @@ export function fireRules(options: FireRulesOptions): ElementRule[] {
           if (!flammable || readProperty(world, entity, 'burning')) return;
           if (temperature < readProperty(world, entity, 'ignitionPoint')) return;
           if (readProperty(world, entity, 'fuel') <= 0 || !isFlammableNow(world, entity)) return;
+          if (isFireImmune(world, entity)) return; // an actor with fire resistance 1 (mw-e03.24)
           if (air.breathes(entity, fire.minAir)) ready.push(entity);
         });
       for (const entity of ready) {
@@ -268,8 +271,10 @@ export function fireRules(options: FireRulesOptions): ElementRule[] {
     run: ({ world, field, hz }) => {
       for (const entity of burningEntities(world)) {
         if (ignited.has(entity)) continue;
-        const ticksLeft = Math.round(readProperty(world, entity, 'fuel') * hz);
-        assignProperty(world, entity, 'fuel', Math.max(0, ticksLeft - 1) / hz);
+        if (!isAflame(world, entity)) {
+          const ticksLeft = Math.round(readProperty(world, entity, 'fuel') * hz);
+          assignProperty(world, entity, 'fuel', Math.max(0, ticksLeft - 1) / hz);
+        }
         const flame = flameTemperatureOf(fire, readProperty(world, entity, 'ignitionPoint'));
         if (readProperty(world, entity, 'temperature') < flame) {
           assignProperty(world, entity, 'temperature', flame);
@@ -298,6 +303,12 @@ export function fireRules(options: FireRulesOptions): ElementRule[] {
       for (const entity of burningEntities(world)) {
         if (readProperty(world, entity, 'fuel') > 0) continue;
         setProperty(world, entity, 'burning', false);
+        if (isActor(world, entity)) {
+          // An actor's fire just goes out: it is not charred or destroyed (its fuel returns when it
+          // has cooled, actor.recover; mw-e03.24).
+          world.events.emit(fireBurntOut, { entity, becomes: null });
+          continue;
+        }
         const state = burntStates.get(readProperty(world, entity, 'material'));
         if (state === undefined) {
           world.events.emit(fireBurntOut, { entity, becomes: null });

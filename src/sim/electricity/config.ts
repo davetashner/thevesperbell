@@ -20,6 +20,8 @@ export interface ConductionConfig {
   readonly shockCharge: number;
   /** Charge at or above which an entity that can burn is heated to its ignition point (> 0). */
   readonly ignitionCharge: number;
+  /** How much stronger a shock is on a soaked actor (wetness at least 0.5), ≥ 1 (mw-e03.24). */
+  readonly wetActorFactor: number;
 }
 
 /** The default tuning: 80% crosses each hop, 256-node floods, a strike drains in about a second. */
@@ -31,6 +33,7 @@ export const DEFAULT_CONDUCTION_CONFIG: ConductionConfig = Object.freeze({
   halfLifeSeconds: 0.15,
   shockCharge: 10,
   ignitionCharge: 500,
+  wetActorFactor: 2,
 });
 
 /** The full, validated config for `input` over the defaults. Throws a RangeError. */
@@ -54,5 +57,8 @@ export function resolveConductionConfig(input: Partial<ConductionConfig> = {}): 
   positive('halfLifeSeconds');
   positive('shockCharge');
   positive('ignitionCharge');
+  if (!(config.wetActorFactor >= 1) || !Number.isFinite(config.wetActorFactor)) {
+    throw new RangeError('conduction config wetActorFactor must be a finite number ≥ 1');
+  }
   return config;
 }
