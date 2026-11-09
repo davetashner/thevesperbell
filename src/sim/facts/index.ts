@@ -4,5 +4,6 @@
 export * from './commands';
 export * from './conditions';
 export * from './migrate';
+export * from './policy';
 export * from './registry';
 export * from './store';

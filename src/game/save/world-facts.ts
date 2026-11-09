@@ -2,10 +2,18 @@
 // inside the world snapshot. Every load runs the facts through the migrations the fact registry
 // generates (src/sim/facts/migrate.ts): a fact saved under a key the registry lists in `renamedFrom`
 // loads under its current key with its value; a fact the registry no longer declares, or whose value
-// its declaration no longer accepts, is dropped with a warning and the rest load. Saves from before
+// its declaration no longer accepts, is dropped with a warning and the rest load. Persistence policies
+// (mw-e27.7) apply on both sides: a save leaves out transient facts, a load resets what ran out and
+// decays what decays (src/sim/facts/policy.ts). Saves from before
 // this section kept their facts in the world section; they get the same migrations.
 
-import { migrateFacts, type DroppedFact, type FactSnapshot, type World } from '@sim/index';
+import {
+  migrateFacts,
+  settleSavedFacts,
+  type DroppedFact,
+  type FactSnapshot,
+  type World,
+} from '@sim/index';
 import { z } from 'zod';
 import {
   defineSaveSection,
@@ -67,7 +75,9 @@ export function worldFactsSaveSection(
       context.warn(message);
       options.warn?.(message);
     }
-    world.facts.prepareRestore(facts)();
+    // Persistence policies (mw-e27.7): transient facts start over, expired ones reset, decayed ones decay.
+    const settled = settleSavedFacts(world.facts, facts, world.tick);
+    world.facts.prepareRestore(settled.facts)();
   };
   return defineSaveSection<WorldFactsData>({
     id: WORLD_FACTS_SECTION_ID,
@@ -75,7 +85,8 @@ export function worldFactsSaveSection(
     schema: worldFactsSchema,
     ownsFacts: true,
     migrations: WORLD_FACTS_MIGRATIONS,
-    serialize: (world) => ({ facts: world.facts.snapshot() }),
+    // Transient facts are never saved (mw-e27.7).
+    serialize: (world) => ({ facts: world.facts.persistentSnapshot() }),
     // The world section of a save that has this section holds no facts; were it to, these win.
     deserialize: (world, { facts }, context) => {
       restore(world, { ...context.worldFacts, ...facts }, context);

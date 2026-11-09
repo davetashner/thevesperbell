@@ -135,7 +135,7 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
-import { installGameFire } from '@game/fire';
+import { fireSettleOptions, installGameFire } from '@game/fire';
 import {
   attachSpellBar,
   attachSpellHud,
@@ -346,6 +346,7 @@ import {
   LEDGE_HANG_CAPABILITY,
   levelDeltasOf,
   arrowSpawner,
+  installRestPolicies,
   persistDroppedItems,
   persistRestingArrows,
   physicsBodiesOf,
@@ -2620,6 +2621,7 @@ function startRenderer(
         world,
         new WorldPersistence({
           spawners: [worldItemSpawner(worldItems), arrowSpawner()],
+          settle: fireSettleOptions(content),
           warn: (message) => {
             console.warn(message);
           },
@@ -2628,6 +2630,8 @@ function startRenderer(
         sceneAuthoredEntities(world, loaded),
         sceneDormantEntities(loaded),
       );
+      // Rest-reset policies (mw-e27.7): resting puts back what is declared to reset on rest.
+      installRestPolicies(world);
       // Fact-gated spawns (mw-e27.8): spawnIf, despawnIf and variant groups were settled when the
       // scene loaded; now they follow the facts, swapping only while the spawn is out of view.
       const variants = watchSpawnVariants({
