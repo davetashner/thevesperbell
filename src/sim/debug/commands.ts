@@ -7,6 +7,8 @@
 
 import type { ControllerTuning, Frozen } from '@content/index';
 import type { EntityId } from '../core/component';
+import type { LevelDeltas } from '../deltas/persistence';
+import type { FactSnapshot } from '../facts/store';
 import { isWorldPropertyKey, validateProperty, type WorldPropertyKey } from '../properties/spec';
 import type { Vec3 } from '../stimulus/shapes';
 
@@ -172,7 +174,22 @@ export type TimeCommand =
       readonly minutes: number;
     };
 
+/**
+ * Puts the world's facts and the stored deltas of its levels back to a snapshot (mw-e27.6: the
+ * console's `state.restore`). Facts are replaced wholesale (no `factChanged` fires, as for a load);
+ * deltas replace those of every level that is not loaded (the loaded level's entities are live and
+ * keep their state; its deltas are read again when it is next entered). Plain JSON, so a replay
+ * carries the whole snapshot.
+ */
+export interface RestoreStateCommand {
+  readonly kind: typeof DEBUG_COMMAND;
+  readonly op: 'restore';
+  readonly facts: FactSnapshot;
+  readonly levels: readonly LevelDeltas[];
+}
+
 export type DebugCommand =
+  | RestoreStateCommand
   | TimeCommand
   | ActCommand
   | SpawnCommand
@@ -332,6 +349,14 @@ export function timeAdvanceCommand(minutes: number): TimeCommand {
 export function actCommand(target: EntityId, move: string): ActCommand {
   if (move === '') throw new RangeError('act needs a move id');
   return { kind: DEBUG_COMMAND, op: 'act', target: entity(target), move };
+}
+
+/** A state restore; `facts` and `levels` come from `FactStore.snapshot` and `LevelDeltaStore.capture`. */
+export function restoreStateCommand(
+  facts: FactSnapshot,
+  levels: readonly LevelDeltas[],
+): RestoreStateCommand {
+  return { kind: DEBUG_COMMAND, op: 'restore', facts: { ...facts }, levels: [...levels] };
 }
 
 /** A despawn of every creature. */

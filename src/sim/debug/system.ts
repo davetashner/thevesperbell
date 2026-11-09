@@ -10,6 +10,7 @@
 // has, or for an entity that is gone, so such commands are skipped rather than failing the tick. The
 // console checks the same things up front and tells the developer instead.
 
+import { levelDeltasOf } from '../deltas/store';
 import { gameClockOf } from '../gametime/clock';
 import { initialCharacterState } from '../character/controller';
 import { CharacterController, CharacterTuning } from '../character/system';
@@ -37,6 +38,7 @@ import {
   type CheatCommand,
   type DebugCommand,
   type PropertyCommand,
+  type RestoreStateCommand,
   type SpawnParams,
   type TuneCommand,
 } from './commands';
@@ -174,6 +176,21 @@ function act<TInput>(world: World<TInput>, { target, move }: ActCommand): void {
   requestMove(world, target, move);
 }
 
+/**
+ * Restores facts and level deltas. Facts that its registry rejects (a replay from another build)
+ * leave everything as it was: the snapshot is checked whole before anything changes.
+ */
+function restoreState<TInput>(world: World<TInput>, { facts, levels }: RestoreStateCommand): void {
+  let apply: () => void;
+  try {
+    apply = world.facts.prepareRestore(facts);
+  } catch {
+    return;
+  }
+  apply();
+  levelDeltasOf(world).restore(levels);
+}
+
 /** The system applying this tick's debug commands in input order (see the file header). */
 export function debugCommandSystem<TInput>(options: DebugCommandOptions): System<TInput> {
   const { spawners } = options;
@@ -230,6 +247,10 @@ export function debugCommandSystem<TInput>(options: DebugCommandOptions): System
           if (clock === undefined) continue; // a world without the game clock has no time to move
           if (command.action === 'set') clock.setTime({ day: command.day, minute: command.minute });
           else clock.advanceTime(command.minutes, 'debug');
+          continue;
+        }
+        if (command.op === 'restore') {
+          restoreState(world, command);
           continue;
         }
         if (command.op === 'despawn') {

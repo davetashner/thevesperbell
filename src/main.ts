@@ -1309,6 +1309,7 @@ function startRenderer(
     let aiDebug: { held(): boolean; frame(): void } | undefined;
     // The field debug overlay (mw-e03.29): loaded with the console too; undefined in release builds.
     let fieldDebug: { frame(): void } | undefined;
+    let worldState: { frame(): void } | undefined;
     // Debug pages only (mw-e01.9): the input log's recorder or replay runs just before each sample.
     let beforeSample: ((tick: number) => void) | undefined;
     // While a replay still has inputs to play, the slice-complete card stays shut: its opening (in a
@@ -1538,6 +1539,7 @@ function startRenderer(
         drawLights();
         aiDebug?.frame();
         fieldDebug?.frame();
+        worldState?.frame();
         view.renderFrame(timeMs);
         // A save's thumbnail (mw-e30.11) is read straight after a render, while the frame is still
         // in the drawing buffer.
@@ -2975,8 +2977,14 @@ function startRenderer(
         import('@tools/console/start'),
         import('@tools/ai-debug/start'),
         import('@tools/field-debug/start'),
+        import('@tools/world-state/start'),
       ]).then(
-        ([{ startDebugConsole, unboundDebugSpawns }, { startAiDebug }, { startFieldDebug }]) => {
+        ([
+          { startDebugConsole, unboundDebugSpawns },
+          { startAiDebug },
+          { startFieldDebug },
+          { startWorldState },
+        ]) => {
           const bookmarks = new Map(
             (scenes.current?.layout.spawns ?? []).map(
               (spawn) => [spawn.id, spawn.position] as const,
@@ -3076,6 +3084,20 @@ function startRenderer(
             publish: (json) => {
               root.dataset['fieldDebug'] = json;
             },
+          });
+          // facts.* / deltas.list / state.* (mw-e27.6): inspect, edit, snapshot and diff the world's
+          // facts and per-level deltas, against live state, in-memory snapshots or save slots.
+          void saves.then(({ store }) => {
+            worldState = startWorldState({
+              world,
+              registry: debugConsole.registry,
+              root,
+              store,
+              saves: saveRegistry,
+              publish: (json) => {
+                root.dataset['worldState'] = json;
+              },
+            });
           });
           // Props the console spawned get grey-box objects like the scene's own props: a movable one
           // a body-sized box following its physics pose.
