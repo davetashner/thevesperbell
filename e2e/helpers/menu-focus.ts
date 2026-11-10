@@ -32,18 +32,10 @@ export interface Sweep {
  * path as a key press.
  */
 export async function sweep(page: Page): Promise<Sweep> {
-  return page.evaluate(async () => {
+  return page.evaluate(() => {
     const screens = [...document.querySelectorAll<HTMLElement>('.vb-menus > [data-screen]')];
     const scope = screens.at(-1);
     if (!scope) throw new Error('no screen is open');
-    const raf = (): Promise<void> =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-      });
     const selector =
       'button, a[href], input, select, textarea, [tabindex], [contenteditable="true"]';
     const controls = [...scope.querySelectorAll<HTMLElement>(selector)].filter(
@@ -59,7 +51,10 @@ export async function sweep(page: Page): Promise<Sweep> {
     });
     const name = (el: Element | null): string =>
       (el instanceof HTMLElement ? names.get(el) : undefined) ?? 'outside';
-    const press = async (shiftKey: boolean): Promise<void> => {
+    // A Tab press is handled synchronously (the UI adapter moves focus inside the keydown), and
+    // focus, scroll and computed style are all current when dispatchEvent returns, so a sweep waits
+    // on nothing: on a runner drawing a frame a second it costs one evaluate, not two frames a key.
+    const press = (shiftKey: boolean): void => {
       window.dispatchEvent(
         new KeyboardEvent('keydown', {
           code: 'Tab',
@@ -69,7 +64,6 @@ export async function sweep(page: Page): Promise<Sweep> {
           cancelable: true,
         }),
       );
-      await raf();
     };
 
     const parse = (color: string): [number, number, number, number] => {
@@ -173,7 +167,7 @@ export async function sweep(page: Page): Promise<Sweep> {
       const first = controls.at(0);
       const last = controls.at(-1);
       for (let i = 0; i < controls.length; i++) {
-        await press(false);
+        press(false);
         const el = document.activeElement;
         if (!(el instanceof HTMLElement) || !scope.contains(el)) {
           escaped.push(`tab ${String(i + 1)}: ${name(el)}`);
@@ -182,9 +176,9 @@ export async function sweep(page: Page): Promise<Sweep> {
         visited.add(name(el));
         check(el);
       }
-      await press(false);
+      press(false);
       wraps = document.activeElement === first;
-      await press(true);
+      press(true);
       wrapsBack = document.activeElement === last;
       // A Tab past the end never leaves the screen either.
       if (!scope.contains(document.activeElement)) escaped.push('shift+tab at the start');
