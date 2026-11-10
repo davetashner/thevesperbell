@@ -3,7 +3,9 @@
 A puzzle is data, not code (contract §1): `src/content/data/puzzle/<id>.json`, checked when content
 loads (mw-e15.1). Field reference, generated from the schema: [puzzle schema](../content/puzzle-schema.md).
 The runtime that tracks, solves and rewards puzzles is described under "How a puzzle runs" below
-(mw-e15.3); the solver that proves declared solutions is mw-e15.6.
+(mw-e15.3); the solver that proves declared solutions is mw-e15.6. Which classes can solve each puzzle
+is audited and gated in CI (mw-e15.8): [puzzle coverage](puzzle-coverage.md), regenerated with
+`pnpm puzzle:coverage --write`.
 
 ## Outcomes, not scripts
 

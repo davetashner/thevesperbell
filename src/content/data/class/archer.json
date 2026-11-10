@@ -9,6 +9,7 @@
   "iconId": "ui-emblem-class-archer-01",
   "portraitId": "keyart-class-card-archer-01",
   "startingCapabilities": ["verb.climb.ledge", "arrow.rope", "sense.tracking"],
+  "mvpCapabilities": ["verb.climb.ledge", "arrow.rope", "sense.tracking", "arrow.pinning-shot"],
   "signature": ["arrow.rope"],
   "startingKit": {
     "gold": 20,

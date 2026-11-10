@@ -9,6 +9,12 @@
   "iconId": "ui-emblem-class-knight-01",
   "portraitId": "keyart-class-card-knight-01",
   "startingCapabilities": ["verb.climb.ledge", "technique.shield-bash", "technique.parry"],
+  "mvpCapabilities": [
+    "verb.climb.ledge",
+    "technique.shield-bash",
+    "technique.parry",
+    "technique.shoulder-barge"
+  ],
   "signature": ["technique.parry"],
   "startingKit": {
     "gold": 25,

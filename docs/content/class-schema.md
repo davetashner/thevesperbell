@@ -18,6 +18,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `iconId` | string | required | Class emblem asset id (style bible §15.1); a placeholder until the art lands. |
 | `portraitId` | string | required | Class card illustration asset id (style bible §15.1). |
 | `startingCapabilities` | list of string (at least 2) | required | Capabilities granted at new game, with the permanent class source (ADR-0004). |
+| `mvpCapabilities` | list of string (at least 2) | required | The capability profile at the MVP progression milestone (mw-e15.8): the starting capabilities plus what the first trainers, books and tools give. The puzzle coverage audit (docs/design/puzzle-coverage.md) asks what a class with exactly these can solve. |
 | `signature` | list of string (at least 1) | required | Capabilities that define the class and are never shared (ADR-0004 "simple" rule). |
 | `startingKit` | object | required | What the player starts with (grey-box; tuned during m2/m3). |
 | `startingKit.gold` | integer ≥ 0 | required | Starting gold. |

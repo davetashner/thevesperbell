@@ -9,6 +9,7 @@
   "iconId": "ui-emblem-class-thief-01",
   "portraitId": "keyart-class-card-thief-01",
   "startingCapabilities": ["verb.climb.ledge", "verb.climb.rough", "trick.pickpocket"],
+  "mvpCapabilities": ["verb.climb.ledge", "verb.climb.rough", "trick.pickpocket", "tool.lockpick"],
   "signature": ["tool.lockpick", "trick.pickpocket"],
   "startingKit": {
     "gold": 40,

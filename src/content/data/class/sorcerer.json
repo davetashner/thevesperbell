@@ -9,6 +9,7 @@
   "iconId": "ui-emblem-class-sorcerer-01",
   "portraitId": "keyart-class-card-sorcerer-01",
   "startingCapabilities": ["verb.climb.ledge", "spell.ember", "spell.mage-hand"],
+  "mvpCapabilities": ["verb.climb.ledge", "spell.ember", "spell.mage-hand", "spell.firebolt"],
   "signature": ["spell.firebolt", "spell.flame-jet", "spell.fire-wall"],
   "startingKit": {
     "gold": 30,

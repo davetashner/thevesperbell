@@ -28,7 +28,7 @@ one definition.
 | `e2e-smoke` (ci.yml) | per-PR | Aggregates the e2e jobs under the required check name. |
 | `perf-budget` (ci.yml) | per-PR tier skipped; runs on push to `main` | Publishes the `perf-report` baseline artifact. Warn-only on GPU-less runners, ~510 s, so it is off every PR's critical path. |
 | `interaction-matrix` (ci.yml) | per-PR | 500 generated worlds x 300 ticks from a fixed seed keep every invariant (about 20 s), and the interaction matrix is regenerated, checked against the committed file and diffed into the job summary (mw-e03.26). |
-| `puzzle-validate` (ci.yml) | per-PR | `pnpm puzzle:validate`: every declared puzzle solution is proven reachable by a bounded abstract search (10 s per puzzle) and its step list runs in the headless sim; fails when an `mvp` puzzle has an unreachable or diverging solution (mw-e15.6). |
+| `puzzle-validate` (ci.yml) | per-PR | `pnpm puzzle:validate`: every declared puzzle solution is proven reachable by a bounded abstract search (10 s per puzzle) and its step list runs in the headless sim; fails when an `mvp` puzzle has an unreachable or diverging solution (mw-e15.6). It also runs `pnpm puzzle:coverage --check` (mw-e15.8): `docs/design/puzzle-coverage.md` must be current, every `mvp` puzzle needs 2 distinct validated solutions and 3 of 4 classes able to solve it at MVP capability levels, and the step summary shows how the PR changes the coverage. |
 | `build` (ci.yml) | per-PR | The production build must work; required. |
 | `beads-validate` (ci.yml) | per-PR | Seconds; validates the backlog export; required. |
 | `element-matrix` (slow-gates.yml) | nightly, release | The same property run over 8000 worlds from a daily seed: finds the rare combinations the fixed seed misses (mw-e03.26). |

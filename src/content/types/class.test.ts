@@ -30,6 +30,7 @@ const thief = (over: Partial<ClassDefInput> = {}): ClassDefInput => ({
   iconId: 'ui-emblem-class-thief-01',
   portraitId: 'keyart-class-card-thief-01',
   startingCapabilities: ['verb.climb.ledge', 'verb.climb.rough'],
+  mvpCapabilities: ['verb.climb.ledge', 'verb.climb.rough', 'tool.lockpick'],
   signature: ['tool.lockpick'],
   startingKit: { gold: 10, items: [{ item: 'lockpicks', equip: true }] },
   proficiencies: ['daggers', 'blades', 'light-armor'],
@@ -137,10 +138,33 @@ describe('class data (mw-e19.4)', () => {
 
   it('AC-2: fails when a starting capability is not in the registry, naming class and id', () => {
     const issues = loadIssues(
-      thief({ startingCapabilities: ['verb.climb.ledge', 'verb.climb.walls'] }),
+      thief({
+        startingCapabilities: ['verb.climb.ledge', 'verb.climb.walls'],
+        mvpCapabilities: ['verb.climb.ledge', 'verb.climb.walls'],
+      }),
     );
+    // The MVP profile names the same unknown capability; one issue per field.
     expect(issues).toEqual([
       `${THIEF_FILE}#/startingCapabilities/1: class:thief names unknown capability "verb.climb.walls": declare it in src/content/data/capability/`,
+      `${THIEF_FILE}#/mvpCapabilities/1: class:thief names unknown capability "verb.climb.walls": declare it in src/content/data/capability/`,
+    ]);
+  });
+
+  it("mw-e15.8: the MVP milestone profile must hold the starting capabilities, declared and the class's own", () => {
+    const issues = loadIssues(thief({ mvpCapabilities: ['verb.climb.ledge', 'verb.climb.walls'] }));
+    expect(issues).toEqual([
+      `${THIEF_FILE}#/mvpCapabilities/1: class:thief names unknown capability "verb.climb.walls": declare it in src/content/data/capability/`,
+      `${THIEF_FILE}#/mvpCapabilities: class:thief mvpCapabilities lacks its starting capability "verb.climb.rough": the milestone profile includes everything the class starts with`,
+    ]);
+    expect(
+      loadIssues(
+        thief({
+          mvpCapabilities: ['verb.climb.ledge', 'verb.climb.rough', 'technique.riposte'],
+        }),
+      ).filter((m) => m.includes('riposte')),
+    ).toEqual([
+      `${THIEF_FILE}#/mvpCapabilities/2: class:thief holds "technique.riposte" at the MVP milestone, a knight capability`,
+      `${THIEF_FILE}#/mvpCapabilities/2: class:thief holds "technique.riposte" at the MVP milestone without its prerequisite "technique.parry"`,
     ]);
   });
 
@@ -197,6 +221,7 @@ describe('class schema (mw-e19.4)', () => {
       problems(
         thief({
           startingCapabilities: ['verb.climb.ledge', 'verb.climb.ledge'],
+          mvpCapabilities: ['verb.climb.ledge', 'verb.climb.ledge'],
           signature: ['tool.lockpick', 'tool.lockpick'],
           proficiencies: ['blades', 'blades'],
           unlockChannels: ['tool', 'tool'],
@@ -205,6 +230,7 @@ describe('class schema (mw-e19.4)', () => {
       ),
     ).toEqual([
       'startingCapabilities.1: "verb.climb.ledge" is listed twice',
+      'mvpCapabilities.1: "verb.climb.ledge" is listed twice',
       'signature.1: "tool.lockpick" is listed twice',
       'proficiencies.1: "blades" is listed twice',
       'unlockChannels.1: "tool" is listed twice',
@@ -248,11 +274,13 @@ describe('class content checks (mw-e19.4)', () => {
     const issues = loadIssues(
       thief({
         startingCapabilities: ['verb.climb.ledge', 'technique.parry'],
+        mvpCapabilities: ['verb.climb.ledge', 'technique.parry'],
         signature: ['tool.lockpick', 'trick.vanish', 'spell.mage-hand', 'arrow.rope'],
       }),
     );
     expect(issues).toEqual([
       `${T}/startingCapabilities/1: class:thief starts with "technique.parry", a knight capability: a class starts with its own or shared capabilities`,
+      `${T}/mvpCapabilities/1: class:thief holds "technique.parry" at the MVP milestone, a knight capability`,
       `${T}/signature/1: class:thief names unknown capability "trick.vanish": declare it in src/content/data/capability/`,
       `${T}/signature/2: class:thief signature "spell.mage-hand" needs classAffinity "thief" (it has none)`,
       `${T}/signature/3: class:thief signature "arrow.rope" needs classAffinity "thief" (it has archer)`,
@@ -334,6 +362,13 @@ describe('class content checks (mw-e19.4)', () => {
       checkClasses([{ type: 'class', file: THIEF_FILE, value: classSchema.parse(thief()) }]).map(
         ({ pointer }) => pointer,
       ),
-    ).toEqual(['/startingCapabilities/0', '/startingCapabilities/1', '/signature/0']);
+    ).toEqual([
+      '/startingCapabilities/0',
+      '/startingCapabilities/1',
+      '/mvpCapabilities/0',
+      '/mvpCapabilities/1',
+      '/mvpCapabilities/2',
+      '/signature/0',
+    ]);
   });
 });

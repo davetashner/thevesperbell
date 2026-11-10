@@ -7,6 +7,9 @@
 // - `startingCapabilities`: registry ids granted at new game with the permanent `class` source
 //   (ADR-0004). Applying them, the kit and the stats to a fresh player is mw-e19.5
 //   (src/sim/progression/classes.ts).
+// - `mvpCapabilities`: the class's capability profile at the MVP progression milestone (mw-e15.8): the
+//   starting capabilities plus the first unlocks the slice offers (trainer, book, tool). The puzzle
+//   coverage audit (src/tools/puzzle/coverage.ts) judges what each class can solve with exactly these.
 // - `signature`: the capabilities that define the class fantasy and are never shared (ADR-0004's
 //   "simple" rule, point 4): the knight's Parry, the archer's Rope Arrow, the thief's Lockpicks and
 //   Pickpocket, the sorcerer's chains past their roots. Each must carry this class's affinity and
@@ -34,7 +37,7 @@ import { contentId, ref } from '../schema.ts';
 import { capabilityId, localisationKey, type CapabilityGroup } from './capability.ts';
 import { PLAYER_CLASSES, type PlayerClass } from './controller.ts';
 import { ITEM_STACK_GUARD, type EquipSlot, type ItemDef } from './item.ts';
-import { UNLOCK_CHANNELS } from './unlock.ts';
+import { UNLOCK_CHANNELS, type UnlockGroup } from './unlock.ts';
 
 /** The progression channels a class may grow through: the unlock channels plus carried tools. */
 export const CLASS_CHANNELS = [...UNLOCK_CHANNELS, 'tool'] as const;
@@ -148,6 +151,12 @@ export const classSchema = z
       .array(capabilityId)
       .min(2, 'a class starts with at least 2 capabilities')
       .describe('Capabilities granted at new game, with the permanent class source (ADR-0004).'),
+    mvpCapabilities: z
+      .array(capabilityId)
+      .min(2, 'the MVP milestone holds at least the starting capabilities')
+      .describe(
+        'The capability profile at the MVP progression milestone (mw-e15.8): the starting capabilities plus what the first trainers, books and tools give. The puzzle coverage audit (docs/design/puzzle-coverage.md) asks what a class with exactly these can solve.',
+      ),
     signature: z
       .array(capabilityId)
       .min(1, 'a class needs at least one signature capability')
@@ -194,6 +203,7 @@ export const classSchema = z
   })
   .superRefine((def, ctx) => {
     noRepeats(def.startingCapabilities, 'startingCapabilities', ctx);
+    noRepeats(def.mvpCapabilities, 'mvpCapabilities', ctx);
     noRepeats(def.signature, 'signature', ctx);
     noRepeats(def.proficiencies, 'proficiencies', ctx);
     noRepeats(def.unlockChannels, 'unlockChannels', ctx);
@@ -233,6 +243,7 @@ export function classKeys(def: Pick<ClassDef, 'id' | 'nameKey' | 'descKey'>): {
 function capabilityIssues(
   def: ClassDef,
   affinity: ReadonlyMap<string, { affinity?: PlayerClass; crossClass: boolean }>,
+  prerequisites: ReadonlyMap<string, readonly string[]>,
 ): { pointer: string; message: string }[] {
   const at = `class:${def.id}`;
   const issues: { pointer: string; message: string }[] = [];
@@ -249,6 +260,33 @@ function capabilityIssues(
       });
     }
   });
+  def.mvpCapabilities.forEach((id, i) => {
+    const pointer = `/mvpCapabilities/${String(i)}`;
+    const cap = affinity.get(id);
+    if (cap === undefined) issues.push({ pointer, message: unknown(id) });
+    else if (cap.affinity !== undefined && cap.affinity !== def.id) {
+      issues.push({
+        pointer,
+        message: `${at} holds "${id}" at the MVP milestone, a ${cap.affinity} capability`,
+      });
+    }
+    for (const needed of prerequisites.get(id) ?? []) {
+      if (!def.mvpCapabilities.includes(needed)) {
+        issues.push({
+          pointer,
+          message: `${at} holds "${id}" at the MVP milestone without its prerequisite "${needed}"`,
+        });
+      }
+    }
+  });
+  for (const id of def.startingCapabilities) {
+    if (!def.mvpCapabilities.includes(id)) {
+      issues.push({
+        pointer: '/mvpCapabilities',
+        message: `${at} mvpCapabilities lacks its starting capability "${id}": the milestone profile includes everything the class starts with`,
+      });
+    }
+  }
   def.signature.forEach((id, i) => {
     const pointer = `/signature/${String(i)}`;
     const cap = affinity.get(id);
@@ -325,6 +363,7 @@ function kitIssues(
 export const checkClasses: ContentCheck = (entries) => {
   const affinity = new Map<string, { affinity?: PlayerClass; crossClass: boolean }>();
   const items = new Map<string, ItemDef>();
+  const prerequisites = new Map<string, readonly string[]>();
   const classes: { file: string; def: ClassDef }[] = [];
   for (const { type, file, value } of entries) {
     if (type === 'capability') {
@@ -334,6 +373,10 @@ export const checkClasses: ContentCheck = (entries) => {
           crossClass: cap.crossClass === true,
         });
       }
+    } else if (type === 'unlock') {
+      for (const unlock of (value as UnlockGroup).unlocks) {
+        prerequisites.set(unlock.capability, unlock.prerequisites);
+      }
     } else if (type === 'item') items.set(value.id, value as ItemDef);
     else if (type === 'class') classes.push({ file, def: value as ClassDef });
   }
@@ -341,7 +384,10 @@ export const checkClasses: ContentCheck = (entries) => {
   const issues: ContentIssue[] = [];
   const tags = new Map<string, string>();
   for (const { file, def } of classes) {
-    for (const issue of [...capabilityIssues(def, affinity), ...kitIssues(def, items)]) {
+    for (const issue of [
+      ...capabilityIssues(def, affinity, prerequisites),
+      ...kitIssues(def, items),
+    ]) {
       issues.push({ file, ...issue });
     }
     const other = tags.get(def.dialogueTag);
