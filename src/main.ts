@@ -163,6 +163,7 @@ import {
   propBodies,
 } from '@game/physics-objects';
 import {
+  comfortDefaults,
   createSettingsStore,
   BindingsEditor,
   bindHoldToggle,
@@ -248,6 +249,7 @@ import {
   attachCorpseDissolves,
   type CorpseGlue,
   DamageVignette,
+  FlashLimiter,
   type CombinedLook,
   ElementFeedbackBridge,
   GasFieldPresenter,
@@ -505,7 +507,11 @@ const app = document.querySelector<HTMLElement>('#app');
 if (app) {
   app.dataset['layers'] = [...layers, tools].join(' ');
   // Player settings (mw-e31.1): per-browser, loaded first; in memory when the browser blocks storage.
-  const settings = createSettingsStore({ storage: () => globalThis.localStorage });
+  const settings = createSettingsStore({
+    storage: () => globalThis.localStorage,
+    // A system that asks for reduced motion starts with no camera shake and reduced flashing (mw-e31.7).
+    initial: comfortDefaults((q) => globalThis.matchMedia(q)),
+  });
   app.dataset['settingsStore'] = settings.persistent ? 'local' : 'memory';
   startRenderer(app, startSaves(app), settings);
 }
@@ -2061,12 +2067,20 @@ function startRenderer(
         });
         const feedback = new ScreenFeedback();
         ui.hud.append(feedback.element);
+        // Every full-screen flash goes through this one limiter; reduce-flashing caps its intensity.
+        const flashLimiter = new FlashLimiter();
+        const configureFlashes = (): void => {
+          flashLimiter.configure(settings.get('accessibility.reduceFlashing'));
+        };
+        configureFlashes();
+        settings.on('accessibility.reduceFlashing', configureFlashes);
         screenFeedback = attachScreenFeedback({
           world,
           player: player.entity,
           shake,
-          vignette: new DamageVignette(),
+          vignette: new DamageVignette(flashLimiter),
           overlay: feedback,
+          reduceEffects: () => settings.get('accessibility.reduceScreenEffects'),
         });
         // The breath meter (mw-e02.14): shown only while the player is short of breath, with the
         // armor's warning when it drags the player under.

@@ -14,9 +14,23 @@ export const MAX_DESATURATION = 0.7;
 /** WCAG 2.3.1: no more than this many full-screen flashes in any one second. */
 export const MAX_FLASHES_PER_SECOND = 3;
 
-/** Allows at most `MAX_FLASHES_PER_SECOND` flashes in any sliding 1000 ms window. */
+/** With reduce-flashing on, no full-screen flash is drawn brighter than this fraction of its maximum. */
+export const REDUCED_FLASH_INTENSITY = 0.35;
+
+/**
+ * The one gate every full-screen flash goes through (mw-e31.7): it allows at most
+ * `MAX_FLASHES_PER_SECOND` in any sliding 1000 ms window, always (WCAG 2.3.1), and with reduce-flashing
+ * on it also caps each admitted flash at `REDUCED_FLASH_INTENSITY`. A new full-screen effect must call
+ * `admit` before drawing; the damage vignette is the only one today.
+ */
 export class FlashLimiter {
   #times: number[] = [];
+  #reduced = false;
+
+  /** Switches the reduce-flashing intensity cap on or off. */
+  configure(reduced: boolean): void {
+    this.#reduced = reduced;
+  }
 
   /** Whether a flash requested at `nowMs` may render; an allowed flash counts against the window. */
   request(nowMs: number): boolean {
@@ -24,6 +38,12 @@ export class FlashLimiter {
     if (this.#times.length >= MAX_FLASHES_PER_SECOND) return false;
     this.#times.push(nowMs);
     return true;
+  }
+
+  /** The intensity (0–1 of maximum) to draw a flash of `intensity` at `nowMs`: 0 when refused. */
+  admit(nowMs: number, intensity: number): number {
+    if (!this.request(nowMs)) return 0;
+    return this.#reduced ? Math.min(intensity, REDUCED_FLASH_INTENSITY) : intensity;
   }
 }
 
@@ -51,8 +71,10 @@ export class DamageVignette {
    */
   hit(lostFraction: number, nowMs: number): boolean {
     const lost = Math.min(1, Math.max(0, lostFraction));
-    if (!(lost > 0) || !this.#limiter.request(nowMs)) return false;
-    this.#peak = Math.max(this.intensity(nowMs), lost);
+    if (!(lost > 0)) return false;
+    const shown = this.#limiter.admit(nowMs, lost);
+    if (shown <= 0) return false;
+    this.#peak = Math.max(this.intensity(nowMs), shown);
     this.#start = nowMs;
     return true;
   }

@@ -43,6 +43,12 @@ export interface SettingsStoreOptions {
   readonly storage?: () => SettingsStorage | null | undefined;
   /** Storage key (default SETTINGS_STORAGE_KEY). */
   readonly key?: string;
+  /**
+   * Values that replace the schema defaults on a first launch (nothing stored yet), e.g. the comfort
+   * defaults from `prefers-reduced-motion`. They are not saved until the player changes something,
+   * and stored settings always win.
+   */
+  readonly initial?: Readonly<Partial<{ [K in SettingKey]: SettingValue<K> }>>;
   /** Receives repairs and storage failures (default console.warn). */
   readonly warn?: SettingsWarn;
 }
@@ -126,6 +132,15 @@ export class SettingsStore {
       this.#warn(`storage unavailable (${errorText(error)}); settings last this session only`);
     }
     this.#values = loadSettings(text, this.#warn);
+    if (text === null) {
+      for (const [key, value] of Object.entries(options.initial ?? {})) {
+        const [category, name] = key.split('.') as [SettingsCategory, string];
+        const def = settingDef(key as SettingKey);
+        if (settingValueSchema(def).safeParse(value).success) {
+          (this.#values[category] as Record<string, unknown>)[name] = value;
+        }
+      }
+    }
     this.#bindings = loadStoredBindings(text);
   }
 
