@@ -69,7 +69,7 @@ const vec3 = z.strictObject({ x: coordinate, y: coordinate, z: coordinate });
 const size = z.number().min(0).describe('Metres.');
 
 /** A trigger volume's shape, relative to where the level places the graph. */
-const volumeShapeSchema = z
+export const volumeShapeSchema = z
   .discriminatedUnion('kind', [
     z.strictObject({
       kind: z.literal('box'),
@@ -83,7 +83,7 @@ const volumeShapeSchema = z
   ])
   .describe('Box, sphere or capsule, relative to the graph origin.');
 
-const predicateSchema = z
+export const predicateSchema = z
   .discriminatedUnion('test', [
     z.strictObject({
       test: z.literal('property'),

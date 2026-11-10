@@ -82,7 +82,7 @@ describe('loot-table schema (mw-e18.1)', () => {
     ).toEqual([
       'entries.0.conditions: conditions need `class` or `when`; omit the field for an unconditional entry',
       'entries.1.conditions.class: Too small: expected array to have >=1 items',
-      'entries.2.conditions.when: a condition is an object with exactly one of: fact, count, all, any, not',
+      'entries.2.conditions.when: a condition is an object with exactly one of: fact, count, all, any, not, entities, signal, sustained',
     ]);
   });
 

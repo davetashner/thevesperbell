@@ -278,11 +278,16 @@ export {
   CONDITION_MAX_DEPTH,
   CONDITION_OPERATORS,
   COUNT_PATTERN,
+  ENTITY_MATCHES,
+  SIGNAL_REF,
+  SUSTAINED_MAX_SECONDS,
   conditionSchema,
   namedConditionSchema,
   type Condition,
   type CountCondition,
+  type EntitiesCondition,
   type FactCondition,
+  type SignalCondition,
   type NamedCondition,
   type NamedConditionInput,
 } from './types/condition.ts';
@@ -382,8 +387,11 @@ export { checkWeapons, hitboxExtent } from './weapon-checks.ts';
 export {
   CONDITION_USAGES,
   checkConditions,
+  conditionEntityRefs,
   conditionProblems,
+  signalIndex,
   type ConditionProblem,
+  type SignalIndex,
   type ConditionUsage,
 } from './condition-checks.ts';
 export {

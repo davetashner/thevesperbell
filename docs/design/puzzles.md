@@ -12,9 +12,11 @@ true**, never which trigger fires:
 
 - `goal` is a [condition](conditions.md): true when the puzzle is solved, whatever made it so. A goal
   like "the lever is thrown" is met by pulling it, by Mage Hand, or by knocking a crate into it,
-  including routes nobody declared (the runtime records those as `undeclared`, mw-e15.3). Today a
-  goal reads world facts; mw-e15.2 adds live-property, signal, volume and sustained predicates to the
-  same language ("every brazier burning", "≥ 40 kg on the plate"), and they work here unchanged.
+  including routes nobody declared (the runtime records those as `undeclared`, mw-e15.3). A goal
+  reads world facts and the live world (mw-e15.2): entities by tag or spawn id tested with property
+  predicates ("every brazier burning"), signal outputs, volumes ("≥ 40 kg on the plate") and
+  `sustained` holds ("for 3 s"), all in the same language. The `GoalRuntime` keeps goals current and
+  `explain` says which part still fails. A goal may only read scene spawns listed in `entities`.
 - `solutions` are the routes the designer intends. Each lists the `capabilities` it needs (all of
   them; empty = anyone) and abstract `steps` for the solver and scenario replays. Steps say what
   happens to the world, in the stimulus/property vocabulary, not which script runs:

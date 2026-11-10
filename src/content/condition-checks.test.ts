@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CONDITION_USAGES, conditionProblems } from './condition-checks.ts';
+import {
+  CONDITION_USAGES,
+  conditionEntityRefs,
+  conditionProblems,
+  signalIndex,
+} from './condition-checks.ts';
 import { factIndex } from './fact-checks.ts';
 import { loadGameContent } from './game-content.ts';
 import { ContentLoadError, loadContent, type ContentSource } from './loader.ts';
@@ -109,6 +114,52 @@ describe('condition checks', () => {
       '/all/7/fact: names undeclared fact "entity:mine/chest-1.opened": declare it in src/content/data/fact/',
       '/all/8/count: counts undeclared fact template "entity:*.opened": declare it in src/content/data/fact/',
       '/all/9/count: counts "entity:*.charges", which is int, not bool',
+    ]);
+  });
+
+  it('checks signal leaves against the signal graphs, when given them (mw-e15.2)', () => {
+    const signals = signalIndex(loadGameContent().all('signal-graph'));
+    const check = (condition: Condition) =>
+      conditionProblems(condition, factIndex([group]), signals).map(
+        (p) => `${p.pointer}: ${p.message}`,
+      );
+    expect(
+      check({
+        all: [
+          { signal: 'greybox-rune-plates/west-plate', port: 'active' },
+          { signal: 'greybox-rune-plates/west-plate' },
+          { signal: 'greybox-rune-plates/nope' },
+          { signal: 'greybox-rune-plates/west-plate', port: 'out' },
+          { signal: 'nowhere/west-plate' },
+          { sustained: { signal: 'nowhere/x' }, seconds: 1 },
+          { entities: { tag: 'brazier' }, match: 'any' },
+        ],
+      }),
+    ).toEqual([
+      '/all/2/signal: reads node "nope", which signal graph "greybox-rune-plates" does not have',
+      '/all/3/signal: reads port "out", which node "greybox-rune-plates/west-plate" does not have (active, stay, enter, exit)',
+      '/all/4/signal: reads signal graph "nowhere", which does not exist: add it to src/content/data/signal-graph/',
+      '/all/5/sustained/signal: reads signal graph "nowhere", which does not exist: add it to src/content/data/signal-graph/',
+    ]);
+    // Without the graphs, signals are not checked (callers that only know facts).
+    expect(problemsOf({ signal: 'nowhere/x' })).toEqual([]);
+  });
+
+  it('finds the scene spawns a condition names', () => {
+    expect(
+      conditionEntityRefs({
+        all: [
+          { entities: { entity: 'room-lever' }, match: 'any' },
+          { not: { entities: { entity: 'loose-crate', tag: 'x' }, gte: 1 } },
+          { any: [{ sustained: { entities: { entity: 'plate' }, match: 'any' }, seconds: 1 }] },
+          { entities: { tag: 'brazier' }, match: 'any' },
+          { fact: 'a' },
+        ],
+      }),
+    ).toEqual([
+      { pointer: '/all/0/entities/entity', entity: 'room-lever' },
+      { pointer: '/all/1/not/entities/entity', entity: 'loose-crate' },
+      { pointer: '/all/2/any/0/sustained/entities/entity', entity: 'plate' },
     ]);
   });
 
