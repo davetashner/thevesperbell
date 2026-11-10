@@ -899,15 +899,22 @@ ${tokens}
 .vb-pickup-flavour { font-style: italic; overflow-wrap: anywhere; }
 .vb-captions {
   position: absolute;
-  top: var(--ui-space-4);
+  /* Below the locked target's health bar (top centre), and no lower than the interact prompt (62%).
+     Lines that do not fit in that band wrap into a second column, which the clip hides whole; they
+     are still in the live region, and are the lowest priority (lines are in priority order). */
+  top: 5.5em;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
   align-items: center;
   gap: var(--ui-space-1);
   width: max-content;
   max-width: calc(100% - 2 * var(--ui-space-3));
+  max-height: calc(58% - 5.5em);
+  overflow: hidden;
   pointer-events: none;
 }
 .vb-captions[hidden] { display: none; }
@@ -916,7 +923,8 @@ ${tokens}
   align-items: center;
   gap: var(--ui-space-2);
   padding: var(--ui-space-1) var(--ui-space-3);
-  background: rgb(30 27 46 / 90%);
+  /* The plate is at least 90% so captions always read; the text background setting can raise it. */
+  background: rgb(30 27 46 / max(90%, calc(var(--ui-text-backdrop-opacity) * 100%)));
   color: var(--ui-color-hud-text);
   text-shadow: none;
   border-radius: var(--ui-radius);
@@ -924,7 +932,7 @@ ${tokens}
 }
 .vb-captions[data-size='small'] .vb-caption { font-size: ${size(0.875)}; }
 .vb-captions[data-size='large'] .vb-caption { font-size: ${size(1.5)}; }
-.vb-caption-arrow { flex: none; display: inline-block; line-height: 1; color: var(--ui-color-accent); }
+.vb-caption-arrow { flex: none; display: inline-block; line-height: 1; font-size: 1.3em; color: var(--ui-color-accent); }
 .vb-caption-text { min-width: 0; overflow-wrap: anywhere; }
 .vb-glyph-prompt { display: inline-flex; align-items: center; gap: var(--ui-space-1); }
 .vb-glyph-prompt kbd {

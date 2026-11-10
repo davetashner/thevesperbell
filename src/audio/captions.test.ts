@@ -34,7 +34,14 @@ const trigger = (over: Partial<CaptionTrigger> = {}): CaptionTrigger => ({
 });
 
 describe('captionDirection (mw-e28.14)', () => {
-  it('AC-1: a source 135° to the camera’s left-rear is "behind left"', () => {
+  it('mw-e31.5 AC-1: a source 90° to the player’s right points right, within 15°', () => {
+    const { bearingDeg, sector } = captionDirection(POSE, at(90));
+    expect(Math.abs(bearingDeg - 90)).toBeLessThanOrEqual(15);
+    expect(sector).toBe('right');
+    expect(Math.abs(captionDirection(POSE, at(-90)).bearingDeg + 90)).toBeLessThanOrEqual(15);
+  });
+
+  it('mw-e28.14 AC-1: a source 135° to the camera’s left-rear is "behind left"', () => {
     const d = captionDirection(POSE, at(-135));
     expect(d.sector).toBe('behind-left');
     expect(d.bearingDeg).toBeCloseTo(-135);
@@ -90,11 +97,33 @@ describe('captionDirection (mw-e28.14)', () => {
 });
 
 describe('CaptionTracker (mw-e28.14)', () => {
-  it('AC-2: five triggers from one source in 1 s make one caption', () => {
+  it('mw-e28.14 AC-2: five triggers from one source in 1 s make one caption', () => {
     const tracker = new CaptionTracker(() => POSE);
     const started = [0, 200, 400, 600, 800].map((t) => tracker.trigger(trigger(), t));
     expect(started).toEqual([true, false, false, false, false]);
     expect(tracker.visible(900)).toHaveLength(1);
+  });
+
+  it('mw-e31.5 AC-2: five identical footstep events within 2 s are one caption with a refreshed timer', () => {
+    const tracker = new CaptionTracker(() => POSE);
+    const times = [0, 400, 800, 1200, 1600];
+    const started = times.map((t) => tracker.trigger(trigger(), t));
+    expect(started.filter(Boolean)).toHaveLength(1);
+    expect(tracker.visible(1700)).toHaveLength(1);
+    // The timer counts from the last event (1600), not the first (0).
+    expect(tracker.visible(1600 + CAPTION_LIFETIME_MS - 1)).toHaveLength(1);
+    expect(tracker.visible(1600 + CAPTION_LIFETIME_MS)).toEqual([]);
+  });
+
+  it('mw-e31.5 AC-3: with more than 4 live captions the lowest priority is dropped first', () => {
+    const tracker = new CaptionTracker(() => POSE);
+    [40, 80, 20, 60, 100].forEach((priority, i) => {
+      tracker.trigger(trigger({ source: `s${String(i)}`, priority }), i);
+    });
+    expect(tracker.visible(10).map((c) => c.priority)).toEqual([100, 80, 60, 40]);
+    // When a higher-priority caption arrives later it displaces the lowest shown one.
+    tracker.trigger(trigger({ source: 'late', priority: 90 }), 20);
+    expect(tracker.visible(30).map((c) => c.priority)).toEqual([100, 90, 80, 60]);
   });
 
   it('de-dupes per source and caption: another source or another sound is its own caption', () => {
@@ -113,7 +142,7 @@ describe('CaptionTracker (mw-e28.14)', () => {
     expect(tracker.visible(CAPTION_DEDUPE_MS)).toHaveLength(1);
   });
 
-  it('AC-3: a source 25 m away makes no caption; 20 m is still in range', () => {
+  it('mw-e28.14 AC-3: a source 25 m away makes no caption; 20 m is still in range', () => {
     const tracker = new CaptionTracker(() => POSE);
     expect(tracker.trigger(trigger({ position: at(0, 25) }), 0)).toBe(false);
     expect(tracker.visible(0)).toEqual([]);
@@ -125,7 +154,7 @@ describe('CaptionTracker (mw-e28.14)', () => {
     expect(tracker.trigger(trigger({ position: { x: 0, y: 21, z: 0 } }), 0)).toBe(false);
   });
 
-  it('AC-4: with 6 live captions the 4 highest priority show, newest first among equals', () => {
+  it('mw-e28.14 AC-4: with 6 live captions the 4 highest priority show, newest first among equals', () => {
     const tracker = new CaptionTracker(() => POSE);
     [10, 90, 50, 70, 50, 30].forEach((priority, i) => {
       tracker.trigger(trigger({ source: `e${String(i)}`, priority }), i * 10);

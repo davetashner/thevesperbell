@@ -441,7 +441,8 @@
       "event": "TelegraphStarted",
       "cue": "{telegraphSound}",
       "priority": 80,
-      "caption": "caption.telegraph"
+      "caption": "caption.telegraph",
+      "gameplayCritical": true
     },
     {
       "event": "TelegraphStarted",
@@ -450,7 +451,8 @@
       },
       "cue": "{telegraphSound}",
       "priority": 95,
-      "caption": "caption.telegraph-unblockable"
+      "caption": "caption.telegraph-unblockable",
+      "gameplayCritical": true
     },
     {
       "event": "ActionRejected",

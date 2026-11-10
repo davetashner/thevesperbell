@@ -170,6 +170,11 @@
             "description": "Localisation key of the sound caption shown for this cue (mw-e28.14), e.g. \"caption.footsteps\"; it also orders captions (the rule’s priority). Absent = no caption.",
             "type": "string",
             "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "gameplayCritical": {
+            "default": false,
+            "description": "True when a player who cannot hear this sound would miss information they need to react (a footstep, an attack telegraph, an alert). A gameplay-critical rule must have a caption (mw-e31.5).",
+            "type": "boolean"
           }
         },
         "required": [

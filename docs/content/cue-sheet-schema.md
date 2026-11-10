@@ -27,3 +27,4 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `rules[].cooldownMs` | integer ≥ 0 | `0` | Minimum ms between two plays of this rule on the same anchor. |
 | `rules[].priority` | integer 0–100 | — | Voice priority for this play (0–100); default: the manifest cue’s priority. |
 | `rules[].caption` | string | — | Localisation key of the sound caption shown for this cue (mw-e28.14), e.g. "caption.footsteps"; it also orders captions (the rule’s priority). Absent = no caption. |
+| `rules[].gameplayCritical` | boolean | `false` | True when a player who cannot hear this sound would miss information they need to react (a footstep, an attack telegraph, an alert). A gameplay-critical rule must have a caption (mw-e31.5). |
