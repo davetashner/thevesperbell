@@ -16,8 +16,11 @@ export const SETTLE_DEGREES = 0.01;
 export class AimZoom {
   #fov: number;
 
-  /** `rest`: the camera's own vertical field of view, degrees. */
-  constructor(readonly rest: number) {
+  /**
+   * `rest`: the camera's own vertical field of view, degrees. It can be changed while playing (the
+   * FOV option, mw-e31.6); the lens eases to the new value.
+   */
+  constructor(public rest: number) {
     this.#fov = rest;
   }
 

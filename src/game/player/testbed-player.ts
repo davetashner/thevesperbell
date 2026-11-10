@@ -92,6 +92,7 @@ import {
   type TargetLocator,
   type TraversalMode,
   type World,
+  type LookSettings,
   type StatusLookup,
   type SurfaceMap,
   type SurfaceOffsets,
@@ -292,6 +293,10 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly shake?: (dt: number) => ShakeOffset;
   /** Mouse look, radians per count; defaults to the camera tuning's. */
   readonly sensitivity?: number;
+  /** The player's live look options (liveLook, mw-e31.6), read every sim tick. Absent = the content's. */
+  readonly lookLive?: () => LookSettings;
+  /** The resting vertical field of view, degrees, read every frame (the FOV option, mw-e31.6). */
+  readonly fov?: () => number;
   /**
    * The moves the player may perform (`compileMoves` of the game content): gives it stamina, an
    * action timeline and the dodge roll and backstep (mw-e04.8). Absent = movement only.
@@ -503,6 +508,7 @@ export function setupTestbedPlayer<TObject, TCommand>(
       ...look,
       ...(options.sensitivity !== undefined && { sensitivity: options.sensitivity }),
     },
+    ...(options.lookLive !== undefined && { lookLive: options.lookLive }),
     pitch: toRadians(cameraTuning.pitch.initial),
     ...(options.ledges !== undefined && {
       ledges: { index: sceneLedges(scene), ...options.ledges },
@@ -635,8 +641,12 @@ export function setupTestbedPlayer<TObject, TCommand>(
 
   /** Eases the lens toward the bow's aim while the player draws (mw-e05.21). */
   const zoomLens = (dt: number): void => {
-    if (aim === undefined) return;
-    const fov = aim.zoom.update(isDrawing(world, entity), aim.fov, aim.time, dt);
+    const rest = options.fov?.() ?? cameraTuning.fov;
+    let fov = rest;
+    if (aim !== undefined) {
+      aim.zoom.rest = rest;
+      fov = aim.zoom.update(isDrawing(world, entity), aim.fov, aim.time, dt);
+    }
     if (fov === camera.fov) return;
     camera.fov = fov;
     camera.updateProjectionMatrix?.();

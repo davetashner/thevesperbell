@@ -168,6 +168,13 @@ describe('subscriptions', () => {
     expect(any).toHaveBeenCalledTimes(2);
   });
 
+  it('mw-e31.6 AC-2: a stored field of view of 120 loads as 100, and 30 as 60', () => {
+    const warn = vi.fn();
+    expect(loadSettings(stored({ camera: { fov: 120 } }), warn).camera.fov).toBe(100);
+    expect(loadSettings(stored({ camera: { fov: 30 } }), warn).camera.fov).toBe(60);
+    expect(warn).toHaveBeenCalledTimes(2);
+  });
+
   it('AC-2: a stored text size of 350% loads as 200%', () => {
     const warn = vi.fn();
     const settings = loadSettings(stored({ accessibility: { textScale: 3.5 } }), warn);

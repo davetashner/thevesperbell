@@ -478,6 +478,58 @@ describe('look pitch (mw-e02.4)', () => {
     expect(inverted.pitch()).toBeCloseTo(-0.1, 12);
   });
 
+  it('mw-e31.6 AC-1: invertY flips pitch for the same mouse movement, and invertX flips yaw', () => {
+    const plain = setup(0.01);
+    plain.world.step([frame({ look: 5, lookY: 100 })]);
+    const flipped = setup(undefined, { look: { sensitivity: 0.01, invertY: true, invertX: true } });
+    flipped.world.step([frame({ look: 5, lookY: 100 })]);
+    expect(flipped.pitch()).toBeCloseTo(-(plain.pitch() ?? NaN), 12);
+    expect(flipped.yaw()).toBeCloseTo(-(plain.yaw() ?? NaN), 12);
+    const stick = lookTurn(
+      { stick: { x: 1, y: 0 } },
+      { ...DEFAULT_LOOK_SETTINGS, invertX: true },
+      0.1,
+    );
+    expect(stick.yaw).toBeGreaterThan(0);
+  });
+
+  it('mw-e31.6: lookLive is read every tick, so a changed sensitivity applies at once', () => {
+    let sensitivity = 0.01;
+    const { world, pitch } = setup(undefined, { lookLive: () => ({ sensitivity }) });
+    world.step([frame({ lookY: 10 })]);
+    expect(pitch()).toBeCloseTo(0.1, 12);
+    sensitivity = 0.02;
+    world.step([frame({ lookY: 10 })]);
+    expect(pitch()).toBeCloseTo(0.3, 12);
+  });
+
+  it('mw-e31.6: auto-centre eases pitch back after a delay of moving without look input', () => {
+    const recentre = { pitch: 0, delay: 0.5, rate: 1 };
+    const { world, pitch } = setup(undefined, {
+      look: { sensitivity: 0.01, recentre },
+      pitch: 0.5,
+    });
+    const hold = (spec: Parameters<typeof frame>[0], ticks: number): void => {
+      for (let i = 0; i < ticks; i++) world.step([frame(spec)]);
+    };
+    hold({}, 120); // standing still never recentres
+    expect(pitch()).toBe(0.5);
+    hold({ move: [0, 1] }, 30); // moving, still inside the 0.5 s delay
+    expect(pitch()).toBe(0.5);
+    hold({ move: [0, 1] }, 31); // past the delay: easing at 1 rad/s
+    expect(pitch()).toBeLessThan(0.5);
+    const eased = pitch() ?? NaN;
+    world.step([frame({ move: [0, 1], lookY: 10 })]); // looking resets the delay and wins
+    expect(pitch()).toBeCloseTo(eased + 0.1, 12);
+    hold({ move: [0, 1] }, 20);
+    expect(pitch()).toBeCloseTo(eased + 0.1, 12);
+    hold({ move: [0, 1] }, 600); // eases all the way to the target without overshooting
+    expect(pitch()).toBe(0);
+    const off = setup(undefined, { pitch: 0.5 });
+    for (let i = 0; i < 300; i++) off.world.step([frame({ move: [0, 1] })]);
+    expect(off.pitch()).toBe(0.5); // off by default
+  });
+
   it('AC-1: pitch input beyond the clamp keeps pitch within −70°..+60°', () => {
     expect(DEFAULT_LOOK_SETTINGS.minPitch).toBeCloseTo(-70 * DEG, 12);
     expect(DEFAULT_LOOK_SETTINGS.maxPitch).toBeCloseTo(60 * DEG, 12);

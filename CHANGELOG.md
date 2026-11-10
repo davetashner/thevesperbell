@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Options > Camera now works: look sensitivity (mouse and right stick), invert horizontal and vertical look, and a 60 to 100 degree field of view all apply as soon as you return to the game, and a new Auto-centre switch eases the camera back to a level view while you run without touching the look controls (mw-e31.6).
 - Options > Accessibility now scales all menu and HUD text from 80% to 200% (read out as a percentage), has a dyslexia-friendly font switch that changes the typeface at once, and a Text background slider that puts a dark plate behind prompts and target names; body text is 18 px on a 1080p screen. Large text now reflows instead of overflowing on a phone-width window: the options tabs wrap, and the shop, inventory and pickup toasts stack or widen, and a hidden options tab no longer shows below the visible one (mw-e31.4).
 - Options > Controls now lets you choose Hold or Toggle for sprint, crouch, block and aim/draw, so you no longer need to keep a key pressed: a toggled action stays on until you press it again, and lets go when a menu opens, you die, or the window loses focus (mw-e31.3).
 - Things in the world can now belong to someone: taking an item or emptying a chest that is Ottilie's (the loaf on her shelf and the box in the back of Marsh's store) without her leave marks the goods as stolen from her in your pack and records the theft, which saves with the game; putting stolen goods back into the owner's chest makes them clean again and settles the theft (mw-e27.9).

@@ -308,7 +308,7 @@ import {
   projectToNdc,
   readPlayerBlade,
 } from '@render/player/index';
-import { anyHiddenByBody, CameraShake } from '@game/camera/index';
+import { anyHiddenByBody, CameraShake, liveLook, lookSettings } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
 import { ElementLooks } from '@render/element-look';
 import { DEATH_TINT, MagicDemo } from '@render/magic-materials/demo';
@@ -1734,7 +1734,7 @@ function startRenderer(
           },
         });
         const cameraTuning = content.get('camera', PLAYER_CAMERA_ID);
-        camera.fov = cameraTuning.fov;
+        camera.fov = settings.get('camera.fov');
         camera.near = cameraTuning.near;
         camera.updateProjectionMatrix();
         // The player's body is the grey-box humanoid, animated from its sim locomotion (mw-e02.6).
@@ -1765,6 +1765,10 @@ function startRenderer(
           sync,
           tuning,
           cameraTuning,
+          // The camera options (mw-e31.6): look sensitivity, invert and auto-centre reach the sim as
+          // input scaling, and a replay keeps the content's values so a recorded run replays as it was.
+          lookLive: liveLook(lookSettings(cameraTuning), cameraTuning, settings, () => replaying),
+          fov: () => settings.get('camera.fov'),
           collision,
           // The knight's moves: the dodge roll and backstep (mw-e04.8), the light chain and the
           // shield (mw-e04.6) are playable.
