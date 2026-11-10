@@ -46,6 +46,7 @@
     "magic-perf.spec.ts": 0,
     "marsh-store.spec.ts": 186.8,
     "mechanisms.spec.ts": 44.9,
+    "menu-focus.spec.ts": 77,
     "motion-comfort.spec.ts": 1.9,
     "pause.spec.ts": 74,
     "perf.spec.ts": 0,

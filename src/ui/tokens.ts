@@ -128,6 +128,8 @@ ${tokens}
   max-width: min(60rem, 100%);
   max-height: 100%;
   overflow: auto;
+  /* Focus scrolling stops this far from the edge, so a control's ring is never cut by the panel. */
+  scroll-padding: var(--ui-space-3);
   padding: var(--ui-space-4);
   background: var(--ui-color-panel);
   color: var(--ui-color-text);
@@ -141,11 +143,16 @@ ${tokens}
 .vb-panel h1 { font-size: ${size(1.75)}; }
 .vb-panel h2 { font-size: ${size(1.25)}; }
 .vb-panel h3 { font-size: ${size(1.05)}; }
+.vb-ui [hidden] { display: none !important; }
 .vb-ui :focus { outline: none; }
 .vb-ui :focus-visible,
 .vb-ui[data-modality='nav'] :focus {
   outline: var(--ui-focus-width) solid var(--ui-color-focus);
   outline-offset: var(--ui-focus-offset);
+  /* A two-tone ring: the ink outline sits between two bands of the light panel colour (the offset gap
+     and a halo outside it), so it stands out on a dark backdrop as well as on parchment, and reads
+     as a shape rather than a colour change. */
+  box-shadow: 0 0 0 calc(var(--ui-focus-offset) + var(--ui-focus-width) + 2px) var(--ui-color-panel-raised);
 }
 .vb-button {
   font: inherit;
@@ -172,6 +179,7 @@ ${tokens}
 .vb-list {
   position: relative;
   overflow-y: auto;
+  scroll-padding: var(--ui-space-3);
   border: 1px solid var(--ui-color-text-muted);
   border-radius: var(--ui-radius);
   background: var(--ui-color-panel-raised);
@@ -562,7 +570,9 @@ ${tokens}
   gap: var(--ui-space-2);
   max-height: 24em;
   overflow-y: auto;
-  padding: var(--ui-space-1);
+  /* Room inside the scroller for the focus ring (offset + width + halo), and for focus scrolling. */
+  padding: var(--ui-space-2);
+  scroll-padding: var(--ui-space-3);
 }
 .vb-inventory-grid[hidden], .vb-inventory-empty[hidden], .vb-item-details[hidden] { display: none; }
 .vb-item-card {
@@ -806,7 +816,7 @@ ${tokens}
 .vb-shop-greeting { margin: 0; font-style: italic; overflow-wrap: anywhere; }
 .vb-shop-crowns { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
 .vb-shop-panel[hidden] { display: none; }
-.vb-shop-rows { gap: var(--ui-space-1); max-height: 40vh; overflow-y: auto; padding: var(--ui-space-1); }
+.vb-shop-rows { gap: var(--ui-space-1); max-height: 40vh; overflow-y: auto; padding: var(--ui-space-2); scroll-padding: var(--ui-space-3); }
 .vb-shop-item {
   position: relative;
   display: grid;
@@ -1031,7 +1041,7 @@ ${tokens}
   flex-direction: column;
   gap: var(--ui-space-2);
 }
-.vb-slot { display: flex; gap: var(--ui-space-2); align-items: stretch; }
+.vb-save-row { display: flex; gap: var(--ui-space-2); align-items: stretch; }
 .vb-slot-choose {
   flex: 1;
   display: flex;

@@ -314,6 +314,9 @@ export function openShopWindow(ui: UiRoot, options: ShopWindowOptions): ShopWind
               }),
             ]),
       ),
+      // A space between the text and the price, so the visible words read "Arming sword 52 crowns"
+      // (Label in Name compares them with the accessible name, which has a space there).
+      ' ',
       h('span', {
         className: 'vb-shop-price',
         text: row.unitPrice === undefined ? '' : crownsText(row.unitPrice * count),

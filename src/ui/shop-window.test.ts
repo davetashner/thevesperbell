@@ -95,6 +95,8 @@ describe('shop window (mw-e20.10)', () => {
       'Buy Arming sword, 60 crowns',
     ]);
     expect(t.rows('buy')[1]?.textContent).toContain('Equipped: Hunting knife.');
+    // mw-e31.11: the visible words read "Healing draught 8 crowns" (Label in Name).
+    expect(t.rows('buy')[0]?.textContent).toMatch(/Healing draught.* 8 crowns/);
     expect(t.rows('buy')[0]?.querySelector('svg')?.dataset['icon']).toBe('consumable');
     expect(t.window.tab).toBe('buy');
   });

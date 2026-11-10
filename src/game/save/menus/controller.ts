@@ -65,7 +65,7 @@ export interface SaveMenusOptions {
   /** Loads a save: in the game, DeathReload.reload (the page reloads into the save's area). */
   readonly load: (load: Omit<PendingLoad, 'requestedAt'>) => void;
   /** New Game on the title menu, called once the title menu has closed. */
-  readonly newGame: () => void;
+  readonly newGame: (back: () => void) => void;
   readonly publish?: (readout: SaveMenuReadout) => void;
   readonly warn?: (message: string) => void;
 }
@@ -177,7 +177,10 @@ export class SaveMenus {
       },
       onNewGame: () => {
         menu.screen.close();
-        this.options.newGame();
+        // `back` is class selection's Back: it returns to this title menu.
+        this.options.newGame(() => {
+          void this.openTitle();
+        });
       },
       onLoad: () => {
         void this.openLoad();
