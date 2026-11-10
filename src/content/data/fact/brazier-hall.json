@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "brazier-hall",
+  "name": "Brazier hall facts",
+  "notes": "Facts of the brazier hall demo puzzle (src/content/data/puzzle/brazier-hall.json, scene brazier-hall; mw-e15.3). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "brazier-hall.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The brazier hall puzzle is solved. Written once by the puzzle runtime when all three braziers have burned together for a second.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "brazier-hall.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The brazier hall's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}

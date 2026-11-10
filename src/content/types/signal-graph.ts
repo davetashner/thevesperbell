@@ -72,14 +72,23 @@ const size = z.number().min(0).describe('Metres.');
 export const volumeShapeSchema = z
   .discriminatedUnion('kind', [
     z.strictObject({
-      kind: z.literal('box'),
-      center: vec3,
+      kind: z.literal('box').describe('Shape: an axis-aligned box.'),
+      center: vec3.describe('Centre of the box, metres.'),
       halfExtents: z
         .strictObject({ x: size, y: size, z: size })
         .describe('Half the size per axis.'),
     }),
-    z.strictObject({ kind: z.literal('sphere'), center: vec3, radius: size }),
-    z.strictObject({ kind: z.literal('capsule'), from: vec3, to: vec3, radius: size }),
+    z.strictObject({
+      kind: z.literal('sphere').describe('Shape: a sphere.'),
+      center: vec3.describe('Centre of the sphere, metres.'),
+      radius: size,
+    }),
+    z.strictObject({
+      kind: z.literal('capsule').describe('Shape: a capsule, a segment swept by a radius.'),
+      from: vec3.describe('One end of the capsule’s segment, metres.'),
+      to: vec3.describe('The other end of the capsule’s segment, metres.'),
+      radius: size,
+    }),
   ])
   .describe('Box, sphere or capsule, relative to the graph origin.');
 

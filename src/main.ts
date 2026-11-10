@@ -97,6 +97,7 @@ import {
   sceneCheckpoints,
   startMechanisms,
 } from '@game/mechanisms/index';
+import { PuzzleWatch, startPuzzles } from '@game/puzzles/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
 import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
@@ -2449,6 +2450,23 @@ function startRenderer(
       // A dying creature drops what it carries and rolls its loot table (mw-e01.5): the slice's
       // skeleton drops the gallery key at its body.
       startCreatureDrops(world, content, worldItems, scene.id, loaded.layout.spawns);
+      // Puzzles (mw-e15.3): only in scenes whose content has some. The e2e reads their state from
+      // #app[data-puzzles]; a solve by a route nobody declared goes to the dev log as telemetry.
+      const puzzles = startPuzzles(world, content, scene.id, {
+        player: player?.entity,
+        report: (line) => {
+          console.info(`telemetry ${line}`);
+        },
+      });
+      if (puzzles !== undefined) {
+        const puzzleWatch = new PuzzleWatch(puzzles);
+        const drawPuzzles = (): void => {
+          const json = puzzleWatch.changed();
+          if (json !== undefined) root.dataset['puzzles'] = json;
+        };
+        drawPuzzles();
+        afterStep.push(drawPuzzles);
+      }
       const watch = watchCreatureAi(world, sceneCreatures.ai, navigation);
       if (watch !== undefined) {
         let publishedAi = '';

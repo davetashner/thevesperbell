@@ -66,8 +66,8 @@ A `condition` is exactly one of these objects:
 | `where[].test` | `"element"` | required |  |
 | `where[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
 | `inside` | object | — | The entity must stand in this box, sphere or capsule, in world coordinates. |
-| `inside.kind` | `"box"` | required |  |
-| `inside.center` | object | required |  |
+| `inside.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `inside.center` | object | required | Centre of the box, metres. |
 | `inside.center.x` | number | required | Metres. |
 | `inside.center.y` | number | required | Metres. |
 | `inside.center.z` | number | required | Metres. |
@@ -75,14 +75,15 @@ A `condition` is exactly one of these objects:
 | `inside.halfExtents.x` | number ≥ 0 | required | Metres. |
 | `inside.halfExtents.y` | number ≥ 0 | required | Metres. |
 | `inside.halfExtents.z` | number ≥ 0 | required | Metres. |
-| `inside.kind` | `"sphere"` | required |  |
+| `inside.kind` | `"sphere"` | required | Shape: a sphere. |
+| `inside.center` | object | required | Centre of the sphere, metres. |
 | `inside.radius` | number ≥ 0 | required | Metres. |
-| `inside.kind` | `"capsule"` | required |  |
-| `inside.from` | object | required |  |
+| `inside.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `inside.from` | object | required | One end of the capsule’s segment, metres. |
 | `inside.from.x` | number | required | Metres. |
 | `inside.from.y` | number | required | Metres. |
 | `inside.from.z` | number | required | Metres. |
-| `inside.to` | object | required |  |
+| `inside.to` | object | required | The other end of the capsule’s segment, metres. |
 | `inside.to.x` | number | required | Metres. |
 | `inside.to.y` | number | required | Metres. |
 | `inside.to.z` | number | required | Metres. |

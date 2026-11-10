@@ -57,6 +57,205 @@
       },
       "description": "The level entities the puzzle is about; steps, hints and recovery name these."
     },
+    "discovery": {
+      "description": "How the puzzle is found. Without it, the first thing the player does to a listed entity finds it.",
+      "type": "object",
+      "properties": {
+        "volume": {
+          "description": "Walking in finds the puzzle: a box, sphere or capsule in world coordinates (the scene’s own, unlike a signal graph’s, which is placed relative to an origin).",
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "box",
+                  "description": "Shape: an axis-aligned box."
+                },
+                "center": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Centre of the box, metres."
+                },
+                "halfExtents": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Half the size per axis."
+                }
+              },
+              "required": [
+                "kind",
+                "center",
+                "halfExtents"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "sphere",
+                  "description": "Shape: a sphere."
+                },
+                "center": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Centre of the sphere, metres."
+                },
+                "radius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Metres."
+                }
+              },
+              "required": [
+                "kind",
+                "center",
+                "radius"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "capsule",
+                  "description": "Shape: a capsule, a segment swept by a radius."
+                },
+                "from": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "One end of the capsule’s segment, metres."
+                },
+                "to": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "The other end of the capsule’s segment, metres."
+                },
+                "radius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Metres."
+                }
+              },
+              "required": [
+                "kind",
+                "from",
+                "to",
+                "radius"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "interact": {
+          "description": "Id of a listed entity; using it finds the puzzle (a plaque, a lever).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        }
+      },
+      "additionalProperties": false
+    },
     "goal": {
       "description": "True when the puzzle is solved, whatever made it so (docs/design/conditions.md).",
       "$ref": "#/$defs/condition"
@@ -526,6 +725,24 @@
             ],
             "additionalProperties": false
           }
+        },
+        "signals": {
+          "default": [],
+          "description": "Lever nodes switched on, or button nodes pressed, when solved, as \"<graph>/<node>\"; a graph the scene places wires them to doors and lights. A repeatable puzzle switches levers back off when it reopens.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$"
+          }
+        },
+        "rewards": {
+          "default": [],
+          "description": "Reward hook ids announced once, the first time the puzzle is solved (the reward systems listen for them).",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
         }
       },
       "required": [
@@ -851,7 +1068,8 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "const": "box"
+                      "const": "box",
+                      "description": "Shape: an axis-aligned box."
                     },
                     "center": {
                       "type": "object",
@@ -874,7 +1092,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "Centre of the box, metres."
                     },
                     "halfExtents": {
                       "type": "object",
@@ -916,7 +1135,8 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "const": "sphere"
+                      "const": "sphere",
+                      "description": "Shape: a sphere."
                     },
                     "center": {
                       "type": "object",
@@ -939,7 +1159,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "Centre of the sphere, metres."
                     },
                     "radius": {
                       "type": "number",
@@ -959,7 +1180,8 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "const": "capsule"
+                      "const": "capsule",
+                      "description": "Shape: a capsule, a segment swept by a radius."
                     },
                     "from": {
                       "type": "object",
@@ -982,7 +1204,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "One end of the capsule’s segment, metres."
                     },
                     "to": {
                       "type": "object",
@@ -1005,7 +1228,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "The other end of the capsule’s segment, metres."
                     },
                     "radius": {
                       "type": "number",

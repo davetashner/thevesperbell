@@ -5,7 +5,7 @@
 // after the systems that move things) re-checks only what no event announces — a signal output that
 // flipped, entities that appeared or vanished, a volume to look in, a hold that came due. A goal none
 // of that touches is never evaluated. Goals are in-memory watches: after `World.restore`, call
-// `refresh` (a `sustained` hold then starts over). `explain` gives the readable account designers
+// `refresh` (a `sustained` hold starts over unless `restoreHolds` resumes it). `explain` gives the readable account designers
 // and hints read.
 
 import type { System, World } from '../core/world';
@@ -17,7 +17,7 @@ import {
   type Condition,
   type ConditionSubscription,
 } from '../facts/conditions';
-import { conditionHost, worldLiveReader } from '../facts/live';
+import { conditionHost } from '../facts/live';
 
 /** Called when a goal's result changes, with the new result and the sim tick it changed on. */
 export type GoalCallback = (met: boolean, tick: number) => void;
@@ -74,8 +74,20 @@ export class GoalRuntime {
    * for debug tools and hints ("2 of 3 braziers burn").
    */
   explain(id: string): string {
-    const { condition } = this.#subscription(id);
-    return formatExplanation(condition.explain(this.#world.facts, worldLiveReader(this.#world)));
+    return formatExplanation(this.#subscription(id).explain());
+  }
+
+  /** The tick each `sustained` hold of goal `id` began (null: not holding); see `restoreHolds`. */
+  holds(id: string): readonly (number | null)[] {
+    return this.#subscription(id).holds();
+  }
+
+  /**
+   * Resumes the holds `holds(id)` returned before a save, so a half-done `sustained` keeps its
+   * progress; call `refresh` after. False when they do not fit the goal.
+   */
+  restoreHolds(id: string, holds: readonly (number | null)[]): boolean {
+    return this.#subscription(id).restoreHolds(holds);
   }
 
   /** Re-checks what events cannot announce; the `puzzleGoalSystem` calls it every tick. */

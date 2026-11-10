@@ -15,6 +15,30 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `entities[].id` | id | required | Id of a spawn in the puzzle’s scene. |
 | `entities[].role` | string | required | What the entity is to the puzzle, e.g. "brazier to be lit". |
 | `entities[].critical` | boolean | `false` | The puzzle needs it: losing it could softlock the puzzle (see `policy.recovery`). |
+| `discovery` | object | — | How the puzzle is found. Without it, the first thing the player does to a listed entity finds it. |
+| `discovery.volume` | object | — | Walking in finds the puzzle: a box, sphere or capsule in world coordinates (the scene’s own, unlike a signal graph’s, which is placed relative to an origin). |
+| `discovery.volume.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `discovery.volume.center` | object | required | Centre of the box, metres. |
+| `discovery.volume.center.x` | number | required | Metres. |
+| `discovery.volume.center.y` | number | required | Metres. |
+| `discovery.volume.center.z` | number | required | Metres. |
+| `discovery.volume.halfExtents` | object | required | Half the size per axis. |
+| `discovery.volume.halfExtents.x` | number ≥ 0 | required | Metres. |
+| `discovery.volume.halfExtents.y` | number ≥ 0 | required | Metres. |
+| `discovery.volume.halfExtents.z` | number ≥ 0 | required | Metres. |
+| `discovery.volume.kind` | `"sphere"` | required | Shape: a sphere. |
+| `discovery.volume.center` | object | required | Centre of the sphere, metres. |
+| `discovery.volume.radius` | number ≥ 0 | required | Metres. |
+| `discovery.volume.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `discovery.volume.from` | object | required | One end of the capsule’s segment, metres. |
+| `discovery.volume.from.x` | number | required | Metres. |
+| `discovery.volume.from.y` | number | required | Metres. |
+| `discovery.volume.from.z` | number | required | Metres. |
+| `discovery.volume.to` | object | required | The other end of the capsule’s segment, metres. |
+| `discovery.volume.to.x` | number | required | Metres. |
+| `discovery.volume.to.y` | number | required | Metres. |
+| `discovery.volume.to.z` | number | required | Metres. |
+| `discovery.interact` | id | — | Id of a listed entity; using it finds the puzzle (a plaque, a lever). |
 | `goal` | `condition` | required | True when the puzzle is solved, whatever made it so (docs/design/conditions.md). |
 | `solutions` | list of object (at least 1) | required | Intended solutions; the goal may also come true by a route nobody declared. |
 | `solutions[].id` | id | required | Solution id, unique in the puzzle (telemetry and solver reports). |
@@ -58,6 +82,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `outputs.set` | list of object | `[]` | Further facts written when solved (doors, rewards and quests read these). |
 | `outputs.set[].fact` | string | required | Declared fact the puzzle writes when solved. |
 | `outputs.set[].value` | boolean or integer or string | required | A bool, a whole number or a string (enum value or content id), fitting the fact type. |
+| `outputs.signals` | list of string | `[]` | Lever nodes switched on, or button nodes pressed, when solved, as "<graph>/<node>"; a graph the scene places wires them to doors and lights. A repeatable puzzle switches levers back off when it reopens. |
+| `outputs.rewards` | list of id | `[]` | Reward hook ids announced once, the first time the puzzle is solved (the reward systems listen for them). |
 
 ## `condition`
 
@@ -107,8 +133,8 @@ A `condition` is exactly one of these objects:
 | `where[].test` | `"element"` | required |  |
 | `where[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
 | `inside` | object | — | The entity must stand in this box, sphere or capsule, in world coordinates. |
-| `inside.kind` | `"box"` | required |  |
-| `inside.center` | object | required |  |
+| `inside.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `inside.center` | object | required | Centre of the box, metres. |
 | `inside.center.x` | number | required | Metres. |
 | `inside.center.y` | number | required | Metres. |
 | `inside.center.z` | number | required | Metres. |
@@ -116,14 +142,15 @@ A `condition` is exactly one of these objects:
 | `inside.halfExtents.x` | number ≥ 0 | required | Metres. |
 | `inside.halfExtents.y` | number ≥ 0 | required | Metres. |
 | `inside.halfExtents.z` | number ≥ 0 | required | Metres. |
-| `inside.kind` | `"sphere"` | required |  |
+| `inside.kind` | `"sphere"` | required | Shape: a sphere. |
+| `inside.center` | object | required | Centre of the sphere, metres. |
 | `inside.radius` | number ≥ 0 | required | Metres. |
-| `inside.kind` | `"capsule"` | required |  |
-| `inside.from` | object | required |  |
+| `inside.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `inside.from` | object | required | One end of the capsule’s segment, metres. |
 | `inside.from.x` | number | required | Metres. |
 | `inside.from.y` | number | required | Metres. |
 | `inside.from.z` | number | required | Metres. |
-| `inside.to` | object | required |  |
+| `inside.to` | object | required | The other end of the capsule’s segment, metres. |
 | `inside.to.x` | number | required | Metres. |
 | `inside.to.y` | number | required | Metres. |
 | `inside.to.z` | number | required | Metres. |

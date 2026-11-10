@@ -155,6 +155,7 @@ export class World<TInput = unknown> {
   private commands: Command[] = [];
   private nextEntity: EntityId = 1;
   private stepping = false;
+  private restoreCount = 0;
 
   constructor(options: WorldOptions) {
     this.root = Rng.create(options.seed);
@@ -203,6 +204,14 @@ export class World<TInput = unknown> {
    */
   get structureVersion(): number {
     return this.structure.version;
+  }
+
+  /**
+   * How many times `restore` has replaced this world's state. Not part of the state (snapshots and
+   * hashes leave it out): watchers that keep in-memory views compare it to know their view is stale.
+   */
+  get restores(): number {
+    return this.restoreCount;
   }
 
   /** The physics this world owns and steps, if it has any. */
@@ -484,6 +493,7 @@ export class World<TInput = unknown> {
     }
     this.events.clear();
     this.settle();
+    this.restoreCount += 1;
   }
 
   private issue(command: Command): void {

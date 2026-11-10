@@ -464,7 +464,8 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "const": "box"
+                      "const": "box",
+                      "description": "Shape: an axis-aligned box."
                     },
                     "center": {
                       "type": "object",
@@ -487,7 +488,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "Centre of the box, metres."
                     },
                     "halfExtents": {
                       "type": "object",
@@ -529,7 +531,8 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "const": "sphere"
+                      "const": "sphere",
+                      "description": "Shape: a sphere."
                     },
                     "center": {
                       "type": "object",
@@ -552,7 +555,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "Centre of the sphere, metres."
                     },
                     "radius": {
                       "type": "number",
@@ -572,7 +576,8 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "const": "capsule"
+                      "const": "capsule",
+                      "description": "Shape: a capsule, a segment swept by a radius."
                     },
                     "from": {
                       "type": "object",
@@ -595,7 +600,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "One end of the capsule’s segment, metres."
                     },
                     "to": {
                       "type": "object",
@@ -618,7 +624,8 @@
                         "y",
                         "z"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "The other end of the capsule’s segment, metres."
                     },
                     "radius": {
                       "type": "number",

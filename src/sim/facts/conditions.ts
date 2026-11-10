@@ -930,6 +930,24 @@ export class CompiledCondition {
     return this.root.explain({ facts, live, memory });
   }
 
+  /**
+   * Every `sustained` node of the condition, in a fixed order (the node, then its operand, left to
+   * right): the order a watcher saves and restores its holds in.
+   */
+  holdNodes(): readonly SustainedCondition[] {
+    const found: SustainedCondition[] = [];
+    const visit = (node: Condition): void => {
+      if ('sustained' in node) {
+        found.push(node);
+        visit(node.sustained);
+      } else if ('not' in node) visit(node.not);
+      else if ('all' in node) node.all.forEach(visit);
+      else if ('any' in node) node.any.forEach(visit);
+    };
+    visit(this.condition);
+    return found;
+  }
+
   /** True when a change to fact `key` can change the result. */
   dependsOn(key: string): boolean {
     return this.keys.has(key) || this.parsedPatterns.some((pattern) => matches(pattern, key));
@@ -1026,6 +1044,22 @@ export interface ConditionSubscription {
    */
   refresh(): boolean;
   /**
+   * Node-by-node account of why the condition holds or not now, including how long each `sustained`
+   * hold has lasted (what `CompiledCondition.explain` cannot know without the watcher's memory).
+   */
+  explain(): ConditionExplanation;
+  /**
+   * The tick each `sustained` hold of the condition began (null: not holding), in
+   * `CompiledCondition.holdNodes` order; empty when it has none. Saved with the game so a hold that
+   * was half done keeps its progress (mw-e15.3).
+   */
+  holds(): readonly (number | null)[];
+  /**
+   * Resumes the holds `holds()` returned, e.g. after `World.restore`; call `refresh` after. Returns
+   * false and changes nothing when `saved` does not fit this condition's `sustained` nodes.
+   */
+  restoreHolds(saved: readonly (number | null)[]): boolean;
+  /**
    * Call once per tick after the systems have run. Re-evaluates only what events cannot announce:
    * a signal output it reads changed, entities were spawned or removed, an `inside` volume (checked
    * every tick), or a `sustained` hold came due. Cheap when none applies. Returns the current result.
@@ -1087,6 +1121,17 @@ export function onConditionChanged(
     },
     condition: compiled,
     refresh: () => update(null),
+    explain: () => compiled.explain(world.facts, live, memory),
+    holds: () => {
+      const nodes = compiled.holdNodes();
+      return nodes.map((node) => memory?.since.get(node) ?? null);
+    },
+    restoreHolds: (saved) => {
+      const nodes = compiled.holdNodes();
+      if (memory === undefined || saved.length !== nodes.length) return false;
+      nodes.forEach((node, i) => memory.since.set(node, known(saved[i])));
+      return true;
+    },
     poll: () => {
       if (live === undefined) return value;
       const moved = needs.structure && live.structure !== structure;
