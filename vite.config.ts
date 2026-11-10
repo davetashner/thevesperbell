@@ -5,6 +5,7 @@ import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 import { DEFAULT_EXCLUDES, readExclusionGlobs } from './scripts/check-coverage-exclusions.ts';
 import { ContentCoverageReporter } from './scripts/content-coverage-reporter.ts';
+import { chunkReportPlugin } from './scripts/size/chunk-report.ts';
 import { readLayers, vitestThresholds } from './scripts/coverage-layers.ts';
 
 /**
@@ -50,7 +51,8 @@ export default defineConfig({
   // Rapier's deterministic build (ADR-0001) imports its .wasm as an ES module; the plugin emits it
   // as a separate asset fetched by the lazily imported physics chunk (mw-e00.19).
   // Its typings declare `any`, hence the cast.
-  plugins: [wasm() as Plugin, controllerHotReload()],
+  // chunkReportPlugin lists each production chunk's source modules for the size check (mw-e32.3).
+  plugins: [wasm() as Plugin, controllerHotReload(), chunkReportPlugin(import.meta.dirname)],
   define: {
     __BUILD_SHA__: JSON.stringify(buildSha()),
     // The debug console (mw-e33.1) is built in unless VESPER_DEBUG_CONSOLE=off (a release build);

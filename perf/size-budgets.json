@@ -1,0 +1,72 @@
+{
+  "$comment": "Size budgets enforced per PR by pnpm size:check over the production build (mw-e32.3). Sizes are decimal (1 MB = 1,000,000 bytes), like perf-budgets.json. Initial JS is gzipped at level 9. The 50 MB ceiling is the initial download cap of docs/backlog-contract.md \u00a71 Hardware baseline. A waiver names one file, its own byte ceiling, why, and the bead that removes it; never raise a cap to make a build pass. toolWaivers are the src/tools modules known to leak into the release bundle; each prefix must go (the check warns when one matches nothing).",
+  "initialJsGzipBytes": 1500000,
+  "initialPayloadBytes": 50000000,
+  "assetCaps": [
+    {
+      "kind": "texture",
+      "label": "texture",
+      "maxBytes": 4000000,
+      "extensions": [".png", ".jpg", ".jpeg", ".webp", ".avif", ".ktx2", ".basis"]
+    },
+    {
+      "kind": "audioLoop",
+      "label": "audio loop",
+      "maxBytes": 3000000,
+      "extensions": [".ogg", ".m4a", ".mp3", ".wav", ".opus"],
+      "pathPattern": "^assets/audio/(music|amb)/",
+      "excludePathPattern": "stinger"
+    }
+  ],
+  "forbiddenSourceDirs": ["src/tools/"],
+  "waivers": [
+    {
+      "file": "assets/audio/music/music-open-world.m4a",
+      "maxBytes": 3700000,
+      "reason": "The approved 3:00 Suno take of music-open-world encodes to 3.65 MB as AAC (2.86 MB as Ogg); it needs re-encoding at a lower bitrate, which mw-e32.19 does.",
+      "bead": "mw-e32.19"
+    }
+  ],
+  "toolWaivers": [
+    {
+      "prefix": "src/tools/index.ts",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/anim-demo/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/arrow-demo/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/awareness-demo/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/debug-camera/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/perf/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/spell-vfx-demo/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    },
+    {
+      "prefix": "src/tools/vfx-demo/",
+      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
+      "bead": "mw-e32.18"
+    }
+  ]
+}

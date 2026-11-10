@@ -3,7 +3,7 @@ name: CI
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
 # lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
 # e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26) and puzzle-validate
-# (mw-e15.6) are not required contexts yet.
+# (mw-e15.6) and size-budget (mw-e32.3) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
 # main pushes still run the perf suite here, to publish the baseline.
@@ -235,6 +235,42 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm build
+
+  # Size budgets over the release build (mw-e32.3, perf/size-budgets.json): initial JS <= 1.5 MB gzipped,
+  # initial payload <= 50 MB, textures <= 4 MB, audio loops <= 3 MB, and no src/tools module in any
+  # chunk. The job summary shows the change against main's last successful run; on a push to main the
+  # measured report is uploaded as the baseline (a missing baseline only drops the delta). Not a
+  # required check yet (owner change, scripts/repo-settings.env).
+  size-budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # The release build: debug console off, as shipped.
+      - run: pnpm build:release
+      - name: Download main's latest size report
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main --event push \
+            --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name size-report --dir baseline \
+              || echo "Could not download the size report from main run $run_id."
+          fi
+      - run: pnpm size:check --baseline baseline/size-report.json
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'push'
+        with:
+          name: size-report
+          path: build-report/size-report.json
+          if-no-files-found: warn
+          retention-days: 90
 
   # The interaction matrix (mw-e03.26): 500 generated worlds of 300 ticks from a fixed seed must keep
   # every invariant (budget 60 s), and the committed matrix must match the sim. On a pull request the
