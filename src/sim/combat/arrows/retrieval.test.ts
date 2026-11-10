@@ -25,6 +25,7 @@ import {
   InteractionFocusComponent,
   InteractableComponent,
   interacted,
+  type InteractionOptions,
 } from '../../interaction/system';
 import { PhysicsColliderComponent } from '../../physics/objects';
 import { PlayerLook } from '../../player/player';
@@ -65,6 +66,7 @@ import {
   type ArrowViewRule,
   type ArrowsTaken,
 } from './retrieval';
+import { FakeSightWorld } from '../../sight/fake-sight-world';
 import { TEST_ARROWS } from '../../testing/arrows';
 import { fireArrow, installArrows, type ArrowLookup } from './system';
 
@@ -97,6 +99,7 @@ interface Options {
   readonly materials?: MaterialPresets;
   readonly quiver?: boolean;
   readonly arrows?: ArrowLookup;
+  readonly interaction?: InteractionOptions<ActionFrame>;
 }
 
 /** A world with a player at the origin facing −z, a quiver of 5 standard arrows, and the arrow rules. */
@@ -112,7 +115,7 @@ function setup(options: Options = {}) {
     ...HIT_VOLUME_COMPONENTS,
     PhysicsColliderComponent,
   );
-  installInteraction(world);
+  installInteraction(world, options.interaction);
   const collision = new FakeCollisionWorld(options.shapes ?? []);
   installArrows(world, {
     arrows: options.arrows ?? ARROWS,
@@ -187,6 +190,38 @@ function stepsUntilRest(t: Setup, entity: EntityId, max = 600): void {
 }
 
 const WALL = box(v3(-5, -5, -12), v3(5, 5, -11));
+
+describe('reaching an arrow stuck in a wall (mw-fh5, mw-5h9)', () => {
+  it('AC-2: the wall an arrow is stuck in never hides it, so a visible "Take arrow" is always takeable', () => {
+    const sight = new FakeSightWorld();
+    const wallBody = sight.add(box(v3(-5, 0, -2), v3(5, 4, -1)));
+    let wall: EntityId = -1;
+    const t = setup({
+      interaction: {
+        sight,
+        bodiesOf: (_world, entity) => (entity === wall ? [wallBody] : []),
+      },
+    });
+    wall = t.world.spawn();
+    // The arrow's tip sits inside the wall's slab, as an arrow stuck in a wall does.
+    const arrow = restArrow(t, v3(0, 1, -1.5), { in: wall });
+    t.world.step([IDLE]);
+    expect(t.world.get(t.player, InteractionFocusComponent)?.target).toBe(arrow);
+    expect(interactionPrompt(t.world, t.player)?.label).toBe('Take arrow');
+    t.world.step([PRESS]);
+    expect(t.taken).toHaveLength(1);
+    expect(quiverCount(t.world, t.player, 'standard')).toBe(6);
+  });
+
+  it('an arrow lying free behind a wall is still hidden by it', () => {
+    const sight = new FakeSightWorld();
+    sight.add(box(v3(-5, 0, -1.4), v3(5, 4, -1.2)));
+    const t = setup({ interaction: { sight } });
+    restArrow(t, v3(0, 1, -2));
+    t.world.step([IDLE]);
+    expect(t.world.get(t.player, InteractionFocusComponent)?.target).toBeNull();
+  });
+});
 
 describe('intact roll at impact (mw-e05.7)', () => {
   it('AC-1: an arrow hitting wood with a roll of 0.5 is intact (0.5 < 0.9) and retrievable', () => {

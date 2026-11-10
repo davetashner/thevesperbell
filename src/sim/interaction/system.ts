@@ -286,6 +286,29 @@ export function addFocusDemotion<TInput>(
   };
 }
 
+/**
+ * A rule that names what `target` is embedded in: its colliders never block reach to it, as its own do
+ * not (an arrow stuck in a wall sits on the wall's surface, so the ray to it grazes the wall). Returns
+ * the host entity, or undefined/null for none. Like filters, hosts are rules, not state, and must only
+ * read the world.
+ */
+export type ReachHost = (world: World<never>, target: EntityId) => EntityId | null | undefined;
+
+const reachHosts = new WeakMap<World<never>, ReachHost[]>();
+
+/** Adds `rule` to `world`'s reach tests (see `ReachHost`). Returns a function that removes it. */
+export function addReachHost<TInput>(world: World<TInput>, rule: ReachHost): () => void {
+  const w: World<never> = world;
+  let own = reachHosts.get(w);
+  if (own === undefined) reachHosts.set(w, (own = []));
+  const list = own;
+  list.push(rule);
+  return () => {
+    const at = list.indexOf(rule);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
 /** Why `actor` (bringing `kit`) can't use `affordance` on `target`, or undefined when it can. */
 function reasonFor(
   world: World<never>,
@@ -412,7 +435,11 @@ export function interactionSystem<TInput>(
   const reachable = (world: World<TInput>, target: EntityId, from: Vec3, to: Vec3): boolean => {
     if (sight === undefined) return true;
     if (from.x === to.x && from.y === to.y && from.z === to.z) return true;
-    const own = bodiesOf(world, target);
+    const own = [...bodiesOf(world, target)];
+    for (const rule of reachHosts.get(world) ?? []) {
+      const host = rule(world, target);
+      if (host !== undefined && host !== null) own.push(...bodiesOf(world, host));
+    }
     let clear = true;
     sight.forEachCrossing(from, to, (body) => {
       clear = own.includes(body);

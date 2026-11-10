@@ -20,6 +20,7 @@ import {
   addFocusFilter,
   addInteractable,
   addInteractor,
+  addReachHost,
   addSceneInteractables,
   affordancesOf,
   holdTicks,
@@ -145,6 +146,33 @@ describe('interaction system (mw-e02.5)', () => {
     place(own.world, 2, 0);
     own.world.step([IDLE]);
     expect(focusOf(own.world, own.actor)?.target).toBe(target);
+  });
+
+  it("mw-5h9: a reach host rule stops the host's colliders blocking an object embedded in it", () => {
+    const sight = new FakeSightWorld();
+    const wallBody = sight.add(box({ x: -2, y: 0, z: -2.2 }, { x: 2, y: 3, z: -1.8 }));
+    let wall: EntityId = -1;
+    const { world, actor } = setup({
+      sight,
+      bodiesOf: (_world, entity) => (entity === wall ? [wallBody] : []),
+    });
+    wall = world.spawn();
+    const stuck = place(world, 2, 0); // on the wall's surface
+    let host: EntityId | null | undefined = null;
+    const off = addReachHost(world, () => host);
+    addReachHost(world, () => undefined); // a second rule that names no host
+    const focus = () => {
+      world.step([IDLE]);
+      return focusOf(world, actor)?.target;
+    };
+    expect(focus()).toBeNull(); // no host: the wall hides it
+    host = undefined;
+    expect(focus()).toBeNull();
+    host = wall;
+    expect(focus()).toBe(stuck);
+    off();
+    off(); // already removed
+    expect(focus()).toBeNull();
   });
 
   it('reaches an object whose focus point is the reach point itself', () => {
