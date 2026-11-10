@@ -449,6 +449,17 @@ The HUD is minimal and diegetic-leaning; menus feel like a well-loved adventurer
 Fonts are self-hosted (WOFF2, subset to Latin + Latin-Extended) — no runtime calls to Google.
 OFL texts are copied into `assets/fonts/<font>/OFL.txt` and listed in `assets/CREDITS.md`.
 
+### 9.1a Colour is never the only cue
+
+Every gameplay cue pairs colour with a shape, pattern, sign or label, so a player who cannot tell the
+colours apart loses nothing (mw-e31.8). Awareness markers have five silhouettes (disc, diamond,
+crescent, triangle, star); HUD bars wear patterns (health solid, stamina diagonal stripes, mana dots,
+breath bars, poise ticks); hit markers have four glyphs; damage taken carries a minus sign; an
+unaffordable spell cost is struck through; warning toasts have a double rule. The optional
+colour-blind palettes (`src/ui/indicator-palette.ts`: deuteranopia, protanopia, tritanopia) re-pick the
+bar and alert colours so adjacent ones also differ by at least 3:1 in lightness under the simulated
+deficiency. New UI must add its non-colour channel before it ships.
+
 ### 9.2 Icon style
 
 - **Item icons:** painted objects, ¾ top-down view, lit from top-left with warm key, soft `ink` drop shadow,

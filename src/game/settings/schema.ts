@@ -221,6 +221,17 @@ export const SETTINGS_SCHEMA = {
         help: 'Switches menus and HUD text to a wider, more distinct typeface with extra letter spacing.',
         default: false,
       }),
+      indicatorPalette: choice({
+        label: 'Indicator colours',
+        help: 'Recolours the health, stamina and mana bars and the alert markers for a kind of colour blindness. Every cue also has a shape or pattern.',
+        options: [
+          { value: 'default', label: 'Default' },
+          { value: 'deuteranopia', label: 'Deuteranopia' },
+          { value: 'protanopia', label: 'Protanopia' },
+          { value: 'tritanopia', label: 'Tritanopia' },
+        ],
+        default: 'default',
+      }),
       textBackground: slider({
         label: 'Text background',
         help: 'Puts a dark plate behind prompts, target names and other HUD text. 0 shows the text alone.',

@@ -6,6 +6,7 @@ export const layer = 'ui' as const;
 export * from './class-select';
 export * from './combat-hud';
 export * from './comfort';
+export * from './indicator-palette';
 export * from './components/controls';
 export * from './components/list';
 export * from './components/overlays';

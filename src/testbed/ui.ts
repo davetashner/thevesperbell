@@ -25,6 +25,7 @@ import {
   PickupToasts,
   reducedMotion,
   setDyslexiaFont,
+  setIndicatorPalette,
   setTextBackdrop,
   setTextScale,
   UiRoot,
@@ -60,6 +61,10 @@ settings.on('accessibility.textScale', (value) => setTextScale(ui.element, value
 setDyslexiaFont(ui.element, settings.get('accessibility.dyslexiaFont'));
 settings.on('accessibility.dyslexiaFont', (on) => {
   setDyslexiaFont(ui.element, on);
+});
+setIndicatorPalette(ui.element, settings.get('accessibility.indicatorPalette'));
+settings.on('accessibility.indicatorPalette', (id) => {
+  setIndicatorPalette(ui.element, id);
 });
 setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
 settings.on('accessibility.textBackground', (value) => setTextBackdrop(ui.element, value));
