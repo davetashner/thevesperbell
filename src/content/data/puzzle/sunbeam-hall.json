@@ -136,9 +136,39 @@
   },
   "hints": [
     {
-      "afterSeconds": 120,
-      "highlight": ["eye-receiver", "mirror-a-mirror"],
-      "bark": "The light comes from the corner. It has to reach that sensor somehow."
+      "afterSeconds": 180,
+      "afterAttempts": 3,
+      "highlight": ["eye-receiver"],
+      "bark": "A shaft of light, and an eye on the far wall that wants it.",
+      "variants": [
+        {
+          "capability": "spell.ember",
+          "bark": "That brazier is cold. A spark from here would reach it."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 360,
+      "highlight": ["mirror-a-mirror", "mirror-b-mirror"],
+      "bark": "The mirrors turn. Light goes where you point it.",
+      "variants": [
+        {
+          "capability": "spell.ember",
+          "bark": "Ember crosses a room easily. Light does it with a little help."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 600,
+      "highlight": ["lamp-brazier", "torch-barrel"],
+      "bark": "Fire is an answer too, if you can carry it.",
+      "variants": [
+        {
+          "capability": "spell.ember",
+          "bark": "You do not need to carry fire. You are fire, near enough."
+        }
+      ],
+      "rumour": "sunbeam-hall.hint-rumour"
     }
   ],
   "tags": ["greybox", "mvp"],

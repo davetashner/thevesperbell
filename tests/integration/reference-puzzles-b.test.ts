@@ -24,6 +24,7 @@ import {
   playReplay,
   PlacementComponent,
   puzzleFailed,
+  puzzleHint,
   puzzleSolved,
   puzzleSolvedUndeclared,
   readProperty,
@@ -560,6 +561,35 @@ describe('the chimes: sound (mw-e15.10)', { timeout: 120_000 }, () => {
     for (let t = 0; t < 30; t++) room.sim.step();
     expect(room.game.puzzles?.state(PUZZLE)).toBe('solved');
     expect(heard.at(-1)).toBe('chime-solved');
+  });
+
+  it('mw-e15.11: three wrong bells (the sequence node pulsing failed) fire the first hint tier long before 3 minutes', () => {
+    const room = open('chimes', []);
+    const hints: { tier: number; bark?: string | undefined; highlight: readonly string[] }[] = [];
+    room.sim.events.on(puzzleHint, (hint) => hints.push(hint));
+    const hit = (name: string) => {
+      const place = room.sim.get(room.id(name), PlacementComponent);
+      if (place === undefined) throw new Error('not placed');
+      deliverImpact(room.sim, {
+        position: { x: place.x, y: place.y, z: place.z },
+        energy: 60,
+        damageType: 'pierce',
+        element: null,
+        source: null,
+      });
+      for (let t = 0; t < 70; t++) room.sim.step();
+    };
+    hit('bell-low');
+    hit('bell-low');
+    expect(hints).toEqual([]);
+    hit('bell-low');
+    expect(hints).toHaveLength(1);
+    expect(hints[0]).toMatchObject({
+      tier: 0,
+      bark: 'That button does something somewhere behind the wall.',
+      highlight: ['chime-button'],
+    });
+    expect(room.game.puzzles?.record(PUZZLE).hints).toEqual({ fired: 1, attempts: 3 });
   });
 
   it('the bells are out of reach across the pit: a player cannot walk to them', () => {

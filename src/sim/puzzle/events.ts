@@ -102,6 +102,30 @@ export interface PuzzleRecovered {
 }
 export const puzzleRecovered = defineEvent<PuzzleRecovered>('puzzleRecovered');
 
+/**
+ * A hint tier of a puzzle's ladder fired (mw-e15.11): the player has been stuck long enough, or failed
+ * often enough. The sim only says so; the game shows `bark` (the player character mutters it), pulses
+ * the `entities` (UI beads draw it), and a `rumour` fact was set for dialogue to pick up. Fires once
+ * per tier, never for a solved puzzle, never when hints are off.
+ */
+export interface PuzzleHint {
+  readonly puzzle: string;
+  /** The tier's index in the ladder, from 0. */
+  readonly tier: number;
+  readonly tick: number;
+  /** The text chosen for the player's capabilities (a class variant, else the tier's own); absent: none. */
+  readonly bark?: string | undefined;
+  /** The capability whose variant text was chosen; absent when the tier's own text was. */
+  readonly variant?: string | undefined;
+  /** Scene spawn ids to pulse. */
+  readonly highlight: readonly string[];
+  /** The entities of `highlight` that exist now. */
+  readonly entities: readonly EntityId[];
+  /** The declared fact set true (an NPC rumour unlocked); absent: none. */
+  readonly rumour?: string | undefined;
+}
+export const puzzleHint = defineEvent<PuzzleHint>('puzzleHint');
+
 /** Trail ids of read clues start with this. */
 export const CLUE_PREFIX = 'clue.';
 

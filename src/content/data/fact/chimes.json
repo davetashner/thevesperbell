@@ -17,6 +17,13 @@
       "default": false,
       "description": "The chime room's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
       "owner": "puzzle"
+    },
+    {
+      "key": "chimes.hint-rumour",
+      "type": "bool",
+      "default": false,
+      "description": "Hearsay about how the chimes puzzle is solved: set when its last hint tier fires, so a townsperson can pass the nudge on. Written once by the puzzle runtime.",
+      "owner": "puzzle"
     }
   ]
 }

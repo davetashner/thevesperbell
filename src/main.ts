@@ -97,7 +97,7 @@ import {
   sceneCheckpoints,
   startMechanisms,
 } from '@game/mechanisms/index';
-import { PuzzleWatch, sceneHost, startPuzzles } from '@game/puzzles/index';
+import { hintReadout, PuzzleWatch, sceneHost, startPuzzles } from '@game/puzzles/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
 import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
@@ -2460,6 +2460,11 @@ function startRenderer(
         killY: () => scenes.killPlane,
         report: (line) => {
           console.info(`telemetry ${line}`);
+        },
+        // A hint tier fired (mw-e15.11): the bark and the entities to pulse. The HUD beads (mw-e31)
+        // draw them; until then they are published for the e2e and debug tools.
+        onHint: (hint) => {
+          root.dataset['puzzleHint'] = hintReadout(hint);
         },
       });
       if (puzzles !== undefined) {

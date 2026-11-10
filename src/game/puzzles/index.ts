@@ -15,11 +15,13 @@
 
 import type { GameContent, SceneDef } from '@content/index';
 import {
+  puzzleHint,
   puzzleSolvedUndeclared,
   PuzzleRuntime,
   puzzleSystem,
   type EntityId,
   type PuzzleDef,
+  type PuzzleHint,
   type PuzzleHost,
   type PuzzleStatus,
   type RecoveryDef,
@@ -73,6 +75,17 @@ export function puzzleDefs(content: Content, sceneId: string): PuzzleDef[] {
             ]),
         };
       }),
+      hints: puzzle.hints.map(
+        ({ afterSeconds, afterAttempts, bark, variants, highlight, rumour }) => ({
+          afterSeconds,
+          afterAttempts,
+          bark,
+          variants,
+          highlight: highlight ?? [],
+          rumour,
+        }),
+      ),
+      failures: puzzle.failures,
       outputs: {
         solvedFact: puzzle.outputs.solvedFact,
         set: puzzle.outputs.set,
@@ -80,6 +93,12 @@ export function puzzleDefs(content: Content, sceneId: string): PuzzleDef[] {
         rewards: puzzle.outputs.rewards,
       },
     }));
+}
+
+/** A fired hint as JSON for the debug surface (#app[data-puzzle-hint]) until the HUD beads draw it. */
+export function hintReadout(hint: PuzzleHint): string {
+  const { puzzle, tier, tick, bark, highlight, rumour } = hint;
+  return JSON.stringify({ puzzle, tier, tick, bark, highlight, rumour });
 }
 
 export interface StartPuzzlesOptions {
@@ -91,6 +110,11 @@ export interface StartPuzzlesOptions {
   readonly killY?: number | (() => number) | undefined;
   /** Hears of puzzles solved by a route nobody declared (telemetry, the dev log). */
   readonly report?: ((line: string) => void) | undefined;
+  /**
+   * Shows a hint tier that fired (mw-e15.11): the bark text and the entities to pulse. Hint styling
+   * belongs to the HUD beads (mw-e31); until then the game publishes it for debug tools and the e2e.
+   */
+  readonly onHint?: ((hint: PuzzleHint) => void) | undefined;
 }
 
 /**
@@ -114,6 +138,9 @@ export function startPuzzles(
   world.addSystem(puzzleSystem(runtime));
   // Scrolls bound to a puzzle (`book.clueFor`) put a clue on its trail when read (mw-e15.5).
   attachBookClues(world, content);
+  world.events.on(puzzleHint, (hint) => {
+    options.onHint?.(hint);
+  });
   world.events.on(puzzleSolvedUndeclared, ({ puzzle, trail, tick }) => {
     options.report?.(
       `puzzle ${puzzle} solved at tick ${String(tick)} by an undeclared route (capabilities used: ${trail.join(', ') || 'none'})`,

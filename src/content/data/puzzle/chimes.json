@@ -151,14 +151,33 @@
   },
   "hints": [
     {
-      "afterSeconds": 90,
+      "afterSeconds": 180,
+      "afterAttempts": 3,
       "highlight": ["chime-button"],
       "bark": "That button does something somewhere behind the wall."
     },
     {
-      "afterSeconds": 180,
+      "afterSeconds": 360,
       "highlight": ["bell-low", "bell-mid", "bell-high"],
-      "bark": "Three bells, out of reach. The order matters."
+      "bark": "Three bells, out of reach. The order matters.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "Anything heavy would ring them. I can fetch it over the pit."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 600,
+      "highlight": ["lob-crate"],
+      "bark": "Throwing is a kind of ringing, if you are patient about the order.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "Press, listen, then carry the crate over and let it fall."
+        }
+      ],
+      "rumour": "chimes.hint-rumour"
     }
   ],
   "tags": ["greybox", "mvp"],
@@ -173,5 +192,11 @@
     ],
     "signals": ["chimes/vault-latch"],
     "rewards": ["chimes-vault"]
-  }
+  },
+  "failures": [
+    {
+      "signal": "chimes/order",
+      "port": "failed"
+    }
+  ]
 }

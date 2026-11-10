@@ -97,9 +97,39 @@
   },
   "hints": [
     {
-      "afterSeconds": 120,
+      "afterSeconds": 180,
+      "afterAttempts": 3,
       "highlight": ["channel", "far-pad"],
-      "bark": "The water is too deep to cross. Something has to get to that pad."
+      "bark": "Too deep to wade. Something has to get to that pad.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "Nobody said I had to cross it myself."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 360,
+      "highlight": ["crate"],
+      "bark": "That crate is not heavy. A weight on the far pad is a weight.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "Mage Hand will carry a crate where I cannot."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 600,
+      "highlight": ["channel"],
+      "bark": "Cold stops water. Anything that is cold enough will do.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "Mage Hand, then. Over the water, set it down gently."
+        }
+      ],
+      "rumour": "frozen-channel.hint-rumour"
     }
   ],
   "tags": ["greybox", "mvp"],
