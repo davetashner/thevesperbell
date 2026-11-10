@@ -95,6 +95,12 @@ export const cueRuleSchema = z
       .describe(
         'Localisation key of the sound caption shown for this cue (mw-e28.14), e.g. "caption.footsteps"; it also orders captions (the rule’s priority). Absent = no caption.',
       ),
+    gameplayCritical: z
+      .boolean()
+      .default(false)
+      .describe(
+        'True when a player who cannot hear this sound would miss information they need to react (a footstep, an attack telegraph, an alert). A gameplay-critical rule must have a caption (mw-e31.5).',
+      ),
   })
   .superRefine((rule, ctx) => {
     checkCueRule(rule, ctx);
@@ -108,6 +114,7 @@ interface PresentationShape {
   readonly at?: string | undefined;
   readonly volumeBy?: { readonly fact: string } | undefined;
   readonly caption?: string | undefined;
+  readonly gameplayCritical?: boolean | undefined;
 }
 
 /** Placeholders must be string facts, `at` an anchor and `volumeBy` a number fact of the event. */
@@ -141,6 +148,13 @@ function checkPresentation(rule: PresentationShape, ctx: z.RefinementCtx): void 
       code: 'custom',
       path: ['caption'],
       message: `caption "${rule.caption}" has no entry in the string table (src/content/strings.ts)`,
+    });
+  }
+  if (rule.gameplayCritical === true && rule.caption === undefined) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['caption'],
+      message: 'a gameplayCritical rule needs a caption (a localisation key in the string table)',
     });
   }
 }

@@ -38,6 +38,12 @@ describe('UI tokens (style bible §9)', () => {
     expect(uiStyleSheet()).not.toMatch(/font-size: [\d.]+rem/);
   });
 
+  it('mw-e31.5: the caption plate follows the text background setting but never drops below 90%', () => {
+    expect(uiStyleSheet()).toContain(
+      'rgb(30 27 46 / max(90%, calc(var(--ui-text-backdrop-opacity) * 100%)))',
+    );
+  });
+
   it('the dyslexia font and the text backdrop are token driven, and tabs wrap', () => {
     const css = uiStyleSheet();
     expect(css).toContain(".vb-ui[data-font='dyslexia']");

@@ -4,6 +4,7 @@ import { contentTypes } from '../registry.ts';
 import { describeContent } from '../testing.ts';
 import { cueEventSpec, cuePlaceholders } from '../cue-events.ts';
 import { loadGameContent } from '../game-content.ts';
+import { hasString } from '../strings.ts';
 import { cueRuleSchema, cueSheetSchema, type CueSheetDefInput } from './cue-sheet.ts';
 
 const sheet = (rules: CueSheetDefInput['rules']): CueSheetDefInput => ({
@@ -36,6 +37,7 @@ describe('cue sheet schema', () => {
       volumeJitterDb: 0,
       volumeDb: 0,
       cooldownMs: 0,
+      gameplayCritical: false,
     });
     expect(
       cueRuleSchema.parse({
@@ -107,6 +109,26 @@ describe('cue sheet schema', () => {
       'breakableBroken:caption.breaking',
       'doorStateChanged:caption.door-close',
       'doorStateChanged:caption.door-open',
+    ]);
+  });
+
+  it('mw-e31.5 AC-4: every gameplay-critical rule has a caption key that exists in the string table', () => {
+    const rules = loadGameContent()
+      .all('cue-sheet')
+      .flatMap((s) => s.rules);
+    const critical = rules.filter((r) => r.gameplayCritical);
+    expect(critical.length).toBeGreaterThan(0);
+    for (const rule of critical) {
+      expect(rule.caption, `${rule.event} ${rule.cue}`).toBeDefined();
+      expect(hasString(String(rule.caption))).toBe(true);
+    }
+    // Every captioned shipped rule is flagged, so the flag cannot drift from the captions.
+    expect(rules.filter((r) => r.caption !== undefined && !r.gameplayCritical)).toEqual([]);
+  });
+
+  it('mw-e31.5 AC-4: rejects a gameplay-critical rule without a caption', () => {
+    expect(problems(sheet([{ event: 'Died', cue: 'sfx-death', gameplayCritical: true }]))).toEqual([
+      'rules.0.caption: a gameplayCritical rule needs a caption (a localisation key in the string table)',
     ]);
   });
 
