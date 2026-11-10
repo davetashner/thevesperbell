@@ -28,6 +28,7 @@ import { checkRepopulation } from './repopulation-checks.ts';
 import { checkVariants } from './variant-checks.ts';
 import { checkRecoveryAnchors } from './recovery-checks.ts';
 import { checkSceneTransitions } from './transition-checks.ts';
+import { checkPrefabs } from './prefabs.ts';
 import { checkPuzzles } from './puzzle-checks.ts';
 import type { Catalogue, ContentCheck, EntryOf } from './loader.ts';
 import { animClipSchema } from './types/anim-clip.ts';
@@ -66,6 +67,7 @@ import { checkNavmeshes, navmeshSchema } from './types/navmesh.ts';
 import { puzzleSchema } from './types/puzzle.ts';
 import { checkRespawnRules, respawnRulesSchema } from './types/respawn-rules.ts';
 import { sandboxSchema } from './types/sandbox.ts';
+import { prefabSchema } from './types/prefab.ts';
 import { sceneSchema } from './types/scene.ts';
 import { senseSchema } from './types/sense.ts';
 import { shieldSchema } from './types/shield.ts';
@@ -117,6 +119,7 @@ export const contentTypes = {
   merchant: merchantSchema,
   move: moveSchema,
   navmesh: navmeshSchema,
+  prefab: prefabSchema,
   puzzle: puzzleSchema,
   'reach-class': reachClassSchema,
   'respawn-rules': respawnRulesSchema,
@@ -146,6 +149,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkSocketTracks,
   checkCapabilities,
   checkPuzzles,
+  checkPrefabs,
   checkCreatureAttacks,
   checkWeapons,
   checkCreatureAudio,

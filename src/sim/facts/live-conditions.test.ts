@@ -71,7 +71,7 @@ describe('live condition validation', () => {
       [{ entities: {}, match: 'all', where: [3] }, 'at where[0]: a predicate must be an object'],
       [
         { entities: {}, match: 'all', where: [{ test: 'smell' }] },
-        'at where[0].test: "smell" is not a predicate (property, tag or element)',
+        'at where[0].test: "smell" is not a predicate (property, tag, element or facing)',
       ],
       [
         {
@@ -112,6 +112,14 @@ describe('live condition validation', () => {
       [
         { entities: {}, match: 'all', where: [{ test: 'element', element: 'mud' }] },
         'at where[0].element: "mud" is not one of fire, water, ice, charge',
+      ],
+      [
+        { entities: {}, match: 'all', where: [{ test: 'facing', facing: 'up' }] },
+        'at where[0].facing: "up" is not one of north, east, south, west',
+      ],
+      [
+        { entities: {}, match: 'all', where: [{ test: 'facing', facing: 'north', extra: 1 }] },
+        '"extra" is not a field of a facing predicate',
       ],
       [{ entities: {}, match: 'all', inside: 3 }, 'at inside: a volume is an object with a kind'],
       [
@@ -255,9 +263,20 @@ describe('live condition text, dependencies and explanations', () => {
       [{ signal: 'g/n' }, 'signals'],
       [{ sustained: { fact: 'a' }, seconds: 1 }, 'timed'],
       [{ entities: {}, match: 'any' }, 'structure'],
+      [{ entities: {}, match: 'any', where: [{ test: 'facing', facing: 'east' }] }, 'spatial'],
     ] as [Condition, string][]) {
       expect(compileCondition(condition).isLive, flag).toBe(true);
     }
+  });
+
+  it('explains a facing predicate in words', () => {
+    const facts = new World({ seed: 1 }).facts;
+    const goal = compileCondition({
+      entities: { tag: 'statue' },
+      match: 'all',
+      where: [{ test: 'facing', facing: 'east' }],
+    });
+    expect(formatExplanation(goal.explain(facts))).toContain('facing east');
   });
 
   it('is false without a live world, and says so', () => {

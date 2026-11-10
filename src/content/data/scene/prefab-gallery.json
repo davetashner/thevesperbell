@@ -1,0 +1,108 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "prefab-gallery",
+  "name": "Puzzle prefab gallery",
+  "description": "Every puzzle prefab (mw-e15.4) placed once on an open floor, the way a designer assembles a puzzle: a rotatable statue, mirror and lens stand with a beam source and sensor, the weighted crate set, a brazier, a water basin with valve and drain, a counterweight lift, a sliding block, a bell, a crystal receiver, a scale plate pair, a timed door and a rune tile sequence. Reach it with ?scene=prefab-gallery. Catalogue: docs/design/puzzle-prefabs.md.",
+  "grid": 1,
+  "camera": {
+    "position": [-12, 12, -10],
+    "target": [0, 0, 0]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [12, 1, 8]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -6],
+      "tags": ["player-start"]
+    }
+  ],
+  "prefabs": [
+    {
+      "id": "statue-demo",
+      "prefab": "rotatable-statue",
+      "at": [-9, 0, 5]
+    },
+    {
+      "id": "mirror-demo",
+      "prefab": "rotatable-mirror",
+      "at": [-6, 0, 5]
+    },
+    {
+      "id": "lens-demo",
+      "prefab": "lens-stand",
+      "at": [-6, 0, 3.5]
+    },
+    {
+      "id": "sun-demo",
+      "prefab": "beam-source",
+      "at": [-6, 0, 1.5]
+    },
+    {
+      "id": "sensor-demo",
+      "prefab": "beam-sensor",
+      "at": [-3, 0, 5]
+    },
+    {
+      "id": "crates-demo",
+      "prefab": "weighted-crate-set",
+      "at": [-9, 0, -4]
+    },
+    {
+      "id": "fire-demo",
+      "prefab": "brazier",
+      "at": [-2, 0, -5]
+    },
+    {
+      "id": "basin-demo",
+      "prefab": "water-basin",
+      "at": [3, 0, -4]
+    },
+    {
+      "id": "lift-demo",
+      "prefab": "counterweight-lift",
+      "at": [8, 0, -5]
+    },
+    {
+      "id": "block-demo",
+      "prefab": "sliding-block",
+      "at": [3, 0, 3]
+    },
+    {
+      "id": "bell-demo",
+      "prefab": "bell",
+      "at": [8, 0, 3]
+    },
+    {
+      "id": "crystal-demo",
+      "prefab": "crystal-receiver",
+      "at": [10, 0, 3]
+    },
+    {
+      "id": "scales-demo",
+      "prefab": "scale-plate-pair",
+      "at": [8, 0, -0.5],
+      "params": {
+        "minWeight": 20
+      }
+    },
+    {
+      "id": "door-demo",
+      "prefab": "timed-door",
+      "at": [-2, 0, 0]
+    },
+    {
+      "id": "runes-demo",
+      "prefab": "rune-tile-sequence",
+      "at": [-2, 0, 3]
+    }
+  ],
+  "light": {
+    "ambient": 0.5
+  }
+}

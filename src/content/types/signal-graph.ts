@@ -47,6 +47,8 @@ const ENTITY_RECEIVERS: readonly string[] = ['door', 'light', 'spawner', 'mechan
 export const PREDICATE_OPS = ['eq', 'ne', 'lt', 'lte', 'gt', 'gte'] as const;
 /** Elements a filter can test for (mirrors the sim's SIGNAL_ELEMENTS). */
 export const SIGNAL_ELEMENTS = ['fire', 'water', 'ice', 'charge'] as const;
+/** Compass directions a facing test names (mirrors the sim's FACINGS). */
+export const FACINGS = ['north', 'east', 'south', 'west'] as const;
 /** Node kinds a loop may pass through (mirrors the sim's REGISTERED_KINDS). */
 export const REGISTERED_KINDS: readonly string[] = ['delay', 'latch'];
 
@@ -103,6 +105,14 @@ export const predicateSchema = z
     z.strictObject({
       test: z.literal('tag'),
       tag: contentId.describe('Tag the entity must carry, e.g. "player".'),
+    }),
+    z.strictObject({
+      test: z.literal('facing'),
+      facing: z
+        .enum(FACINGS)
+        .describe(
+          'Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east.',
+        ),
     }),
     z.strictObject({
       test: z.literal('element'),

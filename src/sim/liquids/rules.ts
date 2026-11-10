@@ -153,7 +153,9 @@ function volumesRule(options: LiquidRulesOptions, config: LiquidConfig): Element
 function fullyUnder(volume: LiquidVolume, at: { x: number; y: number; z: number; radius: number }) {
   const { min, max } = volume;
   const r = at.radius;
+  // A basin drained dry has no surface: nothing in it is under water.
   return (
+    totalDepth(volume) > 0 &&
     at.x - r >= min.x &&
     at.x + r <= max.x &&
     at.z - r >= min.z &&

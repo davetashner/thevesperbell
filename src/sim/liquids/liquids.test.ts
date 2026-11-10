@@ -235,6 +235,24 @@ describe('water volumes, wetness and drying (mw-e03.6)', () => {
     expect(wetness(world, low)).toBeLessThan(before);
   });
 
+  it('mw-e15.4: a drained basin has no surface: a point on its floor is not under water, and a volume can be an existing entity', () => {
+    const { world } = liquidWorld();
+    const entity = world.spawn();
+    const basin = createVolume(world, PRESETS, {
+      ...BASIN,
+      entity,
+      layers: [{ liquid: 'water', depth: 0.5 }],
+      drain: { open: true, rate: 1 },
+    });
+    expect(basin).toBe(entity);
+    const plate = spawn(world, 'generic', { x: 0, y: 0, z: 0, radius: 0 });
+    world.step();
+    expect(world.has(plate, SubmergedComponent)).toBe(true);
+    steps(world, seconds(world, 1));
+    expect(levelOf(volumeOf(world, basin))).toBe(0);
+    expect(world.has(plate, SubmergedComponent)).toBe(false);
+  });
+
   it('AC-3: a drain takes the bottom layer first and a fill refills to the brim only', () => {
     const { world } = liquidWorld();
     const basin = createVolume(world, PRESETS, {

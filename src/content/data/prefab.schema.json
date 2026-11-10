@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name in the catalogue."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What it is for and how a designer uses it."
+    },
+    "tags": {
+      "default": [],
+      "description": "Catalogue tags: light, weight, water…",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "parameters": {
+      "default": {},
+      "description": "Parameters an instance may set; one without a default must be given.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][A-Za-z0-9]*$"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "number"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What the parameter does, for the catalogue."
+              },
+              "unit": {
+                "description": "Unit of the value, e.g. kg, m, s, degrees.",
+                "type": "string",
+                "minLength": 1
+              },
+              "min": {
+                "description": "Least value allowed.",
+                "type": "number"
+              },
+              "max": {
+                "description": "Greatest value allowed.",
+                "type": "number"
+              },
+              "default": {
+                "description": "Value when an instance leaves it out; none = required.",
+                "type": "number"
+              },
+              "example": {
+                "description": "A value used when the prefab is checked and the parameter has no default."
+              }
+            },
+            "required": [
+              "type",
+              "description"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "integer"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What the parameter does, for the catalogue."
+              },
+              "unit": {
+                "description": "Unit of the value, e.g. kg, m, s, degrees.",
+                "type": "string",
+                "minLength": 1
+              },
+              "min": {
+                "description": "Least value allowed.",
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "max": {
+                "description": "Greatest value allowed.",
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "default": {
+                "description": "Value when an instance leaves it out; none = required.",
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "example": {
+                "description": "A value used when the prefab is checked and the parameter has no default."
+              }
+            },
+            "required": [
+              "type",
+              "description"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What the parameter does, for the catalogue."
+              },
+              "default": {
+                "description": "Value when an instance leaves it out; none = required.",
+                "type": "boolean"
+              },
+              "example": {
+                "description": "A value used when the prefab is checked and the parameter has no default."
+              }
+            },
+            "required": [
+              "type",
+              "description"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "enum"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What the parameter does, for the catalogue."
+              },
+              "values": {
+                "minItems": 2,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "The values it may take."
+              },
+              "default": {
+                "description": "Value when an instance leaves it out; none = required.",
+                "type": "string",
+                "minLength": 1
+              },
+              "example": {
+                "description": "A value used when the prefab is checked and the parameter has no default."
+              }
+            },
+            "required": [
+              "type",
+              "description",
+              "values"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "spawns": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "local": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the spawn within the prefab; the instance prefixes it."
+          }
+        },
+        "required": [
+          "local"
+        ],
+        "additionalProperties": {},
+        "description": "A scene spawn minus its id, at a position relative to the instance; \"$name\" values take parameters."
+      },
+      "description": "The spawns it places, relative to the instance."
+    },
+    "graph": {
+      "description": "Its own behaviour, as a signal graph bound to its spawns by their local names (placed with the instance’s id as the graph id).",
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "kind"
+            ],
+            "additionalProperties": {}
+          },
+          "description": "Signal graph nodes (any signal-graph node)."
+        },
+        "wires": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Connections, as in a signal graph."
+        }
+      },
+      "required": [
+        "nodes",
+        "wires"
+      ],
+      "additionalProperties": false
+    },
+    "inputs": {
+      "default": [],
+      "description": "What can drive it, for the catalogue.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "What the input is called in the catalogue."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What drives it and what it does."
+          },
+          "spawn": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "The spawn of the prefab that takes it (a signal graph binds it)."
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "spawn"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "outputs": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "What the output is called in the catalogue."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "When it is on, in a designer’s words."
+          },
+          "node": {
+            "description": "A node of the prefab’s graph: the signal \"<instance>/<node>\" a goal or graph reads.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "spawn": {
+            "description": "A spawn of the prefab: the entity itself (a goal reads where it is, a tag, or `property`).",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "property": {
+            "description": "With `spawn`: the world property of that spawn the output reads.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "description": "What it tells the rest of the puzzle: signals, properties, states."
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "spawns",
+    "outputs"
+  ],
+  "additionalProperties": false
+}

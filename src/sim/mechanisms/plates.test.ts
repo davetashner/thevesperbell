@@ -115,6 +115,30 @@ describe('pressure plates (mw-e03.19)', () => {
     expect(r.on(p)).toBe(false);
   });
 
+  it('mw-e15.4: a box or a capsule resting on a floor plate counts by its body, not its bounding sphere', () => {
+    const r = rig();
+    const p = r.plate({ minWeight: 30 });
+    const crate = r.world.spawn();
+    addProperties(r.world, crate, { weight: 40, liftable: true });
+    addPhysicsObject(r.world, crate, {
+      shape: { kind: 'box', halfExtents: { x: 0.35, y: 0.35, z: 0.35 } },
+      position: v(0, 0.36, 0),
+    });
+    r.steps(40);
+    // The crate's bounding sphere reaches well under the floor; its underside is on it.
+    expect(weighPlate(r.world, p).resting).toEqual([crate]);
+    expect(r.on(p)).toBe(true);
+    removePhysicsObject(r.world, crate);
+    const post = r.world.spawn();
+    addProperties(r.world, post, { weight: 50, liftable: true });
+    addPhysicsObject(r.world, post, {
+      shape: { kind: 'capsule', halfHeight: 0.4, radius: 0.3 },
+      position: v(0, 0.71, 0),
+    });
+    r.steps(40);
+    expect(weighPlate(r.world, p).resting).toEqual([post]);
+  });
+
   it('AC-2: with a 40–60 kg window 70 kg does not turn it on; too heavy also turns a plate off', () => {
     const r = rig();
     const p = r.plate({ minWeight: 40, maxWeight: 60 });
@@ -345,6 +369,22 @@ describe('pressure plates (mw-e03.19)', () => {
     placeEntity(r.world, wolf, v(0, 0, 0), 0);
     r.steps(2);
     expect(weighPlate(r.world, p)).toEqual({ resting: [wolf], weight: 35 });
+  });
+
+  it('mw-e15.4: in a world with no physics objects an actor on a plate is weighed by its bounding sphere', () => {
+    const world = installSignals(
+      installStimuli(registerWorldProperties(new World<never>({ seed: 4, hz: 60 }))),
+    );
+    world.addSystem(stimulusSystem()).addSystem(signalSystem());
+    installMechanisms(world);
+    const plate = world.spawn();
+    makePlate(world, plate, v(0, 0, 0), { minWeight: 10 });
+    const hero = world.spawn();
+    addProperties(world, hero, { weight: 70 });
+    tagEntity(world, hero, 'player');
+    placeEntity(world, hero, v(0, 0, 0), 0);
+    world.step();
+    expect(weighPlate(world, plate)).toEqual({ resting: [hero], weight: 70 });
   });
 
   it('syncPlateNodes does nothing for what is not a plate', () => {

@@ -72,6 +72,8 @@ A `condition` is exactly one of these objects:
 | `where[].value` | number or boolean or string | required | Value to compare with. |
 | `where[].test` | `"tag"` | required |  |
 | `where[].tag` | id | required | Tag the entity must carry, e.g. "player". |
+| `where[].test` | `"facing"` | required |  |
+| `where[].facing` | `"north"` \| `"east"` \| `"south"` \| `"west"` | required | Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east. |
 | `where[].test` | `"element"` | required |  |
 | `where[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
 | `inside` | object | — | The entity must stand in this box, sphere or capsule, in world coordinates. |

@@ -1,0 +1,65 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "beam-sensor",
+  "name": "Beam sensor",
+  "description": "A light receiver that turns on once a beam at or above its threshold has been held on it for the dwell time, and off when the light goes. Half a metre up, at the height of the mirror and lens stands.",
+  "tags": ["light"],
+  "parameters": {
+    "threshold": {
+      "type": "number",
+      "description": "Intensity at or above which light counts.",
+      "min": 0.05,
+      "max": 10,
+      "default": 0.5
+    },
+    "dwellSeconds": {
+      "type": "number",
+      "description": "Seconds the light must be held before it turns on.",
+      "unit": "s",
+      "min": 0,
+      "max": 30,
+      "default": 0.5
+    },
+    "mode": {
+      "type": "enum",
+      "description": "momentary goes off with the light; latching until reset.",
+      "values": ["momentary", "latching"],
+      "default": "momentary"
+    }
+  },
+  "spawns": [
+    {
+      "local": "receiver",
+      "at": [0, 0.5, 0],
+      "lightReceiver": {
+        "threshold": "$threshold",
+        "dwellSeconds": "$dwellSeconds",
+        "mode": "$mode"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "lit",
+        "kind": "lever",
+        "entity": "receiver"
+      }
+    ],
+    "wires": []
+  },
+  "inputs": [
+    {
+      "name": "beam",
+      "description": "A light beam reaching the sensor.",
+      "spawn": "receiver"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "lit",
+      "description": "On while enough light has been held on the sensor.",
+      "node": "lit"
+    }
+  ]
+}

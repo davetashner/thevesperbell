@@ -28,6 +28,7 @@ import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
 import { holdsOf } from '../carry/state';
 import { CreatureComponent } from '../creatures/components';
+import type { BodyShape } from '../physics/bodies';
 import { PhysicsObjectComponent } from '../physics/objects';
 import { readProperty } from '../properties/components';
 import { hasTag } from '../signals/filter';
@@ -165,6 +166,30 @@ export function weighable(world: World<never>, entity: EntityId): boolean {
   );
 }
 
+/** Half the height of a body shape, m: how far its underside is below its centre. */
+function halfHeightOf(shape: BodyShape): number {
+  switch (shape.kind) {
+    case 'box':
+      return shape.halfExtents.y;
+    case 'sphere':
+      return shape.radius;
+    case 'capsule':
+      return shape.halfHeight + shape.radius;
+  }
+}
+
+/**
+ * Where a thing's underside is for resting: a physics object's body bottom (a crate on a plate sits
+ * half its height above it, which its bounding sphere would call far below), anything else its
+ * bounding sphere's.
+ */
+function underside(world: World<never>, entity: EntityId, sphere: Placement): Placement {
+  const object = world.isRegistered(PhysicsObjectComponent)
+    ? world.get(entity, PhysicsObjectComponent)
+    : undefined;
+  return object === undefined ? sphere : { ...sphere, radius: halfHeightOf(object.shape) };
+}
+
 /** Whether a body at `at` rests on `plate`: its centre is over the footprint, its underside touches the top. */
 function rests(plate: Plate, at: Placement): boolean {
   const { origin, width, depth } = plate;
@@ -195,7 +220,7 @@ export function weighPlate(
   let weight = 0;
   world.query(PlacementComponent).forEach((other, placed) => {
     if (other === entity || carried.has(other) || !weighable(world, other)) return;
-    if (!rests(plate, boundingSphereOf(world, other, placed))) return;
+    if (!rests(plate, underside(world, other, boundingSphereOf(world, other, placed)))) return;
     let kilos = readProperty(world, other, 'weight');
     for (const hold of holds) {
       if (hold.actor === other) kilos += readProperty(world, hold.target, 'weight');

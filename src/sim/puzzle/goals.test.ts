@@ -151,7 +151,7 @@ describe('puzzle goals over live properties', () => {
     }).toThrow(
       new ConditionError(
         'all[1].not.where[0].test',
-        '"smell" is not a predicate (property, tag or element)',
+        '"smell" is not a predicate (property, tag, element or facing)',
       ),
     );
     expect(goals.ids).toEqual([]);

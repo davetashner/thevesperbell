@@ -1,0 +1,58 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "bell",
+  "name": "Bell",
+  "description": "A bell that rings when struck from afar by an arrow, a thrown object or a spell, and stays on for a few seconds, loud enough to carry. Wire its output to a door or let a puzzle listen for it.",
+  "tags": ["sound"],
+  "parameters": {
+    "mode": {
+      "type": "enum",
+      "description": "momentary stays on for the hold time; latching until reset.",
+      "values": ["momentary", "latching"],
+      "default": "momentary"
+    },
+    "holdSeconds": {
+      "type": "number",
+      "description": "Momentary: seconds it stays on after a strike.",
+      "unit": "s",
+      "min": 0,
+      "max": 60,
+      "default": 3
+    }
+  },
+  "spawns": [
+    {
+      "local": "bell",
+      "at": [0, 2, 0],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "$mode",
+        "holdSeconds": "$holdSeconds"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "rung",
+        "kind": "lever",
+        "entity": "bell"
+      }
+    ],
+    "wires": []
+  },
+  "inputs": [
+    {
+      "name": "strike",
+      "description": "Any impact above its energy: arrow, thrown crate, spell.",
+      "spawn": "bell"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "rung",
+      "description": "On while the bell has been struck (for its hold time, or until reset).",
+      "node": "rung"
+    }
+  ]
+}

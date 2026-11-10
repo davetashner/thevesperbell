@@ -277,6 +277,17 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].lightReceiver.filter` | list of any (at least 3) | — | Only light of about this colour counts (default any). |
 | `spawns[].lightReceiver.mode` | `"momentary"` \| `"latching"` | `"momentary"` | momentary goes off with the light; latching until a signal resets it. |
 | `spawns[].lightReceiver.radius` | number > 0 | `0.3` | Radius of the sensor, metres. |
+| `spawns[].push` | object | — | Gives a movable prop push rules: a rail, a grid, a rotation step (mw-e15.4). |
+| `spawns[].push.axis` | list of any (at least 2) | — | Unit direction (x, z) the prop may only slide along (a rail); omit for free. |
+| `spawns[].push.grid` | number > 0 | — | Grid cell size, metres: the prop moves one cardinal axis at a time and settles on a cell centre. |
+| `spawns[].push.rotateStep` | number > 0 ≤ 180 | — | Degrees one rotate turns it by; omit for a prop that does not turn. |
+| `spawns[].liquid` | object | — | Makes the spawned entity a volume of liquid, with an optional drain (mw-e15.4). |
+| `spawns[].liquid.size` | list of any (at least 3) | required | Width (x), height to the brim (y) and depth (z) of the volume, metres. |
+| `spawns[].liquid.liquid` | ref → material | required | The liquid it holds: a material with `liquid` (water, oil). |
+| `spawns[].liquid.depth` | number > 0 | required | How deep the liquid stands at the start, metres (not above the brim). |
+| `spawns[].liquid.drain` | object | — | A drain, opened and closed by a signal or code (the valve of a basin). |
+| `spawns[].liquid.drain.rate` | number > 0 | required | Level fall while open, m/s. |
+| `spawns[].liquid.drain.open` | boolean | `false` | Starts open. |
 | `spawns[].container` | object | — | Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3). |
 | `spawns[].container.loot` | ref → loot-table | — | Loot table rolled into it the first time it is opened (once; saves keep the result). |
 | `spawns[].container.contents` | list of object | — | What it holds from the start, before any roll. |
@@ -383,6 +394,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `ambience` | list of object | — | Ambience zones placed over regions of the scene or all of it (mw-e28.13). |
 | `ambience[].zone` | ref → ambience | required | The ambience zone that plays here. |
 | `ambience[].region` | id | — | Id of one of the scene’s regions; leave out to cover the whole scene. |
+| `prefabs` | list of object | — | Puzzle prefab instances (mw-e15.4); expanded into spawns and signal graphs when the content loads, so a loaded scene never has this field. |
+| `prefabs[].id` | id | required | Instance id: prefixes its spawns and names its signal graph. |
+| `prefabs[].prefab` | ref → prefab | required | The prefab to place. |
+| `prefabs[].at` | list of any (at least 3) | required | Position in grid cells (x, y, z), snapped to SCENE_SNAP_STEP. |
+| `prefabs[].yaw` | `0` \| `90` \| `180` \| `270` | `0` | Rotation about +y in degrees: 0, 90, 180 or 270. |
+| `prefabs[].params` | map of string → number or boolean or string | `{}` | Parameter values; a parameter with no default must be given. |
 
 ## `condition`
 
@@ -429,6 +446,8 @@ A `condition` is exactly one of these objects:
 | `where[].value` | number or boolean or string | required | Value to compare with. |
 | `where[].test` | `"tag"` | required |  |
 | `where[].tag` | id | required | Tag the entity must carry, e.g. "player". |
+| `where[].test` | `"facing"` | required |  |
+| `where[].facing` | `"north"` \| `"east"` \| `"south"` \| `"west"` | required | Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east. |
 | `where[].test` | `"element"` | required |  |
 | `where[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
 | `inside` | object | — | The entity must stand in this box, sphere or capsule, in world coordinates. |

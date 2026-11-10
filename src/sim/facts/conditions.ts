@@ -29,6 +29,7 @@ import { propertyChanged } from '../properties/components';
 import { isWorldPropertyKey, PROPERTY_ID_PATTERN, type WorldPropertyKey } from '../properties/spec';
 import {
   PREDICATE_OPS,
+  FACINGS,
   SIGNAL_ELEMENTS,
   type SignalPredicate,
   type VolumeShape,
@@ -371,10 +372,18 @@ function checkPredicate(predicate: unknown, path: string): void {
         `${JSON.stringify(predicate['element'])} is not one of ${SIGNAL_ELEMENTS.join(', ')}`,
       );
     }
+  } else if (test === 'facing') {
+    onlyKeys(predicate, ['test', 'facing'], path, 'a facing predicate');
+    if (!(FACINGS as readonly unknown[]).includes(predicate['facing'])) {
+      throw new ConditionError(
+        join(path, 'facing'),
+        `${JSON.stringify(predicate['facing'])} is not one of ${FACINGS.join(', ')}`,
+      );
+    }
   } else {
     throw new ConditionError(
       join(path, 'test'),
-      `${JSON.stringify(test)} is not a predicate (property, tag or element)`,
+      `${JSON.stringify(test)} is not a predicate (property, tag, element or facing)`,
     );
   }
 }
@@ -617,6 +626,8 @@ export function predicateText(predicate: SignalPredicate): string {
       return `tag ${predicate.tag}`;
     case 'element':
       return predicate.element;
+    case 'facing':
+      return `facing ${predicate.facing}`;
     case 'property':
       return `${predicate.property} ${PREDICATE_SYMBOLS[predicate.op]} ${String(predicate.value)}`;
   }
@@ -987,6 +998,8 @@ export function compileCondition(condition: Condition): CompiledCondition {
       flags.tags ||= node.entities.tag !== undefined;
       for (const predicate of node.where ?? []) {
         flags.tags ||= predicate.test === 'tag';
+        // A body's facing changes with no property event: read it at every poll, like a position.
+        flags.spatial ||= predicate.test === 'facing';
         predicateProperties(predicate).forEach((key) => properties.add(key));
       }
       return entitiesNode(node);

@@ -1,0 +1,120 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "rotatable-statue",
+  "name": "Rotatable statue",
+  "description": "A heavy stone statue the player turns in fixed steps with Interact (and can drag). Placed at yaw 0 it faces north; a quarter turn of the instance turns it east, south, west. A facing sensor per compass direction tells the puzzle which way it looks: a statue that must face the sunrise, a row of statues that must all look at the door.",
+  "tags": ["weight", "facing"],
+  "parameters": {
+    "stepAngle": {
+      "type": "number",
+      "description": "Degrees one turn rotates it; 90 gives the four compass facings.",
+      "unit": "degrees",
+      "min": 15,
+      "max": 180,
+      "default": 90
+    }
+  },
+  "spawns": [
+    {
+      "local": "statue",
+      "at": [0, 0, 0],
+      "prop": "statue",
+      "properties": {
+        "pushable": true
+      },
+      "push": {
+        "rotateStep": "$stepAngle"
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "rotate",
+            "label": "Turn statue"
+          },
+          {
+            "verb": "push",
+            "label": "Drag statue"
+          }
+        ]
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "facing-north",
+        "kind": "sensor",
+        "entity": "statue",
+        "filter": [
+          {
+            "test": "facing",
+            "facing": "north"
+          }
+        ]
+      },
+      {
+        "id": "facing-east",
+        "kind": "sensor",
+        "entity": "statue",
+        "filter": [
+          {
+            "test": "facing",
+            "facing": "east"
+          }
+        ]
+      },
+      {
+        "id": "facing-south",
+        "kind": "sensor",
+        "entity": "statue",
+        "filter": [
+          {
+            "test": "facing",
+            "facing": "south"
+          }
+        ]
+      },
+      {
+        "id": "facing-west",
+        "kind": "sensor",
+        "entity": "statue",
+        "filter": [
+          {
+            "test": "facing",
+            "facing": "west"
+          }
+        ]
+      }
+    ],
+    "wires": []
+  },
+  "inputs": [
+    {
+      "name": "turn",
+      "description": "Interact with the statue turns it by one step; a rotate spell or a shove with a rotate effect does the same.",
+      "spawn": "statue"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "facing-north",
+      "description": "On while the statue faces north (+z).",
+      "node": "facing-north"
+    },
+    {
+      "name": "facing-east",
+      "description": "On while the statue faces east (+x).",
+      "node": "facing-east"
+    },
+    {
+      "name": "facing-south",
+      "description": "On while the statue faces south (-z).",
+      "node": "facing-south"
+    },
+    {
+      "name": "facing-west",
+      "description": "On while the statue faces west (-x).",
+      "node": "facing-west"
+    }
+  ]
+}

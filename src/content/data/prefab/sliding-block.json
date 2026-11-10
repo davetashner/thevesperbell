@@ -1,0 +1,45 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "sliding-block",
+  "name": "Sliding block",
+  "description": "A stone block pushed one grid cell at a time along one axis at a time, settling on cell centres: the block of a sliding-block puzzle. Heavy enough that only strong pushers move it fast.",
+  "tags": ["weight"],
+  "parameters": {
+    "cell": {
+      "type": "number",
+      "description": "Size of a grid cell, metres.",
+      "unit": "m",
+      "min": 0.25,
+      "max": 4,
+      "default": 1
+    }
+  },
+  "spawns": [
+    {
+      "local": "block",
+      "at": [0, 0, 0],
+      "prop": "stone-block",
+      "properties": {
+        "pushable": true
+      },
+      "push": {
+        "grid": "$cell"
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "push",
+            "label": "Push block"
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "block",
+      "description": "The block entity: a goal reads where it stands (`inside`) or a plate reads its weight.",
+      "spawn": "block"
+    }
+  ]
+}

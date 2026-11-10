@@ -1,0 +1,104 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "scale-plate-pair",
+  "name": "Scale plate pair",
+  "description": "Two pressure plates side by side, each with a weight window; the pair is balanced when both are in their window together. Put a 20 kg crate on each, or one 40 kg crate and a friend: the puzzle only asks for weight.",
+  "tags": ["weight"],
+  "parameters": {
+    "minWeight": {
+      "type": "number",
+      "description": "Lightest weight that turns a plate on.",
+      "unit": "kg",
+      "min": 1,
+      "max": 1000,
+      "example": 20
+    },
+    "maxWeight": {
+      "type": "number",
+      "description": "Heaviest weight that keeps it on.",
+      "unit": "kg",
+      "min": 1,
+      "max": 1000,
+      "default": 1000
+    }
+  },
+  "spawns": [
+    {
+      "local": "left",
+      "at": [-1, 0, 0],
+      "plate": {
+        "minWeight": "$minWeight",
+        "maxWeight": "$maxWeight",
+        "width": 1.25,
+        "depth": 1.25
+      }
+    },
+    {
+      "local": "right",
+      "at": [1, 0, 0],
+      "plate": {
+        "minWeight": "$minWeight",
+        "maxWeight": "$maxWeight",
+        "width": 1.25,
+        "depth": 1.25
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "left-on",
+        "kind": "lever",
+        "entity": "left"
+      },
+      {
+        "id": "right-on",
+        "kind": "lever",
+        "entity": "right"
+      },
+      {
+        "id": "balanced",
+        "kind": "and"
+      }
+    ],
+    "wires": [
+      {
+        "from": "left-on",
+        "to": "balanced"
+      },
+      {
+        "from": "right-on",
+        "to": "balanced"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "weight-left",
+      "description": "Weight resting on the left plate.",
+      "spawn": "left"
+    },
+    {
+      "name": "weight-right",
+      "description": "Weight resting on the right plate.",
+      "spawn": "right"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "balanced",
+      "description": "On while both plates hold a weight inside the window.",
+      "node": "balanced"
+    },
+    {
+      "name": "left",
+      "description": "On while the left plate is in its window.",
+      "node": "left-on"
+    },
+    {
+      "name": "right",
+      "description": "On while the right plate is in its window.",
+      "node": "right-on"
+    }
+  ]
+}

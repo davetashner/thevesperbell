@@ -106,6 +106,17 @@ graph. A burning barrel carried from brazier to brazier, an Ember cast from acro
 arrow all solve it, because it reads what burns, not what lit it. The stack it is built from is
 all existing: light sources, world properties, the stimulus API, a door receiver, facts.
 
+## Prefabs
+
+Designers assemble puzzles from prefabs (mw-e15.4): data files under `src/content/data/prefab/`
+that bundle scene spawns and, where the piece has behaviour, a small signal graph, with parameters
+to tune. A scene places one under `prefabs` (the prefab, where, its `yaw`, its `params`) and the
+loader expands it into plain spawns and a graph before anything else reads the scene, so a puzzle's
+`entities` name `<instance>-<spawn>` and its goal reads `<instance>/<node>`. A prefab never
+introduces a component; what the existing ones could not say (push rules, liquid volumes, a body's
+facing) went to the e03 layer as general scene fields and a `facing` predicate. Catalogue, generated
+from the data: [puzzle prefabs](puzzle-prefabs.md); demo scene `?scene=prefab-gallery`.
+
 ## What load checks
 
 - In the file: entity and solution ids are unique; every step, highlight and recovery names a listed
