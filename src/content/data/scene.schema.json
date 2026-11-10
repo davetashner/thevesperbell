@@ -764,6 +764,11 @@
             ],
             "additionalProperties": false
           },
+          "owner": {
+            "description": "Whom the item or container here belongs to, a faction or NPC id (mw-e27.9): taking from it without permission flags the goods stolen and records a theft fact (needs item or container).",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
           "creature": {
             "description": "Creature to spawn here (mw-e12.4); faces the spawn’s yaw.",
             "type": "string",

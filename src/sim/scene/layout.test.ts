@@ -478,6 +478,19 @@ describe('scene layout (mw-e00.21)', () => {
     expect(layoutScene(TEST_SCENE, testKit).spawns.every((s) => s.item === undefined)).toBe(true);
   });
 
+  it('lays out an owner as a plain id, and none when the spawn has none (mw-e27.9)', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        { id: 'chest', at: [1, 0, 1], yaw: 0, tags: [], container: {}, owner: 'mirela' },
+        { id: 'barrel', at: [2, 0, 1], yaw: 0, tags: [], container: {} },
+      ],
+    };
+    const [chest, barrel] = layoutScene(scene, testKit).spawns;
+    expect(chest?.owner).toBe('mirela');
+    expect(barrel).not.toHaveProperty('owner');
+  });
+
   it('lays out a container spawn with its loot table, contents and lock as plain ids (mw-e18.3)', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,

@@ -248,6 +248,20 @@
       }
     },
     {
+      "id": "shelf-loaf",
+      "at": [2, 0, -2.5],
+      "tags": ["stock"],
+      "item": { "id": "bread-loaf" },
+      "owner": "npc-ottilie"
+    },
+    {
+      "id": "back-box",
+      "at": [-3.5, 0, -2.5],
+      "tags": ["stock"],
+      "container": { "contents": [{ "item": "healing-draught" }] },
+      "owner": "npc-ottilie"
+    },
+    {
       "id": "npc-ottilie",
       "at": [-2, 0, 3],
       "yaw": 180,

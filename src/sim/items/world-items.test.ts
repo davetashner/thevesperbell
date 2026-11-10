@@ -23,6 +23,13 @@ import {
   BreakableComponent,
   type BreakableProfile,
 } from '../breakables/components';
+import {
+  ownerOf,
+  THEFT_COUNT_FACT,
+  theftRecorded,
+  thefts,
+  type TheftRecorded,
+} from '../ownership/ownership';
 import { noiseEmitted, type NoiseEvent } from '../noise/events';
 import { installImpactNoise, ITEM_IMPACT_NOISE } from '../noise/impacts';
 import { DEFAULT_NOISE_TUNING } from '../noise/propagation';
@@ -624,5 +631,118 @@ describe('breakable world items (mw-ju8.4)', () => {
       const { s, entity } = place(lookup);
       expect(s.sim.has(entity, BreakableComponent)).toBe(false);
     }
+  });
+});
+
+describe('ownership and theft on pick-up (mw-e27.9)', () => {
+  const MIRELA = { owner: 'mirela', level: 'inn', place: 'shelf-draught' };
+  const placeOwned = (s: Setup, owner: typeof MIRELA | null = MIRELA) => {
+    const half = ITEM_HALF_EXTENTS.consumable;
+    return s.items.spawn(s.sim, {
+      defId: 'healing-draught',
+      position: v(0, half.y, -1),
+      ...(owner !== null && { owner }),
+    });
+  };
+  const take = (s: Setup) => {
+    s.world.step([IDLE]);
+    s.world.step([frame('interact')]);
+  };
+  const theftFlags = (s: Setup) => pack(s)[0]?.flags;
+
+  it('AC-1: taking an item owned by Mirela without permission flags it stolen and records a theft with owner Mirela', () => {
+    const s = setup();
+    const heard: TheftRecorded[] = [];
+    s.world.events.on(theftRecorded, (e) => heard.push(e));
+    placeOwned(s);
+    take(s);
+    expect(theftFlags(s)).toEqual({ stolen: true, ownerId: 'mirela' });
+    expect(thefts(s.sim)).toEqual([
+      {
+        level: 'inn',
+        id: 'theft-1',
+        owner: 'mirela',
+        item: 'healing-draught',
+        units: 1,
+        place: 'shelf-draught',
+        tick: s.world.tick - 1,
+        witnessed: 'unknown',
+        status: 'stolen',
+      },
+    ]);
+    s.world.events.flush();
+    expect(heard).toMatchObject([
+      { id: 'theft-1', thief: s.actor, owner: 'mirela', witnessed: 'unknown' },
+    ]);
+    expect(s.picked[0]?.flags).toEqual({ stolen: true, ownerId: 'mirela' });
+  });
+
+  it('AC-2: a take the owner permits (or a gift, which comes from no owned thing) sets no stolen flag', () => {
+    const s = setup({
+      items: new WorldItems(ITEMS, { materials: MATERIALS, permits: () => true }),
+    });
+    placeOwned(s);
+    take(s);
+    expect(theftFlags(s)).toEqual({});
+    expect(thefts(s.sim)).toEqual([]);
+    // A gift or a purchase is an inventory add with the seller's clean flags: nothing is flagged.
+    s.items.inventory.add(s.sim, s.actor, 'arming-sword', 1);
+    expect(pack(s)[1]?.flags).toEqual({});
+  });
+
+  it('AC-4: an unowned item taken records no theft', () => {
+    const s = setup();
+    placeOwned(s, null);
+    take(s);
+    expect(theftFlags(s)).toEqual({});
+    expect(s.sim.facts.get(THEFT_COUNT_FACT)).toBeUndefined();
+    expect(thefts(s.sim)).toEqual([]);
+  });
+
+  it('a pick-up the inventory refuses is no theft', () => {
+    const s = setup();
+    const half = ITEM_HALF_EXTENTS.artifact;
+    s.items.inventory.add(s.sim, s.actor, 'crown', 1);
+    s.items.spawn(s.sim, { defId: 'crown', position: v(0, half.y, -1), owner: MIRELA });
+    take(s);
+    expect(s.refusedPickups).toHaveLength(1);
+    expect(thefts(s.sim)).toEqual([]);
+  });
+
+  it('stolen goods dropped and picked up again are the same theft, not a new one', () => {
+    const s = setup();
+    placeOwned(s);
+    take(s);
+    s.world.step([frame('drop')]);
+    s.world.step([IDLE]);
+    s.world.step([frame('interact')]);
+    expect(theftFlags(s)).toEqual({ stolen: true, ownerId: 'mirela' });
+    expect(thefts(s.sim)).toHaveLength(1);
+  });
+
+  it('a scene item with an owner is tagged with it, filed under the level, and an unowned one is not', () => {
+    const s = setup();
+    const a = s.sim.spawn();
+    const b = s.sim.spawn();
+    const at = { position: v(0, 0, -2), rotation: { x: 0, y: 0, z: 0, w: 1 } };
+    addSceneItems(
+      s.sim,
+      s.items,
+      [
+        {
+          entity: a,
+          spawn: { id: 'shelf', ...at, item: { id: 'healing-draught', count: 1 }, owner: 'mirela' },
+        },
+        { entity: b, spawn: { ...at, item: { id: 'healing-draught', count: 1 }, owner: 'mirela' } },
+      ],
+      'inn',
+    );
+    expect(ownerOf(s.sim, a)).toEqual({ owner: 'mirela', level: 'inn', place: 'shelf' });
+    expect(ownerOf(s.sim, b)).toEqual({ owner: 'mirela', level: 'inn', place: String(b) });
+    const c = s.sim.spawn();
+    addSceneItems(s.sim, s.items, [
+      { entity: c, spawn: { ...at, item: { id: 'healing-draught', count: 1 } } },
+    ]);
+    expect(ownerOf(s.sim, c)).toBeUndefined();
   });
 });

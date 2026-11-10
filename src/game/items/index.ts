@@ -115,11 +115,12 @@ export function startWorldItems<T>(
   items: WorldItems,
   spawns: readonly ItemSpawnEntity[],
   player: EntityId | undefined,
+  level?: string,
 ): EntityId[] {
   const sim = world as unknown as World<never>;
   installWorldItems(world, items, { busy: (w, actor) => holdOf(w, actor) !== undefined });
   if (player !== undefined && inventoryOf(sim, player) === undefined) addInventory(sim, player);
-  return addSceneItems(sim, items, spawns);
+  return addSceneItems(sim, items, spawns, level);
 }
 
 /** A scene spawn that may be a shoulder-carry, and its entity (as `LoadedScene.spawns` lists them). */

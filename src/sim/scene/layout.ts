@@ -379,6 +379,8 @@ export interface SceneSpawnSpec {
   readonly targetable?: { readonly id: string } | undefined;
   /** An item lying here as a world item (mw-e17.7). */
   readonly item?: { readonly id: { readonly id: string }; readonly count: number } | undefined;
+  /** Whom the item or container here belongs to (mw-e27.9). */
+  readonly owner?: string | undefined;
   /** A creature to spawn here (mw-e12.4). */
   readonly creature?: { readonly id: string } | undefined;
   /** The faction the creature joins instead of its definition's. */
@@ -578,6 +580,8 @@ export interface SceneSpawnPlacement {
   readonly targetable?: string | undefined;
   /** The item lying here (see src/sim/items), when there is one. */
   readonly item?: { readonly id: string; readonly count: number };
+  /** Whom the item or container here belongs to, a faction or NPC id (mw-e27.9). */
+  readonly owner?: string;
   /** The creature spawned here (see src/sim/creatures), when there is one. */
   readonly creature?: string;
   /** The faction that creature joins instead of its definition's. */
@@ -1058,6 +1062,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         ...(spawn.item !== undefined && {
           item: Object.freeze({ id: spawn.item.id.id, count: spawn.item.count }),
         }),
+        ...(spawn.owner !== undefined && { owner: spawn.owner }),
         ...(spawn.creature !== undefined && { creature: spawn.creature.id }),
         ...(spawn.faction !== undefined && { faction: spawn.faction.id }),
         ...(spawn.patrol !== undefined && {

@@ -110,6 +110,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].item` | object | — | Places an item here as a world item the player can take, drop and throw (mw-e17.7). |
 | `spawns[].item.id` | ref → item | required | The item lying here. |
 | `spawns[].item.count` | integer 1–9999 | `1` | Units in the one world item (a pile of arrows); default 1. |
+| `spawns[].owner` | id | — | Whom the item or container here belongs to, a faction or NPC id (mw-e27.9): taking from it without permission flags the goods stolen and records a theft fact (needs item or container). |
 | `spawns[].creature` | ref → creature | — | Creature to spawn here (mw-e12.4); faces the spawn’s yaw. |
 | `spawns[].faction` | ref → faction | — | Faction the spawned creature joins instead of its definition’s (needs creature). |
 | `spawns[].patrol` | list of list of any (at least 3) (at least 1) | — | Patrol route for the spawned creature: waypoints in grid cells, walked in order (needs creature; AI, e11, walks it). |
