@@ -286,6 +286,56 @@ describe('scene pressure plates (mw-e03.19)', () => {
     });
   });
 
+  it('mw-e15.4: push rules and liquid volumes fill their defaults and are checked', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('statue', { prop: 'crate', push: { rotateStep: 90 } }),
+        spawn('basin', {
+          liquid: { size: [2, 1, 2], liquid: 'water', depth: 0.5, drain: { rate: 0.1 } },
+        }),
+      ],
+    });
+    expect(scene.spawns[0]?.push).toEqual({ rotateStep: 90 });
+    expect(scene.spawns[1]?.liquid?.drain).toEqual({ rate: 0.1, open: false });
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('floating', { push: { grid: 1 } }),
+          spawn('empty', { prop: 'crate', push: {} }),
+          spawn('slanted', { prop: 'crate', push: { axis: [1, 1] } }),
+          spawn('brim', { liquid: { size: [2, 1, 2], liquid: 'water', depth: 2 } }),
+          spawn('odd', {
+            prop: 'crate',
+            door: { profile: 'portcullis' },
+            switch: { kind: 'lever' },
+            plate: { minWeight: 5 },
+            item: { id: 'healing-draught' },
+            creature: 'forgotten-miner',
+            liquid: { size: [2, 1, 2], liquid: 'water', depth: 0.5 },
+          }),
+        ],
+      }),
+    ).toEqual([
+      'spawns.0.push: spawn "floating" has push rules but is not a movable prop',
+      'spawns.1.push: spawn "empty" sets no rail, grid or rotation step',
+      'spawns.2.push: spawn "slanted" has an axis that is not a unit vector',
+      'spawns.3.liquid: spawn "brim" starts deeper than its brim',
+      'spawns.4.switch: spawn "odd" cannot be both a door and a switch',
+      'spawns.4.door: spawn "odd" cannot be both a liquid volume and a door',
+      'spawns.4.switch: spawn "odd" cannot be both a liquid volume and a switch',
+      'spawns.4.plate: spawn "odd" cannot be both a liquid volume and a plate',
+      'spawns.4.prop: spawn "odd" cannot be both a liquid volume and a prop',
+      'spawns.4.item: spawn "odd" cannot be both a liquid volume and an item',
+      'spawns.4.creature: spawn "odd" cannot be both a liquid volume and a creature',
+      'spawns.4.door: spawn "odd" cannot be both a plate and a door',
+      'spawns.4.switch: spawn "odd" cannot be both a plate and a switch',
+      'spawns.4.item: spawn "odd" cannot be both a plate and an item',
+      'spawns.4.creature: spawn "odd" cannot be both a plate and a creature',
+    ]);
+  });
+
   it('rejects a ceiling below the floor, and a plate that is also a door, switch, item, creature or container', () => {
     expect(
       problems({
@@ -928,7 +978,7 @@ describeContent(
 );
 
 describe('scene content', () => {
-  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College, the chandelier room, the skeleton pen and the recoil corridor', () => {
+  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College, the chandelier room, the skeleton pen, the recoil corridor and the puzzle prefab gallery', () => {
     expect(
       loadContent(contentTypes, gameContentSources(), contentChecks)
         .all('scene')
@@ -945,6 +995,7 @@ describe('scene content', () => {
       'marsh-store',
       'mechanism-room',
       'perf-baseline',
+      'prefab-gallery',
       'recoil-corridor',
       'skeleton-pen',
       'sleeping-ox',

@@ -172,6 +172,8 @@ export interface VolumeSpec {
   readonly layers?: readonly { readonly liquid: string; readonly depth: number }[];
   readonly drain?: LiquidDrain;
   readonly fill?: LiquidFill;
+  /** An existing entity to make the volume (a scene spawn, so signals and code can name it); default a new one. */
+  readonly entity?: EntityId;
 }
 
 function checkBox(min: Vec3, max: Vec3): void {
@@ -196,7 +198,7 @@ export function createVolume(
   config: LiquidConfig = DEFAULT_LIQUID_CONFIG,
 ): EntityId {
   checkBox(spec.min, spec.max);
-  const volume = world.spawn();
+  const volume = spec.entity ?? world.spawn();
   const merged = new Map<string, number>();
   for (const { liquid, depth } of spec.layers ?? []) {
     if (!(depth > 0) || !Number.isFinite(depth)) throw new RangeError('a layer depth must be > 0');

@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "statue",
+  "name": "Stone statue",
+  "mass": 180,
+  "flammable": false,
+  "tags": ["puzzle"],
+  "body": {
+    "size": [0.6, 1.6, 0.6],
+    "material": "stone"
+  }
+}

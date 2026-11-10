@@ -1,0 +1,106 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "rune-tile-sequence",
+  "name": "Rune tile sequence",
+  "description": "Three rune tiles on the floor that must be stepped on in order (a, b, c): the sequence input of a rune puzzle. Each tile is a pressure plate, so a crate or a companion presses it as well as the player. Solving latches until reset.",
+  "tags": ["weight", "sequence"],
+  "parameters": {
+    "minWeight": {
+      "type": "number",
+      "description": "Weight that presses a tile.",
+      "unit": "kg",
+      "min": 1,
+      "max": 500,
+      "default": 25
+    }
+  },
+  "spawns": [
+    {
+      "local": "tile-a",
+      "at": [0.0, 0, 0],
+      "plate": {
+        "minWeight": "$minWeight",
+        "width": 1,
+        "depth": 1
+      }
+    },
+    {
+      "local": "tile-b",
+      "at": [1.5, 0, 0],
+      "plate": {
+        "minWeight": "$minWeight",
+        "width": 1,
+        "depth": 1
+      }
+    },
+    {
+      "local": "tile-c",
+      "at": [3.0, 0, 0],
+      "plate": {
+        "minWeight": "$minWeight",
+        "width": 1,
+        "depth": 1
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "step-a",
+        "kind": "lever",
+        "entity": "tile-a"
+      },
+      {
+        "id": "step-b",
+        "kind": "lever",
+        "entity": "tile-b"
+      },
+      {
+        "id": "step-c",
+        "kind": "lever",
+        "entity": "tile-c"
+      },
+      {
+        "id": "order",
+        "kind": "sequence",
+        "steps": ["a", "b", "c"]
+      },
+      {
+        "id": "solved",
+        "kind": "latch"
+      }
+    ],
+    "wires": [
+      {
+        "from": "step-a",
+        "to": "order.a"
+      },
+      {
+        "from": "step-b",
+        "to": "order.b"
+      },
+      {
+        "from": "step-c",
+        "to": "order.c"
+      },
+      {
+        "from": "order.success",
+        "to": "solved.set"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "tiles",
+      "description": "Weight on each tile, in the order a, b, c.",
+      "spawn": "tile-a"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "solved",
+      "description": "On once the tiles have been stepped on in order.",
+      "node": "solved"
+    }
+  ]
+}

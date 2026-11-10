@@ -178,6 +178,16 @@ describe('signal graph compilation', () => {
       problems(
         volume({
           filter: [
+            { test: 'facing', facing: 'north' },
+            { test: 'facing', facing: 'up' as never },
+          ],
+        }),
+      ),
+    ).toEqual(['nodes.0.filter.1: unknown facing "up"; one of north, east, south, west']);
+    expect(
+      problems(
+        volume({
+          filter: [
             { test: 'tag', tag: 'Player' },
             { test: 'element', element: 'lava' },
             { test: 'property', property: 'mass', op: 'eq', value: 1 },

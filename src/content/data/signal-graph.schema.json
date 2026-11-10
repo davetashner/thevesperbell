@@ -349,6 +349,30 @@
                       "properties": {
                         "test": {
                           "type": "string",
+                          "const": "facing"
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": [
+                            "north",
+                            "east",
+                            "south",
+                            "west"
+                          ],
+                          "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                        }
+                      },
+                      "required": [
+                        "test",
+                        "facing"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "test": {
+                          "type": "string",
                           "const": "element"
                         },
                         "element": {
@@ -587,6 +611,30 @@
                       "required": [
                         "test",
                         "tag"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "test": {
+                          "type": "string",
+                          "const": "facing"
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": [
+                            "north",
+                            "east",
+                            "south",
+                            "west"
+                          ],
+                          "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                        }
+                      },
+                      "required": [
+                        "test",
+                        "facing"
                       ],
                       "additionalProperties": false
                     },

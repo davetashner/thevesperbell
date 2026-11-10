@@ -21,6 +21,8 @@ import { addSignalGraph } from '../signals/runtime';
 import { PlacementComponent, placeEntity } from '../stimulus/placement';
 import type { DoorProfileLookup, LockLookup, SwitchKind } from './components';
 import { makeLightSource } from '../light/sources';
+import { createVolume } from '../liquids/volumes';
+import { addPushConfig } from '../push/push';
 import { makeCuttable, suspendFrom } from './ropes';
 import { linkSpan, makeSupport } from './supports';
 import { makeImpactSwitch, syncImpactSwitchNodes } from './impacts';
@@ -131,6 +133,27 @@ export function addSceneMechanisms<T>(
         ...(plate.hidden !== undefined && { hidden: plate.hidden }),
       });
       plates.push(entity);
+    }
+    const { push } = spawn;
+    if (push !== undefined) {
+      addPushConfig(sim, entity, {
+        ...(push.axis !== undefined && { axis: push.axis }),
+        ...(push.grid !== undefined && { grid: push.grid }),
+        ...(push.rotateStep !== undefined && { rotateStep: push.rotateStep }),
+      });
+    }
+    const { liquid } = spawn;
+    if (liquid !== undefined) {
+      const presets = need(options.materials, `liquid "${spawn.id}" needs the material presets`);
+      const { x, y, z } = spawn.position;
+      const [hx, hz] = [liquid.size.x / 2, liquid.size.z / 2];
+      createVolume(sim, presets, {
+        entity,
+        min: { x: x - hx, y, z: z - hz },
+        max: { x: x + hx, y: y + liquid.size.y, z: z + hz },
+        layers: [{ liquid: liquid.liquid, depth: liquid.depth }],
+        ...(liquid.drain !== undefined && { drain: liquid.drain }),
+      });
     }
     const { rope } = spawn;
     if (rope !== undefined) {

@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "mirror-stand",
+  "name": "Mirror on a stand",
+  "mass": 25,
+  "flammable": false,
+  "tags": ["puzzle"],
+  "body": {
+    "size": [0.5, 1, 0.2],
+    "material": "iron"
+  }
+}

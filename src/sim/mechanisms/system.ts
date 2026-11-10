@@ -45,6 +45,8 @@ import {
   type AffordanceGate,
 } from '../interaction/system';
 import type { AffordanceSpec } from '../interaction/affordance';
+import { LiquidVolumeComponent } from '../liquids/components';
+import { setDrainOpen } from '../liquids/volumes';
 import { noiseEmitted } from '../noise/events';
 import { bodyMaterialOf, PhysicsColliderComponent, rigidBodiesOf } from '../physics/objects';
 import type { ColliderHandle, StaticColliderSink } from '../physics/static-colliders';
@@ -919,6 +921,11 @@ export function installMechanisms<TInput>(
       } else if (w.has(entity, ImpactSwitchComponent)) {
         // Likewise an impact switch: on resets it (a latching one's way off).
         if (value) resetImpactSwitch(w, entity, graph);
+      } else if (w.isRegistered(LiquidVolumeComponent) && w.has(entity, LiquidVolumeComponent)) {
+        // A valve: on opens the volume's drain, off closes it (a volume with no drain ignores it).
+        if (w.get(entity, LiquidVolumeComponent)?.drain !== undefined) {
+          setDrainOpen(w, entity, value);
+        }
       } else if (w.has(entity, DoorComponent)) moveDoor(w, entity, value ? 1 : 0, graph);
       else setSwitch(w, entity, value ? 1 : 0, graph);
     }),

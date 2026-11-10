@@ -357,6 +357,54 @@ export const sceneImpactSwitchSchema = z.strictObject({
 });
 
 /**
+ * Gives a movable prop its push rules (mw-e15.4; `push.config`, mw-e02.18): a rail to slide along, a
+ * grid to snap to, a step to turn by. The prop must be `pushable` (a world property) and offers the
+ * push and rotate verbs through the spawn's `interact`. Nothing here names a kind of object.
+ */
+export const scenePushSchema = z.strictObject({
+  axis: z
+    .tuple([z.number(), z.number()])
+    .optional()
+    .describe('Unit direction (x, z) the prop may only slide along (a rail); omit for free.'),
+  grid: z
+    .number()
+    .positive()
+    .optional()
+    .describe(
+      'Grid cell size, metres: the prop moves one cardinal axis at a time and settles on a cell centre.',
+    ),
+  rotateStep: z
+    .number()
+    .positive()
+    .max(180)
+    .optional()
+    .describe('Degrees one rotate turns it by; omit for a prop that does not turn.'),
+});
+
+/**
+ * Makes a spawn a volume of liquid (mw-e15.4; `liquid.volume`, mw-e03.6): a basin, a pond, a flooded
+ * pit. The spawn point is the middle of its floor. An open `drain` lowers the level; a signal into a
+ * `mechanism` receiver bound to the spawn opens or closes it (a valve).
+ */
+export const sceneLiquidSchema = z.strictObject({
+  size: z
+    .tuple([z.number().positive(), z.number().positive(), z.number().positive()])
+    .describe('Width (x), height to the brim (y) and depth (z) of the volume, metres.'),
+  liquid: ref('material').describe('The liquid it holds: a material with `liquid` (water, oil).'),
+  depth: z
+    .number()
+    .positive()
+    .describe('How deep the liquid stands at the start, metres (not above the brim).'),
+  drain: z
+    .strictObject({
+      rate: z.number().positive().describe('Level fall while open, m/s.'),
+      open: z.boolean().default(false).describe('Starts open.'),
+    })
+    .optional()
+    .describe('A drain, opened and closed by a signal or code (the valve of a basin).'),
+});
+
+/**
  * Makes a spawn a lootable container (mw-e18.3): a chest, barrel, bookshelf or corpse. What it holds
  * from the start, plus its loot table rolled once on the first open; both persist with the level.
  */
@@ -762,6 +810,12 @@ export const sceneSpawnSchema = z.strictObject({
   lightReceiver: sceneLightReceiverSchema
     .optional()
     .describe('Makes the spawned entity a light receiver that beams switch on (mw-e03.17).'),
+  push: scenePushSchema
+    .optional()
+    .describe('Gives a movable prop push rules: a rail, a grid, a rotation step (mw-e15.4).'),
+  liquid: sceneLiquidSchema
+    .optional()
+    .describe('Makes the spawned entity a volume of liquid, with an optional drain (mw-e15.4).'),
   container: sceneContainerSchema
     .optional()
     .describe(
@@ -1049,6 +1103,22 @@ export const sceneAmbienceSchema = z.strictObject({
     .describe('Id of one of the scene’s regions; leave out to cover the whole scene.'),
 });
 
+/**
+ * Places an instance of a puzzle prefab (mw-e15.4): the prefab, where it stands, how it is turned
+ * and its parameter values. The loader expands it into spawns named `<id>-<local>` and a signal
+ * graph named `<id>` (src/content/prefabs.ts) before anything else reads the scene.
+ */
+export const scenePrefabSchema = z.strictObject({
+  id: contentId.describe('Instance id: prefixes its spawns and names its signal graph.'),
+  prefab: ref('prefab').describe('The prefab to place.'),
+  at: gridPosition,
+  yaw,
+  params: z
+    .record(z.string(), z.union([z.number(), z.boolean(), z.string()]))
+    .default({})
+    .describe('Parameter values; a parameter with no default must be given.'),
+});
+
 export const sceneSchema = z
   .strictObject({
     id: contentId.describe('Scene id; also the ?scene= URL value.'),
@@ -1095,6 +1165,12 @@ export const sceneSchema = z
       .array(sceneAmbienceSchema)
       .default([])
       .describe('Ambience zones placed over regions of the scene or all of it (mw-e28.13).'),
+    prefabs: z
+      .array(scenePrefabSchema)
+      .optional()
+      .describe(
+        'Puzzle prefab instances (mw-e15.4); expanded into spawns and signal graphs when the content loads, so a loaded scene never has this field.',
+      ),
   })
   .superRefine((scene, ctx) => {
     const transitionIds = new Set<string>();
@@ -1190,6 +1266,9 @@ export const sceneSchema = z
         });
       }
     });
+    // With prefab instances the spawns they bring are not here yet: the loader expands them and
+    // parses the scene again, which makes these checks over the whole scene.
+    const expanded = (scene.prefabs ?? []).length === 0;
     scene.signals.forEach((signal, index) => {
       signal.checkpoints.forEach((node, at) => {
         if (signal.checkpoints.indexOf(node) === at) return;
@@ -1200,7 +1279,7 @@ export const sceneSchema = z
         });
       });
       for (const [name, id] of Object.entries(signal.bindings)) {
-        if (seen.has(id)) continue;
+        if (seen.has(id) || !expanded) continue;
         ctx.addIssue({
           code: 'custom',
           path: ['signals', index, 'bindings', name],
@@ -1208,7 +1287,8 @@ export const sceneSchema = z
         });
       }
     });
-    if (scene.acoustics !== undefined) checkAcoustics(scene.spawns, scene.acoustics, ctx);
+    if (scene.acoustics !== undefined && expanded)
+      checkAcoustics(scene.spawns, scene.acoustics, ctx);
     checkRoutes(scene, ctx);
   });
 
@@ -1397,6 +1477,30 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
         'interact',
         'is a hiding spot: its affordances follow who is inside, so it declares none',
       );
+    }
+  }
+  const { push } = spawn;
+  if (push !== undefined) {
+    if (spawn.prop === undefined) issue('push', 'has push rules but is not a movable prop');
+    if (push.axis === undefined && push.grid === undefined && push.rotateStep === undefined) {
+      issue('push', 'sets no rail, grid or rotation step');
+    }
+    if (push.axis !== undefined && Math.abs(Math.hypot(push.axis[0], push.axis[1]) - 1) > 1e-6) {
+      issue('push', 'has an axis that is not a unit vector');
+    }
+  }
+  const { liquid } = spawn;
+  if (liquid !== undefined) {
+    if (liquid.depth > liquid.size[1]) issue('liquid', 'starts deeper than its brim');
+    for (const [key, what] of [
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['prop', 'a prop'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a liquid volume and ${what}`);
     }
   }
   const { plate } = spawn;

@@ -2016,6 +2016,103 @@
             },
             "additionalProperties": false
           },
+          "push": {
+            "description": "Gives a movable prop push rules: a rail, a grid, a rotation step (mw-e15.4).",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "description": "Unit direction (x, z) the prop may only slide along (a rail); omit for free.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "grid": {
+                "description": "Grid cell size, metres: the prop moves one cardinal axis at a time and settles on a cell centre.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "rotateStep": {
+                "description": "Degrees one rotate turns it by; omit for a prop that does not turn.",
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "liquid": {
+            "description": "Makes the spawned entity a volume of liquid, with an optional drain (mw-e15.4).",
+            "type": "object",
+            "properties": {
+              "size": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Width (x), height to the brim (y) and depth (z) of the volume, metres."
+              },
+              "liquid": {
+                "description": "The liquid it holds: a material with `liquid` (water, oil).",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "material"
+              },
+              "depth": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "How deep the liquid stands at the start, metres (not above the brim)."
+              },
+              "drain": {
+                "description": "A drain, opened and closed by a signal or code (the valve of a basin).",
+                "type": "object",
+                "properties": {
+                  "rate": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "Level fall while open, m/s."
+                  },
+                  "open": {
+                    "default": false,
+                    "description": "Starts open.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "rate"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "size",
+              "liquid",
+              "depth"
+            ],
+            "additionalProperties": false
+          },
           "container": {
             "description": "Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3).",
             "type": "object",
@@ -3096,6 +3193,76 @@
         ],
         "additionalProperties": false
       }
+    },
+    "prefabs": {
+      "description": "Puzzle prefab instances (mw-e15.4); expanded into spawns and signal graphs when the content loads, so a loaded scene never has this field.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Instance id: prefixes its spawns and names its signal graph."
+          },
+          "prefab": {
+            "description": "The prefab to place.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "prefab"
+          },
+          "at": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Position in grid cells (x, y, z), snapped to SCENE_SNAP_STEP."
+          },
+          "yaw": {
+            "default": 0,
+            "description": "Rotation about +y in degrees: 0, 90, 180 or 270.",
+            "type": "number",
+            "enum": [
+              0,
+              90,
+              180,
+              270
+            ]
+          },
+          "params": {
+            "default": {},
+            "description": "Parameter values; a parameter with no default must be given.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": [
+                "number",
+                "boolean",
+                "string"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "prefab",
+          "at"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [
@@ -3371,6 +3538,30 @@
                     "required": [
                       "test",
                       "tag"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "facing"
+                      },
+                      "facing": {
+                        "type": "string",
+                        "enum": [
+                          "north",
+                          "east",
+                          "south",
+                          "west"
+                        ],
+                        "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "facing"
                     ],
                     "additionalProperties": false
                   },

@@ -17,9 +17,13 @@ describe('content test harness', () => {
       'chandelier',
       'clay-pot',
       'crate',
+      'lens-stand',
       'lever',
       'limp-body',
+      'mirror-stand',
       'plank',
+      'statue',
+      'stone-block',
     ]);
   });
 

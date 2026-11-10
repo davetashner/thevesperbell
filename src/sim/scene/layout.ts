@@ -132,6 +132,21 @@ export interface ScenePlateSpec {
   readonly hidden?: boolean | undefined;
 }
 
+/** Push rules of a movable prop (mw-e15.4; `push.config`). */
+export interface ScenePushSpec {
+  readonly axis?: readonly [number, number] | undefined;
+  readonly grid?: number | undefined;
+  readonly rotateStep?: number | undefined;
+}
+
+/** A volume of liquid (mw-e15.4; `liquid.volume`): size in metres, what it holds and its drain. */
+export interface SceneLiquidSpec {
+  readonly size: Triple;
+  readonly liquid: { readonly id: string };
+  readonly depth: number;
+  readonly drain?: { readonly rate: number; readonly open: boolean } | undefined;
+}
+
 /** A beam emitter spawn (mw-e03.17). */
 export interface SceneBeamEmitterSpec {
   readonly kind: BeamKind;
@@ -420,6 +435,10 @@ export interface SceneSpawnSpec {
   readonly switch?: SceneSwitchSpec | undefined;
   /** Makes the spawned entity a pressure plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec | undefined;
+  /** Gives a movable prop push rules (mw-e15.4). */
+  readonly push?: ScenePushSpec | undefined;
+  /** Makes the spawned entity a volume of liquid (mw-e15.4). */
+  readonly liquid?: SceneLiquidSpec | undefined;
   /** Makes the spawned entity a light source (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec | undefined;
   /** Makes the spawned entity an impact switch (mw-e03.20). */
@@ -612,6 +631,15 @@ export interface SceneSpawnPlacement {
   readonly switch?: SceneSwitchSpec;
   /** Its pressure plate data, when it is a plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec;
+  /** Its push rules, when it has any (mw-e15.4). */
+  readonly push?: ScenePushSpec;
+  /** Its liquid volume, when it is one (mw-e15.4); size in metres, the liquid by id. */
+  readonly liquid?: {
+    readonly size: Vec3;
+    readonly liquid: string;
+    readonly depth: number;
+    readonly drain?: { readonly rate: number; readonly open: boolean };
+  };
   /** Its light source data, when it is one (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec;
   /** Its impact switch data, when it is one (mw-e03.20). */
@@ -875,6 +903,27 @@ function plateOf(spec: ScenePlateSpec): ScenePlateSpec {
   });
 }
 
+/** A prop's push rules without absent fields. */
+function pushOf(spec: ScenePushSpec): ScenePushSpec {
+  return Object.freeze({
+    ...(spec.axis !== undefined && { axis: Object.freeze([spec.axis[0], spec.axis[1]] as const) }),
+    ...(spec.grid !== undefined && { grid: spec.grid }),
+    ...(spec.rotateStep !== undefined && { rotateStep: spec.rotateStep }),
+  });
+}
+
+/** A liquid volume's data: its size (metres already) and its liquid by id. */
+function liquidOf(spec: SceneLiquidSpec): NonNullable<SceneSpawnPlacement['liquid']> {
+  return Object.freeze({
+    size: Object.freeze({ x: spec.size[0], y: spec.size[1], z: spec.size[2] }),
+    liquid: spec.liquid.id,
+    depth: spec.depth,
+    ...(spec.drain !== undefined && {
+      drain: Object.freeze({ rate: spec.drain.rate, open: spec.drain.open }),
+    }),
+  });
+}
+
 /** An impact switch's data without absent fields. */
 function impactSwitchOf(spec: SceneImpactSwitchSpec): SceneImpactSwitchSpec {
   return Object.freeze({
@@ -1095,6 +1144,8 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
         ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
         ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
+        ...(spawn.push !== undefined && { push: pushOf(spawn.push) }),
+        ...(spawn.liquid !== undefined && { liquid: liquidOf(spawn.liquid) }),
         ...(spawn.lightSource !== undefined && {
           lightSource: Object.freeze({ ...spawn.lightSource }),
         }),

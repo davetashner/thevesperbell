@@ -43,6 +43,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].filter[].value` | number or boolean or string | required | Value to compare with. |
 | `nodes[].filter[].test` | `"tag"` | required |  |
 | `nodes[].filter[].tag` | id | required | Tag the entity must carry, e.g. "player". |
+| `nodes[].filter[].test` | `"facing"` | required |  |
+| `nodes[].filter[].facing` | `"north"` \| `"east"` \| `"south"` \| `"west"` | required | Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east. |
 | `nodes[].filter[].test` | `"element"` | required |  |
 | `nodes[].filter[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
 | `nodes[].minCount` | integer ≥ 1 | — | Occupants needed for `active`; default 1. |

@@ -14,8 +14,10 @@ import {
   fieldRows,
   main,
   MATERIALS_DOC,
+  PUZZLE_PREFABS_DOC,
   renderDoc,
   renderMaterialsDoc,
+  renderPrefabsDoc,
   renderWorldPropertiesDoc,
   typeOf,
   WORLD_PROPERTIES_DOC,
@@ -455,5 +457,50 @@ describe('renderWorldPropertiesDoc (mw-e03.31)', () => {
     expect(doc).toContain('| `wet` | `wetness` |');
     expect(doc).toContain('| buoyant, floats |');
     expect(renderWorldPropertiesDoc()).toBe(doc);
+  });
+
+  it('the prefab catalogue words ranges, tags and outputs of every shape', () => {
+    const base = loadGameContent().get('prefab', 'bell');
+    const doc = renderPrefabsDoc([
+      {
+        ...base,
+        tags: [],
+        parameters: {
+          least: { type: 'number', description: 'a', min: 2, default: 3 },
+          most: { type: 'integer', description: 'b', max: 9, default: 3, unit: 'm' },
+          free: { type: 'number', description: 'c', default: 1 },
+          timed: { type: 'number', description: 'd', default: 1, unit: 's' },
+        },
+        spawns: [{ local: 'x' }],
+        outputs: [{ name: 'self', description: 'itself', spawn: 'x' }],
+      },
+    ]);
+    expect(doc).toContain('| `least` | number | `3` | ≥ 2 |');
+    expect(doc).toContain('| `most` | integer | `3` | ≤ 9 m |');
+    expect(doc).toContain('| `free` | number | `1` | any |');
+    expect(doc).toContain('| `timed` | number | `1` | s |');
+    expect(doc).toContain('Tags: —. Built from: props and world properties only.');
+    expect(doc).toContain('| `self` | entity `<instance>-x` | itself |');
+  });
+
+  it('AC-5: the puzzle prefab catalogue lists every prefab with its properties and outputs, and is committed', () => {
+    const prefabs = loadGameContent().all('prefab');
+    const doc = expectedDocs().get(PUZZLE_PREFABS_DOC) ?? '';
+    expect(prefabs).toHaveLength(15);
+    for (const prefab of prefabs) {
+      expect(doc, prefab.id).toContain(`## ${prefab.name} (\`${prefab.id}\`)`);
+      for (const name of Object.keys(prefab.parameters)) expect(doc).toContain(`| \`${name}\` |`);
+      for (const output of prefab.outputs) expect(doc).toContain(`| \`${output.name}\` |`);
+      for (const input of prefab.inputs) expect(doc).toContain(`| \`${input.name}\` |`);
+    }
+    expect(doc).toContain('| `minWeight` | number | **required** |');
+    expect(doc).toContain('| `stepAngle` | number | `45` | 5–180 degrees |');
+    expect(doc).toContain('| `facing-east` | signal `<instance>/facing-east` |');
+    expect(doc).toContain('| `crate-40` | entity `<instance>-crate-40`, property `weight` |');
+    expect(doc).toContain('| `block` | entity `<instance>-block` |');
+    expect(doc).toContain('Parameters: none.');
+    expect(doc).toContain('Built from: props and world properties only.');
+    expect(readFileSync(join(process.cwd(), PUZZLE_PREFABS_DOC), 'utf8')).toBe(doc);
+    expect(renderPrefabsDoc(prefabs)).toBe(doc);
   });
 });

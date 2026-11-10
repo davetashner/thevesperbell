@@ -7,9 +7,10 @@
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
+import { PhysicsObjectComponent } from '../physics/objects';
 import { readProperty } from '../properties/components';
 import { PROPERTY_ID_PATTERN, type WorldPropertyKey } from '../properties/spec';
-import type { ElementPredicate, PropertyPredicate, SignalPredicate } from './graph';
+import type { ElementPredicate, Facing, PropertyPredicate, SignalPredicate } from './graph';
 
 function tagList(data: unknown): readonly string[] {
   if (
@@ -68,6 +69,7 @@ const ELEMENT_PREDICATES: Readonly<Record<ElementPredicate['element'], PropertyP
 export function predicateProperties(predicate: SignalPredicate): readonly WorldPropertyKey[] {
   switch (predicate.test) {
     case 'tag':
+    case 'facing':
       return [];
     case 'element':
       return predicateProperties(ELEMENT_PREDICATES[predicate.element]);
@@ -93,6 +95,21 @@ function compare(p: PropertyPredicate, actual: unknown): boolean {
   }
 }
 
+/**
+ * The compass direction a physics body's front (+z before any turn) points: north +z, east +x, south
+ * -z, west -x, whichever is nearest. Undefined for an entity with no physics body.
+ */
+export function bodyFacing(world: World<never>, entity: EntityId): Facing | undefined {
+  if (!world.isRegistered(PhysicsObjectComponent)) return undefined;
+  const object = world.get(entity, PhysicsObjectComponent);
+  if (object === undefined) return undefined;
+  const { x, y, z, w } = object.rotation;
+  const east = 2 * (x * z + w * y);
+  const north = 1 - 2 * (x * x + y * y);
+  if (Math.abs(east) > Math.abs(north)) return east > 0 ? 'east' : 'west';
+  return north >= 0 ? 'north' : 'south';
+}
+
 /** Whether `entity` passes one predicate (properties read with their defaults when absent). */
 export function matchesPredicate(
   world: World<never>,
@@ -104,6 +121,8 @@ export function matchesPredicate(
       return hasTag(world, entity, predicate.tag);
     case 'element':
       return matchesPredicate(world, entity, ELEMENT_PREDICATES[predicate.element]);
+    case 'facing':
+      return bodyFacing(world, entity) === predicate.facing;
     case 'property':
       return compare(predicate, readProperty(world, entity, predicate.property));
   }

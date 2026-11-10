@@ -29,9 +29,13 @@ describe('testprop content', () => {
       'chandelier',
       'clay-pot',
       'crate',
+      'lens-stand',
       'lever',
       'limp-body',
+      'mirror-stand',
       'plank',
+      'statue',
+      'stone-block',
     ]);
     expect(content.get('testprop', 'crate').breaksInto?.toString()).toBe('testprop:plank');
     expect(content.get('testprop', 'plank').tags).toEqual([]);

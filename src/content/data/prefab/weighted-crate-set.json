@@ -1,0 +1,103 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "weighted-crate-set",
+  "name": "Weighted crate set",
+  "description": "Four identical-looking crates of 5, 10, 20 and 40 kg in a row along x, the weights the plate puzzles are tuned against. A crate is pushable and carryable; its weight is the world property `weight`, so a plate counts it like anything else.",
+  "tags": ["weight"],
+  "spawns": [
+    {
+      "local": "crate-5",
+      "at": [0, 0, 0],
+      "prop": "crate",
+      "properties": {
+        "pushable": true,
+        "weight": 5
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "push",
+            "label": "Push crate"
+          }
+        ]
+      }
+    },
+    {
+      "local": "crate-10",
+      "at": [1, 0, 0],
+      "prop": "crate",
+      "properties": {
+        "pushable": true,
+        "weight": 10
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "push",
+            "label": "Push crate"
+          }
+        ]
+      }
+    },
+    {
+      "local": "crate-20",
+      "at": [2, 0, 0],
+      "prop": "crate",
+      "properties": {
+        "pushable": true,
+        "weight": 20
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "push",
+            "label": "Push crate"
+          }
+        ]
+      }
+    },
+    {
+      "local": "crate-40",
+      "at": [3, 0, 0],
+      "prop": "crate",
+      "properties": {
+        "pushable": true,
+        "weight": 40
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "push",
+            "label": "Push crate"
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "crate-5",
+      "description": "The 5 kg crate.",
+      "spawn": "crate-5",
+      "property": "weight"
+    },
+    {
+      "name": "crate-10",
+      "description": "The 10 kg crate.",
+      "spawn": "crate-10",
+      "property": "weight"
+    },
+    {
+      "name": "crate-20",
+      "description": "The 20 kg crate.",
+      "spawn": "crate-20",
+      "property": "weight"
+    },
+    {
+      "name": "crate-40",
+      "description": "The 40 kg crate.",
+      "spawn": "crate-40",
+      "property": "weight"
+    }
+  ]
+}

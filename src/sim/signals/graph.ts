@@ -112,8 +112,26 @@ export interface ElementPredicate {
   readonly element: SignalElement;
 }
 
-/** One condition of a filter. Filters read properties and tags, never object type ids. */
-export type SignalPredicate = PropertyPredicate | TagPredicate | ElementPredicate;
+/**
+ * The compass directions a facing test names: north is +z, east +x, south -z, west -x (the way the
+ * hall of the demo scene runs), and a turn of +90° (a rotate step) takes north to east.
+ */
+export const FACINGS = ['north', 'east', 'south', 'west'] as const;
+
+/** A compass direction. */
+export type Facing = (typeof FACINGS)[number];
+
+/**
+ * The entity's physics body faces this way (mw-e15.4): the nearest compass direction of where its
+ * front (+z before any turn) points now. A statue turned by the push rules reads as another facing.
+ */
+export interface FacingPredicate {
+  readonly test: 'facing';
+  readonly facing: Facing;
+}
+
+/** One condition of a filter. Filters read properties, tags and facing, never object type ids. */
+export type SignalPredicate = PropertyPredicate | TagPredicate | ElementPredicate | FacingPredicate;
 
 /** A trigger volume's shape, in world coordinates (or relative to the graph's origin, see runtime). */
 export type VolumeShape = BoxShape | SphereShape | CapsuleShape;
@@ -391,6 +409,11 @@ function checkPredicate(p: SignalPredicate, path: (string | number)[], problems:
     case 'element':
       if (!(SIGNAL_ELEMENTS as readonly string[]).includes(p.element)) {
         fail(`unknown element "${p.element}"`);
+      }
+      return;
+    case 'facing':
+      if (!(FACINGS as readonly string[]).includes(p.facing)) {
+        fail(`unknown facing "${p.facing}"; one of ${FACINGS.join(', ')}`);
       }
       return;
     case 'property': {
