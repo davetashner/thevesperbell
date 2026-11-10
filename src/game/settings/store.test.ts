@@ -114,7 +114,7 @@ describe('loading', () => {
     );
     expect(settings.camera.invertY).toBe(false);
     expect(settings.camera.sensitivity).toBe(1);
-    expect(settings.gameplay.difficulty).toBe('normal');
+    expect(settings.gameplay.difficulty).toBe('adventurer');
     expect(settings.display).toEqual(defaultCategory('display'));
     expect(warn.mock.calls.map(([m]) => m as string)).toEqual([
       'dropped unknown settings category cheats',
@@ -190,9 +190,9 @@ describe('subscriptions', () => {
     settings.set('camera.fov', 500);
     expect(fov).toHaveBeenCalledWith(100, 'camera.fov');
     expect(settings.set('camera.fov', 500)).toBe(false);
-    expect(settings.set('gameplay.difficulty', 'nightmare' as 'hard')).toBe(false);
+    expect(settings.set('gameplay.difficulty', 'nightmare' as 'veteran')).toBe(false);
     expect(settings.set('camera.invertY', 'yes' as unknown as boolean)).toBe(false);
-    expect(settings.get('gameplay.difficulty')).toBe('normal');
+    expect(settings.get('gameplay.difficulty')).toBe('adventurer');
     expect(warn).toHaveBeenCalledWith(
       'setting gameplay.difficulty: "nightmare" is invalid; ignored',
     );
@@ -288,6 +288,20 @@ describe('persistence and migration', () => {
       accessibility: { textScale: 2 },
     });
     expect(migrateSettings({ x: 1 }, SETTINGS_VERSION)).toEqual({ x: 1 });
+  });
+
+  it('mw-e31.10: the v3 placeholder difficulties become the real presets', () => {
+    const load = (difficulty: unknown) =>
+      loadSettings(stored({ gameplay: { difficulty } }, 3), vi.fn()).gameplay.difficulty;
+    expect(load('normal')).toBe('adventurer');
+    expect(load('hard')).toBe('veteran');
+    expect(load('story')).toBe('story');
+    expect(load('nightmare')).toBe('adventurer'); // repaired to the default
+    expect(migrateSettings({ gameplay: { noise: 1 } }, 3)).toEqual({ gameplay: { noise: 1 } });
+    expect(migrateSettings({ audio: {} }, 3)).toEqual({ audio: {} });
+    expect(migrateSettings({ gameplay: { difficulty: 7 } }, 3)).toEqual({
+      gameplay: { difficulty: 7 },
+    });
   });
 
   it('a gap in the migration chain falls back to the defaults with a warning', () => {

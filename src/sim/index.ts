@@ -34,14 +34,17 @@ export {
   difficultyCommand,
   DifficultyConfigError,
   difficultyOverrides,
+  difficultyScaler,
   isDifficultyCommand,
   resolveDifficulty,
+  scaleDifficulty,
   type DifficultyChange,
   type DifficultyCommand,
   type DifficultyConfig,
   type DifficultyKey,
   type DifficultyOverrides,
   type DifficultyRange,
+  type DifficultyScaler,
 } from './difficulty';
 export {
   World,

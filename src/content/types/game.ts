@@ -17,6 +17,13 @@
 //   while open. The sim's `GameClockConfig` has the same shape; the validity checks that need the tick
 //   rate (a whole number of ticks per game minute) run when the clock is installed.
 //
+// - `difficulty` (mw-e31.10): the Story, Adventurer and Veteran presets, each a full set of the sim's
+//   DifficultyConfig multipliers (src/sim/difficulty.ts), and which one a new player starts on. The
+//   game layer validates every preset against the sim's ranges when it loads (resolveDifficulty), so
+//   an out-of-range number fails the preset check test and the boot, not a tick. Adventurer is the
+//   neutral 1.0 everywhere: the game as authored. Story's damage, parry and detection numbers are the
+//   documented table; every other number is a placeholder for the owner to tune.
+//
 // Debug builds can widen the class list with `?allclasses` (src/game/classes.ts) so per-class tests
 // still run.
 
@@ -64,6 +71,49 @@ export const clockSchema = z
   })
   .describe('The in-game clock (mw-e27.12).');
 
+/** The multipliers a difficulty preset sets; the keys are the sim's DifficultyConfig (same names). */
+export const DIFFICULTY_PRESET_KEYS = [
+  'damageTaken',
+  'damageDealt',
+  'detectionSpeed',
+  'parryWindow',
+  'dodgeWindow',
+  'fallDamage',
+  'puzzleHints',
+  'searchDuration',
+] as const;
+
+const multiplier = (what: string) =>
+  z.number().min(0).max(10).describe(`${what} Allowed ranges are checked against the sim's.`);
+
+/** Schema of one preset: every multiplier, so a preset never inherits from another. */
+export const difficultyPresetSchema = z.strictObject({
+  damageTaken: multiplier('Scales damage the player takes (1 = as authored).'),
+  damageDealt: multiplier('Scales damage the player deals.'),
+  detectionSpeed: multiplier('Scales how fast enemy awareness builds; lower is more forgiving.'),
+  parryWindow: multiplier('Scales the parry timing window; higher is more forgiving.'),
+  dodgeWindow: multiplier('Scales dodge invulnerability frames; higher is more forgiving.'),
+  fallDamage: multiplier('Scales fall, crush and hazard damage; 0 turns it off.'),
+  puzzleHints: multiplier('Scales puzzle hint availability; 0 turns hints off.'),
+  searchDuration: multiplier(
+    'Scales how long a creature searches at the last known position; lower is more forgiving.',
+  ),
+});
+
+/** Schema of the difficulty block. */
+export const difficultyConfigSchema = z
+  .strictObject({
+    default: z
+      .enum(['story', 'adventurer', 'veteran'])
+      .describe('The preset a player who has never chosen one plays on.'),
+    presets: z.strictObject({
+      story: difficultyPresetSchema.describe('Combat and stealth are forgiving: the story first.'),
+      adventurer: difficultyPresetSchema.describe('The game as authored; every multiplier 1.'),
+      veteran: difficultyPresetSchema.describe('Less forgiving combat and stealth.'),
+    }),
+  })
+  .describe('Difficulty presets (mw-e31.10).');
+
 /** Schema of the game configuration, `src/content/data/game/game.json`. */
 export const gameSchema = z.strictObject({
   id: z.literal(GAME_CONFIG_ID).describe('Always "game": there is one game configuration.'),
@@ -87,6 +137,7 @@ export const gameSchema = z.strictObject({
     'The scene a new game starts in and the title screen shows behind it (mw-e01.2).',
   ),
   clock: clockSchema,
+  difficulty: difficultyConfigSchema,
 });
 
 /** The game configuration as written in JSON. */

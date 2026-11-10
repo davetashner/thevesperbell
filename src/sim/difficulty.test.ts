@@ -21,6 +21,8 @@ import {
   playReplay,
   recordScenario,
   resolveDifficulty,
+  scaleDifficulty,
+  difficultyScaler,
   serializeReplay,
   World,
   type DifficultyChange,
@@ -57,6 +59,7 @@ describe('DifficultyConfig defaults', () => {
       'fallDamage',
       'parryWindow',
       'puzzleHints',
+      'searchDuration',
     ]);
     for (const key of DIFFICULTY_KEYS) expect(w.difficulty[key]).toBe(1);
     expect(w.difficulty).toEqual(DEFAULT_DIFFICULTY);
@@ -327,5 +330,33 @@ describe('DifficultyConfig runtime changes', () => {
     world.step([difficultyCommand({ dodgeWindow: 1.5 })]);
     expect(world.snapshot().difficulty).toEqual({ dodgeWindow: 1.5 });
     expect(hashSnapshot(world.snapshot())).toBe(hashWorld(world));
+  });
+});
+
+describe('difficulty.scale (mw-e31.10)', () => {
+  it('AC-2: a 20-damage hit at damageTaken 0.5 becomes 10', () => {
+    const config = resolveDifficulty({ damageTaken: 0.5 });
+    expect(scaleDifficulty(config, 'damageTaken', 20)).toBe(10);
+    expect(difficultyScaler(config).scale('damageTaken', 20)).toBe(10);
+    expect(difficultyScaler(config).config).toBe(config);
+  });
+
+  it('AC-2: rounds to the nearest whole number, halves up, and neutral leaves values alone', () => {
+    const half = resolveDifficulty({ damageTaken: 0.5 });
+    expect(scaleDifficulty(half, 'damageTaken', 5)).toBe(3); // 2.5 rounds up
+    expect(scaleDifficulty(half, 'damageTaken', 4)).toBe(2);
+    expect(scaleDifficulty(resolveDifficulty({ damageTaken: 0.4 }), 'damageTaken', 1)).toBe(0);
+    expect(scaleDifficulty(resolveDifficulty({ damageTaken: 0.3 }), 'damageTaken', 5)).toBe(2); // 1.5 up
+    expect(scaleDifficulty(DEFAULT_DIFFICULTY, 'damageTaken', 37)).toBe(37);
+    expect(scaleDifficulty(resolveDifficulty({ searchDuration: 0.6 }), 'searchDuration', 300)).toBe(
+      180,
+    );
+    expect(scaleDifficulty(resolveDifficulty({ fallDamage: 0 }), 'fallDamage', 40)).toBe(0);
+  });
+
+  it('AC-2: rejects values that are negative or not finite', () => {
+    for (const bad of [-1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => scaleDifficulty(DEFAULT_DIFFICULTY, 'damageTaken', bad)).toThrow(RangeError);
+    }
   });
 });

@@ -165,6 +165,9 @@ import {
 import {
   comfortDefaults,
   createSettingsStore,
+  bindDifficulty,
+  choiceOf,
+  loadDifficultyPresets,
   BindingsEditor,
   bindHoldToggle,
   loadBindings,
@@ -2996,6 +2999,30 @@ function startRenderer(
         world.isRegistered(BowComponent) && world.get(body.entity, BowComponent)?.equipped === true;
     }
     const pending: PendingLoad | undefined = takePendingLoad(session);
+    // Difficulty presets and assists (mw-e31.10): the settings feed the sim's DifficultyConfig as a
+    // command (so replays record it), a loaded save's config shows back in the settings, and each
+    // change is logged locally. #app[data-difficulty] reads the choice and the sim's multipliers.
+    const difficultyPresets = loadDifficultyPresets(content.get('game', GAME_CONFIG_ID));
+    const publishDifficulty = (): void => {
+      root.dataset['difficulty'] = JSON.stringify({
+        choice: choiceOf(world.difficulty, difficultyPresets),
+        config: world.difficulty,
+        tick: world.tick,
+      });
+    };
+    const difficulty = bindDifficulty({
+      settings,
+      world,
+      presets: difficultyPresets,
+      submit: (command) => {
+        commands.push(command);
+      },
+      telemetry: (event) => {
+        console.info(`telemetry ${JSON.stringify(event)}`);
+        publishDifficulty();
+      },
+    });
+    publishDifficulty();
     // The debug console (mw-e33.1): its own chunk, loaded only in dev builds or with ?debug=1.
     const consoleGate = {
       built: __DEBUG_CONSOLE__,
@@ -3236,6 +3263,8 @@ function startRenderer(
       // publish the same state hash (mw-e01.16 AC-2, read by the e2e).
       root.dataset['bootState'] = JSON.stringify({ tick: world.tick, hash: hashWorld(world) });
       arrival?.playable();
+      // A recorded input replay runs on the difficulty it was recorded with, not the player's.
+      if (!replaying) difficulty.start();
       loop.start();
       inPlay = true;
       openRequestedMenu();
@@ -3243,6 +3272,9 @@ function startRenderer(
       void deathReload
         .then((reload) => reload.resume(pending))
         .finally(() => {
+          // The save's difficulty wins over the settings (an old save has none: Adventurer).
+          difficulty.adopt();
+          publishDifficulty();
           loop.start();
           inPlay = true;
         });
