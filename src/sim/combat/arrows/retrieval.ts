@@ -33,6 +33,7 @@ import {
   addFocusDemotion,
   addFocusFilter,
   addInteractable,
+  addReachHost,
   affordancesOf,
   InteractableComponent,
   interacted,
@@ -285,6 +286,9 @@ export function installArrowRetrieval<TInput>(
     const rest = arrowAt(target);
     return rest !== undefined && inLivingBody(w, rest);
   });
+
+  // An arrow rests on the surface of what it is stuck in: that body must not hide it from reach.
+  addReachHost(world, (_w, target) => arrowAt(target)?.in);
 
   // Interact on an arrow needs somewhere to put it.
   addAffordanceGate(world, (_w, actor, target, affordance) => {

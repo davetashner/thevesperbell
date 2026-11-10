@@ -1,16 +1,16 @@
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { runConsole, stubPointerLock, takeControl, turnTo } from './helpers/player';
 
 // mw-e05.7: arrows that stick stay, and Interact takes them back. `?arrows=standard` looses a standard
 // arrow at the testbed's back wall every 2.5 s, all to the same spot, so they pile up within 1 m of one
-// another (lane 0.9 is bare wall: arrows in the target board, a living thing, are not takeable); the player walks up, faces them and reads "Take arrows (n)", presses E and the quiver
-// count rises by n. Set E2E_ARROW_SHOTS to a directory to also save screenshots.
+// another (lane 0.9 is bare wall: arrows in the target board, a living thing, are not takeable); the player (teleported to the wall, far from the room lever)
+// faces them and reads "Take arrows (n)", presses E once and the quiver
+// count rises by n (more if another arrow lands meanwhile). Set E2E_ARROW_SHOTS to a directory to also save screenshots.
 test.use({ viewport: { width: 1024, height: 576 } });
 
 interface Player {
-  position: { x: number; y: number; z: number };
-  yaw: number;
   bow?: { quiver: Record<string, number> };
 }
 
@@ -18,37 +18,19 @@ test('AC-2: stuck arrows show "Take arrows (n)" and Interact puts them back in t
   page,
 }) => {
   test.setTimeout(120_000);
-  await page.addInitScript(() => {
-    const lock: { element: Element | null } = { element: null };
-    Object.defineProperty(Document.prototype, 'pointerLockElement', {
-      configurable: true,
-      get: () => lock.element,
-    });
-    Element.prototype.requestPointerLock = function requestPointerLock(this: Element) {
-      lock.element = this;
-      document.dispatchEvent(new Event('pointerlockchange'));
-      return Promise.resolve();
-    };
-  });
-  await page.goto('/?scene=testbed&arrows=standard&lane=0.9');
+  await stubPointerLock(page);
+  await page.goto('/?scene=testbed&arrows=standard&lane=0.9&debug=1');
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-scene', 'testbed', { timeout: 5_000 });
   await expect(app).toHaveAttribute('data-player', /"grounded":true/);
-  await page.getByTestId('game-canvas').click();
-  await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(true);
-  const player = async (): Promise<Player> =>
-    JSON.parse((await app.getAttribute('data-player')) ?? '{}') as Player;
-  const wrap = (a: number): number => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
-  const turnTo = async (yaw: number): Promise<void> => {
-    const counts = Math.round(-wrap(yaw - (await player()).yaw) / 0.003);
-    await page.evaluate((movementX) => {
-      window.dispatchEvent(new MouseEvent('mousemove', { movementX, movementY: 0 }));
-    }, counts);
-  };
-  await turnTo(0);
-  await page.keyboard.down('KeyW');
-  await expect.poll(async () => (await player()).position.z).toBeLessThan(-2.5);
-  await page.keyboard.up('KeyW');
+  await takeControl(page);
+  const quiver = async (): Promise<number> =>
+    (JSON.parse((await app.getAttribute('data-player')) ?? '{}') as Player).bow?.quiver[
+      'standard'
+    ] ?? 0;
+  // Stand at the back wall (arrows rest on its face, so the wall must not hide them), 5.5 m from the
+  // room lever at (0, 1): the pile is the only thing in reach.
+  await runConsole(page, 'tp 0 0 -4.5');
   // Wait for three arrows to be stuck whole.
   await expect
     .poll(
@@ -59,14 +41,13 @@ test('AC-2: stuck arrows show "Take arrows (n)" and Interact puts them back in t
       { timeout: 60_000 },
     )
     .toBeGreaterThanOrEqual(3);
-  // Face the arrows (yaw: 0 looks along -z, positive turns left).
   const latest = JSON.parse((await app.getAttribute('data-arrows')) ?? '{}') as {
     latest: { position: { x: number; z: number } };
   };
-  const at = (await player()).position;
-  await turnTo(Math.atan2(-(latest.latest.position.x - at.x), -(latest.latest.position.z - at.z)));
+  await turnTo(page, { x: latest.latest.position.x, z: latest.latest.position.z });
   const prompt = page.getByTestId('interact-prompt');
-  await expect(prompt).toContainText(/Take arrows? ?(\(\d+\))?/, { timeout: 10_000 });
+  await expect(prompt).toBeVisible({ timeout: 10_000 });
+  await expect(prompt).toContainText(/Take arrows? ?(\(\d+\))?/);
   const label = (await prompt.textContent()) ?? '';
   const n = Number(/\((\d+)\)/.exec(label)?.[1] ?? '1');
   expect(n).toBeGreaterThanOrEqual(1);
@@ -75,18 +56,10 @@ test('AC-2: stuck arrows show "Take arrows (n)" and Interact puts them back in t
     await mkdir(dir, { recursive: true });
     await page.screenshot({ path: join(dir, 'take-prompt.png') });
   }
-  const before = (await player()).bow?.quiver['standard'] ?? 0;
-  // Press until the quiver rises (a press can land on a tick where focus is between neighbouring
-  // arrows); the exact count is the unit test's.
-  await expect
-    .poll(
-      async () => {
-        await page.keyboard.press('KeyE');
-        await page.waitForTimeout(300);
-        return (await player()).bow?.quiver['standard'] ?? 0;
-      },
-      { timeout: 15_000 },
-    )
-    .toBeGreaterThanOrEqual(before + 1);
+  const before = await quiver();
+  // One press takes the whole pile. An arrow that lands between the prompt and the press joins it, and
+  // none ever leaves, so the quiver rises by at least the n the prompt showed.
+  await page.keyboard.press('KeyE');
+  await expect.poll(quiver, { timeout: 5_000 }).toBeGreaterThanOrEqual(before + n);
   if (dir !== undefined) await page.screenshot({ path: join(dir, 'after-take.png') });
 });
