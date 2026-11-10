@@ -49,7 +49,7 @@
     "mechanisms.spec.ts": 44.9,
     "menu-focus-death.spec.ts": 12,
     "menu-focus-items.spec.ts": 14,
-    "menu-focus-pause.spec.ts": 33,
+    "menu-focus-pause.spec.ts": 60,
     "menu-focus-shop.spec.ts": 10,
     "menu-focus-title.spec.ts": 15,
     "motion-comfort.spec.ts": 1.9,

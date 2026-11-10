@@ -36,11 +36,16 @@ export async function topIs(page: Page, id: string, stack?: string[]): Promise<v
   await expect.poll(async () => (await screenStack(page)).screens, POLL).toEqual(stack ?? [id]);
 }
 
-/** axe-core serious or critical violations inside the open (top) screen only. */
-async function screenAxe(page: Page): Promise<string[]> {
-  const results = await new AxeBuilder({ page })
-    .include('.vb-menus > [data-screen]:last-child')
-    .analyze();
+const TOP_SCREEN = '.vb-menus > [data-screen]:last-child';
+/** The shown tab panel of the open screen (a hidden panel is not scanned). */
+export const OPEN_TAB_PANEL = `${TOP_SCREEN} [role="tabpanel"]:not([hidden])`;
+
+/**
+ * axe-core serious or critical violations inside `scope` (default: the open, top screen). Every
+ * rule runs; a big screen can be scanned panel by panel to keep one scan short.
+ */
+async function screenAxe(page: Page, scope = TOP_SCREEN): Promise<string[]> {
+  const results = await new AxeBuilder({ page }).include(scope).analyze();
   return results.violations
     .filter((v) => v.impact === 'serious' || v.impact === 'critical')
     .map(
@@ -48,11 +53,11 @@ async function screenAxe(page: Page): Promise<string[]> {
     );
 }
 
-/** The audit every screen gets: a Tab sweep, then axe. */
-export async function audit(page: Page, label: string): Promise<Sweep> {
+/** The audit every screen gets: a Tab sweep, then axe (over the whole screen, or just `axeScope`). */
+export async function audit(page: Page, label: string, axeScope?: string): Promise<Sweep> {
   const result = await sweep(page);
   expect({ label, problems: sweepProblems(result) }).toEqual({ label, problems: [] });
-  expect({ label, axe: await screenAxe(page) }).toEqual({ label, axe: [] });
+  expect({ label, axe: await screenAxe(page, axeScope) }).toEqual({ label, axe: [] });
   return result;
 }
 

@@ -1,13 +1,15 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { installVirtualPad } from './helpers/ui';
 import {
   audit,
-  auditTabs,
   collectProblems,
+  OPEN_TAB_PANEL,
   PAD,
   playSlice,
   POLL,
   screenStack,
+  selectedTab,
+  tabLabels,
   tapKey,
   tapPad,
   topIs,
@@ -46,19 +48,45 @@ test('AC-1, AC-2, AC-3: pause, and its Save and Load lists with Esc back to the 
   expect(problems).toEqual([]);
 });
 
-test('AC-1, AC-2, AC-3, AC-4: every options tab including key bindings, and the confirmation dialog traps focus', async ({
-  page,
-}) => {
-  test.setTimeout(120_000);
-  const problems = collectProblems(page);
+/** Open the pause menu, then Settings, in a fresh slice. */
+async function openOptions(page: Page): Promise<void> {
   await playSlice(page);
   await tapPad(page, PAD.menu);
   await topIs(page, 'pause');
   await page.locator('[data-screen="pause"] [data-action="settings"]').focus();
   await tapPad(page, PAD.a);
   await topIs(page, 'options', ['pause', 'options']);
-  const tabs = await auditTabs(page, 'options');
-  expect(tabs.length).toBeGreaterThanOrEqual(5);
+}
+
+// One test per options tab, each with its own budget: a Tab sweep of the tab, and axe over its panel
+// (every rule, serious and critical kept). Camera is also scanned over the whole screen, which
+// covers the title, the tab strip and Back that the panel scans leave out.
+const OPTIONS_TABS = ['Controls', 'Camera', 'Display', 'Audio', 'Accessibility', 'Gameplay'];
+
+for (const [index, tab] of OPTIONS_TABS.entries()) {
+  test(`AC-1, AC-2, AC-3: options tab ${tab} (Controls includes key bindings) sweeps clean`, async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    const problems = collectProblems(page);
+    await openOptions(page);
+    // RB moves on one tab at a time; each step waits for that tab to be the selected one.
+    for (const step of OPTIONS_TABS.slice(0, index + 1)) {
+      if (step !== OPTIONS_TABS[0]) await tapPad(page, PAD.rb);
+      await expect.poll(() => selectedTab(page), POLL).toBe(step);
+    }
+    await audit(page, `options: ${tab}`, tab === 'Camera' ? undefined : OPEN_TAB_PANEL);
+    expect(problems).toEqual([]);
+  });
+}
+
+test('AC-3, AC-4: the options tabs are the ones tested, and the confirmation dialog traps focus', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const problems = collectProblems(page);
+  await openOptions(page);
+  expect(await tabLabels(page)).toEqual(OPTIONS_TABS);
 
   // A modal confirmation traps focus; B answers No and focus returns to the button that asked.
   await page
