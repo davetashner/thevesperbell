@@ -316,7 +316,10 @@ export {
   type ClassEntry,
 } from './types/class.ts';
 export {
+  DIFFICULTY_PRESET_KEYS,
   GAME_CONFIG_ID,
+  difficultyConfigSchema,
+  difficultyPresetSchema,
   gameSchema,
   type GameConfig,
   type GameConfigEntry,

@@ -11,6 +11,8 @@
 
 import { defineEvent } from './core/events';
 
+const BASIS_POINTS = 10_000;
+
 /** Every tunable multiplier the sim knows about; all are dimensionless factors, neutral at 1. */
 export interface DifficultyConfig {
   /** Scales damage the player receives (e04 damage model). */
@@ -27,6 +29,8 @@ export interface DifficultyConfig {
   readonly fallDamage: number;
   /** Scales puzzle hint availability (e15 hints); 0 turns hints off, higher offers them sooner. */
   readonly puzzleHints: number;
+  /** Scales how long a creature searches at a last known position (e09 stealth); lower is more forgiving. */
+  readonly searchDuration: number;
 }
 
 export type DifficultyKey = keyof DifficultyConfig;
@@ -52,6 +56,7 @@ export const DIFFICULTY_RANGES: Readonly<Record<DifficultyKey, DifficultyRange>>
   dodgeWindow: Object.freeze({ min: 0.5, max: 3 }),
   fallDamage: Object.freeze({ min: 0, max: 4 }),
   puzzleHints: Object.freeze({ min: 0, max: 4 }),
+  searchDuration: Object.freeze({ min: 0.25, max: 4 }),
 });
 
 /** Multiplier names in code-unit order (the order snapshots and errors use). */
@@ -68,6 +73,7 @@ export const DEFAULT_DIFFICULTY: DifficultyConfig = Object.freeze({
   dodgeWindow: 1,
   fallDamage: 1,
   puzzleHints: 1,
+  searchDuration: 1,
 });
 
 /** Thrown for an unknown multiplier or a value outside its range; `field` names the culprit. */
@@ -110,6 +116,37 @@ export function resolveDifficulty(
     next[field] = value;
   }
   return Object.freeze(next);
+}
+
+/**
+ * Scales a whole number of `value`s (damage points, ticks) by the multiplier `key` of `config`, for
+ * systems that read the config (`difficulty.scale("damageTaken", 20)`). The multiplier is rounded to
+ * basis points (so 0.1 + 0.2 style float noise never decides a result) and the product is rounded to
+ * the nearest whole number, halves rounding up: 20 x 0.5 = 10, 5 x 0.5 = 3 (2.5 rounds up), 1 x 0.4 = 0.
+ * Systems that need finer units (the damage model counts hundredths) scale those units instead.
+ * @throws RangeError when `value` is negative or not finite.
+ */
+export function scaleDifficulty(
+  config: DifficultyConfig,
+  key: DifficultyKey,
+  value: number,
+): number {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new RangeError(`cannot scale ${String(value)}: expected a finite number >= 0`);
+  }
+  return Math.round((value * Math.round(config[key] * BASIS_POINTS)) / BASIS_POINTS);
+}
+
+/** A config with the `scale` helper bound to it. */
+export interface DifficultyScaler {
+  readonly config: DifficultyConfig;
+  /** `scaleDifficulty(config, key, value)`. */
+  scale(key: DifficultyKey, value: number): number;
+}
+
+/** Binds `config` so a system can write `difficulty.scale("damageTaken", x)`. */
+export function difficultyScaler(config: DifficultyConfig): DifficultyScaler {
+  return { config, scale: (key, value) => scaleDifficulty(config, key, value) };
 }
 
 /** The values of `config` that differ from neutral, in key order (empty when fully neutral). */

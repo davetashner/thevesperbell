@@ -39,9 +39,11 @@ export const WORLD_SECTION_ID = 'world';
  * loading a save whose facts they would not find. v5 (mw-e12.14): the same for creatures, whose
  * runtime state (creature, condition, brain and perception components) the `creatures` section now
  * holds; an older save's creatures stay here (identity migration) and that section's `missing` hook
- * upgrades them.
+ * upgrades them. v6 (mw-e31.10): the difficulty config gains the `searchDuration` multiplier; the
+ * stored difficulty is sparse and an absent multiplier is neutral, so the migration is the identity
+ * (a v5 save, with no difficulty block or without the new key, loads as Adventurer).
  */
-export const WORLD_SECTION_VERSION = 5;
+export const WORLD_SECTION_VERSION = 6;
 
 const worldSnapshotSchema = z.strictObject({
   seed: z.number(),
@@ -151,7 +153,13 @@ export class SaveRegistry {
         id: WORLD_SECTION_ID,
         version: WORLD_SECTION_VERSION,
         schema: worldSnapshotSchema,
-        migrations: { 1: (data) => data, 2: (data) => data, 3: (data) => data, 4: (data) => data },
+        migrations: {
+          1: (data) => data,
+          2: (data) => data,
+          3: (data) => data,
+          4: (data) => data,
+          5: (data) => data,
+        },
         serialize: (world) => {
           const { facts, ...snapshot } = world.snapshot();
           const components = Object.fromEntries(

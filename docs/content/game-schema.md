@@ -20,3 +20,33 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `clock.phases[].id` | string | required | Phase id, e.g. "dawn". |
 | `clock.phases[].startMinute` | integer 0–1439 | required | Minute of the day the phase begins. |
 | `clock.pauseScreens` | map of string → boolean | required | Screen id -> whether it holds the clock while open (the sim already stops while a menu pauses it; this is for screens that leave it running). |
+| `difficulty` | object | required | Difficulty presets (mw-e31.10). |
+| `difficulty.default` | `"story"` \| `"adventurer"` \| `"veteran"` | required | The preset a player who has never chosen one plays on. |
+| `difficulty.presets` | object | required |  |
+| `difficulty.presets.story` | object | required | Combat and stealth are forgiving: the story first. |
+| `difficulty.presets.story.damageTaken` | number 0–10 | required | Scales damage the player takes (1 = as authored). Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.damageDealt` | number 0–10 | required | Scales damage the player deals. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.detectionSpeed` | number 0–10 | required | Scales how fast enemy awareness builds; lower is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.parryWindow` | number 0–10 | required | Scales the parry timing window; higher is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.dodgeWindow` | number 0–10 | required | Scales dodge invulnerability frames; higher is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.fallDamage` | number 0–10 | required | Scales fall, crush and hazard damage; 0 turns it off. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.puzzleHints` | number 0–10 | required | Scales puzzle hint availability; 0 turns hints off. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.story.searchDuration` | number 0–10 | required | Scales how long a creature searches at the last known position; lower is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer` | object | required | The game as authored; every multiplier 1. |
+| `difficulty.presets.adventurer.damageTaken` | number 0–10 | required | Scales damage the player takes (1 = as authored). Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.damageDealt` | number 0–10 | required | Scales damage the player deals. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.detectionSpeed` | number 0–10 | required | Scales how fast enemy awareness builds; lower is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.parryWindow` | number 0–10 | required | Scales the parry timing window; higher is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.dodgeWindow` | number 0–10 | required | Scales dodge invulnerability frames; higher is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.fallDamage` | number 0–10 | required | Scales fall, crush and hazard damage; 0 turns it off. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.puzzleHints` | number 0–10 | required | Scales puzzle hint availability; 0 turns hints off. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.adventurer.searchDuration` | number 0–10 | required | Scales how long a creature searches at the last known position; lower is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran` | object | required | Less forgiving combat and stealth. |
+| `difficulty.presets.veteran.damageTaken` | number 0–10 | required | Scales damage the player takes (1 = as authored). Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.damageDealt` | number 0–10 | required | Scales damage the player deals. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.detectionSpeed` | number 0–10 | required | Scales how fast enemy awareness builds; lower is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.parryWindow` | number 0–10 | required | Scales the parry timing window; higher is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.dodgeWindow` | number 0–10 | required | Scales dodge invulnerability frames; higher is more forgiving. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.fallDamage` | number 0–10 | required | Scales fall, crush and hazard damage; 0 turns it off. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.puzzleHints` | number 0–10 | required | Scales puzzle hint availability; 0 turns hints off. Allowed ranges are checked against the sim's. |
+| `difficulty.presets.veteran.searchDuration` | number 0–10 | required | Scales how long a creature searches at the last known position; lower is more forgiving. Allowed ranges are checked against the sim's. |

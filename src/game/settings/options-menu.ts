@@ -52,7 +52,8 @@ export function formatSlider(def: Pick<SliderSetting, 'unit'>, value: number): s
     case 'percent':
       return `${String(Math.round(value * 100))}%`;
     case 'times':
-      return `×${value.toFixed(1)}`;
+      // One decimal, or two when the value needs them (×1.0, ×1.5, ×1.25).
+      return `×${value.toFixed(2).replace(/(\.\d)0$/, '$1')}`;
     case 'degrees':
       return `${String(Math.round(value))}°`;
   }

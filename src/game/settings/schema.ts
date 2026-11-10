@@ -70,7 +70,7 @@ const volume = (label: string, help: string, value = 1): SliderSetting =>
   slider({ label, help, min: 0, max: 1, step: 0.05, default: value, unit: 'percent' });
 
 /** The current schema version of stored settings. Bump it with a migration on a breaking change. */
-export const SETTINGS_VERSION = 3;
+export const SETTINGS_VERSION = 4;
 
 /** Every category and setting, in menu order. */
 export const SETTINGS_SCHEMA = {
@@ -302,13 +302,60 @@ export const SETTINGS_SCHEMA = {
     settings: {
       difficulty: choice({
         label: 'Difficulty',
-        help: 'How hard fights hit and how forgiving the world is. Change it any time.',
+        help: 'Story is forgiving, Adventurer is the game as made, Veteran hits harder and sees more. Custom uses the assists below. Change it any time.',
         options: [
           { value: 'story', label: 'Story' },
-          { value: 'normal', label: 'Normal' },
-          { value: 'hard', label: 'Hard' },
+          { value: 'adventurer', label: 'Adventurer' },
+          { value: 'veteran', label: 'Veteran' },
+          { value: 'custom', label: 'Custom' },
         ],
-        default: 'normal',
+        default: 'adventurer',
+      }),
+      customDamageTaken: slider({
+        label: 'Damage you take',
+        help: 'How hard enemies and hazards hit you. Below x1.0 is easier. Changing it switches Difficulty to Custom.',
+        min: 0.25,
+        max: 4,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customParryWindow: slider({
+        label: 'Parry and dodge timing',
+        help: 'How long the parry and dodge windows last. Above x1.0 is more forgiving. Changing it switches Difficulty to Custom.',
+        min: 0.5,
+        max: 3,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customDetectionSpeed: slider({
+        label: 'Enemy notice speed',
+        help: 'How fast enemies notice you. Below x1.0 gives you more time to hide. Changing it switches Difficulty to Custom.',
+        min: 0.25,
+        max: 4,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customSearchDuration: slider({
+        label: 'Enemy search time',
+        help: 'How long an enemy keeps searching where it last saw you. Below x1.0 gives up sooner. Changing it switches Difficulty to Custom.',
+        min: 0.25,
+        max: 4,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customPuzzleHints: toggle({
+        label: 'Puzzle hints',
+        help: 'Lets the world offer a hint when you are stuck on a puzzle. Changing it switches Difficulty to Custom.',
+        default: true,
+      }),
+      customFallDamage: toggle({
+        label: 'Fall damage',
+        help: 'Falls, crushing and other hazards hurt you. Off makes them harmless. Changing it switches Difficulty to Custom.',
+        default: true,
       }),
       damageNumbers: toggle({
         label: 'Damage numbers',

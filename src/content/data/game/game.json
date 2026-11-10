@@ -14,5 +14,40 @@
       { "id": "night", "startMinute": 1260 }
     ],
     "pauseScreens": { "dialogue": true, "shop": true, "inventory": true, "map": false }
+  },
+  "difficulty": {
+    "default": "adventurer",
+    "presets": {
+      "story": {
+        "damageTaken": 0.5,
+        "damageDealt": 1,
+        "detectionSpeed": 0.6,
+        "parryWindow": 1.5,
+        "dodgeWindow": 1.5,
+        "fallDamage": 1,
+        "puzzleHints": 1,
+        "searchDuration": 0.6
+      },
+      "adventurer": {
+        "damageTaken": 1,
+        "damageDealt": 1,
+        "detectionSpeed": 1,
+        "parryWindow": 1,
+        "dodgeWindow": 1,
+        "fallDamage": 1,
+        "puzzleHints": 1,
+        "searchDuration": 1
+      },
+      "veteran": {
+        "damageTaken": 1.5,
+        "damageDealt": 1,
+        "detectionSpeed": 1.5,
+        "parryWindow": 0.8,
+        "dodgeWindow": 0.8,
+        "fallDamage": 1,
+        "puzzleHints": 1,
+        "searchDuration": 1.5
+      }
+    }
   }
 }
