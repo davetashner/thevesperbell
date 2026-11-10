@@ -1,6 +1,6 @@
 import { readdirSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
-import { main, sourceChanges, testChanges } from './content-data-only.ts';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { changedFiles, main, sourceChanges, testChanges } from './content-data-only.ts';
 
 const run = (args: string[], diff: (base: string) => string[] = () => []) => {
   const lines: string[] = [];
@@ -57,5 +57,24 @@ describe('content data-only check (mw-e15.9)', () => {
     );
     expect(own).toHaveLength(12);
     expect(sourceChanges(own)).toEqual([]);
+  });
+});
+
+describe('content data-only diff and entry point', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    process.exitCode = undefined;
+  });
+
+  it('reads the changed files from git: HEAD against itself changes nothing', () => {
+    expect(changedFiles('HEAD')).toEqual([]);
+  });
+
+  it('the CLI sets the exit code from main', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    process.argv = ['node', 'content-data-only-cli.ts', '--files', 'src/content/data/a.json'];
+    await import('./content-data-only-cli.ts');
+    expect(process.exitCode).toBe(0);
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('data-only: 1 changed file'));
   });
 });
