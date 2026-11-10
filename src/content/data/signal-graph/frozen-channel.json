@@ -1,0 +1,30 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "frozen-channel",
+  "name": "Frozen channel wiring",
+  "notes": "The wiring of the frozen channel (scene frozen-channel, mw-e15.9): the far-bank pad is read by the puzzle goal, and the puzzle runtime switches the vault latch on when the puzzle frozen-channel is solved, which raises the portcullis. Binding names are the scene's spawn ids.",
+  "nodes": [
+    {
+      "id": "far-pad-on",
+      "kind": "lever",
+      "entity": "far-pad",
+      "observed": true
+    },
+    {
+      "id": "vault-latch",
+      "kind": "lever"
+    },
+    {
+      "id": "vault-gate",
+      "kind": "receiver",
+      "receiver": "door",
+      "entity": "vault-gate"
+    }
+  ],
+  "wires": [
+    {
+      "from": "vault-latch",
+      "to": "vault-gate"
+    }
+  ]
+}

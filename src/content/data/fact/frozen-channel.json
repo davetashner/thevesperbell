@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "frozen-channel",
+  "name": "Frozen channel facts",
+  "notes": "Facts of the frozen channel reference puzzle (src/content/data/puzzle/frozen-channel.json, scene frozen-channel; mw-e15.9). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "frozen-channel.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The frozen channel puzzle is solved. Written once by the puzzle runtime when the far-bank pad has been weighed for a second.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "frozen-channel.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The frozen channel's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}

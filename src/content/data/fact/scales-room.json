@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "scales-room",
+  "name": "Scales room facts",
+  "notes": "Facts of the scales room reference puzzle (src/content/data/puzzle/scales-room.json, scene scales-room; mw-e15.9). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "scales-room.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The scales room puzzle is solved. Written once by the puzzle runtime when both plates have held a weight in their window together for a second.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "scales-room.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The scales room's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}

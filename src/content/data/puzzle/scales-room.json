@@ -1,0 +1,200 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "scales-room",
+  "name": "Scales room: balance the two plates",
+  "notes": "Reference puzzle for weight (mw-e15.9), built with data only: the scale-plate-pair prefab, two weighted crate sets, props with weight and a signal latch that raises the portcullis. The goal is the outcome (both plates carry 20 to 100 kg together for a second), so any load works: it reads weight, never what supplies it. Equality is a window, not a comparison: the signal graph has no 'weigh against' node, so the plates share one window and the puzzle asks for both to sit in it. The 120 kg stone block overloads a plate (the window has a ceiling), the decoy that teaches the ceiling. Greybox, not story canon.",
+  "scene": "scales-room",
+  "entities": [
+    {
+      "id": "scales-left",
+      "role": "left plate"
+    },
+    {
+      "id": "scales-right",
+      "role": "right plate"
+    },
+    {
+      "id": "crates-west-crate-40",
+      "role": "40 kg crate",
+      "critical": true
+    },
+    {
+      "id": "crates-east-crate-40",
+      "role": "40 kg crate",
+      "critical": true
+    },
+    {
+      "id": "light-crate",
+      "role": "a 20 kg crate: light enough for Mage Hand",
+      "critical": true
+    },
+    {
+      "id": "body-a",
+      "role": "a limp body, 45 kg",
+      "critical": true
+    },
+    {
+      "id": "body-b",
+      "role": "a limp body, 45 kg",
+      "critical": true
+    },
+    {
+      "id": "ice-block",
+      "role": "a block of ice, 60 kg",
+      "critical": true
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 5,
+        "y": 1.5,
+        "z": 3
+      }
+    }
+  },
+  "goal": {
+    "sustained": {
+      "signal": "scales/balanced"
+    },
+    "seconds": 1
+  },
+  "solutions": [
+    {
+      "id": "crates",
+      "name": "A 40 kg crate on each plate",
+      "steps": [
+        {
+          "do": "move",
+          "target": "crates-west-crate-40",
+          "to": "scales-left"
+        },
+        {
+          "do": "move",
+          "target": "crates-east-crate-40",
+          "to": "scales-right"
+        }
+      ]
+    },
+    {
+      "id": "bodies",
+      "name": "Carry a body onto each plate",
+      "steps": [
+        {
+          "do": "move",
+          "target": "body-a",
+          "to": "scales-left"
+        },
+        {
+          "do": "move",
+          "target": "body-b",
+          "to": "scales-right"
+        }
+      ]
+    },
+    {
+      "id": "ice-and-crate",
+      "name": "The ice block on one plate, a 40 kg crate on the other",
+      "steps": [
+        {
+          "do": "move",
+          "target": "ice-block",
+          "to": "scales-left"
+        },
+        {
+          "do": "move",
+          "target": "crates-east-crate-40",
+          "to": "scales-right"
+        }
+      ]
+    },
+    {
+      "id": "stand-and-lift",
+      "name": "Stand on one plate and set a crate on the other with Mage Hand",
+      "capabilities": ["spell.mage-hand"],
+      "steps": [
+        {
+          "do": "move",
+          "target": "player",
+          "to": "scales-left"
+        },
+        {
+          "do": "stimulus",
+          "element": "force",
+          "target": "light-crate",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "move",
+          "target": "light-crate",
+          "to": "scales-right"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false,
+    "recovery": [
+      {
+        "kind": "respawn",
+        "entity": "crates-west-crate-40",
+        "seconds": 10
+      },
+      {
+        "kind": "respawn",
+        "entity": "crates-east-crate-40",
+        "seconds": 10
+      },
+      {
+        "kind": "respawn",
+        "entity": "light-crate",
+        "seconds": 10
+      },
+      {
+        "kind": "respawn",
+        "entity": "body-a",
+        "seconds": 10
+      },
+      {
+        "kind": "respawn",
+        "entity": "body-b",
+        "seconds": 10
+      },
+      {
+        "kind": "respawn",
+        "entity": "ice-block",
+        "seconds": 10
+      }
+    ]
+  },
+  "hints": [
+    {
+      "afterSeconds": 120,
+      "highlight": ["scales-left", "scales-right"],
+      "bark": "Two plates. They want to carry about the same."
+    }
+  ],
+  "tags": ["greybox", "mvp"],
+  "focus": ["knight", "sorcerer"],
+  "outputs": {
+    "solvedFact": "scales-room.solved",
+    "set": [
+      {
+        "fact": "scales-room.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["scales-room/vault-latch"],
+    "rewards": ["scales-room-vault"]
+  }
+}

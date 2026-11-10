@@ -1,0 +1,118 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "frozen-channel",
+  "name": "Frozen channel: weigh the far pad",
+  "notes": "Reference puzzle for freezing and levitation (mw-e15.9), built with data only: a liquid volume, a pressure plate on the far bank, a crate and a signal latch that raises the portcullis. The goal is the outcome (the far pad is weighed for a second), so a person who crosses and a crate that is lifted across both count. Declared: freeze the surface (a cold stimulus, so any future cold source such as Frostglass, mw-e08.5) and Mage Hand the crate over. Not declared, for gaps the beads below track: floating crates (mw-e03.14, no buoyancy yet), levitating oneself (mw-e08.13) and climbing ceiling beams (ceiling traversal does not exist). Greybox, not story canon.",
+  "scene": "frozen-channel",
+  "entities": [
+    {
+      "id": "channel",
+      "role": "the channel of water"
+    },
+    {
+      "id": "far-pad",
+      "role": "pressure pad on the far bank"
+    },
+    {
+      "id": "crate",
+      "role": "a 12 kg crate: light enough for Mage Hand",
+      "critical": true
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": -2
+      },
+      "halfExtents": {
+        "x": 6,
+        "y": 1.5,
+        "z": 5
+      }
+    }
+  },
+  "goal": {
+    "sustained": {
+      "signal": "frozen-channel/far-pad-on"
+    },
+    "seconds": 1
+  },
+  "solutions": [
+    {
+      "id": "freeze",
+      "name": "Freeze the surface and walk across",
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "cold",
+          "target": "channel",
+          "note": "Any cold stimulus that reaches the water; no cold source exists in the game yet (Frostglass, mw-e08.5)."
+        },
+        {
+          "do": "wait",
+          "seconds": 5
+        },
+        {
+          "do": "move",
+          "target": "player",
+          "to": "far-pad"
+        }
+      ]
+    },
+    {
+      "id": "levitate-crate",
+      "name": "Lift the crate across with Mage Hand and set it on the pad",
+      "capabilities": ["spell.mage-hand"],
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "force",
+          "target": "crate",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "move",
+          "target": "crate",
+          "to": "far-pad"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false,
+    "recovery": [
+      {
+        "kind": "respawn",
+        "entity": "crate",
+        "seconds": 10
+      }
+    ]
+  },
+  "hints": [
+    {
+      "afterSeconds": 120,
+      "highlight": ["channel", "far-pad"],
+      "bark": "The water is too deep to cross. Something has to get to that pad."
+    }
+  ],
+  "tags": ["greybox", "mvp"],
+  "focus": ["sorcerer"],
+  "outputs": {
+    "solvedFact": "frozen-channel.solved",
+    "set": [
+      {
+        "fact": "frozen-channel.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["frozen-channel/vault-latch"],
+    "rewards": ["frozen-channel-vault"]
+  }
+}

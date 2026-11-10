@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "sunbeam-hall",
+  "name": "Sunbeam hall facts",
+  "notes": "Facts of the sunbeam hall reference puzzle (src/content/data/puzzle/sunbeam-hall.json, scene sunbeam-hall; mw-e15.9). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "sunbeam-hall.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The sunbeam hall puzzle is solved. Written once by the puzzle runtime when the beam sensor or the brazier beside it has been lit for a second.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "sunbeam-hall.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The sunbeam hall's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}
