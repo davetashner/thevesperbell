@@ -3,6 +3,7 @@
 A desktop-first, browser-based fantasy action RPG. Start with [`CONSTITUTION.md`](CONSTITUTION.md)
 for the vision and [`docs/backlog-contract.md`](docs/backlog-contract.md) for how work is planned and tested.
 The backlog is published at https://thevesperbell.com/backlog.html.
+To contribute, read [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Build, launch and play
 
