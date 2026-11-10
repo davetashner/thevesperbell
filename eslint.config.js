@@ -10,6 +10,7 @@ export default tseslint.config(
   {
     ignores: [
       'dist/',
+      'build-report/',
       'coverage/',
       'playwright-report/',
       'test-results/',

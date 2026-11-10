@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:release": "VESPER_DEBUG_CONSOLE=off vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -27,6 +28,7 @@
     "perf:latency": "playwright test -c playwright.perf.config.ts --project=latency",
     "perf:budgets": "node scripts/perf/budgets-cli.ts",
     "perf:compare": "node scripts/perf/compare-cli.ts",
+    "size:check": "node scripts/size/size-budget-cli.ts",
     "coverage:ratchet": "node scripts/coverage-ratchet-cli.ts",
     "coverage:baseline": "node scripts/coverage-ratchet-cli.ts --write-baseline",
     "coverage:exclusions": "node scripts/check-coverage-exclusions-cli.ts",
