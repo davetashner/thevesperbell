@@ -218,6 +218,21 @@ describe('title menu', () => {
     expect(s.ui.top).toBeUndefined();
   });
 
+  it('mw-e31.11 AC-3: the Back handed to New Game returns to the title menu', async () => {
+    const s = setup();
+    let back: (() => void) | undefined;
+    s.newGame.mockImplementation((handed: () => void) => {
+      back = handed;
+    });
+    await s.menus.openTitle();
+    s.ui.intent('confirm', 'keyboard');
+    expect(s.ui.top).toBeUndefined();
+    back?.();
+    await vi.waitFor(() => {
+      expect(s.ui.top?.id).toBe(TITLE_SCREEN);
+    });
+  });
+
   it('when saves cannot be read, Continue is disabled with that reason and a warning is logged', async () => {
     const s = setup();
     s.store.failList = true;

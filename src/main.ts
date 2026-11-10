@@ -1335,7 +1335,7 @@ function startRenderer(
     // selection right there (`startNewGame`), with no reload. The e2e reads the timings (page-relative
     // milliseconds) from #app[data-front-door]: the title shown, New Game pressed, the class applied.
     const titleFirst = opensTitle(location.search);
-    let startNewGame: (() => void) | undefined;
+    let startNewGame: ((back: () => void) => void) | undefined;
     const frontDoor: { titleMs?: number; newGameMs?: number; playableMs?: number } = {};
     const markFrontDoor = (step: keyof typeof frontDoor): void => {
       frontDoor[step] = Math.round(performance.now());
@@ -2277,8 +2277,9 @@ function startRenderer(
           drawKit();
           if (frontDoor.newGameMs !== undefined) markFrontDoor('playableMs');
         };
-        const selectClass = (): void => {
+        const selectClass = (back?: () => void): void => {
           openClassSelect(ui, {
+            onBack: back,
             cards: classCards(content, playable),
             onConfirm: (id) => {
               if (isPlayerClass(id) && playable.has(id)) choose(id);
@@ -2813,9 +2814,9 @@ function startRenderer(
           },
           // New Game opens class selection over the scene behind the title; a scene with no player
           // to give a class to reloads into a new game instead.
-          newGame: () => {
+          newGame: (back) => {
             markFrontDoor('newGameMs');
-            if (startNewGame !== undefined) startNewGame();
+            if (startNewGame !== undefined) startNewGame(back);
             else location.search = searchWithoutMenu(location.search, { newgame: '' });
           },
           publish: (readout: SaveMenuReadout) => {

@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Every menu works from the keyboard and a gamepad with a two-tone focus ring that never gets clipped, Back (Esc or B) on class selection returns to the title menu, the death screen no longer shows its save list under the choices, and the Save screen's slot rows are full-size again (mw-e31.11).
 - Sound captions now sit below the target health bar and clear of the interact prompt at phone width and 200% text, their plate follows the Text background setting (never below 90%), and the direction arrow is larger; a cue sheet rule can be marked gameplay-critical and must then have a caption (mw-e31.5).
 - Health, stamina and mana bars now each wear their own pattern, damage you take shows a minus sign, and Options > Accessibility has colour-blind palettes for the bars and alert markers, so nothing relies on colour alone (mw-e31.8).
 - Options > Audio volume sliders now follow a perceptual curve, so 50% sounds about half as loud (-10 dB) instead of far quieter (mw-e31.9).

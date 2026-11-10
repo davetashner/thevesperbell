@@ -44,6 +44,18 @@ describe('UI tokens (style bible §9)', () => {
     );
   });
 
+  it('mw-e31.11: the focus ring is two-tone, honours the hidden attribute and leaves room in scrollers', () => {
+    const css = uiStyleSheet();
+    // Ink outline between two bands of the light panel colour: visible on dark and light grounds.
+    expect(css).toMatch(
+      /\.vb-ui\[data-modality='nav'\] :focus \{[^}]*outline: var\(--ui-focus-width\) solid[^}]*box-shadow: 0 0 0 calc\(/,
+    );
+    expect(css).toContain('.vb-ui [hidden] { display: none !important; }');
+    expect(css).toMatch(/\.vb-panel \{[^}]*scroll-padding: var\(--ui-space-3\)/);
+    expect(css).toContain('.vb-save-row {');
+    expect(css).not.toContain('.vb-slot { display: flex');
+  });
+
   it('the dyslexia font and the text backdrop are token driven, and tabs wrap', () => {
     const css = uiStyleSheet();
     expect(css).toContain(".vb-ui[data-font='dyslexia']");
