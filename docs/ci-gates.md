@@ -41,6 +41,7 @@ one definition.
 | `dependency-review` (security.yml) | per-PR | Flags risky dependency changes in the PR; required. |
 | `pr-lint` (pr-lint.yml) | per-PR | Closes lines in the PR body; required. |
 | `changelog` (pr-lint.yml) | per-PR | User-facing changes carry a CHANGELOG note; required. |
+| `dco` (pr-lint.yml) | per-PR | Every commit in the PR has a `Signed-off-by` line (`git commit -s`); seconds. Not yet a required check: adding it to branch protection is an owner-approved step (`docs/repo-settings.md`). |
 | `validate` (plan-check.yml) | per-PR | Backlog checks, path-filtered to `plan/`, `.beads/` and `scripts/`; seconds. |
 | `publish` (publish-site.yml) | per-PR | Republishes the backlog site on PR events and `main` pushes; no test signal. |
 
