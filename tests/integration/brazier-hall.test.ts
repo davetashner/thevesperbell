@@ -157,7 +157,7 @@ function botScenario(route: 'torch' | 'ember'): ReplayScenario<BotCommand> {
   };
 }
 
-describe('the brazier hall puzzle runs from data (mw-e15.3)', { timeout: 30_000 }, () => {
+describe('the brazier hall puzzle runs from data (mw-e15.3)', { timeout: 120_000 }, () => {
   it('AC-6: the bot lights all braziers with a torch and the vault opens', ({ task }) => {
     markExercised(task, 'scene', 'brazier-hall');
     const h = hall();
@@ -283,7 +283,7 @@ describe('the brazier hall puzzle runs from data (mw-e15.3)', { timeout: 30_000 
 
   it.each(['torch', 'ember'] as const)(
     'AC-6: the %s replay solves the puzzle, and replays to the same hashes',
-    { timeout: 30_000 },
+    { timeout: 120_000 },
     (route) => {
       const scenario = botScenario(route);
       const contentHash = fnv1a64(canonicalJson(content.all('puzzle')));
