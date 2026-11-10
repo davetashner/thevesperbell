@@ -253,6 +253,7 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `book.rarity` | `"common"` \| `"uncommon"` \| `"rare"` \| `"unique"` | required | How scarce it is; unique exactly when flags.unique. |
 | `book.coverArtId` | string | — | Cover art asset id; absent = "ui-book-cover-<item id>", the only value allowed. |
 | `book.cursedWhispers` | boolean | `false` | Whispers from the pages while it is carried or read. |
+| `book.clueFor` | list of ref → puzzle | — | Puzzles its text is a clue to (mw-e15.5): reading it adds `clue.<item id>` to each puzzle’s trail, so a solve and its hint attribution can say a book helped. The text itself says what the clue is. |
 
 ## 6. A key. Lives on the keyring (mw-e17.5).
 

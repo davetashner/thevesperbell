@@ -62,6 +62,9 @@ import {
 } from './recovery';
 import {
   capabilityUsed,
+  CLUE_PREFIX,
+  clueCapability,
+  clueRead,
   puzzleDiscovered,
   puzzleFailed,
   puzzleRecovered,
@@ -326,6 +329,10 @@ export class PuzzleRuntime {
           tick: world.tick,
         });
       }),
+      world.events.on(clueRead, ({ actor, item, puzzle, tick }) => {
+        if (this.#player !== undefined && actor !== this.#player) return;
+        this.#trailOf(puzzle, clueCapability(item), tick);
+      }),
       world.events.on(capabilityUsed, (use) => {
         if (this.#player !== undefined && use.actor !== this.#player) return;
         this.#trail(use.capability, use.tick, use.target);
@@ -422,11 +429,14 @@ export class PuzzleRuntime {
     const from = this.#state(id);
     const tick = this.#world.tick;
     if (to === 'discovered' || (from === 'dormant' && to === 'in-progress')) {
-      // The first touch: what was done a moment ago counts, what was done long before does not.
+      // The first touch: what was done a moment ago counts, what was done long before does not
+      // (a clue read at any time before does: the book was read, however long ago).
       const since = tick - ENGAGE_WINDOW_SECONDS * this.#world.clock.hz;
       this.#update(id, {
         discoveredAt: tick,
-        trail: this.#record(id).trail.filter((use) => use.tick >= since),
+        trail: this.#record(id).trail.filter(
+          (use) => use.tick >= since || use.capability.startsWith(CLUE_PREFIX),
+        ),
       });
     }
     this.#update(id, { state: to });
@@ -509,11 +519,17 @@ export class PuzzleRuntime {
 
   #trail(capability: string, tick: number, target: EntityId | undefined): void {
     for (const [id, def] of this.#defs) {
-      if (!IN_PLAY.includes(this.#state(id))) continue;
-      const trail = [...this.#record(id).trail, { capability, tick }].slice(-TRAIL_LIMIT);
-      this.#update(id, { trail });
+      if (!this.#trailOf(id, capability, tick)) continue;
       if (target !== undefined && this.#lists(def, target)) this.#engage(id);
     }
+  }
+
+  /** Adds a use to puzzle `id`'s trail when it is still open; false when it is not (or unknown). */
+  #trailOf(id: string, capability: string, tick: number): boolean {
+    if (!this.#defs.has(id) || !IN_PLAY.includes(this.#state(id))) return false;
+    const trail = [...this.#record(id).trail, { capability, tick }].slice(-TRAIL_LIMIT);
+    this.#update(id, { trail });
+    return true;
   }
 
   /** Dormant puzzles whose discovery volume holds the player. */

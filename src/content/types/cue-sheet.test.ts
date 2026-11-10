@@ -109,6 +109,11 @@ describe('cue sheet schema', () => {
       'breakableBroken:caption.breaking',
       'doorStateChanged:caption.door-close',
       'doorStateChanged:caption.door-open',
+      'soundClueCued:caption.clue.chime-high',
+      'soundClueCued:caption.clue.chime-low',
+      'soundClueCued:caption.clue.chime-mid',
+      'soundClueCued:caption.clue.chime-solved',
+      'soundClueCued:caption.clue.chime-wrong',
     ]);
   });
 

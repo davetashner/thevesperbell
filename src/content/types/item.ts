@@ -458,6 +458,12 @@ const bookSchema = z
       .boolean()
       .default(false)
       .describe('Whispers from the pages while it is carried or read.'),
+    clueFor: z
+      .array(ref('puzzle'))
+      .default([])
+      .describe(
+        'Puzzles its text is a clue to (mw-e15.5): reading it adds `clue.<item id>` to each puzzle’s trail, so a solve and its hint attribution can say a book helped. The text itself says what the clue is.',
+      ),
   })
   .describe('Book data (mw-e07.1).');
 

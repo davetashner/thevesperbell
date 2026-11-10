@@ -71,6 +71,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].steps` | list of id (at least 2) | required | Input port names in the expected order. |
 | `nodes[].kind` | `"random"` | required |  |
 | `nodes[].outcomes` | list of id (at least 2) | required | Output port names, one pulsed per rising edge. |
+| `nodes[].kind` | `"clue"` | required |  |
+| `nodes[].cues` | list of id (at least 1) | required | Cue ids sounded in order, e.g. "chime-low"; a cue sheet rule maps each to a sound. |
+| `nodes[].spacing` | number > 0 | — | Seconds between cues; default 1. The first sounds on the rising edge. |
+| `nodes[].entity` | id | — | Where the sound comes from (a spawn); without one the cues have no position. |
 | `nodes[].kind` | `"receiver"` | required |  |
 | `nodes[].receiver` | `"door"` \| `"light"` \| `"spawner"` \| `"audio-cue"` \| `"fact"` \| `"mechanism"` | required | What the signal drives. |
 | `nodes[].entity` | id | — | Required by door, light, spawner and mechanism. |

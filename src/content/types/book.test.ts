@@ -232,3 +232,17 @@ describe('book items (mw-e07.1)', () => {
     ]);
   });
 });
+
+describe('readable clue binding (mw-e15.5)', () => {
+  it('clueFor defaults to none and takes puzzle ids; a puzzle that does not exist fails, naming it', () => {
+    const parsed = itemSchema.parse(book());
+    if (parsed.category !== 'book') throw new Error('not a book');
+    expect(parsed.book.clueFor).toEqual([]);
+    expect(loadIssues(files(book({ clueFor: ['brazier-hall'] })))).toEqual([]);
+    expect(loadIssues(files(book({ clueFor: ['no-such-puzzle'] }, { id: 'riddle-book' })))).toEqual(
+      [
+        'src/content/data/item/riddle-book.json#/book/clueFor/0: item:riddle-book references missing puzzle:no-such-puzzle',
+      ],
+    );
+  });
+});

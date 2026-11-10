@@ -254,7 +254,7 @@ describe('signal graph content', () => {
       ),
     ).toEqual([
       'nodes.0.shape.halfExtents.x: Too small: expected number to be >=0',
-      "nodes.1.kind: Invalid discriminator value. Expected 'volume' | 'lever' | 'button' | 'sensor' | 'and' | 'or' | 'xor' | 'not' | 'delay' | 'timer' | 'pulse' | 'latch' | 'counter' | 'sequence' | 'random' | 'receiver' | 'set-property'",
+      "nodes.1.kind: Invalid discriminator value. Expected 'volume' | 'lever' | 'button' | 'sensor' | 'and' | 'or' | 'xor' | 'not' | 'delay' | 'timer' | 'pulse' | 'latch' | 'counter' | 'sequence' | 'random' | 'clue' | 'receiver' | 'set-property'",
       'nodes.2.seconds: Too small: expected number to be >0',
       'nodes.3.edge: Invalid option: expected one of "rising"|"falling"|"both"',
       expect.stringMatching(/^nodes\.4\.filter\.0\.property: Invalid option/),

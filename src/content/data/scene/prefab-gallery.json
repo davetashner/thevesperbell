@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "prefab-gallery",
   "name": "Puzzle prefab gallery",
-  "description": "Every puzzle prefab (mw-e15.4) placed once on an open floor, the way a designer assembles a puzzle: a rotatable statue, mirror and lens stand with a beam source and sensor, the weighted crate set, a brazier, a water basin with valve and drain, a counterweight lift, a sliding block, a bell, a crystal receiver, a scale plate pair, a timed door and a rune tile sequence. Reach it with ?scene=prefab-gallery. Catalogue: docs/design/puzzle-prefabs.md.",
+  "description": "Every puzzle prefab (mw-e15.4) placed once on an open floor, the way a designer assembles a puzzle: a rotatable statue, mirror and lens stand with a beam source and sensor, the weighted crate set, a brazier, a water basin with valve and drain, a counterweight lift, a sliding block, a bell, a crystal receiver, a scale plate pair, a timed door and a rune tile sequence, a sound clue with its answering bell sequence, and a plate timed door. Reach it with ?scene=prefab-gallery. Catalogue: docs/design/puzzle-prefabs.md.",
   "grid": 1,
   "camera": {
     "position": [-12, 12, -10],
@@ -100,6 +100,21 @@
       "id": "runes-demo",
       "prefab": "rune-tile-sequence",
       "at": [-2, 0, 3]
+    },
+    {
+      "id": "clue-demo",
+      "prefab": "sound-clue",
+      "at": [3, 0, 0]
+    },
+    {
+      "id": "bells-demo",
+      "prefab": "bell-sequence",
+      "at": [4.5, 0, 6]
+    },
+    {
+      "id": "race-demo",
+      "prefab": "plate-timed-door",
+      "at": [-6, 0, -2]
     }
   ],
   "light": {

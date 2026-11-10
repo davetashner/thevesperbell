@@ -29,6 +29,7 @@ export const SIGNAL_NODE_KINDS = [
   'counter',
   'sequence',
   'random',
+  'clue',
   'receiver',
   'set-property',
 ] as const;
@@ -199,6 +200,24 @@ const nodeSchema = z
       ...base,
       kind: z.literal('random'),
       outcomes: portNames('Output port names, one pulsed per rising edge.'),
+    }),
+    z.strictObject({
+      ...base,
+      kind: z.literal('clue'),
+      cues: z
+        .array(contentId)
+        .min(1)
+        .describe(
+          'Cue ids sounded in order, e.g. "chime-low"; a cue sheet rule maps each to a sound.',
+        ),
+      spacing: z
+        .number()
+        .positive()
+        .optional()
+        .describe('Seconds between cues; default 1. The first sounds on the rising edge.'),
+      entity: binding
+        .optional()
+        .describe('Where the sound comes from (a spawn); without one the cues have no position.'),
     }),
     z.strictObject({
       ...base,
@@ -439,7 +458,7 @@ function checkGraph(graph: Graph, ctx: z.RefinementCtx): void {
     if (node.kind === 'latch' && counts['set'] === 0 && counts['toggle'] === 0) {
       issue(['nodes', i], `node "${node.id}" (latch) needs a wire into "set" or "toggle"`);
     }
-    const sink = node.kind === 'receiver' || node.kind === 'set-property';
+    const sink = node.kind === 'receiver' || node.kind === 'set-property' || node.kind === 'clue';
     if (!sink && node.observed !== true && !drives.has(node.id)) {
       issue(['nodes', i], `node "${node.id}" drives nothing: wire an output or mark it "observed"`);
     }

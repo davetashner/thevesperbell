@@ -935,6 +935,49 @@
               },
               "kind": {
                 "type": "string",
+                "const": "clue"
+              },
+              "cues": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "description": "Cue ids sounded in order, e.g. \"chime-low\"; a cue sheet rule maps each to a sound."
+              },
+              "spacing": {
+                "description": "Seconds between cues; default 1. The first sounds on the rising edge.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "entity": {
+                "description": "Where the sound comes from (a spawn); without one the cues have no position.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "cues"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Node id, unique in the graph; wires refer to it."
+              },
+              "observed": {
+                "description": "Outputs are read outside the graph (puzzle goal, quest), so unwired is fine.",
+                "type": "boolean"
+              },
+              "kind": {
+                "type": "string",
                 "const": "receiver"
               },
               "receiver": {
