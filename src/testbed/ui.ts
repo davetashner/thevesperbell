@@ -19,6 +19,8 @@ import {
   openInventory,
   PickupToasts,
   reducedMotion,
+  setDyslexiaFont,
+  setTextBackdrop,
   setTextScale,
   UiRoot,
   type ContainerWindowModel,
@@ -44,6 +46,15 @@ let gallery: Gallery = openGallery(ui, {
 });
 
 const settings = createSettingsStore({ storage: () => window.localStorage });
+// The accessibility settings drive the root live, as in the game (src/main.ts); ?scale= wins at load.
+if (scale === null) setTextScale(ui.element, settings.get('accessibility.textScale'));
+settings.on('accessibility.textScale', (value) => setTextScale(ui.element, value));
+setDyslexiaFont(ui.element, settings.get('accessibility.dyslexiaFont'));
+settings.on('accessibility.dyslexiaFont', (on) => {
+  setDyslexiaFont(ui.element, on);
+});
+setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
+settings.on('accessibility.textBackground', (value) => setTextBackdrop(ui.element, value));
 
 const demoItem = (id: number, item: Omit<InventoryItemModel, 'id'>): InventoryItemModel => ({
   id,

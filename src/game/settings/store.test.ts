@@ -168,6 +168,13 @@ describe('subscriptions', () => {
     expect(any).toHaveBeenCalledTimes(2);
   });
 
+  it('AC-2: a stored text size of 350% loads as 200%', () => {
+    const warn = vi.fn();
+    const settings = loadSettings(stored({ accessibility: { textScale: 3.5 } }), warn);
+    expect(settings.accessibility.textScale).toBe(2);
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
   it('clamps an out-of-range set, ignores an invalid one, and unsubscribes', () => {
     const warn = vi.fn();
     const settings = createSettingsStore({ warn });

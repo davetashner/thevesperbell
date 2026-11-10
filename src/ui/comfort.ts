@@ -25,6 +25,19 @@ export function textScale(root: HTMLElement): number {
   return value === '' ? 1 : clampTextScale(Number(value));
 }
 
+/** Sets the opacity (0-1, clamped) of the plate behind HUD text; returns the value applied. */
+export function setTextBackdrop(root: HTMLElement, opacity: number): number {
+  const applied = Number.isFinite(opacity) ? Math.min(1, Math.max(0, opacity)) : 0;
+  root.style.setProperty('--ui-text-backdrop-opacity', String(applied));
+  return applied;
+}
+
+/** Switches the dyslexia-friendly font on or off (the stylesheet reads `data-font`). */
+export function setDyslexiaFont(root: HTMLElement, on: boolean): void {
+  if (on) root.dataset['font'] = 'dyslexia';
+  else delete root.dataset['font'];
+}
+
 /**
  * Motion preference: `system` follows the OS `prefers-reduced-motion`, `reduce` forces it on, `full`
  * forces full motion even when the OS asks for less.

@@ -50,8 +50,11 @@ export const UI_TOKENS: Readonly<Record<string, string>> = Object.freeze({
   // Type (style bible §9.1; the fonts are self-hosted by mw-e37, system fallbacks until then).
   'ui-font-body': "'Alegreya Sans', 'Atkinson Hyperlegible', system-ui, sans-serif",
   'ui-font-heading': "'Cinzel', Georgia, serif",
-  'ui-font-size': '16px',
+  // 16px, rising with the window to 18px at 1080p (1.6667vh) so body text reads from a couch or desk.
+  'ui-font-size': 'max(16px, 1.6667vh)',
   'ui-text-scale': '1',
+  // Opacity (0-1) of the ink plate behind HUD text; 0 keeps the plain shadowed text.
+  'ui-text-backdrop-opacity': '0',
   // Space, shape, motion.
   'ui-space-1': '0.25rem',
   'ui-space-2': '0.5rem',
@@ -85,6 +88,18 @@ ${tokens}
   font-size: ${size(1)};
   line-height: 1.4;
   color: var(--ui-color-text);
+}
+.vb-ui[data-font='dyslexia'] {
+  --ui-font-body: 'OpenDyslexic', 'Lexend', 'Atkinson Hyperlegible', 'Trebuchet MS', Verdana, sans-serif;
+  --ui-font-heading: var(--ui-font-body);
+  letter-spacing: 0.03em;
+  word-spacing: 0.1em;
+}
+.vb-interact, .vb-target-name, .vb-target-note, .vb-boss-name, .vb-reticle-spell, .vb-reticle-note {
+  --ui-backdrop: rgb(30 27 46 / calc(var(--ui-text-backdrop-opacity) * 100%));
+  background: var(--ui-backdrop);
+  box-shadow: 0 0 0 0.2em var(--ui-backdrop);
+  border-radius: 0.2em;
 }
 .vb-ui[data-motion='reduce'] { --ui-motion-scale: 0; }
 @media (prefers-reduced-motion: reduce) {
@@ -170,7 +185,7 @@ ${tokens}
   white-space: nowrap;
 }
 .vb-list-item[aria-selected='true'] { background: var(--ui-color-accent); }
-.vb-tabs [role='tablist'] { display: flex; gap: var(--ui-space-1); }
+.vb-tabs [role='tablist'] { display: flex; flex-wrap: wrap; gap: var(--ui-space-1); }
 .vb-tab {
   font: inherit;
   color: var(--ui-color-text);
@@ -182,6 +197,8 @@ ${tokens}
 }
 .vb-tab[aria-selected='true'] { border-bottom-color: var(--ui-color-text); font-weight: 700; }
 .vb-tabpanel { padding: var(--ui-space-2) 0; }
+/* A panel that is also a .vb-stack/.vb-row would otherwise keep its display and show every tab at once. */
+.vb-tabpanel[hidden] { display: none; }
 .vb-toggle {
   font: inherit;
   color: var(--ui-color-text);
@@ -190,6 +207,8 @@ ${tokens}
 }
 .vb-toggle, .vb-slider, .vb-select {
   display: inline-flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   align-items: center;
   gap: var(--ui-space-2);
   padding: var(--ui-space-1) var(--ui-space-2);
@@ -218,14 +237,14 @@ ${tokens}
 .vb-toggle[aria-checked='true'] .vb-toggle-track { background: var(--ui-color-text); }
 .vb-toggle[aria-checked='true'] .vb-toggle-track::after { transform: translateX(1.2em); }
 .vb-slider-track {
-  width: 10em;
+  width: min(10em, 100%);
   height: 0.5em;
   border-radius: 0.25em;
   background: var(--ui-color-text-muted);
   position: relative;
 }
 .vb-slider-fill { position: absolute; inset: 0 auto 0 0; background: var(--ui-color-text); border-radius: inherit; }
-.vb-select-value { min-width: 6em; text-align: center; font-weight: 700; }
+.vb-select-value { min-width: min(6em, 100%); text-align: center; font-weight: 700; }
 .vb-meter {
   position: relative;
   width: 14em;
@@ -464,7 +483,7 @@ ${tokens}
   left: 0;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-size: 0.8rem;
+  font-size: ${size(0.8)};
   text-shadow: 0 0 2px var(--ui-color-hud-shadow), 0 0 2px var(--ui-color-hud-shadow);
 }
 .vb-reticle-spell { top: 1.1em; }
@@ -514,7 +533,7 @@ ${tokens}
 .vb-inventory-items { position: relative; flex: 3 1 20em; min-width: 0; }
 .vb-inventory-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(10em, 100%), 1fr));
   gap: var(--ui-space-2);
   max-height: 24em;
   overflow-y: auto;
@@ -677,7 +696,7 @@ ${tokens}
   border: 2px solid var(--ui-color-border);
   background: var(--ui-color-bar-track);
   text-align: center;
-  font-size: 0.85rem;
+  font-size: ${size(0.85)};
 }
 .vb-spell-wheel-slot[data-state='empty'] { opacity: 0.45; }
 .vb-spell-wheel-slot[data-state='unavailable'] { opacity: 0.6; }
@@ -689,7 +708,7 @@ ${tokens}
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: ${size(1.1)};
   text-shadow: 0 0 2px var(--ui-color-hud-shadow), 0 0 2px var(--ui-color-hud-shadow);
 }
 .vb-tooltip {
@@ -742,7 +761,7 @@ ${tokens}
 .vb-container-status:empty { display: none; }
 .vb-container-hint { color: var(--ui-color-text-muted); font-size: ${size(0.875)}; }
 .vb-container-actions { flex-wrap: wrap; }
-.vb-panel.vb-shop { width: min(40em, 100%); }
+.vb-panel.vb-shop { width: min(40em, 100%); container-type: inline-size; }
 .vb-shop h1 { overflow-wrap: anywhere; margin: 0; }
 .vb-shop-header { display: flex; align-items: center; gap: var(--ui-space-3); }
 .vb-shop-portrait {
@@ -803,6 +822,16 @@ ${tokens}
 .vb-shop-status, .vb-shop-hint { margin: 0; }
 .vb-shop-status:empty { display: none; }
 .vb-shop-hint { color: var(--ui-color-text-muted); font-size: ${size(0.875)}; }
+/* Narrow shop (a phone, or large text): each row stacks its price and stepper under the name. */
+@container (max-width: 30em) {
+  .vb-shop-header { flex-wrap: wrap; }
+  .vb-shop-who { flex: 1 1 100%; }
+  .vb-shop-portrait { width: 2.25em; height: 2.75em; }
+  .vb-shop-item { grid-template-columns: minmax(0, 1fr); }
+  .vb-button.vb-shop-row { grid-template-columns: auto minmax(0, 1fr); }
+  .vb-shop-price { grid-column: 2; text-align: left; }
+  .vb-shop-stepper { justify-content: flex-start; }
+}
 .vb-pickups {
   position: absolute;
   right: var(--ui-space-3);
@@ -811,7 +840,7 @@ ${tokens}
   flex-direction: column;
   align-items: flex-end;
   gap: var(--ui-space-2);
-  max-width: min(22em, 45%);
+  max-width: max(min(22em, 45%), min(14em, calc(100% - 2 * var(--ui-space-3))));
   pointer-events: none;
 }
 .vb-pickup {
