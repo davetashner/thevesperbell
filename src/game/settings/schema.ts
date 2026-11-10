@@ -204,12 +204,26 @@ export const SETTINGS_SCHEMA = {
     settings: {
       textScale: slider({
         label: 'Text size',
-        help: 'Scales every menu and HUD text.',
+        help: 'Scales every menu and HUD text, from 80% to 200%.',
         min: 0.8,
         max: 2,
         step: 0.1,
         default: 1,
-        unit: 'times',
+        unit: 'percent',
+      }),
+      dyslexiaFont: toggle({
+        label: 'Dyslexia-friendly font',
+        help: 'Switches menus and HUD text to a wider, more distinct typeface with extra letter spacing.',
+        default: false,
+      }),
+      textBackground: slider({
+        label: 'Text background',
+        help: 'Puts a dark plate behind prompts, target names and other HUD text. 0 shows the text alone.',
+        min: 0,
+        max: 1,
+        step: 0.05,
+        default: 0,
+        unit: 'percent',
       }),
       hudScale: slider({
         label: 'HUD size',

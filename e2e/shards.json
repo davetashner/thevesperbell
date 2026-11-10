@@ -69,6 +69,7 @@
     "sword-carry.spec.ts": 59,
     "testbed-audio.spec.ts": 16.5,
     "testbed-player.spec.ts": 147.8,
+    "text-scale.spec.ts": 5,
     "title.spec.ts": 97.9,
     "transitions.spec.ts": 18.5,
     "ui-perf.spec.ts": 5.6,

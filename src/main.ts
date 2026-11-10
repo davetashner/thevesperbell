@@ -443,6 +443,8 @@ import {
   ScreenFeedback,
   setMotionPreference,
   SoundCaptions,
+  setDyslexiaFont,
+  setTextBackdrop,
   setTextScale,
   UiRoot,
   WaterHud,
@@ -660,6 +662,15 @@ function startRenderer(
   setTextScale(ui.element, settings.get('accessibility.textScale'));
   settings.on('accessibility.textScale', (scale) => {
     setTextScale(ui.element, scale);
+  });
+  // Dyslexia-friendly font and the plate behind HUD text (accessibility.dyslexiaFont, .textBackground).
+  setDyslexiaFont(ui.element, settings.get('accessibility.dyslexiaFont'));
+  settings.on('accessibility.dyslexiaFont', (on) => {
+    setDyslexiaFont(ui.element, on);
+  });
+  setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
+  settings.on('accessibility.textBackground', (opacity) => {
+    setTextBackdrop(ui.element, opacity);
   });
   // The contextual Interact prompt (mw-e02.5): the player's focus, with the bound key or button.
   const interactPrompt = new InteractPrompt();
