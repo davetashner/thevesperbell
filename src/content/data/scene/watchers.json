@@ -1,0 +1,199 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "watchers",
+  "name": "Watchers",
+  "description": "Greybox reference puzzle for statues (mw-e15.10): three hollow stone watchers (20 kg each, so Mage Hand can lift them) stand in a 12 m hall staring south at the entrance, and the portcullis in the north wall opens once every watcher still standing faces north, towards the altar. A turn is a quarter turn, so each needs two. Turn them by hand (Interact), turn them from across the room with Mage Hand (the tether performs the same Interact), or smash the cracked one in the middle (a blow) so it faces nothing, and turn the other two. Reach it with ?scene=watchers.",
+  "grid": 1,
+  "camera": {
+    "position": [-10, 10, -12],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0.0],
+      "scale": [6, 1, 6.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -7]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0, 0, 7]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-7, 0, 0.0],
+      "yaw": 90,
+      "scale": [7.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [7, 0, 0.0],
+      "yaw": 90,
+      "scale": [7.0, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 11],
+      "scale": [1, 1, 4]
+    },
+    {
+      "piece": "wall",
+      "at": [-1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 15]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -5],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "watcher-a",
+      "at": [-3, 0, 1],
+      "yaw": 180,
+      "prop": "statue",
+      "tags": ["watcher"],
+      "properties": {
+        "pushable": true,
+        "liftable": true,
+        "weight": 20,
+        "remoteActuatable": true
+      },
+      "push": {
+        "rotateStep": 90
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "rotate",
+            "label": "Turn statue"
+          },
+          {
+            "verb": "push",
+            "label": "Drag statue"
+          }
+        ]
+      }
+    },
+    {
+      "id": "watcher-b",
+      "at": [3, 0, 1],
+      "yaw": 180,
+      "prop": "statue",
+      "tags": ["watcher"],
+      "properties": {
+        "pushable": true,
+        "liftable": true,
+        "weight": 20,
+        "remoteActuatable": true
+      },
+      "push": {
+        "rotateStep": 90
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "rotate",
+            "label": "Turn statue"
+          },
+          {
+            "verb": "push",
+            "label": "Drag statue"
+          }
+        ]
+      }
+    },
+    {
+      "id": "watcher-c",
+      "at": [0, 0, -1.5],
+      "yaw": 180,
+      "prop": "statue",
+      "tags": ["watcher"],
+      "properties": {
+        "pushable": true,
+        "liftable": true,
+        "weight": 20,
+        "remoteActuatable": true,
+        "hp": 100
+      },
+      "push": {
+        "rotateStep": 90
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "rotate",
+            "label": "Turn statue"
+          },
+          {
+            "verb": "push",
+            "label": "Drag statue"
+          }
+        ]
+      },
+      "breakable": {
+        "profile": "old-wall"
+      }
+    },
+    {
+      "id": "altar",
+      "at": [0, 0, 5],
+      "tags": ["altar"]
+    },
+    {
+      "id": "vault-gate",
+      "at": [0, 0, 7],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "vault-prize",
+      "at": [0, 0, 13],
+      "tags": ["goal"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "watchers"
+    }
+  ],
+  "light": {
+    "ambient": 0.5
+  }
+}

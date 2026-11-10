@@ -28,10 +28,13 @@ From `mvpCapabilities` in `src/content/data/class/<class>.json`: what the class 
 | Puzzle | mvp | Distinct solutions | Validated | knight | archer | sorcerer | thief | any |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `brazier-hall` | no | 2 | 2 | yes | yes | yes | yes | yes |
+| `chimes` | yes | 3 | 3 | yes | yes | yes | yes | yes |
+| `dark-crossing` | yes | 3 | 3 | yes | yes | yes | yes | yes |
 | `frozen-channel` | yes | 2 | 2 | yes | yes | yes | yes | yes |
 | `scales-room` | yes | 4 | 4 | yes | yes | yes | yes | yes |
 | `sunbeam-hall` | yes | 3 | 3 | yes | yes | yes | yes | yes |
 | `testbed-room-lever` | no | 3 | 0 | inconclusive | inconclusive | inconclusive | inconclusive | inconclusive |
+| `watchers` | yes | 3 | 3 | yes | yes | yes | yes | yes |
 
 ## `brazier-hall`
 
@@ -44,6 +47,30 @@ Distinct declared solutions: 2; validated: 2; solvable by 4 of 4 classes.
 | sorcerer | yes (carry-flame) | none | 3 | 2 |
 | thief | yes (carry-flame) | none | 3 | 1 |
 | any | yes (carry-flame) | none | 3 | 1 |
+
+## `chimes` (mvp)
+
+Distinct declared solutions: 3; validated: 3; solvable by 4 of 4 classes.
+
+| Who | Solvable | Minimum capability set | Steps | Routes |
+| --- | --- | --- | --- | --- |
+| knight | yes (by-the-book) | none | 3 | 2 |
+| archer | yes (by-the-book) | none | 3 | 2 |
+| sorcerer | yes (by-the-book) | none | 3 | 3 |
+| thief | yes (by-the-book) | none | 3 | 2 |
+| any | yes (by-the-book) | none | 3 | 2 |
+
+## `dark-crossing` (mvp)
+
+Distinct declared solutions: 3; validated: 3; solvable by 4 of 4 classes.
+
+| Who | Solvable | Minimum capability set | Steps | Routes |
+| --- | --- | --- | --- | --- |
+| knight | yes (torch) | none | 3 | 2 |
+| archer | yes (torch) | none | 3 | 2 |
+| sorcerer | yes (torch) | none | 3 | 3 |
+| thief | yes (torch) | none | 3 | 2 |
+| any | yes (torch) | none | 3 | 2 |
 
 ## `frozen-channel` (mvp)
 
@@ -92,3 +119,15 @@ Distinct declared solutions: 3; validated: 0; solvable by 0 of 4 classes.
 | sorcerer | inconclusive | — | — | — |
 | thief | inconclusive | — | — | — |
 | any | inconclusive | — | — | — |
+
+## `watchers` (mvp)
+
+Distinct declared solutions: 3; validated: 3; solvable by 4 of 4 classes.
+
+| Who | Solvable | Minimum capability set | Steps | Routes |
+| --- | --- | --- | --- | --- |
+| knight | yes (smash) | none | 5 | 2 |
+| archer | yes (smash) | none | 5 | 2 |
+| sorcerer | yes (smash) | none | 5 | 3 |
+| thief | yes (smash) | none | 5 | 2 |
+| any | yes (smash) | none | 5 | 2 |

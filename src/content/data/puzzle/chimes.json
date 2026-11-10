@@ -1,0 +1,177 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "chimes",
+  "name": "Chimes: ring the bells in the order heard",
+  "notes": "Reference puzzle for sound (mw-e15.10), built with data only: a button and a hidden chime source (the sound clue node), three impact-switch bells against the far wall of a pit, a bell sequence node (high, low, mid) and a crate to throw. The goal is the outcome (the sequence latch is set), so any strike counts: a crate lobbed or carried over the pit, an arrow. Declared: listen then lob the crate; listen then carry the crate over with Mage Hand and drop it on the bells (sorcerer); and the order known without listening, written in a keeper's ledger (`by-the-book`). That last route is modelled as skipping the button: no readable item exists in the scene because a lore book needs cover art and legal data this bead may not add, and the book reader is not wired (see the follow-up bead), so the `clue.<item>` trail is not exercised here (mw-e15.32, mw-e15.25). Shooting the bells from a balcony is not declared: the validator cannot model an arrow (mw-e15.31) (a `contact` stimulus is never an impact), so it would be unvalidated; the arrow feed rings the same bells, and the tests strike them as an arrow does. Greybox, not story canon.",
+  "scene": "chimes",
+  "entities": [
+    {
+      "id": "chime-button",
+      "role": "the button that plays the chimes"
+    },
+    {
+      "id": "bell-low",
+      "role": "low bell, west"
+    },
+    {
+      "id": "bell-mid",
+      "role": "mid bell, centre"
+    },
+    {
+      "id": "bell-high",
+      "role": "high bell, east"
+    },
+    {
+      "id": "lob-crate",
+      "role": "a 12 kg crate to throw at the bells",
+      "critical": true
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": -2
+      },
+      "halfExtents": {
+        "x": 6,
+        "y": 1.5,
+        "z": 5
+      }
+    }
+  },
+  "goal": {
+    "signal": "chimes/solved"
+  },
+  "solutions": [
+    {
+      "id": "listen",
+      "name": "Press the button, listen, lob the crate at the bells in order",
+      "steps": [
+        {
+          "do": "interact",
+          "verb": "press",
+          "target": "chime-button"
+        },
+        {
+          "do": "wait",
+          "seconds": 4
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-high"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-low"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-mid"
+        }
+      ]
+    },
+    {
+      "id": "mage-hand",
+      "name": "Press the button, listen, carry the crate over the pit with Mage Hand and drop it on the bells in order",
+      "capabilities": ["spell.mage-hand"],
+      "steps": [
+        {
+          "do": "interact",
+          "verb": "press",
+          "target": "chime-button"
+        },
+        {
+          "do": "wait",
+          "seconds": 4
+        },
+        {
+          "do": "stimulus",
+          "element": "force",
+          "target": "lob-crate",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-high"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-low"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-mid"
+        }
+      ]
+    },
+    {
+      "id": "by-the-book",
+      "name": "Know the order from the keeper's ledger and lob the crate",
+      "steps": [
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-high"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-low"
+        },
+        {
+          "do": "move",
+          "target": "lob-crate",
+          "to": "bell-mid"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false,
+    "recovery": [
+      {
+        "kind": "respawn",
+        "entity": "lob-crate",
+        "seconds": 10
+      }
+    ]
+  },
+  "hints": [
+    {
+      "afterSeconds": 90,
+      "highlight": ["chime-button"],
+      "bark": "That button does something somewhere behind the wall."
+    },
+    {
+      "afterSeconds": 180,
+      "highlight": ["bell-low", "bell-mid", "bell-high"],
+      "bark": "Three bells, out of reach. The order matters."
+    }
+  ],
+  "tags": ["greybox", "mvp"],
+  "focus": ["sorcerer", "archer"],
+  "outputs": {
+    "solvedFact": "chimes.solved",
+    "set": [
+      {
+        "fact": "chimes.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["chimes/vault-latch"],
+    "rewards": ["chimes-vault"]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "dark-crossing",
+  "name": "Dark crossing facts",
+  "notes": "Facts of the Dark crossing reference puzzle (src/content/data/puzzle/dark-crossing.json, scene dark-crossing; mw-e15.10). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "dark-crossing.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The dark crossing puzzle is solved: the far-bank pad has been weighed for a second. Written once by the puzzle runtime.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "dark-crossing.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The dark crossing's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}

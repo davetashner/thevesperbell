@@ -1,0 +1,190 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "watchers",
+  "name": "Watchers: face the altar",
+  "notes": "Reference puzzle for statues (mw-e15.10), built with data only: three rotatable, hollow statues, one of them cracked (breakable), a goal that reads their facing and a signal latch that raises the portcullis. The goal is the outcome (every watcher still standing faces north, the altar), so turning each by hand, turning them from afar with Mage Hand's tether (which performs the statue's rotate affordance) and smashing the cracked one so that no statue is left staring at the door all count. A destroyed statue is not selected by the goal, and at least two plain statues can never be broken, so the puzzle stays solvable whichever statue is lost (AC-3). The abstract search and softlock search do not model facing yet (mw-e15.30), so both report inconclusive; the concrete runs and the integration tests prove each route. Greybox, not story canon.",
+  "scene": "watchers",
+  "entities": [
+    {
+      "id": "watcher-a",
+      "role": "west watcher, stares at the door",
+      "critical": true
+    },
+    {
+      "id": "watcher-b",
+      "role": "east watcher, stares at the door",
+      "critical": true
+    },
+    {
+      "id": "watcher-c",
+      "role": "the cracked watcher in the middle: breakable"
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": -2
+      },
+      "halfExtents": {
+        "x": 6,
+        "y": 1.5,
+        "z": 5
+      }
+    }
+  },
+  "goal": {
+    "entities": {
+      "tag": "watcher"
+    },
+    "where": [
+      {
+        "test": "facing",
+        "facing": "north"
+      }
+    ],
+    "match": "all"
+  },
+  "solutions": [
+    {
+      "id": "turn",
+      "name": "Turn each watcher by hand, two quarter turns apiece",
+      "steps": [
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-a"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-a"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-b"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-b"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-c"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-c"
+        }
+      ]
+    },
+    {
+      "id": "mage-hand",
+      "name": "Turn them from across the room with Mage Hand",
+      "capabilities": ["spell.mage-hand"],
+      "steps": [
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-a",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-a",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-b",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-b",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-c",
+          "using": "spell.mage-hand"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-c",
+          "using": "spell.mage-hand"
+        }
+      ]
+    },
+    {
+      "id": "smash",
+      "name": "Smash the cracked watcher, turn the other two",
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "blunt",
+          "target": "watcher-c",
+          "note": "A shield bash, a hammer blow or a hurled crate: the cracked stone gives (old-wall profile, 100 hp, blunt resisted 20%)."
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-a"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-a"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-b"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "watcher-b"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false
+  },
+  "hints": [
+    {
+      "afterSeconds": 120,
+      "highlight": ["watcher-a", "watcher-b", "watcher-c"],
+      "bark": "They all stare at the door. Something wants them looking the other way."
+    }
+  ],
+  "tags": ["greybox", "mvp"],
+  "focus": ["sorcerer"],
+  "outputs": {
+    "solvedFact": "watchers.solved",
+    "set": [
+      {
+        "fact": "watchers.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["watchers/vault-latch"],
+    "rewards": ["watchers-vault"]
+  }
+}

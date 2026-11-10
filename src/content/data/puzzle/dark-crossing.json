@@ -1,0 +1,166 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "dark-crossing",
+  "name": "Dark crossing: reach the far pad",
+  "notes": "Reference puzzle for darkness (mw-e15.10), built with data only: a pit room at ambient 0.03 with a one metre causeway, three unlit braziers on ledges beside it, a burning barrel and a pressure pad on the far bank. The goal is the outcome (the far pad is weighed for a second). Light reveals the causeway, which the tests prove with the sim's light field (the path reads below 0.1 in the dark and above 0.3 once lit), but no condition, receiver or tile reads light, so the game does not stop a player who crosses blind: the pit does. Declared: carry the burning barrel along the path (anyone), light the three braziers with it, or light them from the bank with Ember (sorcerer). Not declared, for gaps the beads track: a light spell and light-sensing receivers (light-gated tiles, mw-e03.55), and following drafts in smoke (no smoke or draft field exists to read, mw-e03.58). Greybox, not story canon.",
+  "scene": "dark-crossing",
+  "entities": [
+    {
+      "id": "far-pad",
+      "role": "pressure pad on the far bank"
+    },
+    {
+      "id": "torch-barrel",
+      "role": "a burning barrel to carry light with",
+      "critical": true
+    },
+    {
+      "id": "lamp-a-brazier",
+      "role": "first brazier, on a ledge west of the path"
+    },
+    {
+      "id": "lamp-b-brazier",
+      "role": "second brazier, on a ledge east of the path"
+    },
+    {
+      "id": "lamp-c-brazier",
+      "role": "third brazier, on a ledge west of the path"
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": -2
+      },
+      "halfExtents": {
+        "x": 6,
+        "y": 1.5,
+        "z": 5
+      }
+    }
+  },
+  "goal": {
+    "sustained": {
+      "signal": "dark-crossing/far-pad-on"
+    },
+    "seconds": 1
+  },
+  "solutions": [
+    {
+      "id": "torch",
+      "name": "Carry the burning barrel along the causeway",
+      "steps": [
+        {
+          "do": "reach",
+          "target": "torch-barrel"
+        },
+        {
+          "do": "move",
+          "target": "torch-barrel",
+          "to": "far-pad"
+        },
+        {
+          "do": "move",
+          "target": "player",
+          "to": "far-pad",
+          "note": "The concrete solver teleports; the replays walk the causeway."
+        }
+      ]
+    },
+    {
+      "id": "braziers",
+      "name": "Light the three braziers with the burning barrel",
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-a-brazier"
+        },
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-b-brazier"
+        },
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-c-brazier"
+        },
+        {
+          "do": "move",
+          "target": "player",
+          "to": "far-pad",
+          "note": "The concrete solver teleports; the replays walk the causeway."
+        }
+      ]
+    },
+    {
+      "id": "ember",
+      "name": "Light the braziers from the bank with Ember",
+      "capabilities": ["spell.ember"],
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-a-brazier",
+          "using": "spell.ember"
+        },
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-b-brazier",
+          "using": "spell.ember"
+        },
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-c-brazier",
+          "using": "spell.ember"
+        },
+        {
+          "do": "move",
+          "target": "player",
+          "to": "far-pad",
+          "note": "The concrete solver teleports; the replays walk the causeway."
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false,
+    "recovery": [
+      {
+        "kind": "respawn",
+        "entity": "torch-barrel",
+        "seconds": 10
+      }
+    ]
+  },
+  "hints": [
+    {
+      "afterSeconds": 120,
+      "highlight": ["lamp-a-brazier", "lamp-b-brazier", "lamp-c-brazier"],
+      "bark": "You cannot see the path. Something in here could burn."
+    }
+  ],
+  "tags": ["greybox", "mvp"],
+  "focus": ["sorcerer"],
+  "outputs": {
+    "solvedFact": "dark-crossing.solved",
+    "set": [
+      {
+        "fact": "dark-crossing.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["dark-crossing/vault-latch"],
+    "rewards": ["dark-crossing-vault"]
+  }
+}
