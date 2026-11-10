@@ -127,9 +127,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 4 minutes and retry, so it fails fast instead.
+        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 4 minutes and retry, so it fails fast instead.
+        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - name: Run this shard's specs
         run: |
           files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 6)
@@ -178,9 +182,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 4 minutes and retry, so it fails fast instead.
+        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 4 minutes and retry, so it fails fast instead.
+        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - run: pnpm e2e --project=playthrough
       - uses: actions/upload-artifact@v7
         if: failure()
