@@ -54,7 +54,7 @@ import { prepareTestbedCombat, startTestbedCombat, TRAINING_DUMMY } from '../com
 import { createGameLoop, FakeFrames, RenderSync, type SceneBinding, type Transform } from '../loop';
 import { installGamePhysics } from '../physics-objects';
 import { readSceneTransform, SceneLoader } from '../scene';
-import { lookForward, toRadians } from '../camera';
+import { lookForward, lookSettings, toRadians } from '../camera';
 import type { CharacterProbe } from '../animation';
 import {
   CROUCH_DROP,
@@ -1234,6 +1234,58 @@ describe('testbed player with a bow (mw-e05.21)', () => {
     const settled = camera.rebuilt;
     run(0.5);
     expect(camera.rebuilt).toBe(settled); // a settled lens is not rebuilt every frame
+  });
+
+  it('mw-e31.6: the fov option sets the lens live, and a drawn bow still zooms from it', () => {
+    let wanted = 70;
+    const { sampler, run, camera } = testbed({
+      moves: combat.moves,
+      bow: combat.bow,
+      fov: () => wanted,
+    });
+    run(0.2);
+    expect(camera.fov).toBe(70);
+    wanted = 100;
+    run(2); // the lens eases to the new rest like it eases to the aim
+    expect(camera.fov).toBe(100);
+    tap(sampler, run, 'Digit4');
+    sampler.down('Mouse0');
+    run(2);
+    expect(camera.fov).toBe(aim.fov);
+    tap(sampler, run, 'Digit4'); // put the bow away mid-draw, as the test above does
+    sampler.up('Mouse0');
+    run(2);
+    expect(camera.fov).toBe(100);
+  });
+
+  it('mw-e31.6: the fov option also moves the lens of a player with no bow', () => {
+    let wanted = 85;
+    const { run, camera } = testbed({ fov: () => wanted });
+    run(0.2);
+    expect(camera.fov).toBe(85);
+    wanted = 60;
+    run(0.2);
+    expect(camera.fov).toBe(60);
+  });
+
+  it('mw-e31.6 AC-3: look options read live turn the same mouse counts further, without a rebuild', () => {
+    let scale = 1;
+    const { sampler, run, state } = testbed({
+      lookLive: () => ({
+        ...lookSettings(cameraTuning),
+        sensitivity: cameraTuning.mouseSensitivity * scale,
+      }),
+    });
+    run(0.2);
+    const yaw0 = state().yaw;
+    sampler.look(100, 0);
+    run(0.2);
+    const first = yaw0 - state().yaw;
+    scale = 2;
+    const yaw1 = state().yaw;
+    sampler.look(100, 0);
+    run(0.2);
+    expect(yaw1 - state().yaw).toBeCloseTo(2 * first, 9);
   });
 
   it('works with a camera that needs no projection rebuild, and reads a bow taken away as none', () => {

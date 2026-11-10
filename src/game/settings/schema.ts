@@ -130,6 +130,11 @@ export const SETTINGS_SCHEMA = {
         help: 'Pushing right turns the camera left.',
         default: false,
       }),
+      autoCentre: toggle({
+        label: 'Auto-centre',
+        help: 'While you run without touching the look controls, the camera eases back to a level view.',
+        default: false,
+      }),
       shakeScale: slider({
         label: 'Camera shake',
         help: 'How much the camera shakes when you are hit or something explodes. 0 turns it off.',

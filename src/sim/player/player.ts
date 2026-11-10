@@ -233,6 +233,13 @@ export interface LookSettings {
   readonly sensitivity: number;
   /** Looking up (mouse or stick) looks down. */
   readonly invertY: boolean;
+  /** Pushing right turns left. */
+  readonly invertX?: boolean;
+  /**
+   * Eases the pitch back to `recentre.pitch` radians while the player moves without look input
+   * (auto-centre, mw-e31.6): after `delay` seconds, at `rate` radians per second. Off when absent.
+   */
+  readonly recentre?: { readonly pitch: number; readonly delay: number; readonly rate: number };
   /** Lowest pitch, radians (looking down); ≤ 0. */
   readonly minPitch: number;
   /** Highest pitch, radians (looking up); ≥ 0. */
@@ -283,15 +290,16 @@ export function stickResponse(stick: ActionVector, settings: StickLookSettings):
  */
 export function lookTurn(input: LookInput, settings: LookSettings, dt: number): LookTurn {
   const up = settings.invertY ? -1 : 1;
+  const right = settings.invertX === true ? -1 : 1;
   let yaw = 0;
   let pitch = 0;
   if (input.mouse !== undefined) {
-    yaw -= input.mouse.x * settings.sensitivity;
+    yaw -= input.mouse.x * settings.sensitivity * right;
     pitch += input.mouse.y * settings.sensitivity * up;
   }
   if (input.stick !== undefined) {
     const rate = stickResponse(input.stick, settings.stick);
-    yaw -= rate.x * settings.stick.yawRate * dt;
+    yaw -= rate.x * settings.stick.yawRate * dt * right;
     pitch += rate.y * settings.stick.pitchRate * dt * up;
   }
   return { yaw: yaw + 0, pitch: pitch + 0 };
@@ -311,20 +319,34 @@ export function clampPitch(
  * the world must have registered) do not turn.
  */
 export function playerLookSystem<TInput>(
-  settings: LookSettings = DEFAULT_LOOK_SETTINGS,
+  source: LookSettings | (() => LookSettings) = DEFAULT_LOOK_SETTINGS,
 ): System<TInput> {
+  // Seconds of moving without look input so far (auto-centre's delay); it is only a pacing counter.
+  let idle = 0;
   return {
     name: 'player-look',
     run({ world, inputs, clock }) {
       const frame = actionFrameOf(inputs);
       if (frame === undefined) return;
-      const turn = lookTurn({ mouse: frame.look, stick: frame.lookStick }, settings, 1 / clock.hz);
-      if (turn.yaw === 0 && turn.pitch === 0) return;
+      const settings = typeof source === 'function' ? source() : source;
+      const dt = 1 / clock.hz;
+      const turn = lookTurn({ mouse: frame.look, stick: frame.lookStick }, settings, dt);
+      const looking = turn.yaw !== 0 || turn.pitch !== 0;
+      const moving = frame.move.x !== 0 || frame.move.y !== 0;
+      idle = looking || !moving ? 0 : idle + dt;
+      const { recentre } = settings;
+      const easing = recentre !== undefined && !looking && idle > recentre.delay;
+      if (!looking && !easing) return;
       world.query(PlayerLook).forEach((id, current) => {
         if (world.has(id, ViewAnchor)) return;
+        let pitch = current.pitch + turn.pitch;
+        if (easing) {
+          const step = recentre.rate * dt;
+          pitch += Math.max(-step, Math.min(step, recentre.pitch - pitch));
+        }
         world.set(id, PlayerLook, {
           yaw: wrapYaw(current.yaw + turn.yaw),
-          pitch: clampPitch(current.pitch + turn.pitch, settings),
+          pitch: clampPitch(pitch, settings),
         });
       });
     },
@@ -594,6 +616,11 @@ export interface PlayerOptions {
   readonly tuning: Frozen<ControllerTuning>;
   /** Look input; each setting defaults to DEFAULT_LOOK_SETTINGS. */
   readonly look?: Partial<LookSettings>;
+  /**
+   * Read every tick and laid over `look`: the player's own look options (sensitivity, invert,
+   * auto-centre, mw-e31.6), which can change while playing. A replay passes none.
+   */
+  readonly lookLive?: () => Partial<LookSettings>;
   /** The pitch the player starts with, radians (clamped to the limits); defaults to level (0). */
   readonly pitch?: number;
   /**
@@ -712,7 +739,11 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   }
   const { combat } = options;
   world.register(CharacterController, CharacterTuning, CharacterLocomotion, PlayerLook, ViewAnchor);
-  world.addSystem(playerLookSystem(look));
+  world.addSystem(
+    playerLookSystem(
+      options.lookLive === undefined ? look : () => ({ ...look, ...options.lookLive?.() }),
+    ),
+  );
   const melee = combat?.melee;
   if (combat !== undefined) {
     const { moves } = combat;
