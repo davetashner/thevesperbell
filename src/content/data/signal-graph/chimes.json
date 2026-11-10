@@ -1,0 +1,101 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "chimes",
+  "name": "Chimes wiring",
+  "notes": "The wiring of the chime room (scene chimes, mw-e15.10), the sound clue and bell sequence prefabs written out so the source can stand behind a wall while the button is on the bank: the button plays high, low, mid from the closet source; the bells must be struck high, low, mid (a wrong bell fails the sequence and rings a wrong chime); the right order latches `solved`, which the puzzle goal reads. The puzzle runtime switches the vault latch on when the puzzle chimes is solved, which raises the portcullis. Binding names are the scene's spawn ids.",
+  "nodes": [
+    {
+      "id": "press",
+      "kind": "button",
+      "entity": "chime-button"
+    },
+    {
+      "id": "chimes",
+      "kind": "clue",
+      "cues": ["chime-high", "chime-low", "chime-mid"],
+      "spacing": 1,
+      "entity": "chime-source"
+    },
+    {
+      "id": "low",
+      "kind": "lever",
+      "entity": "bell-low"
+    },
+    {
+      "id": "mid",
+      "kind": "lever",
+      "entity": "bell-mid"
+    },
+    {
+      "id": "high",
+      "kind": "lever",
+      "entity": "bell-high"
+    },
+    {
+      "id": "order",
+      "kind": "sequence",
+      "steps": ["one", "two", "three"]
+    },
+    {
+      "id": "wrong",
+      "kind": "clue",
+      "cues": ["chime-wrong"],
+      "entity": "bell-mid"
+    },
+    {
+      "id": "right",
+      "kind": "clue",
+      "cues": ["chime-solved"],
+      "entity": "bell-mid"
+    },
+    {
+      "id": "solved",
+      "kind": "latch",
+      "observed": true
+    },
+    {
+      "id": "vault-latch",
+      "kind": "lever"
+    },
+    {
+      "id": "vault-gate",
+      "kind": "receiver",
+      "receiver": "door",
+      "entity": "vault-gate"
+    }
+  ],
+  "wires": [
+    {
+      "from": "press",
+      "to": "chimes"
+    },
+    {
+      "from": "high",
+      "to": "order.one"
+    },
+    {
+      "from": "low",
+      "to": "order.two"
+    },
+    {
+      "from": "mid",
+      "to": "order.three"
+    },
+    {
+      "from": "order.failed",
+      "to": "wrong"
+    },
+    {
+      "from": "order.success",
+      "to": "right"
+    },
+    {
+      "from": "order.success",
+      "to": "solved.set"
+    },
+    {
+      "from": "vault-latch",
+      "to": "vault-gate"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "watchers",
+  "name": "Watchers facts",
+  "notes": "Facts of the Watchers reference puzzle (src/content/data/puzzle/watchers.json, scene watchers; mw-e15.10). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "watchers.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The Watchers puzzle is solved: every statue still standing faces the altar. Written once by the puzzle runtime.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "watchers.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The Watchers vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}

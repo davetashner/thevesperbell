@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "chimes",
+  "name": "Chimes facts",
+  "notes": "Facts of the Chimes reference puzzle (src/content/data/puzzle/chimes.json, scene chimes; mw-e15.10). Grey-box, not story canon.",
+  "facts": [
+    {
+      "key": "chimes.solved",
+      "type": "bool",
+      "default": false,
+      "description": "The chimes puzzle is solved: the bells have been struck in the order the hidden source plays. Written once by the puzzle runtime.",
+      "owner": "puzzle"
+    },
+    {
+      "key": "chimes.vault-open",
+      "type": "bool",
+      "default": false,
+      "description": "The chime room's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
+      "owner": "puzzle"
+    }
+  ]
+}

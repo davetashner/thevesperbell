@@ -988,7 +988,9 @@ describe('scene content', () => {
       'briar-glen-lane',
       'bridgeward-college',
       'chandelier-room',
+      'chimes',
       'combat-sandbox',
+      'dark-crossing',
       'frozen-channel',
       'hiding-room',
       'kit-gallery',
@@ -1009,6 +1011,7 @@ describe('scene content', () => {
       'valley-02',
       'valley-03',
       'variant-room',
+      'watchers',
       'weak-wall-room',
     ]);
   });

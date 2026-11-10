@@ -1,0 +1,209 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "dark-crossing",
+  "name": "Dark crossing",
+  "description": "Greybox reference puzzle for darkness (mw-e15.10): a 6 m pit, 2 m deep, lies between the doorway and the vault, crossed by a one metre wide causeway that nobody can see in the dark (ambient light 0.03). Three unlit braziers stand on stone ledges beside it, each backed by a pillar. Light is what reveals the path: carry the burning barrel along it, or light the braziers (by hand with the barrel, or from the bank with Ember), and the causeway is visible; the portcullis opens when the pad on the far bank has been weighed for a second. Nothing but sight stops a player crossing blind, and nothing but the pit stops them falling, so what the game proves is the light and the crossing, not that light is required (see the puzzle notes). Reach it with ?scene=dark-crossing.",
+  "grid": 1,
+  "camera": {
+    "position": [-10, 10, -12],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, -5],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 5],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [0, -2, 0],
+      "scale": [6, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, -2, 0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, -2, 0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [0.5, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -7]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, 5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, 5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0, 0, 7]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 11],
+      "scale": [1, 1, 4]
+    },
+    {
+      "piece": "wall",
+      "at": [-1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 15]
+    },
+    {
+      "piece": "floor",
+      "at": [-1.5, 0, -1.5],
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [1.5, 0, 0],
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-1.5, 0, 1.5],
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-1.5, 0, -1.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [1.5, 0, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [-1.5, 0, 1.75]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -5.5],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "far-pad",
+      "at": [0, 0, 5],
+      "tags": ["goal"],
+      "plate": {
+        "minWeight": 40,
+        "width": 3,
+        "depth": 2
+      }
+    },
+    {
+      "id": "torch-barrel",
+      "at": [-4.5, 0, -6],
+      "prop": "barrel",
+      "tags": ["torch-barrel"],
+      "properties": {
+        "burning": true,
+        "fuel": 900
+      }
+    },
+    {
+      "id": "vault-gate",
+      "at": [0, 0, 7],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "vault-prize",
+      "at": [0, 0, 13],
+      "tags": ["goal"]
+    }
+  ],
+  "prefabs": [
+    {
+      "id": "lamp-a",
+      "prefab": "brazier",
+      "at": [-1.5, 0, -2.0]
+    },
+    {
+      "id": "lamp-b",
+      "prefab": "brazier",
+      "at": [1.5, 0, -0.5]
+    },
+    {
+      "id": "lamp-c",
+      "prefab": "brazier",
+      "at": [-1.5, 0, 1.0]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "dark-crossing"
+    }
+  ],
+  "light": {
+    "ambient": 0.03
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "chimes",
+  "name": "Chimes",
+  "description": "Greybox reference puzzle for sound (mw-e15.10): a button on the south bank makes a hidden source in a closet behind the west wall chime three times, high, low, mid, and across a 6 m pit three bells stand against the north wall. Strike them in the order you heard and the portcullis opens; a wrong bell rings a wrong chime and starts the order over. The bells are out of reach, so something has to be thrown, shot or cast at them: a crate lobbed over the pit, a crate carried over with Mage Hand. The order can also be known without listening (a keeper's ledger; there is no readable item for it yet, see the puzzle notes). Reach it with ?scene=chimes.",
+  "grid": 1,
+  "camera": {
+    "position": [-10, 10, -12],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, -5],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 5],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [0, -2, 0],
+      "scale": [6, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, -2, 0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, -2, 0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -7]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, 5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, 5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0, 0, 7]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 11],
+      "scale": [1, 1, 4]
+    },
+    {
+      "piece": "wall",
+      "at": [-1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 15]
+    },
+    {
+      "piece": "floor",
+      "at": [-9, 0, -5],
+      "scale": [2, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [-9, 0, -8],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-9, 0, -2],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-12, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -5.5],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "chime-button",
+      "at": [-2, 0, -6],
+      "switch": {
+        "kind": "button"
+      }
+    },
+    {
+      "id": "chime-source",
+      "at": [-9, 1.5, -5],
+      "tags": ["chime-source"]
+    },
+    {
+      "id": "lob-crate",
+      "at": [2, 0, -4],
+      "prop": "crate",
+      "tags": ["carry"],
+      "properties": {
+        "pushable": true,
+        "liftable": true
+      }
+    },
+    {
+      "id": "bell-low",
+      "at": [-3, 0.5, 5.5],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "momentary",
+        "holdSeconds": 1,
+        "minEnergy": 1,
+        "radius": 1.2,
+        "elements": ["force"]
+      }
+    },
+    {
+      "id": "bell-mid",
+      "at": [0, 0.5, 5.5],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "momentary",
+        "holdSeconds": 1,
+        "minEnergy": 1,
+        "radius": 1.2,
+        "elements": ["force"]
+      }
+    },
+    {
+      "id": "bell-high",
+      "at": [3, 0.5, 5.5],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "momentary",
+        "holdSeconds": 1,
+        "minEnergy": 1,
+        "radius": 1.2,
+        "elements": ["force"]
+      }
+    },
+    {
+      "id": "vault-gate",
+      "at": [0, 0, 7],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "vault-prize",
+      "at": [0, 0, 13],
+      "tags": ["goal"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "chimes"
+    }
+  ],
+  "light": {
+    "ambient": 0.5
+  }
+}
