@@ -80,12 +80,12 @@ jobs:
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-firefox-webkit
       - if: steps.browsers.outputs.cache-hit != 'true'
         # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
-        # try 4 minutes and retry, so it fails fast instead.
-        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install --with-deps firefox webkit && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install --with-deps firefox webkit && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
         # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
-        # try 4 minutes and retry, so it fails fast instead.
-        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install-deps firefox webkit && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install-deps firefox webkit && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       # Firefox only runs an AudioContext with a sound server; the runner has no sound card, so give
       # it PulseAudio with a null sink (mw-e28.1 AC-6).
       - run: |
@@ -130,12 +130,12 @@ jobs:
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - if: steps.browsers.outputs.cache-hit != 'true'
         # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
-        # try 4 minutes and retry, so it fails fast instead.
-        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
         # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
-        # try 4 minutes and retry, so it fails fast instead.
-        run: for try in 1 2 3; do timeout 240 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       # Writes test-results/perf-report.json and the job summary (e2e/perf/reporter.ts).
       - run: pnpm perf
       - uses: actions/upload-artifact@v7
