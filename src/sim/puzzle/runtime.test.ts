@@ -11,6 +11,8 @@ import { placeEntity } from '../stimulus/placement';
 import { installStimuli } from '../stimulus/stimulus';
 import {
   capabilityUsed,
+  clueRead,
+  readClue,
   puzzleDiscovered,
   puzzleFailed,
   puzzleRewarded,
@@ -436,6 +438,49 @@ describe('attribution from the capability trail (mw-e15.3)', () => {
     w3.events.emit(capabilityUsed, { actor: p3, capability: 'spell.ember', tick: w3.tick });
     steps(w3, 1);
     expect(r3.record('braziers').trail).toEqual([]);
+  });
+});
+
+describe('readable clues (mw-e15.5)', () => {
+  it('reading a clue adds clue.<item> to its puzzle’s trail only, at any time before the first touch', () => {
+    const { world, runtime, west, east, player } = setup({
+      ...braziers,
+      solutions: [{ id: 'torch', capabilities: [] }],
+    });
+    readClue(world, player, 'bell-notes', ['braziers']);
+    steps(world, ENGAGE_WINDOW_SECONDS * HZ + 5); // long before the puzzle is touched
+    expect(runtime.state('braziers')).toBe('dormant');
+    setProperty(world, west, 'burning', true);
+    setProperty(world, east, 'burning', true);
+    steps(world, 2);
+    expect(runtime.state('braziers')).toBe('solved');
+    expect(runtime.status()[0]?.trail).toEqual(['clue.bell-notes']);
+  });
+
+  it('a clue for another puzzle, from another actor, or after the solve adds nothing', () => {
+    const { world, runtime, player, west, east } = setup();
+    const stranger = world.spawn();
+    readClue(world, stranger, 'bell-notes', ['braziers']);
+    readClue(world, player, 'bell-notes', ['somewhere-else']);
+    steps(world, 1);
+    expect(runtime.record('braziers').trail).toEqual([]);
+    setProperty(world, west, 'burning', true);
+    setProperty(world, east, 'burning', true);
+    steps(world, 2);
+    expect(runtime.state('braziers')).toBe('solved');
+    readClue(world, player, 'late-notes', ['braziers']);
+    steps(world, 1);
+    expect(runtime.record('braziers').trail).toEqual([]);
+  });
+
+  it('readClue announces one event per bound puzzle, and none for an unbound readable', () => {
+    const { world, player } = setup();
+    const seen: string[] = [];
+    world.events.on(clueRead, (e) => seen.push(`${e.puzzle}:${e.item}:${String(e.tick)}`));
+    readClue(world, player, 'bell-notes', ['a', 'b']);
+    readClue(world, player, 'plain-book', []);
+    steps(world, 1);
+    expect(seen).toEqual(['a:bell-notes:0', 'b:bell-notes:0']);
   });
 });
 

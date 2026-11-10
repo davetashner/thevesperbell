@@ -231,6 +231,12 @@ export const CUE_EVENTS = {
     /** `key` is the fact key or, for an `audio-cue` receiver, the cue id. */
     facts: { graph: 'string', node: 'string', receiver: 'string', key: 'string', value: 'boolean' },
   },
+  soundClueCued: {
+    /** `entity` is the sound's source (a clue node's bound spawn), so the cue plays from it. */
+    anchors: ['entity'],
+    /** `cue` is the clue cue id, e.g. "chime-high"; `graph` and `node` name the emitter. */
+    facts: { graph: 'string', node: 'string', cue: 'string' },
+  },
   volumeEntered: { anchors: ['entity'], facts: { graph: 'string', node: 'string' } },
   volumeExited: { anchors: ['entity'], facts: { graph: 'string', node: 'string' } },
   physicsImpact: {

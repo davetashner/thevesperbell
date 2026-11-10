@@ -79,20 +79,23 @@ describeContent(
 );
 
 describe('puzzle prefabs (mw-e15.4)', () => {
-  it('ships 15 prefabs', () => {
+  it('ships 18 prefabs', () => {
     expect(content.all('prefab').map((p) => p.id)).toEqual([
       'beam-sensor',
       'beam-source',
       'bell',
+      'bell-sequence',
       'brazier',
       'counterweight-lift',
       'crystal-receiver',
       'lens-stand',
+      'plate-timed-door',
       'rotatable-mirror',
       'rotatable-statue',
       'rune-tile-sequence',
       'scale-plate-pair',
       'sliding-block',
+      'sound-clue',
       'timed-door',
       'water-basin',
       'weighted-crate-set',

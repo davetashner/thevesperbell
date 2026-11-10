@@ -1,0 +1,66 @@
+{
+  "id": "puzzle-clues",
+  "notes": "Sound clue cues of puzzle mechanisms (mw-e15.5): a clue node (src/sim/signals) sounds its cues in order, each as soundClueCued anchored at the node's bound spawn, so the chime is positional (behind a wall it is muffled and panned by the audio engine). Every clue cue is gameplay-critical: a player who cannot hear it still needs it, so each has a caption with a direction ([High chime, left]). All play the placeholder metal impact set until the approved bell and chime SFX arrive (mw-e38.144), which replaces the cue ids here and nothing else; the cue ids low, mid, high, wrong and solved are the contract with puzzle data.",
+  "rules": [
+    {
+      "event": "soundClueCued",
+      "match": {
+        "cue": "chime-low"
+      },
+      "layer": "clue",
+      "cue": "sfx-impact-metal",
+      "volumeDb": -4,
+      "priority": 52,
+      "caption": "caption.clue.chime-low",
+      "gameplayCritical": true
+    },
+    {
+      "event": "soundClueCued",
+      "match": {
+        "cue": "chime-mid"
+      },
+      "layer": "clue",
+      "cue": "sfx-impact-metal",
+      "volumeDb": -4,
+      "priority": 52,
+      "caption": "caption.clue.chime-mid",
+      "gameplayCritical": true
+    },
+    {
+      "event": "soundClueCued",
+      "match": {
+        "cue": "chime-high"
+      },
+      "layer": "clue",
+      "cue": "sfx-impact-metal",
+      "volumeDb": -4,
+      "priority": 52,
+      "caption": "caption.clue.chime-high",
+      "gameplayCritical": true
+    },
+    {
+      "event": "soundClueCued",
+      "match": {
+        "cue": "chime-wrong"
+      },
+      "layer": "clue",
+      "cue": "sfx-impact-metal",
+      "volumeDb": -2,
+      "priority": 60,
+      "caption": "caption.clue.chime-wrong",
+      "gameplayCritical": true
+    },
+    {
+      "event": "soundClueCued",
+      "match": {
+        "cue": "chime-solved"
+      },
+      "layer": "clue",
+      "cue": "sfx-impact-metal",
+      "volumeDb": -2,
+      "priority": 60,
+      "caption": "caption.clue.chime-solved",
+      "gameplayCritical": true
+    }
+  ]
+}

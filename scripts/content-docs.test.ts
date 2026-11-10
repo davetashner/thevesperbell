@@ -486,7 +486,7 @@ describe('renderWorldPropertiesDoc (mw-e03.31)', () => {
   it('AC-5: the puzzle prefab catalogue lists every prefab with its properties and outputs, and is committed', () => {
     const prefabs = loadGameContent().all('prefab');
     const doc = expectedDocs().get(PUZZLE_PREFABS_DOC) ?? '';
-    expect(prefabs).toHaveLength(15);
+    expect(prefabs).toHaveLength(18);
     for (const prefab of prefabs) {
       expect(doc, prefab.id).toContain(`## ${prefab.name} (\`${prefab.id}\`)`);
       for (const name of Object.keys(prefab.parameters)) expect(doc).toContain(`| \`${name}\` |`);

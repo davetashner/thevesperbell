@@ -141,6 +141,16 @@ const SAMPLES: Record<CueEventName, unknown> = {
     value: true,
     tick: 1,
   },
+  soundClueCued: {
+    graph: 7,
+    graphId: 'bells',
+    node: 'chimes',
+    entity: 4,
+    cue: 'chime-high',
+    index: 1,
+    count: 3,
+    tick: 1,
+  },
   volumeEntered: { graph: 7, graphId: 'gate', node: 'plate', entity: 4, tick: 1 },
   volumeExited: { graph: 7, graphId: 'gate', node: 'plate', entity: 4, tick: 1 },
   physicsImpact: {
@@ -506,6 +516,13 @@ describe('cue event bindings', () => {
         key: null,
       }).facts['key'],
     ).toBeUndefined();
+  });
+
+  it('mw-e15.5: read a sound clue cue, anchored at its source with the cue id as a fact', () => {
+    expect(read('soundClueCued', SAMPLES.soundClueCued)).toEqual({
+      anchors: { entity: { entity: 4 } },
+      facts: { graph: 'bells', node: 'chimes', cue: 'chime-high' },
+    });
   });
 
   it('AC-1: read a physics impact: both sides’ impact class and material, energy, impulse and speed', () => {

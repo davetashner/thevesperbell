@@ -1,0 +1,114 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "plate-timed-door",
+  "name": "Plate timed door",
+  "description": "A door held open by a pressure plate and for a while after it is released: the race-the-door puzzle. Step on the plate (or weigh it with a crate) and the door opens; once the plate is clear the door stays open for the window, then shuts. The door is moved only by the signal, never by hand.",
+  "tags": ["time", "weight"],
+  "parameters": {
+    "profile": {
+      "type": "enum",
+      "description": "What kind of door.",
+      "values": ["sliding-door", "portcullis"],
+      "default": "sliding-door"
+    },
+    "windowSeconds": {
+      "type": "number",
+      "description": "Seconds the door stays open after the plate is released.",
+      "unit": "s",
+      "min": 0.5,
+      "max": 120,
+      "default": 8
+    },
+    "minWeight": {
+      "type": "number",
+      "description": "Weight that presses the plate.",
+      "unit": "kg",
+      "min": 1,
+      "max": 500,
+      "default": 25
+    }
+  },
+  "spawns": [
+    {
+      "local": "door",
+      "at": [0, 0, 0],
+      "door": {
+        "profile": "$profile"
+      }
+    },
+    {
+      "local": "plate",
+      "at": [-2, 0, -1],
+      "plate": {
+        "minWeight": "$minWeight",
+        "width": 1,
+        "depth": 1
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "held",
+        "kind": "lever",
+        "entity": "plate"
+      },
+      {
+        "id": "released",
+        "kind": "pulse",
+        "edge": "falling"
+      },
+      {
+        "id": "window",
+        "kind": "timer",
+        "seconds": "$windowSeconds"
+      },
+      {
+        "id": "open",
+        "kind": "or"
+      },
+      {
+        "id": "leaf",
+        "kind": "receiver",
+        "receiver": "door",
+        "entity": "door"
+      }
+    ],
+    "wires": [
+      {
+        "from": "held",
+        "to": "released"
+      },
+      {
+        "from": "released",
+        "to": "window"
+      },
+      {
+        "from": "held",
+        "to": "open"
+      },
+      {
+        "from": "window",
+        "to": "open"
+      },
+      {
+        "from": "open",
+        "to": "leaf"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "plate",
+      "description": "Weight on the plate; stepping on it again during the window keeps the door open until it is released.",
+      "spawn": "plate"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "open",
+      "description": "On while the plate is held and for the window after it is released.",
+      "node": "open"
+    }
+  ]
+}

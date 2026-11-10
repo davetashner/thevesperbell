@@ -50,6 +50,7 @@
               "propertyChanged",
               "factChanged",
               "signalReceived",
+              "soundClueCued",
               "volumeEntered",
               "volumeExited",
               "physicsImpact",

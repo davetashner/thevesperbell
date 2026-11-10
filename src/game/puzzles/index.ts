@@ -9,6 +9,8 @@
 //   plan.
 // - `PuzzleWatch` publishes what the puzzles are doing for the e2e (#app[data-puzzles]).
 //
+// Readable clue binding lives in clues.ts (mw-e15.5).
+//
 // No puzzles, no cost: scenes without puzzle files never reach any of this.
 
 import type { GameContent, SceneDef } from '@content/index';
@@ -24,6 +26,7 @@ import {
   type SceneSpawnPlacement,
   type World,
 } from '@sim/index';
+import { attachBookClues } from './clues.ts';
 import { breakableProfiles } from '../breakables';
 import { propBodies } from '../physics-objects';
 import { placeSpawn, type SpawnLoader } from '../scene/variants';
@@ -109,6 +112,8 @@ export function startPuzzles(
     killY: options.killY,
   });
   world.addSystem(puzzleSystem(runtime));
+  // Scrolls bound to a puzzle (`book.clueFor`) put a clue on its trail when read (mw-e15.5).
+  attachBookClues(world, content);
   world.events.on(puzzleSolvedUndeclared, ({ puzzle, trail, tick }) => {
     options.report?.(
       `puzzle ${puzzle} solved at tick ${String(tick)} by an undeclared route (capabilities used: ${trail.join(', ') || 'none'})`,
@@ -202,3 +207,4 @@ export class PuzzleWatch {
     return json;
   }
 }
+export * from './clues.ts';

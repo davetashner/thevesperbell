@@ -4,6 +4,7 @@
 
 import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
+import type { World } from '../core/world';
 
 /** The lifecycle of a puzzle: where it is between "nobody has seen it" and "done". */
 export const PUZZLE_STATES = ['dormant', 'discovered', 'in-progress', 'solved', 'failed'] as const;
@@ -100,3 +101,34 @@ export interface PuzzleRecovered {
   readonly entity: string;
 }
 export const puzzleRecovered = defineEvent<PuzzleRecovered>('puzzleRecovered');
+
+/** Trail ids of read clues start with this. */
+export const CLUE_PREFIX = 'clue.';
+
+/** The capability id a read clue adds to a puzzle's trail: `clue.<item id>`. */
+export const clueCapability = (item: string): string => `${CLUE_PREFIX}${item}`;
+
+/**
+ * A readable item bound to a puzzle was read (mw-e15.5): its text is a clue to `puzzle`, so the
+ * puzzle's trail gains `clue.<item>` and a later solve can credit the book. One event per bound
+ * puzzle. The reader (a scroll read, the book reader of mw-e07.9) emits it through `readClue`.
+ */
+export interface ClueRead {
+  readonly actor: EntityId;
+  /** The readable item's definition id. */
+  readonly item: string;
+  readonly puzzle: string;
+  readonly tick: number;
+}
+export const clueRead = defineEvent<ClueRead>('clueRead');
+
+/** Announces that `actor` read `item`, a clue to each of `puzzles` (the item's `clueFor`). */
+export function readClue(
+  world: World<never>,
+  actor: EntityId,
+  item: string,
+  puzzles: readonly string[],
+): void {
+  for (const puzzle of puzzles)
+    world.events.emit(clueRead, { actor, item, puzzle, tick: world.tick });
+}

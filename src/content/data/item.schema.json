@@ -1026,6 +1026,15 @@
               "default": false,
               "description": "Whispers from the pages while it is carried or read.",
               "type": "boolean"
+            },
+            "clueFor": {
+              "description": "Puzzles its text is a clue to (mw-e15.5): reading it adds `clue.<item id>` to each puzzle’s trail, so a solve and its hint attribution can say a book helped. The text itself says what the clue is.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "puzzle"
+              }
             }
           },
           "required": [

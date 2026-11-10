@@ -36,6 +36,7 @@ import {
   PoiseBroken,
   propertyChanged,
   signalReceived,
+  soundClueCued,
   StaminaExhausted,
   StaminaRecovered,
   stimulusResolved,
@@ -423,6 +424,10 @@ export const CUE_EVENT_BINDINGS: Readonly<Record<CueEventName, CueEventBinding>>
       key: e.key ?? undefined,
       value: e.value,
     },
+  })),
+  soundClueCued: bind(soundClueCued, (e) => ({
+    anchors: { entity: at(e.entity) },
+    facts: { graph: e.graphId, node: e.node, cue: e.cue },
   })),
   volumeEntered: bind(volumeEntered, (e) => ({
     anchors: { entity: { entity: e.entity } },

@@ -1,0 +1,144 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "bell-sequence",
+  "name": "Bell sequence",
+  "description": "Three bells, low, mid and high, that must be struck in the order the instance expects (low, high, mid by default): the answering half of a bell-tower puzzle. A wrong bell starts the sequence over and rings a wrong chime; the right order rings a bright chime and latches solved until reset. Each bell is struck as the single bell prefab is: an arrow, a thrown object or a spell.",
+  "tags": ["sound", "sequence"],
+  "parameters": {
+    "first": {
+      "type": "enum",
+      "description": "The bell to strike first.",
+      "values": ["low", "mid", "high"],
+      "default": "low"
+    },
+    "second": {
+      "type": "enum",
+      "description": "The bell to strike second.",
+      "values": ["low", "mid", "high"],
+      "default": "high"
+    },
+    "third": {
+      "type": "enum",
+      "description": "The bell to strike third.",
+      "values": ["low", "mid", "high"],
+      "default": "mid"
+    },
+    "holdSeconds": {
+      "type": "number",
+      "description": "Seconds a bell stays on after a strike.",
+      "unit": "s",
+      "min": 0,
+      "max": 60,
+      "default": 1
+    }
+  },
+  "spawns": [
+    {
+      "local": "bell-low",
+      "at": [-1.5, 2, 0],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "momentary",
+        "holdSeconds": "$holdSeconds"
+      }
+    },
+    {
+      "local": "bell-mid",
+      "at": [0, 2, 0],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "momentary",
+        "holdSeconds": "$holdSeconds"
+      }
+    },
+    {
+      "local": "bell-high",
+      "at": [1.5, 2, 0],
+      "impactSwitch": {
+        "variant": "bell",
+        "mode": "momentary",
+        "holdSeconds": "$holdSeconds"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "low",
+        "kind": "lever",
+        "entity": "bell-low"
+      },
+      {
+        "id": "mid",
+        "kind": "lever",
+        "entity": "bell-mid"
+      },
+      {
+        "id": "high",
+        "kind": "lever",
+        "entity": "bell-high"
+      },
+      {
+        "id": "order",
+        "kind": "sequence",
+        "steps": ["one", "two", "three"]
+      },
+      {
+        "id": "wrong",
+        "kind": "clue",
+        "cues": ["chime-wrong"],
+        "entity": "bell-mid"
+      },
+      {
+        "id": "right",
+        "kind": "clue",
+        "cues": ["chime-solved"],
+        "entity": "bell-mid"
+      },
+      {
+        "id": "solved",
+        "kind": "latch"
+      }
+    ],
+    "wires": [
+      {
+        "from": "$first",
+        "to": "order.one"
+      },
+      {
+        "from": "$second",
+        "to": "order.two"
+      },
+      {
+        "from": "$third",
+        "to": "order.three"
+      },
+      {
+        "from": "order.failed",
+        "to": "wrong"
+      },
+      {
+        "from": "order.success",
+        "to": "right"
+      },
+      {
+        "from": "order.success",
+        "to": "solved.set"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "strike",
+      "description": "Any impact above a bell's energy: arrow, thrown crate, spell. The low bell is the first spawn.",
+      "spawn": "bell-low"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "solved",
+      "description": "On once the bells have been struck in the expected order.",
+      "node": "solved"
+    }
+  ]
+}

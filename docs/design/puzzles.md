@@ -143,6 +143,32 @@ introduces a component; what the existing ones could not say (push rules, liquid
 facing) went to the e03 layer as general scene fields and a `facing` predicate. Catalogue, generated
 from the data: [puzzle prefabs](puzzle-prefabs.md); demo scene `?scene=prefab-gallery`.
 
+## Ordered, timed and sound-clue mechanisms
+
+Listening, repeating and racing are signal-graph mechanisms (mw-e15.5), not puzzle code.
+
+- **Sound clue emitter**: the `clue` signal node. A rising edge plays its `cues` in order,
+  `spacing` seconds apart (the first at once), each as a `soundClueCued` event anchored at the
+  node's bound spawn. The sim stays silent: the `puzzle-clues` cue sheet turns each cue (`chime-low`,
+  `chime-mid`, `chime-high`, `chime-wrong`, `chime-solved`) into a positional sound from that spawn,
+  so a source behind a wall is muffled and panned by the audio engine. Every clue cue is
+  gameplay-critical (mw-e31.5) with a caption, so with sound captions on it reads like
+  `[High chime, left]` (the caption system supplies the direction). A press mid-run is ignored; the
+  run is node state and survives a save. Until the approved bell SFX land (mw-e38.144) every clue cue
+  plays the placeholder metal impact set.
+- **Sequence validator**: the existing `sequence` node. The right order pulses `success`; any
+  out-of-order input pulses `failed` and restarts. The `bell-sequence` prefab wires `failed` to a
+  `chime-wrong` clue and `success` to `chime-solved` and a latch.
+- **Timed window**: `plate-timed-door` opens a door while its plate is weighed and for
+  `windowSeconds` (8 by default) after it is released: a falling-edge `pulse` starts a `timer`, and
+  the door follows plate OR timer. The door then takes its profile's close time (1.5 s for the sliding
+  door) to shut.
+- **Readable clue binding**: an item's `book.clueFor` lists the puzzles its text is a clue to.
+  Reading it (`readClue`; scrolls are wired, the book reader of mw-e07.9 calls the same function)
+  puts `clue.<item id>` on each bound puzzle's trail, at any time before the puzzle is touched, so
+  `puzzleSolved.trail` and hint attribution can say a book helped. The text itself is the item's own
+  pages.
+
 ## The solvability validator
 
 `pnpm puzzle:validate [id…] [--abstract-only] [--time-box <ms>]` (mw-e15.6; code in
