@@ -289,6 +289,9 @@ jobs:
   # puzzle is proven reachable by a bounded abstract search (10 s per puzzle) and its step list is run in
   # the headless sim. The job fails when an mvp puzzle has an unreachable or diverging declared solution;
   # other puzzles are reported in the log. It runs outside coverage, in a few seconds.
+  # It also audits per-class solution coverage (mw-e15.8): docs/design/puzzle-coverage.md must be what
+  # `pnpm puzzle:coverage --write` generates, every mvp puzzle needs 2 distinct validated solutions and
+  # 3 of 4 classes able to solve it, and the step summary shows what a PR changed.
   puzzle-validate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -296,6 +299,11 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm puzzle:validate
+      - name: Puzzle coverage gate and report check
+        run: |
+          git fetch --depth=1 origin main
+          git show origin/main:docs/design/puzzle-coverage.md > "$RUNNER_TEMP/base-coverage.md" || : > "$RUNNER_TEMP/base-coverage.md"
+          pnpm puzzle:coverage --check --summary --base "$RUNNER_TEMP/base-coverage.md" >> "$GITHUB_STEP_SUMMARY"
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.
