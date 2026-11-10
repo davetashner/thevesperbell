@@ -1,0 +1,157 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "sunbeam-hall",
+  "name": "Sunbeam hall: light the sensor",
+  "notes": "Reference puzzle for light (mw-e15.9), built with data only: a sunlight beam source, two rotatable mirror prefabs, a beam sensor and a brazier, with a signal latch that raises the portcullis. The goal is the outcome (the sensor is lit, or the brazier beside it burns, for a second), so turning the mirrors, carrying flame to the brazier or casting Ember at it all count. There is no light spell yet (see the gap bead filed with this puzzle) and a light receiver only answers beams, so the brazier route is expressed in the goal as an alternative, not as light on the sensor. Greybox, not story canon.",
+  "scene": "sunbeam-hall",
+  "entities": [
+    {
+      "id": "mirror-a-mirror",
+      "role": "first mirror, on the beam's line"
+    },
+    {
+      "id": "mirror-b-mirror",
+      "role": "second mirror, east of the first"
+    },
+    {
+      "id": "eye-receiver",
+      "role": "beam sensor by the north-east wall"
+    },
+    {
+      "id": "lamp-brazier",
+      "role": "brazier beside the sensor"
+    },
+    {
+      "id": "torch-barrel",
+      "role": "a burning barrel to carry flame with",
+      "critical": true
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 5,
+        "y": 1.5,
+        "z": 3
+      }
+    }
+  },
+  "goal": {
+    "sustained": {
+      "any": [
+        {
+          "signal": "eye/lit"
+        },
+        {
+          "signal": "lamp/lit"
+        }
+      ]
+    },
+    "seconds": 1
+  },
+  "solutions": [
+    {
+      "id": "mirrors",
+      "name": "Turn both mirrors so the beam reaches the sensor",
+      "steps": [
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "mirror-a-mirror",
+          "note": "Each use turns the mirror one 45 degree step; three steps send the beam east."
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "mirror-a-mirror",
+          "note": "Each use turns the mirror one 45 degree step; three steps send the beam east."
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "mirror-a-mirror",
+          "note": "Each use turns the mirror one 45 degree step; three steps send the beam east."
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "mirror-b-mirror"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "mirror-b-mirror"
+        },
+        {
+          "do": "interact",
+          "verb": "rotate",
+          "target": "mirror-b-mirror"
+        }
+      ]
+    },
+    {
+      "id": "carry-flame",
+      "name": "Carry the burning barrel to the brazier",
+      "steps": [
+        {
+          "do": "move",
+          "target": "torch-barrel",
+          "to": "lamp-brazier"
+        }
+      ]
+    },
+    {
+      "id": "ember",
+      "name": "Cast Ember at the brazier from across the room",
+      "capabilities": ["spell.ember"],
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "lamp-brazier",
+          "using": "spell.ember"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false,
+    "recovery": [
+      {
+        "kind": "respawn",
+        "entity": "torch-barrel",
+        "seconds": 10
+      }
+    ]
+  },
+  "hints": [
+    {
+      "afterSeconds": 120,
+      "highlight": ["eye-receiver", "mirror-a-mirror"],
+      "bark": "The light comes from the corner. It has to reach that sensor somehow."
+    }
+  ],
+  "tags": ["greybox", "mvp"],
+  "focus": ["knight", "sorcerer"],
+  "outputs": {
+    "solvedFact": "sunbeam-hall.solved",
+    "set": [
+      {
+        "fact": "sunbeam-hall.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["sunbeam-hall/vault-latch"],
+    "rewards": ["sunbeam-hall-vault"]
+  }
+}

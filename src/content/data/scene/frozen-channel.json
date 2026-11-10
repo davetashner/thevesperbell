@@ -1,0 +1,170 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "frozen-channel",
+  "name": "Frozen channel",
+  "description": "Greybox reference puzzle for freezing and levitation (mw-e15.9): a 6 m channel of water above a 2 m trench splits a 12 m hall in two, and the portcullis in the north wall opens when the pressure pad on the far bank is weighed for a second. A person's 90 kg does it and so does a 12 kg crate, so there are two ways: freeze the surface into walkable ice (any cold stimulus) and walk across, or lift the crate over the water with Mage Hand and set it on the pad. The 2 m trench cannot be climbed out of and crates sink (there is no buoyancy yet, mw-e03.14), which is why those routes are not declared. Reach it with ?scene=frozen-channel.",
+  "grid": 1,
+  "camera": {
+    "position": [-10, 10, -10],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, -5],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 5],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [0, -2, 0],
+      "scale": [6, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, -2, 0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, -2, 0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, -7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -7]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, -5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, 5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, 5],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0, 0, 7]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, 7],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 11],
+      "scale": [1, 1, 4]
+    },
+    {
+      "piece": "wall",
+      "at": [-1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1, 0, 11],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 15]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -5.5],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "channel",
+      "at": [0, -2, 0],
+      "tags": ["channel"],
+      "liquid": {
+        "size": [12, 2, 6],
+        "liquid": "water",
+        "depth": 2
+      }
+    },
+    {
+      "id": "far-pad",
+      "at": [0, 0, 5],
+      "tags": ["goal"],
+      "plate": {
+        "minWeight": 10,
+        "width": 3,
+        "depth": 2
+      }
+    },
+    {
+      "id": "crate",
+      "at": [2, 0, -4],
+      "prop": "crate",
+      "tags": ["carry"],
+      "properties": {
+        "pushable": true,
+        "liftable": true
+      }
+    },
+    {
+      "id": "vault-gate",
+      "at": [0, 0, 7],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "vault-prize",
+      "at": [0, 0, 13],
+      "tags": ["goal"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "frozen-channel"
+    }
+  ],
+  "light": {
+    "ambient": 0.5
+  }
+}
