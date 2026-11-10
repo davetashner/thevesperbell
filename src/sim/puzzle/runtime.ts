@@ -24,9 +24,23 @@
 //   `World.restore` the runtime reloads its view (it notices by `World.restores`), resumes the holds
 //   and re-reads the goals; a solved puzzle stays solved without firing anything.
 //
+// - Recovery (mw-e15.7): `recovery` policies bring a puzzle back from a loss, in the world, never by
+//   rolling a save back. `respawn`: a critical entity that is lost (destroyed) or spent (burnt out)
+//   is replaced at its source after N seconds through the host (the scene loader), never overlapping
+//   another physics object: while the spot is taken it retries every `RETRY_SECONDS`. `reset`: using
+//   the trigger entity (a lever) returns the listed doors and switches to their authored state and
+//   counts a reset in a fact; a solved puzzle ignores it. Every critical entity that is a physics
+//   object and falls below the kill plane is put back at its spawn within the tick (recovery.ts).
+//   Each recovery says so with `puzzleRecovered`. Pending respawns are part of the saved record
+//   (`recovering`, present only while one is pending), so a save in the middle of one finishes it.
+//
 // Everything here is deterministic: events, ids and sim ticks only.
 
 import { defineComponent, type EntityId } from '../core/component';
+import { fireBurntOut } from '../elements/fire';
+import { PhysicsObjectComponent } from '../physics/objects';
+import { SceneTransformComponent } from '../scene/loader';
+import type { Vec3 } from '../stimulus/shapes';
 import type { System, World } from '../core/world';
 import type { Condition } from '../facts/conditions';
 import { worldLiveReader } from '../facts/live';
@@ -34,13 +48,23 @@ import { interacted } from '../interaction/system';
 import { SpellCast } from '../magic/events';
 import { propertyChanged } from '../properties/components';
 import { SceneSpawnComponent } from '../scene/loader';
+import { DoorComponent, LockComponent, SwitchComponent } from '../mechanisms/components';
 import { SignalGraphComponent, pressButton, setLever, signalGraphOf } from '../signals/runtime';
 import type { VolumeShape } from '../signals/graph';
 import { GoalRuntime } from './goals';
 import {
+  footprintClear,
+  markPuzzleCritical,
+  PuzzleCriticalComponent,
+  resetMechanisms,
+  returnLost,
+  type MechanismDefault,
+} from './recovery';
+import {
   capabilityUsed,
   puzzleDiscovered,
   puzzleFailed,
+  puzzleRecovered,
   puzzleRewarded,
   puzzleSolved,
   puzzleSolvedUndeclared,
@@ -68,6 +92,45 @@ export interface PuzzleOutputsDef {
   readonly rewards: readonly string[];
 }
 
+/** A door or switch of a reset policy, as its scene authored it. */
+export interface ResetMechanismDef {
+  /** The scene spawn id of the door or switch. */
+  readonly spawn: string;
+  readonly door?: { readonly open: boolean; readonly jammed: boolean; readonly locked?: boolean };
+  readonly switch?: { readonly position: number };
+}
+
+/** How a puzzle recovers (the content's `policy.recovery`). */
+export type RecoveryDef =
+  | {
+      readonly kind: 'respawn';
+      /** The critical entity (a spawn id) that is replaced. */
+      readonly entity: string;
+      readonly seconds: number;
+    }
+  | {
+      readonly kind: 'reset';
+      /** The spawn id of the lever (or anything else that is interacted with) that resets. */
+      readonly trigger: string;
+      /** A declared int fact counted up by each reset. */
+      readonly fact?: string | undefined;
+      /** What goes back to its authored state. */
+      readonly mechanisms: readonly ResetMechanismDef[];
+    };
+
+/** What the runtime asks of the world's owner to replace a lost entity (the scene loader). */
+export interface PuzzleHost {
+  /** The centre and half extents (metres) of what a fresh copy of `spawn` occupies; undefined: nothing to collide. */
+  footprint(spawn: string): { readonly centre: Vec3; readonly halfExtents: Vec3 } | undefined;
+  /** Brings a fresh copy of `spawn` into the world (its source, as authored). */
+  spawn(spawn: string): void;
+  /** Takes a spent copy of `spawn` out of the world, if it is there. */
+  remove(spawn: string): void;
+}
+
+/** Seconds a respawn that finds its spot taken waits before it tries again. */
+export const RETRY_SECONDS = 2;
+
 /** A puzzle as the runtime runs it (the content layer builds these from puzzle files). */
 export interface PuzzleDef {
   readonly id: string;
@@ -85,6 +148,17 @@ export interface PuzzleDef {
       }
     | undefined;
   readonly outputs: PuzzleOutputsDef;
+  /** Diegetic recovery from lost objects and stuck mechanisms (mw-e15.7). */
+  readonly recovery?: readonly RecoveryDef[] | undefined;
+}
+
+/** A respawn waiting for its time (saved, so a load in the middle of one finishes it). */
+export interface PendingRespawn {
+  readonly spawn: string;
+  /** The tick it is tried at. */
+  readonly due: number;
+  /** The old copy is still in the world (it burnt out): take it away first. */
+  readonly spent: boolean;
 }
 
 /** One capability use on a puzzle's trail. */
@@ -109,6 +183,8 @@ export interface PuzzleRecord {
   readonly solvedAt: number | null;
   /** Start ticks of the goal's `sustained` holds (null: not holding), see `ConditionSubscription.holds`. */
   readonly holds: readonly (number | null)[];
+  /** Respawns waiting for their time; absent when none is (records of puzzles at rest are unchanged). */
+  readonly recovering?: readonly PendingRespawn[];
 }
 
 export const PuzzleStateComponent = defineComponent<PuzzleRecord>('puzzle.state');
@@ -167,6 +243,13 @@ export interface PuzzleStatus {
 export interface PuzzleRuntimeOptions {
   /** The player: discovery volumes look for it, and only its capability uses count. */
   readonly player?: EntityId | undefined;
+  /** Replaces lost critical entities (respawn policies); absent: they are not replaced. */
+  readonly host?: PuzzleHost | undefined;
+  /**
+   * The height under which a critical physics object is lost, metres (a function: read each tick).
+   * Absent: critical entities are not watched for falling out of the level.
+   */
+  readonly killY?: number | (() => number) | undefined;
 }
 
 const IN_PLAY: readonly PuzzleState[] = ['dormant', 'discovered', 'in-progress', 'failed'];
@@ -175,6 +258,8 @@ const IN_PLAY: readonly PuzzleState[] = ['dormant', 'discovered', 'in-progress',
 export class PuzzleRuntime {
   readonly #world: World<never>;
   readonly #player: EntityId | undefined;
+  readonly #host: PuzzleHost | undefined;
+  readonly #killY: (() => number) | undefined;
   readonly #defs = new Map<string, PuzzleDef>();
   readonly #goals: GoalRuntime;
   readonly #records = new Map<string, PuzzleRecord>();
@@ -194,6 +279,9 @@ export class PuzzleRuntime {
   constructor(world: World<never>, defs: readonly PuzzleDef[], options: PuzzleRuntimeOptions = {}) {
     this.#world = world;
     this.#player = options.player;
+    this.#host = options.host;
+    const { killY } = options;
+    this.#killY = typeof killY === 'number' ? () => killY : killY;
     this.#restores = world.restores;
     this.#goals = new GoalRuntime(world);
     for (const def of defs) {
@@ -215,10 +303,16 @@ export class PuzzleRuntime {
           }
         }
       }),
+      world.events.on(fireBurntOut, ({ entity }) => {
+        this.#spent(entity);
+      }),
       world.events.on(interacted, ({ target }) => {
         const spawn = this.#spawnId(target);
         if (spawn === undefined) return;
         for (const [id, def] of this.#defs) {
+          for (const policy of this.#policies(id)) {
+            if (policy.kind === 'reset' && policy.trigger === spawn) this.#reset(id, policy);
+          }
           if (def.discovery?.interact === spawn && this.#state(id) === 'dormant') {
             this.#transition(id, 'discovered');
           }
@@ -293,6 +387,7 @@ export class PuzzleRuntime {
   poll(): void {
     this.#reload();
     this.#scan();
+    this.#recover();
     this.#look();
     this.#goals.poll();
     this.#holds();
@@ -335,6 +430,7 @@ export class PuzzleRuntime {
       });
     }
     this.#update(id, { state: to });
+    if (from === 'dormant') this.#mark(known(this.#defs.get(id)));
     this.#world.events.emit(puzzleStateChanged, { puzzle: id, from, to, tick });
     if (from === 'dormant' && (to === 'discovered' || to === 'in-progress')) {
       this.#world.events.emit(puzzleDiscovered, { puzzle: id, tick });
@@ -447,7 +543,14 @@ export class PuzzleRuntime {
       });
     }
     const wanted = new Set(
-      [...this.#defs.values()].flatMap((def) => def.entities.map((entity) => entity.id)),
+      [...this.#defs.values()].flatMap((def) => [
+        ...def.entities.map((entity) => entity.id),
+        ...this.#policies(def.id).flatMap((policy) =>
+          policy.kind === 'reset'
+            ? [policy.trigger, ...policy.mechanisms.map(({ spawn }) => spawn)]
+            : [],
+        ),
+      ]),
     );
     this.#bound = new Map([...bound].filter(([spawn]) => wanted.has(spawn)));
     this.#watched.clear();
@@ -465,6 +568,8 @@ export class PuzzleRuntime {
         this.#update(id, { lost });
       }
       this.#checkLost(id);
+      this.#schedule(id);
+      this.#mark(def);
     }
   }
 
@@ -485,6 +590,147 @@ export class PuzzleRuntime {
   #spawnId(entity: EntityId): string | undefined {
     if (!this.#world.isRegistered(SceneSpawnComponent)) return undefined;
     return this.#world.get(entity, SceneSpawnComponent)?.id;
+  }
+
+  // --- recovery ------------------------------------------------------------------------------
+
+  /** Marks the puzzle's critical physics objects so a fall out of the level returns them home. */
+  #mark(def: PuzzleDef): void {
+    // Only a puzzle in play marks anything: a dormant one leaves the world (and its hash) as it was.
+    if (this.#killY === undefined || this.#state(def.id) === 'dormant') return;
+    if (!this.#world.isRegistered(PhysicsObjectComponent)) return;
+    for (const { id: spawn, critical } of def.entities) {
+      const entity = this.#bound.get(spawn);
+      if (!critical || entity === undefined || !this.#world.has(entity, PhysicsObjectComponent)) {
+        continue;
+      }
+      const home = this.#world.get(entity, SceneTransformComponent)?.position;
+      const marked =
+        this.#world.isRegistered(PuzzleCriticalComponent) &&
+        this.#world.has(entity, PuzzleCriticalComponent);
+      if (home !== undefined && !marked)
+        markPuzzleCritical(this.#world, entity, { puzzle: def.id, spawn, home });
+    }
+  }
+
+  #policies(id: string): readonly RecoveryDef[] {
+    return known(this.#defs.get(id)).recovery ?? [];
+  }
+
+  #setRecovering(id: string, recovering: readonly PendingRespawn[]): void {
+    const next: PuzzleRecord = { ...this.#record(id), recovering };
+    if (recovering.length === 0) delete (next as { recovering?: unknown }).recovering;
+    this.#records.set(id, next);
+    this.#dirty.add(id);
+  }
+
+  #pending(id: string): readonly PendingRespawn[] {
+    return this.#record(id).recovering ?? [];
+  }
+
+  /** Queues a respawn for each lost critical entity a policy replaces, and drops those that came back. */
+  #schedule(id: string): void {
+    const { state, lost } = this.#record(id);
+    const hz = this.#world.clock.hz;
+    let pending = this.#pending(id);
+    for (const policy of this.#policies(id)) {
+      if (policy.kind !== 'respawn') continue;
+      const queued = pending.find((p) => p.spawn === policy.entity);
+      if (queued !== undefined && !queued.spent && this.#bound.has(policy.entity)) {
+        pending = pending.filter((p) => p !== queued);
+      }
+      if (state === 'solved' || !lost.includes(policy.entity)) continue;
+      if (pending.some((p) => p.spawn === policy.entity)) continue;
+      const due = this.#world.tick + Math.ceil(policy.seconds * hz);
+      pending = [...pending, { spawn: policy.entity, due, spent: false }];
+    }
+    if (pending.length !== this.#pending(id).length) this.#setRecovering(id, pending);
+  }
+
+  /** A critical entity burnt out: a respawn policy for it replaces the spent copy. */
+  #spent(entity: EntityId): void {
+    for (const id of this.#defs.keys()) {
+      for (const policy of this.#policies(id)) {
+        if (policy.kind !== 'respawn' || this.#bound.get(policy.entity) !== entity) continue;
+        if (this.#pending(id).some((p) => p.spawn === policy.entity)) continue;
+        const due = this.#world.tick + Math.ceil(policy.seconds * this.#world.clock.hz);
+        this.#setRecovering(id, [...this.#pending(id), { spawn: policy.entity, due, spent: true }]);
+      }
+    }
+  }
+
+  /** Tries the respawns that are due: clear spot, new copy; else again in `RETRY_SECONDS`. */
+  #recover(): void {
+    const host = this.#host;
+    const tick = this.#world.tick;
+    if (this.#killY !== undefined) returnLost(this.#world, this.#killY());
+    if (host === undefined) return;
+    for (const id of this.#defs.keys()) {
+      const due = this.#pending(id).filter((p) => p.due <= tick);
+      if (due.length === 0) continue;
+      let pending = [...this.#pending(id)];
+      const without = (p: PendingRespawn) => pending.filter((q) => q !== p);
+      for (const p of due) {
+        if (this.#state(id) === 'solved') {
+          pending = without(p);
+        } else if (p.spent) {
+          // The old copy goes this tick; the spot is looked at the next.
+          host.remove(p.spawn);
+          pending = [...without(p), { ...p, spent: false, due: tick + 1 }];
+        } else if (this.#taken(host, p.spawn)) {
+          const retry = tick + Math.ceil(RETRY_SECONDS * this.#world.clock.hz);
+          pending = [...without(p), { ...p, due: retry }];
+        } else {
+          pending = without(p);
+          host.spawn(p.spawn);
+          this.#world.events.emit(puzzleRecovered, {
+            puzzle: id,
+            tick,
+            kind: 'respawn',
+            entity: p.spawn,
+          });
+        }
+      }
+      this.#setRecovering(id, pending);
+    }
+  }
+
+  /** Whether another physics object stands where a fresh copy of `spawn` would appear. */
+  #taken(host: PuzzleHost, spawn: string): boolean {
+    const spot = host.footprint(spawn);
+    return spot !== undefined && !footprintClear(this.#world, spot.centre, spot.halfExtents);
+  }
+
+  /** The reset trigger was used: mechanisms back to authored, the puzzle back in progress. */
+  #reset(id: string, policy: Extract<RecoveryDef, { kind: 'reset' }>): void {
+    if (this.#state(id) === 'solved') return;
+    const defaults: MechanismDefault[] = [];
+    for (const { spawn, door, switch: own } of policy.mechanisms) {
+      const entity = this.#bound.get(spawn);
+      if (entity === undefined) continue;
+      if (door !== undefined && this.#world.has(entity, DoorComponent)) {
+        defaults.push({
+          kind: 'door',
+          entity,
+          open: door.open,
+          jammed: door.jammed,
+          locked: this.#world.has(entity, LockComponent) ? door.locked : undefined,
+        });
+      }
+      if (own !== undefined && this.#world.has(entity, SwitchComponent)) {
+        defaults.push({ kind: 'switch', entity, position: own.position });
+      }
+    }
+    resetMechanisms(this.#world, defaults);
+    if (policy.fact !== undefined) this.#world.facts.increment(policy.fact);
+    const state = this.#state(id);
+    if (state === 'dormant' || state === 'discovered') this.#transition(id, 'in-progress');
+    this.#world.events.emit(puzzleRecovered, {
+      puzzle: id,
+      tick: this.#world.tick,
+      kind: 'reset',
+      entity: '',
+    });
   }
 
   // --- persistence ---------------------------------------------------------------------------
@@ -510,7 +756,9 @@ export class PuzzleRuntime {
     for (const id of this.#dirty) {
       const record = this.#record(id);
       let entity = this.#entities.get(id);
-      if (entity === undefined && record.state === 'dormant') continue;
+      if (entity === undefined && record.state === 'dormant' && record.recovering === undefined) {
+        continue;
+      }
       if (!this.#world.isRegistered(PuzzleStateComponent))
         this.#world.register(PuzzleStateComponent);
       if (entity === undefined) {

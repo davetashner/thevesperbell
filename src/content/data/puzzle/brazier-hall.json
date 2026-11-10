@@ -108,7 +108,13 @@
   ],
   "policy": {
     "repeatable": false,
-    "recovery": []
+    "recovery": [
+      {
+        "kind": "respawn",
+        "entity": "torch-barrel",
+        "seconds": 10
+      }
+    ]
   },
   "hints": [
     {

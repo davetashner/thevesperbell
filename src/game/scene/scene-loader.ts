@@ -161,6 +161,14 @@ export class SceneLoader<TObject, TCommand = unknown> {
     this.kit = (id) => (content.has('kit', id) ? content.get('kit', id) : undefined);
   }
 
+  /**
+   * The height under which an object has fallen out of the loaded scene, metres: 20 m under its
+   * lowest solid. Set whenever a scene loads with physics (puzzles return critical objects from it).
+   */
+  get killPlane(): number {
+    return this.killY;
+  }
+
   /** The loaded scene, if any. */
   get current(): LoadedScene | undefined {
     return this.loaded;
@@ -234,9 +242,21 @@ export class SceneLoader<TObject, TCommand = unknown> {
    * @throws Error when no scene is loaded or the spawn is already there.
    */
   addSpawn(spawn: SceneSpawnPlacement): EntityId {
+    const entity = this.addSpawnToSim(spawn);
+    this.bindSpawn(spawn, entity);
+    return entity;
+  }
+
+  /**
+   * The sim half of `addSpawn`: the entity, its body or properties, no render object. Unlike
+   * `addSpawn` it may run inside a sim step (a puzzle respawner does); bind the render object with
+   * `bindSpawn` once the step is over and the entity is alive.
+   * @throws Error when no scene is loaded or the spawn is already there.
+   */
+  addSpawnToSim(spawn: SceneSpawnPlacement): EntityId {
     const { loaded } = this;
     if (loaded === undefined) throw new Error('no scene is loaded');
-    const { world, sync, objects, binding, content, physics } = this.options;
+    const { world, content, physics } = this.options;
     const existing = this.entityOfSpawn(spawn.id);
     if (existing !== undefined && world.isAlive(existing)) {
       throw new Error(`spawn "${spawn.id}" is already in scene "${loaded.id}"`);
@@ -250,22 +270,30 @@ export class SceneLoader<TObject, TCommand = unknown> {
     const materials = materialPresets(content.all('material'));
     if (body !== undefined) {
       addPropPhysics(world, entity, body, materials, spawn.position, spawn.rotation, own);
-      sync.bind(
-        entity,
-        binding(
-          objects.body?.(spawn, body.size) ?? objects.spawn(spawn),
-          readPhysicsObjectTransform,
-        ),
-      );
-    } else {
-      if (physics !== undefined && Object.keys(own).length > 0) {
-        addMaterialProperties(world, entity, materials, own);
-        placeEntity(world, entity, spawn.position);
-      }
-      sync.bind(entity, binding(objects.spawn(spawn), readSceneTransform));
+    } else if (physics !== undefined && Object.keys(own).length > 0) {
+      addMaterialProperties(world, entity, materials, own);
+      placeEntity(world, entity, spawn.position);
     }
     this.live.set(spawn.id, entity);
     return entity;
+  }
+
+  /** The render half of `addSpawn`: binds the render object of `spawn`'s live `entity`. */
+  bindSpawn(spawn: SceneSpawnPlacement, entity: EntityId): void {
+    const { sync, objects, binding, content, physics } = this.options;
+    const body =
+      physics !== undefined && spawn.prop !== undefined
+        ? propBodies(content)(spawn.prop)
+        : undefined;
+    sync.bind(
+      entity,
+      body === undefined
+        ? binding(objects.spawn(spawn), readSceneTransform)
+        : binding(
+            objects.body?.(spawn, body.size) ?? objects.spawn(spawn),
+            readPhysicsObjectTransform,
+          ),
+    );
   }
 
   /** Removes spawn `id` (loaded with the scene or added since): its entity and render object. */
@@ -290,9 +318,9 @@ export class SceneLoader<TObject, TCommand = unknown> {
    * scene, so a world without any has no recovery rules.
    */
   private watchRecoveries(loaded: LoadedScene): void {
-    if (!loaded.layout.spawns.some((spawn) => spawn.recovery !== undefined)) return;
     const lowest = Math.min(0, ...loaded.layout.parts.map((part) => part.min.y));
     this.killY = lowest - RECOVERY_DEPTH;
+    if (!loaded.layout.spawns.some((spawn) => spawn.recovery !== undefined)) return;
     if (this.recoveryInstalled) return;
     this.recoveryInstalled = true;
     installObjectRecovery(this.options.world, () => ({ killY: this.killY }));

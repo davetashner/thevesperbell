@@ -11,16 +11,22 @@
 //
 // No puzzles, no cost: scenes without puzzle files never reach any of this.
 
-import type { GameContent } from '@content/index';
+import type { GameContent, SceneDef } from '@content/index';
 import {
   puzzleSolvedUndeclared,
   PuzzleRuntime,
   puzzleSystem,
   type EntityId,
   type PuzzleDef,
+  type PuzzleHost,
   type PuzzleStatus,
+  type RecoveryDef,
+  type SceneSpawnPlacement,
   type World,
 } from '@sim/index';
+import { breakableProfiles } from '../breakables';
+import { propBodies } from '../physics-objects';
+import { placeSpawn, type SpawnLoader } from '../scene/variants';
 
 type Content = Pick<GameContent, 'all'>;
 
@@ -36,6 +42,34 @@ export function puzzleDefs(content: Content, sceneId: string): PuzzleDef[] {
       entities: puzzle.entities.map(({ id, critical }) => ({ id, critical })),
       solutions: puzzle.solutions.map(({ id, capabilities }) => ({ id, capabilities })),
       ...(puzzle.discovery !== undefined && { discovery: puzzle.discovery }),
+      recovery: puzzle.policy.recovery.map((policy): RecoveryDef => {
+        if (policy.kind === 'respawn') return policy;
+        // A reset returns the doors and switches the puzzle lists to the way their scene authored them.
+        const { spawns } = content.all('scene').find((scene) => scene.id === sceneId) as SceneDef;
+        const listed = new Set(puzzle.entities.map(({ id }) => id));
+        return {
+          kind: 'reset',
+          trigger: policy.trigger,
+          fact: policy.fact,
+          mechanisms: spawns
+            .filter((spawn) => listed.has(spawn.id))
+            .flatMap(({ id, door, switch: own }) => [
+              ...(door === undefined
+                ? []
+                : [
+                    {
+                      spawn: id,
+                      door: {
+                        open: door.state === 'open',
+                        jammed: door.state === 'jammed',
+                        locked: door.locked ?? door.lock !== undefined,
+                      },
+                    },
+                  ]),
+              ...(own === undefined ? [] : [{ spawn: id, switch: { position: own.initial } }]),
+            ]),
+        };
+      }),
       outputs: {
         solvedFact: puzzle.outputs.solvedFact,
         set: puzzle.outputs.set,
@@ -48,6 +82,10 @@ export function puzzleDefs(content: Content, sceneId: string): PuzzleDef[] {
 export interface StartPuzzlesOptions {
   /** The player: discovery volumes look for it, and its capability uses form the trail. */
   readonly player?: EntityId | undefined;
+  /** Replaces lost critical entities (respawn policies); see `sceneHost`. */
+  readonly host?: PuzzleHost | undefined;
+  /** The height under which a critical object counts as out of the level, metres. */
+  readonly killY?: number | (() => number) | undefined;
   /** Hears of puzzles solved by a route nobody declared (telemetry, the dev log). */
   readonly report?: ((line: string) => void) | undefined;
 }
@@ -65,7 +103,11 @@ export function startPuzzles(
 ): PuzzleRuntime | undefined {
   const defs = puzzleDefs(content, sceneId);
   if (defs.length === 0) return undefined;
-  const runtime = new PuzzleRuntime(world, defs, { player: options.player });
+  const runtime = new PuzzleRuntime(world, defs, {
+    player: options.player,
+    host: options.host,
+    killY: options.killY,
+  });
   world.addSystem(puzzleSystem(runtime));
   world.events.on(puzzleSolvedUndeclared, ({ puzzle, trail, tick }) => {
     options.report?.(
@@ -73,6 +115,69 @@ export function startPuzzles(
     );
   });
   return runtime;
+}
+
+/** A puzzle host whose new copies are drawn once `flush` is called (between sim steps). */
+export interface SceneHost extends PuzzleHost {
+  readonly flush: () => void;
+}
+
+/**
+ * The puzzle host over a scene loader (mw-e15.7): a respawner drops a fresh copy of an authored prop
+ * spawn where it began, and the runtime asks for the spot's footprint so a copy never lands in
+ * another body. Interactions and breakables come with the copy as they did at load. The copy is made
+ * inside the sim step (so it is part of the replay); its render object is bound by `flush`, which the
+ * game calls after each step.
+ */
+export function sceneHost(
+  world: World<never>,
+  loader: SpawnLoader & {
+    addSpawnToSim(spawn: SceneSpawnPlacement): EntityId;
+    bindSpawn(spawn: SceneSpawnPlacement, entity: EntityId): void;
+  },
+  content: GameContent,
+): SceneHost {
+  const placement = (id: string) => loader.current?.authoredSpawns.find((spawn) => spawn.id === id);
+  const bodies = propBodies(content);
+  const profiles = breakableProfiles(content);
+  const waiting: (() => void)[] = [];
+  return {
+    flush: () => {
+      for (const bind of waiting.splice(0)) bind();
+    },
+    footprint: (id) => {
+      const spawn = placement(id);
+      const size = spawn?.prop === undefined ? undefined : bodies(spawn.prop)?.size;
+      if (spawn === undefined || size === undefined) return undefined;
+      const wide = Math.max(size.x, size.z) / 2;
+      const { x, y, z } = spawn.position;
+      return {
+        centre: { x, y: y + size.y / 2, z },
+        halfExtents: { x: wide, y: size.y / 2, z: wide },
+      };
+    },
+    spawn: (id) => {
+      const spawn = placement(id);
+      if (spawn !== undefined && loader.current !== undefined) {
+        placeSpawn(
+          world,
+          (placed) => {
+            const entity = loader.addSpawnToSim(placed);
+            waiting.push(() => {
+              if (world.isAlive(entity)) loader.bindSpawn(placed, entity);
+            });
+            return entity;
+          },
+          profiles,
+          spawn,
+          loader.current,
+        );
+      }
+    },
+    remove: (id) => {
+      loader.removeSpawn(id);
+    },
+  };
 }
 
 /** Publishes the puzzles' state when it changes: states, attributions and the entity ids they bind. */

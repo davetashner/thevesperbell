@@ -76,6 +76,7 @@ describe('validatePuzzle', () => {
           abstract: inconclusive,
           concrete: { status: 'diverged', reason: 'stayed false' },
           shortcut: { capabilities: [], steps: 2 },
+          softlock: { status: 'none', explored: 1 },
           verdict: 'diverged',
         },
         {
@@ -84,10 +85,32 @@ describe('validatePuzzle', () => {
           abstract: reachable,
           concrete: diverged,
           shortcut: undefined,
+          softlock: { status: 'inconclusive', reason: 'bound', explored: 2 },
           verdict: 'diverged',
+        },
+        {
+          id: 'u',
+          capabilities: [],
+          abstract: reachable,
+          concrete: undefined,
+          shortcut: undefined,
+          softlock: { status: 'softlock', lost: ['crate'], path: ['burn crate'], explored: 4 },
+          verdict: 'ok',
+        },
+        {
+          id: 'v',
+          capabilities: [],
+          abstract: reachable,
+          concrete: undefined,
+          shortcut: undefined,
+          softlock: { status: 'covered', by: ['burn of crate'], explored: 4 },
+          verdict: 'ok',
         },
       ],
     }).join('\n');
+    expect(text).toContain('softlock search: inconclusive, bound');
+    expect(text).toContain('SOFTLOCK: after burn crate (crate lost for good)');
+    expect(text).toContain('softlock avoided by recovery: burn of crate');
     expect(text).toContain('abstract: inconclusive, bound (3 states)');
     expect(text).toContain('concrete: diverged: stayed false');
     expect(text).toContain('concrete: diverged at step 1: it did not burn');
@@ -136,7 +159,7 @@ describe('puzzle:validate main', () => {
     const { io, lines } = ioFor([broken]);
     expect(main([], io)).toBe(1);
     expect(lines.join('\n')).toContain(
-      '1 puzzle(s) with an unreachable or diverging declared solution',
+      '1 puzzle(s) with an unreachable, diverging or softlocking declared solution',
     );
   });
 

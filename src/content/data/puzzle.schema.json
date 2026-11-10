@@ -554,7 +554,7 @@
                   "seconds": {
                     "type": "number",
                     "exclusiveMinimum": 0,
-                    "description": "Seconds after it is lost that a new one appears."
+                    "description": "Seconds after it is lost (destroyed or burnt out) that a new one appears."
                   }
                 },
                 "required": [
@@ -563,7 +563,7 @@
                   "seconds"
                 ],
                 "additionalProperties": false,
-                "description": "A lost critical entity reappears where it spawned (a crate chute)."
+                "description": "A lost critical entity reappears where it spawned (a crate chute), once the spot is clear; a spot that is taken is tried again every 2 s."
               },
               {
                 "type": "object",
@@ -577,6 +577,11 @@
                     "type": "string",
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                     "description": "Id of the listed entity that resets the puzzle (a lever)."
+                  },
+                  "fact": {
+                    "description": "Declared int fact counted up by each reset (telemetry, quests, hints).",
+                    "type": "string",
+                    "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
                   }
                 },
                 "required": [
@@ -584,7 +589,7 @@
                   "trigger"
                 ],
                 "additionalProperties": false,
-                "description": "Using the trigger returns the puzzle’s mechanisms to their authored state."
+                "description": "Using the trigger returns the listed doors and switches to their authored state and the puzzle to in-progress (a solved puzzle ignores it)."
               }
             ],
             "description": "How the puzzle recovers when a key object is lost or a mechanism is stuck."

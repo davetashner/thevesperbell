@@ -64,9 +64,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `policy.recovery` | list of object | `[]` | Diegetic recovery from lost objects and stuck mechanisms. |
 | `policy.recovery[].kind` | `"respawn"` | required | Policy kind: a lost critical entity reappears. |
 | `policy.recovery[].entity` | id | required | Id of the listed critical entity that is replaced. |
-| `policy.recovery[].seconds` | number > 0 | required | Seconds after it is lost that a new one appears. |
+| `policy.recovery[].seconds` | number > 0 | required | Seconds after it is lost (destroyed or burnt out) that a new one appears. |
 | `policy.recovery[].kind` | `"reset"` | required | Policy kind: a trigger resets the mechanisms. |
 | `policy.recovery[].trigger` | id | required | Id of the listed entity that resets the puzzle (a lever). |
+| `policy.recovery[].fact` | string | — | Declared int fact counted up by each reset (telemetry, quests, hints). |
 | `hints` | list of object | `[]` | The hint ladder: tiers fire in order while the player is stuck. |
 | `hints[].afterSeconds` | number > 0 | required | Seconds in progress before the tier fires; tiers are in increasing order. |
 | `hints[].afterAttempts` | integer ≥ 1 | — | Failed attempts that fire the tier sooner, whichever comes first. |

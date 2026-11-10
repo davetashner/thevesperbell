@@ -39,7 +39,12 @@ function capabilityUsages(puzzle: Puzzle): { pointer: string; id: string }[] {
 export const checkPuzzles: ContentCheck = (entries) => {
   const scenes = new Map<
     string,
-    { file: string; spawns: ReadonlySet<string>; graphs: ReadonlySet<string> }
+    {
+      file: string;
+      spawns: ReadonlySet<string>;
+      props: ReadonlySet<string>;
+      graphs: ReadonlySet<string>;
+    }
   >();
   const graphs = new Map<string, ReadonlyMap<string, string>>();
   for (const { type, file, value } of entries) {
@@ -51,6 +56,9 @@ export const checkPuzzles: ContentCheck = (entries) => {
     scenes.set(value.id, {
       file,
       spawns: new Set((value as SceneDef).spawns.map(({ id }) => id)),
+      props: new Set(
+        (value as SceneDef).spawns.flatMap((spawn) => (spawn.prop === undefined ? [] : [spawn.id])),
+      ),
       graphs: new Set((value as SceneDef).signals.map(({ graph }) => graph.id)),
     });
   }
@@ -97,6 +105,33 @@ export const checkPuzzles: ContentCheck = (entries) => {
         );
       }
     }
+
+    puzzle.policy.recovery.forEach((policy, i) => {
+      const pointer = `/policy/recovery/${String(i)}`;
+      if (policy.kind === 'respawn') {
+        if (
+          scene !== undefined &&
+          scene.spawns.has(policy.entity) &&
+          !scene.props.has(policy.entity)
+        ) {
+          report(
+            `${pointer}/entity`,
+            `respawns "${policy.entity}", which is not a prop spawn of level "${puzzle.scene.id}": only a prop can be dropped again`,
+          );
+        }
+        return;
+      }
+      if (policy.fact === undefined) return;
+      const counter = lookupFact(facts, policy.fact);
+      if (counter === undefined) {
+        report(
+          `${pointer}/fact`,
+          `names undeclared fact "${policy.fact}": declare it in src/content/data/fact/`,
+        );
+      } else if (counter.type !== 'int') {
+        report(`${pointer}/fact`, `reset fact "${policy.fact}" must be int, not ${counter.type}`);
+      }
+    });
 
     puzzle.outputs.signals.forEach((signal, i) => {
       const pointer = `/outputs/signals/${String(i)}`;

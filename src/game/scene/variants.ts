@@ -68,6 +68,29 @@ function creaturesAt(world: World<never>, point: string): EntityId[] {
 }
 
 /**
+ * Brings spawn `spawn` of `scene` into the world: its entity (through the loader), and what its
+ * content puts on it, an interaction and a breakable. Used by the variant watcher and by puzzle
+ * respawners (mw-e15.7). `add` makes the entity: the loader's `addSpawn`, or its sim half inside a
+ * sim step.
+ */
+export function placeSpawn(
+  world: World<never>,
+  add: (spawn: SceneSpawnPlacement) => EntityId,
+  profiles: ReturnType<typeof breakableProfiles>,
+  spawn: SceneSpawnPlacement,
+  scene: LoadedScene,
+): EntityId {
+  const entity = add(spawn);
+  if (spawn.interact !== undefined && world.isRegistered(InteractableComponent)) {
+    addInteractable(world, entity, spawn.interact, spawn.position);
+  }
+  if (spawn.breakable !== undefined && world.isRegistered(BreakableComponent)) {
+    addSceneBreakables(world, { ...scene, spawns: [{ entity, spawn }], pieces: [] }, profiles);
+  }
+  return entity;
+}
+
+/**
  * Keeps the loaded scene's gated spawns in step with the world facts. Call after the level deltas
  * were entered; call `step()` after each sim step; `dispose()` stops it. Returns undefined when the
  * scene has no gated spawn.
@@ -85,14 +108,8 @@ export function watchSpawnVariants(options: WatchSpawnVariantsOptions): SpawnVar
   const profiles = breakableProfiles(content);
   const scene = current;
   const bring = (spawn: SceneSpawnPlacement): void => {
-    const entity = loader.addSpawn(spawn);
+    const entity = placeSpawn(world, (placed) => loader.addSpawn(placed), profiles, spawn, scene);
     const brought: [string, EntityId][] = [[`spawn:${spawn.id}`, entity]];
-    if (spawn.interact !== undefined && world.isRegistered(InteractableComponent)) {
-      addInteractable(world, entity, spawn.interact, spawn.position);
-    }
-    if (spawn.breakable !== undefined && world.isRegistered(BreakableComponent)) {
-      addSceneBreakables(world, { ...scene, spawns: [{ entity, spawn }], pieces: [] }, profiles);
-    }
     if (spawn.creature !== undefined && creatures !== undefined && creaturesInstalled(world)) {
       const result = spawnCreature(world, creatures, originOfSpawn(spawn, spawn.creature));
       if (result.ok) brought.push([`creature:${spawn.id}`, result.entity]);

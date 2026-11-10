@@ -97,7 +97,7 @@ import {
   sceneCheckpoints,
   startMechanisms,
 } from '@game/mechanisms/index';
-import { PuzzleWatch, startPuzzles } from '@game/puzzles/index';
+import { PuzzleWatch, sceneHost, startPuzzles } from '@game/puzzles/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
 import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
@@ -2452,8 +2452,12 @@ function startRenderer(
       startCreatureDrops(world, content, worldItems, scene.id, loaded.layout.spawns);
       // Puzzles (mw-e15.3): only in scenes whose content has some. The e2e reads their state from
       // #app[data-puzzles]; a solve by a route nobody declared goes to the dev log as telemetry.
+      const puzzleHost = sceneHost(world, scenes, content);
+      afterStep.push(puzzleHost.flush);
       const puzzles = startPuzzles(world, content, scene.id, {
         player: player?.entity,
+        host: puzzleHost,
+        killY: () => scenes.killPlane,
         report: (line) => {
           console.info(`telemetry ${line}`);
         },

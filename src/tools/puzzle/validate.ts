@@ -12,6 +12,10 @@
 //                    too pessimistic (a warning; the abstraction needs a rule).
 //   inconclusive     the search stopped at its bound (states, depth or the time budget) or the goal /
 //                    a capability has no abstract model, and nothing confirmed it. A warning.
+// Softlocks (mw-e15.7): for each solution's capability set the abstract layer also searches the states
+// reachable after something the puzzle lists is lost for good (burnt away, broken, pushed out of the
+// level, melted) for one from which the goal cannot be reached. One that no recovery policy covers is
+// a failure like an unreachable solution; one only a recovery removes is reported as covered.
 // Shortcuts (a class-specific solution whose goal is also reachable with fewer capabilities) are
 // informational. Failures of an `mvp` puzzle fail the run (exit 1): CI's puzzle-validate job.
 
@@ -24,10 +28,12 @@ import {
   checkSolution,
   DEFAULT_BOUNDS,
   findShortcut,
+  findSoftlock,
   type AbstractResult,
   type CapabilityElements,
   type SearchBounds,
   type Shortcut,
+  type SoftlockResult,
 } from './abstract';
 import type { ConcreteResult } from './concrete';
 
@@ -39,6 +45,8 @@ export interface SolutionReport {
   readonly abstract: AbstractResult;
   readonly concrete: ConcreteResult | undefined;
   readonly shortcut: Shortcut | undefined;
+  /** The softlock search (mw-e15.7): can something be lost for good so that the goal cannot be reached. */
+  readonly softlock: SoftlockResult;
   readonly verdict: Verdict;
 }
 
@@ -85,6 +93,7 @@ export function validatePuzzle(
       abstract: result,
       concrete,
       shortcut: findShortcut(abstract, solution, bounds),
+      softlock: findSoftlock(abstract, solution.capabilities, bounds),
       verdict: verdictOf(result, concrete),
     };
   });
@@ -92,7 +101,10 @@ export function validatePuzzle(
     id: puzzle.id,
     mvp: puzzle.tags.includes('mvp'),
     solutions,
-    failed: solutions.some((s) => s.verdict === 'unreachable' || s.verdict === 'diverged'),
+    failed: solutions.some(
+      (s) =>
+        s.verdict === 'unreachable' || s.verdict === 'diverged' || s.softlock.status === 'softlock',
+    ),
   };
 }
 
@@ -127,6 +139,16 @@ export function formatReport(report: PuzzleReport): string[] {
       lines.push(
         '    warning: abstraction gap, the concrete run succeeded where the search found nothing',
       );
+    }
+    const k = s.softlock;
+    if (k.status === 'softlock') {
+      lines.push(
+        `    SOFTLOCK: after ${k.path.join(', ')} (${k.lost.join(', ')} lost for good) no action reaches the goal; declare a recovery policy (respawn the entity, or mark it critical) in policy.recovery`,
+      );
+    } else if (k.status === 'covered') {
+      lines.push(`    info: softlock avoided by recovery: ${k.by.join('; ')}`);
+    } else if (k.status === 'inconclusive') {
+      lines.push(`    softlock search: inconclusive, ${k.reason}`);
     }
     if (s.shortcut !== undefined) {
       lines.push(
@@ -204,7 +226,7 @@ export function main(args: readonly string[], io: ValidateIo): number {
   io.log(
     broken === 0
       ? `puzzle:validate: ${String(chosen.length)} puzzle(s) checked, no broken mvp solution`
-      : `puzzle:validate: ${String(broken)} puzzle(s) with an unreachable or diverging declared solution`,
+      : `puzzle:validate: ${String(broken)} puzzle(s) with an unreachable, diverging or softlocking declared solution`,
   );
   return broken === 0 ? 0 : 1;
 }

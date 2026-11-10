@@ -158,15 +158,25 @@ const recoverySchema = z
       .strictObject({
         kind: z.literal('respawn').describe('Policy kind: a lost critical entity reappears.'),
         entity: entity.describe('Id of the listed critical entity that is replaced.'),
-        seconds: z.number().positive().describe('Seconds after it is lost that a new one appears.'),
+        seconds: z
+          .number()
+          .positive()
+          .describe('Seconds after it is lost (destroyed or burnt out) that a new one appears.'),
       })
-      .describe('A lost critical entity reappears where it spawned (a crate chute).'),
+      .describe(
+        'A lost critical entity reappears where it spawned (a crate chute), once the spot is clear; a spot that is taken is tried again every 2 s.',
+      ),
     z
       .strictObject({
         kind: z.literal('reset').describe('Policy kind: a trigger resets the mechanisms.'),
         trigger: entity.describe('Id of the listed entity that resets the puzzle (a lever).'),
+        fact: factKey
+          .optional()
+          .describe('Declared int fact counted up by each reset (telemetry, quests, hints).'),
       })
-      .describe('Using the trigger returns the puzzle’s mechanisms to their authored state.'),
+      .describe(
+        'Using the trigger returns the listed doors and switches to their authored state and the puzzle to in-progress (a solved puzzle ignores it).',
+      ),
   ])
   .describe('How the puzzle recovers when a key object is lost or a mechanism is stuck.');
 

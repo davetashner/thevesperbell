@@ -63,7 +63,7 @@ and walks the puzzle through its lifecycle:
 | `discovered`  | the player entered its discovery volume or used its trigger (`puzzleDiscovered`)       |
 | `in-progress` | the player did something to it: a property its goal reads changed on a listed entity, a listed entity was used, a capability was used on one |
 | `solved`      | its goal is true, from any state, however it got there (`puzzleSolved`)                |
-| `failed`      | a `critical` entity was destroyed (`puzzleFailed`); it returns to `in-progress` when one is back |
+| `failed`      | a `critical` entity was destroyed (`puzzleFailed`); it returns to `in-progress` when one is back (a `respawn` policy brings one back) |
 
 When it is solved the outputs fire once, in this order: the solved fact and the other `set` facts
 (one transaction), the `signals`, then the events `puzzleSolved`, and for a first solve one
@@ -106,6 +106,32 @@ graph. A burning barrel carried from brazier to brazier, an Ember cast from acro
 arrow all solve it, because it reads what burns, not what lit it. The stack it is built from is
 all existing: light sources, world properties, the stimulus API, a door receiver, facts.
 
+## Recovery
+
+Failure should make a story, not a dead save (mw-e15.7), and recovery is always in the world: save
+rollback is out of scope. `policy.recovery` lists what a puzzle does about losing a key object;
+every recovery announces itself with `puzzleRecovered` (`kind` `respawn`, `reset` or `out-of-bounds`,
+`entity` the spawn id put back).
+
+- `respawn` (`entity`, `seconds`): the critical entity, once destroyed or burnt out (a wooden barrel
+  that chars is as lost as one that is smashed), is replaced where it spawned after that many
+  seconds: a fresh copy of the authored prop spawn, with its properties, interaction and breakable
+  profile. If another physics object stands in the spot, the replacement waits and tries again every
+  2 s, so a copy never appears inside another body. A solved puzzle replaces nothing. The pending
+  respawn is part of the saved `puzzle.state` (`recovering`, present only while one is pending), so a
+  save and load in the middle of one finishes it. The entity must be a prop spawn (checked at load).
+- `reset` (`trigger`, optional `fact`): using the trigger entity (a lever) returns every door and
+  switch the puzzle lists to the state its scene authored (a door open or shut, jammed or not, locked
+  or not; a lever, crank or wheel at its starting position) and the puzzle to `in-progress`. A solved
+  puzzle ignores it. The optional int `fact` counts the resets (hints, quests and telemetry can read
+  it). Doors swing to their places like any door, so a reset is seen and heard.
+- Falling out of the level: every `critical` entity that is a physics object and falls below the kill
+  plane (20 m under the scene's lowest solid) is put back at its spawn point, at rest, with no speed,
+  within the same tick and without breaking, whatever policy the puzzle declares. It is property
+  based: the `puzzle.critical` marker component (`{ puzzle, spawn, home }`) is what makes an entity
+  come home, so anything may carry it. The runtime marks a puzzle's critical entities once the puzzle
+  is in play (a dormant puzzle adds nothing to the world); the component is registered on first use.
+
 ## Prefabs
 
 Designers assemble puzzles from prefabs (mw-e15.4): data files under `src/content/data/prefab/`
@@ -140,17 +166,32 @@ for its capability set. Two layers:
   step has an expected effect (a heated target burns, a moved thing ends up there); the report names
   the index of the first step that diverged, or says the goal stayed false after the last step.
 
+- **Softlock search** (mw-e15.7, `findSoftlock`). The same abstraction plus irreversible losses of
+  the things the puzzle lists: a flammable thing burns away once lit, a breakable thing breaks, a
+  movable thing is pushed out of the level, a frozen thing melts when anything can heat. From every
+  reachable state it asks whether the goal is still reachable (a backward sweep over the explored
+  graph); a reachable state that cannot win is a **softlock**, reported with the shortest actions to
+  it, the losses included, per solution (so the actor is the one with that solution's capabilities).
+  A loss that something recovers is not explored: a `respawn` policy for the entity (every loss), the
+  return of a `critical` entity that falls out of the level, a recovery anchor on the spawn (fall and
+  break). A softlock that only such recovery removes is reported as `covered`, so the report shows
+  what protects the puzzle. Conservative like the rest: bounded, inconclusive rather than a false
+  "none" when the bound is hit, and it assumes every loss its properties allow can happen, so a
+  `SOFTLOCK` finding may name a loss no player is likely to cause: fix it with a policy, or mark the
+  entity `critical` if a fall is the only way.
+
 Verdicts per solution: `ok`; `unreachable` and `diverged` fail the run for an `mvp` puzzle (CI job
 `puzzle-validate`) and are reported for others; `abstraction-gap` (the search found nothing but the
 sim succeeded: the abstraction needs a rule) and `inconclusive` (a bound was hit: node count, depth
 or the 10 s time box per puzzle, or the model has a gap) are warnings. A class-specific solution
-whose goal is also reachable with fewer capabilities is reported as an informational shortcut.
+whose goal is also reachable with fewer capabilities is reported as an informational shortcut. A
+`SOFTLOCK` line (an uncovered irreversible loss) fails an `mvp` puzzle's run like `unreachable`.
 
 ## What load checks
 
 - In the file: entity and solution ids are unique; every step, highlight and recovery names a listed
   entity; a step's capability is its solution's; hint tiers are in order; a respawned entity is
-  critical; an `mvp` puzzle has two or more solutions.
+  critical and a prop spawn; a reset fact is a declared int; an `mvp` puzzle has two or more solutions.
 - Against other content (`src/content/puzzle-checks.ts`): the scene exists and places every listed
   entity; every capability is declared in `src/content/data/capability/`; the goal's facts are
   declared and fit their operators; `solvedFact` is a declared bool and each `set` value fits its

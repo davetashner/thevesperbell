@@ -54,7 +54,7 @@ import {
 import { hasHiding, startHiding } from '@game/hiding/index';
 import { hasContainers, prepareContainers, startContainers } from '@game/items/containers';
 import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
-import { startPuzzles } from '@game/puzzles/index';
+import { sceneHost, startPuzzles } from '@game/puzzles/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
 import { createGameLight, installGameLight, type GameLight } from '@game/light/index';
 import { installGameFire } from '@game/fire';
@@ -416,7 +416,11 @@ export function createGameWorld<TInput>(
   // Spawns that keep to some phases of the day come and go with the clock (mw-ju8.14).
   watchPresence(world, creatures.spawn, scene.layout.spawns);
   // Puzzles (mw-e15.3) in scenes that have some, last: they read what everything else did this tick.
-  const puzzles = startPuzzles(world, content, scene.id, { player });
+  const puzzles = startPuzzles(world, content, scene.id, {
+    player,
+    host: sceneHost(world, scenes, content),
+    killY: () => scenes.killPlane,
+  });
   return {
     puzzles,
     world,

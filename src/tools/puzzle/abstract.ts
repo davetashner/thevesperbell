@@ -26,6 +26,12 @@ type Puzzle = Frozen<PuzzleDef>;
 
 type Spawn = Frozen<SceneDef>['spawns'][number];
 
+/**
+ * How a thing is lost for good: it burns away once lit, breaks, is pushed out of the level, or melts
+ * (a frozen thing meets heat). These are the irreversible transitions of the softlock search.
+ */
+export type LossKind = 'burn' | 'break' | 'fall' | 'melt';
+
 /** What the abstract layer knows of a capability: the elements it brings to bear. */
 export type CapabilityElements = ReadonlyMap<string, readonly string[]>;
 
@@ -80,10 +86,16 @@ interface Entity {
   readonly lit0: boolean;
   readonly movable: boolean;
   readonly carrier: boolean;
+  /** The ways a listed entity can be lost for good (none for one the puzzle does not list). */
+  readonly losses: readonly LossKind[];
+  /** The losses something already recovers: a recovery policy, the critical return, an anchor. */
+  readonly covered: readonly LossKind[];
 }
 
 interface State {
   readonly lit: readonly boolean[];
+  /** Entities lost for good: burnt away, broken, fallen out of the level, melted (softlocks, below). */
+  readonly gone: readonly boolean[];
   /** Index of the entity a movable thing rests at, or -1 for its home. */
   readonly at: readonly number[];
 }
@@ -103,19 +115,38 @@ const known = <T>(value: T | undefined): T => value as T;
 
 const properties = (spawn: Spawn): Readonly<Record<string, unknown>> => spawn.properties ?? {};
 
-function entityOf(spawn: Spawn): Entity {
+function entityOf(
+  spawn: Spawn,
+  listed: ReadonlySet<string>,
+  respawned: ReadonlySet<string>,
+): Entity {
   const props = properties(spawn);
   const burning = props['burning'] === true;
   const lightSource = spawn.lightSource;
   const hasProp = spawn.prop !== undefined;
   const pushable = spawn.push !== undefined || props['pushable'] === true;
+  const movable = pushable || hasProp;
+  const flammable = lightSource === undefined && (props['flammable'] === true || burning);
+  const losses: LossKind[] = [];
+  if (listed.has(spawn.id)) {
+    if (flammable) losses.push('burn');
+    if (spawn.breakable !== undefined) losses.push('break');
+    if (movable) losses.push('fall');
+    if (movable && props['frozen'] === true) losses.push('melt');
+  }
   return {
     id: spawn.id,
     spawn,
     litable: lightSource !== undefined || props['flammable'] === true || burning,
     lit0: lightSource !== undefined ? lightSource.unlit !== true : burning,
-    movable: pushable || hasProp,
+    movable,
     carrier: burning && hasProp && lightSource === undefined,
+    losses,
+    covered: respawned.has(spawn.id)
+      ? losses
+      : losses.filter(
+          (kind) => (kind === 'fall' || kind === 'break') && spawn.recovery !== undefined,
+        ),
   };
 }
 
@@ -125,9 +156,21 @@ export function abstractPuzzle(
   scene: Frozen<Pick<SceneDef, 'spawns'>>,
   capabilityElements: CapabilityElements,
 ): AbstractPuzzle {
-  const entities = scene.spawns.map(entityOf);
-  const index = new Map(entities.map((entity, i) => [entity.id, i] as const));
   const listed = new Set(puzzle.entities.map(({ id }) => id));
+  const respawned = new Set(
+    puzzle.policy.recovery.flatMap((policy) => (policy.kind === 'respawn' ? [policy.entity] : [])),
+  );
+  // A critical entity that falls out of the level is returned to where it began (mw-e15.7).
+  const critical = new Set(puzzle.entities.filter((e) => e.critical).map(({ id }) => id));
+  const entities = scene.spawns.map((spawn) => {
+    const entity = entityOf(spawn, listed, respawned);
+    return critical.has(spawn.id) &&
+      entity.losses.includes('fall') &&
+      !entity.covered.includes('fall')
+      ? { ...entity, covered: [...entity.covered, 'fall' as const] }
+      : entity;
+  });
+  const index = new Map(entities.map((entity, i) => [entity.id, i] as const));
   const places = entities.flatMap((entity, i) =>
     listed.has(entity.id) || entity.spawn.plate !== undefined ? [i] : [],
   );
@@ -168,11 +211,13 @@ export function missingRequirements(
 function initial(abstract: AbstractPuzzle): State {
   return {
     lit: abstract.entities.map((e) => e.lit0),
+    gone: abstract.entities.map(() => false),
     at: abstract.entities.map(() => -1),
   };
 }
 
-const keyOf = (s: State): string => `${s.lit.map(Number).join('')}|${s.at.join(',')}`;
+const keyOf = (s: State): string =>
+  `${s.lit.map(Number).join('')}|${s.gone.map(Number).join('')}|${s.at.join(',')}`;
 
 const withAt = <T>(list: readonly T[], i: number, value: T): T[] => {
   const next = [...list];
@@ -185,17 +230,18 @@ function successors(
   abstract: AbstractPuzzle,
   state: State,
   elements: ReadonlySet<string>,
+  losses?: ReadonlySet<number>,
 ): [string, State][] {
   const out: [string, State][] = [];
   const { entities, places } = abstract;
   entities.forEach((target, t) => {
     // Heat from range, or a flame carried from a burning prop.
-    if (target.litable && !state.lit[t]) {
+    if (target.litable && !state.lit[t] && !state.gone[t]) {
       if (elements.has('heat')) {
         out.push([`heat ${target.id}`, { ...state, lit: withAt(state.lit, t, true) }]);
       }
       entities.forEach((carrier, c) => {
-        if (carrier.carrier && state.lit[c] && c !== t) {
+        if (carrier.carrier && state.lit[c] && !state.gone[c] && c !== t) {
           out.push([
             `carry ${carrier.id} to ${target.id}`,
             { ...state, lit: withAt(state.lit, t, true), at: withAt(state.at, c, t) },
@@ -206,16 +252,45 @@ function successors(
   });
   // A movable thing is put at any place (by hand, or dragged from range).
   entities.forEach((thing, m) => {
-    if (!thing.movable) return;
+    if (!thing.movable || state.gone[m]) return;
     for (const place of places) {
-      if (place === m || state.at[m] === place) continue;
+      if (place === m || state.at[m] === place || state.gone[place]) continue;
       out.push([
         `move ${thing.id} to ${known(entities[place]).id}`,
         { ...state, at: withAt(state.at, m, place) },
       ]);
     }
   });
+  // Irreversible losses of the entities that can suffer them (the softlock search only).
+  for (const t of losses ?? []) {
+    if (state.gone[t]) continue;
+    for (const kind of lossKinds(abstract, state, elements, t)) {
+      out.push([
+        `${kind} ${known(entities[t]).id}`,
+        {
+          lit: withAt(state.lit, t, false),
+          gone: withAt(state.gone, t, true),
+          at: withAt(state.at, t, -1),
+        },
+      ]);
+    }
+  }
   return out;
+}
+
+/** The ways a listed entity can be lost for good in `state` (see `Entity.losses`). */
+function lossKinds(
+  abstract: AbstractPuzzle,
+  state: State,
+  elements: ReadonlySet<string>,
+  i: number,
+): LossKind[] {
+  const entity = known(abstract.entities[i]);
+  return entity.losses.filter((kind) => {
+    if (kind === 'burn') return Boolean(state.lit[i]);
+    if (kind === 'melt') return elements.has('heat') || state.lit.some(Boolean);
+    return true;
+  });
 }
 
 const COMPARISONS: readonly [string, (count: number, bound: number) => boolean][] = [
@@ -432,4 +507,153 @@ export function findShortcut(
     if (result.status === 'reachable') return { capabilities, steps: result.steps };
   }
   return undefined;
+}
+
+export type SoftlockResult =
+  /** No reachable loss leaves the goal out of reach (or the goal is already out of reach: see the goal search). */
+  | { readonly status: 'none'; readonly explored: number }
+  /** A reachable state, after the `lost` entities were lost for good, from which no action reaches the goal. */
+  | {
+      readonly status: 'softlock';
+      readonly lost: readonly string[];
+      /** Actions from the start to that state, the losses included. */
+      readonly path: readonly string[];
+      readonly explored: number;
+    }
+  /** Without the recovery declared a softlock exists; with it, none. */
+  | { readonly status: 'covered'; readonly by: readonly string[]; readonly explored: number }
+  | { readonly status: 'inconclusive'; readonly reason: string; readonly explored: number };
+
+/** Explores every reachable state, losses included, and returns the shallowest dead one (goal out of reach). */
+function deadState(
+  abstract: AbstractPuzzle,
+  elements: ReadonlySet<string>,
+  losses: ReadonlySet<number>,
+  bounds: SearchBounds,
+): { dead: State | undefined; path: string[]; explored: number } | string {
+  const goal = abstract.puzzle.goal;
+  const start = initial(abstract);
+  const states: State[] = [start];
+  const index = new Map([[keyOf(start), 0]]);
+  const parent: ([number, string] | undefined)[] = [undefined];
+  const into: number[][] = [[]];
+  const depth: number[] = [0];
+  const clock = bounds.now;
+  const began = clock?.() ?? 0;
+  for (let at = 0; at < states.length; at++) {
+    if (known(depth[at]) >= bounds.maxDepth) {
+      return `depth bound of ${String(bounds.maxDepth)} actions reached`;
+    }
+    if (
+      clock !== undefined &&
+      bounds.timeBudgetMs !== undefined &&
+      clock() - began > bounds.timeBudgetMs
+    ) {
+      return `time budget of ${String(bounds.timeBudgetMs)} ms used up`;
+    }
+    for (const [label, after] of successors(abstract, known(states[at]), elements, losses)) {
+      const key = keyOf(after);
+      let to = index.get(key);
+      if (to === undefined) {
+        if (states.length >= bounds.maxNodes) {
+          return `search bound of ${String(bounds.maxNodes)} states reached`;
+        }
+        to = states.length;
+        index.set(key, to);
+        states.push(after);
+        parent.push([at, label]);
+        into.push([]);
+        depth.push(known(depth[at]) + 1);
+      }
+      known(into[to]).push(at);
+    }
+  }
+  // Backwards from the states that meet the goal: everything that can still win.
+  const winning = new Set<number>();
+  const queue = states.flatMap((state, i) => (holds(abstract, state, goal) ? [i] : []));
+  queue.forEach((i) => winning.add(i));
+  for (const i of queue) {
+    for (const before of known(into[i])) {
+      if (winning.has(before)) continue;
+      winning.add(before);
+      queue.push(before);
+    }
+  }
+  // A goal out of reach from the start is the goal search's finding, not a softlock.
+  const deadAt = winning.has(0) ? states.findIndex((_, i) => !winning.has(i)) : -1;
+  if (deadAt < 0) return { dead: undefined, path: [], explored: states.length };
+  const path: string[] = [];
+  for (let i = deadAt, link = parent[i]; link !== undefined; link = parent[i]) {
+    path.unshift(link[1]);
+    i = link[0];
+  }
+  return { dead: states[deadAt], path, explored: states.length };
+}
+
+/**
+ * Searches for a softlock for an actor with `capabilities`: a reachable state, after something the
+ * puzzle lists is lost for good (burnt away, broken, pushed out of the level, melted), from which no
+ * action reaches the goal. A loss that something recovers (a respawn policy for it, the return of a
+ * critical entity that falls out of the level, a recovery anchor) is not explored; a softlock that
+ * only that recovery removes is reported as `covered`. Conservative: it assumes every listed thing
+ * can suffer every loss its properties allow, and stops at the bounds as inconclusive.
+ */
+export function findSoftlock(
+  abstract: AbstractPuzzle,
+  capabilities: readonly string[],
+  bounds: SearchBounds = DEFAULT_BOUNDS,
+): SoftlockResult {
+  const elements = new Set<string>();
+  for (const capability of capabilities) {
+    const known = abstract.capabilityElements.get(capability);
+    if (known === undefined || known.some((e) => !MODELLED_ELEMENTS.has(e))) {
+      return {
+        status: 'inconclusive',
+        reason: `capability "${capability}" has no abstract model`,
+        explored: 0,
+      };
+    }
+    known.forEach((e) => elements.add(e));
+  }
+  const gap = unmodelled(abstract.puzzle.goal);
+  if (gap !== undefined) {
+    return {
+      status: 'inconclusive',
+      reason: `the goal uses ${gap}, which the abstraction does not model`,
+      explored: 0,
+    };
+  }
+  const exposed = (all: boolean): Set<number> =>
+    new Set(
+      abstract.entities.flatMap((entity, i) =>
+        entity.losses.some((kind) => all || !entity.covered.includes(kind)) ? [i] : [],
+      ),
+    );
+  // The protected search prunes covered kinds per entity: a covered entity keeps only its open kinds.
+  const protectedAbstract: AbstractPuzzle = {
+    ...abstract,
+    entities: abstract.entities.map((entity) => ({
+      ...entity,
+      losses: entity.losses.filter((kind) => !entity.covered.includes(kind)),
+    })),
+  };
+  const open = deadState(protectedAbstract, elements, exposed(false), bounds);
+  if (typeof open === 'string') return { status: 'inconclusive', reason: open, explored: 0 };
+  if (open.dead !== undefined) {
+    return {
+      status: 'softlock',
+      lost: abstract.entities.flatMap((e, i) => (open.dead?.gone[i] === true ? [e.id] : [])),
+      path: open.path,
+      explored: open.explored,
+    };
+  }
+  const by = abstract.entities.flatMap((entity) =>
+    entity.covered.map((kind) => `${kind} of ${entity.id}`),
+  );
+  if (by.length === 0) return { status: 'none', explored: open.explored };
+  const bare = deadState(abstract, elements, exposed(true), bounds);
+  if (typeof bare === 'string') return { status: 'inconclusive', reason: bare, explored: 0 };
+  return bare.dead === undefined
+    ? { status: 'none', explored: open.explored }
+    : { status: 'covered', by, explored: bare.explored };
 }
