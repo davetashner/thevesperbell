@@ -23,7 +23,7 @@ one definition.
 | `unit` (ci.yml) | per-PR | Required context name. A no-op that points at `coverage-gate`; vitest bench left it for the nightly tier. |
 | `coverage-gate` (ci.yml) | per-PR | The only unit and integration test run; enforces the per-layer thresholds of contract §3; required. |
 | `coverage-ratchet` (ci.yml) | per-PR | Coverage must not decrease versus `main`; seconds; required. |
-| `e2e-shard` 1 to 5 (ci.yml) | per-PR | Chromium e2e smoke in duration-weighted shards (`e2e/shards.json`); the behaviour gate for gameplay changes. |
+| `e2e-shard` 1 to 6 (ci.yml) | per-PR | Chromium e2e smoke in duration-weighted shards (`e2e/shards.json`); the behaviour gate for gameplay changes. |
 | `e2e-playthrough` (ci.yml) | per-PR | The slice playthrough replays a whole run; kept on every PR until path-aware selection lands (mw-e41.4). |
 | `e2e-smoke` (ci.yml) | per-PR | Aggregates the e2e jobs under the required check name. |
 | `perf-budget` (ci.yml) | per-PR tier skipped; runs on push to `main` | Publishes the `perf-report` baseline artifact. Warn-only on GPU-less runners, ~510 s, so it is off every PR's critical path. |
