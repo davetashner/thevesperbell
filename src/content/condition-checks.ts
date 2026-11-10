@@ -14,8 +14,10 @@ import {
   CONDITION_OPERATORS,
   COUNT_PATTERN,
   type Condition,
+  SIGNAL_REF,
   type CountCondition,
   type FactCondition,
+  type SignalCondition,
   type NamedCondition,
 } from './types/condition.ts';
 import type { FactDef, FactGroup } from './types/fact.ts';
@@ -23,6 +25,7 @@ import type { LootTable } from './types/loot-table.ts';
 import type { Puzzle } from './types/puzzle.ts';
 import type { RespawnRules } from './types/respawn-rules.ts';
 import type { SceneDef } from './types/scene.ts';
+import { signalPorts, type SignalGraphEntry } from './types/signal-graph.ts';
 import type { UnlockGroup } from './types/unlock.ts';
 
 /** One condition in a content entry. */
@@ -129,6 +132,36 @@ function countProblem(leaf: Frozen<CountCondition>, index: FactIndex): string | 
   return def.type === 'bool' ? undefined : `counts "${template}", which is ${def.type}, not bool`;
 }
 
+/** Signal graph id → its node ids → their output ports, for checking `signal` conditions. */
+export type SignalIndex = ReadonlyMap<string, ReadonlyMap<string, readonly string[]>>;
+
+/** The signal graphs of `graphs` as a `SignalIndex`. */
+export function signalIndex(graphs: readonly Frozen<SignalGraphEntry>[]): SignalIndex {
+  return new Map(
+    graphs.map((graph) => [
+      graph.id,
+      new Map(graph.nodes.map((node) => [node.id, signalPorts(node).outputs])),
+    ]),
+  );
+}
+
+/** What is wrong with a `signal` leaf, if anything (checked only when a signal index is given). */
+function signalProblem(leaf: Frozen<SignalCondition>, signals: SignalIndex | undefined) {
+  if (signals === undefined) return undefined;
+  const [graph, node] = known(SIGNAL_REF.exec(leaf.signal)).slice(1) as [string, string];
+  const nodes = signals.get(graph);
+  if (nodes === undefined) {
+    return `reads signal graph "${graph}", which does not exist: add it to src/content/data/signal-graph/`;
+  }
+  const ports = nodes.get(node);
+  if (ports === undefined)
+    return `reads node "${node}", which signal graph "${graph}" does not have`;
+  if (leaf.port !== undefined && !ports.includes(leaf.port)) {
+    return `reads port "${leaf.port}", which node "${graph}/${node}" does not have (${ports.join(', ')})`;
+  }
+  return undefined;
+}
+
 /**
  * Every problem with `condition` against the fact registry `index`, with JSON pointers relative to
  * the condition (walked without recursion; the schema already capped the depth).
@@ -136,6 +169,7 @@ function countProblem(leaf: Frozen<CountCondition>, index: FactIndex): string | 
 export function conditionProblems(
   condition: Frozen<Condition>,
   index: FactIndex,
+  signals?: SignalIndex,
 ): ConditionProblem[] {
   const problems: ConditionProblem[] = [];
   const stack: { node: Frozen<Condition>; pointer: string }[] = [{ node: condition, pointer: '' }];
@@ -151,6 +185,13 @@ export function conditionProblems(
     } else if ('count' in node) {
       const message = countProblem(node, index);
       if (message !== undefined) problems.push({ pointer: `${pointer}/count`, message });
+    } else if ('entities' in node) {
+      // Property, tag and element predicates are checked by the schema; nothing reads facts.
+    } else if ('signal' in node) {
+      const message = signalProblem(node, signals);
+      if (message !== undefined) problems.push({ pointer: `${pointer}/signal`, message });
+    } else if ('sustained' in node) {
+      stack.push({ node: node.sustained, pointer: `${pointer}/sustained` });
     } else if ('not' in node) {
       stack.push({ node: node.not, pointer: `${pointer}/not` });
     } else {
@@ -166,16 +207,46 @@ export function conditionProblems(
   return problems;
 }
 
+/** Every scene spawn an `entities` leaf names (`entities.entity`), with its JSON pointer. */
+export function conditionEntityRefs(
+  condition: Frozen<Condition>,
+): { readonly pointer: string; readonly entity: string }[] {
+  const refs: { pointer: string; entity: string }[] = [];
+  const stack: { node: Frozen<Condition>; pointer: string }[] = [{ node: condition, pointer: '' }];
+  for (let item = stack.pop(); item !== undefined; item = stack.pop()) {
+    const { node, pointer } = item;
+    if ('entities' in node) {
+      const { entity } = node.entities;
+      if (entity !== undefined) refs.push({ pointer: `${pointer}/entities/entity`, entity });
+    } else if ('sustained' in node) {
+      stack.push({ node: node.sustained, pointer: `${pointer}/sustained` });
+    } else if ('not' in node) {
+      stack.push({ node: node.not, pointer: `${pointer}/not` });
+    } else if ('all' in node || 'any' in node) {
+      const [kind, children] = 'all' in node ? ['all', node.all] : ['any', node.any];
+      for (let i = children.length - 1; i >= 0; i--) {
+        stack.push({ node: known(children[i]), pointer: `${pointer}/${kind}/${String(i)}` });
+      }
+    }
+  }
+  return refs;
+}
+
 /** The content check for conditions: every condition in content names declared facts, used right. */
 export const checkConditions: ContentCheck = (entries) => {
   const index = factIndex(
     entries.filter((entry) => entry.type === 'fact').map((entry) => entry.value as FactGroup),
   );
+  const signals = signalIndex(
+    entries
+      .filter((entry) => entry.type === 'signal-graph')
+      .map((entry) => entry.value as SignalGraphEntry),
+  );
   const issues: ContentIssue[] = [];
   for (const { type, file, value } of entries) {
     const usages = Object.hasOwn(CONDITION_USAGES, type) ? CONDITION_USAGES[type] : undefined;
     for (const usage of usages?.(value as never) ?? []) {
-      for (const { pointer, message } of conditionProblems(usage.condition, index)) {
+      for (const { pointer, message } of conditionProblems(usage.condition, index, signals)) {
         issues.push({
           file,
           pointer: `${usage.pointer}${pointer}`,

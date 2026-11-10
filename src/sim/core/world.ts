@@ -197,6 +197,14 @@ export class World<TInput = unknown> {
     return this.factStore;
   }
 
+  /**
+   * Counts structural changes (spawns, despawns, components added or removed). Watchers that depend
+   * on which entities exist compare it between ticks instead of scanning.
+   */
+  get structureVersion(): number {
+    return this.structure.version;
+  }
+
   /** The physics this world owns and steps, if it has any. */
   get physics(): PhysicsPort | undefined {
     return this.physicsPort;

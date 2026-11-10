@@ -721,4 +721,17 @@ describe('World remove listeners (mw-e03.41)', () => {
     const Unregistered = defineComponent<number>('Unregistered');
     expect(() => w.onRemove(Unregistered, () => undefined)).toThrow('is not registered');
   });
+
+  it('structureVersion counts structural changes, so watchers can skip scans', () => {
+    const w = new World({ seed: 1 }).register(Position);
+    const start = w.structureVersion;
+    const e = w.spawn();
+    w.add(e, Position, { x: 1, y: 0 });
+    const added = w.structureVersion;
+    expect(added).toBeGreaterThan(start);
+    w.set(e, Position, { x: 2, y: 0 }); // a value write is not structural
+    expect(w.structureVersion).toBe(added);
+    w.remove(e, Position);
+    expect(w.structureVersion).toBeGreaterThan(added);
+  });
 });

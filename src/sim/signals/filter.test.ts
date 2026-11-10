@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { World } from '../core/world';
 import { addProperties, registerWorldProperties } from '../properties/components';
-import { hasTag, matchesFilter, matchesPredicate, tagEntity, TagsComponent } from './filter';
+import {
+  hasTag,
+  matchesFilter,
+  matchesPredicate,
+  predicateProperties,
+  tagEntity,
+  TagsComponent,
+  tagsChanged,
+  type TagsChange,
+} from './filter';
 import type { PredicateOp } from './graph';
 
 function world() {
@@ -22,6 +31,32 @@ describe('entity tags', () => {
     }).toThrow(/kebab-case/);
     expect(() => TagsComponent.deserialize('player')).toThrow(/list of kebab-case ids/);
     expect(TagsComponent.deserialize(['b', 'a', 'b'])).toEqual(['a', 'b']);
+  });
+});
+
+describe('tag change events and predicate properties (mw-e15.2)', () => {
+  it('tagEntity announces a changed tag list, and only a changed one', () => {
+    const w = world();
+    const seen: TagsChange[] = [];
+    w.events.on(tagsChanged, (change) => seen.push(change));
+    const e = w.spawn();
+    tagEntity(w, e, 'player');
+    tagEntity(w, e, 'player'); // nothing new
+    tagEntity(w, e, 'actor');
+    w.events.flush();
+    expect(seen).toEqual([
+      { entity: e, tags: ['player'] },
+      { entity: e, tags: ['actor', 'player'] },
+    ]);
+  });
+
+  it('says which world properties a predicate reads', () => {
+    expect(predicateProperties({ test: 'tag', tag: 'x' })).toEqual([]);
+    expect(predicateProperties({ test: 'element', element: 'water' })).toEqual(['wetness']);
+    expect(predicateProperties({ test: 'element', element: 'fire' })).toEqual(['burning']);
+    expect(
+      predicateProperties({ test: 'property', property: 'weight', op: 'gt', value: 1 }),
+    ).toEqual(['weight']);
   });
 });
 

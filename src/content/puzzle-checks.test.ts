@@ -108,4 +108,34 @@ describe('puzzle load checks (mw-e15.1)', () => {
   it('ignores entries of other types', () => {
     expect(checkPuzzles([{ type: 'testprop', file: 'x.json', value: { id: 'x' } }])).toEqual([]);
   });
+
+  it('mw-e15.2: a goal may read only entities the puzzle lists, and signals that exist', () => {
+    const goal = (g: unknown) => puzzle((p) => ({ ...p, goal: g }));
+    expect(
+      loadIssues([
+        goal({
+          all: [
+            { entities: { entity: 'room-lever' }, match: 'any' },
+            { sustained: { entities: { entity: 'loose-crate' }, match: 'any' }, seconds: 2 },
+            { entities: { tag: 'brazier' }, match: 'all' },
+            { signal: 'greybox-rune-plates/west-plate', port: 'active' },
+          ],
+        }),
+      ]),
+    ).toEqual([]);
+    expect(
+      loadIssues([
+        goal({
+          all: [
+            { entities: { entity: 'west-brazier' }, match: 'any' },
+            { not: { entities: { entity: 'room-lever' }, match: 'none' } },
+            { signal: 'greybox-rune-plates/missing' },
+          ],
+        }),
+      ]),
+    ).toEqual([
+      `${FILE}#/goal/all/2/signal: puzzle:zz-test reads node "missing", which signal graph "greybox-rune-plates" does not have`,
+      `${FILE}#/goal/all/0/entities/entity: puzzle:zz-test goal reads entity "west-brazier", which the puzzle does not list in \`entities\``,
+    ]);
+  });
 });

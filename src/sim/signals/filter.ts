@@ -5,9 +5,10 @@
 // carries (`player`, `actor`, `companion`), set by whoever spawns it.
 
 import { defineComponent, type EntityId } from '../core/component';
+import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
 import { readProperty } from '../properties/components';
-import { PROPERTY_ID_PATTERN } from '../properties/spec';
+import { PROPERTY_ID_PATTERN, type WorldPropertyKey } from '../properties/spec';
 import type { ElementPredicate, PropertyPredicate, SignalPredicate } from './graph';
 
 function tagList(data: unknown): readonly string[] {
@@ -25,15 +26,29 @@ export const TagsComponent = defineComponent<readonly string[]>('entity.tags', {
   deserialize: tagList,
 });
 
+/** An entity's tag list changed (`tagEntity` added one), delivered at the next phase boundary. */
+export interface TagsChange {
+  readonly entity: EntityId;
+  /** Every tag the entity carries now, sorted. */
+  readonly tags: readonly string[];
+}
+
+/** Fired by `tagEntity` when it adds a tag the entity did not carry (puzzle goals watch it). */
+export const tagsChanged = defineEvent<TagsChange>('tagsChanged');
+
 /**
  * Gives `entity` these tags in addition to any it has (validated: kebab-case ids). Adding the
- * component is structural, so during a step a first tag applies at the end of the tick.
+ * component is structural, so during a step a first tag applies at the end of the tick. Fires
+ * `tagsChanged` when the list changes.
  */
 export function tagEntity(world: World<never>, entity: EntityId, ...tags: string[]): void {
   const current = world.get(entity, TagsComponent);
   const next = tagList([...(current ?? []), ...tags]);
   if (current === undefined) world.add(entity, TagsComponent, next);
   else world.set(entity, TagsComponent, next);
+  if (current?.length !== next.length) {
+    world.events.emit(tagsChanged, { entity, tags: next });
+  }
 }
 
 /** Whether `entity` carries `tag`. */
@@ -48,6 +63,18 @@ const ELEMENT_PREDICATES: Readonly<Record<ElementPredicate['element'], PropertyP
   ice: { test: 'property', property: 'frozen', op: 'eq', value: true },
   charge: { test: 'property', property: 'charge', op: 'gt', value: 0 },
 };
+
+/** The world properties a predicate reads (none for a tag test). */
+export function predicateProperties(predicate: SignalPredicate): readonly WorldPropertyKey[] {
+  switch (predicate.test) {
+    case 'tag':
+      return [];
+    case 'element':
+      return predicateProperties(ELEMENT_PREDICATES[predicate.element]);
+    case 'property':
+      return [predicate.property];
+  }
+}
 
 function compare(p: PropertyPredicate, actual: unknown): boolean {
   switch (p.op) {

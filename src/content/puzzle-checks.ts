@@ -3,10 +3,11 @@
 // its scene (the level; a typo fails in CI, not in play), every capability its solutions and hints
 // name is declared in the capability registry, and the facts it writes when solved are declared and
 // typed (the solved fact a bool). The scene itself is a `ref`, which the loader checks. The goal
-// condition is checked by src/content/condition-checks.ts (CONDITION_USAGES). Issues name the file,
+// condition is checked by src/content/condition-checks.ts (CONDITION_USAGES), and every scene spawn it
+// reads (`entities.entity`) must be listed in the puzzle's `entities`. Issues name the file,
 // the JSON pointer and the missing id.
 
-import { conditionProblems } from './condition-checks.ts';
+import { conditionEntityRefs, conditionProblems } from './condition-checks.ts';
 import { factIndex, lookupFact } from './fact-checks.ts';
 import type { ContentCheck, ContentIssue } from './loader.ts';
 import { capabilityIds } from './types/capability.ts';
@@ -65,6 +66,17 @@ export const checkPuzzles: ContentCheck = (entries) => {
         );
       }
     });
+
+    // A goal may only read entities the puzzle lists, so the entity list is the whole picture.
+    const listed = new Set(puzzle.entities.map(({ id }) => id));
+    for (const { pointer, entity: ref } of conditionEntityRefs(puzzle.goal)) {
+      if (!listed.has(ref)) {
+        report(
+          `/goal${pointer}`,
+          `goal reads entity "${ref}", which the puzzle does not list in \`entities\``,
+        );
+      }
+    }
 
     for (const { pointer, id } of capabilityUsages(puzzle)) {
       if (!capabilities.has(id)) {

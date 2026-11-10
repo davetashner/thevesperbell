@@ -209,8 +209,8 @@ describe('condition compilation', () => {
     ).toEqual([
       'invalid condition: a condition must be an object',
       'invalid condition: a condition must be an object',
-      'invalid condition: a condition has exactly one of fact, count, all, any, not; got {}',
-      'invalid condition: a condition has exactly one of fact, count, all, any, not; got {fact, all}',
+      'invalid condition: a condition has exactly one of fact, count, all, any, not, entities, signal, sustained; got {}',
+      'invalid condition: a condition has exactly one of fact, count, all, any, not, entities, signal, sustained; got {fact, all}',
       'invalid condition at fact: "Bad Key" is not a fact key',
       'invalid condition at fact: 3 is not a fact key',
       'invalid condition at gte: invalid operand 1.5',

@@ -80,6 +80,7 @@ export * from './player';
 export * from './inventory';
 export * from './items';
 export * from './progression';
+export * from './puzzle';
 export * from './properties';
 export * from './push';
 export * from './respawn';

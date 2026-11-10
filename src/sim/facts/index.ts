@@ -3,6 +3,7 @@
 // the migrations that load saved facts under renamed or removed declarations (mw-e27.4).
 export * from './commands';
 export * from './conditions';
+export * from './live';
 export * from './migrate';
 export * from './policy';
 export * from './registry';

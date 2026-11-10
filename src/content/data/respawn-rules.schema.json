@@ -142,7 +142,7 @@
   "additionalProperties": false,
   "$defs": {
     "condition": {
-      "description": "A condition over world facts: one of fact, count, all, any, not (docs/design/conditions.md).",
+      "description": "A condition over world facts and live state: one of fact, count, entities, signal, sustained, all, any, not (docs/design/conditions.md).",
       "anyOf": [
         {
           "type": "object",
@@ -271,6 +271,444 @@
           ],
           "additionalProperties": false,
           "description": "Counts true entity facts matching a pattern, compared with exactly one operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "object",
+              "properties": {
+                "tag": {
+                  "description": "Entities carrying this tag (an entity tag, or the tag of a scene spawn).",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "entity": {
+                  "description": "The entity of the scene spawn with this id.",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                }
+              },
+              "additionalProperties": false,
+              "description": "Which entities to test. `{ \"tag\": … }`, `{ \"entity\": … }` or both; `{}` is every entity with a placement."
+            },
+            "where": {
+              "description": "Predicates (property, tag, element) an entity must all pass.",
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "property"
+                      },
+                      "property": {
+                        "type": "string",
+                        "enum": [
+                          "material",
+                          "temperature",
+                          "flammable",
+                          "ignitionPoint",
+                          "fuel",
+                          "burning",
+                          "wetness",
+                          "absorbency",
+                          "frozen",
+                          "freezePoint",
+                          "conductive",
+                          "charge",
+                          "weight",
+                          "fragile",
+                          "hp",
+                          "density",
+                          "climbable",
+                          "liftable",
+                          "pushable",
+                          "remoteActuatable",
+                          "hideable",
+                          "reflective",
+                          "transparent",
+                          "opaque",
+                          "soundDamping",
+                          "friction",
+                          "impactAbsorb",
+                          "owner",
+                          "liquid",
+                          "flammableGas",
+                          "extinguishable",
+                          "windResistance",
+                          "flameRadius",
+                          "waterSurface",
+                          "unstable",
+                          "suspended",
+                          "support",
+                          "breakable",
+                          "bashable",
+                          "cuttable",
+                          "shootable",
+                          "softAnchor",
+                          "surfaceHardness",
+                          "chargeActivated",
+                          "lightActivated",
+                          "hidden",
+                          "trapped",
+                          "trap",
+                          "container",
+                          "remains",
+                          "noiseMultiplier"
+                        ],
+                        "description": "World property to compare (absent = its default)."
+                      },
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "eq",
+                          "ne",
+                          "lt",
+                          "lte",
+                          "gt",
+                          "gte"
+                        ],
+                        "description": "Comparison; lt/lte/gt/gte need a number property."
+                      },
+                      "value": {
+                        "description": "Value to compare with.",
+                        "type": [
+                          "number",
+                          "boolean",
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "property",
+                      "op",
+                      "value"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "tag"
+                      },
+                      "tag": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "description": "Tag the entity must carry, e.g. \"player\"."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "tag"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "element"
+                      },
+                      "element": {
+                        "type": "string",
+                        "enum": [
+                          "fire",
+                          "water",
+                          "ice",
+                          "charge"
+                        ],
+                        "description": "fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "element"
+                    ],
+                    "additionalProperties": false
+                  }
+                ],
+                "description": "One condition; every condition of a filter must hold."
+              }
+            },
+            "inside": {
+              "description": "The entity must stand in this box, sphere or capsule, in world coordinates.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "box"
+                    },
+                    "center": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "halfExtents": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Half the size per axis."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "center",
+                    "halfExtents"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "sphere"
+                    },
+                    "center": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "center",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "capsule"
+                    },
+                    "from": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "to": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "from",
+                    "to",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "match": {
+              "description": "all: at least one entity is selected and every one passes; any: one passes; none: none passes.",
+              "type": "string",
+              "enum": [
+                "all",
+                "any",
+                "none"
+              ]
+            },
+            "eq": {
+              "description": "The number of entities that pass equals this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "neq": {
+              "description": "The number that pass does not equal this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gt": {
+              "description": "The number that pass is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "At least this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "Fewer than this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "At most this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "entities"
+          ],
+          "additionalProperties": false,
+          "description": "Property predicates over live entities: how many of them pass, and where they are. Exactly one of match or an operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "signal": {
+              "type": "string",
+              "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$",
+              "description": "Signal graph id and node id, e.g. \"vault/gate-open\". Holds while the output is on."
+            },
+            "port": {
+              "description": "Output port of the node; default: its first.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "required": [
+            "signal"
+          ],
+          "additionalProperties": false,
+          "description": "True while a signal graph node output is on (mark the node `observed`)."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sustained": {
+              "description": "The condition that must keep holding.",
+              "$ref": "#/$defs/condition"
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 3600,
+              "description": "Seconds of sim time it must hold, without a break."
+            }
+          },
+          "required": [
+            "sustained",
+            "seconds"
+          ],
+          "additionalProperties": false,
+          "description": "True once the condition has held, without a break, for that long."
         },
         {
           "type": "object",

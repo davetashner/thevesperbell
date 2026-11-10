@@ -8,8 +8,8 @@
 // when solved (mw-e15.3 runs it).
 //
 // The goal is the shared condition language (docs/design/conditions.md), registered in
-// CONDITION_USAGES; mw-e15.2 extends that language with live-property, signal and volume predicates
-// and they become valid here unchanged. This schema checks what one file can: ids unique, every step,
+// CONDITION_USAGES; its live leaves (entity property predicates, signals, volumes, sustained holds,
+// mw-e15.2) are valid here unchanged. This schema checks what one file can: ids unique, every step,
 // highlight and recovery names a listed entity, a step's capability is one its solution declares,
 // and an `mvp` puzzle declares at least two solutions. The load check (src/content/puzzle-checks.ts)
 // checks the rest against other content: listed entities are spawns of the scene, capabilities are
