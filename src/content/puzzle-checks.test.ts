@@ -99,6 +99,36 @@ describe('puzzle load checks (mw-e15.1)', () => {
     ]);
   });
 
+  it('mw-e15.7: a respawned entity must be a prop, and a reset fact a declared int', () => {
+    const issues = loadIssues([
+      puzzle((p) => ({
+        ...p,
+        entities: [
+          ...p.entities,
+          { id: 'player-start', role: 'a marker', critical: true },
+          { id: 'ghost', role: 'not placed', critical: true },
+        ],
+        policy: {
+          repeatable: false,
+          recovery: [
+            { kind: 'respawn', entity: 'player-start', seconds: 5 },
+            { kind: 'respawn', entity: 'ghost', seconds: 5 },
+            { kind: 'reset', trigger: 'room-lever' },
+            { kind: 'reset', trigger: 'room-lever', fact: 'testbed.nope' },
+            { kind: 'reset', trigger: 'room-lever', fact: 'testbed.room-lever.thrown' },
+            { kind: 'reset', trigger: 'room-lever', fact: 'ownership.thefts' },
+          ],
+        },
+      })),
+    ]);
+    expect(issues).toEqual([
+      `${FILE}#/entities/3/id: puzzle:zz-test names entity "ghost", which level "testbed" (${SCENE}) does not place`,
+      `${FILE}#/policy/recovery/0/entity: puzzle:zz-test respawns "player-start", which is not a prop spawn of level "testbed": only a prop can be dropped again`,
+      `${FILE}#/policy/recovery/3/fact: puzzle:zz-test names undeclared fact "testbed.nope": declare it in src/content/data/fact/`,
+      `${FILE}#/policy/recovery/4/fact: puzzle:zz-test reset fact "testbed.room-lever.thrown" must be int, not bool`,
+    ]);
+  });
+
   it('a puzzle in a missing scene is reported once, by the reference check', () => {
     const issues = loadIssues([puzzle((p) => ({ ...p, scene: 'no-such-level' }))]);
     expect(issues).toHaveLength(1);

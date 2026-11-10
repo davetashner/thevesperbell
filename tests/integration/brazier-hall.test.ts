@@ -12,11 +12,16 @@ import { markExercised } from '@content/testing';
 import { installFactRegistry } from '@game/facts';
 import { createGameSaveRegistry } from '@game/save/sections';
 import {
+  addPhysicsObject,
+  addProperties,
   applyStimulus,
+  interacted,
+  teleportPhysicsObject,
   doorStatus,
   learnSpell,
   PlacementComponent,
   puzzleDiscovered,
+  puzzleRecovered,
   puzzleRewarded,
   puzzleSolved,
   playReplay,
@@ -306,4 +311,76 @@ describe('the brazier hall puzzle runs from data (mw-e15.3)', { timeout: 120_000
       expect(playReplay(replay, scenario, { contentHash }).status).toBe('passed');
     },
   );
+});
+
+const must = <T>(value: T | undefined): T => {
+  if (value === undefined) throw new Error('expected a value');
+  return value;
+};
+
+describe('the brazier hall recovers from a lost torch (mw-e15.7)', { timeout: 120_000 }, () => {
+  const BARREL = 'torch-barrel';
+  const barrelOf = (h: ReturnType<typeof hall>): EntityId | undefined => {
+    const entity = h.game.scenes.entityOfSpawn(BARREL);
+    return entity !== undefined && h.sim.isAlive(entity) ? entity : undefined;
+  };
+
+  it('a burnt-out torch barrel is replaced by a fresh burning one after 10 s, and the spot is never taken twice', () => {
+    const h = hall();
+    const recovered: string[] = [];
+    h.sim.events.on(puzzleRecovered, (e) => recovered.push(`${e.kind}:${e.entity}`));
+    const spent = h.id(BARREL);
+    h.sim.events.emit(interacted, { target: spent } as never); // the puzzle is touched
+    h.steps(2);
+    // Its fuel runs out: it chars (wood burns to charred) and stays, spent.
+    setProperty(h.sim, spent, 'fuel', 0);
+    h.steps(2);
+    expect(readProperty(h.sim, spent, 'burning')).toBe(false);
+    expect(recovered).toEqual([]);
+    h.steps(10 * 60 - 5);
+    expect(recovered).toEqual([]);
+    h.steps(10);
+    expect(recovered).toEqual([`respawn:${BARREL}`]);
+    const fresh = barrelOf(h);
+    expect(fresh).toBeDefined();
+    expect(fresh).not.toBe(spent);
+    expect(h.sim.isAlive(spent)).toBe(false);
+    h.steps(3);
+    expect(readProperty(h.sim, must(fresh), 'burning')).toBe(true);
+    const at = h.sim.get(must(fresh), PlacementComponent);
+    expect(at?.x).toBeCloseTo(-3.5, 1);
+    expect(at?.z).toBeCloseTo(-3, 1);
+  });
+
+  it('a blocked spot is retried, and a torch barrel pushed off the world comes back within the tick', () => {
+    const h = hall();
+    const recovered: string[] = [];
+    h.sim.events.on(puzzleRecovered, (e) => recovered.push(`${e.kind}:${e.entity}`));
+    h.sim.events.emit(interacted, { target: h.id(BARREL) } as never); // the puzzle is touched
+    h.steps(2);
+    // Lost: removed from the world. Something big is parked where the new one would appear.
+    h.game.scenes.removeSpawn(BARREL);
+    h.steps(2);
+    const blocker = h.sim.spawn();
+    addProperties(h.sim, blocker, { liftable: true, weight: 50 });
+    addPhysicsObject(h.sim, blocker, {
+      shape: { kind: 'box', halfExtents: { x: 0.4, y: 0.4, z: 0.4 } },
+      position: { x: -3.5, y: 0.4, z: -3 },
+    });
+    h.steps(10 * 60 + 2 * 60 + 5);
+    expect(recovered).toEqual([]);
+    expect(barrelOf(h)).toBeUndefined();
+    h.sim.destroy(blocker);
+    h.steps(2 * 60 + 5);
+    expect(recovered).toEqual([`respawn:${BARREL}`]);
+    // Pushed off the edge of the world, it is back at its spawn point on the next tick.
+    h.steps(60);
+    const barrel = must(barrelOf(h));
+    teleportPhysicsObject(h.sim, barrel, { x: 40, y: -200, z: 40 });
+    h.steps(1);
+    const at = h.sim.get(barrel, PlacementComponent);
+    expect(at?.x).toBeCloseTo(-3.5, 1);
+    expect(at?.z).toBeCloseTo(-3, 1);
+    expect(recovered).toEqual([`respawn:${BARREL}`, `out-of-bounds:${BARREL}`]);
+  });
 });

@@ -82,3 +82,21 @@ export interface CapabilityUsed {
   readonly tick: number;
 }
 export const capabilityUsed = defineEvent<CapabilityUsed>('capabilityUsed');
+
+/** How a puzzle came back from a loss: a critical entity respawned, the mechanisms reset, an out-of-bounds return. */
+export const PUZZLE_RECOVERY_KINDS = ['respawn', 'reset', 'out-of-bounds'] as const;
+export type PuzzleRecoveryKind = (typeof PUZZLE_RECOVERY_KINDS)[number];
+
+/**
+ * A puzzle recovered (mw-e15.7): a lost critical entity reappeared at its source (`respawn`), a reset
+ * trigger returned the mechanisms to their authored state (`reset`), or a critical object that fell
+ * out of the level was put back where it began (`out-of-bounds`). Telemetry and audio listen.
+ */
+export interface PuzzleRecovered {
+  readonly puzzle: string;
+  readonly tick: number;
+  readonly kind: PuzzleRecoveryKind;
+  /** Scene spawn id of the entity put back (respawn, out-of-bounds); empty for a reset. */
+  readonly entity: string;
+}
+export const puzzleRecovered = defineEvent<PuzzleRecovered>('puzzleRecovered');

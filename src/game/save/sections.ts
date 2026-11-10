@@ -8,6 +8,7 @@ import {
   CapabilitiesComponent,
   NavRouteComponent,
   PlayerClassComponent,
+  PuzzleCriticalComponent,
   PuzzleStateComponent,
   RecoveryAnchorComponent,
   settleHeldObjects,
@@ -31,7 +32,7 @@ import { worldFactsSaveSection } from './world-facts';
  * save holding them loads into a fresh world that has not chosen a class yet (Continue from the
  * title, mw-e01.7) or whose creatures have not moved yet (a save mid-fight with the slice's skeleton,
  * mw-e01.5), or whose puzzles have not left dormant yet (mw-e15.3: the puzzle record is only made
- * when a puzzle is first touched).
+ * when a puzzle is first touched), or whose critical puzzle objects are not marked yet (mw-e15.7).
  */
 export const ON_DEMAND_COMPONENTS = Object.freeze([
   PlayerClassComponent,
@@ -41,6 +42,7 @@ export const ON_DEMAND_COMPONENTS = Object.freeze([
   SpellHotbarComponent,
   RecoveryAnchorComponent,
   PuzzleStateComponent,
+  PuzzleCriticalComponent,
 ]);
 
 /** What the game's sections need from the running build. */
