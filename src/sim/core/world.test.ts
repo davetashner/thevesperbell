@@ -735,3 +735,15 @@ describe('World remove listeners (mw-e03.41)', () => {
     expect(w.structureVersion).toBeGreaterThan(added);
   });
 });
+
+describe('World.restores (mw-e15.3)', () => {
+  it('counts restores, and is not part of the state', () => {
+    const world = new World<never>({ seed: 1 });
+    const before = world.snapshot();
+    expect(world.restores).toBe(0);
+    world.restore(before);
+    world.restore(before);
+    expect(world.restores).toBe(2);
+    expect(world.snapshot()).toEqual(before);
+  });
+});

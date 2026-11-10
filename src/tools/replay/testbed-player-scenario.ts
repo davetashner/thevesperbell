@@ -54,6 +54,7 @@ import {
 import { hasHiding, startHiding } from '@game/hiding/index';
 import { hasContainers, prepareContainers, startContainers } from '@game/items/containers';
 import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
+import { startPuzzles } from '@game/puzzles/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
 import { createGameLight, installGameLight, type GameLight } from '@game/light/index';
 import { installGameFire } from '@game/fire';
@@ -85,6 +86,7 @@ import {
   RapierSightWorld,
   registerSceneComponents,
   World,
+  type PuzzleRuntime,
   zeroHealth,
   type ActionFrame,
   type RapierModule,
@@ -196,6 +198,8 @@ export interface HeadlessGame<TInput> {
   readonly consumables: Consumables;
   /** The scene's doors and switches (mw-e03.18), or undefined in a scene without mechanisms. */
   readonly mechanisms: SceneMechanisms | undefined;
+  /** The scene's puzzles (mw-e15.3), or undefined when it has none. */
+  readonly puzzles: PuzzleRuntime | undefined;
   /** The scene's containers (mw-e18.3), in scene order. */
   readonly containers: readonly EntityId[];
   /** The scene's hiding spots (mw-e03.23), when it has any. */
@@ -411,7 +415,10 @@ export function createGameWorld<TInput>(
   const aiWatch = watchCreatureAi(world, sceneCreatures.ai, navigation);
   // Spawns that keep to some phases of the day come and go with the clock (mw-ju8.14).
   watchPresence(world, creatures.spawn, scene.layout.spawns);
+  // Puzzles (mw-e15.3) in scenes that have some, last: they read what everything else did this tick.
+  const puzzles = startPuzzles(world, content, scene.id, { player });
   return {
+    puzzles,
     world,
     player,
     combat,

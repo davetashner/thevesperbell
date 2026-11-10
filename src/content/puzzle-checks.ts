@@ -4,8 +4,9 @@
 // name is declared in the capability registry, and the facts it writes when solved are declared and
 // typed (the solved fact a bool). The scene itself is a `ref`, which the loader checks. The goal
 // condition is checked by src/content/condition-checks.ts (CONDITION_USAGES), and every scene spawn it
-// reads (`entities.entity`) must be listed in the puzzle's `entities`. Issues name the file,
-// the JSON pointer and the missing id.
+// reads (`entities.entity`) must be listed in the puzzle's `entities`. The signals a puzzle drives
+// (`outputs.signals`) must be lever or button nodes of a graph its scene places (mw-e15.3). Issues
+// name the file, the JSON pointer and the missing id.
 
 import { conditionEntityRefs, conditionProblems } from './condition-checks.ts';
 import { factIndex, lookupFact } from './fact-checks.ts';
@@ -14,6 +15,7 @@ import { capabilityIds } from './types/capability.ts';
 import type { FactGroup } from './types/fact.ts';
 import type { Puzzle } from './types/puzzle.ts';
 import type { SceneDef } from './types/scene.ts';
+import type { SignalGraphEntry } from './types/signal-graph.ts';
 
 /** Every capability a puzzle names, with its JSON pointer. */
 function capabilityUsages(puzzle: Puzzle): { pointer: string; id: string }[] {
@@ -35,12 +37,21 @@ function capabilityUsages(puzzle: Puzzle): { pointer: string; id: string }[] {
 
 /** The content check for puzzles: entities, capabilities and output facts exist. */
 export const checkPuzzles: ContentCheck = (entries) => {
-  const scenes = new Map<string, { file: string; spawns: ReadonlySet<string> }>();
+  const scenes = new Map<
+    string,
+    { file: string; spawns: ReadonlySet<string>; graphs: ReadonlySet<string> }
+  >();
+  const graphs = new Map<string, ReadonlyMap<string, string>>();
   for (const { type, file, value } of entries) {
+    if (type === 'signal-graph') {
+      const graph = value as SignalGraphEntry;
+      graphs.set(graph.id, new Map(graph.nodes.map((node) => [node.id, node.kind])));
+    }
     if (type !== 'scene') continue;
     scenes.set(value.id, {
       file,
       spawns: new Set((value as SceneDef).spawns.map(({ id }) => id)),
+      graphs: new Set((value as SceneDef).signals.map(({ graph }) => graph.id)),
     });
   }
   const capabilities = capabilityIds(entries);
@@ -86,6 +97,28 @@ export const checkPuzzles: ContentCheck = (entries) => {
         );
       }
     }
+
+    puzzle.outputs.signals.forEach((signal, i) => {
+      const pointer = `/outputs/signals/${String(i)}`;
+      const [graph = '', node = ''] = signal.split('/');
+      const nodes = graphs.get(graph);
+      const kind = nodes?.get(node);
+      if (nodes === undefined) {
+        report(pointer, `drives signal "${signal}", but there is no signal graph "${graph}"`);
+      } else if (kind === undefined) {
+        report(pointer, `drives signal "${signal}", but graph "${graph}" has no node "${node}"`);
+      } else if (kind !== 'lever' && kind !== 'button') {
+        report(
+          pointer,
+          `drives signal "${signal}", a ${kind} node: only a lever (switched on) or a button (pressed) can be driven from outside the graph`,
+        );
+      } else if (scene !== undefined && !scene.graphs.has(graph)) {
+        report(
+          pointer,
+          `drives signal "${signal}", but level "${puzzle.scene.id}" (${scene.file}) does not place signal graph "${graph}"`,
+        );
+      }
+    });
 
     const solved = puzzle.outputs.solvedFact;
     const def = lookupFact(facts, solved);

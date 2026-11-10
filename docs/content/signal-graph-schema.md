@@ -15,8 +15,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].observed` | boolean | — | Outputs are read outside the graph (puzzle goal, quest), so unwired is fine. |
 | `nodes[].kind` | `"volume"` | required |  |
 | `nodes[].shape` | object | required | Box, sphere or capsule, relative to the graph origin. |
-| `nodes[].shape.kind` | `"box"` | required |  |
-| `nodes[].shape.center` | object | required |  |
+| `nodes[].shape.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `nodes[].shape.center` | object | required | Centre of the box, metres. |
 | `nodes[].shape.center.x` | number | required | Metres. |
 | `nodes[].shape.center.y` | number | required | Metres. |
 | `nodes[].shape.center.z` | number | required | Metres. |
@@ -24,14 +24,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].shape.halfExtents.x` | number ≥ 0 | required | Metres. |
 | `nodes[].shape.halfExtents.y` | number ≥ 0 | required | Metres. |
 | `nodes[].shape.halfExtents.z` | number ≥ 0 | required | Metres. |
-| `nodes[].shape.kind` | `"sphere"` | required |  |
+| `nodes[].shape.kind` | `"sphere"` | required | Shape: a sphere. |
+| `nodes[].shape.center` | object | required | Centre of the sphere, metres. |
 | `nodes[].shape.radius` | number ≥ 0 | required | Metres. |
-| `nodes[].shape.kind` | `"capsule"` | required |  |
-| `nodes[].shape.from` | object | required |  |
+| `nodes[].shape.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `nodes[].shape.from` | object | required | One end of the capsule’s segment, metres. |
 | `nodes[].shape.from.x` | number | required | Metres. |
 | `nodes[].shape.from.y` | number | required | Metres. |
 | `nodes[].shape.from.z` | number | required | Metres. |
-| `nodes[].shape.to` | object | required |  |
+| `nodes[].shape.to` | object | required | The other end of the capsule’s segment, metres. |
 | `nodes[].shape.to.x` | number | required | Metres. |
 | `nodes[].shape.to.y` | number | required | Metres. |
 | `nodes[].shape.to.z` | number | required | Metres. |

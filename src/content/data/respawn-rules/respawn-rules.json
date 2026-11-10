@@ -19,6 +19,14 @@
       "priority": 0,
       "destination": { "scene": "testbed", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "brazier-hall-reload",
+      "notes": "Demo scene of the puzzle runtime: the puzzle save and load e2e (mw-e15.3) dies here.",
+      "region": "brazier-hall",
+      "priority": 0,
+      "destination": { "scene": "brazier-hall", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }

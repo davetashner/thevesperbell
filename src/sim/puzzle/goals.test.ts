@@ -278,3 +278,17 @@ describe('GoalRuntime', () => {
     ).toBe(true);
   });
 });
+
+describe('explaining a sustained goal (mw-e15.3)', () => {
+  it('says how long the hold has lasted, not that there is no world to read', () => {
+    const { world, goals } = setup();
+    const lamp = brazier(world, true);
+    goals.add('hold', { sustained: allBurning, seconds: 3 });
+    steps(world, 12);
+    expect(goals.explain('hold')).toContain('held 1.2s of 3s');
+    expect(goals.explain('hold')).not.toContain('no live world');
+    setProperty(world, lamp, 'burning', false);
+    steps(world, 1);
+    expect(goals.explain('hold')).toContain('held 0s of 3s');
+  });
+});

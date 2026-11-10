@@ -55,6 +55,7 @@
     "motion-comfort.spec.ts": 1.4,
     "pause.spec.ts": 72.3,
     "perf.spec.ts": 0,
+    "puzzles.spec.ts": 70,
     "rebind-controls.spec.ts": 148.9,
     "render-boot.spec.ts": 79.3,
     "river.spec.ts": 15.9,

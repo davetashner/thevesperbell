@@ -509,3 +509,36 @@ describe('watching live conditions', () => {
     expect(bare.structure).toBeGreaterThanOrEqual(0);
   });
 });
+
+describe('sustained holds that can be saved and resumed (mw-e15.3)', () => {
+  const lit: Condition = { entities: { tag: 'brazier' }, match: 'any' };
+  const nested: Condition = {
+    all: [
+      { sustained: { not: { sustained: lit, seconds: 1 } }, seconds: 2 },
+      { any: [{ fact: 'a' }, { sustained: { fact: 'b' }, seconds: 3 }] },
+    ],
+  };
+
+  it('lists the sustained nodes of a condition in a fixed order', () => {
+    const nodes = compileCondition(nested).holdNodes();
+    expect(nodes.map((node) => node.seconds)).toEqual([2, 1, 3]);
+    expect(compileCondition({ fact: 'a' }).holdNodes()).toEqual([]);
+  });
+
+  it('reports holds, resumes them, and refuses ones that do not fit', () => {
+    const w = new World<never>({ seed: 2, hz: 10 });
+    w.facts.declare('b', { type: 'bool', default: false });
+    const watch = onConditionChanged(
+      conditionHost(w),
+      { sustained: { fact: 'b' }, seconds: 2 },
+      () => undefined,
+    );
+    expect(watch.holds()).toEqual([null]);
+    expect(watch.restoreHolds([0, 1])).toBe(false);
+    expect(watch.restoreHolds([5])).toBe(true);
+    expect(watch.holds()).toEqual([5]);
+    const plain = onConditionChanged(conditionHost(w), { fact: 'b' }, () => undefined);
+    expect(plain.holds()).toEqual([]);
+    expect(plain.restoreHolds([])).toBe(false);
+  });
+});

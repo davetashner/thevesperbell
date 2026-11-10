@@ -138,4 +138,22 @@ describe('puzzle load checks (mw-e15.1)', () => {
       `${FILE}#/goal/all/0/entities/entity: puzzle:zz-test goal reads entity "west-brazier", which the puzzle does not list in \`entities\``,
     ]);
   });
+
+  it('mw-e15.3: the signals a puzzle drives are lever or button nodes of a graph its scene places', () => {
+    const drive = (...signals: string[]) =>
+      loadIssues([puzzle((p) => ({ ...p, outputs: { ...p.outputs, signals } }))]);
+    expect(drive('nowhere/gate')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "nowhere/gate", but there is no signal graph "nowhere"`,
+    ]);
+    expect(drive('mechanism-room/missing')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "mechanism-room/missing", but graph "mechanism-room" has no node "missing"`,
+    ]);
+    expect(drive('mechanism-room/north-gate')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "mechanism-room/north-gate", a receiver node: only a lever (switched on) or a button (pressed) can be driven from outside the graph`,
+    ]);
+    expect(drive('mechanism-room/north-lever', 'mechanism-room/east-button')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "mechanism-room/north-lever", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
+      `${FILE}#/outputs/signals/1: puzzle:zz-test drives signal "mechanism-room/east-button", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
+    ]);
+  });
 });

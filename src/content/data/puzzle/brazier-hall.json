@@ -1,0 +1,133 @@
+{
+  "$schema": "../puzzle.schema.json",
+  "id": "brazier-hall",
+  "name": "Brazier hall: light all three braziers",
+  "notes": "The greybox demo of the puzzle runtime (mw-e15.3), not story canon. The goal is the outcome (every brazier burns, together, for a second), so a carried burning barrel, a fire spell from range, a fire arrow or anything else that puts a flame to them counts. It is composed entirely from reusable world objects: light-source braziers, a prop that burns, a portcullis driven by a signal latch; no script runs it. The two declared solutions give the runtime something to attribute a solve to; a route that uses neither is still a solve.",
+  "scene": "brazier-hall",
+  "entities": [
+    {
+      "id": "brazier-west",
+      "role": "brazier to be lit"
+    },
+    {
+      "id": "brazier-north",
+      "role": "brazier to be lit"
+    },
+    {
+      "id": "brazier-east",
+      "role": "brazier to be lit"
+    },
+    {
+      "id": "torch-barrel",
+      "role": "a burning barrel to carry flame with",
+      "critical": true
+    },
+    {
+      "id": "vault-gate",
+      "role": "the portcullis that opens when it is solved"
+    }
+  ],
+  "discovery": {
+    "volume": {
+      "kind": "box",
+      "center": {
+        "x": 0,
+        "y": 1.5,
+        "z": 2
+      },
+      "halfExtents": {
+        "x": 5,
+        "y": 1.5,
+        "z": 3
+      }
+    }
+  },
+  "goal": {
+    "sustained": {
+      "entities": {
+        "tag": "brazier"
+      },
+      "where": [
+        {
+          "test": "element",
+          "element": "fire"
+        }
+      ],
+      "match": "all"
+    },
+    "seconds": 1
+  },
+  "solutions": [
+    {
+      "id": "carry-flame",
+      "name": "Carry the burning barrel from brazier to brazier",
+      "steps": [
+        {
+          "do": "move",
+          "target": "torch-barrel",
+          "to": "brazier-west",
+          "note": "Lifted and carried; its flame heats what it stands beside."
+        },
+        {
+          "do": "move",
+          "target": "torch-barrel",
+          "to": "brazier-north"
+        },
+        {
+          "do": "move",
+          "target": "torch-barrel",
+          "to": "brazier-east"
+        }
+      ]
+    },
+    {
+      "id": "fire-from-range",
+      "name": "Cast a fire spell at each brazier",
+      "capabilities": ["spell.ember"],
+      "steps": [
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "brazier-west",
+          "using": "spell.ember"
+        },
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "brazier-north",
+          "using": "spell.ember"
+        },
+        {
+          "do": "stimulus",
+          "element": "heat",
+          "target": "brazier-east",
+          "using": "spell.ember"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "repeatable": false,
+    "recovery": []
+  },
+  "hints": [
+    {
+      "afterSeconds": 120,
+      "highlight": ["brazier-west", "brazier-north", "brazier-east"],
+      "bark": "Three braziers, all cold. Something here must burn."
+    }
+  ],
+  "tags": ["greybox"],
+  "focus": ["sorcerer"],
+  "outputs": {
+    "solvedFact": "brazier-hall.solved",
+    "set": [
+      {
+        "fact": "brazier-hall.vault-open",
+        "value": true
+      }
+    ],
+    "signals": ["brazier-hall/vault-latch"],
+    "rewards": ["brazier-hall-vault"]
+  }
+}
