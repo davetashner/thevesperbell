@@ -122,6 +122,7 @@ describe('size budgets', () => {
     chunks: string,
     extra: string[] = [],
     env: Record<string, string> = {},
+    budgetsFile = 'perf/size-budgets.json',
   ) => {
     const lines: string[] = [];
     const code = main(
@@ -131,7 +132,7 @@ describe('size budgets', () => {
         '--chunks',
         chunks,
         '--budgets',
-        'perf/size-budgets.json',
+        budgetsFile,
         '--out',
         join(dir, 'size-report.json'),
         ...extra,
@@ -366,9 +367,22 @@ describe('size budgets', () => {
     writeFileSync(join(dir, 'base.json'), JSON.stringify(base));
     const { chunks } = writeInputs(dist);
     const summary = join(dir, 'summary.md');
-    const { code, lines } = run(dist, chunks, ['--baseline', join(dir, 'base.json')], {
-      GITHUB_STEP_SUMMARY: summary,
-    });
+    // The committed file has no tool waivers any more (mw-e32.18): waive the perf probe here.
+    const waived = join(dir, 'waived-budgets.json');
+    writeFileSync(
+      waived,
+      JSON.stringify({
+        ...budgets,
+        toolWaivers: [{ prefix: 'src/tools/perf/', reason: 'r', bead: 'mw-2' }],
+      }),
+    );
+    const { code, lines } = run(
+      dist,
+      chunks,
+      ['--baseline', join(dir, 'base.json')],
+      { GITHUB_STEP_SUMMARY: summary },
+      waived,
+    );
     expect(code).toBe(0);
     expect(lines.some((l) => l.startsWith('::warning') && l.includes('music-open-world'))).toBe(
       true,

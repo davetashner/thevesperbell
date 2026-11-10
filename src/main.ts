@@ -408,29 +408,11 @@ import {
   EquipmentRules,
   createSurfaceMap,
 } from '@sim/index';
-import {
-  compactProbe,
-  playerAnimationProbe,
-  setupAnimationDemo,
-  type AnimDemo,
-} from '@tools/anim-demo/setup';
-import { bindDebugCameraInput, DebugCamera } from '@tools/debug-camera/index';
-import { layer as tools } from '@tools/index';
-import { sceneAgitator } from '@tools/perf/agitator';
-import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
 import { installLatencyProbe } from '@tools/perf/latency-probe';
-import { ArrowDemo, parseArrowDemoLane, parseArrowDemoParam } from '@tools/arrow-demo/index';
+import type { AnimDemo, ArrowDemo, SpellVfxDemo, VfxDemo } from '@tools/dev-kit';
 import { SpellVfxLibrary, SpellVfxPlayer } from '@game/spell-vfx/index';
 import { SpellVfxView } from '@render/spell-vfx/index';
 import { SpellDemoFigures } from '@render/spell-vfx/demo';
-import { parseSpellDemoParam, spellDemoBlocks, SpellVfxDemo } from '@tools/spell-vfx-demo/index';
-import {
-  AWARENESS_DEMO_NOISE_MS,
-  awarenessDemoAgents,
-  awarenessDemoNoise,
-  parseAwarenessDemoParam,
-} from '@tools/awareness-demo/index';
-import { formatVfxStats, parseVfxParam, VfxDemo } from '@tools/vfx-demo/index';
 import {
   CombatHud,
   DamageNumbers,
@@ -509,9 +491,13 @@ type GameCommand =
   | SandboxCommand
   | UseQuickSlotCommand;
 
+// The demos and probes (src/tools/dev-kit.ts) are debug-build only: a release build folds this
+// import away, so none of them reaches any chunk (mw-e32.18). `dev` is undefined there.
+const dev = __DEBUG_CONSOLE__ ? await import('@tools/dev-kit') : undefined;
+
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
-  app.dataset['layers'] = [...layers, tools].join(' ');
+  app.dataset['layers'] = [...layers, 'tools'].join(' ');
   // Player settings (mw-e31.1): per-browser, loaded first; in memory when the browser blocks storage.
   const settings = createSettingsStore({
     storage: () => globalThis.localStorage,
@@ -574,11 +560,11 @@ function startRenderer(
 
   // ?perf (mw-e00.21 AC-6): times each whole frame callback (sim steps + render submission) and the
   // interval between frames, then logs percentiles once. See src/tools/perf/frame-probe.ts.
-  const perf = parsePerfParam(location.search);
+  const perf = dev?.parsePerfParam(location.search);
   const browserSources = browserFrameSources(globalThis.window);
   let sources = browserSources;
-  if (perf !== undefined) {
-    const probe = new FramePerfProbe(perf);
+  if (dev !== undefined && perf !== undefined) {
+    const probe = new dev.FramePerfProbe(perf);
     const { scheduler } = browserSources;
     sources = {
       ...browserSources,
@@ -592,7 +578,7 @@ function startRenderer(
               root.dataset['perf'] = JSON.stringify(report);
               const { calls, triangles } = view.renderer.info.render;
               root.dataset['renderInfo'] = JSON.stringify({ calls, triangles });
-              console.info(formatPerfReport(report));
+              console.info(dev.formatPerfReport(report));
             }
           }),
         cancel: (handle) => {
@@ -612,21 +598,23 @@ function startRenderer(
   };
   // ?debug=1 pages publish the view camera every frame, so a test can ask what is in view (mw-ju8.42).
   const publishLiveCamera = new URLSearchParams(location.search).get('debug') === '1';
-  const debugCamera = new DebugCamera({
-    read: () => ({
-      position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
-      rotation: {
-        x: camera.quaternion.x,
-        y: camera.quaternion.y,
-        z: camera.quaternion.z,
-        w: camera.quaternion.w,
+  const debugCamera =
+    dev &&
+    new dev.DebugCamera({
+      read: () => ({
+        position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+        rotation: {
+          x: camera.quaternion.x,
+          y: camera.quaternion.y,
+          z: camera.quaternion.z,
+          w: camera.quaternion.w,
+        },
+      }),
+      write: ({ position, rotation }) => {
+        camera.position.set(position.x, position.y, position.z);
+        camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
       },
-    }),
-    write: ({ position, rotation }) => {
-      camera.position.set(position.x, position.y, position.z);
-      camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-    },
-  });
+    });
 
   const hud = document.createElement('div');
   hud.dataset['testid'] = 'scene-hud';
@@ -637,7 +625,9 @@ function startRenderer(
   hint.textContent = DEBUG_CAMERA_HINT;
   const controls = document.createElement('p');
   controls.dataset['testid'] = 'player-controls-hint';
-  hud.append(label, controls, hint);
+  // The fly camera is a debug tool: a release build has neither it nor its hint.
+  hud.append(label, controls);
+  if (debugCamera !== undefined) hud.append(hint);
   root.append(hud);
 
   // Keyboard + mouse and gamepad → one ActionFrame per sim tick (mw-e02.1, mw-e02.9); a click on the
@@ -809,19 +799,21 @@ function startRenderer(
     hadLock = locked;
   });
 
-  bindDebugCameraInput(debugCamera, {
-    keys: globalThis.window,
-    surface: view.canvas,
-    onToggle: (active) => {
-      root.dataset['debugCamera'] = active ? 'on' : 'off';
-      hint.textContent = active ? `${DEBUG_CAMERA_HINT} · ON` : DEBUG_CAMERA_HINT;
-      // The fly camera shares WASD: the player lets go of input and the camera while it flies.
-      playerInput.enabled = !active;
-      if (player) player.drivesCamera = !active;
-      writeCameraData();
-    },
-  });
-  root.dataset['debugCamera'] = 'off';
+  if (dev !== undefined && debugCamera !== undefined) {
+    dev.bindDebugCameraInput(debugCamera, {
+      keys: globalThis.window,
+      surface: view.canvas,
+      onToggle: (active) => {
+        root.dataset['debugCamera'] = active ? 'on' : 'off';
+        hint.textContent = active ? `${DEBUG_CAMERA_HINT} · ON` : DEBUG_CAMERA_HINT;
+        // The fly camera shares WASD: the player lets go of input and the camera while it flies.
+        playerInput.enabled = !active;
+        if (player) player.drivesCamera = !active;
+        writeCameraData();
+      },
+    });
+    root.dataset['debugCamera'] = 'off';
+  }
 
   // Fixed-step sim on requestAnimationFrame (mw-e00.20). The sim owns its physics (mw-e03.35), so the
   // world starts once the physics module has loaded; the dynamic import keeps Rapier and its WASM
@@ -968,9 +960,9 @@ function startRenderer(
       content.all('vfx-effect'),
     );
     for (const spell of content.all('spell')) spellLibrary.resolve(spell.vfx);
-    const spellDemoSteps = parseSpellDemoParam(location.search);
-    if (spellDemoSteps !== undefined) {
-      for (const block of Object.values(spellDemoBlocks())) spellLibrary.resolve(block);
+    const spellDemoSteps = dev?.parseSpellDemoParam(location.search);
+    if (dev !== undefined && spellDemoSteps !== undefined) {
+      for (const block of Object.values(dev.spellDemoBlocks())) spellLibrary.resolve(block);
     }
     let spellDemo: SpellVfxDemo | undefined;
     const vfx = new VfxSystem({
@@ -1009,7 +1001,7 @@ function startRenderer(
     // Awareness feedback (mw-e29.12): the indicator over each alerted creature, and the two assists
     // (last-known-position ghost, noise ripple), both off unless the player turns them on. Read-only
     // over the sim; `?awareness=demo` lines up stand-ins in every state for the e2e and screenshots.
-    const awarenessDemo = parseAwarenessDemoParam(location.search);
+    const awarenessDemo = dev?.parseAwarenessDemoParam(location.search) === true;
     // Publishes #app[data-awareness] for the e2e only: this is built every frame otherwise.
     const awarenessProbe =
       awarenessDemo || new URLSearchParams(location.search).get('debug') === '1';
@@ -1024,18 +1016,19 @@ function startRenderer(
       colourOf: (state) => awarenessColour(settings.get('accessibility.indicatorPalette'), state),
       listener: () =>
         player === undefined ? undefined : world.get(player.entity, PlacementComponent),
-      ...(awarenessDemo && {
-        agents: (into) => {
-          const at =
-            player === undefined ? undefined : world.get(player.entity, PlacementComponent);
-          const origin = at ?? view.camera.position;
-          // The camera's forward (0, 0, -1) turned by its rotation, flattened to a heading.
-          const q = view.camera.quaternion;
-          const forwardX = -2 * (q.x * q.z + q.w * q.y);
-          const forwardZ = -(1 - 2 * (q.x * q.x + q.y * q.y));
-          return awarenessDemoAgents(origin, Math.atan2(-forwardX, -forwardZ), into);
-        },
-      }),
+      ...(dev !== undefined &&
+        awarenessDemo && {
+          agents: (into) => {
+            const at =
+              player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+            const origin = at ?? view.camera.position;
+            // The camera's forward (0, 0, -1) turned by its rotation, flattened to a heading.
+            const q = view.camera.quaternion;
+            const forwardX = -2 * (q.x * q.z + q.w * q.y);
+            const forwardZ = -(1 - 2 * (q.x * q.x + q.y * q.y));
+            return dev.awarenessDemoAgents(origin, Math.atan2(-forwardX, -forwardZ), into);
+          },
+        }),
     });
     awarenessFx.attach();
     const awarenessView = createAwarenessRenderer(view.scene);
@@ -1116,8 +1109,8 @@ function startRenderer(
     });
     let spellDemoFigures: SpellDemoFigures | undefined;
     let publishedSpellVfx = '';
-    if (spellDemoSteps !== undefined) {
-      spellDemo = new SpellVfxDemo(spellPlayer, spellLibrary, spellDemoSteps);
+    if (dev !== undefined && spellDemoSteps !== undefined) {
+      spellDemo = new dev.SpellVfxDemo(spellPlayer, spellLibrary, spellDemoSteps);
       spellDemoFigures = new SpellDemoFigures(view.scene, magicLooks);
     }
     const vfxView = createVfxRenderer(view.scene, {
@@ -1190,11 +1183,11 @@ function startRenderer(
       const json = JSON.stringify({ state, voices, cues: recentCues });
       if (json !== publishedAudio) root.dataset['audio'] = publishedAudio = json;
     };
-    const vfxMode = parseVfxParam(location.search);
+    const vfxMode = dev?.parseVfxParam(location.search);
     let vfxDemo: VfxDemo | undefined;
     // ?arrows=demo|<id> looses the shipped arrows at the back wall and publishes what the arrow
     // effects are doing on #app[data-arrow-fx] (the e2e probe, mw-e29.11).
-    const arrowDemoOrder = parseArrowDemoParam(location.search);
+    const arrowDemoOrder = dev?.parseArrowDemoParam(location.search);
     let arrowDemo: ArrowDemo | undefined;
     let publishedArrowFx = '';
     let vfxStats: HTMLElement | undefined;
@@ -1206,10 +1199,10 @@ function startRenderer(
     }
     const showVfxStats = (elapsedMs: number): void => {
       vfxStatsAgeMs += elapsedMs;
-      if (vfxStats === undefined || vfxStatsAgeMs < 250) return;
+      if (dev === undefined || vfxStats === undefined || vfxStatsAgeMs < 250) return;
       vfxStatsAgeMs = 0;
       const stats = vfx.stats();
-      vfxStats.textContent = formatVfxStats(stats);
+      vfxStats.textContent = dev.formatVfxStats(stats);
       root.dataset['vfx'] = JSON.stringify(stats);
     };
 
@@ -1400,7 +1393,7 @@ function startRenderer(
         bridge.frame();
         const { timeMs } = frame;
         const elapsedMs = timeMs - (lastFrameMs ?? timeMs);
-        if (debugCamera.update(elapsedMs) || publishLiveCamera) writeCameraData();
+        if (debugCamera?.update(elapsedMs) || publishLiveCamera) writeCameraData();
         lastFrameMs = timeMs;
         deathBeat?.frame(frame.alpha);
         if (!replayPlaying()) sliceCard?.frame();
@@ -1460,9 +1453,9 @@ function startRenderer(
         frameClock?.(timeMs);
         hitFlashes?.update(timeMs);
         creatureAnimation?.frame(frame.alpha, Math.max(0, elapsedMs) / 1000, camera.position);
-        if (animation !== undefined) {
+        if (dev !== undefined && animation !== undefined) {
           animation.driver.frame(frame.alpha, Math.max(0, elapsedMs) / 1000, camera.position);
-          const probe = JSON.stringify(compactProbe(animation.driver.probe()));
+          const probe = JSON.stringify(dev.compactProbe(animation.driver.probe()));
           if (probe !== publishedProbe) root.dataset['animation'] = publishedProbe = probe;
         }
         showControls();
@@ -1547,12 +1540,16 @@ function startRenderer(
         }
         arrowFx.frame();
         arrowFxView.draw(arrowFx.view);
-        if (awarenessDemo && performance.now() - lastDemoNoise >= AWARENESS_DEMO_NOISE_MS) {
+        if (
+          dev !== undefined &&
+          awarenessDemo &&
+          performance.now() - lastDemoNoise >= dev.AWARENESS_DEMO_NOISE_MS
+        ) {
           lastDemoNoise = performance.now();
           demoNoises++;
           const at =
             player === undefined ? undefined : world.get(player.entity, PlacementComponent);
-          awarenessFx.ripple(awarenessDemoNoise(at ?? camera.position, world.tick));
+          awarenessFx.ripple(dev.awarenessDemoNoise(at ?? camera.position, world.tick));
         }
         awarenessFx.frame(camera.position);
         awarenessView.draw(awarenessFx.view, camera);
@@ -1717,7 +1714,7 @@ function startRenderer(
       sceneWater = waterVolumes(loaded.layout.regions);
       // The perf-baseline stress scene (mw-e32.1): blasts at its perf-agitator markers keep its props
       // moving; scenes without markers have no agitator.
-      const agitator = sceneAgitator(loaded.layout.spawns, world.clock.hz);
+      const agitator = dev?.sceneAgitator(loaded.layout.spawns, world.clock.hz);
       if (agitator !== undefined) {
         afterStep.push(() => {
           const blast = agitator.commandFor(world.tick);
@@ -1822,8 +1819,8 @@ function startRenderer(
             // The e2e animation probe (mw-e02.6 AC-4): each layer's state and clip, and the states
             // and clips entered, oldest first.
             publish: (probe) => {
-              const json = JSON.stringify(playerAnimationProbe(probe));
-              if (json !== publishedPlayerProbe) {
+              const json = dev && JSON.stringify(dev.playerAnimationProbe(probe));
+              if (json !== undefined && json !== publishedPlayerProbe) {
                 root.dataset['playerAnimation'] = publishedPlayerProbe = json;
               }
               // Where the sword points (mw-a6t), in the body's space: the e2e checks the carry.
@@ -1917,8 +1914,8 @@ function startRenderer(
         );
         showControls();
       }
-      if (scene.id === 'testbed') {
-        animation = setupAnimationDemo({
+      if (dev !== undefined && scene.id === 'testbed') {
+        animation = dev.setupAnimationDemo({
           world,
           sync,
           content,
@@ -2651,17 +2648,17 @@ function startRenderer(
         sync.bind(entity, object3DBinding(object, readDummyTransform));
       }
       dummy = dummies[0];
-      if (vfxMode === 'demo' || vfxMode === 'stress') {
+      if (dev !== undefined && (vfxMode === 'demo' || vfxMode === 'stress')) {
         const [x, y, z] = scene.camera.target;
         const centre = playerStart(loaded.layout.spawns)?.position ?? { x, y, z };
-        vfxDemo = new VfxDemo(vfx, vfxMode, centre);
+        vfxDemo = new dev.VfxDemo(vfx, vfxMode, centre);
       }
-      if (arrowDemoOrder !== undefined) {
-        arrowDemo = new ArrowDemo(
+      if (dev !== undefined && arrowDemoOrder !== undefined) {
+        arrowDemo = new dev.ArrowDemo(
           world,
           combat.bow.arrows,
           arrowDemoOrder,
-          parseArrowDemoLane(location.search),
+          dev.parseArrowDemoLane(location.search),
         );
       }
       if (magicMode !== undefined) {
