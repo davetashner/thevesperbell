@@ -252,6 +252,8 @@ export interface AwarenessFxOptions {
    */
   readonly friendly?: (entity: EntityId) => boolean;
   readonly reducedMotion?: () => boolean;
+  /** The fill colour for a state when a colour-blind palette is on (mw-e31.8); undefined = the art palette's. */
+  readonly colourOf?: (state: AlertState) => number | undefined;
   /** The player's position, to keep far noises off the ground; omitted = every noise counts. */
   readonly listener?: () => Vec3 | undefined;
 }
@@ -374,7 +376,7 @@ export class AwarenessFx {
           entity: agent.entity,
           state: agent.state,
           shape: style.shape,
-          colour: style.colour,
+          colour: this.#o.colourOf?.(agent.state) ?? style.colour,
           x: agent.feet.x,
           y: agent.feet.y + agent.height + INDICATOR_LIFT_M,
           z: agent.feet.z,
@@ -387,7 +389,7 @@ export class AwarenessFx {
         const lkp = known(agent.lkp);
         ghosts.push({
           entity: agent.entity,
-          colour: INDICATOR_STYLES[agent.state].colour,
+          colour: this.#o.colourOf?.(agent.state) ?? INDICATOR_STYLES[agent.state].colour,
           x: lkp.x,
           y: lkp.y,
           z: lkp.z,

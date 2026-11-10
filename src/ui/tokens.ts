@@ -264,6 +264,29 @@ ${tokens}
 .vb-meter[data-kind='breath'] .vb-meter-fill { background: var(--ui-color-breath); }
 .vb-meter[data-kind='mana'] .vb-meter-fill { background: var(--ui-color-mana); }
 .vb-meter[data-kind='poise'] .vb-meter-fill { background: var(--ui-color-poise); }
+/* Colour is never the only cue (mw-e31.8): each bar also wears its own ink pattern over the whole bar,
+   so greyscale or colour-blind eyes tell them apart. Health is solid, stamina is diagonal stripes,
+   mana is dots, breath is horizontal bars, poise is upright ticks. */
+.vb-meter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.vb-meter[data-kind='stamina']::after {
+  background-image: repeating-linear-gradient(45deg, rgb(30 27 46 / 60%) 0 2px, transparent 2px 6px);
+}
+.vb-meter[data-kind='mana']::after {
+  background-image: radial-gradient(circle, rgb(30 27 46 / 65%) 1.2px, transparent 1.6px);
+  background-size: 6px 6px;
+}
+.vb-meter[data-kind='breath']::after {
+  background-image: repeating-linear-gradient(0deg, rgb(30 27 46 / 55%) 0 1px, transparent 1px 3px);
+}
+.vb-meter[data-kind='poise']::after {
+  background-image: repeating-linear-gradient(90deg, rgb(30 27 46 / 60%) 0 2px, transparent 2px 5px);
+}
 .vb-water-hud {
   position: absolute;
   left: 50%;
@@ -431,6 +454,8 @@ ${tokens}
   white-space: nowrap;
 }
 .vb-damage-number[data-kind='taken'] { color: var(--ui-color-damage); }
+/* Damage you take reads with a minus sign, so it differs from damage you deal without colour. */
+.vb-damage-number[data-kind='taken']::before { content: '\\2212'; }
 .vb-damage-number[hidden] { display: none; }
 .vb-lock-marker {
   position: absolute;
@@ -666,7 +691,7 @@ ${tokens}
 }
 .vb-spell-slot-key { left: 0.2em; top: 0.2em; }
 .vb-spell-slot-cost { right: 0.2em; bottom: 0.2em; color: var(--ui-color-mana); }
-.vb-spell-slot[data-state='unaffordable'] .vb-spell-slot-cost { color: var(--ui-color-warning); }
+.vb-spell-slot[data-state='unaffordable'] .vb-spell-slot-cost { color: var(--ui-color-warning); text-decoration: line-through; }
 .vb-spell-slot-timer { font-size: 1.2em; }
 .vb-spell-wheel {
   position: absolute;
@@ -740,7 +765,7 @@ ${tokens}
   border-left: 4px solid var(--ui-color-accent);
   border-radius: var(--ui-radius);
 }
-.vb-toast[data-tone='warning'] { border-left-color: var(--ui-color-warning); }
+.vb-toast[data-tone='warning'] { border-left: 8px double var(--ui-color-warning); }
 .vb-panel.vb-container { width: min(26em, 100%); }
 .vb-container h1 { overflow-wrap: anywhere; }
 .vb-container-rows[hidden], .vb-container-empty[hidden] { display: none; }

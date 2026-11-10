@@ -1,4 +1,5 @@
 // mw-e29.12: the awareness indicator rules, the last-known-position ghost and the noise ripple.
+import type { AlertState } from '@content/index';
 import { describe, expect, it } from 'vitest';
 import {
   BrainComponent,
@@ -75,6 +76,7 @@ function setup(
     reduced?: boolean;
     at?: Vec3 | undefined;
     friendly?: (entity: EntityId) => boolean;
+    colourOf?: (state: AlertState) => number | undefined;
   } = {},
 ) {
   const world = new World<never>({ seed: 1 });
@@ -87,6 +89,7 @@ function setup(
       into.push(...agents());
       return into;
     },
+    ...(opts.colourOf && { colourOf: opts.colourOf }),
     ghostEnabled: () => opts.ghost === true,
     ripplesEnabled: () => opts.ripples === true,
     reducedMotion: () => opts.reduced === true,
@@ -256,6 +259,20 @@ describe('AwarenessFx', () => {
     const { fx: full } = setup(() => [reading({ state: 'combat' })]);
     full.frame(CAMERA);
     expect(full.view.indicators[0]?.scale).toBeLessThan(fx.view.indicators[0]?.scale ?? 0);
+  });
+
+  it('mw-e31.8: a colour-blind palette recolours indicator and ghost, keeping the shape; undefined keeps the art colour', () => {
+    const agents = [reading({ state: 'searching', lkp: { x: 4, y: 0, z: 3 }, confidence: 0.8 })];
+    const on = setup(() => agents, {
+      ghost: true,
+      colourOf: (state) => (state === 'searching' ? 0x4fa3a5 : undefined),
+    });
+    on.fx.frame(CAMERA);
+    expect(on.fx.view.indicators[0]).toMatchObject({ shape: 'crescent', colour: 0x4fa3a5 });
+    expect(on.fx.view.ghosts[0]?.colour).toBe(0x4fa3a5);
+    const off = setup(() => agents, { ghost: true, colourOf: () => undefined });
+    off.fx.frame(CAMERA);
+    expect(off.fx.view.indicators[0]?.colour).toBe(0xe8a24a);
   });
 
   it('the ghost marker is off by default, and on shows where the creature believes the target is', () => {

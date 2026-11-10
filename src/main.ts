@@ -446,6 +446,8 @@ import {
   setMotionPreference,
   SoundCaptions,
   setDyslexiaFont,
+  setIndicatorPalette,
+  awarenessColour,
   setTextBackdrop,
   setTextScale,
   UiRoot,
@@ -673,6 +675,11 @@ function startRenderer(
   setDyslexiaFont(ui.element, settings.get('accessibility.dyslexiaFont'));
   settings.on('accessibility.dyslexiaFont', (on) => {
     setDyslexiaFont(ui.element, on);
+  });
+  // Colour-blind palette for the indicator colours (accessibility.indicatorPalette, mw-e31.8).
+  setIndicatorPalette(ui.element, settings.get('accessibility.indicatorPalette'));
+  settings.on('accessibility.indicatorPalette', (id) => {
+    setIndicatorPalette(ui.element, id);
   });
   setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
   settings.on('accessibility.textBackground', (opacity) => {
@@ -1010,6 +1017,7 @@ function startRenderer(
       // Shopkeepers and the Watch are friends: they greet, they do not hunt (mw-e09.5).
       friendly: (entity) => isFriendlyToPlayer(world, creatures.spawn.factions, entity),
       reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+      colourOf: (state) => awarenessColour(settings.get('accessibility.indicatorPalette'), state),
       listener: () =>
         player === undefined ? undefined : world.get(player.entity, PlacementComponent),
       ...(awarenessDemo && {
