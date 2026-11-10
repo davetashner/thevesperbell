@@ -34,6 +34,14 @@ import {
   makeDoor,
   refreshAffordances,
 } from '../mechanisms/system';
+import {
+  ownerOf,
+  theftRecorded,
+  theftReturned,
+  thefts,
+  type TheftRecorded,
+  type TheftReturned,
+} from '../ownership/ownership';
 import { PlayerLook } from '../player/player';
 import { registerWorldProperties } from '../properties/components';
 import { PlacementComponent } from '../stimulus/placement';
@@ -797,5 +805,168 @@ describe('container window actions (mw-e18.4)', () => {
         () => true,
       ).name,
     ).toBe('containerActions');
+  });
+});
+
+describe('ownership and theft in containers (mw-e27.9)', () => {
+  const OWNER = { owner: 'mirela', level: LEVEL, place: 'chest' };
+  const owned = (extra: Partial<ContainerSpec> = {}): SetupOptions => ({
+    chest: { loot: null, owner: OWNER, ...extra },
+  });
+  const flagsCarried = (t: Setup) => inventoryOf(t.sim, t.player)?.items.map((i) => i.flags);
+
+  it('AC-1: taking from Mirela’s chest without permission flags the goods stolen and records a theft with owner Mirela', () => {
+    const t = setup(owned({ contents: [{ item: 'arrow', count: 12 }] }));
+    const heard: TheftRecorded[] = [];
+    t.world.events.on(theftRecorded, (e) => heard.push(e));
+    t.world.step([takeAllCommand(t)]);
+    expect(flagsCarried(t)).toEqual([{ stolen: true, ownerId: 'mirela' }]);
+    expect(thefts(t.sim)).toMatchObject([
+      { level: LEVEL, owner: 'mirela', item: 'arrow', units: 12, place: 'chest', status: 'stolen' },
+    ]);
+    t.world.events.flush();
+    expect(heard).toMatchObject([{ count: 12, witnessed: 'unknown', thief: t.player }]);
+  });
+
+  it('AC-1: each stack taken is its own theft, and a single take records one for the units moved', () => {
+    const t = setup(
+      owned({
+        contents: [
+          { item: 'arrow', count: 4 },
+          { item: 'lockpicks', count: 1 },
+        ],
+      }),
+    );
+    const arrows = inventoryOf(t.sim, t.chest)?.items[0]?.instanceId ?? 0;
+    t.containers.take(t.sim, t.chest, t.player, arrows, 3);
+    expect(thefts(t.sim).map((x) => [x.id, x.item, x.units])).toEqual([['theft-1', 'arrow', 3]]);
+    t.containers.takeAll(t.sim, t.chest, t.player);
+    expect(thefts(t.sim).map((x) => [x.id, x.item, x.units])).toEqual([
+      ['theft-1', 'arrow', 3],
+      ['theft-2', 'arrow', 1],
+      ['theft-3', 'lockpicks', 1],
+    ]);
+  });
+
+  it('AC-2: a permitted take (the owner, or one the game permits) flags nothing', () => {
+    const t = setup(owned({ contents: [{ item: 'bread', count: 2 }] }));
+    const generous = new Containers(t.rules, t.containers.loot, { permits: () => true });
+    generous.takeAll(t.sim, t.chest, t.player);
+    expect(flagsCarried(t)).toEqual([{}]);
+    expect(thefts(t.sim)).toEqual([]);
+  });
+
+  it('AC-4: an unowned chest records no theft when taken from', () => {
+    const t = setup({ chest: { loot: null, contents: [{ item: 'bread', count: 2 }] } });
+    expect(ownerOf(t.sim, t.chest)).toBeUndefined();
+    t.containers.takeAll(t.sim, t.chest, t.player);
+    expect(flagsCarried(t)).toEqual([{}]);
+    expect(thefts(t.sim)).toEqual([]);
+  });
+
+  it('AC-3: a stolen stack put back into its owner’s chest is clean again and the theft resolves to returned', () => {
+    const t = setup(owned({ contents: [{ item: 'crown', count: 1 }] }));
+    t.containers.takeAll(t.sim, t.chest, t.player);
+    expect(flagsCarried(t)).toEqual([{ stolen: true, ownerId: 'mirela' }]);
+    const heard: TheftReturned[] = [];
+    t.world.events.on(theftReturned, (e) => heard.push(e));
+    const crown = inventoryOf(t.sim, t.player)?.items[0]?.instanceId ?? 0;
+    expect(t.containers.put(t.sim, t.chest, t.player, crown)).toMatchObject({ ok: true });
+    expect(inventoryOf(t.sim, t.chest)?.items.map((i) => i.flags)).toEqual([{}]);
+    expect(thefts(t.sim)).toMatchObject([{ id: 'theft-1', status: 'returned', units: 1 }]);
+    t.world.events.flush();
+    expect(heard).toMatchObject([{ id: 'theft-1', count: 1, resolved: true, actor: t.player }]);
+  });
+
+  it('AC-3: a partial return keeps the theft open for the units still out, then later returns resolve it', () => {
+    const t = setup(owned({ contents: [{ item: 'arrow', count: 10 }] }));
+    t.containers.takeAll(t.sim, t.chest, t.player);
+    const arrows = inventoryOf(t.sim, t.player)?.items[0]?.instanceId ?? 0;
+    t.containers.put(t.sim, t.chest, t.player, arrows, 4);
+    expect(thefts(t.sim)).toMatchObject([{ status: 'stolen', units: 6 }]);
+    t.containers.put(t.sim, t.chest, t.player, arrows, 6);
+    expect(thefts(t.sim)).toMatchObject([{ status: 'returned', units: 6 }]);
+    expect(inventoryOf(t.sim, t.chest)?.items.map((i) => [i.count, i.flags])).toEqual([[10, {}]]);
+  });
+
+  it('AC-3: goods stolen from someone else, or put into an unowned or another owner’s chest, stay stolen', () => {
+    const t = setup(owned({ contents: [{ item: 'bread', count: 1 }] }));
+    t.containers.takeAll(t.sim, t.chest, t.player);
+    const other = t.sim.spawn();
+    t.containers.make(t.sim, other, {
+      level: LEVEL,
+      id: 'other',
+      position: { x: 3, y: 0, z: 0 },
+      owner: { owner: 'toma', level: LEVEL, place: 'other' },
+    });
+    const plain = t.sim.spawn();
+    t.containers.make(t.sim, plain, {
+      level: LEVEL,
+      id: 'plain',
+      position: { x: 6, y: 0, z: 0 },
+    });
+    for (const target of [other, plain]) {
+      const bread = inventoryOf(t.sim, t.player)?.items[0]?.instanceId ?? 0;
+      t.containers.put(t.sim, target, t.player, bread);
+      expect(inventoryOf(t.sim, target)?.items.map((i) => i.flags)).toEqual([
+        { stolen: true, ownerId: 'mirela' },
+      ]);
+      const back = inventoryOf(t.sim, target)?.items[0]?.instanceId ?? 0;
+      t.containers.take(t.sim, target, t.player, back);
+    }
+    expect(thefts(t.sim).filter((x) => x.status === 'returned')).toEqual([]);
+  });
+
+  it('AC-5: after a save and reload the stolen flag and the theft fact are still there', () => {
+    const t = setup(owned({ contents: [{ item: 'crown', count: 1 }] }));
+    t.containers.takeAll(t.sim, t.chest, t.player);
+    const savedPack = structuredClone(inventoryOf(t.sim, t.player));
+    const saved = t.save();
+    const back = reload(saved, owned());
+    // The player's pack is a component of the saved world; here the pack is restored as the game does.
+    back.sim.set(back.player, InventoryComponent, savedPack as never);
+    expect(flagsCarried(back)).toEqual([{ stolen: true, ownerId: 'mirela' }]);
+    expect(thefts(back.sim)).toMatchObject([
+      { id: 'theft-1', owner: 'mirela', item: 'crown', witnessed: 'unknown', status: 'stolen' },
+    ]);
+    // The counter saved too: the next theft is theft-2.
+    expect(back.world.facts.get('ownership.thefts')).toBe(1);
+  });
+
+  it('a scene container spawn with an owner is tagged with it under the level and spawn id', () => {
+    const t = setup();
+    const entity = t.sim.spawn();
+    addSceneContainers(
+      t.sim,
+      t.containers,
+      'vault',
+      [
+        {
+          entity,
+          spawn: {
+            id: 'strongbox',
+            position: { x: 5, y: 0, z: 0 },
+            container: { contents: [] },
+            owner: 'mirela',
+          },
+        },
+      ],
+      () => undefined,
+    );
+    expect(ownerOf(t.sim, entity)).toEqual({ owner: 'mirela', level: 'vault', place: 'strongbox' });
+  });
+
+  it('a broken owned chest spills goods that are still its owner’s', () => {
+    const t = setup(owned({ contents: [{ item: 'bread', count: 2 }] }));
+    const spawned: unknown[] = [];
+    const spawner = {
+      spawn: (_w: unknown, spec: unknown) => {
+        spawned.push(spec);
+        return t.sim.spawn();
+      },
+    };
+    const breaker = new Containers(t.rules, t.containers.loot, { items: spawner });
+    breaker.spill(t.sim, t.chest);
+    expect(spawned).toMatchObject([{ defId: 'bread', owner: OWNER }]);
   });
 });

@@ -646,6 +646,23 @@ describe('scene creature leashes (mw-e01.17)', () => {
   });
 });
 
+describe('scene spawn owners (mw-e27.9)', () => {
+  it('an item or a container can have an owner; a bare marker cannot', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          { id: 'loaf', at: [0, 0, 0], item: { id: 'rusted-gallery-key' }, owner: 'npc-ottilie' },
+          { id: 'box', at: [1, 0, 0], container: {}, owner: 'npc-ottilie' },
+          { id: 'marker', at: [2, 0, 0], owner: 'npc-ottilie' },
+        ],
+      }),
+    ).toEqual([
+      'spawns.2.owner: spawn "marker" has an owner but is neither an item nor a container',
+    ]);
+  });
+});
+
 describe('scene creature carries (mw-e01.5)', () => {
   it('lists items a placed creature carries, a unit by default; needs a creature, an item and at least one entry', () => {
     const spawns = [

@@ -2085,7 +2085,7 @@ function startRenderer(
       // box once it exists; the e2e reads the pack and the world items from #app[data-items], which
       // is rebuilt only after a take, drop, throw or refusal.
       const worldItems = prepareWorldItems(content);
-      startWorldItems(world, worldItems, loaded.spawns, player?.entity);
+      startWorldItems(world, worldItems, loaded.spawns, player?.entity, loaded.id);
       // Carrying (mw-e02.17): Interact lifts a liftable object up to the class's carry limit; Drop
       // (G) lets go, Drop with crouch places it, and Throw (T), held and released, throws it. The
       // arc a charged throw would fly is drawn while the button is held.

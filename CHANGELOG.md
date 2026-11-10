@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Things in the world can now belong to someone: taking an item or emptying a chest that is Ottilie's (the loaf on her shelf and the box in the back of Marsh's store) without her leave marks the goods as stolen from her in your pack and records the theft, which saves with the game; putting stolen goods back into the owner's chest makes them clean again and settles the theft (mw-e27.9).
 - Loading a save no longer brings back things that only last a moment: a fire that was burning when you saved has burnt out to char (or burnt away) by the time you load, and anything soaked loads dry; looted chests, opened doors and kills stay put however many times you rest, and the world can now be told to reset small changes on rest or after a set time (mw-e27.7).
 - The world reacts to what you did: level spawns can appear, vanish or swap for another variant when a world fact changes (the variant room shows a miller who arrives once he is rescued), changing only while out of your view (mw-e27.8).
 - Fire, water, frost and gas more than 40 m from you now update every fourth tick instead of every tick, so a big blaze across the valley costs less; nearby elements are unchanged (mw-e03.30).

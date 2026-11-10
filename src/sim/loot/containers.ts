@@ -67,6 +67,16 @@ import {
 import { LockComponent, type Lock, type LockSpec } from '../mechanisms/components';
 import type { WorldItemSpec } from '../items/world-items';
 import { lockRefused, lockUnlocked } from '../mechanisms/events';
+import {
+  flagsOnPut,
+  ownerOf,
+  recordTheft,
+  stolenFlags,
+  tagOwner,
+  theftTag,
+  type OwnerTag,
+  type PermissionCheck,
+} from '../ownership/ownership';
 import { lockAffordances } from '../mechanisms/system';
 import { cos, sin } from '../math';
 import { readProperty } from '../properties/components';
@@ -139,6 +149,8 @@ export interface ContainerSpec {
   readonly locked?: boolean;
   /** Room for bodies, kg (mw-e03.23); without it the container takes none. */
   readonly stashKg?: number;
+  /** Whom it belongs to (mw-e27.9): taking from it without permission is a theft. */
+  readonly owner?: OwnerTag;
 }
 
 /** A container was opened. */
@@ -254,6 +266,7 @@ export class Containers {
   readonly loot: LootTables;
   readonly #classOf: (world: World<never>, actor: EntityId) => string | undefined;
   readonly #items: ItemSpawner | undefined;
+  readonly #permits: PermissionCheck | undefined;
 
   /**
    * `classOf`: the opener's class, which class-conditioned loot entries read (mw-e19); none: those
@@ -266,12 +279,15 @@ export class Containers {
     options: {
       readonly classOf?: (world: World<never>, actor: EntityId) => string | undefined;
       readonly items?: ItemSpawner;
+      /** Whether an actor may take from an owner's containers without theft; default: only the owner. */
+      readonly permits?: PermissionCheck;
     } = {},
   ) {
     this.inventory = inventory;
     this.loot = loot;
     this.#classOf = options.classOf ?? (() => undefined);
     this.#items = options.items;
+    this.#permits = options.permits;
   }
 
   /**
@@ -298,6 +314,7 @@ export class Containers {
         locked: spec.locked ?? true,
       });
     }
+    if (spec.owner !== undefined) tagOwner(world, entity, spec.owner);
     if (spec.stashKg !== undefined) {
       world.add(entity, StashComponent, { capacityKg: spec.stashKg, bodies: [] });
     }
@@ -413,9 +430,18 @@ export class Containers {
       };
     };
     const items = this.#items;
+    const owner = ownerOf(world, entity);
     if (items !== undefined) {
       stacks.forEach(({ item, count }, i) => {
-        spawned.push(items.spawn(world, { defId: item, count, position: where(i) }));
+        // What spills from an owned container is still its owner's (mw-e27.9).
+        spawned.push(
+          items.spawn(world, {
+            defId: item,
+            count,
+            position: where(i),
+            ...(owner !== undefined && { owner }),
+          }),
+        );
       });
     }
     bodies.forEach((body, i) => {
@@ -442,7 +468,7 @@ export class Containers {
     if (!open.ok) return open;
     const moved: LootStack[] = [...this.#moveGold(world, entity, actor)];
     for (const { instanceId, defId, count } of open.items) {
-      if (this.#transfer(world, entity, actor, instanceId, count) === undefined) {
+      if (this.#transfer(world, actor, entity, actor, instanceId, count) === undefined) {
         moved.push({ item: defId, count });
       }
     }
@@ -485,7 +511,7 @@ export class Containers {
   ): MoveResult {
     const open = this.open(world, entity, actor);
     if (!open.ok) return open;
-    const result = this.#move(world, entity, actor, instanceId, count);
+    const result = this.#move(world, actor, entity, actor, instanceId, count);
     if (result.ok) this.#takenBy(world, entity, actor, result.moved);
     return result;
   }
@@ -508,12 +534,13 @@ export class Containers {
     if (instance !== undefined && this.inventory.def(instance.defId).flags.questItem) {
       return { ok: false, reason: 'quest-item' };
     }
-    return this.#move(world, actor, entity, instanceId, count);
+    return this.#move(world, actor, actor, entity, instanceId, count);
   }
 
   /** Moves units of `from`'s stack `instanceId` to `to`, checking the stack and count first. */
   #move(
     world: World<never>,
+    actor: EntityId,
     from: EntityId,
     to: EntityId,
     instanceId: number,
@@ -526,7 +553,7 @@ export class Containers {
       throw new RangeError(`count must be a positive integer, got ${String(units)}`);
     }
     if (units > instance.count) return { ok: false, reason: 'not-enough' };
-    const refused = this.#transfer(world, from, to, instanceId, units);
+    const refused = this.#transfer(world, actor, from, to, instanceId, units);
     if (refused !== undefined) return { ok: false, reason: refused };
     return { ok: true, moved: [{ item: instance.defId, count: units }] };
   }
@@ -537,6 +564,7 @@ export class Containers {
    */
   #transfer(
     world: World<never>,
+    actor: EntityId,
     from: EntityId,
     to: EntityId,
     instanceId: number,
@@ -544,9 +572,16 @@ export class Containers {
   ): AddRefusal | undefined {
     const instance = this.#pack(world, from).items.find((i) => i.instanceId === instanceId);
     const { defId, flags } = known(instance); // callers found it
-    const added = this.inventory.add(world, to, defId, count, flags);
+    const move = { item: defId, count, flags };
+    // Leaving an owned container without permission is a theft; going into its owner's container
+    // returns stolen goods (mw-e27.9). The theft is recorded once the units have really moved.
+    const tag = theftTag(world, actor, from, move, this.#permits);
+    const carried =
+      tag !== undefined ? stolenFlags(flags, tag) : flagsOnPut(world, actor, to, move);
+    const added = this.inventory.add(world, to, defId, count, carried);
     if (!added.ok) return added.reason;
     this.inventory.remove(world, from, { instanceId, count, force: true });
+    if (tag !== undefined) recordTheft(world, actor, tag, move);
     return undefined;
   }
 
@@ -810,6 +845,8 @@ export interface ContainerSpawnEntity {
           readonly stashKg?: number;
         }
       | undefined;
+    /** Whom it belongs to (mw-e27.9). */
+    readonly owner?: string | undefined;
   };
 }
 
@@ -843,6 +880,9 @@ export function addSceneContainers(
       ...(lock !== undefined && { lock }),
       ...(own.locked !== undefined && { locked: own.locked }),
       ...(own.stashKg !== undefined && { stashKg: own.stashKg }),
+      ...(spawn.owner !== undefined && {
+        owner: { owner: spawn.owner, level, place: spawn.id },
+      }),
     });
     made.push(entity);
   }

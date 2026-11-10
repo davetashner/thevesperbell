@@ -598,6 +598,11 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Places an item here as a world item the player can take, drop and throw (mw-e17.7).',
     ),
+  owner: contentId
+    .optional()
+    .describe(
+      'Whom the item or container here belongs to, a faction or NPC id (mw-e27.9): taking from it without permission flags the goods stolen and records a theft fact (needs item or container).',
+    ),
   creature: ref('creature')
     .optional()
     .describe('Creature to spawn here (mw-e12.4); faces the spawn’s yaw.'),
@@ -1159,6 +1164,13 @@ export const sceneSchema = z
           code: 'custom',
           path: ['spawns', index, 'suspendedFrom'],
           message: `spawn "${spawn.id}" hangs from "${spawn.suspendedFrom}", which is not a rope spawn of this scene`,
+        });
+      }
+      if (spawn.owner !== undefined && spawn.item === undefined && spawn.container === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['spawns', index, 'owner'],
+          message: `spawn "${spawn.id}" has an owner but is neither an item nor a container`,
         });
       }
       if (spawn.creature !== undefined) return;
