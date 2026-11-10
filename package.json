@@ -48,7 +48,8 @@
     "replay:record": "node scripts/replay-cli.ts record",
     "replay:rebless": "node scripts/replay-cli.ts rebless",
     "save:fixture": "node scripts/save-fixture-cli.ts generate",
-    "save:check": "node scripts/save-fixture-cli.ts check"
+    "save:check": "node scripts/save-fixture-cli.ts check",
+    "puzzle:validate": "node scripts/puzzle-validate-cli.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

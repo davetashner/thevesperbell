@@ -2,7 +2,8 @@ name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
 # lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
-# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26) is not a required context yet.
+# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26) and puzzle-validate
+# (mw-e15.6) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
 # main pushes still run the perf suite here, to publish the baseline.
@@ -283,6 +284,18 @@ jobs:
             echo "::error title=Interaction matrix::$doc is stale; run pnpm content:matrix and commit it."
             exit 1
           fi
+
+  # The puzzle solvability validator (mw-e15.6, docs/design/puzzles.md): every declared solution of every
+  # puzzle is proven reachable by a bounded abstract search (10 s per puzzle) and its step list is run in
+  # the headless sim. The job fails when an mvp puzzle has an unreachable or diverging declared solution;
+  # other puzzles are reported in the log. It runs outside coverage, in a few seconds.
+  puzzle-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm puzzle:validate
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.
