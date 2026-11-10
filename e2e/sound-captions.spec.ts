@@ -39,24 +39,6 @@ async function readout(page: Page): Promise<CaptionReadout | null> {
   });
 }
 
-async function openSandbox(page: Page, settings: Record<string, unknown>): Promise<void> {
-  await page.addInitScript(
-    ([key, version, saved]) => {
-      window.localStorage.setItem(
-        key as string,
-        JSON.stringify({ version, settings: { accessibility: saved } }),
-      );
-    },
-    [SETTINGS_KEY, SETTINGS_VERSION, settings],
-  );
-  await page.goto('/?scene=combat-sandbox');
-  await expect(page.locator('#app')).toHaveAttribute('data-debug-console', 'closed', {
-    timeout: 30_000,
-  });
-  await page.keyboard.press('Backquote');
-  await expect(page.getByTestId('debug-console-input')).toBeFocused();
-}
-
 async function typeCommand(page: Page, line: string, echo: string): Promise<void> {
   await page.keyboard.type(line);
   await page.keyboard.press('Enter');
@@ -99,28 +81,39 @@ test('AC-5: with captions on, a creature telegraph in the sandbox shows its capt
   expect(problems).toEqual([]);
 });
 
-// mw-e31.5: at phone width and 200% text, with several creatures shouting at once, the captions
-// stay inside the screen and clear of the interact prompt and the rest of the HUD. Set
-// E2E_CAPTION_SHOTS to a directory to also save a screenshot.
+// mw-e31.5: at phone width and 200% text, a full stack of four captions (the most that show) stays
+// inside the screen and clear of the locked target's bar, the interact prompt and the rest of the
+// HUD. Layout only, so it is deterministic on a slow runner: the lines are built in one evaluate
+// from the widget's own markup, and the target bar and prompt (hidden until there is a target or
+// something to use) are shown with their longest text for the measurement. Set E2E_CAPTION_SHOTS to
+// a directory to also save a screenshot.
 test.describe('phone width, 200% text', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('mw-e31.5: captions fit the screen and clear the interact prompt and HUD', async ({
+  test('mw-e31.5: captions fit the screen and clear the target bar, interact prompt and HUD', async ({
     page,
   }) => {
     test.setTimeout(150_000);
     const problems = collectProblems(page);
-    await openSandbox(page, { captions: true, textScale: 2, textBackground: 0.5 });
-    await typeCommand(page, 'god on', 'god mode on');
-    await typeCommand(page, 'spawn forgotten-miner 3', 'spawning 3 × forgotten-miner');
-    await page.keyboard.press('Backquote');
+    await page.addInitScript(
+      ([key, version]) => {
+        window.localStorage.setItem(
+          key as string,
+          JSON.stringify({
+            version,
+            settings: { accessibility: { captions: true, textScale: 2, textBackground: 0.5 } },
+          }),
+        );
+      },
+      [SETTINGS_KEY, SETTINGS_VERSION],
+    );
+    await page.goto('/?scene=combat-sandbox');
+    await expect(page.locator('#app')).toHaveAttribute('data-debug-console', 'closed', {
+      timeout: 60_000,
+    });
+    await expect(page.getByTestId('sound-captions')).toBeAttached({ timeout: 60_000 });
     // F3 hides the sandbox's debug frame-data panel (a developer overlay, not part of the HUD).
     await page.keyboard.press('F3');
-
-    const lines = page.getByTestId('sound-captions').locator('.vb-caption');
-    await expect.poll(async () => lines.count(), { timeout: 120_000 }).toBeGreaterThanOrEqual(3);
-    const shots = process.env['E2E_CAPTION_SHOTS'];
-    if (shots !== undefined) await page.screenshot({ path: `${shots}/captions-390-200.png` });
 
     const boxes = await page.evaluate(() => {
       const rect = (el: Element) => {
@@ -130,22 +123,59 @@ test.describe('phone width, 200% text', () => {
       const captions = document.querySelector<HTMLElement>('[data-testid="sound-captions"]');
       const hud = captions?.parentElement;
       if (captions === null || !hud) return null;
-      // The interact prompt is hidden until there is something to use: measure where it would sit.
+      // Four lines of typical caption text, in the widget's markup.
+      captions.hidden = false;
+      captions.replaceChildren(
+        ...[
+          'Attack incoming, ahead left',
+          'Alert bark, behind right',
+          'Door opening, behind left',
+          'Footsteps, ahead right',
+        ].map((words) => {
+          const line = document.createElement('div');
+          line.className = 'vb-caption';
+          const arrow = document.createElement('span');
+          arrow.className = 'vb-caption-arrow';
+          arrow.textContent = '▲';
+          const text = document.createElement('span');
+          text.className = 'vb-caption-text';
+          text.textContent = `[${words}]`;
+          line.append(arrow, text);
+          return line;
+        }),
+      );
+      // The locked target's bar and the interact prompt, shown with their text for the measurement.
+      const shown: Element[] = [];
+      for (const [selector, texts] of [
+        [
+          '.vb-target-bar',
+          { '.vb-target-name': 'Forgotten miner', '.vb-target-note': 'Staggered' },
+        ],
+        ['.vb-interact', {}],
+      ] as const) {
+        const el = hud.querySelector<HTMLElement>(selector);
+        if (!el) continue;
+        el.hidden = false;
+        el.querySelectorAll<HTMLElement>('[hidden]').forEach((child) => (child.hidden = false));
+        for (const [sub, text] of Object.entries(texts)) {
+          const t = el.querySelector(sub);
+          if (t) t.textContent = text;
+        }
+        shown.push(el);
+      }
+      const targetBar = hud.querySelector<HTMLElement>('.vb-target-bar');
       const prompt = hud.querySelector<HTMLElement>('.vb-interact');
-      const wasHidden = prompt?.hidden ?? true;
-      if (prompt) prompt.hidden = false;
-      const promptRect = prompt ? rect(prompt) : null;
-      if (prompt) prompt.hidden = wasHidden;
-      // Every visible leaf of the HUD (containers such as the combat HUD cover the whole screen).
+      // Every other visible leaf of the HUD (containers such as the combat HUD cover the screen).
       const others = [...hud.querySelectorAll('*')]
         .filter(
           (el) =>
             !captions.contains(el) &&
             !(prompt?.contains(el) ?? false) &&
+            !(targetBar?.contains(el) ?? false) &&
             el.children.length === 0 &&
             getComputedStyle(el).display !== 'none' &&
             getComputedStyle(el).visibility !== 'hidden' &&
-            (el as HTMLElement).closest('[hidden]') === null,
+            el.closest('[hidden]') === null,
         )
         .map((el) => ({
           cls: `${el.closest<HTMLElement>('[data-ui-component]')?.dataset['uiComponent'] ?? '?'} > ${el.className}`,
@@ -155,22 +185,31 @@ test.describe('phone width, 200% text', () => {
       return {
         captions: rect(captions),
         lines: [...captions.querySelectorAll('.vb-caption')].map(rect),
-        prompt: promptRect,
+        targetBar: targetBar ? rect(targetBar) : null,
+        prompt: prompt ? rect(prompt) : null,
         others,
         width: window.innerWidth,
       };
     });
     expect(boxes).not.toBeNull();
     if (boxes === null) return;
+    const shots = process.env['E2E_CAPTION_SHOTS'];
+    if (shots !== undefined) await page.screenshot({ path: `${shots}/captions-390-200.png` });
+
     // The band is clipped: lines that do not fit wrap into a column the clip hides whole.
     expect(boxes.captions.left).toBeGreaterThanOrEqual(0);
     expect(boxes.captions.right).toBeLessThanOrEqual(boxes.width);
-    const shown = boxes.lines.filter((line) => line.left < boxes.captions.right);
-    expect(shown.length).toBeGreaterThanOrEqual(2);
-    for (const line of shown) {
+    const visible = boxes.lines.filter((line) => line.left < boxes.captions.right);
+    expect(visible.length).toBeGreaterThanOrEqual(2);
+    for (const line of visible) {
       expect(line.left).toBeGreaterThanOrEqual(boxes.captions.left);
       expect(line.right).toBeLessThanOrEqual(boxes.captions.right + 1);
       expect(line.bottom).toBeLessThanOrEqual(boxes.captions.bottom + 1);
+    }
+    expect(boxes.targetBar).not.toBeNull();
+    expect(boxes.prompt).not.toBeNull();
+    if (boxes.targetBar !== null) {
+      expect(boxes.targetBar.bottom).toBeLessThanOrEqual(boxes.captions.top);
     }
     if (boxes.prompt !== null) expect(boxes.captions.bottom).toBeLessThanOrEqual(boxes.prompt.top);
     for (const other of boxes.others) {
