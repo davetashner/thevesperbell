@@ -230,3 +230,10 @@ mw-e02.22) keep the data in the settings store's document, under `bindings` besi
 localStorage key, same in-memory fallback). It keeps its own version, so `SETTINGS_VERSION` is
 unaffected. `main.ts` loads it before building the sampler, so saved bindings apply at startup. Repairs
 are logged with `console.warn`. The rebind UI that calls `saveBindings` is mw-e31.2.
+
+**Hold or toggle (mw-e31.3).** Options > Controls picks Hold (default) or Toggle for sprint, crouch,
+block (the secondary attack) and aim/draw (the attack button while the bow is out). The sampler
+resolves it (`src/game/input/sampler.ts`, `src/game/settings/hold-toggle.ts`) before the sim, so the
+sim only sees held or not held. A toggled action lets go when a menu or dialogue opens, the player
+dies or respawns, focus or pointer lock is lost, the setting changes, or (aim) the bow is put away.
+Controller crouch and sprint keep their own latches. A replayed input log always runs on hold.

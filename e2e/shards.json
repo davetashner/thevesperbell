@@ -37,6 +37,7 @@
     "items.spec.ts": 25.7,
     "knight-combat.spec.ts": 52.8,
     "lighting.spec.ts": 43.9,
+    "hold-toggle.spec.ts": 20,
     "lock-on.spec.ts": 75.8,
     "mage-hand-input.spec.ts": 24,
     "magic-materials.spec.ts": 18.7,

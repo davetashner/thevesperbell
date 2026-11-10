@@ -38,9 +38,22 @@ const v1ToV2: SettingsMigration = (settings) => {
   return next;
 };
 
+/**
+ * v2 → v3: the crouch hold-or-toggle option shipped before it did anything, with a default of toggle.
+ * It now drives the crouch key (mw-e31.3) and defaults to hold, so a value stored while it was inert
+ * is dropped rather than suddenly changing how the key behaves.
+ */
+const v2ToV3: SettingsMigration = (settings) => {
+  const controls = settings['controls'];
+  if (!isRecord(controls) || !('crouch' in controls)) return settings;
+  const rest = Object.fromEntries(Object.entries(controls).filter(([key]) => key !== 'crouch'));
+  return { ...settings, controls: rest };
+};
+
 /** `SETTINGS_MIGRATIONS[n]` upgrades version n to n + 1. */
 export const SETTINGS_MIGRATIONS: Readonly<Record<number, SettingsMigration>> = Object.freeze({
   1: v1ToV2,
+  2: v2ToV3,
 });
 
 /**

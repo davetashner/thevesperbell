@@ -70,7 +70,7 @@ const volume = (label: string, help: string, value = 1): SliderSetting =>
   slider({ label, help, min: 0, max: 1, step: 0.05, default: value, unit: 'percent' });
 
 /** The current schema version of stored settings. Bump it with a migration on a breaking change. */
-export const SETTINGS_VERSION = 2;
+export const SETTINGS_VERSION = 3;
 
 /** Every category and setting, in menu order. */
 export const SETTINGS_SCHEMA = {
@@ -87,7 +87,19 @@ export const SETTINGS_SCHEMA = {
         label: 'Crouch',
         help: 'Hold the key to stay crouched, or press it once to crouch and again to stand.',
         options: holdOrToggle,
-        default: 'toggle',
+        default: 'hold',
+      }),
+      block: choice({
+        label: 'Block',
+        help: 'Hold the button to keep your shield up, or press it once to raise it and again to lower it.',
+        options: holdOrToggle,
+        default: 'hold',
+      }),
+      aim: choice({
+        label: 'Aim and draw',
+        help: 'Hold the attack button to draw the bow, or press it once to draw and again to loose.',
+        options: holdOrToggle,
+        default: 'hold',
       }),
       interact: keybind({
         label: 'Interact',
