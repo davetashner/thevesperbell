@@ -36,6 +36,8 @@ export interface ScreenFeedbackGlueOptions {
   readonly shake: CameraShake;
   readonly vignette: DamageVignette;
   readonly overlay: ScreenFeedback;
+  /** Whether reduce-screen-effects is on (accessibility.reduceScreenEffects): no vignette, no grade. */
+  readonly reduceEffects?: () => boolean;
 }
 
 export interface ScreenFeedbackGlue {
@@ -47,6 +49,7 @@ export interface ScreenFeedbackGlue {
 
 export function attachScreenFeedback(options: ScreenFeedbackGlueOptions): ScreenFeedbackGlue {
   const { world, player, shake, vignette, overlay } = options;
+  const reduceEffects = options.reduceEffects ?? (() => false);
   let trauma = 0;
   let lost = 0;
   const offDamage = world.events.on(DamageApplied, (hit) => {
@@ -71,9 +74,11 @@ export function attachScreenFeedback(options: ScreenFeedbackGlueOptions): Screen
       if (lost > 0) vignette.hit(lost, nowMs);
       lost = 0;
       const health = healthOf(world, player);
+      // Reduce screen effects: the health bar and the damage ring still say what happened.
+      const plain = reduceEffects();
       overlay.update({
-        vignette: vignette.intensity(nowMs),
-        desaturation: health === undefined ? 0 : desaturation(health.current, health.max),
+        vignette: plain ? 0 : vignette.intensity(nowMs),
+        desaturation: plain || health === undefined ? 0 : desaturation(health.current, health.max),
       });
     },
     dispose() {

@@ -249,6 +249,16 @@ export const SETTINGS_SCHEMA = {
         ],
         default: 'system',
       }),
+      reduceFlashing: toggle({
+        label: 'Reduce flashing',
+        help: 'Dims full-screen flashes, such as the red hit vignette, and lets at most three through a second.',
+        default: false,
+      }),
+      reduceScreenEffects: toggle({
+        label: 'Reduce screen effects',
+        help: 'Turns off the red hit vignette and the colour drain at low health.',
+        default: false,
+      }),
       subtitles: toggle({
         label: 'Subtitles',
         help: 'Shows spoken lines as text.',

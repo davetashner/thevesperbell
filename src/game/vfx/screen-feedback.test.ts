@@ -3,6 +3,8 @@ import {
   DamageVignette,
   desaturation,
   FlashLimiter,
+  MAX_FLASHES_PER_SECOND,
+  REDUCED_FLASH_INTENSITY,
   MAX_DESATURATION,
   VIGNETTE_MS,
 } from './screen-feedback';
@@ -52,5 +54,34 @@ describe('screen feedback (mw-e29.5)', () => {
     expect(desaturation(-5, 100)).toBe(MAX_DESATURATION);
     expect(desaturation(500, 100)).toBe(0);
     expect(desaturation(10, 0)).toBe(0);
+  });
+});
+
+describe('reduce flashing (mw-e31.7)', () => {
+  it('AC-1: with reduce-flashing on, 10 full-screen flashes in 1 s let 3 through, capped', () => {
+    const limiter = new FlashLimiter();
+    limiter.configure(true);
+    const shown = Array.from({ length: 10 }, (_, i) => limiter.admit(i * 100, 1)).filter(
+      (v) => v > 0,
+    );
+    expect(shown).toHaveLength(MAX_FLASHES_PER_SECOND);
+    expect(shown.every((v) => v === REDUCED_FLASH_INTENSITY)).toBe(true);
+    expect(limiter.admit(50, 0.1)).toBe(0);
+  });
+
+  it('a dim flash stays as it is, and with reduce-flashing off a flash is not capped', () => {
+    const limiter = new FlashLimiter();
+    limiter.configure(true);
+    expect(limiter.admit(0, 0.1)).toBeCloseTo(0.1);
+    limiter.configure(false);
+    expect(limiter.admit(2000, 1)).toBe(1);
+  });
+
+  it('the damage vignette peaks at the cap with reduce-flashing on', () => {
+    const limiter = new FlashLimiter();
+    limiter.configure(true);
+    const vignette = new DamageVignette(limiter);
+    expect(vignette.hit(0.9, 0)).toBe(true);
+    expect(vignette.intensity(0)).toBe(REDUCED_FLASH_INTENSITY);
   });
 });
