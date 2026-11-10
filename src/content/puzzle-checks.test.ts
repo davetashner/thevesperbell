@@ -186,4 +186,29 @@ describe('puzzle load checks (mw-e15.1)', () => {
       `${FILE}#/outputs/signals/1: puzzle:zz-test drives signal "mechanism-room/east-button", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
     ]);
   });
+
+  it('mw-e15.11: failure signals name a node of a graph the scene places, and a rumour is a declared bool fact', () => {
+    const fail = (...signals: string[]) =>
+      loadIssues([
+        puzzle((p) => ({ ...p, failures: signals.map((signal) => ({ signal, port: 'failed' })) })),
+      ]);
+    expect(fail('nowhere/order')).toEqual([
+      `${FILE}#/failures/0: puzzle:zz-test counts failures from signal "nowhere/order", but there is no signal graph "nowhere"`,
+    ]);
+    expect(fail('mechanism-room/missing')).toEqual([
+      `${FILE}#/failures/0: puzzle:zz-test counts failures from signal "mechanism-room/missing", but graph "mechanism-room" has no node "missing"`,
+    ]);
+    expect(fail('mechanism-room/north-lever')).toEqual([
+      `${FILE}#/failures/0: puzzle:zz-test counts failures from signal "mechanism-room/north-lever", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
+    ]);
+    const rumour = (key: string) =>
+      loadIssues([puzzle((p) => ({ ...p, hints: [{ afterSeconds: 60, rumour: key }] }))]);
+    expect(rumour('testbed.nope')).toEqual([
+      `${FILE}#/hints/0/rumour: puzzle:zz-test names undeclared fact "testbed.nope": declare it in src/content/data/fact/`,
+    ]);
+    expect(rumour('ownership.thefts')).toEqual([
+      `${FILE}#/hints/0/rumour: puzzle:zz-test rumour fact "ownership.thefts" must be bool, not int`,
+    ]);
+    expect(rumour('testbed.room-lever.thrown')).toEqual([]);
+  });
 });

@@ -17,6 +17,13 @@
       "default": false,
       "description": "The frozen channel's vault has been opened by solving its puzzle (the portcullis is raised by the puzzle's vault latch).",
       "owner": "puzzle"
+    },
+    {
+      "key": "frozen-channel.hint-rumour",
+      "type": "bool",
+      "default": false,
+      "description": "Hearsay about how the frozen-channel puzzle is solved: set when its last hint tier fires, so a townsperson can pass the nudge on. Written once by the puzzle runtime.",
+      "owner": "puzzle"
     }
   ]
 }

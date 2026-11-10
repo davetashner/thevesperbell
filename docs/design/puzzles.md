@@ -41,8 +41,15 @@ A step's `using` names the capability it relies on; it must be one of its soluti
   ways back from a lost object or stuck mechanism: `respawn` a critical entity after some seconds, or
   a `reset` trigger (mw-e15.7).
 - `hints`: the hint ladder, tiers in increasing `afterSeconds` (or sooner after `afterAttempts`
-  failures), each a `bark`, a `highlight` of entities, or both, with class-aware `variants` chosen by
-  capability (mw-e15.11).
+  failures), each a `bark`, a `highlight` of entities, a `rumour` fact, or any mix, with class-aware
+  `variants` chosen by capability (mw-e15.11). Defaults for new ladders: 180 s or 3 attempts, 360 s,
+  600 s. `failures` lists the signal outputs whose pulses are failed attempts (a sequence node's
+  `failed` port). The runtime counts seconds in sim ticks since the puzzle was found, fires each tier
+  once (`puzzleHint`, with the chosen text and the entities to pulse), sets the rumour fact, and
+  never fires for a solved puzzle. The `puzzleHints` assist (difficulty, mw-e31.10) scales the times
+  (2 = twice as soon) and 0 turns hints off. Progress is in the puzzle's saved record, absent until
+  an attempt fails or a tier fires. The game publishes a fired hint as `#app[data-puzzle-hint]`; the
+  bark and glint are drawn by the HUD beads (mw-e31).
 - `tags` (`mvp` puzzles must declare at least two solutions; mw-e15.8 later requires them to be
   distinct and cover three classes) and `focus`, the classes it is meant to showcase.
 - `discovery`: how the player finds it, a `volume` (world coordinates) to walk into and/or an

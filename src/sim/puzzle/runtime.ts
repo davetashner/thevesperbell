@@ -38,6 +38,7 @@
 
 import { defineComponent, type EntityId } from '../core/component';
 import { fireBurntOut } from '../elements/fire';
+import { hasCapability } from '../progression/capabilities';
 import { PhysicsObjectComponent } from '../physics/objects';
 import { SceneTransformComponent } from '../scene/loader';
 import type { Vec3 } from '../stimulus/shapes';
@@ -67,6 +68,7 @@ import {
   clueRead,
   puzzleDiscovered,
   puzzleFailed,
+  puzzleHint,
   puzzleRecovered,
   puzzleRewarded,
   puzzleSolved,
@@ -134,6 +136,27 @@ export interface PuzzleHost {
 /** Seconds a respawn that finds its spot taken waits before it tries again. */
 export const RETRY_SECONDS = 2;
 
+/** One tier of a puzzle's hint ladder (mw-e15.11). */
+export interface HintTierDef {
+  /** Seconds since the puzzle was found; scaled by the `puzzleHints` difficulty multiplier (higher: sooner). */
+  readonly afterSeconds: number;
+  /** Failed attempts that fire the tier sooner. */
+  readonly afterAttempts?: number | undefined;
+  readonly bark?: string | undefined;
+  /** Class-aware text: the first whose capability the player has replaces `bark`. */
+  readonly variants: readonly { readonly capability: string; readonly bark: string }[];
+  /** Scene spawn ids to pulse. */
+  readonly highlight: readonly string[];
+  /** A declared bool fact set true when the tier fires (the NPC rumour it unlocks). */
+  readonly rumour?: string | undefined;
+}
+
+/** A signal output whose rising edge is a failed attempt (the sequence node's `failed` port). */
+export interface FailureSignalDef {
+  readonly signal: string;
+  readonly port?: string | undefined;
+}
+
 /** A puzzle as the runtime runs it (the content layer builds these from puzzle files). */
 export interface PuzzleDef {
   readonly id: string;
@@ -153,6 +176,10 @@ export interface PuzzleDef {
   readonly outputs: PuzzleOutputsDef;
   /** Diegetic recovery from lost objects and stuck mechanisms (mw-e15.7). */
   readonly recovery?: readonly RecoveryDef[] | undefined;
+  /** The hint ladder, in order (mw-e15.11). */
+  readonly hints?: readonly HintTierDef[] | undefined;
+  /** Signal outputs whose pulses count as failed attempts, for tiers that fire after attempts. */
+  readonly failures?: readonly FailureSignalDef[] | undefined;
 }
 
 /** A respawn waiting for its time (saved, so a load in the middle of one finishes it). */
@@ -188,6 +215,8 @@ export interface PuzzleRecord {
   readonly holds: readonly (number | null)[];
   /** Respawns waiting for their time; absent when none is (records of puzzles at rest are unchanged). */
   readonly recovering?: readonly PendingRespawn[];
+  /** Hint ladder progress; absent until an attempt fails or a tier fires (records of puzzles at rest are unchanged). */
+  readonly hints?: { readonly fired: number; readonly attempts: number };
 }
 
 export const PuzzleStateComponent = defineComponent<PuzzleRecord>('puzzle.state');
@@ -276,6 +305,8 @@ export class PuzzleRuntime {
   readonly #watched = new Set<EntityId>();
   readonly #goalProperties = new Map<string, ReadonlySet<string>>();
   readonly #offs: (() => void)[] = [];
+  /** Puzzle id → whether each failure signal was on at the last look (a rising edge is an attempt). */
+  readonly #failing = new Map<string, boolean[]>();
   #structure = -1;
   #restores: number;
 
@@ -339,6 +370,7 @@ export class PuzzleRuntime {
       }),
     );
     this.#sync();
+    this.#readFailures();
     for (const id of this.#defs.keys()) {
       if (this.#goals.met(id)) this.#onGoal(id, true);
     }
@@ -398,6 +430,7 @@ export class PuzzleRuntime {
     this.#look();
     this.#goals.poll();
     this.#holds();
+    this.#hints();
     this.#flush();
   }
 
@@ -495,7 +528,13 @@ export class PuzzleRuntime {
   #reopen(id: string): void {
     const def = known(this.#defs.get(id));
     this.#transition(id, 'in-progress');
-    this.#update(id, { attribution: null, solvedAt: null, trail: [] });
+    this.#update(id, {
+      attribution: null,
+      solvedAt: null,
+      trail: [],
+      discoveredAt: this.#world.tick,
+    });
+    this.#setHints(id, undefined);
     this.#world.facts.set(def.outputs.solvedFact, false);
     for (const signal of def.outputs.signals) this.#drive(signal, false);
     this.#world.events.emit(puzzleUnsolved, { puzzle: id, tick: this.#world.tick });
@@ -749,6 +788,86 @@ export class PuzzleRuntime {
     });
   }
 
+  // --- hints ---------------------------------------------------------------------------------
+
+  #setHints(id: string, hints: PuzzleRecord['hints'] | undefined): void {
+    const next: PuzzleRecord = { ...this.#record(id), ...(hints !== undefined && { hints }) };
+    if (hints === undefined) delete (next as { hints?: unknown }).hints;
+    this.#records.set(id, next);
+    this.#dirty.add(id);
+  }
+
+  /** Whether each of puzzle `id`'s failure signals is on now. */
+  #failures(id: string): boolean[] {
+    const live = worldLiveReader(this.#world);
+    return (known(this.#defs.get(id)).failures ?? []).map(({ signal, port }) => {
+      const [graph = '', node = ''] = signal.split('/');
+      return live.signal(graph, node, port);
+    });
+  }
+
+  /** Takes the failure signals as they stand, so a pulse already on is not an attempt. */
+  #readFailures(): void {
+    for (const id of this.#defs.keys()) this.#failing.set(id, this.#failures(id));
+  }
+
+  /** Counts failed attempts and fires the next hint tier of each puzzle in play that is due one. */
+  #hints(): void {
+    const tick = this.#world.tick;
+    const hz = this.#world.clock.hz;
+    const scale = Math.round(this.#world.difficulty.puzzleHints * 10_000);
+    for (const [id, def] of this.#defs) {
+      if (def.hints === undefined || def.hints.length === 0) continue;
+      const now = this.#failures(id);
+      const before = known(this.#failing.get(id));
+      this.#failing.set(id, now);
+      const record = this.#record(id);
+      if (record.state !== 'discovered' && record.state !== 'in-progress') continue;
+      const edges = now.filter((on, i) => on && !before[i]).length;
+      let progress = record.hints ?? { fired: 0, attempts: 0 };
+      if (edges > 0) {
+        progress = { ...progress, attempts: progress.attempts + edges };
+        this.#setHints(id, progress);
+      }
+      const tier = def.hints[progress.fired];
+      if (tier === undefined || scale === 0) continue;
+      const elapsed = tick - Number(record.discoveredAt);
+      const due = Math.ceil((tier.afterSeconds * hz * 10_000) / scale);
+      if (
+        elapsed < due &&
+        !(tier.afterAttempts !== undefined && progress.attempts >= tier.afterAttempts)
+      ) {
+        continue;
+      }
+      this.#fireHint(id, progress.fired, tier);
+    }
+  }
+
+  #fireHint(id: string, index: number, tier: HintTierDef): void {
+    const progress = this.#record(id).hints ?? { fired: 0, attempts: 0 };
+    this.#setHints(id, { ...progress, fired: index + 1 });
+    const player = this.#player;
+    const variant =
+      player === undefined
+        ? undefined
+        : tier.variants.find(({ capability }) => hasCapability(this.#world, player, capability));
+    const entities = tier.highlight.flatMap((spawn) => {
+      const entity = this.#bound.get(spawn);
+      return entity === undefined ? [] : [entity];
+    });
+    if (tier.rumour !== undefined) this.#world.facts.set(tier.rumour, true);
+    this.#world.events.emit(puzzleHint, {
+      puzzle: id,
+      tier: index,
+      tick: this.#world.tick,
+      bark: variant?.bark ?? tier.bark,
+      variant: variant?.capability,
+      highlight: tier.highlight,
+      entities,
+      rumour: tier.rumour,
+    });
+  }
+
   // --- persistence ---------------------------------------------------------------------------
 
   /** Keeps each unsolved puzzle's sustained-hold progress in its record. */
@@ -809,6 +928,7 @@ export class PuzzleRuntime {
     this.#structure = -1;
     this.#sync();
     this.#goals.refresh();
+    this.#readFailures();
   }
 }
 

@@ -155,6 +155,44 @@ export const checkPuzzles: ContentCheck = (entries) => {
       }
     });
 
+    puzzle.failures.forEach(({ signal }, i) => {
+      const pointer = `/failures/${String(i)}`;
+      const [graph = '', node = ''] = signal.split('/');
+      const nodes = graphs.get(graph);
+      if (nodes === undefined) {
+        report(
+          pointer,
+          `counts failures from signal "${signal}", but there is no signal graph "${graph}"`,
+        );
+      } else if (!nodes.has(node)) {
+        report(
+          pointer,
+          `counts failures from signal "${signal}", but graph "${graph}" has no node "${node}"`,
+        );
+      } else if (scene !== undefined && !scene.graphs.has(graph)) {
+        report(
+          pointer,
+          `counts failures from signal "${signal}", but level "${puzzle.scene.id}" (${scene.file}) does not place signal graph "${graph}"`,
+        );
+      }
+    });
+
+    puzzle.hints.forEach(({ rumour }, t) => {
+      if (rumour === undefined) return;
+      const def = lookupFact(facts, rumour);
+      if (def === undefined) {
+        report(
+          `/hints/${String(t)}/rumour`,
+          `names undeclared fact "${rumour}": declare it in src/content/data/fact/`,
+        );
+      } else if (def.type !== 'bool') {
+        report(
+          `/hints/${String(t)}/rumour`,
+          `rumour fact "${rumour}" must be bool, not ${def.type}`,
+        );
+      }
+    });
+
     const solved = puzzle.outputs.solvedFact;
     const def = lookupFact(facts, solved);
     if (def === undefined) {

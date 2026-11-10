@@ -179,9 +179,27 @@
   },
   "hints": [
     {
-      "afterSeconds": 120,
+      "afterSeconds": 180,
+      "afterAttempts": 3,
       "highlight": ["scales-left", "scales-right"],
       "bark": "Two plates. They want to carry about the same."
+    },
+    {
+      "afterSeconds": 360,
+      "highlight": ["light-crate", "body-a", "body-b", "ice-block"],
+      "bark": "Not every weight in here is a crate. Some are lying down.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "I can stand on one plate and set a weight on the other."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 600,
+      "highlight": ["crates-west-crate-40", "crates-east-crate-40"],
+      "bark": "Forty kilos each. Somebody made them to match.",
+      "rumour": "scales-room.hint-rumour"
     }
   ],
   "tags": ["greybox", "mvp"],

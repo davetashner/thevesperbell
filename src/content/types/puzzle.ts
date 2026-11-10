@@ -138,6 +138,11 @@ const hintTierSchema = z
       .min(1)
       .optional()
       .describe('Listed entities that glint or pulse to draw the eye.'),
+    rumour: factKey
+      .optional()
+      .describe(
+        'Declared bool fact set true when the tier fires: an NPC rumour (dialogue conditions read it) is unlocked.',
+      ),
     variants: z
       .array(
         z.strictObject({
@@ -148,9 +153,10 @@ const hintTierSchema = z
       .default([])
       .describe('Class-aware barks: the first whose capability the player has replaces `bark`.'),
   })
-  .refine((tier) => tier.bark !== undefined || tier.highlight !== undefined, {
-    message: 'a hint tier needs a bark or a highlight',
-  });
+  .refine(
+    (tier) => tier.bark !== undefined || tier.highlight !== undefined || tier.rumour !== undefined,
+    { message: 'a hint tier needs a bark, a highlight or a rumour' },
+  );
 
 const recoverySchema = z
   .discriminatedUnion('kind', [
@@ -231,7 +237,23 @@ export const puzzleSchema = z
     hints: z
       .array(hintTierSchema)
       .default([])
-      .describe('The hint ladder: tiers fire in order while the player is stuck.'),
+      .describe(
+        'The hint ladder: tiers fire in order while the player is stuck (seconds since the puzzle was found, or failed attempts). Defaults: tier 1 at 180 s or 3 attempts, tier 2 at 360 s, tier 3 at 600 s.',
+      ),
+    failures: z
+      .array(
+        z.strictObject({
+          signal: z
+            .string()
+            .regex(SIGNAL_REF, 'must be "<graph>/<node>"')
+            .describe('Signal graph id and node id, e.g. "chimes/order".'),
+          port: contentId.optional().describe('Output port of the node; default: its first.'),
+        }),
+      )
+      .default([])
+      .describe(
+        'Signal outputs whose pulses are failed attempts (a sequence node’s `failed` port): each rising edge counts one towards a tier’s `afterAttempts`.',
+      ),
     tags: z
       .array(contentId)
       .default([])

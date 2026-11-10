@@ -11,7 +11,7 @@ import {
   type EntityId,
   type SceneSpawnPlacement,
 } from '@sim/index';
-import { PuzzleWatch, puzzleDefs, sceneHost, startPuzzles } from './index';
+import { PuzzleWatch, hintReadout, puzzleDefs, sceneHost, startPuzzles } from './index';
 
 const content = loadGameContent();
 
@@ -36,6 +36,65 @@ describe('puzzles in the game (mw-e15.3)', () => {
     expect(puzzleDefs(content, 'mechanism-room')).toEqual([]);
     // A puzzle with no discovery rule carries none.
     expect(puzzleDefs(content, 'testbed')[0]).not.toHaveProperty('discovery');
+  });
+
+  it('carries the hint ladder and the failure signals through (mw-e15.11)', () => {
+    const [chimes] = puzzleDefs(content, 'chimes');
+    expect(chimes?.failures).toEqual([{ signal: 'chimes/order', port: 'failed' }]);
+    expect(chimes?.hints?.map(({ afterSeconds }) => afterSeconds)).toEqual([180, 360, 600]);
+    expect(chimes?.hints?.[0]).toMatchObject({
+      afterAttempts: 3,
+      highlight: ['chime-button'],
+      variants: [],
+    });
+    const [frozen] = puzzleDefs(content, 'frozen-channel');
+    expect(frozen?.hints?.[2]).toMatchObject({ rumour: 'frozen-channel.hint-rumour' });
+    expect(frozen?.hints?.[0]?.variants[0]?.capability).toBe('spell.mage-hand');
+    // A tier that only has a rumour highlights nothing.
+    const stub = {
+      all: () => [
+        {
+          ...content.all('puzzle').find((p) => p.id === 'brazier-hall'),
+          hints: [{ afterSeconds: 5, rumour: 'brazier-hall.vault-open', variants: [] }],
+        },
+      ],
+    };
+    expect(puzzleDefs(stub as never, 'brazier-hall')[0]?.hints?.[0]?.highlight).toEqual([]);
+  });
+
+  it('hands a hint that fires to onHint (mw-e15.11)', () => {
+    const w = world();
+    const entity = spawnSceneSpawn(w, 'brazier-hall', {
+      id: 'brazier-west',
+      tags: ['brazier'],
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+    } as never);
+    addProperties(w, entity, { burning: false });
+    const stub = {
+      all: () => [
+        {
+          ...content.all('puzzle').find((p) => p.id === 'brazier-hall'),
+          hints: [{ afterSeconds: 2, bark: 'Hm.', variants: [], highlight: ['brazier-west'] }],
+        },
+      ],
+    };
+    const heard: unknown[] = [];
+    startPuzzles(w, stub as never, 'brazier-hall', {
+      onHint: (hint) => heard.push(hint),
+    });
+    setProperty(w, entity, 'burning', true);
+    setProperty(w, entity, 'burning', false);
+    for (let i = 0; i < 40; i++) w.step();
+    expect(heard).toEqual([
+      expect.objectContaining({ puzzle: 'brazier-hall', bark: 'Hm.', tier: 0 }),
+    ]);
+    expect(JSON.parse(hintReadout(heard[0] as never))).toMatchObject({
+      puzzle: 'brazier-hall',
+      tier: 0,
+      bark: 'Hm.',
+      highlight: ['brazier-west'],
+    });
   });
 
   function world() {

@@ -100,6 +100,20 @@ describe('puzzle schema (mw-e15.1)', () => {
     expect(minimal.solutions[0]?.capabilities).toEqual([]);
   });
 
+  it('mw-e15.11: a hint tier may be a rumour alone; failure signals default to none and must be graph/node', () => {
+    expect(
+      problems({
+        ...valid,
+        hints: [{ afterSeconds: 60, rumour: 'test.heard' }],
+        failures: [{ signal: 'bells/order', port: 'failed' }],
+      }),
+    ).toEqual([]);
+    expect(puzzleSchema.parse({ ...valid, failures: undefined }).failures).toEqual([]);
+    expect(problems({ ...valid, failures: [{ signal: 'bells' }] })).toEqual([
+      'failures.0.signal: must be "<graph>/<node>"',
+    ]);
+  });
+
   it('AC-3: an mvp puzzle with fewer than 2 declared solutions fails', () => {
     expect(problems({ ...valid, solutions: [valid.solutions[0]] })).toEqual([
       'solutions: an mvp puzzle needs at least 2 declared solutions; it has 1',
@@ -183,7 +197,7 @@ describe('puzzle schema (mw-e15.1)', () => {
     ).toEqual([
       'solutions.0.capabilities.0: must be a capability id, e.g. "spell.mage-hand"',
       "solutions.1.steps.0.do: Invalid discriminator value. Expected 'stimulus' | 'move' | 'interact' | 'reach' | 'wait'",
-      'hints.0: a hint tier needs a bark or a highlight',
+      'hints.0: a hint tier needs a bark, a highlight or a rumour',
       'focus.0: Invalid option: expected one of "knight"|"archer"|"sorcerer"|"thief"',
       'outputs.solvedFact: must be a fact key',
     ]);

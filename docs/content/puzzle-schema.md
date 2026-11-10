@@ -68,14 +68,18 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `policy.recovery[].kind` | `"reset"` | required | Policy kind: a trigger resets the mechanisms. |
 | `policy.recovery[].trigger` | id | required | Id of the listed entity that resets the puzzle (a lever). |
 | `policy.recovery[].fact` | string | — | Declared int fact counted up by each reset (telemetry, quests, hints). |
-| `hints` | list of object | `[]` | The hint ladder: tiers fire in order while the player is stuck. |
+| `hints` | list of object | `[]` | The hint ladder: tiers fire in order while the player is stuck (seconds since the puzzle was found, or failed attempts). Defaults: tier 1 at 180 s or 3 attempts, tier 2 at 360 s, tier 3 at 600 s. |
 | `hints[].afterSeconds` | number > 0 | required | Seconds in progress before the tier fires; tiers are in increasing order. |
 | `hints[].afterAttempts` | integer ≥ 1 | — | Failed attempts that fire the tier sooner, whichever comes first. |
 | `hints[].bark` | string | — | What the player character mutters. |
 | `hints[].highlight` | list of id (at least 1) | — | Listed entities that glint or pulse to draw the eye. |
+| `hints[].rumour` | string | — | Declared bool fact set true when the tier fires: an NPC rumour (dialogue conditions read it) is unlocked. |
 | `hints[].variants` | list of object | `[]` | Class-aware barks: the first whose capability the player has replaces `bark`. |
 | `hints[].variants[].capability` | string | required | Used when the player has this capability. |
 | `hints[].variants[].bark` | string | required | The bark for a player with that capability. |
+| `failures` | list of object | `[]` | Signal outputs whose pulses are failed attempts (a sequence node’s `failed` port): each rising edge counts one towards a tier’s `afterAttempts`. |
+| `failures[].signal` | string | required | Signal graph id and node id, e.g. "chimes/order". |
+| `failures[].port` | id | — | Output port of the node; default: its first. |
 | `tags` | list of id | `[]` | Free-form tags; "mvp" requires 2+ solutions. |
 | `focus` | list of `"knight"` \| `"archer"` \| `"sorcerer"` \| `"thief"` | `[]` | Classes the puzzle is meant to showcase; empty = none in particular. |
 | `outputs` | object | required | Facts written when the puzzle is solved. |

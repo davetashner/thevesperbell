@@ -145,9 +145,33 @@
   },
   "hints": [
     {
-      "afterSeconds": 120,
+      "afterSeconds": 180,
+      "afterAttempts": 3,
       "highlight": ["lamp-a-brazier", "lamp-b-brazier", "lamp-c-brazier"],
-      "bark": "You cannot see the path. Something in here could burn."
+      "bark": "You cannot see the path. Something in here could burn.",
+      "variants": [
+        {
+          "capability": "spell.ember",
+          "bark": "Three cold braziers. One spark each."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 360,
+      "highlight": ["torch-barrel"],
+      "bark": "A barrel that burns lights a very long way.",
+      "variants": [
+        {
+          "capability": "spell.ember",
+          "bark": "Ember reaches farther than the dark does."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 600,
+      "highlight": ["far-pad"],
+      "bark": "The pad is on the far bank. Light will show the way to it.",
+      "rumour": "dark-crossing.hint-rumour"
     }
   ],
   "tags": ["greybox", "mvp"],

@@ -169,9 +169,27 @@
   },
   "hints": [
     {
-      "afterSeconds": 120,
+      "afterSeconds": 180,
+      "afterAttempts": 3,
       "highlight": ["watcher-a", "watcher-b", "watcher-c"],
       "bark": "They all stare at the door. Something wants them looking the other way."
+    },
+    {
+      "afterSeconds": 360,
+      "highlight": ["watcher-a"],
+      "bark": "They turn, a quarter at a time. They are heavier than they look.",
+      "variants": [
+        {
+          "capability": "spell.mage-hand",
+          "bark": "I do not have to touch them to turn them."
+        }
+      ]
+    },
+    {
+      "afterSeconds": 600,
+      "highlight": ["watcher-b", "watcher-c"],
+      "bark": "One of them is cracked. A crack is a way out.",
+      "rumour": "watchers.hint-rumour"
     }
   ],
   "tags": ["greybox", "mvp"],

@@ -600,7 +600,7 @@
     },
     "hints": {
       "default": [],
-      "description": "The hint ladder: tiers fire in order while the player is stuck.",
+      "description": "The hint ladder: tiers fire in order while the player is stuck (seconds since the puzzle was found, or failed attempts). Defaults: tier 1 at 180 s or 3 attempts, tier 2 at 360 s, tier 3 at 600 s.",
       "type": "array",
       "items": {
         "type": "object",
@@ -631,6 +631,11 @@
               "description": "Id of an entity listed in `entities`."
             }
           },
+          "rumour": {
+            "description": "Declared bool fact set true when the tier fires: an NPC rumour (dialogue conditions read it) is unlocked.",
+            "type": "string",
+            "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
+          },
           "variants": {
             "default": [],
             "description": "Class-aware barks: the first whose capability the player has replaces `bark`.",
@@ -659,6 +664,30 @@
         },
         "required": [
           "afterSeconds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "failures": {
+      "default": [],
+      "description": "Signal outputs whose pulses are failed attempts (a sequence node’s `failed` port): each rising edge counts one towards a tier’s `afterAttempts`.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "signal": {
+            "type": "string",
+            "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$",
+            "description": "Signal graph id and node id, e.g. \"chimes/order\"."
+          },
+          "port": {
+            "description": "Output port of the node; default: its first.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "signal"
         ],
         "additionalProperties": false
       }
