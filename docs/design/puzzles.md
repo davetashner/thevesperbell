@@ -117,6 +117,35 @@ introduces a component; what the existing ones could not say (push rules, liquid
 facing) went to the e03 layer as general scene fields and a `facing` predicate. Catalogue, generated
 from the data: [puzzle prefabs](puzzle-prefabs.md); demo scene `?scene=prefab-gallery`.
 
+## The solvability validator
+
+`pnpm puzzle:validate [id…] [--abstract-only] [--time-box <ms>]` (mw-e15.6; code in
+`src/tools/puzzle`) proves what each puzzle declares: that every `solutions` entry can reach the goal
+for its capability set. Two layers:
+
+- **Abstract search** (`abstract.ts`). The scene's spawns (prefabs already expanded) become a small
+  state: which things are lit, and where each movable thing rests. Actions come from the capability
+  set, not from the declared steps: anyone can carry a burning prop to a lit-able entity and move a
+  movable thing to a place (the puzzle's entities, plates); a capability stands for the stimulus
+  elements its spell emits (heat lights from range, a tether counts as force). A breadth-first search
+  with memoised states finds the fewest actions that make the goal true. The abstraction ignores
+  cells, timing and signal graphs, so it only over-approximates: "unreachable" means no sequence
+  works, or the level lacks something the steps name (a crate that is not a spawn, a thing that
+  cannot move). Goals that read facts, signals or an element it has no rule for (water, cold) and
+  capabilities it has no model of are reported inconclusive, never unreachable.
+- **Concrete run** (`concrete.ts`). The solution's `steps` are executed in the headless sim, loaded
+  through the game's own wiring: `stimulus` casts the spell (or applies the element by contact),
+  `move` carries the thing beside its destination, `interact` uses the target's primary affordance
+  (which must be the step's verb), `reach` puts the player beside the target, `wait` runs time. Each
+  step has an expected effect (a heated target burns, a moved thing ends up there); the report names
+  the index of the first step that diverged, or says the goal stayed false after the last step.
+
+Verdicts per solution: `ok`; `unreachable` and `diverged` fail the run for an `mvp` puzzle (CI job
+`puzzle-validate`) and are reported for others; `abstraction-gap` (the search found nothing but the
+sim succeeded: the abstraction needs a rule) and `inconclusive` (a bound was hit: node count, depth
+or the 10 s time box per puzzle, or the model has a gap) are warnings. A class-specific solution
+whose goal is also reachable with fewer capabilities is reported as an informational shortcut.
+
 ## What load checks
 
 - In the file: entity and solution ids are unique; every step, highlight and recovery names a listed
