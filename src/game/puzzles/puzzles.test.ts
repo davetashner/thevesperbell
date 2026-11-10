@@ -232,7 +232,7 @@ describe('the scene host of a puzzle respawner (mw-e15.7)', () => {
     s.host.spawn('barrel');
     expect(s.made).toHaveLength(2);
     expect(s.bound).toEqual([]);
-    s.w.destroy(s.made[1] as EntityId);
+    s.w.destroy(s.made.at(1) ?? 0);
     s.host.flush();
     expect(s.bound).toEqual([s.made[0]]);
     s.host.flush();
