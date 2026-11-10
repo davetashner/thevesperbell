@@ -165,6 +165,7 @@ import {
 import {
   createSettingsStore,
   BindingsEditor,
+  bindHoldToggle,
   loadBindings,
   openOptionsMenu,
   type SettingsStore,
@@ -352,6 +353,8 @@ import {
   physicsBodiesOf,
   PhysicsObjectComponent,
   playerRespawned,
+  playerDied,
+  BowComponent,
   playerStart,
   RapierCollisionWorld,
   RapierSightWorld,
@@ -628,10 +631,17 @@ function startRenderer(
   // no click: the sampler polls it every tick while the page has focus.
   // Custom bindings saved through the settings store apply at startup (mw-e02.22).
   const savedBindings = loadBindings(settings);
+  // Hold or toggle for sprint, crouch, block and aim/draw (mw-e31.3): resolved in the sampler, before
+  // the sim, so the sim only sees held or not held. Aim toggles only while the bow is out, so a sword
+  // swing is never stuck on; a replayed input log stays on hold, as it was recorded.
+  let bowEquipped: () => boolean = () => false;
+  let toggleLocked = false;
   const sampler = new ActionSampler({
     bindings: savedBindings.bindings,
     padBindings: savedBindings.gamepad,
+    toggleApplies: (action) => action !== 'primaryAttack' || bowEquipped(),
   });
+  bindHoldToggle(settings, sampler, () => toggleLocked);
   // The options menu's Key bindings panel edits these live (mw-e31.2): each change saves and the
   // sampler maps the next sample through it.
   const bindingsEditor = new BindingsEditor(settings, (bindings) => {
@@ -687,6 +697,8 @@ function startRenderer(
   ui.subscribe(({ capturesInput }) => {
     root.dataset['uiCapture'] = String(capturesInput);
     if (capturesInput && document.pointerLockElement !== null) document.exitPointerLock();
+    // A menu, dialogue or death screen opening lets toggled actions go; they do not resume after.
+    if (capturesInput) sampler.releaseToggles();
   });
   // The controls hint follows the device last used (mw-e02.9 AC-5); a disconnect says so (AC-4).
   let shown: InputDevice | 'gone' | undefined;
@@ -2937,7 +2949,13 @@ function startRenderer(
       });
       world.events.on(playerRespawned, (respawned) => {
         root.dataset['respawned'] = JSON.stringify(respawned);
+        sampler.releaseToggles();
       });
+      world.events.on(playerDied, () => {
+        sampler.releaseToggles();
+      });
+      bowEquipped = () =>
+        world.isRegistered(BowComponent) && world.get(body.entity, BowComponent)?.equipped === true;
     }
     const pending: PendingLoad | undefined = takePendingLoad(session);
     // The debug console (mw-e33.1): its own chunk, loaded only in dev builds or with ?debug=1.
@@ -2980,6 +2998,10 @@ function startRenderer(
         inputRecorder.segment();
       const replay = (window as unknown as { mwInputReplay?: InputLogSegment }).mwInputReplay;
       replaying = replay !== undefined;
+      if (replaying) {
+        toggleLocked = true;
+        sampler.setToggled([]);
+      }
       const player =
         replay === undefined
           ? undefined
