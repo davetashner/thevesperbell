@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { factIndex, lookupFact } from '@content/fact-checks';
 import { loadGameContent } from '@content/index';
+import { markExercised } from '@content/testing';
 import type { QuestDef } from '@content/types/quest';
 import { declareFacts, QuestRuntime, validateQuestLogic, World } from '@sim/index';
 import { evaluateLogic, MemoryLogicHost, type LogicRefChecker } from '@sim/logic/index';
@@ -84,9 +85,9 @@ function toHub(): Game {
   const g = boot();
   expect(g.runtime.questState(MAIN)).toBe('unstarted');
   set(g, { 'player.class': 'archer' });
+  expect(g.runtime.questState(MAIN)).toBe('unstarted');
+  set(g, { 'briar-glen.arrived': true });
   expect(g.runtime.questState(MAIN)).toBe('active');
-  expect(stage(g)).toBe('arrival');
-  done(g, 'reach-briar-glen');
   expect(stage(g)).toBe('first-night');
   done(g, 'see-the-horned-shape');
   expect(stage(g)).toBe('morning');
@@ -184,7 +185,11 @@ function referencesIn(): LogicRefChecker {
 }
 
 describe('main quest: data', () => {
-  it('AC-1: the quests validate with zero errors and every referenced fact is registered', () => {
+  it('AC-1: the quests validate with zero errors and every referenced fact is registered', ({
+    task,
+  }) => {
+    markExercised(task, 'quest', MAIN);
+    markExercised(task, 'quest', EPILOGUE);
     for (const quest of [main, epilogue]) {
       expect(validateQuestLogic(quest, referencesIn()), quest.id).toEqual([]);
       const keys = [
@@ -225,6 +230,17 @@ describe('main quest: data', () => {
   });
 });
 
+describe('main quest: start', () => {
+  it('a new game does not start the quest or write any quest fact; arrival does', () => {
+    const g = boot();
+    set(g, { 'player.class': 'knight' });
+    expect(g.runtime.questState(MAIN)).toBe('unstarted');
+    expect(g.world.facts.entries('quest.').length).toBe(0);
+    set(g, { 'briar-glen.arrived': true });
+    expect(g.runtime.questState(MAIN)).toBe('active');
+  });
+});
+
 describe('main quest: stages', () => {
   it('AC-3: the hub completes in any order and advances to Getting in identically', () => {
     const orders = [
@@ -253,8 +269,8 @@ describe('main quest: stages', () => {
     done(g, 'enter-by-supply-tunnel');
     expect(stage(g)).toBe('deepworks');
     const early = boot();
-    set(early, { 'player.class': 'thief' });
-    expect(early.runtime.stage(MAIN)).toBe('arrival');
+    set(early, { 'player.class': 'thief', 'briar-glen.arrived': true });
+    expect(early.runtime.stage(MAIN)).toBe('first-night');
     expect(early.runtime.completeObjective(MAIN, 'enter-by-weeping-adit')).toBeUndefined();
     tick(early);
     expect(early.runtime.stage(MAIN)).toBe('deepworks');
@@ -263,8 +279,7 @@ describe('main quest: stages', () => {
 
   it('the first night ends with the next day even if the shape was never seen', () => {
     const g = boot();
-    set(g, { 'player.class': 'knight' });
-    done(g, 'reach-briar-glen');
+    set(g, { 'player.class': 'knight', 'briar-glen.arrived': true });
     expect(stage(g)).toBe('first-night');
     set(g, { 'time.day': 2 });
     expect(stage(g)).toBe('morning');
@@ -456,7 +471,7 @@ describe('main quest: endings', () => {
     'AC-2: %s is reachable, with wendmouth.visited false throughout',
     (resolution, headline, facts) => {
       const g = boot();
-      set(g, { 'player.class': 'sorcerer', ...facts });
+      set(g, { 'player.class': 'sorcerer', 'briar-glen.arrived': true, ...facts });
       if (resolution !== 'long-vespers') {
         done(g, 'return-to-briar-glen');
         set(g, { 'bell.rung': 'rung' });
@@ -476,7 +491,7 @@ describe('main quest: endings', () => {
 
   it('AC-2: every fact set maps to exactly one ending, or to none while the story is unfinished', () => {
     const g = boot();
-    set(g, { 'player.class': 'knight' });
+    set(g, { 'player.class': 'knight', 'briar-glen.arrived': true });
     expect(g.runtime.completeObjective(MAIN, 'return-to-briar-glen')).toBeUndefined();
     const host = g.runtime.host;
     const holding = () =>
@@ -511,7 +526,7 @@ describe('main quest: endings', () => {
   it('the headline ending never depends on a harbour fact', () => {
     const harbour = ['wendmouth.visited', 'crate.intercepted', 'tern.sailed'];
     const g = boot();
-    set(g, { 'player.class': 'thief' });
+    set(g, { 'player.class': 'thief', 'briar-glen.arrived': true });
     for (const r of main.resolutions) {
       for (const key of harbour) expect(factsRead(r.when), r.id).not.toContain(key);
     }
@@ -522,7 +537,7 @@ describe('main quest: endings', () => {
 describe('main quest: epilogue slides', () => {
   const finish = (facts: Record<string, boolean | string>): Game => {
     const g = boot();
-    set(g, { 'player.class': 'archer', ...facts });
+    set(g, { 'player.class': 'archer', 'briar-glen.arrived': true, ...facts });
     if (facts['abbot.fate'] !== 'joined') {
       done(g, 'return-to-briar-glen');
       set(g, { 'bell.rung': 'rung' });

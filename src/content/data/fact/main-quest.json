@@ -5,6 +5,13 @@
   "notes": "Facts of the main quest The Labyrinth Beneath Briar Glen (mw-e39.4) that no dialogue or ending group registers yet: the entry route, the Act III bell, the morning-after bounty, Horn spoken for, the two harbour facts the quest and the epilogue read, and the ending itself. Horn, abbot, Vane, breach, Clatter, goblin and Tansy facts are in endings.json and the dialogue groups, and are reused as they are.",
   "facts": [
     {
+      "key": "briar-glen.arrived",
+      "type": "bool",
+      "default": false,
+      "description": "The player has arrived in Briar Glen on the mountain road at dusk (bible 4.1 beat 1). Starts the main quest. Written by the arrival scene (follow-up).",
+      "owner": "scene"
+    },
+    {
       "key": "deepworks.route",
       "type": "enum",
       "values": [

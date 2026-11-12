@@ -3,13 +3,11 @@
   "id": "quest-labyrinth-beneath-briar-glen",
   "title": "The Labyrinth Beneath Briar Glen",
   "summary": "Sleepers are walking out of Briar Glen at night and going into the mine, and Harrow Vane is paying five hundred crowns to whoever kills the beast that takes them. The beast, so far, has only ever carried them gently.",
-  "notes": "The main quest (mw-e39.4): bible 4.1 beats 1 to 16 as stages, with the four headline endings as resolutions (bible 4.4). The quest is started by class choice (arrival). Stages move by `transitions` (conditions over world facts and objective states), never by dialogue, so any order of dialogue, any class route and any resolution of Horn and the abbot all lead on. Wendmouth (bible 3.6) is optional: no required objective and no transition or resolution condition reads a harbour fact; the harbour only adds optional objectives and epilogue slides (quest-briar-glen-epilogue). Event, area and talk objectives are bound to sim events by mw-e23.3 and emitted or triggered by the level scripts (E26): until then they complete through completeObjective.",
+  "notes": "The main quest (mw-e39.4): bible 4.1 beats 1 to 16 as stages, with the four headline endings as resolutions (bible 4.4). The quest starts when the player arrives in Briar Glen (briar-glen.arrived, written by the arrival scene), not at new game. Stages move by `transitions` (conditions over world facts and objective states), never by dialogue, so any order of dialogue, any class route and any resolution of Horn and the abbot all lead on. Wendmouth (bible 3.6) is optional: no required objective and no transition or resolution condition reads a harbour fact; the harbour only adds optional objectives and epilogue slides (quest-briar-glen-epilogue). Event, area and talk objectives are bound to sim events by mw-e23.3 and emitted or triggered by the level scripts (E26): until then they complete through completeObjective.",
   "givers": ["npc-vane"],
   "startWhen": {
-    "kind": "factCmp",
-    "fact": "player.class",
-    "op": "neq",
-    "value": "none"
+    "kind": "fact",
+    "fact": "briar-glen.arrived"
   },
   "stages": [
     {
@@ -925,10 +923,10 @@
   "objectives": [
     {
       "id": "reach-briar-glen",
-      "kind": "enterArea",
+      "kind": "fact",
       "text": "Arrive in Briar Glen.",
       "params": {
-        "area": "briar-glen"
+        "fact": "briar-glen.arrived"
       },
       "stage": "arrival"
     },
