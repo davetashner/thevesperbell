@@ -32,7 +32,21 @@ interface Queued {
   readonly payload: unknown;
 }
 
+/** An open hold over some event types (see `EventBus.hold`). */
+export interface EventHold {
+  /** Releases the held events, in order, to the enclosing hold or the queue. */
+  commit(): void;
+  /** Drops the held events. */
+  rollback(): void;
+}
+
+interface HoldFrame {
+  readonly types: ReadonlySet<EventType<unknown>>;
+  readonly held: Queued[];
+}
+
 export class EventBus {
+  private readonly holds: HoldFrame[] = [];
   /** Per type; the list is replaced, never mutated, so a flush in progress iterates a snapshot. */
   private readonly channels = new Map<EventType<unknown>, { handlers: EventHandler<unknown>[] }>();
   private queue: Queued[] = [];
@@ -65,7 +79,44 @@ export class EventBus {
 
   /** Queues an event for the next flush. */
   emit<T>(type: EventType<T>, payload: T): void {
-    this.queue.push({ type: type as EventType<unknown>, payload });
+    this.route({ type: type as EventType<unknown>, payload }, this.holds.length);
+  }
+
+  /** Sends `entry` to the innermost hold below `above` that holds its type, else to the queue. */
+  private route(entry: Queued, above: number): void {
+    const hold = this.holds.slice(0, above).findLast((frame) => frame.types.has(entry.type));
+    if (hold !== undefined) {
+      hold.held.push(entry);
+      return;
+    }
+    this.queue.push(entry);
+  }
+
+  /**
+   * Holds events of `types` instead of queueing them, for a transaction that may roll back
+   * (mw-e22.16). `commit` releases them in order, to the enclosing hold of their type if there is
+   * one (so a nested commit folds into its parent) or else to the queue; `rollback` drops them.
+   * Holds of different types may settle in any order; each settles exactly once. Other event types
+   * are untouched.
+   */
+  hold(types: readonly EventType<never>[]): EventHold {
+    const frame: HoldFrame = { types: new Set(types as readonly EventType<unknown>[]), held: [] };
+    this.holds.push(frame);
+    const settle = (): number => {
+      const index = this.holds.indexOf(frame);
+      if (index < 0) throw new Error('event hold settled twice');
+      this.holds.splice(index, 1);
+      return index;
+    };
+    return {
+      commit: () => {
+        const index = settle();
+        for (const entry of frame.held) this.route(entry, index);
+      },
+      rollback: () => {
+        settle();
+      },
+    };
   }
 
   /** Events waiting for the next flush. */
