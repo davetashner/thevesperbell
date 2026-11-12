@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "slice",
   "name": "Vertical slice",
-  "description": "The m1 vertical slice in grey box (docs/design/vertical-slice.md \u00a74, mw-e01.4): a 10 \u00d7 10 m spawn room behind a wooden door, a dim 20 m corridor with an ivy-faced ledge in its side alcove, a 12 \u00d7 12 m arena with two pillars, a floor brazier and a loot alcove 1.4 m up off its east side, and an iron exit door locked by the slice-exit lock. The alcove holds a chest rolling the slice-alcove-chest loot table, and the Forgotten miner rests at its post by pillar B, facing the doorway, leashed 25 m to it and carrying the rusted gallery key that opens the exit, which it drops where it dies (mw-e01.5). Checkpoint volumes CP-1 (past the spawn door) and CP-2 (before the arena) request autosaves; walking into the vestibule behind the exit door sets slice.complete.",
+  "description": "The m1 vertical slice in grey box (docs/design/vertical-slice.md \u00a74, mw-e01.4): a 10 \u00d7 10 m spawn room behind a wooden door, a dim 20 m corridor with an ivy-faced ledge in its side alcove, a 12 \u00d7 12 m arena with two pillars, a floor brazier and a loot alcove 1.4 m up off its east side, and an iron exit door locked by the slice-exit lock. The alcove holds a chest rolling the slice-alcove-chest loot table, and the Forgotten miner rests at its post by pillar B, facing the doorway, leashed 25 m to it and carrying the rusted gallery key that opens the exit, which it drops where it dies (mw-e01.5). Checkpoint volumes CP-1 (past the spawn door) and CP-2 (before the arena) request autosaves; walking into the vestibule behind the exit door sets slice.complete. Past the vestibule a short doorway and passage lead out onto the mountain road: its transition volume mountain-road leads to valley-01 (mw-e24.21), whose south gate leads back to the arrive-from-valley-01 spawn.",
   "grid": 1,
   "camera": {
     "position": [-14, 22, -10],
@@ -195,11 +195,38 @@
       "scale": [1.5, 1, 1]
     },
     {
-      "piece": "wall",
+      "piece": "doorway",
       "at": [0, 0, 40]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 43],
+      "scale": [1, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [-1, 0, 43],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1, 0, 43],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 46]
     }
   ],
   "spawns": [
+    {
+      "id": "arrive-from-valley-01",
+      "at": [0, 0, 42],
+      "yaw": 180,
+      "tags": ["arrival"]
+    },
     {
       "id": "player-start",
       "at": [0, 0, -2],
@@ -397,5 +424,14 @@
       }
     ]
   },
-  "ambience": [{ "zone": "slice-gallery" }]
+  "ambience": [{ "zone": "slice-gallery" }],
+  "transitions": [
+    {
+      "id": "mountain-road",
+      "min": [-1, -1, 44.25],
+      "max": [1, 3, 45.75],
+      "scene": "valley-01",
+      "spawn": "arrive-from-slice"
+    }
+  ]
 }
