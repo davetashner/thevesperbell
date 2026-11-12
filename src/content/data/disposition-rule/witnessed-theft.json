@@ -1,0 +1,6 @@
+{
+  "$schema": "../disposition-rule.schema.json",
+  "id": "witnessed-theft",
+  "notes": "This creature saw the player steal. Emitted by the stealing system with the witness as target.",
+  "delta": -20
+}

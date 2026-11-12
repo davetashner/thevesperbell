@@ -52,6 +52,7 @@ import { doorSchema } from './types/door.ts';
 import { elementFeedbackSchema } from './types/element-feedback.ts';
 import { environmentDamageSchema } from './types/environment-damage.ts';
 import { factSchema } from './types/fact.ts';
+import { dispositionRuleSchema } from './types/disposition-rule.ts';
 import { factionSchema } from './types/faction.ts';
 import { gameSchema } from './types/game.ts';
 import { checkItems, itemSchema } from './types/item.ts';
@@ -105,6 +106,7 @@ export const contentTypes = {
   creature: creatureSchema,
   dialogue: dialogueSchema,
   'cue-sheet': cueSheetSchema,
+  'disposition-rule': dispositionRuleSchema,
   door: doorSchema,
   'element-feedback': elementFeedbackSchema,
   'environment-damage': environmentDamageSchema,

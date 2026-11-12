@@ -1132,6 +1132,17 @@
             "prey",
             "predator"
           ]
+        },
+        "baseline": {
+          "description": "Disposition toward the player (−100..100) it starts at and decays back to (mw-e12.9); absent = seeded from its stance toward the player.",
+          "type": "integer",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "decayPerMinute": {
+          "description": "Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets.",
+          "type": "number",
+          "exclusiveMinimum": 0
         }
       },
       "additionalProperties": false

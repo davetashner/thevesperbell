@@ -57,6 +57,7 @@ export {
 } from './core/world';
 export * from './debug';
 export * from './deltas';
+export * from './disposition';
 export * from './economy';
 export * from './electricity';
 export * from './elements';
