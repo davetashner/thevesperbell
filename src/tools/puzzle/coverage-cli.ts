@@ -64,8 +64,21 @@ export const defaultIo: CliIo = {
   },
 };
 
-/** The coverage of every puzzle in `content`, each run headlessly. */
+const audits = new WeakMap<GameContent, ReturnType<typeof runAudit>>();
+
+/**
+ * The coverage of every puzzle in `content`, each run headlessly. Content is immutable once
+ * loaded, so one audit per content object serves every later call (the CLI tests call it often).
+ */
 export function auditContent(content: GameContent, rapier: typeof RAPIER) {
+  const cached = audits.get(content);
+  if (cached) return cached;
+  const audit = runAudit(content, rapier);
+  audits.set(content, audit);
+  return audit;
+}
+
+function runAudit(content: GameContent, rapier: typeof RAPIER) {
   const capabilityElements = capabilityElementsOf(content.all('spell'));
   const profiles = profilesOf(content);
   const coverages: PuzzleCoverage[] = content.all('puzzle').map((puzzle) => {
