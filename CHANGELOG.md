@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Tansy Pell now stands at Pell's Bakery once you have rescued her, and is not there before: characters can appear in and leave a scene as the story changes (mw-e24.22).
 - Briar Glen is now a whole town: at the north end of the shop lane a gate opens on Market Green, with its notice board, the Glen Well, the three-storey Lamplit Stacks leaning on the forge yard, the Watch House, the schoolhouse, the lychgate cemetery and Vane House's tower on its rise (visible from across town); doors to buildings without interiors yet are shut, and the mine road and priory road gates are signposted but not open (mw-e24.2).
 - Conversations now have a proper dialogue screen: a speaker name and portrait slot, lines that type out at a speed you choose (Enter shows the rest), replies you pick with 1 to 9, the arrows, a controller or the mouse, [Knight]-style tags, locked replies that say what they need, difficulty labels before a persuasion and its score breakdown after, and a history you open with H; text size, text background and the new Dialogue text speed and High contrast dialogue options apply to it (mw-e22.10).
 - You can now talk to the greybox villager in the debug conversation room: walk up, press Interact, and she stops walking her route to chat, picking up where she left off when you say goodbye, walk away or danger turns up.
