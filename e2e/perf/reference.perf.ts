@@ -175,6 +175,43 @@ test.describe('briar-glen-green at high', () => {
   });
 });
 
+// Mooring's Watch (mw-e25.6 AC-3: 180 × 100 m, viewed from the tower roof over the valley) at the High
+// preset, the same sampling as the Briarwood. Reference machine only.
+test.describe('moorings-watch at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the roof view over the valley at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'moorings-watch',
+      spawn: 'roof-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('moorings-watch high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'moorings-watch',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
 // The wall-clock load budgets that used to be PR e2e assertions (mw-e41.8): same moments, measured
 // in the page, enforced here against the reference machine. Budgets: perf/perf-budgets.json.
 test.describe('load budgets', () => {

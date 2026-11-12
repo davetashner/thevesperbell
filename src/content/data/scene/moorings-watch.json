@@ -1,0 +1,1350 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "moorings-watch",
+  "name": "Mooring's Watch",
+  "description": "Bead mw-e25.6 (with the forest-loop leg of mw-e25.25): the abandoned barony watchtower, a 180 x 100 m greybox on its spur. From the west gap (spur-gate, back to the Briarwood's moorings-gate; arrive-from-briarwood) the spur trail runs east between drop-off walls to the goblin lookout camp below the curtain wall (goblin-lookout, a ladder post at lookout-post), then through the courtyard gate (courtyard-gate) into the courtyard (moorings-courtyard). The tower (moorings-tower; region tower, which doubles as the Hollow Sentinels' leash volume) takes four floors of 3 m: the armour stand hall (armour-stand-a to d), the keeper's quarters with the keepers-log desk, the bell cord shaft (bell-cord, hanging through the roof) and the roof (tower-roof) with the signal-mirror plinth. Stairs wind up inside (three flights); two climbs go up outside, ivy on the south face (everyone: walk into it) and broken masonry on the east face (rough: a jump at it, thief and archer only). The supply tunnel's cellar door (supply-tunnel-door, lock tunnel-collapsed) stands in the courtyard's north wall, shut over a sealed vestibule: the tunnel beyond is mw-e26 and the way through it is mw-e25.9. East of the courtyard a plain of crags stands in for the valley (view it from roof-view). Encounters (mw-e25.7) and the signal mirror puzzle (mw-e25.8) are not built.",
+  "grid": 1,
+  "camera": {
+    "position": [-10, 14, 20],
+    "target": [30, 0, 45]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [90.0, 0.0, 50.0],
+      "scale": [90.0, 1.0, 50.0]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0.0, 0.0],
+      "scale": [90.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0.0, 100.0],
+      "scale": [90.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [180.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [50.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, 0.0, 20.5],
+      "yaw": 90,
+      "scale": [20.5, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, 0.0, 74.5],
+      "yaw": 90,
+      "scale": [25.5, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [19.0, 0.0, 33.0],
+      "scale": [19.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [19.0, 0.0, 57.0],
+      "scale": [19.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0.0, 20.0],
+      "scale": [20.0, 1.5, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [73.5, 0.0, 70.0],
+      "scale": [3.5, 1.5, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [94.5, 0.0, 70.0],
+      "scale": [15.5, 1.5, 1.0]
+    },
+    {
+      "piece": "doorway",
+      "at": [78.0, 0.0, 70.0]
+    },
+    {
+      "piece": "wall",
+      "at": [78.0, 3.0, 70.0],
+      "scale": [1.0, 0.5, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [70.0, 0.0, 31.0],
+      "yaw": 90,
+      "scale": [11.0, 1.5, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [70.0, 0.0, 59.0],
+      "yaw": 90,
+      "scale": [11.0, 1.5, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [110.0, 0.0, 45.0],
+      "yaw": 90,
+      "scale": [25.0, 1.5, 1.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [70.0, 0.0, 41.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [70.0, 0.0, 48.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, 0.0, 72.0],
+      "yaw": 90,
+      "scale": [2.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [80.0, 0.0, 72.0],
+      "yaw": 90,
+      "scale": [2.0, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [78.0, 0.0, 74.0],
+      "scale": [2.0, 1.0, 1.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [77.75, 0.0, 73.0],
+      "scale": [2.5, 0.39999999999999997, 1.6666666666666667]
+    },
+    {
+      "piece": "pillar",
+      "at": [79.25, 0.0, 71.5],
+      "scale": [1.6666666666666667, 0.19999999999999998, 1.6666666666666667]
+    },
+    {
+      "piece": "wall",
+      "at": [88.0, 0.0, 52.0],
+      "yaw": 90,
+      "scale": [6.0, 3.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [102.0, 0.0, 52.0],
+      "yaw": 90,
+      "scale": [6.0, 3.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [95.0, 0.0, 58.0],
+      "scale": [7.0, 3.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [91.0, 0.0, 46.0],
+      "scale": [3.0, 3.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [99.0, 0.0, 46.0],
+      "scale": [3.0, 3.0, 1.0]
+    },
+    {
+      "piece": "doorway",
+      "at": [95.0, 0.0, 46.0]
+    },
+    {
+      "piece": "wall",
+      "at": [95.0, 3.0, 46.0],
+      "scale": [1.0, 2.0, 1.0]
+    },
+    {
+      "piece": "floor",
+      "at": [96.0, 3.0, 52.0],
+      "scale": [6.0, 1.0, 6.0]
+    },
+    {
+      "piece": "floor",
+      "at": [89.0, 3.0, 55.5],
+      "scale": [1.0, 1.0, 2.5]
+    },
+    {
+      "piece": "floor",
+      "at": [94.0, 6.0, 52.0],
+      "scale": [6.0, 1.0, 6.0]
+    },
+    {
+      "piece": "floor",
+      "at": [101.0, 6.0, 48.5],
+      "scale": [1.0, 1.0, 2.5]
+    },
+    {
+      "piece": "floor",
+      "at": [92.0, 9.0, 52.0],
+      "scale": [2.0, 1.0, 6.0]
+    },
+    {
+      "piece": "floor",
+      "at": [99.0, 9.0, 52.0],
+      "scale": [3.0, 1.0, 6.0]
+    },
+    {
+      "piece": "floor",
+      "at": [95.0, 9.0, 48.5],
+      "scale": [1.0, 1.0, 2.5]
+    },
+    {
+      "piece": "floor",
+      "at": [95.0, 9.0, 55.5],
+      "scale": [1.0, 1.0, 2.5]
+    },
+    {
+      "piece": "floor",
+      "at": [89.0, 9.0, 55.5],
+      "scale": [1.0, 1.0, 2.5]
+    },
+    {
+      "piece": "stairs",
+      "at": [89.0, 0.0, 48.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [89.0, 1.0, 50.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [89.0, 2.0, 52.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [101.0, 3.0, 56.0],
+      "yaw": 180
+    },
+    {
+      "piece": "stairs",
+      "at": [101.0, 4.0, 54.0],
+      "yaw": 180
+    },
+    {
+      "piece": "stairs",
+      "at": [101.0, 5.0, 52.0],
+      "yaw": 180
+    },
+    {
+      "piece": "stairs",
+      "at": [89.0, 6.0, 48.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [89.0, 7.0, 50.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [89.0, 8.0, 52.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [89.0, 0.0, 50.0],
+      "scale": [3.3333333333333335, 0.3333333333333333, 3.3333333333333335]
+    },
+    {
+      "piece": "pillar",
+      "at": [101.0, 3.0, 54.0],
+      "scale": [3.3333333333333335, 0.3333333333333333, 3.3333333333333335]
+    },
+    {
+      "piece": "pillar",
+      "at": [89.0, 6.0, 50.0],
+      "scale": [3.3333333333333335, 0.3333333333333333, 3.3333333333333335]
+    },
+    {
+      "piece": "pillar",
+      "at": [89.0, 0.0, 52.0],
+      "scale": [3.3333333333333335, 0.6666666666666666, 3.3333333333333335]
+    },
+    {
+      "piece": "pillar",
+      "at": [101.0, 3.0, 52.0],
+      "scale": [3.3333333333333335, 0.6666666666666666, 3.3333333333333335]
+    },
+    {
+      "piece": "pillar",
+      "at": [89.0, 6.0, 52.0],
+      "scale": [3.3333333333333335, 0.6666666666666666, 3.3333333333333335]
+    },
+    {
+      "piece": "wall",
+      "at": [95.0, 9.0, 51.0],
+      "scale": [1.0, 0.3, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [95.0, 9.0, 53.0],
+      "scale": [1.0, 0.3, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [94.0, 9.0, 52.0],
+      "yaw": 90,
+      "scale": [1.0, 0.3, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [96.0, 9.0, 52.0],
+      "yaw": 90,
+      "scale": [1.0, 0.3, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [89.0, 9.0, 46.0],
+      "scale": [1.0, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [97.0, 9.0, 46.0],
+      "scale": [5.0, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [95.0, 9.0, 58.0],
+      "scale": [7.0, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [88.0, 9.0, 52.0],
+      "yaw": 90,
+      "scale": [6.0, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [102.0, 9.0, 48.5],
+      "yaw": 90,
+      "scale": [2.5, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [102.0, 9.0, 55.5],
+      "yaw": 90,
+      "scale": [2.5, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "platform",
+      "at": [91.0, 0.0, 45.75],
+      "scale": [0.5, 9.0, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ivy"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [102.25, 0.0, 52.0],
+      "scale": [0.25, 9.0, 0.5],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [92.0, 0.0, 49.0],
+      "scale": [0.4, 0.5, 0.4]
+    },
+    {
+      "piece": "platform",
+      "at": [98.0, 0.0, 49.0],
+      "scale": [0.4, 0.5, 0.4]
+    },
+    {
+      "piece": "platform",
+      "at": [92.0, 0.0, 55.0],
+      "scale": [0.4, 0.5, 0.4]
+    },
+    {
+      "piece": "platform",
+      "at": [98.0, 0.0, 55.0],
+      "scale": [0.4, 0.5, 0.4]
+    },
+    {
+      "piece": "platform",
+      "at": [96.0, 3.0, 56.5],
+      "scale": [0.8, 0.5, 0.4]
+    },
+    {
+      "piece": "platform",
+      "at": [99.0, 3.0, 48.0],
+      "scale": [0.5, 0.5, 1.0]
+    },
+    {
+      "piece": "platform",
+      "at": [100.0, 9.0, 49.0],
+      "scale": [0.5, 1.0, 0.5]
+    },
+    {
+      "piece": "platform",
+      "at": [44.0, 0.0, 36.0],
+      "scale": [1.5, 2.5, 0.875]
+    },
+    {
+      "piece": "platform",
+      "at": [44.0, 0.0, 35.0],
+      "scale": [0.4, 2.5, 0.125],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "crate",
+      "at": [54.0, 0.0, 27.0]
+    },
+    {
+      "piece": "crate",
+      "at": [56.0, 0.0, 28.5]
+    },
+    {
+      "piece": "crate",
+      "at": [52.5, 0.0, 29.0]
+    },
+    {
+      "piece": "crate",
+      "at": [58.0, 0.0, 26.0]
+    },
+    {
+      "piece": "platform",
+      "at": [55.0, 0.0, 31.0],
+      "scale": [1.0, 0.4, 0.75]
+    },
+    {
+      "piece": "platform",
+      "at": [100.0, 0.0, 28.0],
+      "scale": [1.5, 0.5, 1.0]
+    },
+    {
+      "piece": "platform",
+      "at": [84.0, 0.0, 62.0],
+      "scale": [1.2, 0.4, 1.5]
+    },
+    {
+      "piece": "platform",
+      "at": [104.0, 0.0, 36.0],
+      "scale": [0.8, 0.6, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [82.0, 0.0, 30.0]
+    },
+    {
+      "piece": "crate",
+      "at": [106.0, 0.0, 64.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [10.25, 0.0, 60.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [64.5, 0.0, 96.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [4.5, 0.0, 65.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [20.5, 0.0, 2.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [55.0, 0.0, 71.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [17.5, 0.0, 13.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [60.25, 0.0, 3.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [66.75, 0.0, 7.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [50.75, 0.0, 70.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [15.5, 0.0, 67.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [15.0, 0.0, 72.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [24.0, 0.0, 53.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [57.0, 0.0, 12.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [41.0, 0.0, 76.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [45.25, 0.0, 8.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [33.5, 0.0, 95.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [35.5, 0.0, 94.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [12.5, 0.0, 29.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [2.5, 0.0, 67.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [32.75, 0.0, 19.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [16.0, 0.0, 31.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [14.0, 0.0, 61.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [12.75, 0.0, 93.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [38.75, 0.0, 82.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [56.75, 0.0, 5.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [27.75, 0.0, 70.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [26.5, 0.0, 22.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [60.0, 0.0, 59.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [8.25, 0.0, 84.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [43.0, 0.0, 58.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [17.25, 0.0, 21.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [3.25, 0.0, 37.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [38.25, 0.0, 79.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [41.75, 0.0, 7.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [36.75, 0.0, 37.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [38.0, 0.0, 14.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [3.0, 0.0, 60.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [44.75, 0.0, 61.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [3.0, 0.0, 81.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [61.0, 0.0, 6.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [42.5, 0.0, 55.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [50.25, 0.0, 3.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [53.5, 0.0, 61.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [37.0, 0.0, 26.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [20.0, 0.0, 84.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [12.5, 0.0, 65.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [62.75, 0.0, 13.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [27.0, 0.0, 36.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [6.25, 0.0, 8.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [19.0, 0.0, 90.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [6.75, 0.0, 81.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [37.5, 0.0, 86.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [4.0, 0.0, 97.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [59.5, 0.0, 70.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [10.0, 0.0, 55.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [19.5, 0.0, 53.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [43.5, 0.0, 50.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [14.0, 0.0, 18.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [67.0, 0.0, 77.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [36.5, 0.0, 58.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [28.25, 0.0, 28.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [30.0, 0.0, 34.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [4.5, 0.0, 2.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [51.25, 0.0, 13.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [6.5, 0.0, 55.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [43.5, 0.0, 81.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [63.0, 0.0, 74.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [60.75, 0.0, 87.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [21.25, 0.0, 30.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [10.0, 0.0, 6.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [52.0, 0.0, 83.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [43.25, 0.0, 95.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [53.75, 0.0, 58.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [7.5, 0.0, 52.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [12.5, 0.0, 27.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [37.75, 0.0, 65.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [31.25, 0.0, 79.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [64.0, 0.0, 4.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [52.5, 0.0, 88.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [10.75, 0.0, 21.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [7.25, 0.0, 66.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [61.5, 0.0, 90.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [35.25, 0.0, 71.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [61.0, 0.0, 8.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [40.75, 0.0, 81.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [21.25, 0.0, 94.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [63.0, 0.0, 93.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [4.0, 0.0, 91.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [53.5, 0.0, 73.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [31.75, 0.0, 2.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [34.0, 0.0, 14.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [44.5, 0.0, 4.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [66.25, 0.0, 3.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [19.25, 0.0, 5.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [47.75, 0.0, 98.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [22.75, 0.0, 17.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [41.5, 0.0, 3.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [29.25, 0.0, 64.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [57.75, 0.0, 58.5],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [46.25, 0.0, 53.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [46.5, 0.0, 92.25],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [42.25, 0.0, 63.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [50.5, 0.0, 73.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [49.75, 0.0, 6.0],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [49.75, 0.0, 76.75],
+      "scale": [1.5, 2.0, 1.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [173.0, 0.0, 58.5],
+      "scale": [5.0, 4.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [134.75, 0.0, 44.75],
+      "scale": [3.0, 6.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [174.75, 0.0, 20.5],
+      "scale": [3.0, 4.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [164.5, 0.0, 79.5],
+      "scale": [3.0, 4.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [140.75, 0.0, 15.25],
+      "scale": [5.0, 4.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [128.75, 0.0, 30.0],
+      "scale": [3.0, 4.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [130.75, 0.0, 92.0],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [175.0, 0.0, 85.0],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [142.0, 0.0, 85.75],
+      "scale": [3.0, 6.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [125.25, 0.0, 65.0],
+      "scale": [4.0, 6.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [117.75, 0.0, 87.5],
+      "scale": [5.0, 4.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [131.75, 0.0, 52.5],
+      "scale": [5.0, 6.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [170.0, 0.0, 11.5],
+      "scale": [5.0, 5.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [168.25, 0.0, 42.75],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [144.75, 0.0, 72.5],
+      "scale": [4.0, 5.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [144.75, 0.0, 44.75],
+      "scale": [3.0, 5.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [164.5, 0.0, 47.5],
+      "scale": [4.0, 6.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [145.25, 0.0, 26.25],
+      "scale": [4.0, 5.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [120.5, 0.0, 4.0],
+      "scale": [4.0, 5.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [167.0, 0.0, 65.75],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [162.5, 0.0, 40.75],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [159.75, 0.0, 33.0],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [157.25, 0.0, 66.0],
+      "scale": [5.0, 5.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [131.5, 0.0, 69.0],
+      "scale": [3.0, 6.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [153.75, 0.0, 25.75],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [152.75, 0.0, 51.0],
+      "scale": [3.0, 5.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [130.0, 0.0, 16.0],
+      "scale": [5.0, 5.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [128.5, 0.0, 37.0],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [117.5, 0.0, 31.5],
+      "scale": [5.0, 6.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [164.25, 0.0, 14.25],
+      "scale": [5.0, 5.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [165.25, 0.0, 24.75],
+      "scale": [3.0, 4.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [169.25, 0.0, 75.25],
+      "scale": [4.0, 6.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [127.25, 0.0, 43.0],
+      "scale": [5.0, 6.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [136.5, 0.0, 22.75],
+      "scale": [3.0, 5.0, 3.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [166.5, 0.0, 93.0],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [138.0, 0.0, 5.0],
+      "scale": [4.0, 4.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [172.5, 0.0, 92.25],
+      "scale": [5.0, 4.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [155.25, 0.0, 75.5],
+      "scale": [5.0, 5.0, 5.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [147.75, 0.0, 4.5],
+      "scale": [4.0, 6.0, 4.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [127.75, 0.0, 9.25],
+      "scale": [5.0, 6.0, 5.0]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [10.0, 0.0, 45.0],
+      "yaw": 90,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "arrive-from-briarwood",
+      "at": [6.0, 0.0, 45.0],
+      "yaw": 90,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "spur-gate",
+      "at": [2.0, 0.0, 45.0],
+      "tags": ["transition"]
+    },
+    {
+      "id": "goblin-lookout",
+      "at": [52.0, 0.0, 28.0],
+      "tags": ["node", "goblin-camp", "encounter-stub"]
+    },
+    {
+      "id": "lookout-post",
+      "at": [44.0, 2.5, 36.0],
+      "tags": ["lookout"]
+    },
+    {
+      "id": "courtyard-gate",
+      "at": [70.0, 0.0, 45.0],
+      "tags": ["gate"]
+    },
+    {
+      "id": "moorings-courtyard",
+      "at": [78.0, 0.0, 45.0],
+      "tags": ["node"]
+    },
+    {
+      "id": "moorings-tower",
+      "at": [95.0, 0.0, 48.0],
+      "tags": ["node", "tower"]
+    },
+    {
+      "id": "armour-stand-a",
+      "at": [92.0, 0.5, 49.0],
+      "tags": ["armour-stand", "sentinel-post"]
+    },
+    {
+      "id": "armour-stand-b",
+      "at": [98.0, 0.5, 49.0],
+      "tags": ["armour-stand", "sentinel-post"]
+    },
+    {
+      "id": "armour-stand-c",
+      "at": [92.0, 0.5, 55.0],
+      "tags": ["armour-stand", "sentinel-post"]
+    },
+    {
+      "id": "armour-stand-d",
+      "at": [98.0, 0.5, 55.0],
+      "tags": ["armour-stand", "sentinel-post"]
+    },
+    {
+      "id": "keepers-log",
+      "at": [96.0, 3.5, 56.5],
+      "tags": ["keepers-log"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the keeper's log"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "bell-cord",
+      "at": [95.0, 6.0, 52.0],
+      "tags": ["bell-cord"]
+    },
+    {
+      "id": "tower-roof",
+      "at": [97.0, 9.0, 49.0],
+      "tags": ["roof"]
+    },
+    {
+      "id": "roof-view",
+      "at": [98.0, 9.0, 54.0],
+      "yaw": 90,
+      "tags": ["roof"]
+    },
+    {
+      "id": "signal-mirror",
+      "at": [100.0, 10.0, 49.0],
+      "tags": ["signal-mirror", "puzzle-stub"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Examine the signal mirror"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "ivy-climb-foot",
+      "at": [91.0, 0.0, 44.5],
+      "tags": ["climb-route"]
+    },
+    {
+      "id": "masonry-climb-foot",
+      "at": [103.5, 0.0, 52.0],
+      "tags": ["climb-route"]
+    },
+    {
+      "id": "supply-tunnel",
+      "at": [78.0, 0.0, 67.5],
+      "tags": ["node", "tunnel-entry"]
+    },
+    {
+      "id": "supply-tunnel-door",
+      "at": [78.0, 0.0, 70.0],
+      "tags": ["tunnel-entry"],
+      "door": {
+        "profile": "iron-door",
+        "lock": "tunnel-collapsed"
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.4,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.4, -1, 0.3],
+        "level": 0.6,
+        "reach": 80
+      }
+    ]
+  },
+  "environment": {
+    "sky": "#8FA6BC",
+    "fog": {
+      "color": "#B4C3CE",
+      "near": 40,
+      "far": 190
+    }
+  },
+  "regions": [
+    {
+      "id": "moorings-watch",
+      "min": [0, -2, 0],
+      "max": [180, 40, 100],
+      "tags": ["region", "ruin"]
+    },
+    {
+      "id": "tower",
+      "min": [87.9, -2, 45.9],
+      "max": [102.1, 14, 58.1],
+      "tags": ["region", "tower", "sentinel-leash"]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "spur-gate",
+      "min": [0.25, -1, 42],
+      "max": [1.75, 3, 48],
+      "scene": "briarwood",
+      "spawn": "arrive-from-moorings-watch"
+    }
+  ]
+}
