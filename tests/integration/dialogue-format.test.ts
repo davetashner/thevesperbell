@@ -49,7 +49,7 @@ describe('dialogue format fixtures', () => {
     const classes = options.flatMap((o) =>
       o.when?.kind === 'playerClass' ? [o.when['class']] : [],
     );
-    expect(new Set(classes)).toEqual(new Set(['knight', 'thief']));
+    expect(new Set(classes)).toEqual(new Set(['knight', 'thief', 'archer']));
     expect(JSON.stringify(content.all('dialogue'))).toContain('dialogue.visitedCount');
   });
 

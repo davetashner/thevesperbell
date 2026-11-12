@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../data/dialogue.schema.json",
+  "id": "greybox-greeting",
+  "notes": "Dev-only grey box (mw-e22.9), not shipped: the greybox villager's chat, to try walking up to someone and talking in a debug build (?scene=conversation-room&debug=1). Enter or E continues a line; 1 to 9 picks an option. The real conversations are written under E39.",
+  "speakers": [{ "id": "villager", "npc": "greybox-villager" }],
+  "entries": [
+    {
+      "id": "return",
+      "when": { "kind": "dialogue.visitedCount", "id": "hello", "op": "gte", "value": 1 },
+      "node": "hello-again"
+    },
+    { "id": "first-meeting", "node": "hello" }
+  ],
+  "nodes": [
+    {
+      "id": "hello",
+      "kind": "line",
+      "speaker": "villager",
+      "text": "Oh, hello there. Don't mind me, I'm only walking my rounds.",
+      "next": "menu"
+    },
+    {
+      "id": "hello-again",
+      "kind": "line",
+      "speaker": "villager",
+      "text": "Back again? I haven't got far with my rounds.",
+      "next": "menu"
+    },
+    {
+      "id": "menu",
+      "kind": "choice",
+      "options": [
+        { "id": "who", "text": "Who are you?", "once": true, "next": "who-line" },
+        { "id": "news", "text": "Heard anything lately?", "once": true, "next": "news-line" },
+        { "id": "leave", "text": "Goodbye.", "end": true }
+      ]
+    },
+    {
+      "id": "who-line",
+      "kind": "line",
+      "speaker": "villager",
+      "text": "Nobody much. A stand-in with a route to walk and a few things to say.",
+      "next": "menu"
+    },
+    {
+      "id": "news-line",
+      "kind": "line",
+      "speaker": "villager",
+      "text": "Only that someone has been talking to me, which makes a change.",
+      "next": "menu"
+    }
+  ]
+}

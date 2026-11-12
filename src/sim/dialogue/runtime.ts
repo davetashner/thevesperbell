@@ -252,6 +252,13 @@ function textKey(dialogue: string, node: string, option?: string): string {
   return `dialogue.${dialogue}.${node}${option === undefined ? '' : `.${option}`}`;
 }
 
+/** Whether a condition tree has a `disposition` node anywhere in it. */
+function readsDisposition(node: unknown): boolean {
+  if (typeof node !== 'object' || node === null) return false;
+  if ((node as { kind?: unknown }).kind === 'disposition') return true;
+  return Object.values(node).some(readsDisposition);
+}
+
 /** Where a conversation is: the dialogue (a `jump` changes it) and who is being talked to. */
 interface Position {
   dialogue: DialogueDef;
@@ -318,6 +325,24 @@ export class DialogueRuntime {
     }
     this.emit(DialogueStarted, { dialogue: dialogueId, npc, entry: entry.id });
     return this.enter({ dialogue, npc }, entry.node);
+  }
+
+  /**
+   * Whether `npc` can be talked to while hostile (mw-e22.9): some entry of the dialogue is written
+   * for that state, meaning its condition reads a `disposition`, and holds now (a parley). A
+   * hostile NPC whose dialogue has none refuses to talk. Authors put such an entry before any
+   * entry a hostile NPC should not reach, since `start` takes the first that holds.
+   */
+  canParley(dialogueId: string, npc: string): boolean {
+    const dialogue = this.options.dialogues(dialogueId);
+    if (dialogue === undefined) return false;
+    const context = this.contextFor(npc, dialogueId);
+    return dialogue.entries.some(
+      (e) =>
+        e.when !== undefined &&
+        readsDisposition(e.when) &&
+        evaluateLogic(e.when, context, this.registry),
+    );
   }
 
   /** Moves past the current `line`: to its `next`, or ends the conversation. */

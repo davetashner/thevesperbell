@@ -412,6 +412,36 @@
       "scene": "briarwood",
       "preset": "high",
       "note": "mw-e25.1 AC-4. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "briar-glen-green-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "note": "mw-e24.2 AC-4. The 180 × 140 m Briar Glen grey-box town viewed from Market Green (the scene's player-start). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "briar-glen-green-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "note": "mw-e24.2 AC-4. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "briar-glen-green-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "note": "mw-e24.2 AC-4. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
     }
   ]
 }

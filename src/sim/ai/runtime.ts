@@ -31,6 +31,9 @@
 // think; it searches for its `leashSearchS` and then takes Searching's timeout. A leashed agent
 // takes no transition into Combat while it believes its target is beyond its leash.
 //
+// Conversing (mw-e22.9, conversing.ts): an agent in a conversation with the player is skipped
+// altogether (its routine paused) until the conversation ends.
+//
 // All brain state is plain data in `ai.brain`. A despawned agent's brain leaves with it at the end
 // of the tick, so from then on nothing runs for it; an agent whose behaviour this world does not
 // know is skipped.
@@ -53,6 +56,7 @@ import {
   type CompiledState,
 } from './behaviour';
 import { DEFAULT_ATTACK_TOKENS, isStaggered } from './combat';
+import { isConversing } from './conversing';
 import { AlertStateChanged, BrainComponent, type Blackboard, type Brain } from './components';
 import { leashAllows, leashBroken } from './leash';
 import { DEFAULT_MEMORY_TUNING, type MemoryTuning } from './memory';
@@ -291,6 +295,8 @@ function aiSystem<TInput>(runtime: AiRuntime): System<TInput> {
         if (health !== undefined && health.current <= 0) return undefined;
         // Frozen solid, it does nothing until it thaws (mw-e03.24).
         if (isFrozenSolid(world, entity)) return undefined;
+        // Talking to the player, it keeps still until the conversation ends (mw-e22.9).
+        if (isConversing(world, entity)) return undefined;
         view.entity = entity;
         view.brain = brain;
         view.creature = getIf(world, entity, CreatureComponent);

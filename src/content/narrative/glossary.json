@@ -1,0 +1,989 @@
+{
+  "version": 1,
+  "source": "docs/narrative/story-bible.md (CANON v1)",
+  "characters": [
+    {
+      "id": "npc-mirela",
+      "name": "Mirela Thorne",
+      "section": "5.1",
+      "tier": "principal",
+      "role": "bookseller, the Lamplit Stacks"
+    },
+    {
+      "id": "npc-hale",
+      "name": "Brannoc Hale",
+      "title": "Captain",
+      "section": "5.2",
+      "tier": "principal",
+      "role": "guard captain"
+    },
+    {
+      "id": "npc-vane",
+      "name": "Harrow Vane",
+      "section": "5.3",
+      "tier": "principal",
+      "role": "mine owner"
+    },
+    {
+      "id": "npc-dot",
+      "name": "Odette \"Dot\" Farrow",
+      "section": "5.4",
+      "tier": "principal",
+      "role": "innkeeper and rumour-monger, the Sleeping Ox"
+    },
+    {
+      "id": "npc-hollis",
+      "name": "Hollis Pell",
+      "section": "5.5",
+      "tier": "principal",
+      "role": "baker"
+    },
+    {
+      "id": "npc-juniper",
+      "name": "Juniper Fenn",
+      "section": "5.6",
+      "tier": "principal",
+      "role": "fletcher and herbalist (merchant)"
+    },
+    {
+      "id": "npc-oswin",
+      "name": "Oswin Brand",
+      "section": "5.7",
+      "tier": "principal",
+      "role": "smith (merchant)"
+    },
+    {
+      "id": "npc-horn",
+      "name": "Brother Horn",
+      "section": "5.8",
+      "tier": "principal",
+      "role": "the minotaur, Warden of the Knot"
+    },
+    {
+      "id": "npc-clatter",
+      "name": "Clatter",
+      "section": "5.9",
+      "tier": "principal",
+      "role": "the skeleton who remembers (Brother Anselm Hobb)"
+    },
+    {
+      "id": "npc-kettleback",
+      "name": "Mother Kettleback",
+      "section": "5.10",
+      "tier": "principal",
+      "role": "goblin matriarch"
+    },
+    {
+      "id": "npc-snig",
+      "name": "Snig",
+      "section": "5.11",
+      "tier": "principal",
+      "role": "goblin scout"
+    },
+    {
+      "id": "npc-abbot",
+      "name": "The Sleepless Abbot",
+      "section": "5.12",
+      "tier": "principal",
+      "role": "the wraith (Corvin Ashgrove)"
+    },
+    {
+      "id": "npc-mags",
+      "name": "Mags Oakum",
+      "section": "5.13",
+      "tier": "principal",
+      "role": "bargewoman, skipper of the Patient Ann"
+    },
+    {
+      "id": "npc-nell",
+      "name": "Nell Gannet",
+      "section": "5.13",
+      "tier": "principal",
+      "role": "keeper of the Drowned Gull, queen of the Low Tide Company"
+    },
+    {
+      "id": "npc-cray",
+      "name": "Prudence Cray",
+      "title": "Inspector",
+      "section": "5.13",
+      "tier": "principal",
+      "role": "Lantern Court customs inspector"
+    },
+    {
+      "id": "npc-tereza",
+      "name": "Tereza Maelo",
+      "section": "5.13",
+      "tier": "principal",
+      "role": "import merchant, retired duellist"
+    },
+    {
+      "id": "npc-quell",
+      "name": "Jasper Quell",
+      "section": "5.13",
+      "tier": "principal",
+      "role": "shipping agent, Vane Deepworks"
+    },
+    {
+      "id": "npc-duggan",
+      "name": "Duggan Marl",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "Vane's foreman"
+    },
+    {
+      "id": "npc-tansy",
+      "name": "Tansy Pell",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "the baker's daughter, twelve"
+    },
+    {
+      "id": "npc-moss",
+      "name": "Moss Greaves",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "one of the six missing"
+    },
+    {
+      "id": "npc-ettie",
+      "name": "Ettie Lark",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "one of the six missing"
+    },
+    {
+      "id": "npc-rowan",
+      "name": "Rowan Tate",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "one of the six missing"
+    },
+    {
+      "id": "npc-harlan",
+      "name": "Harlan Burr",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "one of the six missing"
+    },
+    {
+      "id": "npc-mina",
+      "name": "Mina Coles",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "one of the six missing, the schoolteacher"
+    },
+    {
+      "id": "npc-fitch",
+      "name": "Fitch",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "one of the six missing, the barman at the Sleeping Ox"
+    },
+    {
+      "id": "npc-mortimer",
+      "name": "Mortimer",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "tame book mimic"
+    },
+    {
+      "id": "npc-mooring",
+      "name": "Aldric Mooring",
+      "title": "Sergeant",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "historical: sergeant who held Mooring's Watch"
+    },
+    {
+      "id": "npc-ysolde",
+      "name": "Ysolde Thorne",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "historical"
+    },
+    {
+      "id": "npc-oona",
+      "name": "Big Oona",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "dockhand, arm-wrestling champion of the Drowned Gull"
+    },
+    {
+      "id": "npc-reed",
+      "name": "Old Reed",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "Kestrel Lock keeper"
+    },
+    {
+      "id": "npc-hesketh",
+      "name": "Hesketh",
+      "title": "Captain",
+      "section": "5.14",
+      "tier": "minor",
+      "role": "captain of the Gilded Tern"
+    },
+    {
+      "id": "npc-ottilie",
+      "name": "Ottilie Marsh",
+      "section": "5.15",
+      "tier": "minor",
+      "role": "shopkeeper, Marsh's General Store (merchant)"
+    },
+    {
+      "id": "npc-garrick",
+      "name": "Maud Garrick",
+      "title": "Sergeant",
+      "section": "5.16",
+      "tier": "minor",
+      "role": "fighting instructor, Bridgeward College"
+    },
+    {
+      "id": "npc-rooke",
+      "name": "Ewan Rooke",
+      "title": "Master",
+      "section": "5.16",
+      "tier": "minor",
+      "role": "archery instructor, Bridgeward College"
+    },
+    {
+      "id": "npc-quillon",
+      "name": "Idris Quillon",
+      "section": "5.17",
+      "tier": "minor",
+      "role": "sorcery teacher under the bridge"
+    }
+  ],
+  "places": [
+    {
+      "id": "place-briar-glen",
+      "name": "Briar Glen",
+      "section": "3.5",
+      "kind": "town"
+    },
+    {
+      "id": "place-sleeping-ox",
+      "name": "The Sleeping Ox",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-lamplit-stacks",
+      "name": "The Lamplit Stacks",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-brands-forge",
+      "name": "Brand's Forge",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-fenns-fletchery",
+      "name": "Fenn's Fletchery & Simples",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-pells-bakery",
+      "name": "Pell's Bakery",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-marshs-general-store",
+      "name": "Marsh's General Store",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-watch-house",
+      "name": "The Watch House",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-vane-house",
+      "name": "Vane House",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-glen-well",
+      "name": "The Glen Well",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-miners-bridge",
+      "name": "The Miners' Bridge",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-bridgeward-college",
+      "name": "The Bridgeward College",
+      "section": "3.5",
+      "kind": "building"
+    },
+    {
+      "id": "place-briarwood",
+      "name": "The Briarwood",
+      "section": "3.5",
+      "kind": "wilderness"
+    },
+    {
+      "id": "place-standing-horn",
+      "name": "The Standing Horn",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-mooring-watch",
+      "name": "Mooring's Watch",
+      "section": "3.5",
+      "kind": "dungeon"
+    },
+    {
+      "id": "place-deepworks",
+      "name": "The Deepworks",
+      "section": "3.5",
+      "kind": "dungeon"
+    },
+    {
+      "id": "place-bellwater-priory",
+      "name": "Bellwater Priory",
+      "section": "3.5",
+      "kind": "dungeon"
+    },
+    {
+      "id": "place-knot",
+      "name": "The Knot",
+      "section": "3.5",
+      "kind": "dungeon"
+    },
+    {
+      "id": "place-fold",
+      "name": "The Fold",
+      "section": "3.5",
+      "kind": "room"
+    },
+    {
+      "id": "place-cradle",
+      "name": "The Cradle",
+      "section": "3.5",
+      "kind": "room"
+    },
+    {
+      "id": "place-river-wend",
+      "name": "The River Wend",
+      "section": "3.5",
+      "kind": "route"
+    },
+    {
+      "id": "place-briar-glen-quay",
+      "name": "Briar Glen Quay",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-stone-stair",
+      "name": "The Stone Stair",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-millweir",
+      "name": "The Millweir",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-weeping-adit",
+      "name": "The Weeping Adit",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-kestrel-lock",
+      "name": "Kestrel Lock",
+      "section": "3.5",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-wendmouth",
+      "name": "Wendmouth",
+      "section": "3.5",
+      "kind": "town"
+    },
+    {
+      "id": "place-stone-wharf",
+      "name": "The Stone Wharf",
+      "section": "3.6",
+      "kind": "landmark"
+    },
+    {
+      "id": "place-customs-house",
+      "name": "The Customs House",
+      "section": "3.6",
+      "kind": "building"
+    },
+    {
+      "id": "place-bonded-warehouse",
+      "name": "The Bonded Warehouse",
+      "section": "3.6",
+      "kind": "building"
+    },
+    {
+      "id": "place-bay-nine",
+      "name": "Bay nine",
+      "section": "3.6",
+      "kind": "room"
+    },
+    {
+      "id": "place-drowned-gull",
+      "name": "The Drowned Gull",
+      "section": "3.6",
+      "kind": "building"
+    },
+    {
+      "id": "place-tidemarket",
+      "name": "The Tidemarket",
+      "section": "3.6",
+      "kind": "building"
+    },
+    {
+      "id": "place-undertow",
+      "name": "The Undertow",
+      "section": "3.6",
+      "kind": "district"
+    },
+    {
+      "id": "place-net-lofts",
+      "name": "The Net Lofts",
+      "section": "3.6",
+      "kind": "district"
+    },
+    {
+      "id": "place-breakwater",
+      "name": "The Breakwater",
+      "section": "3.6",
+      "kind": "landmark"
+    }
+  ],
+  "creatures": [
+    {
+      "id": "species-forgotten",
+      "name": "The Forgotten",
+      "section": "8"
+    },
+    {
+      "id": "species-rootcellar-goblins",
+      "name": "Rootcellar Goblins",
+      "section": "8"
+    },
+    {
+      "id": "species-brother-horn",
+      "name": "Brother Horn",
+      "section": "8"
+    },
+    {
+      "id": "species-loom-spiders",
+      "name": "Loom Spiders",
+      "section": "8"
+    },
+    {
+      "id": "species-briar-wolves",
+      "name": "Briar Wolves",
+      "section": "8"
+    },
+    {
+      "id": "species-hushlings",
+      "name": "Hushlings",
+      "section": "8"
+    },
+    {
+      "id": "species-tallow-ooze",
+      "name": "Tallow Ooze",
+      "section": "8"
+    },
+    {
+      "id": "species-mimics",
+      "name": "Mimics",
+      "section": "8"
+    },
+    {
+      "id": "species-hollow-sentinels",
+      "name": "Hollow Sentinels",
+      "section": "8"
+    },
+    {
+      "id": "species-sleepless-abbot",
+      "name": "The Sleepless Abbot",
+      "section": "8"
+    }
+  ],
+  "numbers": [
+    {
+      "id": "long-vespers-years-ago",
+      "quote": "61 years ago",
+      "label": "The Long Vespers happened",
+      "value": 61,
+      "unit": "years ago"
+    },
+    {
+      "id": "priory-age",
+      "quote": "~300 years ago",
+      "label": "The priory was founded, built of the first glenstone cut",
+      "value": 300,
+      "unit": "years ago",
+      "occurrences": 2,
+      "approximate": true
+    },
+    {
+      "id": "breach-months-ago",
+      "quote": "3 months ago",
+      "label": "The breach opened",
+      "value": 3,
+      "unit": "months ago"
+    },
+    {
+      "id": "disappearance-weeks",
+      "quote": "3 weeks",
+      "label": "The disappearances have lasted",
+      "value": 3,
+      "unit": "weeks"
+    },
+    {
+      "id": "missing-count",
+      "quote": "6 missing before the game, Tansy the 7th",
+      "label": "Missing before the game; Tansy the seventh",
+      "value": 6,
+      "unit": "people"
+    },
+    {
+      "id": "mooring-watch-abandoned",
+      "quote": "~40 years",
+      "label": "Mooring's Watch was abandoned (garrison left)",
+      "value": 40,
+      "unit": "years ago",
+      "approximate": true
+    },
+    {
+      "id": "tansy-age",
+      "quote": "12",
+      "label": "Tansy Pell's age",
+      "value": 12,
+      "unit": "years",
+      "occurrences": 2
+    },
+    {
+      "id": "goblins-cannot-read",
+      "quote": "cannot read and do not dream",
+      "label": "Goblins cannot read and do not dream",
+      "value": "cannot read, do not dream"
+    },
+    {
+      "id": "river-trade-age",
+      "quote": "~250 years ago",
+      "label": "Stone mine, river trade, Kestrel Lock and the Wendmouth charter date from",
+      "value": 250,
+      "unit": "years ago",
+      "approximate": true
+    },
+    {
+      "id": "vane-generations",
+      "quote": "five generations",
+      "label": "The Vanes have run the Deepworks for",
+      "value": 5,
+      "unit": "generations"
+    },
+    {
+      "id": "silver-struck",
+      "quote": "~35 years ago",
+      "label": "Silver was struck, above the Bell Line, by Harrow Vane's grandfather",
+      "value": 35,
+      "unit": "years ago",
+      "approximate": true
+    },
+    {
+      "id": "barge-journey",
+      "quote": "1 day downriver, 2 days up",
+      "label": "Barge journey between Briar Glen and Wendmouth",
+      "value": "1 day downriver, 2 days up (towed)"
+    },
+    {
+      "id": "relic-shipments-began",
+      "quote": "~2 months ago",
+      "label": "Relic shipments began (after the breach)",
+      "value": 2,
+      "unit": "months ago",
+      "approximate": true
+    },
+    {
+      "id": "bay-nine-crate-number",
+      "quote": "fourth",
+      "label": "The crate in bay nine is the fourth shipment",
+      "value": 4,
+      "unit": "shipment"
+    },
+    {
+      "id": "bay-nine-crate-contents",
+      "quote": "40 horn-coins, 3 carved stones, 1 name-stone",
+      "label": "The bay-nine crate holds",
+      "value": "40 horn-coins, 3 carved stones, 1 name-stone"
+    },
+    {
+      "id": "brass-trinkets-ordered",
+      "quote": "40",
+      "label": "Brass trinkets ordered",
+      "value": 40,
+      "unit": "trinkets"
+    },
+    {
+      "id": "tern-sails",
+      "quote": "when Act III begins",
+      "label": "The Gilded Tern sails (no real-time clock)",
+      "value": "when Act III begins"
+    },
+    {
+      "id": "mags-stone-years",
+      "quote": "30 years",
+      "label": "Mags has carried stone for",
+      "value": 30,
+      "unit": "years"
+    },
+    {
+      "id": "mags-crate-months",
+      "quote": "2 months",
+      "label": "Mags has carried Vane's crates for",
+      "value": 2,
+      "unit": "months"
+    },
+    {
+      "id": "ardley-dead",
+      "quote": "dead a year",
+      "label": "Seal clerk E. Ardley has been",
+      "value": 1,
+      "unit": "year dead"
+    },
+    {
+      "id": "creature-roster-after-wendmouth",
+      "quote": "10",
+      "label": "Creature roster after Wendmouth (no new types)",
+      "value": 10,
+      "unit": "types"
+    },
+    {
+      "id": "rootcellar-clan-size",
+      "quote": "~20",
+      "label": "Rootcellar clan goblins",
+      "value": 20,
+      "unit": "goblins",
+      "approximate": true
+    },
+    {
+      "id": "oswin-father-clapper",
+      "quote": "~80 years ago",
+      "label": "Oswin's father cast the replacement clapper",
+      "value": 80,
+      "unit": "years ago",
+      "approximate": true
+    },
+    {
+      "id": "age-mirela",
+      "quote": "fifties",
+      "label": "Mirela's age",
+      "value": "fifties"
+    },
+    {
+      "id": "age-mags",
+      "quote": "fifties",
+      "label": "Mags's age",
+      "value": "fifties"
+    },
+    {
+      "id": "age-hale",
+      "quote": "sixty",
+      "label": "Hale's age",
+      "value": "sixty"
+    },
+    {
+      "id": "age-nell",
+      "quote": "sixty",
+      "label": "Nell's age",
+      "value": "sixty"
+    },
+    {
+      "id": "age-vane",
+      "quote": "forty",
+      "label": "Vane's age",
+      "value": "forty"
+    },
+    {
+      "id": "age-juniper",
+      "quote": "thirties",
+      "label": "Juniper's age",
+      "value": "thirties"
+    },
+    {
+      "id": "age-quell",
+      "quote": "thirties",
+      "label": "Quell's age",
+      "value": "thirties"
+    },
+    {
+      "id": "age-oswin",
+      "quote": "seventy",
+      "label": "Oswin's age",
+      "value": "seventy"
+    },
+    {
+      "id": "age-cray",
+      "quote": "forties",
+      "label": "Cray's age",
+      "value": "forties"
+    },
+    {
+      "id": "age-tereza",
+      "quote": "forties",
+      "label": "Tereza's age",
+      "value": "forties"
+    },
+    {
+      "id": "horn-height",
+      "quote": "nine feet",
+      "label": "Horn's height (about 2.75 m)",
+      "value": 9,
+      "unit": "feet"
+    },
+    {
+      "id": "bounty",
+      "quote": "500 crowns, raised to 800",
+      "label": "The bounty on the disappearances",
+      "value": "500 crowns, raised to 800 crowns"
+    },
+    {
+      "id": "principal-count",
+      "quote": "12 principal characters",
+      "label": "Principal characters (5.1 to 5.12)",
+      "value": 12,
+      "unit": "characters"
+    },
+    {
+      "id": "harbour-principal-count",
+      "quote": "5 harbour principals",
+      "label": "Harbour principals (5.13)",
+      "value": 5,
+      "unit": "characters"
+    },
+    {
+      "id": "creature-type-count",
+      "quote": "10 creature types",
+      "label": "Creature types in the MVP roster",
+      "value": 10,
+      "unit": "types"
+    },
+    {
+      "id": "side-quest-count",
+      "quote": "8 side quests",
+      "label": "Side quests: 5 in the valley, 3 in Wendmouth",
+      "value": 8,
+      "unit": "quests"
+    },
+    {
+      "id": "ending-count",
+      "quote": "4 headline endings",
+      "label": "Headline endings",
+      "value": 4,
+      "unit": "endings"
+    },
+    {
+      "id": "rumour-count",
+      "quote": "18 rumours",
+      "label": "Rumours: 12 in the valley, 6 on the river and harbour",
+      "value": 18,
+      "unit": "rumours"
+    }
+  ],
+  "terms": [
+    {
+      "id": "term-bell-line",
+      "name": "Bell Line",
+      "section": "11.2"
+    },
+    {
+      "id": "term-crowns",
+      "name": "Crowns",
+      "section": "11.2"
+    },
+    {
+      "id": "term-empire",
+      "name": "The empire",
+      "section": "11.2"
+    },
+    {
+      "id": "term-glenstone",
+      "name": "Glenstone",
+      "section": "11.2"
+    },
+    {
+      "id": "term-forgotten-name",
+      "name": "The Forgotten",
+      "section": "11.2"
+    },
+    {
+      "id": "term-friend-below",
+      "name": "A friend below",
+      "section": "11.2"
+    },
+    {
+      "id": "term-hornfolk",
+      "name": "Hornfolk",
+      "section": "11.2"
+    },
+    {
+      "id": "term-hushlings-name",
+      "name": "Hushlings",
+      "section": "11.2"
+    },
+    {
+      "id": "term-measure",
+      "name": "The Measure",
+      "section": "11.2"
+    },
+    {
+      "id": "term-lantern-court",
+      "name": "The Lantern Court",
+      "section": "11.2"
+    },
+    {
+      "id": "term-long-vespers",
+      "name": "The Long Vespers",
+      "section": "11.2"
+    },
+    {
+      "id": "term-low-tide-company",
+      "name": "The Low Tide Company",
+      "section": "11.2"
+    },
+    {
+      "id": "term-mr-s",
+      "name": "Mr. S—",
+      "section": "11.2"
+    },
+    {
+      "id": "term-nightjar",
+      "name": "The Nightjar",
+      "section": "11.2"
+    },
+    {
+      "id": "term-rootcellar-clan",
+      "name": "Rootcellar clan",
+      "section": "11.2"
+    },
+    {
+      "id": "term-saltmarch-isles",
+      "name": "Saltmarch Isles",
+      "section": "11.2"
+    },
+    {
+      "id": "term-somnomancy",
+      "name": "Somnomancy",
+      "section": "11.2"
+    },
+    {
+      "id": "term-sounding-shaft",
+      "name": "The Sounding Shaft",
+      "section": "11.2"
+    },
+    {
+      "id": "term-vesper-bell",
+      "name": "The Vesper Bell",
+      "section": "11.2"
+    },
+    {
+      "id": "term-vesperines",
+      "name": "Vesperines",
+      "section": "11.2"
+    },
+    {
+      "id": "term-tidefair",
+      "name": "The Tidefair",
+      "section": "11.2"
+    },
+    {
+      "id": "term-gilded-tern",
+      "name": "The Gilded Tern",
+      "section": "11.2"
+    }
+  ],
+  "texts": [
+    {
+      "id": "book-vesperine-hours",
+      "name": "The Vesperine Hours",
+      "section": "7.2"
+    },
+    {
+      "id": "book-travellers-account",
+      "name": "A Traveller's Account of the Glen",
+      "section": "7.2"
+    },
+    {
+      "id": "book-silence-of-goblins",
+      "name": "On the Silence of Goblins",
+      "section": "7.2"
+    },
+    {
+      "id": "book-ox-beneath-the-hill",
+      "name": "The Ox Beneath the Hill",
+      "section": "7.2"
+    },
+    {
+      "id": "book-keepers-log",
+      "name": "Keeper's Log, Mooring's Watch",
+      "section": "7.2"
+    },
+    {
+      "id": "book-abbots-letters",
+      "name": "Letters of Abbot Corvin Ashgrove",
+      "section": "7.2"
+    },
+    {
+      "id": "book-nine-sleeps",
+      "name": "Nine Sleeps",
+      "section": "7.2"
+    },
+    {
+      "id": "book-deepworks-ledger",
+      "name": "Deepworks Ledger",
+      "section": "7.2"
+    },
+    {
+      "id": "inscription-rules-of-the-mine",
+      "name": "Rules of the Mine",
+      "section": "7.2"
+    },
+    {
+      "id": "note-cargo-manifest",
+      "name": "Cargo Manifest — Gilded Tern, Bay Nine",
+      "section": "7.2"
+    },
+    {
+      "id": "note-lantern-court-notice",
+      "name": "Notice of the Lantern Court — Port of Wendmouth",
+      "section": "7.2"
+    },
+    {
+      "id": "inscription-kestrel-lock-toll-board",
+      "name": "Kestrel Lock Toll Board",
+      "section": "7.2"
+    },
+    {
+      "id": "note-foundry-invoice",
+      "name": "Foundry invoice",
+      "section": "7.2"
+    }
+  ]
+}

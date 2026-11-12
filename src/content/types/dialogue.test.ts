@@ -54,6 +54,7 @@ describe('dialogue schema', () => {
     expect(sources.map((s) => s.path.split('/').at(-1))).toEqual([
       'brand-commission.json',
       'marsh-greeting.json',
+      'ottilie-bridge-talk.json',
     ]);
     for (const source of sources) {
       const result = validateDialogueText(source.path, source.text);
@@ -63,7 +64,7 @@ describe('dialogue schema', () => {
       loadDialogueFixtureContent()
         .all('dialogue')
         .map((d) => d.id),
-    ).toEqual(['brand-commission', 'marsh-greeting']);
+    ).toEqual(['brand-commission', 'marsh-greeting', 'ottilie-bridge-talk']);
   });
 
   it('AC-2: a node with an unknown kind fails with file, node id and line', () => {

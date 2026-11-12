@@ -43,12 +43,20 @@ afterEach(() => {
 });
 
 describe('pnpm nav:bake / nav:check (mw-e11.4)', () => {
-  it('AC-6: the committed navmeshes are what a bake gives now', () => {
-    const { io: repo, out } = io(REPO);
-    expect(main(['check'], repo)).toBe(0);
-    expect(out.log).toEqual(['navmeshes are up to date']);
+  // One test per committed navmesh, each with its own budget: re-baking them all in one test grew
+  // past its timeout as scenes were added (the Briarwood and the town green bake for 5 to 25 s alone).
+  it('AC-6: the testbed is among the committed navmeshes', () => {
     expect(bakedScenes(REPO)).toContain('testbed');
-  }, 120_000); // re-bakes every committed navmesh: the three valley scenes and the 300 x 250 m Briarwood (about 5 to 25 s alone)
+  });
+
+  it.each(bakedScenes(REPO))(
+    'AC-6: the committed navmesh of %s is what a bake gives now',
+    (scene) => {
+      const [outcome] = bakeScenes(REPO, [scene], false);
+      expect(outcome?.current).toBe(true);
+    },
+    120_000,
+  );
 
   it('AC-6: bakes a scene into its data file, then check passes; a stale file fails check', () => {
     const dir = scratch();

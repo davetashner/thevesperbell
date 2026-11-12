@@ -140,7 +140,7 @@ export function loadItemFixtureContent(): GameContent {
   );
 }
 
-// Fixture dialogues (mw-e22.3): two small conversations that exercise every part of the dialogue
+// Fixture dialogues (mw-e22.3): three small conversations that exercise every part of the dialogue
 // format (entries, once options, visited counts, class-gated and locked options, a persuasion check,
 // effects) for the format's and the runtime's tests (mw-e22.5+). Never shipped: the real
 // conversations are written under E39. They name game NPCs and items, so they load with the game.
@@ -154,7 +154,11 @@ const dialogueFiles = import.meta.glob<string>('./fixtures/dialogue/*/*.json', {
 export const DIALOGUE_FIXTURE_ROOT = 'src/content/fixtures/dialogue';
 
 /** The fixture dialogue ids. */
-export const FIXTURE_DIALOGUE_IDS = ['brand-commission', 'marsh-greeting'] as const;
+export const FIXTURE_DIALOGUE_IDS = [
+  'brand-commission',
+  'marsh-greeting',
+  'ottilie-bridge-talk',
+] as const;
 
 /** Every fixture dialogue file, with repo-relative paths. */
 export function dialogueFixtureSources(): ContentSource[] {
@@ -173,7 +177,7 @@ export function loadDialogueFixtureContent(): GameContent {
   );
 }
 
-// Fixture quests (mw-e23.1): three small quests that exercise every part of the quest format
+// Fixture quests (mw-e23.1): four small quests that exercise every part of the quest format
 // (givers, started by condition and by effect, stages, every objective flavour, several resolution
 // approaches, hidden and optional objectives, each kind of failure continuation) for the format's
 // and the runtime's tests (mw-e23.2+). Never shipped: the real quests are written under E39. They
@@ -189,6 +193,7 @@ export const QUEST_FIXTURE_ROOT = 'src/content/fixtures/quest';
 
 /** The fixture quest ids. */
 export const FIXTURE_QUEST_IDS = [
+  'quest-empty-barge',
   'the-captain-below',
   'the-captains-boots',
   'the-name-on-the-bones',
