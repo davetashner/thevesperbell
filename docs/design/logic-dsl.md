@@ -18,7 +18,7 @@ string expressions and no `eval`: every node is a plain object with a `kind`. Co
 | `{ "kind": "playerClass", "class": "mage" }`              | the player's class                                  |
 | `{ "kind": "disposition", "npc": "miller", "op": "gte", "value": 10 }` | the NPC's disposition score compares   |
 | `{ "kind": "questState", "quest": "mill", "state": "active" }` | `unstarted active resolved failed`             |
-| `{ "kind": "objectiveState", "quest": "mill", "objective": "grain", "state": "complete" }` | `inactive active complete failed` |
+| `{ "kind": "objectiveState", "quest": "mill", "objective": "grain", "state": "complete" }` | `inactive active complete skipped failed` |
 | `{ "kind": "gold", "op": "gte", "value": 50 }`            | the player's gold compares                          |
 | `{ "kind": "timeOfDay", "from": "22:00", "to": "04:00" }` | game clock in `[from, to)`; may wrap midnight       |
 
