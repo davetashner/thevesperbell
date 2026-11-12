@@ -139,3 +139,36 @@ export function loadItemFixtureContent(): GameContent {
     contentChecks,
   );
 }
+
+// Fixture dialogues (mw-e22.3): two small conversations that exercise every part of the dialogue
+// format (entries, once options, visited counts, class-gated and locked options, a persuasion check,
+// effects) for the format's and the runtime's tests (mw-e22.5+). Never shipped: the real
+// conversations are written under E39. They name game NPCs and items, so they load with the game.
+const dialogueFiles = import.meta.glob<string>('./fixtures/dialogue/*/*.json', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+/** Where the fixture dialogue files live, relative to the repo root. */
+export const DIALOGUE_FIXTURE_ROOT = 'src/content/fixtures/dialogue';
+
+/** The fixture dialogue ids. */
+export const FIXTURE_DIALOGUE_IDS = ['brand-commission', 'marsh-greeting'] as const;
+
+/** Every fixture dialogue file, with repo-relative paths. */
+export function dialogueFixtureSources(): ContentSource[] {
+  return Object.entries(dialogueFiles).map(([path, text]) => ({
+    path: `${DIALOGUE_FIXTURE_ROOT}/${path.slice('./fixtures/dialogue/'.length)}`,
+    text,
+  }));
+}
+
+/** The game's content plus the fixture dialogues, loaded and validated together. */
+export function loadDialogueFixtureContent(): GameContent {
+  return loadContent(
+    contentTypes,
+    [...gameContentSources(), ...dialogueFixtureSources()],
+    contentChecks,
+  );
+}

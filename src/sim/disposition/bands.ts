@@ -5,9 +5,14 @@
 //
 // These five names are the creature-level vocabulary for UI and dialogue; they are not the faction
 // ladder in ../factions/stance.ts (ally..hostile, prey, predator), which describes groups and the
-// food chain. The NPC bands of mw-e22.4 (cold, devoted > 75...) are a different, finer mapping over
-// the same number: that bead adds its own band function and event beside `dispositionStance`, and
-// leaves this one alone.
+// food chain.
+//
+// NPC bands (mw-e22.4) are a second, deliberately different reading of the same number, for the
+// people dialogue, prices and help talk to (the bead's wording: hostile < -50, cold, neutral, friendly,
+// devoted > 75). An NPC is neutral across a wide middle (-10..50: a stranger who has been civil is
+// still a stranger), friendly from 51 and devoted above 75, where a creature's stance is friendly from
+// 11 and devoted above 50. Both functions read one score; neither replaces the other, and each has
+// its own event (`DispositionStanceChanged` vs `disposition.bandChanged`).
 
 import type { Stance } from '../factions/stance';
 
@@ -55,3 +60,23 @@ export const STANCE_SEED: Readonly<Record<Stance, number>> = Object.freeze({
   prey: -75,
   predator: -30,
 });
+
+/** Every NPC band, coldest to warmest. */
+export const NPC_BANDS = ['hostile', 'cold', 'neutral', 'friendly', 'devoted'] as const;
+
+/** How an NPC feels about the player (dialogue, prices, help), read off its disposition. */
+export type NpcBand = (typeof NPC_BANDS)[number];
+
+/** Upper bounds of the NPC bands: below -50 hostile, below -10 cold, up to 50 neutral, up to 75 friendly. */
+export const NPC_COLD_BELOW = -10;
+export const NPC_NEUTRAL_UP_TO = 50;
+export const NPC_FRIENDLY_UP_TO = 75;
+
+/** The NPC band a disposition score reads as. */
+export function npcBand(score: number): NpcBand {
+  if (score < HOSTILE_BELOW) return 'hostile';
+  if (score < NPC_COLD_BELOW) return 'cold';
+  if (score <= NPC_NEUTRAL_UP_TO) return 'neutral';
+  if (score <= NPC_FRIENDLY_UP_TO) return 'friendly';
+  return 'devoted';
+}

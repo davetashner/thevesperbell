@@ -7,3 +7,4 @@ export * from './memory-host';
 export * from './registry';
 export * from './types';
 export * from './validate';
+export * from './dialogue-kinds';

@@ -13,6 +13,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `towardPlayer` | `"ally"` \| `"friendly"` \| `"neutral"` \| `"wary"` \| `"hostile"` \| `"prey"` \| `"predator"` | `"neutral"` | Starting stance of members toward the player; play can change it. |
 | `towardMembers` | `"ally"` \| `"friendly"` \| `"neutral"` \| `"wary"` \| `"hostile"` \| `"prey"` \| `"predator"` | `"ally"` | Stance of members toward each other. |
 | `towardOthers` | `"ally"` \| `"friendly"` \| `"neutral"` \| `"wary"` \| `"hostile"` \| `"prey"` \| `"predator"` | `"neutral"` | Stance toward any faction not listed in `relations`. |
+| `dispositionSpread` | number 0–1 | `0` | Fraction of a change in one member’s disposition toward the player that the other members take too (mw-e22.4): 0.5 turns -20 into -10 for each. 0 = members judge the player alone. |
 | `relations` | list of object | `[]` | Stances toward specific factions that differ from `towardOthers`. |
 | `relations[].faction` | ref → faction | required | The other faction. |
 | `relations[].stance` | `"ally"` \| `"friendly"` \| `"neutral"` \| `"wary"` \| `"hostile"` \| `"prey"` \| `"predator"` | required | This faction’s stance toward the other one. |

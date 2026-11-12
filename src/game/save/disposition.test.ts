@@ -33,7 +33,7 @@ function folkWorld() {
 describe('disposition save', () => {
   it('AC-5: a creature saved at -37 loads at exactly -37, and decay continues from the save', () => {
     const { world, entity } = folkWorld();
-    const config = { factions, rules: new Map<string, number>() };
+    const config = { factions, rules: new Map() };
     const minutes = { now: 100 };
     const before = new Dispositions(world, {
       ...config,

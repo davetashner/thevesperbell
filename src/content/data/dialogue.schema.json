@@ -1,0 +1,605 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Id of the dialogue; stable forever (saves track visited nodes)."
+    },
+    "notes": {
+      "description": "What the conversation is for, for writers.",
+      "type": "string",
+      "minLength": 1
+    },
+    "speakers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Local id lines name in `speaker`. \"player\" and \"narrator\" are built in."
+          },
+          "npc": {
+            "description": "Id of the NPC creature who speaks.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "creature"
+          },
+          "name": {
+            "description": "Display name when there is no `npc` (a voice, a sign).",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Who speaks, besides \"player\" and \"narrator\"."
+    },
+    "entries": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Id of the entry, for tools and previews."
+          },
+          "when": {
+            "description": "Condition (logic DSL) that must hold. Omit: always.",
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"hasItem\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {}
+          },
+          "node": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Node the conversation starts at."
+          }
+        },
+        "required": [
+          "id",
+          "node"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Ways in, tried in order; the first whose condition holds starts. The last has none."
+    },
+    "nodes": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "line",
+                "description": "Someone speaks."
+              },
+              "speaker": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "A declared speaker, \"player\" or \"narrator\"."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What is said, British-leaning (story bible §11.1)."
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `dialogue.<dialogue id>.<node id>` (options add `.<option id>`).",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "next": {
+                "description": "Node that follows. Give `next` or `end: true`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "end": {
+                "description": "`true`: the conversation ends here. Give `next` or `end: true`.",
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "speaker",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "choice",
+                "description": "The player picks an option."
+              },
+              "options": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "description": "Id of the option, unique in the dialogue; tracked for `once`."
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "What the player says or does."
+                    },
+                    "textKey": {
+                      "description": "Localization key for the text. Default: `dialogue.<dialogue id>.<node id>` (options add `.<option id>`).",
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                    },
+                    "when": {
+                      "description": "Condition (logic DSL) that must hold. Omit: always.",
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The logic kind, e.g. \"hasItem\"."
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": {}
+                    },
+                    "showWhenLocked": {
+                      "default": false,
+                      "description": "When the condition fails: show the option locked with its reason, not hidden.",
+                      "type": "boolean"
+                    },
+                    "once": {
+                      "default": false,
+                      "description": "Offered only until it has been chosen.",
+                      "type": "boolean"
+                    },
+                    "effects": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "The logic kind, e.g. \"hasItem\"."
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": {},
+                        "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                      },
+                      "description": "Effects (logic DSL) applied together: all or nothing."
+                    },
+                    "next": {
+                      "description": "Node that follows. Give `next` or `end: true`.",
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "end": {
+                      "description": "`true`: the conversation ends here. Give `next` or `end: true`.",
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "onFail": {
+                      "description": "Node entered when the effects cannot all apply. Omit: stay and report an error.",
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "text"
+                  ],
+                  "additionalProperties": false
+                },
+                "description": "The options, in display order."
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "options"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "branch",
+                "description": "Routes by condition without showing anything."
+              },
+              "routes": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The logic kind, e.g. \"hasItem\"."
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": {},
+                      "description": "Condition (logic DSL) for this route."
+                    },
+                    "next": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "description": "Id of a node of this dialogue."
+                    }
+                  },
+                  "required": [
+                    "when",
+                    "next"
+                  ],
+                  "additionalProperties": false
+                },
+                "description": "Tried in order; the first whose condition holds."
+              },
+              "else": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Node taken when no route matches."
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "routes",
+              "else"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "check",
+                "description": "A deterministic persuasion check (mw-e22.7)."
+              },
+              "approach": {
+                "type": "string",
+                "enum": [
+                  "persuade",
+                  "intimidate",
+                  "deceive",
+                  "charm"
+                ],
+                "description": "How the player tries."
+              },
+              "difficulty": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991,
+                "description": "Score needed; the player’s score is computed from data."
+              },
+              "target": {
+                "description": "Speaker being worked on. Default: the first NPC speaker.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "modifiers": {
+                "default": [],
+                "description": "Extra score from items, facts, class.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The logic kind, e.g. \"hasItem\"."
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": {},
+                      "description": "Condition (logic DSL) under which the modifier applies."
+                    },
+                    "bonus": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "description": "Added to the score."
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Why, in the words shown to the player (\"You look the part\")."
+                    }
+                  },
+                  "required": [
+                    "when",
+                    "bonus",
+                    "label"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "success": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Node entered when the score meets the difficulty."
+              },
+              "failure": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Node entered otherwise: failures must continue the story."
+              },
+              "successEffects": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The logic kind, e.g. \"hasItem\"."
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": {},
+                  "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                },
+                "description": "Effects (logic DSL) applied together: all or nothing."
+              },
+              "failureEffects": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The logic kind, e.g. \"hasItem\"."
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": {},
+                  "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                },
+                "description": "Effects (logic DSL) applied together: all or nothing."
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "approach",
+              "difficulty",
+              "success",
+              "failure"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "effect",
+                "description": "Changes the world, silently."
+              },
+              "effects": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The logic kind, e.g. \"hasItem\"."
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": {},
+                  "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                },
+                "description": "Effects (logic DSL) applied together: all or nothing."
+              },
+              "next": {
+                "description": "Node that follows. Give `next` or `end: true`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "end": {
+                "description": "`true`: the conversation ends here. Give `next` or `end: true`.",
+                "type": "boolean",
+                "const": true
+              },
+              "onFail": {
+                "description": "Node entered when the effects cannot all apply.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "effects"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "jump",
+                "description": "Continues in another dialogue."
+              },
+              "dialogue": {
+                "description": "Id of the dialogue to continue in.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "dialogue"
+              },
+              "node": {
+                "description": "Node of that dialogue. Omit: its entries decide.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "dialogue"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the node, unique in the dialogue."
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "end",
+                "description": "The conversation ends."
+              }
+            },
+            "required": [
+              "id",
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "description": "Every step of the conversation."
+    }
+  },
+  "required": [
+    "id",
+    "speakers",
+    "entries",
+    "nodes"
+  ],
+  "additionalProperties": false
+}

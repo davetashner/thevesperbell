@@ -50,6 +50,14 @@ export const factionSchema = z
     towardOthers: stance
       .default('neutral')
       .describe('Stance toward any faction not listed in `relations`.'),
+    dispositionSpread: z
+      .number()
+      .min(0)
+      .max(1)
+      .default(0)
+      .describe(
+        'Fraction of a change in one member’s disposition toward the player that the other members take too (mw-e22.4): 0.5 turns -20 into -10 for each. 0 = members judge the player alone.',
+      ),
     relations: z
       .array(relationSchema)
       .prefault([])

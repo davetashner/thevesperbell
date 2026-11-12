@@ -171,6 +171,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `disposition.towardPlayer` | `"ally"` \| `"friendly"` \| `"neutral"` \| `"wary"` \| `"hostile"` \| `"prey"` \| `"predator"` | — | Starting stance toward the player that overrides its faction’s; absent = the faction’s. |
 | `disposition.baseline` | integer -100–100 | — | Disposition toward the player (−100..100) it starts at and decays back to (mw-e12.9); absent = seeded from its stance toward the player. |
 | `disposition.decayPerMinute` | number > 0 | — | Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets. |
+| `disposition.classAffinity` | map of `"knight"` \| `"archer"` \| `"sorcerer"` \| `"thief"` → integer -100–100 | — | Offset added to the starting disposition for a player of each class (mw-e22.4), e.g. a fence warms to a thief; absent or unlisted class = 0. |
 | `fears` | list of object | `[]` | Stimuli that lower its morale (e12.10). |
 | `fears[].kind` | `"property"` \| `"faction"` \| `"event"` | required | What kind of stimulus it fears. |
 | `fears[].stimulus` | id | required | The world property, faction id or event name, e.g. "burning". |
