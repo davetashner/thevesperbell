@@ -24,6 +24,7 @@
     "sociability": 0.6,
     "greed": 0.8
   },
+  "dialogue": "quell-harbor-agent",
   "behaviour": {
     "profile": "shopkeeper"
   },
