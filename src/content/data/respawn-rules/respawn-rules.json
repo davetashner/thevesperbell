@@ -43,6 +43,14 @@
       "priority": 0,
       "destination": { "scene": "moorings-watch", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "bellwater-priory-reload",
+      "notes": "Death at Bellwater Priory (mw-e26.5): the region is the whole scene; the death screen offers Load last save, and with no save the priory restarts at the head of the priory road. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
+      "region": "bellwater-priory",
+      "priority": 0,
+      "destination": { "scene": "bellwater-priory", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }

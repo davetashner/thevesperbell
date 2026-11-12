@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "choir-door-hidden",
+  "name": "Bellwater Priory hidden choir door",
+  "notes": "The hidden choir door between the choir and the scriptorium (mw-e26.5): plain stone to look at, a door only once the Watchers puzzle is solved (fact watchers.solved, mw-e26.6 replaces this lock with that unlock). No key exists; tier 3.",
+  "tier": 3,
+  "pickTier": 3,
+  "hint": "Plain stone. Nothing here."
+}

@@ -1,0 +1,968 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "bellwater-priory",
+  "name": "Bellwater Priory",
+  "description": "Bead mw-e26.5 (with the priory legs of mw-e25.25): the ruined Vesperine monastery on the hill, a 120 x 130 m greybox. From the south edge (road-gate, back to the Briarwood's priory-road-gate; arrive-from-briarwood) the priory road runs north between a few trees to the precinct gate wall (priory-gate), past a forecourt into the roofless nave (priory-nave; walls and a colonnade, six metres tall, open to the sky). West of the nave: the garden with the dead pear tree (priory-garden, a dead end) and a sealed vestibule behind a locked door, the priory end of the cistern (cistern, cistern-door; the Glen Well route joins here in mw-e24.10 and mw-e26.20). North: the choir (priory-choir) with four singing-monk statue stubs and the altar for the Watchers puzzle (mw-e26.6) and, in its east wall, the hidden choir door (choir-hidden-door, locked, lock choir-door-hidden) to the scriptorium (scriptorium: shelves, book mimic, tallow ooze and abbot letter stubs, mw-e26.7). East: the belfry, a 9 m tower whose open doorway in the nave's east wall (belfry-stair-door, where mw-e26.8 fits the jammed door) leads up three stair flights to the deck, with the Sounding Shaft's mouth in the deck (sounding-shaft-top, vesper-bell above it), a rough-stone free-climb up the south face (belfry-climb-foot, grade 2) and two rope anchors on the south parapet (belfry-anchor-a/b); belfry-view is the perf viewpoint. East of the nave a stair descends 3 m to the crypt stair landing (priory-crypt-stair, the Sunbeam puzzle's place) and a locked tier-3 door (crypt-door, lock crypt-sealed) over the sealed crypt vestibule (priory-crypt): no route this side until world.priory-crypt.unsealed (mw-e26.20). The whole scene is the bellwater-priory region; the belfry volume is its own region.",
+  "grid": 1,
+  "camera": {
+    "position": [20, 16, 4],
+    "target": [60, 0, 60]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [60, 0, 19],
+      "scale": [60, 1, 19]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 90],
+      "scale": [60, 1, 40]
+    },
+    {
+      "piece": "floor",
+      "at": [40.5, 0, 44],
+      "scale": [40.5, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [115.5, 0, 44],
+      "scale": [4.5, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [105, 0, 39],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [105, 0, 49],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28.5, 0, 0],
+      "scale": [28.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [91.5, 0, 0],
+      "scale": [28.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 65],
+      "yaw": 90,
+      "scale": [65, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [120, 0, 65],
+      "yaw": 90,
+      "scale": [65, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, 0, 130],
+      "scale": [60, 1, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [45, 0, 6]
+    },
+    {
+      "piece": "pillar",
+      "at": [45, 0, 12]
+    },
+    {
+      "piece": "pillar",
+      "at": [45, 0, 18]
+    },
+    {
+      "piece": "pillar",
+      "at": [45, 0, 22]
+    },
+    {
+      "piece": "pillar",
+      "at": [75, 0, 6]
+    },
+    {
+      "piece": "pillar",
+      "at": [75, 0, 12]
+    },
+    {
+      "piece": "pillar",
+      "at": [75, 0, 18]
+    },
+    {
+      "piece": "pillar",
+      "at": [75, 0, 22]
+    },
+    {
+      "piece": "wall",
+      "at": [28.5, 0, 26],
+      "scale": [28.5, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [91.5, 0, 26],
+      "scale": [28.5, 1.5, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [57.25, 0, 26],
+      "scale": [1, 1.8, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [62.75, 0, 26],
+      "scale": [1, 1.8, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [46, 0, 90],
+      "scale": [6, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [74, 0, 90],
+      "scale": [6, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40, 0, 36.5],
+      "yaw": 90,
+      "scale": [4.5, 2, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [40, 0, 42],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [40, 3, 42],
+      "yaw": 90,
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40, 0, 50.5],
+      "yaw": 90,
+      "scale": [7.5, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40, 0, 77],
+      "yaw": 90,
+      "scale": [13, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 37],
+      "yaw": 90,
+      "scale": [5, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 57],
+      "yaw": 90,
+      "scale": [11, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 86],
+      "yaw": 90,
+      "scale": [4, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [48, 0, 40],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [48, 0, 48],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [48, 0, 56],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [48, 0, 64],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [48, 0, 72],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [48, 0, 80],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [72, 0, 40],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [72, 0, 48],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [72, 0, 56],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [72, 0, 64],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [72, 0, 72],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [72, 0, 80],
+      "scale": [1, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [20, 0, 52],
+      "scale": [20, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [20, 0, 90],
+      "scale": [20, 1, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [20, 0, 70],
+      "scale": [1.6, 1.1, 1.6]
+    },
+    {
+      "piece": "wall",
+      "at": [34, 0, 36],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [34, 0, 48],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28, 0, 42],
+      "yaw": 90,
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [52, 0, 103],
+      "yaw": 90,
+      "scale": [13, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, 0, 116],
+      "scale": [8, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [68, 0, 96.5],
+      "yaw": 90,
+      "scale": [6.5, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [68, 0, 110.5],
+      "yaw": 90,
+      "scale": [5.5, 2, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [68, 0, 104],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [68, 3, 104],
+      "yaw": 90,
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [55, 0, 96],
+      "scale": [1, 0.7, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [65, 0, 96],
+      "scale": [1, 0.7, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [55, 0, 106],
+      "scale": [1, 0.7, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [65, 0, 106],
+      "scale": [1, 0.7, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [87, 0, 92],
+      "scale": [19, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [87, 0, 122],
+      "scale": [19, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [106, 0, 107],
+      "yaw": 90,
+      "scale": [15, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [68, 0, 119],
+      "yaw": 90,
+      "scale": [3, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 104],
+      "yaw": 90,
+      "scale": [6, 0.6, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [84, 0, 104],
+      "yaw": 90,
+      "scale": [6, 0.6, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [92, 0, 104],
+      "yaw": 90,
+      "scale": [6, 0.6, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100, 0, 104],
+      "yaw": 90,
+      "scale": [6, 0.6, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [84, -3, 42],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [84, -3, 46],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [87, -3, 40],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [87, -3, 48],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [93, -3, 38],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [93, -3, 50],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [99, -3, 40.5],
+      "yaw": 90,
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [99, -3, 47.5],
+      "yaw": 90,
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [99, -3, 44],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [105, -3, 40],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [105, -3, 48],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [111, -3, 44],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [93, -3, 44],
+      "scale": [6, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [105, -3, 44],
+      "scale": [6, 1, 4]
+    },
+    {
+      "piece": "stairs",
+      "at": [82, -1, 44],
+      "yaw": 270,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [84, -2, 44],
+      "yaw": 270,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [86, -3, 44],
+      "yaw": 270,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [86, 0, 82],
+      "yaw": 180,
+      "scale": [6.0, 3.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [86, 0, 68],
+      "yaw": 180,
+      "scale": [6.0, 3.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [92, 0, 75],
+      "scale": [7.0, 3.0, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 79],
+      "scale": [3.0, 3.0, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 71],
+      "scale": [3.0, 3.0, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "doorway",
+      "at": [80, 0, 75],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [80, 3, 75],
+      "scale": [1.0, 2.0, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "floor",
+      "at": [86, 3, 74],
+      "scale": [6, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [89.5, 3, 81],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [86, 6, 76],
+      "scale": [6, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [82.5, 6, 69],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [86, 9, 78],
+      "scale": [6, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [86, 9, 71],
+      "scale": [6, 1, 3]
+    },
+    {
+      "piece": "floor",
+      "at": [82.5, 9, 75],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [89.5, 9, 75],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [89.5, 9, 81],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [82, 0, 81],
+      "yaw": 90
+    },
+    {
+      "piece": "stairs",
+      "at": [84, 1, 81],
+      "yaw": 90
+    },
+    {
+      "piece": "stairs",
+      "at": [86, 2, 81],
+      "yaw": 90
+    },
+    {
+      "piece": "stairs",
+      "at": [90, 3, 69],
+      "yaw": 270
+    },
+    {
+      "piece": "stairs",
+      "at": [88, 4, 69],
+      "yaw": 270
+    },
+    {
+      "piece": "stairs",
+      "at": [86, 5, 69],
+      "yaw": 270
+    },
+    {
+      "piece": "stairs",
+      "at": [82, 6, 81],
+      "yaw": 90
+    },
+    {
+      "piece": "stairs",
+      "at": [84, 7, 81],
+      "yaw": 90
+    },
+    {
+      "piece": "stairs",
+      "at": [86, 8, 81],
+      "yaw": 90
+    },
+    {
+      "piece": "pillar",
+      "at": [84, 0, 81],
+      "scale": [3.3333, 0.3333, 3.3333]
+    },
+    {
+      "piece": "pillar",
+      "at": [88, 3, 69],
+      "scale": [3.3333, 0.3333, 3.3333]
+    },
+    {
+      "piece": "pillar",
+      "at": [84, 6, 81],
+      "scale": [3.3333, 0.3333, 3.3333]
+    },
+    {
+      "piece": "pillar",
+      "at": [86, 0, 81],
+      "scale": [3.3333, 0.6667, 3.3333]
+    },
+    {
+      "piece": "pillar",
+      "at": [86, 3, 69],
+      "scale": [3.3333, 0.6667, 3.3333]
+    },
+    {
+      "piece": "pillar",
+      "at": [86, 6, 81],
+      "scale": [3.3333, 0.6667, 3.3333]
+    },
+    {
+      "piece": "wall",
+      "at": [85, 9, 75],
+      "scale": [1.0, 0.3, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [87, 9, 75],
+      "scale": [1.0, 0.3, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [86, 9, 76],
+      "yaw": 180,
+      "scale": [1.0, 0.3, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [86, 9, 74],
+      "yaw": 180,
+      "scale": [1.0, 0.3, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [80, 9, 81],
+      "scale": [1.0, 0.39999999999999997, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [80, 9, 73],
+      "scale": [5.0, 0.39999999999999997, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [92, 9, 75],
+      "scale": [7.0, 0.39999999999999997, 1.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [86, 9, 82],
+      "yaw": 180,
+      "scale": [6.0, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [82.5, 9, 68],
+      "yaw": 180,
+      "scale": [2.5, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [89.5, 9, 68],
+      "yaw": 180,
+      "scale": [2.5, 0.39999999999999997, 1.0]
+    },
+    {
+      "piece": "platform",
+      "at": [86, 0, 67.75],
+      "scale": [0.5, 9, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [60, 0, 12],
+      "yaw": 0,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "arrive-from-briarwood",
+      "at": [60, 0, 6],
+      "yaw": 0,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "road-gate",
+      "at": [60, 0, 1],
+      "tags": ["transition"]
+    },
+    {
+      "id": "priory-gate",
+      "at": [60, 0, 26],
+      "tags": ["node", "gate"]
+    },
+    {
+      "id": "priory-nave",
+      "at": [60, 0, 60],
+      "tags": ["node"]
+    },
+    {
+      "id": "priory-garden",
+      "at": [20, 0, 76],
+      "tags": ["node", "dead-end"]
+    },
+    {
+      "id": "dead-pear-tree",
+      "at": [20, 0, 72],
+      "tags": ["landmark", "pear-tree"]
+    },
+    {
+      "id": "priory-choir",
+      "at": [60, 0, 100],
+      "tags": ["node"]
+    },
+    {
+      "id": "choir-altar",
+      "at": [60, 0, 112],
+      "tags": ["altar", "puzzle-stub:watchers"]
+    },
+    {
+      "id": "monk-statue-a",
+      "at": [55, 0, 96],
+      "tags": ["statue", "puzzle-stub:watchers"]
+    },
+    {
+      "id": "monk-statue-b",
+      "at": [65, 0, 96],
+      "tags": ["statue", "puzzle-stub:watchers"]
+    },
+    {
+      "id": "monk-statue-c",
+      "at": [55, 0, 106],
+      "tags": ["statue", "puzzle-stub:watchers"]
+    },
+    {
+      "id": "monk-statue-d",
+      "at": [65, 0, 106],
+      "tags": ["statue", "puzzle-stub:watchers"]
+    },
+    {
+      "id": "choir-hidden-door",
+      "at": [68, 0, 104],
+      "yaw": 90,
+      "tags": ["door-stub", "puzzle-stub:watchers"],
+      "door": {
+        "profile": "iron-door",
+        "lock": "choir-door-hidden"
+      }
+    },
+    {
+      "id": "scriptorium",
+      "at": [88, 0, 100],
+      "tags": ["node"]
+    },
+    {
+      "id": "abbot-letters",
+      "at": [104, 0, 120],
+      "tags": ["lore", "abbot-letters"]
+    },
+    {
+      "id": "book-mimic-a",
+      "at": [80, 0, 104],
+      "tags": ["encounter-stub", "book-mimic"]
+    },
+    {
+      "id": "book-mimic-b",
+      "at": [96, 0, 104],
+      "tags": ["encounter-stub", "book-mimic"]
+    },
+    {
+      "id": "book-mimic-c",
+      "at": [88, 0, 112],
+      "tags": ["encounter-stub", "book-mimic"]
+    },
+    {
+      "id": "tallow-ooze-spawn",
+      "at": [100, 0, 96],
+      "tags": ["encounter-stub", "tallow-ooze"]
+    },
+    {
+      "id": "belfry",
+      "at": [86, 0, 75],
+      "tags": ["node", "tower"]
+    },
+    {
+      "id": "belfry-stair-door",
+      "at": [79, 0, 75],
+      "tags": ["door-stub", "puzzle-stub:belfry"]
+    },
+    {
+      "id": "belfry-climb-foot",
+      "at": [86, 0, 66.5],
+      "tags": ["climb-route"]
+    },
+    {
+      "id": "belfry-deck",
+      "at": [83, 9, 73],
+      "tags": ["roof"]
+    },
+    {
+      "id": "belfry-view",
+      "at": [88, 9, 72],
+      "yaw": 270,
+      "tags": ["roof"]
+    },
+    {
+      "id": "sounding-shaft-top",
+      "at": [86, 9, 75],
+      "tags": ["sounding-shaft", "puzzle-stub:belfry"]
+    },
+    {
+      "id": "vesper-bell",
+      "at": [86, 11, 75],
+      "tags": ["bell", "puzzle-stub:belfry"]
+    },
+    {
+      "id": "belfry-anchor-a",
+      "at": [84, 9.75, 69],
+      "tags": ["rope-anchor"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "climb",
+            "label": "Tie rope",
+            "requires": [
+              {
+                "item": "climbing-rope"
+              }
+            ],
+            "reason": "Needs a climbing rope"
+          },
+          {
+            "verb": "release",
+            "label": "Untie rope"
+          }
+        ],
+        "radius": 0.5
+      }
+    },
+    {
+      "id": "belfry-anchor-b",
+      "at": [88, 9.75, 69],
+      "tags": ["rope-anchor"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "climb",
+            "label": "Tie rope",
+            "requires": [
+              {
+                "item": "climbing-rope"
+              }
+            ],
+            "reason": "Needs a climbing rope"
+          },
+          {
+            "verb": "release",
+            "label": "Untie rope"
+          }
+        ],
+        "radius": 0.5
+      }
+    },
+    {
+      "id": "priory-crypt-stair",
+      "at": [92, -3, 44],
+      "tags": ["node"]
+    },
+    {
+      "id": "sunbeam-spot",
+      "at": [93, -3, 44],
+      "tags": ["puzzle-stub:sunbeam"]
+    },
+    {
+      "id": "crypt-door",
+      "at": [99, -3, 44],
+      "yaw": 90,
+      "tags": ["door-stub"],
+      "door": {
+        "profile": "iron-door",
+        "lock": "crypt-sealed"
+      }
+    },
+    {
+      "id": "priory-crypt",
+      "at": [105, -3, 44],
+      "tags": ["node", "sealed"]
+    },
+    {
+      "id": "cistern",
+      "at": [34, 0, 42],
+      "tags": ["node", "sealed", "cistern-link"]
+    },
+    {
+      "id": "cistern-door",
+      "at": [40, 0, 42],
+      "yaw": 90,
+      "tags": ["door-stub"],
+      "door": {
+        "profile": "iron-door",
+        "lock": "cistern-sealed"
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.4,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.4, -1, 0.3],
+        "level": 0.6,
+        "reach": 80
+      }
+    ]
+  },
+  "environment": {
+    "sky": "#8FA6BC",
+    "fog": {
+      "color": "#B4C3CE",
+      "near": 40,
+      "far": 190
+    }
+  },
+  "regions": [
+    {
+      "id": "bellwater-priory",
+      "min": [0, -6, 0],
+      "max": [120, 40, 130],
+      "tags": ["region", "ruin"]
+    },
+    {
+      "id": "belfry",
+      "min": [79.9, -2, 67.9],
+      "max": [92.1, 14, 82.1],
+      "tags": ["region", "tower"]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "road-gate",
+      "min": [57.25, -1, 0.25],
+      "max": [62.75, 3, 1.75],
+      "scene": "briarwood",
+      "spawn": "arrive-from-bellwater-priory"
+    }
+  ]
+}
