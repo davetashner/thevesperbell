@@ -1143,6 +1143,24 @@
           "description": "Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets.",
           "type": "number",
           "exclusiveMinimum": 0
+        },
+        "classAffinity": {
+          "description": "Offset added to the starting disposition for a player of each class (mw-e22.4), e.g. a fence warms to a thief; absent or unlisted class = 0.",
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "enum": [
+              "knight",
+              "archer",
+              "sorcerer",
+              "thief"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": -100,
+            "maximum": 100
+          }
         }
       },
       "additionalProperties": false

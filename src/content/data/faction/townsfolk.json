@@ -5,5 +5,6 @@
   "notes": "Placeholder for the shopkeepers and villagers of story bible §3.4 (\"the townsfolk of Briar Glen\"), added with the first shopkeeper, Ottilie Marsh (mw-ju8.9). Friendly to the player from the start, allied with each other and neutral to everyone else, so no townsperson ever picks a fight. Nobody here attacks: a member has no attacks, and a hostile stance would only come from play (theft, violence) once dispositions exist (mw-e22.4). The full story factions and their relations are authored by mw-e13.17 and mw-e40.18, which may replace or extend this entry.",
   "towardPlayer": "friendly",
   "towardMembers": "ally",
-  "towardOthers": "neutral"
+  "towardOthers": "neutral",
+  "dispositionSpread": 0.25
 }

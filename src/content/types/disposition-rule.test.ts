@@ -27,10 +27,27 @@ describe('disposition-rule schema (mw-e12.9)', () => {
 
 const EXPECTED: Readonly<Record<string, number>> = {
   attacked: -40,
+  theft: -10,
   fed: 15,
   'witnessed-theft': -20,
   'helped-ally': 25,
 };
+
+describe('disposition-rule value tiers (mw-e22.4)', () => {
+  it('AC-4: tiers default to none, take a positive scale and must ascend by minValue', () => {
+    expect(dispositionRuleSchema.parse(valid).valueTiers).toEqual([]);
+    const tiers = [
+      { minValue: 0, scale: 1 },
+      { minValue: 50, scale: 2 },
+    ];
+    expect(dispositionRuleSchema.parse({ ...valid, valueTiers: tiers }).valueTiers).toEqual(tiers);
+    expect(problems({ ...valid, valueTiers: [tiers[1], tiers[0]] })).toEqual([
+      'valueTiers.1.minValue: tiers must ascend by minValue',
+    ]);
+    expect(problems({ ...valid, valueTiers: [tiers[0], tiers[0]] })).toHaveLength(1);
+    expect(problems({ ...valid, valueTiers: [{ minValue: 0, scale: 0 }] })).toHaveLength(1);
+  });
+});
 
 describeContent('disposition-rule', 'AC-1: the game rules are the bead’s deltas', (rule) => {
   expect(EXPECTED[rule.id]).toBe(rule.delta);
