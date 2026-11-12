@@ -224,6 +224,7 @@ export class QuestRuntime implements QuestOps {
       if (watch !== undefined) deps.facts.add(watch.fact);
       return { def: objective, key: questObjectiveFactKey(def.id, objective.id), watch };
     });
+    for (const stage of def.stages) for (const t of stage.transitions) need(t.when);
     for (const resolution of def.resolutions) need(resolution.when);
     for (const failure of def.failures) need(failure.when);
     const meta: QuestMeta = {
@@ -471,6 +472,24 @@ export class QuestRuntime implements QuestOps {
       const refused = this.failWith(meta, failure);
       if (refused === undefined) return;
       this.refused(meta, `failure:${failure.id}`, refused);
+    }
+    this.advance(meta);
+  }
+
+  /** Moves the quest out of its stage by the first transition whose condition holds (one per pass). */
+  private advance(meta: QuestMeta): void {
+    const stage = this.read(meta.stageKey);
+    const transitions = meta.def.stages.find((s) => s.id === stage)?.transitions ?? [];
+    for (const [i, transition] of transitions.entries()) {
+      if (!this.holds(transition.when)) continue;
+      const refused = this.within(() => {
+        const moved = this.setStage(meta.def.id, transition.stage);
+        return (
+          moved ?? (transition.effects === undefined ? undefined : this.apply(transition.effects))
+        );
+      });
+      if (refused === undefined) return;
+      this.refused(meta, `transition:${String(stage)}/${String(i)}`, refused);
     }
   }
 

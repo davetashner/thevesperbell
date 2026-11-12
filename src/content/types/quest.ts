@@ -5,7 +5,8 @@
 // a condition: the first to hold wins, so a problem supports several solutions; `failures` are the
 // ways it can go wrong, and every failure must continue the story (a successor quest, another
 // stage, or a bittersweet resolution) so failing is a story and not a dead end (constitution §2).
-// `stages` optionally sequence a long quest; `startWhen` starts a quest by condition, and a quest
+// `stages` optionally sequence a long quest (a stage's `transitions` move it on by condition, for
+// quests that branch); `startWhen` starts a quest by condition, and a quest
 // without one is started by an effect (a dialogue option, another quest's `startQuest`).
 //
 // Conditions (`startWhen`, `activeWhen`, `when`) and effects are the shared logic DSL
@@ -176,10 +177,27 @@ const objectiveSchema = z.discriminatedUnion('kind', OBJECTIVE_SCHEMAS, {
 // ---------------------------------------------------------------------------------------------
 // Stages, resolutions, failures
 
+const transitionSchema = z.strictObject({
+  when: logicNode.describe(
+    'Condition (logic DSL) that moves the quest on. The first to hold, in file order, wins.',
+  ),
+  stage: stageRef.describe('The stage the quest moves to.'),
+  effects: effects
+    .optional()
+    .describe('Effects applied in the same atomic batch as the move (e.g. set a fact).'),
+  note,
+});
+
 const stageSchema = z.strictObject({
   id: localId.describe('Id of the stage, unique in the quest.'),
   text: text.optional().describe('Journal text while the quest is in this stage.'),
   textKey,
+  transitions: z
+    .array(transitionSchema)
+    .default([])
+    .describe(
+      'Moves out of this stage, evaluated while it is current (branching quests: the first condition that holds picks the next stage).',
+    ),
   note,
 });
 
@@ -261,6 +279,7 @@ const failureSchema = z
 
 export type QuestObjective = z.output<typeof objectiveSchema>;
 export type QuestStage = z.output<typeof stageSchema>;
+export type QuestTransition = z.output<typeof transitionSchema>;
 export type QuestResolution = z.output<typeof resolutionSchema>;
 export type QuestFailure = z.output<typeof failureSchema>;
 export type QuestContinuation = z.output<typeof continuationSchema>;
@@ -357,6 +376,16 @@ export const questSchema = z
     if (quest.initialStage !== undefined && quest.stages.length === 0) {
       issue(['initialStage'], 'initialStage needs `stages`');
     }
+    quest.stages.forEach((stage, i) => {
+      stage.transitions.forEach((t, j) => {
+        const at: Path = ['stages', i, 'transitions', j, 'stage'];
+        if (!stages.has(t.stage)) {
+          issue(at, `stage "${stage.id}" moves to unknown stage "${t.stage}"`);
+        } else if (t.stage === stage.id) {
+          issue(at, `stage "${stage.id}" moves to itself`);
+        }
+      });
+    });
     quest.objectives.forEach((o, i) => {
       if (o.stage !== undefined && !stages.has(o.stage)) {
         issue(['objectives', i, 'stage'], `objective "${o.id}" names unknown stage "${o.stage}"`);

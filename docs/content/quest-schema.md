@@ -20,6 +20,13 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `stages[].id` | id | required | Id of the stage, unique in the quest. |
 | `stages[].text` | string | — | Journal text while the quest is in this stage. |
 | `stages[].textKey` | string | — | Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`. |
+| `stages[].transitions` | list of object | `[]` | Moves out of this stage, evaluated while it is current (branching quests: the first condition that holds picks the next stage). |
+| `stages[].transitions[].when` | object | required | Condition (logic DSL) that moves the quest on. The first to hold, in file order, wins. |
+| `stages[].transitions[].when.kind` | string | required | The logic kind, e.g. "hasItem". |
+| `stages[].transitions[].stage` | id | required | The stage the quest moves to. |
+| `stages[].transitions[].effects` | list of object (at least 1) | — | Effects applied in the same atomic batch as the move (e.g. set a fact). |
+| `stages[].transitions[].effects[].kind` | string | required | The logic kind, e.g. "hasItem". |
+| `stages[].transitions[].note` | string | — | A note for writers; never shown to players. |
 | `stages[].note` | string | — | A note for writers; never shown to players. |
 | `initialStage` | id | — | The stage the quest starts in. Default: the first stage. |
 | `objectives` | list of object | — | What the quest tracks. |
