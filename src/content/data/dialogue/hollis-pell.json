@@ -1,0 +1,466 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "hollis-pell",
+  "notes": "Hollis Pell the baker (bible 5.5), widower, frightened that he slept through it. Voice: short, broken sentences that stop mid-thought, flour and ovens. AC-3 branches: with tansy.saved the entry `reunion` (then `reunion-again`) plays and he is warm and shaky; without it the class greetings lead to the grief branch. Class gifts per bible 5.5: knight bread for the road, archer told where Tansy played, sorcerer her library card, thief the spare key. The library card and spare key have no item yet (fact stand-ins hollis.library-card-given, hollis.spare-key-given plus an emit); mw-e39.6 filed a follow-up bead. The bible option sets hollis.bible-lent for the side quest The Name on the Bones. Merchant greeting and farewell lines vary by class.",
+  "speakers": [
+    {
+      "id": "hollis",
+      "npc": "npc-hollis"
+    }
+  ],
+  "entries": [
+    {
+      "id": "reunion-return",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tansy.saved"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "reunion",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "node": "reunion-again"
+    },
+    {
+      "id": "reunion",
+      "when": {
+        "kind": "fact",
+        "fact": "tansy.saved"
+      },
+      "node": "reunion"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "grief-hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Knight. Thank God. Someone with a sword and a reason. I've no coin worth the name, but the oven's hot and the loaves are yesterday's and, and, you'll find her. Please.",
+      "next": "grief-1"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "You carry a bow. You'll track, then. She, my girl, Tansy, twelve, a blue ribbon, she walked right past the window. In her bare feet. In the cold.",
+      "next": "grief-1"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "A sorcerer? She'd have loved you. Reads everything she's not supposed to. Reads. Not read. She reads, I'll not say it any other way.",
+      "next": "grief-1"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "You've the look of someone who knows a door. Mine's never locked. Never was. I'd have heard. I was up. I was right there.",
+      "next": "grief-1"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Sorry, sorry, we're open, we're always open. I bake at four. Bread? I don't, what can I get you? Anything. I'll give you anything if you're going toward the mine.",
+      "next": "grief-1"
+    },
+    {
+      "id": "grief-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Three weeks of dough I can't taste. If you're going to the mine, she's twelve. Her name's Tansy. She'll have taken her shoes off so they didn't get muddy. She was always careful of her shoes.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Back. Have you, no. No, of course not. Sit if you like. I've the kettle on. Always the kettle on.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "grief-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-night",
+          "text": "Tell me about that night.",
+          "once": true,
+          "next": "night-1"
+        },
+        {
+          "id": "ask-bible",
+          "text": "Does your family keep a Bible? Letters, old names?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "hollis.bible-lent"
+            }
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hollis.bible-lent",
+              "value": true
+            }
+          ],
+          "next": "bible-1"
+        },
+        {
+          "id": "gift-knight",
+          "text": "I'll bring her home.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "giveItem",
+              "item": "bread-loaf",
+              "count": 2
+            }
+          ],
+          "next": "gift-knight-1"
+        },
+        {
+          "id": "gift-archer",
+          "text": "Where did she like to play?",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "gift-archer-1"
+        },
+        {
+          "id": "gift-sorcerer",
+          "text": "Anything of hers I could use to find her?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hollis.library-card-given",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "hollis.gave-library-card"
+            }
+          ],
+          "next": "gift-sorcerer-1"
+        },
+        {
+          "id": "gift-thief",
+          "text": "Is your door ever locked?",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hollis.spare-key-given",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "hollis.gave-spare-key"
+            }
+          ],
+          "next": "gift-thief-1"
+        },
+        {
+          "id": "leave",
+          "text": "I'll do what I can.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "night-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "I bake at four. I was up. I was right there with my hands in the dough and she walked past the window and I didn't, I didn't,",
+      "next": "night-2"
+    },
+    {
+      "id": "night-2",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "(He stops. He wipes his hands on his apron, and then wipes them again.) She was humming. A tune with no words in it. I thought she was in her bed. I thought, what a nice quiet morning.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "bible-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "A Bible? My gran's, aye, upstairs, with letters tucked in the back. Brother Anselm, one of them, from the priory. Take it. Take anything, if it helps. I'll leave it on the counter.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "gift-knight-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Bread. For the road. Two, there's no use arguing. A man can't fight on an empty stomach and a knight can't search for her on one either.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "gift-archer-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "The millpond. The drowned lane, she says there's a heron. The sluice walk, and I told her never to, so she did. Look where the ferns are flattened. She never took a path in her life.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "gift-sorcerer-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Her library card. Mirela's. The Stacks, blue ink. She'll want it back, mind, there's a fine on the one about oxen. Here. Take it. Bring it back.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "gift-thief-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "The spare. It's on the nail. The place is a mess, I haven't, I haven't done the beds. Don't judge the mess. Just find my girl.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "reunion",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "She's upstairs. Asleep. She came in at dawn on her own feet and asked what was for breakfast. I burned the first batch. Forty years and I never burned a loaf. Thank you. Thank you.",
+      "next": "reunion-hub"
+    },
+    {
+      "id": "reunion-again",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "You again. Come in, come in. I've the good loaves out. Tansy's at the Stacks, of course she is, reading something she shouldn't. I've never been so glad to be annoyed.",
+      "next": "reunion-hub"
+    },
+    {
+      "id": "reunion-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-tansy",
+          "text": "How is she?",
+          "once": true,
+          "next": "tansy-1"
+        },
+        {
+          "id": "ask-bible-glad",
+          "text": "Your family Bible. May I see the letters in it?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "hollis.bible-lent"
+            }
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hollis.bible-lent",
+              "value": true
+            }
+          ],
+          "next": "bible-glad-1"
+        },
+        {
+          "id": "vane-purse",
+          "text": "What about Vane's money?",
+          "when": {
+            "kind": "factCmp",
+            "fact": "vane.fate",
+            "op": "eq",
+            "value": "confessed"
+          },
+          "once": true,
+          "next": "purse-1"
+        },
+        {
+          "id": "reunion-loaf",
+          "text": "I'll take a loaf, then.",
+          "once": true,
+          "effects": [
+            {
+              "kind": "giveItem",
+              "item": "bread-loaf",
+              "count": 1
+            }
+          ],
+          "next": "loaf-1"
+        },
+        {
+          "id": "leave-glad",
+          "text": "I'll leave you to it.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "tansy-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Quiet. Quieter than she was. She asks what the bell was, and who rang it, and then she asks if the big one is warm enough down there. I don't, I don't have an answer for the last.",
+      "next": "reunion-hub"
+    },
+    {
+      "id": "bible-glad-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "That old thing? Take it. Gran's, and her gran's. There's a letter from a monk, Anselm, in the back. I kept meaning to read it. I kept meaning to do a lot of things.",
+      "next": "reunion-hub"
+    },
+    {
+      "id": "purse-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "A purse came from the big house. I told his man to put it to the bell. It isn't right to take it and it isn't right to refuse it. Gran'd say, bread is bread. I'm not sure.",
+      "next": "reunion-hub"
+    },
+    {
+      "id": "loaf-1",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Take two. On the house. On the house, always. I'll not forget it, you know. I never will. Go carefully.",
+      "next": "reunion-hub"
+    },
+    {
+      "id": "farewell",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "farewell-knight"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "farewell-archer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "farewell-sorcerer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "farewell-thief"
+        }
+      ],
+      "else": "farewell-any"
+    },
+    {
+      "id": "farewell-knight",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Bread for the road, if you want it. Go carefully. She'd tell you to mind the steps, knight or no.",
+      "end": true
+    },
+    {
+      "id": "farewell-archer",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Good hunting. Mind the ferns. She'd have followed the ferns.",
+      "end": true
+    },
+    {
+      "id": "farewell-sorcerer",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Mind the library fine. I'm only joking. I think I'm joking.",
+      "end": true
+    },
+    {
+      "id": "farewell-thief",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Take the back way, if you like. Door's open. It was always open.",
+      "end": true
+    },
+    {
+      "id": "farewell-any",
+      "kind": "line",
+      "speaker": "hollis",
+      "text": "Thank you. Thank you for listening. Mind the cold.",
+      "end": true
+    }
+  ]
+}

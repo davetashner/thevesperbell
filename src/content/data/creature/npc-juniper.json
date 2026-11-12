@@ -18,6 +18,7 @@
     "greed": 0.5
   },
   "behaviour": { "profile": "shopkeeper" },
+  "dialogue": "juniper-fenn",
   "audio": {
     "idleLoop": "sfx-human-idle",
     "footsteps": "sfx-human-step",
