@@ -4,7 +4,7 @@ How writers and designers author a conversation as data (mw-e22.3), without touc
 schema is `src/content/types/dialogue.ts`; the generated field reference is
 [dialogue-schema](../content/dialogue-schema.md). Conditions and effects are the shared
 [logic DSL](logic-dsl.md); this page is about the graph around them. The runtime that plays a
-dialogue is mw-e22.5, disposition mw-e22.4, persuasion math mw-e22.7, the graph validator mw-e22.8.
+dialogue is mw-e22.5 ([below](#runtime)), disposition mw-e22.4, persuasion math mw-e22.7, the graph validator mw-e22.8.
 
 ## Decision: plain JSON, one dialogue per file
 
@@ -107,3 +107,29 @@ like the creature and spell fixtures, loaded with `loadDialogueFixtureContent`):
 (Ottilie Marsh: first meeting versus return, a once-only option) and `brand-commission` (Oswin Brand:
 knight and thief options, a locked option, a persuasion check with modifiers and a failure that
 continues, effects). Real conversations go in `src/content/data/dialogue/` (E39).
+
+## Runtime
+
+`DialogueRuntime` (`src/sim/dialogue/runtime.ts`, mw-e22.5) plays a dialogue: `start(dialogueId, npcId)` picks the
+first entry whose condition holds and runs to the first thing that needs the player. A `line` waits for `advance()`,
+a `choice` for `choose(i)` (`i` indexes `choices()`, locked options included). `branch`, `effect`, `check` and `jump`
+nodes run silently in between; `abort(cause?)` ends a conversation from outside (combat, walking away).
+
+- **Locked options.** An option whose `when` fails is hidden, or with `showWhenLocked` listed `locked` with `reason`
+  (`describeCondition`) and `reasonParts`; choosing it returns `{ ok: false, reason: 'locked' }`.
+- **Effects are atomic.** Each option, effect node and check outcome applies as one `applyLogicEffects` batch through the
+  `LogicHost` you pass (compose the checkpoints of inventory, facts and disposition with `composeCheckpoints`; a
+  quest-aware host works unchanged). If it fails nothing applies: an option goes to its `onFail` node, else the
+  conversation stays on the node and `choose` returns `effects-failed`; an effect node goes to `onFail`, else the
+  conversation aborts. Every failure also emits `dialogue.error`. Call the runtime between sim steps, never from
+  a system, because `World.add`/`remove` are deferred mid-step.
+- **Visited state** is world facts: `entity:<dialogue>/<n>-<npc>-<id>.visits`, an int per node or option per NPC
+  (template `entity:*.visits`, content fact group `dialogue`, so the game's registry declares it and a production save
+  load keeps it). `dialogue.visitedCount`, entry selection and `once` read it; a world that never talks hashes as
+  before. The conversation in progress is not saved: a restored world drops it silently.
+- **Checks** are decided by the `checks` option, a `CheckResolver` (mw-e22.7 fills it in). The default `failClosed`
+  fails every check, so an unwired runtime takes each check's `failure` branch and its `failureEffects`.
+- **Events:** `dialogue.started`, `dialogue.nodeVisited` (nodes and options), `dialogue.ended`
+  `{ reason: completed | aborted, cause? }` and `dialogue.error`, each with the tick.
+- **Guards.** A choice with nothing choosable, a missing node or dialogue, or more than `MAX_SILENT_STEPS` silent nodes
+  in a row aborts with an error and a `cause`; the graph validator (mw-e22.8) should catch these first.
