@@ -73,10 +73,13 @@ flowchart LR
     lower_deepworks["The lower Deepworks"]
   end
   subgraph priory["Bellwater Priory"]
+    priory_gate["The priory gate"]
     priory_nave["The priory nave"]
     priory_choir["The priory choir"]
+    priory_garden["The priory garden"]
     scriptorium["The scriptorium"]
     belfry["The belfry"]
+    priory_crypt_stair["The crypt stair"]
     priory_crypt["The priory crypt"]
     cistern["The cistern"]
   end
@@ -166,11 +169,14 @@ flowchart LR
   briar_glen_quay ---|barge| kestrel_lock
   kestrel_lock ---|barge| stone_wharf
   kestrel_lock -.-|shortcut| lockkeepers_cottage
-  priory_road --- priory_nave
+  priory_road --- priory_gate
+  priory_gate --- priory_nave
+  priory_nave --- priory_garden
   priory_nave --- priory_choir
-  priory_choir ---|door| scriptorium
+  priory_choir ---|door, Watchers| scriptorium
   priory_nave ---|door| belfry
-  priory_nave ---|door| priory_crypt
+  priory_nave ---|door| priory_crypt_stair
+  priory_crypt_stair ---|door, sealed| priory_crypt
   priory_nave ---|door| cistern
   glen_well -.-|shortcut archer/knight/sorcerer/thief| cistern
   jail_cell -.-|secret knight/thief| cistern
@@ -204,8 +210,8 @@ Each loop is a simple cycle of edges the validator checks. "Every loop is a shor
 | --- | --- | --- |
 | `forest-watchtower-priory`: Forest, watchtower and priory | `hub-moorings`, `moorings-priory-ridge`, `hub-priory-road` | open paths |
 | `watchtower-tunnel-upper-mine`: Watchtower supply tunnel and upper mine | `lane-briarwood-edge`, `edge-hub`, `hub-moorings`, `courtyard-supply-tunnel`, `supply-tunnel-collapse`, `winch-galleries`, `mine-gate-winch`, `miners-bridge`, `lane-bridge-post` | `supply-tunnel-collapse`, `mine-gate-winch` |
-| `priory-crypt-sounding-shaft-knot`: Priory crypt and Sounding Shaft to the Knot | `ossuary-crypt`, `nave-crypt`, `nave-belfry`, `sounding-shaft`, `cradle-shaft-foot`, `horns-hall-cradle`, `chapel-horns-hall`, `ossuary-chapel` | `ossuary-crypt` |
-| `glen-well-cistern-priory`: Glen Well, cistern and priory | `glen-well-cistern`, `nave-cistern`, `priory-road-nave`, `hub-priory-road`, `edge-hub`, `lane-briarwood-edge`, `lane-market-green`, `green-glen-well` | `glen-well-cistern` |
+| `priory-crypt-sounding-shaft-knot`: Priory crypt and Sounding Shaft to the Knot | `ossuary-crypt`, `crypt-stair-crypt`, `nave-crypt-stair`, `nave-belfry`, `sounding-shaft`, `cradle-shaft-foot`, `horns-hall-cradle`, `chapel-horns-hall`, `ossuary-chapel` | `ossuary-crypt` |
+| `glen-well-cistern-priory`: Glen Well, cistern and priory | `glen-well-cistern`, `nave-cistern`, `priory-road-gate`, `priory-gate-nave`, `hub-priory-road`, `edge-hub`, `lane-briarwood-edge`, `lane-market-green`, `green-glen-well` | `glen-well-cistern` |
 | `jail-drain-cistern`: Jail drain and cistern | `jail-drain`, `glen-well-cistern`, `green-glen-well`, `green-watch-house`, `watch-house-cell` | `jail-drain`, `glen-well-cistern` |
 | `weeping-adit-lower-deepworks`: Weeping Adit and lower Deepworks | `weeping-adit`, `quay-adit-mouth`, `under-the-bridge-quay`, `riverbank-path`, `lane-bridge-post`, `miners-bridge`, `mine-gate-winch`, `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` | `weeping-adit`, `mine-gate-winch` |
 | `stone-stair`: Stone Stair, cutting hall to quay | `stone-stair`, `under-the-bridge-quay`, `riverbank-path`, `lane-bridge-post`, `miners-bridge`, `mine-gate-winch`, `winch-galleries`, `galleries-rootcellar` | `stone-stair`, `mine-gate-winch` |
@@ -284,10 +290,13 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `vane-sealed-gallery` | Vane's sealed gallery | deepworks | e26 | planned | Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6). |
 | `breach` | The breach | deepworks | e26 | planned | Where the mine opened into the Knot (bible 3.5, mw-e26.4). |
 | `lower-deepworks` | The lower Deepworks | deepworks | e26 | planned | Flooded lower galleries the Weeping Adit enters (bible 3.1). |
+| `priory-gate` | The priory gate | priory | e26 | planned | The gate at the head of the priory road (mw-e26.5; PROPOSAL, mw-e26.1: the bible names only the road and the nave). |
 | `priory-nave` | The priory nave | priory | e26 | planned | Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5). |
 | `priory-choir` | The priory choir | priory | e26 | planned | Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6). |
+| `priory-garden` | The priory garden | priory | e26 | planned | Garden with the dead pear tree Clatter remembers (bible 4.1 beat 8; mw-e26.5). Optional dead end. |
 | `scriptorium` | The scriptorium | priory | e26 | planned | Book mimics (bible 3.5, mw-e26.7). |
 | `belfry` | The belfry | priory | e26 | planned | The cracked Vesper Bell (bible 3.5, mw-e26.8). |
+| `priory-crypt-stair` | The crypt stair | priory | e26 | planned | The stair down to the sealed crypt door; the Sunbeam puzzle (PROPOSAL, mw-e26.1). |
 | `priory-crypt` | The priory crypt | priory | e26 | planned | Sealed from below (bible 4.1 beat 9). |
 | `cistern` | The cistern | priory | e26 | planned | Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). |
 | `knot-outer-ring` | The Outer Ring | knot | e26 | planned | Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). |
@@ -375,11 +384,14 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
-| `priory-road-nave` | `priory-road` | `priory-nave` | path |  |  | planned: mw-e25.25 |
+| `priory-road-gate` | `priory-road` | `priory-gate` | path |  |  | planned: mw-e25.25 |
+| `priory-gate-nave` | `priory-gate` | `priory-nave` | path |  |  | planned: mw-e26.5 |
 | `nave-choir` | `priory-nave` | `priory-choir` | path |  |  | planned: mw-e26.5 |
-| `choir-scriptorium` | `priory-choir` | `scriptorium` | door |  |  | planned: mw-e26.7 |
+| `nave-garden` | `priory-nave` | `priory-garden` | path |  |  | planned: mw-e26.5 |
+| `choir-scriptorium` | `priory-choir` | `scriptorium` | door | `{"fact":"watchers.solved"}` |  | planned: mw-e26.7 |
 | `nave-belfry` | `priory-nave` | `belfry` | door |  |  | planned: mw-e26.8 |
-| `nave-crypt` | `priory-nave` | `priory-crypt` | door |  |  | planned: mw-e26.5 |
+| `nave-crypt-stair` | `priory-nave` | `priory-crypt-stair` | door |  |  | planned: mw-e26.5 |
+| `crypt-stair-crypt` | `priory-crypt-stair` | `priory-crypt` | door | `{"fact":"world.priory-crypt.unsealed"}` |  | planned: mw-e26.5 |
 | `nave-cistern` | `priory-nave` | `cistern` | door |  |  | planned: mw-e26.20 |
 | `glen-well-cistern` | `glen-well` | `cistern` | shortcut | `{"fact":"world.glen-well.rung-pulled"}` | `verb.climb.ledge` | planned: mw-e24.10 |
 | `jail-drain` | `jail-cell` | `cistern` | secret | `{"fact":"world.jail-drain.open"}` | `tool.lockpick`, `technique.shoulder-barge` | planned: mw-e24.8 |
@@ -474,10 +486,10 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.22 | `lane-briarwood-edge` |
 | mw-e25.23 | `miners-bridge`, `green-mine-road`, `mine-road-gate` |
 | mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
-| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge`, `priory-road-nave` |
+| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge`, `priory-road-gate` |
 | mw-e26.2 | `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` |
 | mw-e26.4 | `silver-vane-gallery`, `vane-gallery-breach` |
-| mw-e26.5 | `nave-choir`, `nave-crypt` |
+| mw-e26.5 | `priory-gate-nave`, `nave-choir`, `nave-garden`, `nave-crypt-stair`, `crypt-stair-crypt` |
 | mw-e26.7 | `choir-scriptorium` |
 | mw-e26.8 | `nave-belfry` |
 | mw-e26.9 | `breach-outer-ring`, `outer-ring-ossuary`, `ossuary-chapel` |
