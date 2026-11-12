@@ -23,9 +23,7 @@ describe('pnpm world:validate', () => {
 
   it('lists planned connections and their beads with --plan', () => {
     const { lines } = run(['--plan']);
-    expect(lines).toContain(
-      'planned: market-green-briarwood-edge (market-green -> briarwood-edge) mw-e25.22',
-    );
+    expect(lines).toContain('planned: hub-sleepers-path (briarwood-hub -> sleepers-path) mw-e25.2');
   });
 
   it('exits 1 when the map has an error', () => {

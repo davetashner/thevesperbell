@@ -27,6 +27,14 @@
       "priority": 0,
       "destination": { "scene": "brazier-hall", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "briarwood-reload",
+      "notes": "Death in the Briarwood (mw-e25.1): the region is the whole scene; the death screen offers Load last save, and with no save the forest restarts at the town gate. Waking at the Sleeping Ox is e24-sleeping-ox.",
+      "region": "briarwood",
+      "priority": 0,
+      "destination": { "scene": "briarwood", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }
