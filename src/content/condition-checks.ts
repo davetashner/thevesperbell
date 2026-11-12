@@ -27,6 +27,7 @@ import type { RespawnRules } from './types/respawn-rules.ts';
 import type { SceneDef } from './types/scene.ts';
 import { signalPorts, type SignalGraphEntry } from './types/signal-graph.ts';
 import type { UnlockGroup } from './types/unlock.ts';
+import type { WorldMap } from './types/world.ts';
 
 /** One condition in a content entry. */
 export interface ConditionUsage {
@@ -74,6 +75,10 @@ export const CONDITION_USAGES: Readonly<
           : [{ pointer: `${base}/variant/when`, condition: spawn.variant.when }]),
       ];
     }),
+  world: (entry: WorldMap) =>
+    entry.edges.flatMap(({ unlock }, i) =>
+      unlock === undefined ? [] : [{ pointer: `/edges/${String(i)}/unlock`, condition: unlock }],
+    ),
   unlock: (entry: UnlockGroup) =>
     entry.unlocks.flatMap(({ requirements }, i) =>
       requirements === undefined

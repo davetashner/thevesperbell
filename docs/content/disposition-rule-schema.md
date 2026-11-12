@@ -10,3 +10,6 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `id` | id | required | The event type this rule answers, e.g. "attacked", "fed". Unique; stable once shipped. |
 | `notes` | string | required | Why this event moves disposition, and by this much. |
 | `delta` | integer -200–200 | required | Change in disposition when the event happens (−100..100 scale; the result clamps). |
+| `valueTiers` | list of object | `[]` | Item value tiers that scale `delta` (crime.theft, mw-e22.4): the highest tier whose minValue the item reaches applies; below the first tier, or none listed = ×1. Ascending by minValue. |
+| `valueTiers[].minValue` | integer ≥ 0 | required | Item value (gold) at which this tier starts. |
+| `valueTiers[].scale` | number > 0 | required | Multiplier on `delta` for items in this tier. |

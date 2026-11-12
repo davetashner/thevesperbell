@@ -14,6 +14,7 @@
 import { z } from 'zod';
 import type { Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
+import { PLAYER_CLASSES } from './controller.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
 import { creatureAudioSchema } from './creature-audio.ts';
 import { hitReactionsSchema, poiseRegenSchema, resistancesSchema } from './damage.ts';
@@ -216,6 +217,12 @@ export const creatureSchema = z.strictObject({
         .optional()
         .describe(
           'Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets.',
+        ),
+      classAffinity: z
+        .partialRecord(z.enum(PLAYER_CLASSES), z.int().min(-100).max(100))
+        .optional()
+        .describe(
+          'Offset added to the starting disposition for a player of each class (mw-e22.4), e.g. a fence warms to a thief; absent or unlisted class = 0.',
         ),
     })
     .prefault({})

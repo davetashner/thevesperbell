@@ -14,18 +14,44 @@ import { contentId } from '../schema.ts';
 export const ATTACKED_EVENT = 'attacked';
 
 /** Schema of one rule file, `src/content/data/disposition-rule/<event>.json`. */
-export const dispositionRuleSchema = z.strictObject({
-  id: contentId.describe(
-    'The event type this rule answers, e.g. "attacked", "fed". Unique; stable once shipped.',
-  ),
-  notes: z.string().min(1).describe('Why this event moves disposition, and by this much.'),
-  delta: z
-    .int()
-    .min(-200)
-    .max(200)
-    .refine((delta) => delta !== 0, 'a rule that changes nothing is not a rule')
-    .describe('Change in disposition when the event happens (−100..100 scale; the result clamps).'),
-});
+export const dispositionRuleSchema = z
+  .strictObject({
+    id: contentId.describe(
+      'The event type this rule answers, e.g. "attacked", "fed". Unique; stable once shipped.',
+    ),
+    notes: z.string().min(1).describe('Why this event moves disposition, and by this much.'),
+    delta: z
+      .int()
+      .min(-200)
+      .max(200)
+      .refine((delta) => delta !== 0, 'a rule that changes nothing is not a rule')
+      .describe(
+        'Change in disposition when the event happens (−100..100 scale; the result clamps).',
+      ),
+    valueTiers: z
+      .array(
+        z.strictObject({
+          minValue: z.int().nonnegative().describe('Item value (gold) at which this tier starts.'),
+          scale: z.number().positive().describe('Multiplier on `delta` for items in this tier.'),
+        }),
+      )
+      .prefault([])
+      .describe(
+        'Item value tiers that scale `delta` (crime.theft, mw-e22.4): the highest tier whose minValue the item reaches applies; below the first tier, or none listed = ×1. Ascending by minValue.',
+      ),
+  })
+  .superRefine((rule, ctx) => {
+    rule.valueTiers.forEach((tier, index) => {
+      const previous = rule.valueTiers[index - 1];
+      if (previous !== undefined && tier.minValue <= previous.minValue) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['valueTiers', index, 'minValue'],
+          message: 'tiers must ascend by minValue',
+        });
+      }
+    });
+  });
 
 /** A rule as written in JSON. */
 export type DispositionRuleDefInput = z.input<typeof dispositionRuleSchema>;
