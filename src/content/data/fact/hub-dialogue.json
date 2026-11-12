@@ -1,0 +1,141 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "hub-dialogue",
+  "name": "Hub dialogue facts",
+  "notes": "mw-e39.5: world-state facts read and written by the Mirela, Dot and Captain Hale dialogues (bible 5.1, 5.2, 5.4). Writers other than the dialogues (the quest, Mortimer's ban, the theft system, the ginger-biscuits item) are named in each description; each has a follow-up bead.",
+  "facts": [
+    {
+      "key": "mirela.banned",
+      "type": "bool",
+      "default": false,
+      "description": "Mortimer caught the player and Mirela has barred them from the Lamplit Stacks (bible 9: she bans you for a day). This is a fact, not a disposition band: her mood towards you is separate from Mortimer's rule. Written by the shop's thief-catching system; cleared by mirela-stacks when the player brings biscuits or a day has passed.",
+      "owner": "mortimer-ban"
+    },
+    {
+      "key": "mirela.banned-days",
+      "type": "int",
+      "default": 0,
+      "description": "Full in-game days elapsed since Mortimer's ban began. The ban system increments it at each midnight while mirela.banned holds; mirela-stacks lifts the ban at 1 or more and resets it to 0.",
+      "owner": "mortimer-ban"
+    },
+    {
+      "key": "mirela.biscuits-brought",
+      "type": "bool",
+      "default": false,
+      "description": "The player carries ginger biscuits for Mirela (bible 9). Stand-in until the ginger-biscuits item exists: written by its pickup, read and cleared by mirela-stacks to lift a ban.",
+      "owner": "item"
+    },
+    {
+      "key": "mirela.restricted-access",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela has opened the restricted shelf behind the curtain to the player (bible 5.1): a sorcerer's welcome, a won persuasion, or enough trust. Set by mirela-stacks; the bookshop's restricted stock reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mirela.nine-sleeps.confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela has told the player that she owns Nine Sleeps and will never sell it (bible 5.1, 7.2). She never gives, lends or sells the book. Set by mirela-stacks.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mirela.hours.lent",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela has offered to lend The Vesperine Hours (bible 4.1 beat 4). Set by mirela-stacks; the lending itself is the bookshop system.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mirela.thief-job.accepted",
+      "type": "bool",
+      "default": false,
+      "description": "A thief accepted Mirela's job to retrieve the book 'someone borrowed permanently' (bible 5.1). Set by mirela-stacks; read by the job's quest.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "dot.trinket.confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Dot has shown the player the goblin trinket with a Vane Deepworks stamp on the back (bible 5.4). Set by dot-sleeping-ox.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "dot.fence.open",
+      "type": "bool",
+      "default": false,
+      "description": "Dot has told a thief about the cellar that buys what the lamp shouldn't see (bible 5.4). Set by dot-sleeping-ox; the fence's prices are the shop system.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "dot.hearth.lit",
+      "type": "bool",
+      "default": false,
+      "description": "A sorcerer lit the Sleeping Ox's hearth without burning the beams (bible 5.4). Set by dot-sleeping-ox.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "well.player-fell",
+      "type": "bool",
+      "default": false,
+      "description": "The player fell down the Glen Well (bible 9: Dot remembers embarrassment). Written by the well's fall handling; read by dot-sleeping-ox for a one-time quip.",
+      "owner": "world"
+    },
+    {
+      "key": "hale.sleepwalking.revealed",
+      "type": "bool",
+      "default": false,
+      "description": "The Captain's Boots has revealed to Hale that he sleepwalked and delivered the 'friend below' note (bible 5.2, 6.1). Until it is true hale-watch never refers to him delivering the note. Set by the quest.",
+      "owner": "quest"
+    },
+    {
+      "key": "hale.secret.kept",
+      "type": "bool",
+      "default": false,
+      "description": "The player kept Hale's sleepwalking secret (The Captain's Boots, bible 6.1): he becomes a loyal ally and backs the Act III testimony. Set by the quest.",
+      "owner": "quest"
+    },
+    {
+      "key": "hale.secret.exposed",
+      "type": "bool",
+      "default": false,
+      "description": "The player told the town about Hale's sleepwalking (The Captain's Boots): he loses authority and Vane gains it. Set by the quest.",
+      "owner": "quest"
+    },
+    {
+      "key": "hale.list.shared",
+      "type": "bool",
+      "default": false,
+      "description": "Hale has given the player his missing-persons list and map of where the footprints ended (bible 4.1 beat 4). Set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.boots.asked",
+      "type": "bool",
+      "default": false,
+      "description": "The player asked Hale about his dusty boots and he deflected. Set by hale-watch; the quest The Captain's Boots can start from it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.boots.confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Hale admitted to a trusted player that he wakes with mine dust on his boots (not that he delivered the note). Set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.testimony.given",
+      "type": "bool",
+      "default": false,
+      "description": "Hale has agreed to stand before the council and back the player's account of the Fold (bible 6.1, Act III). Set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.jailed",
+      "type": "bool",
+      "default": false,
+      "description": "Hale has jailed the player for stealing in town (bible 4.5). Set by the theft system; hale-watch plays the jail talk and clears it.",
+      "owner": "crime"
+    }
+  ]
+}

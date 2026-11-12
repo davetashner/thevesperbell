@@ -28,6 +28,7 @@
     "sociability": 0.5,
     "greed": 0.1
   },
+  "dialogue": "hale-watch",
   "behaviour": {
     "profile": "watchman"
   },

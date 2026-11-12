@@ -1,0 +1,906 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "hale-watch",
+  "notes": "Captain Brannoc Hale (bible 5.2), the whole Watch of Briar Glen plus two teenagers with spears. Honest, tired, rumpled; clipped sentences, counts doors. Fears he is too old for this. SECRET: he sleepwalks and hides the mine dust on his boots. AC-3/bible: he must not know he delivered the 'friend below' note until The Captain's Boots reveals it, so every line about the note is behind hale.sleepwalking.revealed (the entry boots-acknowledged and the option ask-note); before that he only deflects about his boots. The quest owns hale.secret.kept / hale.secret.exposed (tell the town or keep it). Also: the missing-persons list, the jail (hale.jailed, set by the theft system; the loose stone is only hinted), Act III testimony (a persuasion check unless the secret was kept), and a reaction to each headline ending. Disposition: cold (<= -10) shuts him down; >= 10 he admits the dust on his boots.",
+  "speakers": [
+    {
+      "id": "hale",
+      "npc": "npc-hale"
+    }
+  ],
+  "entries": [
+    {
+      "id": "jailed",
+      "when": {
+        "kind": "fact",
+        "fact": "hale.jailed"
+      },
+      "node": "jail-1"
+    },
+    {
+      "id": "ending-long",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.fate",
+        "op": "eq",
+        "value": "joined"
+      },
+      "node": "ending-long-1"
+    },
+    {
+      "id": "ending-silence",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-silence-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-silence-1"
+    },
+    {
+      "id": "ending-warden",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "dead"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-warden-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-warden-1"
+    },
+    {
+      "id": "ending-rung",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "alive"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-rung-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-rung-1"
+    },
+    {
+      "id": "distrust",
+      "when": {
+        "kind": "disposition",
+        "npc": "npc-hale",
+        "op": "lte",
+        "value": -10
+      },
+      "node": "cold-1"
+    },
+    {
+      "id": "boots-acknowledged",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "hale.sleepwalking.revealed"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "boots-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "boots-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Well met. A knight in Briar Glen, and I've been the entire Watch for twenty years. Captain Hale. Sit, if the stool takes you. I'd stand, but my knees have views.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Scout the tree line for me, would you? My knees don't do tree lines. Captain Hale, what's left of the Watch. You're the archer, I take it. I'm told you hit things.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Ah. Sorcerer. Right. Civil of you to come to the Watch House first. Could you, ah, do something about the dreams? Everyone's having them. I'm told it's the damp.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I know what you are. Don't make me prove it. Hale, Captain. Keep your hands where I can count them; I'm told I count badly.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Captain Hale, Briar Glen Watch. Such as it is: me, two lads with spears and a kettle. State your business, then sit. You're making the lads nervous.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Back. Good. Come in, mind the kettle. Anything new?",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-list",
+          "text": "Can I see the missing-persons list?",
+          "once": true,
+          "next": "list-1"
+        },
+        {
+          "id": "ask-footprints",
+          "text": "Where did the footprints end?",
+          "once": true,
+          "next": "prints-1"
+        },
+        {
+          "id": "ask-watch",
+          "text": "Is the Watch enough?",
+          "once": true,
+          "next": "watch-1"
+        },
+        {
+          "id": "ask-boots",
+          "text": "Your boots are dusty, Captain.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.sleepwalking.revealed"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.boots.asked"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "boots-ask-1"
+        },
+        {
+          "id": "ask-confide",
+          "text": "You look like you haven't slept.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "disposition",
+                "npc": "npc-hale",
+                "op": "gte",
+                "value": 10
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.sleepwalking.revealed"
+                }
+              }
+            ]
+          },
+          "next": "confide-1"
+        },
+        {
+          "id": "ask-note",
+          "text": "I want to talk about the note.",
+          "when": {
+            "kind": "fact",
+            "fact": "hale.sleepwalking.revealed"
+          },
+          "next": "note-1"
+        },
+        {
+          "id": "peer-knight",
+          "text": "Captain. Tell me what you need.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "peer-1"
+        },
+        {
+          "id": "treeline-archer",
+          "text": "I'll scout the tree line.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "tree-1"
+        },
+        {
+          "id": "dreams-sorcerer",
+          "text": "I can look into the dreams.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "dreams-1"
+        },
+        {
+          "id": "prove-thief",
+          "text": "Go on, then. Prove it.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "prove-check"
+        },
+        {
+          "id": "testify",
+          "text": "Will you stand with me before the council?",
+          "when": {
+            "kind": "fact",
+            "fact": "tansy.saved"
+          },
+          "next": "testify-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Mind the doors on your way. I count them.",
+      "end": true
+    },
+    {
+      "id": "list-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Three weeks. Seven beds gone cold. I've started counting the doors on my rounds, like that'll help.",
+      "next": "list-2"
+    },
+    {
+      "id": "list-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Moss Greaves, tanner. Ettie Lark, milkmaid. Rowan Tate and Harlan Burr, miners. Mina Coles, schoolhouse. Fitch, from the Ox. And the Pell girl, Tansy, the night you arrived.",
+      "next": "list-3"
+    },
+    {
+      "id": "list-3",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I've written it all down. Take a copy. Where their footprints stopped, I've marked on the map. All toward the mine. Every one of them.",
+      "next": "list-fx"
+    },
+    {
+      "id": "list-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.list.shared",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hale.list-shared"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "prints-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Cobbles, then the mine road, then gravel, then nothing. Bare feet, every one; not a shoe among them. They stop at the gate. Barred, on Vane's order. And Vane chairs the council.",
+      "next": "prints-fx"
+    },
+    {
+      "id": "prints-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "hale.map-shared"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "watch-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "The Watch is me, two lads who ask leave to visit their mothers, and a kettle. Before you say it: yes. I'm too old for this. Everyone knows. Strike that from the record.",
+      "next": "hub"
+    },
+    {
+      "id": "boots-ask-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Dust. It's a mining town. It gets into everything. Don't write that down.",
+      "next": "boots-ask-fx"
+    },
+    {
+      "id": "boots-ask-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.boots.asked",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hale.boots-asked"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "confide-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I haven't. Not properly. I go to bed one man and wake another, and my boots are dusty with mine dust. I've never been up the mine road, not since the gate shut. I tie the laces to the bedpost now.",
+      "next": "confide-2"
+    },
+    {
+      "id": "confide-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "They're still tied in the morning. That's the part I can't explain. Tell no one. If the council hears, Vane gets the Watch.",
+      "next": "confide-fx"
+    },
+    {
+      "id": "confide-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.boots.confessed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hale.boots-confessed"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "boots-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "So. The note under your door. It was my boots that took it. Eyes shut, boots on, up the Ox's stairs and under the door, and not a notion in my head. I've sat here an hour working out how to say it.",
+      "next": "boots-route"
+    },
+    {
+      "id": "boots-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "hale.secret.exposed"
+          },
+          "next": "boots-exposed"
+        }
+      ],
+      "else": "boots-kept"
+    },
+    {
+      "id": "boots-kept",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "You kept it between us. I won't forget that, and neither will my knees. If you've a use for an old man who owes you, I'm yours.",
+      "next": "hub"
+    },
+    {
+      "id": "boots-exposed",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "The town knows now. Vane's got the council's ear and the Watch is half his. I don't hold it against you. I'd have told, in your place. I'd only have hoped I wouldn't.",
+      "next": "hub"
+    },
+    {
+      "id": "note-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I carried it. In my sleep. A stranger wrote it and my feet delivered it, like the world's worst postman. 'The beast keeps them in the dark.' Who taught my feet to follow a stranger?",
+      "next": "note-2"
+    },
+    {
+      "id": "note-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Whoever it was, they know the way, they know me, and they know who'll listen. Find them. I'll tie myself to the bedpost if you like.",
+      "next": "hub"
+    },
+    {
+      "id": "peer-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Peer to peer, then. Watch the mine gate at dusk. Be a second pair of eyes on the road. And tell me, now and then, that I haven't lost my wits. You'll do for all three.",
+      "next": "peer-fx"
+    },
+    {
+      "id": "peer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 10
+        },
+        {
+          "kind": "emit",
+          "event": "hale.knight-asked"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "tree-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Bless you. East of the bridge, where the Briarwood comes down to the road. The footprints all head for the gate; I want to know if anything comes out. Report to me. Not to Vane.",
+      "next": "tree-fx"
+    },
+    {
+      "id": "tree-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "hale.scout-asked"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "dreams-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Can you? Everyone has the same one. A music, a long way off, and a door. I don't. I want that on record. I don't have it.",
+      "next": "dreams-fx"
+    },
+    {
+      "id": "dreams-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "prove-check",
+      "kind": "check",
+      "approach": "deceive",
+      "difficulty": 9,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-hale",
+            "op": "gte",
+            "value": 3
+          },
+          "bonus": 2,
+          "label": "He wants to believe you"
+        }
+      ],
+      "success": "prove-ok",
+      "failure": "prove-fail"
+    },
+    {
+      "id": "prove-ok",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "...You're right. I've nothing. A feeling in my knees. Get out of my sight before I find something to charge you with.",
+      "next": "hub"
+    },
+    {
+      "id": "prove-fail",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Pockets. Out. All of them. (He finds a tin.) Is that my own tobacco? Take it. I'll pretend I never saw. Clear out before I recall otherwise.",
+      "next": "prove-fx"
+    },
+    {
+      "id": "prove-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": -5
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "testify-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Before the council, to speak for what's below. They'll want proof and they'll want a name to blame. I'm one old man with a badge. Let me think what it costs me.",
+      "next": "testify-route"
+    },
+    {
+      "id": "testify-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "hale.secret.kept"
+          },
+          "next": "testify-yes"
+        }
+      ],
+      "else": "testify-check"
+    },
+    {
+      "id": "testify-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 12,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-hale",
+            "op": "gte",
+            "value": 10
+          },
+          "bonus": 3,
+          "label": "He trusts you"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "hale.secret.exposed"
+          },
+          "bonus": -4,
+          "label": "The town has laughed at him"
+        }
+      ],
+      "success": "testify-yes",
+      "failure": "testify-no"
+    },
+    {
+      "id": "testify-yes",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I'll stand. I've stood in worse rooms, though never one with Vane in it. Say what you saw; I'll say what I saw, and I'll say you don't lie. That's worth more than my name.",
+      "next": "testify-fx"
+    },
+    {
+      "id": "testify-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.testimony.given",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hale.testified"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "testify-no",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I can't, not today. Bring me something I can put on a table, and I'll stand beside it. That isn't cowardice. It's a captain's arithmetic.",
+      "next": "hub"
+    },
+    {
+      "id": "cold-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I've nothing to say to you. Not until you've shown me something other than your back.",
+      "next": "cold-hub"
+    },
+    {
+      "id": "cold-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "cold-amends",
+          "text": "I'll make amends.",
+          "effects": [
+            {
+              "kind": "disposition",
+              "npc": "npc-hale",
+              "delta": 6
+            }
+          ],
+          "next": "cold-amends-1"
+        },
+        {
+          "id": "cold-leave",
+          "text": "Understood.",
+          "next": "cold-end"
+        }
+      ]
+    },
+    {
+      "id": "cold-amends-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "We'll see. Actions, not words. I've heard words.",
+      "end": true
+    },
+    {
+      "id": "cold-end",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Good. Mind the door.",
+      "end": true
+    },
+    {
+      "id": "jail-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Caught with your fingers in someone else's pocket. I don't enjoy this. The cell's older than the Watch and damper than the river. You'll sit in it till the sun's up and think about what you've done.",
+      "next": "jail-2"
+    },
+    {
+      "id": "jail-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Nothing in there but a bench, a bucket and the damp. Nobody's looked at that floor in a hundred years, and I'm not going to start tonight.",
+      "next": "jail-choice"
+    },
+    {
+      "id": "jail-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "jail-sorry",
+          "text": "I'm sorry, Captain.",
+          "effects": [
+            {
+              "kind": "disposition",
+              "npc": "npc-hale",
+              "delta": 2
+            }
+          ],
+          "next": "jail-sorry-1"
+        },
+        {
+          "id": "jail-argue",
+          "text": "It was a misunderstanding.",
+          "effects": [
+            {
+              "kind": "disposition",
+              "npc": "npc-hale",
+              "delta": -3
+            }
+          ],
+          "next": "jail-argue-1"
+        }
+      ]
+    },
+    {
+      "id": "jail-sorry-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I believe you. Doesn't change the bench. Make it right with whoever you wronged, and we'll call it done.",
+      "next": "jail-fx"
+    },
+    {
+      "id": "jail-argue-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "A misunderstanding in somebody's pocket. Sit. We'll talk when the bench has had its say.",
+      "next": "jail-fx"
+    },
+    {
+      "id": "jail-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.jailed",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "jail.sentence",
+          "data": {
+            "days": 1
+          }
+        }
+      ],
+      "next": "jail-end"
+    },
+    {
+      "id": "jail-end",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Door closes. Don't kick it; it's older than your grandmother.",
+      "end": true
+    },
+    {
+      "id": "ending-long-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "(Hale stands at the Watch House door, eyes shut, boots dusty. He is counting under his breath.) 'Forty. Forty-one. All the doors. Someone has to count the doors.'",
+      "next": "ending-long-2"
+    },
+    {
+      "id": "ending-long-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "(The lamp over the Watch House door is still lit.)",
+      "end": true
+    },
+    {
+      "id": "ending-rung-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Seven doors, counted twice. All open, all lit, all the beds warm. I slept. Eleven hours. I woke with clean boots. You'll not know what that is to me. Thank you.",
+      "next": "ending-rung-2"
+    },
+    {
+      "id": "ending-rung-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "The bell rings each dusk. I find I'm on the bridge for it, every time. I've told the lads it's duty.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-warden-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "They're home. All seven. And a creature that carried them gently lies dead. I wrote the report. I didn't know what to put under 'thanks to'. I put his name in. I hope you don't mind.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-silence-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "The bounty's paid and the council's pleased. I haven't written the report. Don't ask me to. Vane's quite right that nobody wants to read it. Somebody ought to.",
+      "next": "hub"
+    }
+  ]
+}
