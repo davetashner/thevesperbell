@@ -479,6 +479,17 @@
       }
     },
     {
+      "id": "npc-tansy",
+      "at": [7.0, 0.0, 30.0],
+      "tags": ["child"],
+      "yaw": 270,
+      "creature": "npc-tansy",
+      "spawnIf": { "fact": "tansy.saved" },
+      "leash": {
+        "radius": 2
+      }
+    },
+    {
       "id": "sign-pell-bakery",
       "at": [4.25, 3.25, 32.0],
       "tags": ["sign"]
