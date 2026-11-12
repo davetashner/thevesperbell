@@ -69,6 +69,7 @@ export * from './hiding';
 export * from './input';
 export * from './interaction';
 export * from './light';
+export * from './logic';
 export * from './loot';
 export * from './magic';
 export * from './mechanisms';
