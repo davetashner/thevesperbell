@@ -986,6 +986,7 @@ describe('scene content', () => {
     ).toEqual([
       'brazier-hall',
       'briar-glen-lane',
+      'briarwood',
       'bridgeward-college',
       'chandelier-room',
       'chimes',

@@ -110,7 +110,8 @@
       "name": "Market Green",
       "area": "town",
       "epic": "e24",
-      "notes": "The town's heart with the notice board (bible 3.5)."
+      "scene": "briar-glen-lane",
+      "notes": "The town's heart with the notice board (bible 3.5). Stand-in until mw-e24.2 builds the green: the north end of briar-glen-lane (its woodside path, mw-e25.22), which owns the way into the Briarwood."
     },
     {
       "id": "lamplit-stacks",
@@ -194,63 +195,72 @@
       "name": "The Briarwood edge (town side)",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Where the town's upper lane meets the forest (bible 3.1: above the town)."
+      "scene": "briarwood",
+      "notes": "Where the town's upper lane meets the forest (bible 3.1: above the town). Built as the south end of the briarwood scene: the town gate (mw-e25.1, mw-e25.22)."
     },
     {
       "id": "briarwood-hub",
       "name": "The Briarwood paths and clearings",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "The forest hub joining the watchtower, priory road and far bank (bible 3.1, mw-e25.1)."
+      "scene": "briarwood",
+      "notes": "The forest hub joining the watchtower, priory road and far bank (bible 3.1, mw-e25.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "sleepers-path",
       "name": "The Sleepers' Path",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Line of trampled ferns, visible at night or to a sharp eye (bible 3.5, mw-e25.2)."
+      "scene": "briarwood",
+      "notes": "Line of trampled ferns, visible at night or to a sharp eye (bible 3.5, mw-e25.2). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "standing-horn",
       "name": "The Standing Horn",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Hornfolk menhir, hands over its ears (bible 3.5, mw-e25.3)."
+      "scene": "briarwood",
+      "notes": "Hornfolk menhir, hands over its ears (bible 3.5, mw-e25.3). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "wolf-den",
       "name": "The wolf den",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Encounter site (bible 3.5, mw-e25.4)."
+      "scene": "briarwood",
+      "notes": "Encounter site (bible 3.5, mw-e25.4). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "woodcutters-hut",
       "name": "The woodcutter's empty hut",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Bible 3.5."
+      "scene": "briarwood",
+      "notes": "Bible 3.5. Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "millpond",
       "name": "The millpond and drowned lane",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Bible 3.5, mw-e25.5."
+      "scene": "briarwood",
+      "notes": "Bible 3.5, mw-e25.5. Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "priory-road",
       "name": "The priory road",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Road through the forest to Bellwater Priory (bible 3.5)."
+      "scene": "briarwood",
+      "notes": "Road through the forest to Bellwater Priory (bible 3.5). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "millweir-far-bank",
       "name": "The Briarwood far bank",
       "area": "briarwood",
       "epic": "e25",
-      "notes": "Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1)."
+      "scene": "briarwood",
+      "notes": "Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead."
     },
     {
       "id": "moorings-courtyard",
@@ -719,8 +729,8 @@
       "from": "market-green",
       "to": "briarwood-edge",
       "kind": "path",
-      "bead": "mw-e25.22",
-      "notes": "Upper lane / woodside path from the green into the forest."
+      "notes": "Upper lane / woodside path from the green into the forest. Market Green is not built yet (mw-e24.2), so the lane's north end (the woodside path past the Bridgeward College) stands in for it: briar-glen-lane/woodside-path leads into the Briarwood and briarwood/town-gate leads back (mw-e25.22).",
+      "transitions": ["briar-glen-lane/woodside-path", "briarwood/town-gate"]
     },
     {
       "id": "edge-hub",
@@ -728,7 +738,7 @@
       "to": "briarwood-hub",
       "kind": "path",
       "bead": "mw-e25.1",
-      "notes": "Forest path from the town side to the hub."
+      "notes": "Forest path from the town side to the hub. Walkable inside the briarwood scene (mw-e25.1); an edge inside one scene has no transition volume."
     },
     {
       "id": "hub-sleepers-path",
@@ -773,7 +783,7 @@
       "to": "woodcutters-hut",
       "kind": "path",
       "bead": "mw-e25.1",
-      "notes": "The hut."
+      "notes": "The hut. Walkable inside the briarwood scene (mw-e25.1); an edge inside one scene has no transition volume."
     },
     {
       "id": "hub-millpond",

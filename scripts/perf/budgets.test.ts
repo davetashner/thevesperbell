@@ -56,6 +56,7 @@ describe('perf budgets (mw-e32.1)', () => {
       ...['valley-01', 'valley-02', 'valley-03'].flatMap((scene) =>
         ['high', 'low'].map((preset) => ['reference', scene, preset, 0]),
       ),
+      ['reference', 'briarwood', 'high', 0],
     ]);
     expect(budgets.find((b) => b.id === 'frame-p95-high')).toMatchObject({
       max: 16.7,
