@@ -2,7 +2,7 @@
   "$schema": "../../../data/scene.schema.json",
   "id": "conversation-room",
   "name": "Conversation room",
-  "description": "A walled 12 m room to try talking to someone (mw-e22.9), in debug builds only: a greybox villager walks a patrol route along the room, and the player can walk up, press Interact to talk, continue lines with Enter or E and pick options with 1 to 9. Walking more than 6 m away, or a creature turning on the player, ends the conversation and she walks her route again.",
+  "description": "A walled 12 m room to try talking to someone (mw-e22.9), in debug builds only: a greybox villager walks a patrol route along the room, Clatter, Mother Kettleback and Snig (mw-e39.8, unplaced in the real game until E26) stand at its edges, and the player can walk up, press Interact to talk, continue lines with Enter or E and pick options with 1 to 9. Walking more than 6 m away, or a creature turning on the player, ends the conversation and she walks her route again.",
   "grid": 1,
   "camera": {
     "position": [0, 8, -12],
@@ -52,6 +52,30 @@
         [-4, 0, 3],
         [4, 0, 3]
       ]
+    },
+    {
+      "id": "clatter",
+      "at": [-4.5, 0, -1],
+      "yaw": 90,
+      "tags": ["npc"],
+      "creature": "npc-clatter",
+      "leash": { "radius": 1.5 }
+    },
+    {
+      "id": "kettleback",
+      "at": [4.5, 0, -1],
+      "yaw": 270,
+      "tags": ["npc"],
+      "creature": "npc-kettleback",
+      "leash": { "radius": 1.5 }
+    },
+    {
+      "id": "snig",
+      "at": [4.5, 0, 4.5],
+      "yaw": 270,
+      "tags": ["npc"],
+      "creature": "npc-snig",
+      "leash": { "radius": 1.5 }
     }
   ],
   "light": {

@@ -1,0 +1,912 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "clatter-garden",
+  "notes": "Clatter (Brother Anselm Hobb, bible 5.9) in his mushroom garden among the Forgotten (the Ossuary, E26: unplaced for now; reachable in the debug conversation room). Courteous, apologetic, tends pale mushrooms like a garden; the bones 'have opinions'. Memory stages follow the numeric fact clatter.memories (0 to 3 pieces of The Name on the Bones recovered, written by the quest): every stage has its own greeting and its own set of remembered fragments (ask-memory). If the song swells before he is restored the quest sets clatter.song-swelled and drops clatter.memories to 0: he notices something is missing (lost-1) and the dialogue clears the flag. While clatter.hostile (the Forgotten's fighting reflex has him, until the player hums the hymn or lowers a weapon) he only apologises (barks). Once clatter.restored he asks to rest or to join; either is right (bible 6.1). Class branches: sorcerer reads his memories (a gamble: success skips a piece, failure costs one, once only), thief returns a thing he does not know he lost, knight stands guard (and gives the rites if he asks for rest), archer keeps watch. Not placed yet: the Ossuary scenes belong to E26.",
+  "speakers": [
+    {
+      "id": "clatter",
+      "npc": "npc-clatter"
+    }
+  ],
+  "entries": [
+    {
+      "id": "song-lost",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "clatter.song-swelled"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "clatter.restored"
+            }
+          }
+        ]
+      },
+      "node": "lost-1"
+    },
+    {
+      "id": "hostile-again",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "clatter.hostile"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "bark-a",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "node": "bark-b"
+    },
+    {
+      "id": "hostile",
+      "when": {
+        "kind": "fact",
+        "fact": "clatter.hostile"
+      },
+      "node": "bark-a"
+    },
+    {
+      "id": "joined",
+      "when": {
+        "kind": "factCmp",
+        "fact": "clatter.fate",
+        "op": "eq",
+        "value": "joined"
+      },
+      "node": "joined-1"
+    },
+    {
+      "id": "restored",
+      "when": {
+        "kind": "fact",
+        "fact": "clatter.restored"
+      },
+      "node": "restored-1"
+    },
+    {
+      "id": "first-meeting",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 0
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "meet-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "meet-1"
+    },
+    {
+      "id": "stage-3",
+      "when": {
+        "kind": "factCmp",
+        "fact": "clatter.memories",
+        "op": "gte",
+        "value": 3
+      },
+      "node": "stage-3"
+    },
+    {
+      "id": "stage-2",
+      "when": {
+        "kind": "factCmp",
+        "fact": "clatter.memories",
+        "op": "eq",
+        "value": 2
+      },
+      "node": "stage-2"
+    },
+    {
+      "id": "stage-1",
+      "when": {
+        "kind": "factCmp",
+        "fact": "clatter.memories",
+        "op": "eq",
+        "value": 1
+      },
+      "node": "stage-1"
+    },
+    {
+      "id": "stage-0",
+      "node": "stage-0"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "bark-a",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Sorry! Sorry. I don't want to hit you, it's the bones, they have opinions. Please stand somewhere I'm not aiming. Further. A bit further. Thank you, sorry.",
+      "next": "bark-menu"
+    },
+    {
+      "id": "bark-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh, you again. Sorry, sorry, the arm is doing it. I'm not doing it. I'd like that noted, if anyone is noting.",
+      "next": "bark-menu"
+    },
+    {
+      "id": "bark-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "bark-lower",
+          "text": "Lower your weapon and wait.",
+          "next": "bark-lower-1"
+        },
+        {
+          "id": "bark-hum",
+          "text": "Hum the Vesper hymn, softly.",
+          "next": "bark-hum-1"
+        },
+        {
+          "id": "bark-back",
+          "text": "Back away slowly.",
+          "next": "bark-back-1"
+        }
+      ]
+    },
+    {
+      "id": "bark-lower-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh. Oh, that's very decent of you. The arm has stopped, look. It's thinking about it. Sorry, it's still thinking about it.",
+      "next": "bark-calm"
+    },
+    {
+      "id": "bark-hum-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh. Oh, that's the evening one. Somebody used to... Sorry, I've gone quiet all through, right down to the knees. That is a lovely tune, as long as it stays small.",
+      "next": "bark-calm"
+    },
+    {
+      "id": "bark-back-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Thank you! Thank you, I'll try not to follow. The legs have opinions as well, I'm afraid. Sorry. Sorry! Mind the mushrooms!",
+      "end": true
+    },
+    {
+      "id": "bark-calm",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.hostile",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-clatter",
+          "delta": 2
+        }
+      ],
+      "next": "stage-gate"
+    },
+    {
+      "id": "stage-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "gte",
+            "value": 3
+          },
+          "next": "stage-3"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 2
+          },
+          "next": "stage-2"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 1
+          },
+          "next": "stage-1"
+        }
+      ],
+      "else": "stage-0"
+    },
+    {
+      "id": "lost-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "I had something just now. It was round. A pear? No, it's gone. It was in my hands and it's gone. Was someone humming? I think someone was humming.",
+      "next": "lost-1-b"
+    },
+    {
+      "id": "lost-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Sorry. It's only that I'd got so far. I'd laid it all out like seedlings, and then the whole tray went. Never mind. We start again. Gardeners are good at starting again.",
+      "next": "lost-fx"
+    },
+    {
+      "id": "lost-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.song-swelled",
+          "value": false
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "meet-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh! Oh, hello. Sorry, I wasn't... Do mind the mushrooms, they're easily offended. I'd offer you a seat, but I can't remember where I put the chairs. Or whether there were chairs.",
+      "next": "meet-1-b"
+    },
+    {
+      "id": "meet-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "The goblins call me Clatter. I assume that's because of the clatter. I can't think what else it would be for.",
+      "next": "hub"
+    },
+    {
+      "id": "stage-0",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Hello again. Sorry. I do know you, I think; I know your feet. Mind the mushrooms. They've started sulking. I can't think what I did.",
+      "next": "hub"
+    },
+    {
+      "id": "stage-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Ah, hello. I've got a pear tree now. Just the one. I keep it in my head, between the fourth and fifth thoughts, and I water it twice a day. It's very good company.",
+      "next": "hub"
+    },
+    {
+      "id": "stage-2",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Hello! I had a sister. And a tree. I'm so full of things I've had to start a second pocket. Sorry, I'm talking too much. Do stop me. Or don't. It's rather nice.",
+      "next": "hub"
+    },
+    {
+      "id": "stage-3",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Hello, friend. I nearly have it. My name's on the tip of my tongue, if I had a tongue. Sorry. Nearly. Do you ever feel that someone is about to say a word that's yours?",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-memory",
+          "text": "What do you remember?",
+          "next": "memory-gate"
+        },
+        {
+          "id": "ask-garden",
+          "text": "Tell me about the mushrooms.",
+          "once": true,
+          "next": "garden-1"
+        },
+        {
+          "id": "ask-goblins",
+          "text": "The goblins call you Clatter?",
+          "once": true,
+          "next": "goblins-1"
+        },
+        {
+          "id": "ask-humming",
+          "text": "You look afraid. What of?",
+          "once": true,
+          "next": "humming-1"
+        },
+        {
+          "id": "read-sorcerer",
+          "text": "May I try to read your memories? It might hurt.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "sorcerer"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "clatter.memories",
+                "op": "lt",
+                "value": 3
+              }
+            ]
+          },
+          "once": true,
+          "next": "read-1"
+        },
+        {
+          "id": "return-thief",
+          "text": "I found this by the Ossuary door. Yours?",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "return-1"
+        },
+        {
+          "id": "guard-knight",
+          "text": "I'll stand watch at the door while you work.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "guard-1"
+        },
+        {
+          "id": "watch-archer",
+          "text": "I can keep the Forgotten off your garden from the stair.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "watch-1"
+        },
+        {
+          "id": "leave",
+          "text": "Goodbye, Clatter.",
+          "next": "bye-1"
+        }
+      ]
+    },
+    {
+      "id": "memory-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "gte",
+            "value": 3
+          },
+          "next": "mem-3"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 2
+          },
+          "next": "mem-2"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 1
+          },
+          "next": "mem-1"
+        }
+      ],
+      "else": "mem-0"
+    },
+    {
+      "id": "mem-0",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Mushrooms. I remember mushrooms. And that I'm sorry, though I don't know what for. I think it was a large sorry, the kind you carry up a staircase.",
+      "next": "mem-0-b"
+    },
+    {
+      "id": "mem-0-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "There's a gap where a name goes. Rather a tidy gap. I've been keeping it dusted.",
+      "next": "hub"
+    },
+    {
+      "id": "mem-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "A pear tree. There was a pear tree, white in spring, and the bees went at it like a rumour. I used to stand under it and do nothing at all. Nobody told me off.",
+      "next": "mem-1-b"
+    },
+    {
+      "id": "mem-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "I can't see whose garden it was. But I can smell it. Isn't that odd? A bone, smelling a pear.",
+      "next": "hub"
+    },
+    {
+      "id": "mem-2",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "A sister. She laughed like a gate that wanted oiling. I... liked that gate. She sent me letters in a hand like a hen's. I can see the hen. I can't see the name.",
+      "next": "mem-2-b"
+    },
+    {
+      "id": "mem-2-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "There was a friend, too. Taller than me. Afraid of the quiet. I think he was the only person I ever knew who kept a candle lit to hear it burn.",
+      "next": "hub"
+    },
+    {
+      "id": "mem-3",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Corvin. He was afraid of silence, which is why he fell so hard for a song. I could have told him. I think I did tell him. It's the sort of thing a gardener says to a friend, over a fence.",
+      "next": "mem-3-b"
+    },
+    {
+      "id": "mem-3-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "And my sister's grandchildren, a long way down the line. A baker, I think. I can smell the bread. Anselm... Anselm Ho... No. Sorry. Nearly. The rest is loose in the soil.",
+      "next": "hub"
+    },
+    {
+      "id": "garden-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Pale ones, mostly. They don't mind the dark, and I don't mind them, which is the whole arrangement. I turn them over, I tell them they're doing well. I'm told it helps.",
+      "next": "garden-1-b"
+    },
+    {
+      "id": "garden-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "The goblins say it's a flower room. I haven't the heart to correct them.",
+      "next": "hub"
+    },
+    {
+      "id": "goblins-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "A little one brings me buttons, and tells me what they're for. Snig, I think. Always wrong, always enthusiastic. I keep the buttons in the soil. They haven't come up yet, but one has hope.",
+      "next": "goblins-1-b"
+    },
+    {
+      "id": "goblins-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Mother Kettleback sends bread, because I look peckish. I tell her I haven't the equipment. She sends it anyway. Goblins are very kind in a way that doesn't ask what you meant.",
+      "next": "hub"
+    },
+    {
+      "id": "humming-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "The humming. When it swells, I go loose. Whatever I've gathered goes down the drain, and I stand there, a bag of bones in a good habit, wondering where I put myself.",
+      "next": "humming-1-b"
+    },
+    {
+      "id": "humming-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "So if you hear it coming, do stand close. Not for me, necessarily. Someone ought to be there to say, 'Brother, you were just in the middle of something.'",
+      "next": "hub"
+    },
+    {
+      "id": "return-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "A trowel! A little trowel, with a handle gone soft as a pear. Oh, it is. It's mine. I didn't know I'd lost it. How did you know?",
+      "next": "return-1-b"
+    },
+    {
+      "id": "return-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "You have a gift. I hope you use it on the rich. Thank you. Truly.",
+      "next": "return-fx"
+    },
+    {
+      "id": "return-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-clatter",
+          "delta": 4
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "guard-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh, thank you. A knight at the door! The Forgotten will like that, they love a uniform. Only don't hit them too hard. Most of them were someone's uncle.",
+      "next": "guard-fx"
+    },
+    {
+      "id": "guard-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-clatter",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "watch-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "You'd hit a snail at forty paces? Sorry, that's what Snig says. He says it about you. I think he made it up. Still, I'll sleep easier. If I slept. Which I don't. But I would.",
+      "next": "watch-fx"
+    },
+    {
+      "id": "watch-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-clatter",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "read-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh. Yes. Go on. It may sting? Sorry. I mean I'm sorry if it stings you. It won't me. I haven't the nerve.",
+      "next": "read-check"
+    },
+    {
+      "id": "read-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 8,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-clatter",
+            "op": "gte",
+            "value": 5
+          },
+          "bonus": 2,
+          "label": "He trusts you"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 2
+          },
+          "bonus": -2,
+          "label": "Deep, crowded memories"
+        }
+      ],
+      "success": "read-ok",
+      "failure": "read-bad"
+    },
+    {
+      "id": "read-ok",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "...Oh! Oh, there's a drawer. I didn't know there was a drawer! Thank you. There's so much in the drawer.",
+      "next": "read-up"
+    },
+    {
+      "id": "read-up",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 0
+          },
+          "next": "read-up-1"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 1
+          },
+          "next": "read-up-2"
+        }
+      ],
+      "else": "read-up-3"
+    },
+    {
+      "id": "read-up-1",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "read-up-2",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "read-up-3",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "read-bad",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Ah. Ow. Not you, me. Something went, with a noise like a spoon in a drain. It's all right. It's quite all right. I'm sure it was a good one.",
+      "next": "read-down"
+    },
+    {
+      "id": "read-down",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 2
+          },
+          "next": "read-down-2"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 1
+          },
+          "next": "read-down-1"
+        }
+      ],
+      "else": "hub"
+    },
+    {
+      "id": "read-down-1",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 0
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "read-down-2",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "bye-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Goodbye! Mind the mushrooms. And mind the bones, they have opinions about your knees.",
+      "end": true
+    },
+    {
+      "id": "joined-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "I'm right behind you. Or beside. Beside's better, I trip over things behind. Sorry. Lead on, friend. Is it a long walk? I do hope it's a long walk.",
+      "next": "joined-menu"
+    },
+    {
+      "id": "joined-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "joined-chat",
+          "text": "Tell me about your sister again.",
+          "once": true,
+          "next": "joined-chat-1"
+        },
+        {
+          "id": "joined-leave",
+          "text": "Right. Onward.",
+          "end": true
+        }
+      ]
+    },
+    {
+      "id": "joined-chat-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Her name was Amabel. Amabel Hobb. She laughed like a gate. I'd give a good deal of my bones to hear that gate again. Tansy has the laugh, did you notice? Quite uncanny. Sorry. Not uncanny. Lovely.",
+      "next": "joined-menu"
+    },
+    {
+      "id": "restored-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Brother Anselm Hobb. Gardener. Friend of Corvin Ashgrove, and sorry for it. Sorry. Is it all right to say it aloud? I like the sound of it. It's got shoulders.",
+      "next": "restored-1-b"
+    },
+    {
+      "id": "restored-1-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "I've a question and I'd rather you didn't answer fast. I've been dead a long while and it's gone to my head. Is it time to rest? Or is there something yet for hands like mine to do?",
+      "next": "restored-menu"
+    },
+    {
+      "id": "restored-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "restored-name",
+          "text": "Say it again.",
+          "once": true,
+          "next": "restored-name-1"
+        },
+        {
+          "id": "join-ask",
+          "text": "Come with me to the Cradle. Corvin should hear his friend.",
+          "next": "join-1"
+        },
+        {
+          "id": "rest-ask",
+          "text": "You've done enough. Would you like to rest?",
+          "next": "rest-gate"
+        },
+        {
+          "id": "restored-leave",
+          "text": "Take your time, Anselm. I'm in no hurry.",
+          "end": true
+        }
+      ]
+    },
+    {
+      "id": "restored-name-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Anselm Hobb. Anselm Hobb! Oh, I'd forgotten how good that was. It has a tidy sound. Like a gate closing. A well-oiled one.",
+      "next": "restored-menu"
+    },
+    {
+      "id": "join-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Yes. Yes, I think so. I've something to say to him. Not an argument. A gardener's remark, over a fence. Give me a moment. I'll find my feet. They're just here.",
+      "next": "join-fx"
+    },
+    {
+      "id": "join-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.fate",
+          "value": "joined"
+        },
+        {
+          "kind": "emit",
+          "event": "clatter.joined"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "rest-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "rest-knight"
+        }
+      ],
+      "else": "rest-any"
+    },
+    {
+      "id": "rest-knight",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh, would you? The old words? The Vesperine rites? I'd have been so embarrassed to ask. I've been hoping someone knew them. Lay down the bell, lay down the work... Yes. Yes, that's the one.",
+      "next": "rest-knight-b"
+    },
+    {
+      "id": "rest-knight-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Thank you, Sir Knight. It's a very good voice for it. Rather a lot like a gate, actually.",
+      "next": "rest-fx"
+    },
+    {
+      "id": "rest-any",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Yes. I think I would. Lay my psalter on the altar, if you'd be so kind. Water the pear tree if it blooms. And tell Tansy her great-great-great-aunt's gate is still oiled. She'll know.",
+      "next": "rest-fx"
+    },
+    {
+      "id": "rest-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.fate",
+          "value": "rested"
+        },
+        {
+          "kind": "emit",
+          "event": "clatter.rested"
+        }
+      ],
+      "end": true
+    }
+  ]
+}
