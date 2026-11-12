@@ -54,7 +54,10 @@ function loadIssues(def: unknown, extra: readonly ContentSource[] = []): string[
     loadContent(contentTypes, [...sources, source(THIEF_FILE, def), ...extra], contentChecks);
   } catch (error) {
     if (!(error instanceof ContentLoadError)) throw error;
-    return error.issues.map((i) => `${i.file}#${i.pointer}: ${i.message}`);
+    // The world map's classesHint check (mw-e24.1) reacts to a broken thief too; it has its own tests.
+    return error.issues
+      .filter((i) => !i.file.startsWith('src/content/data/world/'))
+      .map((i) => `${i.file}#${i.pointer}: ${i.message}`);
   }
   return [];
 }
