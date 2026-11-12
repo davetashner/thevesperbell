@@ -1,0 +1,712 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "tereza-arms-stall",
+  "notes": "mw-e39.20: Tereza Maelo (bible 5.13), retired duellist at the Tidemarket arms stall. A knight's first meeting leads straight to the duel challenge (AC-4); combat is an emit hook (tereza.duel-start) and the combat system writes tereza.duel.fought and tereza.duel.victor (the dialogue clears fought when a duel is accepted and when its result is recorded), after which the entries duel-won and duel-lost set tereza.duel.result to won or lost. A win opens the under-the-counter stock, a loss offers a rematch, and declining relieves her. Sorcerer trades a story for a foreign spellbook (a charm check, fails gracefully). Tern access via the debt of honour needs disposition 10 or a duel win. Shop stock is E20/E21.",
+  "speakers": [
+    {
+      "id": "tereza",
+      "npc": "npc-tereza"
+    }
+  ],
+  "entries": [
+    {
+      "id": "duel-won",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tereza.duel.fought"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "tereza.duel.victor",
+            "op": "eq",
+            "value": "player"
+          }
+        ]
+      },
+      "node": "duel-won-1"
+    },
+    {
+      "id": "duel-lost",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tereza.duel.fought"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "tereza.duel.victor",
+            "op": "eq",
+            "value": "tereza"
+          }
+        ]
+      },
+      "node": "duel-lost-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "A knight, and with a good sword arm by the look of that shoulder. Tereza Maelo. This blade was made for someone braver than you. Let us see if it can make you braver. First blood only.",
+      "next": "challenge"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Tereza Maelo, steel from the Saltmarch Isles. You have a draw like a gate. I would like to see it, and then sell you arrows that deserve it.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Tereza Maelo. A sorcerer: I have a foreign spellbook I won in a duel and cannot read. I am told it is good. I will trade it for a story. A good one.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Put it back. No, the other one too. Tereza Maelo. I count my stock twice a day and my thieves once. Hello.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Tereza Maelo, arms merchant. Everything on this stall is the best of its kind in the valley. You will find that I am correct, and that I am expensive.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Back again. Do not touch the display. Do ask the price.",
+      "next": "hub"
+    },
+    {
+      "id": "challenge",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "accept-duel",
+          "text": "First blood. I accept.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "duel-accept-fx"
+        },
+        {
+          "id": "decline-duel",
+          "text": "I'll decline, with respect.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "duel-decline-fx"
+        },
+        {
+          "id": "later-duel",
+          "text": "Perhaps another time.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "duel-accept-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.accepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.fought",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.duel-start",
+          "data": {
+            "stakes": "first-blood",
+            "arena": "tidemarket"
+          }
+        }
+      ],
+      "next": "duel-accept-1"
+    },
+    {
+      "id": "duel-accept-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Good. Draw, then. No killing, no cheating, no crying. If you lose, I shall be gentle, which is worse.",
+      "end": true
+    },
+    {
+      "id": "duel-decline-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.declined",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 3
+        }
+      ],
+      "next": "duel-decline-1"
+    },
+    {
+      "id": "duel-decline-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "...Thank you. I will say I am disappointed, and that is a lie. The offer stands whenever you tire of declining.",
+      "next": "hub"
+    },
+    {
+      "id": "duel-won-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "First blood: yours. A fine cut. Well! I am retired, I am satisfied, I am almost relieved. What is under the counter is yours to see. Look; do not break.",
+      "next": "duel-won-fx"
+    },
+    {
+      "id": "duel-won-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.result",
+          "value": "won"
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.fought",
+          "value": false
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.under-counter",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 10
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.under-counter-opened"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "duel-lost-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "First blood: mine. A near thing, which I will say to be kind. Practise. Come back and I will beat you better, and be glad of it.",
+      "next": "duel-lost-fx"
+    },
+    {
+      "id": "duel-lost-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.result",
+          "value": "lost"
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.fought",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-stall",
+          "text": "What do you sell?",
+          "next": "stall-fx"
+        },
+        {
+          "id": "ask-saltmarch",
+          "text": "You're from the Saltmarch Isles.",
+          "once": true,
+          "next": "saltmarch-1"
+        },
+        {
+          "id": "ask-fear",
+          "text": "You don't seem to enjoy selling.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "disposition",
+                "npc": "npc-tereza",
+                "op": "gte",
+                "value": 10
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "tereza.confided"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "fear-1"
+        },
+        {
+          "id": "rematch",
+          "text": "I'd like a rematch.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "knight"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tereza.duel.result",
+                "op": "eq",
+                "value": "lost"
+              }
+            ]
+          },
+          "next": "rematch-fx"
+        },
+        {
+          "id": "duel-again",
+          "text": "First blood, Tereza. I accept.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "knight"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "factCmp",
+                  "fact": "tereza.duel.result",
+                  "op": "eq",
+                  "value": "won"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "factCmp",
+                  "fact": "tereza.duel.result",
+                  "op": "eq",
+                  "value": "lost"
+                }
+              },
+              {
+                "kind": "fact",
+                "fact": "tereza.duel.accepted"
+              }
+            ]
+          },
+          "next": "duel-accept-fx"
+        },
+        {
+          "id": "arrows-archer",
+          "text": "Show me the exotic arrows.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "arrows-fx"
+        },
+        {
+          "id": "draw-archer",
+          "text": "Care to see my draw?",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "draw-1"
+        },
+        {
+          "id": "story-sorcerer",
+          "text": "I have a story for the spellbook.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "sorcerer"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "tereza.spellbook-traded"
+                }
+              }
+            ]
+          },
+          "next": "story-check"
+        },
+        {
+          "id": "sorry-thief",
+          "text": "I was only looking.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "thief-fx"
+        },
+        {
+          "id": "ask-tern",
+          "text": "I hear the Tern's captain owes you a debt of honour.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "disposition",
+                    "npc": "npc-tereza",
+                    "op": "gte",
+                    "value": 10
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tereza.duel.result",
+                    "op": "eq",
+                    "value": "won"
+                  }
+                ]
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "tereza.tern-access"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "tern-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Go well. Come back with coin, or with a duel.",
+      "end": true
+    },
+    {
+      "id": "stall-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "tereza.shop-requested",
+          "data": {
+            "stall": "arms"
+          }
+        }
+      ],
+      "next": "stall-1"
+    },
+    {
+      "id": "stall-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Steel, mostly. Swords, daggers, an honest mace. Quiver stock when I can get it past customs. Look, ask, buy. I do not haggle on blades. I haggle on everything else.",
+      "next": "hub"
+    },
+    {
+      "id": "saltmarch-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Over the sea. Salt on everything, islands that argue with the tide. I want to go home rich enough that no one ever asks me to fight again. It is a short list of wants.",
+      "next": "hub"
+    },
+    {
+      "id": "fear-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "You see more than most. I retired because I enjoyed it, you understand. All of it. The ring, the crowd, the little cut. That is what frightens me. Not losing. Liking it.",
+      "next": "fear-fx"
+    },
+    {
+      "id": "fear-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.confided",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "rematch-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.result",
+          "value": "none"
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.accepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.duel.fought",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.duel-start",
+          "data": {
+            "stakes": "first-blood",
+            "arena": "tidemarket"
+          }
+        }
+      ],
+      "next": "rematch-1"
+    },
+    {
+      "id": "rematch-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Ha! That is the spirit. Draw, and mind my left; I am told it is my weak side. It is not.",
+      "end": true
+    },
+    {
+      "id": "arrows-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.arrows-offered"
+        }
+      ],
+      "next": "arrows-1"
+    },
+    {
+      "id": "arrows-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Whistlers, sea-fletched, bodkin points. Fine. Dear. Spoken for by no one: yours if you pay. Drawing hand first, please.",
+      "next": "hub"
+    },
+    {
+      "id": "draw-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Hm. Not bad. Elbow high; you have a flinch on the release. Fix it and you will be better than good. Your arrows will thank you. Your enemies will not.",
+      "next": "hub"
+    },
+    {
+      "id": "story-check",
+      "kind": "check",
+      "approach": "charm",
+      "difficulty": 8,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-tereza",
+            "op": "gte",
+            "value": 5
+          },
+          "bonus": 3,
+          "label": "She likes you"
+        }
+      ],
+      "success": "story-win",
+      "failure": "story-lose"
+    },
+    {
+      "id": "story-win",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.spellbook-traded",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.spellbook-traded",
+          "data": {
+            "book": "foreign-spellbook"
+          }
+        }
+      ],
+      "next": "story-win-1"
+    },
+    {
+      "id": "story-win-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "That will do. A drowned lighthouse, a loud goose, and a bad decision. Marvellous. Take the book, and tell me if the pictures move; I always thought they did.",
+      "next": "hub"
+    },
+    {
+      "id": "story-lose",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Too short, and I knew the ending. A better story, please. I have waited three years for a good one; I can wait another week.",
+      "next": "hub"
+    },
+    {
+      "id": "thief-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": -2
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.pockets-checked"
+        }
+      ],
+      "next": "thief-1"
+    },
+    {
+      "id": "thief-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Looking. Of course. Hands where I can see them, thank you, and I will count my daggers while you stand there. Twice. ...They are all here. Remarkable. Carry on.",
+      "next": "hub"
+    },
+    {
+      "id": "tern-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "Hesketh owes me, yes. A debt of honour: he lost a wager and refused to say so. I can have anyone aboard the Tern, if I choose. I choose you. Say my name at the gangway.",
+      "next": "tern-fx"
+    },
+    {
+      "id": "tern-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.tern-access",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.tern-introduced"
+        }
+      ],
+      "next": "hub"
+    }
+  ]
+}

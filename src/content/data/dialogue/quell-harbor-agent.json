@@ -1,0 +1,614 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "quell-harbor-agent",
+  "notes": "mw-e39.20: Jasper Quell (bible 5.13), Vane's shipping agent. Nervous denials in the hub; the invoice (stand-in fact evidence.foundry-invoice) or the honest manifest (evidence.honest-manifest) unlocks the collapse branch, which can hand over crate access and the manifest and bargain a head start on the mountain road (The Crate for Mr. S: Leverage). Once quell.left is set he is gone: entry gone plays a narrator note only, so no reachable line references him as present (AC-6). Scene presence is gated on quell.left by the future Wendmouth scene.",
+  "speakers": [
+    {
+      "id": "quell",
+      "npc": "npc-quell"
+    }
+  ],
+  "entries": [
+    {
+      "id": "gone",
+      "when": {
+        "kind": "fact",
+        "fact": "quell.left"
+      },
+      "node": "gone-1"
+    },
+    {
+      "id": "collapsed",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "quell.collapsed"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "quell.left"
+            }
+          }
+        ]
+      },
+      "node": "collapsed-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "gone-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The agent's office is shut up, the ledger gone and the desk cleared. A note is pinned to the door: 'Gone to see my mother. Mountain road. Do not follow. Do not mention the stone. J. Q.'",
+      "next": "gone-2"
+    },
+    {
+      "id": "gone-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Under it, in another hand, someone has written 'Ha.' The door is locked; the ink on the note is a day old.",
+      "end": true
+    },
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Oh. A knight. Jasper Quell, shipping agent, Vane Deepworks. I am, ah, entirely at your service. Stone. It is stone. Heavy stone. Is something wrong? You look at me very sternly.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Jasper Quell, shipping, Vane Deepworks. An archer! Good. I have crates, and crates need guarding, and I have a budget. Not a large budget. Are you looking for work?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Quell, Jasper. Shipping. Sorcerer? Oh dear. You can tell, can't you, if something is cursed? One hears. No reason. Entirely hypothetical. I have a... a hypothetical crate.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Quell. Jasper Quell. Vane Deepworks. Please don't look at my desk. Not that there is anything on it. It is a very ordinary desk. Is there a problem?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Jasper Quell, Vane Deepworks, harbour agent. Stone. It is stone, all of it, heavy stone. Stone with... look, is there a problem? Is it the factors?",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Oh. You. Again. Stone. Still stone, if that is why you came.",
+      "next": "hub"
+    },
+    {
+      "id": "collapsed-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Have you decided? I have been sitting here deciding for you, and I keep arriving at the mountain road.",
+      "next": "collapse-choice"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-stone",
+          "text": "What is in bay nine?",
+          "once": true,
+          "next": "stone-1"
+        },
+        {
+          "id": "ask-manifest",
+          "text": "May I see the bay nine manifest?",
+          "once": true,
+          "next": "manifest-1"
+        },
+        {
+          "id": "ask-factors",
+          "text": "Who are you afraid of, Mr. Quell?",
+          "once": true,
+          "next": "factors-1"
+        },
+        {
+          "id": "confront-invoice",
+          "text": "I have the foundry invoice. Forty brass trinkets, goblin style.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "evidence.foundry-invoice"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "quell.collapsed"
+                }
+              }
+            ]
+          },
+          "next": "collapse-1"
+        },
+        {
+          "id": "confront-manifest",
+          "text": "I know about your second, honest manifest.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "evidence.honest-manifest"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "quell.collapsed"
+                }
+              }
+            ]
+          },
+          "next": "collapse-1"
+        },
+        {
+          "id": "stern-knight",
+          "text": "Look at me, Mr. Quell. Plainly.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "stern-1"
+        },
+        {
+          "id": "guard-archer",
+          "text": "What does crate guarding pay?",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "guard-1"
+        },
+        {
+          "id": "cursed-sorcerer",
+          "text": "Yes, I can tell if something is cursed.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "cursed-1"
+        },
+        {
+          "id": "desk-thief",
+          "text": "Nice desk. Locked drawer, I see.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "desk-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Yes. Good day. It was only stone. You may tell anyone who asks.",
+      "end": true
+    },
+    {
+      "id": "stone-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Stone. It is stone. All of it. Heavy stone. Dressed blocks, sealed and stamped. The stamp is perfectly in order. Entirely routine. Why would I say otherwise?",
+      "next": "hub"
+    },
+    {
+      "id": "manifest-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "The manifest? The manifest is, ah, at the customs house. In copy. The original has been, mislaid. Entirely innocent. Stone does not need so many papers.",
+      "next": "hub"
+    },
+    {
+      "id": "factors-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Nobody! The factors, perhaps. A little. They are owed money, you see, and they know where I sit. And the inspector, a little. And hanging. I do not like hanging.",
+      "next": "hub"
+    },
+    {
+      "id": "stern-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Oh, no. No, no, no. All right: the brass came from a foundry on Quay Row. Forty trinkets, goblin-fashioned, on Mr. Vane's instruction. That is all. I said nothing. I said nothing at all.",
+      "next": "stern-fx"
+    },
+    {
+      "id": "stern-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "quell.foundry.named",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-quell",
+          "delta": -2
+        },
+        {
+          "kind": "emit",
+          "event": "quell.foundry-named"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "guard-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Four silver a night, and no questions about the weight. It is not a trick. The crates are only very heavy. Think about it; there is no hurry. There is a bit of hurry.",
+      "next": "guard-fx"
+    },
+    {
+      "id": "guard-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-quell",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "quell.guard-job-offered"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "cursed-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Can you? Splendid. I do not know of anything cursed, naturally. Though if there were a crate that hummed, a little, at night... one might wonder. Hypothetically.",
+      "next": "cursed-fx"
+    },
+    {
+      "id": "cursed-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-quell",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "quell.curse-asked"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "desk-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "It is only a drawer. A very dull drawer, full of dull things. Please do not. It is Mr. Vane's, I mean it is mine. It is both. Do not open it.",
+      "next": "desk-fx"
+    },
+    {
+      "id": "desk-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "quell.desk-noticed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "quell.desk-mentioned"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "collapse-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Where did you find... No. No, no. That is, ah, I may have made some arrangements. On instruction. I have a second ledger. I am a careful man, and careful men keep copies.",
+      "next": "collapse-2"
+    },
+    {
+      "id": "collapse-2",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "The crate. The manifest. They are all in the bay, and in my desk. I will give you the lot. All I ask is a head start on the mountain road, before Mr. Vane hears. Please.",
+      "next": "collapse-fx"
+    },
+    {
+      "id": "collapse-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "quell.collapsed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "quell.collapsed"
+        }
+      ],
+      "next": "collapse-choice"
+    },
+    {
+      "id": "collapse-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "deal",
+          "text": "Take your head start. Hand it all over.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "quell.left"
+            }
+          },
+          "next": "deal-fx"
+        },
+        {
+          "id": "demand",
+          "text": "Hand it over now. No head start.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "quell.crate-access"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "quell.left"
+                }
+              }
+            ]
+          },
+          "next": "demand-check"
+        },
+        {
+          "id": "later",
+          "text": "Let me think about it.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "quell.left"
+            }
+          },
+          "next": "later-1"
+        }
+      ]
+    },
+    {
+      "id": "deal-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "quell.crate-access",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "quell.manifest-given",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "quell.head-start.given",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "quell.left",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-quell",
+          "delta": 5
+        },
+        {
+          "kind": "emit",
+          "event": "quell.crate-opened"
+        },
+        {
+          "kind": "emit",
+          "event": "quell.manifest-handed"
+        },
+        {
+          "kind": "emit",
+          "event": "quell.departs",
+          "data": {
+            "route": "mountain-road"
+          }
+        }
+      ],
+      "next": "deal-1"
+    },
+    {
+      "id": "deal-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Thank you. Bay nine's key, the manifest, the drawer. All yours. I will take the mountain road before the tide. If anyone asks, I was never here. Good luck.",
+      "end": true
+    },
+    {
+      "id": "demand-check",
+      "kind": "check",
+      "approach": "intimidate",
+      "difficulty": 6,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "evidence.foundry-invoice"
+              },
+              {
+                "kind": "fact",
+                "fact": "evidence.honest-manifest"
+              }
+            ]
+          },
+          "bonus": 4,
+          "label": "He is thoroughly caught"
+        }
+      ],
+      "success": "demand-win",
+      "failure": "demand-lose"
+    },
+    {
+      "id": "demand-win",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "quell.crate-access",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "quell.manifest-given",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-quell",
+          "delta": -3
+        },
+        {
+          "kind": "emit",
+          "event": "quell.crate-opened"
+        },
+        {
+          "kind": "emit",
+          "event": "quell.manifest-handed"
+        }
+      ],
+      "next": "demand-1"
+    },
+    {
+      "id": "demand-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "All right! Here, the key, the manifest, take them. Just do not tell Mr. Vane it was me. Or Cray. Or the factors. I will, ah, be at my desk.",
+      "next": "hub"
+    },
+    {
+      "id": "demand-lose",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "No. I... no. Not without a head start. I will sit here until the tide goes out, and then I will sit here some more. A head start, and everything is yours.",
+      "next": "collapse-choice"
+    },
+    {
+      "id": "later-1",
+      "kind": "line",
+      "speaker": "quell",
+      "text": "Of course. Of course. I will be here. Thinking. Perhaps sweating. Do hurry.",
+      "end": true
+    }
+  ]
+}

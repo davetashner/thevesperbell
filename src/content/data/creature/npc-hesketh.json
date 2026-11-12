@@ -24,6 +24,7 @@
     "sociability": 0.5,
     "greed": 0.7
   },
+  "dialogue": "hesketh-gilded-tern",
   "behaviour": {
     "profile": "shopkeeper"
   },
