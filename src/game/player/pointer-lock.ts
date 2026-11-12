@@ -21,6 +21,8 @@ export interface PlayerInputHost extends DomInputHost {
   readonly element: PointerLockElement & InputEventTarget;
   /** The Gamepad API; without it only keyboard and mouse play. */
   readonly gamepad?: GamepadHost;
+  /** True while a screen or conversation holds the pointer free: a click does not lock it. */
+  readonly held?: () => boolean;
 }
 
 export interface PlayerInput {
@@ -37,7 +39,7 @@ export function attachPlayerInput(sampler: ActionSampler, host: PlayerInputHost)
   const pad = host.gamepad === undefined ? undefined : attachGamepadInput(sampler, host.gamepad);
   let enabled = true;
   const onClick = (): void => {
-    if (enabled) dom.requestPointerLock();
+    if (enabled && host.held?.() !== true) dom.requestPointerLock();
   };
   host.element.addEventListener('click', onClick);
   return {

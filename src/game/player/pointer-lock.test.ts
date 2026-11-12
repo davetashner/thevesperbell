@@ -32,6 +32,19 @@ function fakePage({ canExit = true } = {}) {
 }
 
 describe('attachPlayerInput (mw-e02.23)', () => {
+  it('a click does not lock while the host holds the pointer free (a menu or conversation)', () => {
+    const window = new EventTarget();
+    const element = Object.assign(new EventTarget(), { requestPointerLock: vi.fn() });
+    let held = true;
+    const document = Object.assign(new EventTarget(), { pointerLockElement: null });
+    attachPlayerInput(new ActionSampler(), { window, document, element, held: () => held });
+    element.dispatchEvent(new Event('click'));
+    expect(element.requestPointerLock).not.toHaveBeenCalled();
+    held = false;
+    element.dispatchEvent(new Event('click'));
+    expect(element.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
   it('a click on the canvas locks the pointer; then keys reach the sampler', async () => {
     const page = fakePage();
     page.key('keydown', 'KeyW');

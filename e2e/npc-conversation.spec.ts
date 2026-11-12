@@ -104,6 +104,9 @@ test('mw-e22.9 AC-5, mw-e22.10: talk to the greybox villager, pick options by nu
   });
   await expect(page.getByTestId('dialogue-box')).toContainText(first.text);
   const stopped = await villager(page);
+  // Talking is modal for input (mw-e22.19): the pointer is free and gameplay frames are withheld.
+  await expect(app).toHaveAttribute('data-ui-capture', 'true');
+  expect(await page.evaluate(() => document.pointerLockElement)).toBeNull();
   // The line types out: Enter shows the rest first, then goes on. Press until it has.
   const continueLine = async (): Promise<void> => {
     for (let i = 0; i < 6 && (await dialogue(page)).kind === 'line'; i += 1) {
@@ -150,6 +153,7 @@ test('mw-e22.9 AC-5, mw-e22.10: talk to the greybox villager, pick options by nu
   await expect.poll(async () => (await dialogue(page)).open, POLL).toBe(false);
   expect((await dialogue(page)).last).toEqual({ npc: 'greybox-villager', reason: 'completed' });
   await expect(page.getByTestId('dialogue-box')).toBeHidden();
+  await expect(app).toHaveAttribute('data-ui-capture', 'false');
 
   // She went nowhere while talking, and walks her route again.
   await expect
