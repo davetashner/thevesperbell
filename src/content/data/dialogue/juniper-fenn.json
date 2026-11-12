@@ -1,0 +1,375 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "juniper-fenn",
+  "notes": "Juniper Fenn (bible 5.6), fletcher and herbalist, laconic, sunburnt, knows the Briarwood. Fears fire; the silence of the wolves frightens her more than howling. Secret: her sleep-draughts make the song easier to follow, and she has just worked it out (option ask-draughts). Class reactions per bible: archer peer, knight 'you'll clank', sorcerer trades herbs for Nature scraps, thief gets poisons only after a favour (the thief option checks disposition >= 10, which the draught talk can raise). Merchant greeting and farewell lines vary by class; the counter itself is the shop.",
+  "speakers": [
+    {
+      "id": "juniper",
+      "npc": "npc-juniper"
+    }
+  ],
+  "entries": [
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "You'll clank. Everything in the Briarwood will hear you. That's fine. It'll hear you coming and leave. What do you need?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Archer. Good. Somebody who knows a string from a snare. Don't touch the yew until I've waxed it. What can I do for you?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Sorcerer. I've no use for flash. I do have a use for anything Nature-school you've got scraps of. Herbs for scraps. Fair? What do you need?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Hm. Hands where I can see them. I don't judge what you take. I judge what you do with it. What do you need?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Fenn's. Arrows, snares, salves. Don't ask for a refund. What do you need?",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Back. Good. Say what you need. Or say nothing. Either's fine.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-wolves",
+          "text": "The wolves have stopped howling.",
+          "once": true,
+          "next": "wolves-1"
+        },
+        {
+          "id": "ask-path",
+          "text": "Someone mentioned the Sleepers' Path.",
+          "once": true,
+          "next": "path-1"
+        },
+        {
+          "id": "ask-draughts",
+          "text": "Your sleep-draughts. Half the town buys them.",
+          "once": true,
+          "next": "draughts-1"
+        },
+        {
+          "id": "trail-archer",
+          "text": "Anything about trail lore or trick arrows?",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "trail-1"
+        },
+        {
+          "id": "herbs-sorcerer",
+          "text": "What would you give me for Nature-school scraps?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "herbs-1"
+        },
+        {
+          "id": "clank-knight",
+          "text": "Is my armour really that loud?",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "clank-1"
+        },
+        {
+          "id": "poison-thief",
+          "text": "I hear you keep things for the careful.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "poison-check"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "wolves-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Wolves don't go quiet. Not unless something bigger is listening. Three weeks ago they stopped. I don't know a Briarwood without howling. It's like being in a house with the clocks stopped.",
+      "next": "hub"
+    },
+    {
+      "id": "path-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "A line of trampled ferns, running toward the mine. You can only see it at night or if you know how to look. I found it. I haven't followed it. I'm told I'm very sensible. I'd rather be brave.",
+      "next": "hub"
+    },
+    {
+      "id": "draughts-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Aye. Sleep-draughts. I've sold them to half the town for the wolves' howling. I thought I was selling rest. This week I worked it out. They sleep deeper. And deeper they hear it clearer.",
+      "next": "draughts-2"
+    },
+    {
+      "id": "draughts-2",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "The song. I've been selling people an easier way to follow it. I haven't slept since. Tell me I'm wrong. Please. You'd be the first.",
+      "next": "draughts-choice"
+    },
+    {
+      "id": "draughts-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "draughts-forgive",
+          "text": "You couldn't have known.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "juniper.draught-confessed",
+              "value": true
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-juniper",
+              "delta": 10
+            }
+          ],
+          "next": "forgive-1"
+        },
+        {
+          "id": "draughts-blame",
+          "text": "People are gone, Juniper.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "juniper.draught-confessed",
+              "value": true
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-juniper",
+              "delta": -5
+            }
+          ],
+          "next": "blame-1"
+        }
+      ]
+    },
+    {
+      "id": "forgive-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Maybe. Maybe not. I'll brew wakeful tea instead, and stop selling the other. It won't bring anyone back. But it's a thing I can do with my hands.",
+      "next": "hub"
+    },
+    {
+      "id": "blame-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Aye. They are. I know. I counted. I'm not asking you to be kind. I'm asking you to be right. You are. I'll make the wakeful tea.",
+      "next": "hub"
+    },
+    {
+      "id": "trail-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Peer to peer: fire-arrows spook wolves and nothing else, and a snare line sings if you wet it. Tell me what you'd like and I'll set the price at what I'd charge myself.",
+      "next": "hub"
+    },
+    {
+      "id": "herbs-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Scraps of Nature-school for good herbs. Bring me anything that grows when it shouldn't. I'll bring you what grows when it should. That's a fair trade in any country.",
+      "next": "hub"
+    },
+    {
+      "id": "clank-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Like a cart of kettles. It's no insult. A loud knight is a kindness to everything else in the Briarwood, who get to leave. Oil the joints. That's free advice.",
+      "next": "hub"
+    },
+    {
+      "id": "poison-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-juniper",
+            "op": "gte",
+            "value": 10
+          },
+          "next": "poison-yes"
+        }
+      ],
+      "else": "poison-favour"
+    },
+    {
+      "id": "poison-yes",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "You did right by me. Ask at the counter. Quietly. What I keep under it is for the careful, and the careful pay in advance.",
+      "next": "hub"
+    },
+    {
+      "id": "poison-favour",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "I don't sell poisons to strangers. Do me a favour first. Hear me out on a thing that's keeping me up, and ask me again.",
+      "next": "hub"
+    },
+    {
+      "id": "farewell",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "farewell-knight"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "farewell-archer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "farewell-sorcerer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "farewell-thief"
+        }
+      ],
+      "else": "farewell-any"
+    },
+    {
+      "id": "farewell-knight",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Mind the clank. Mind the trees. Mind your feet.",
+      "end": true
+    },
+    {
+      "id": "farewell-archer",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Good shooting. Wax the string.",
+      "end": true
+    },
+    {
+      "id": "farewell-sorcerer",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Mind the herbs. If it grows back, it's yours.",
+      "end": true
+    },
+    {
+      "id": "farewell-thief",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Come back when you need a thing, quietly.",
+      "end": true
+    },
+    {
+      "id": "farewell-any",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Walk careful. Light a lamp.",
+      "end": true
+    }
+  ]
+}
