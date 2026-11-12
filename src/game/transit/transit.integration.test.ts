@@ -5,6 +5,7 @@
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import {
   controllerTuningFor,
+  materialPresets,
   loadGameContent,
   PLAYER_CONTROLLER_ID,
   type GameContent,
@@ -41,10 +42,17 @@ import {
   worldItemSpawner,
   type Containers,
   type EntityId,
+  DoorComponent,
+  doorStatus,
+  InMemoryColliderSink,
+  installLightSources,
+  lightComponents,
+  type SceneMechanisms,
   type LoadedScene,
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
 import { installFactRegistry } from '../facts';
+import { hasMechanisms, startMechanisms } from '../mechanisms';
 import { prepareTestbedCombat, startTestbedCombat } from '../combat';
 import { prepareCreatures, startCreatures, SceneNavigation } from '../creatures';
 import {
@@ -105,6 +113,8 @@ interface Area {
   readonly containers: Containers;
   readonly creatures: readonly EntityId[];
   readonly controller: TransitionController;
+  /** The scene's doors, when it has mechanisms. */
+  readonly mechanisms: SceneMechanisms | undefined;
   /** The search strings the page would have been reloaded with. */
   readonly navigated: string[];
   /** The transition this area was entered by, if any. */
@@ -122,7 +132,6 @@ function boot(content: GameContent, session: MemoryStorage, scene: string, spawn
   installFactRegistry(world.facts, content);
   world.register(...HIT_VOLUME_COMPONENTS, ...DAMAGE_COMPONENTS);
   installInteraction(world);
-  installMechanisms(world);
   const loader = new SceneLoader({
     world,
     sync: new RenderSync(world),
@@ -133,6 +142,18 @@ function boot(content: GameContent, session: MemoryStorage, scene: string, spawn
     physics: {},
   });
   const loaded = loader.load(scene);
+  let mechanisms: SceneMechanisms | undefined;
+  if (!hasMechanisms(loaded.layout)) installMechanisms(world);
+  else {
+    world.register(...lightComponents);
+    installLightSources(world);
+    mechanisms = startMechanisms(world, loaded, {
+      content,
+      materials: materialPresets(content.all('material')),
+      colliders: physics,
+      occluders: new InMemoryColliderSink(),
+    });
+  }
   const handOff = takeTransit(session);
   const arrivedBy = handOff?.to === scene ? handOff : undefined;
   const registry = createGameSaveRegistry({ knownItem: (id) => content.has('item', id) });
@@ -213,6 +234,7 @@ function boot(content: GameContent, session: MemoryStorage, scene: string, spawn
     containers,
     creatures: started.entities,
     controller,
+    mechanisms,
     navigated,
     arrivedBy,
     step,
@@ -401,6 +423,56 @@ describe('area transitions (mw-e01.11)', () => {
       expectAt(area, spawn);
     }
     expect(area.scene).toBe('valley-01');
+  });
+
+  it('mw-e24.21 AC-1: crossing the mountain road past the slice vestibule loads valley-01 at arrive-from-slice', () => {
+    const session = new MemoryStorage();
+    const slice = boot(baseContent, session, 'slice');
+    // slice.complete is true once the vestibule is entered; it is carried across the hand-off.
+    slice.world.facts.set('slice.complete', true);
+    const valley = cross(slice, session, 'mountain-road');
+    expect(valley.scene).toBe('valley-01');
+    expect(slice.navigated).toEqual(['scene=valley-01']);
+    expect(valley.arrivedBy).toMatchObject({
+      from: 'slice',
+      to: 'valley-01',
+      spawn: 'arrive-from-slice',
+    });
+    expectAt(valley, 'arrive-from-slice');
+    expect(valley.world.facts.get('slice.complete')).toBe(true);
+  });
+
+  it('mw-e24.21 AC-2: valley-01’s south gate returns to the vestibule passage, and the slice’s door and chest stay as left', () => {
+    const session = new MemoryStorage();
+    const slice = boot(baseContent, session, 'slice');
+    const doorEntity = slice.mechanisms?.doors[1];
+    expect(doorEntity).toBeDefined();
+    if (doorEntity === undefined) return;
+    // The exit door is opened (as the key does), and the alcove chest looted.
+    const door = slice.world.get(doorEntity, DoorComponent);
+    if (door === undefined) throw new Error('the exit door has no door component');
+    slice.world.set(doorEntity, DoorComponent, { ...door, openness: 1, target: 1 });
+    const chest = slice.chests.get('alcove-chest');
+    expect(chest).toBeDefined();
+    if (chest === undefined) return;
+    expect(slice.containers.open(slice.world, chest, slice.player).ok).toBe(true);
+    expect(slice.containers.takeAll(slice.world, chest, slice.player).ok).toBe(true);
+    slice.world.facts.set('slice.complete', true);
+
+    const valley = cross(slice, session, 'mountain-road');
+    expect(valley.scene).toBe('valley-01');
+    const back = cross(valley, session, 'south-gate');
+    expect(back.scene).toBe('slice');
+    expect(back.arrivedBy).toMatchObject({ from: 'valley-01', spawn: 'arrive-from-valley-01' });
+    expectAt(back, 'arrive-from-valley-01');
+    // Arriving is not crossing: the player stands in the passage, clear of the road's volume.
+    back.step();
+    expect(back.navigated).toEqual([]);
+
+    expect(back.world.facts.get('slice.complete')).toBe(true);
+    const doorBack = back.mechanisms?.doors[1];
+    expect(doorBack === undefined ? undefined : doorStatus(back.world, doorBack)).toBe('open');
+    expect(back.watch?.readout()['alcove-chest']).toMatchObject({ opened: true, items: [] });
   });
 
   it('a player who arrives must step out and back in to leave again: an arrival is not a crossing', () => {

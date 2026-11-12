@@ -115,6 +115,7 @@ describe('the walkable world (mw-e01.11)', () => {
 
   it('every scene of the chain is reachable from valley-01 and valley-01 from each of them', () => {
     const chain = [
+      'slice',
       'valley-01',
       'valley-02',
       'valley-03',
