@@ -87,3 +87,16 @@ quests are evaluated; gold, time of day, disposition and unknown kinds are polle
 Run logic through `runtime.host` (the game's host with quest conditions and effects served by the
 runtime). `completeObjective` is the hook objective trackers call; `quest.started`, `.stage`,
 `.objective`, `.resolved`, `.failed` and `.refused` events feed the journal.
+
+### In the game (mw-e23.11)
+
+`installGameLogic` (src/game/logic) builds the game's `LogicHost` and, when the content has quests,
+installs the runtime over it; `startWorld` calls it right after the fact registry and clock, before
+any save loads. `gameLogic.host` is the host dialogue and shop effects run against (quest-aware when
+quests exist, the plain game host otherwise). The host reads and writes the real systems: world
+facts, the player's pack and gold, capabilities, class, the game clock and, once the NPC registry
+exists (mw-e22.4), dispositions. Its one `checkpoint()` composes a fact overlay (written to the
+store as one transaction at the outermost commit), `inventoryCheckpoint`, `capabilityCheckpoint`
+and the dispositions' checkpoint. `createGameSaveRegistry` refreshes and settles the runtime after
+every load (`afterRead`), so slots, recovery and death reloads all re-evaluate. A world with no
+quests gets no runtime, no system and no declared fact, so it hashes as before.
