@@ -190,6 +190,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `behaviour.profile` | id | `"default"` | Behaviour profile id (E11). |
 | `behaviour.tuning` | map of string → number | `{}` | Numeric overrides of the profile’s tuning values. |
 | `interactions` | list of id | `[]` | Non-hostile affordances offered to the player, e.g. "feed", "talk", "pet". |
+| `dialogue` | ref → dialogue | — | Dialogue the player starts by talking to it (mw-e22.9): with it, Interact offers Talk, the creature pauses its routine and faces the player, and the dialogue runs with this creature as the NPC (its id is the NPC id dialogue conditions and effects name). Absent = it cannot be talked to. |
 | `loot` | id | — | Loot table id (E18); absent = drops only what it carries. |
 | `shield` | ref → shield | — | Shield (or shieldless guard) it carries, mw-ju8.19: it blocks frontal hits like the knight’s while its behaviour holds a `guard` step; absent = it has no guard. |
 | `audio` | object | — | Audio slots (mw-e28.8): idle loop, footsteps, barks, telegraphs, hurt, death. |

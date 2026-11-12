@@ -982,6 +982,28 @@ ${tokens}
   transform-origin: left center;
   transform: scaleX(0);
 }
+.vb-dialogue {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  width: min(40rem, 90%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-3);
+  font-size: ${size(1.125)};
+  background: var(--ui-color-panel-raised);
+  border: 2px solid var(--ui-color-text-muted);
+  border-radius: var(--ui-radius);
+  text-shadow: none;
+}
+.vb-dialogue[hidden], .vb-dialogue [hidden] { display: none; }
+.vb-dialogue p, .vb-dialogue ol { margin: 0; }
+.vb-dialogue-speaker { font-weight: bold; }
+.vb-dialogue-choices { padding-left: 1.5em; }
+.vb-dialogue-choice[data-locked='true'] { opacity: 0.6; }
+.vb-dialogue-hint { font-size: ${size(0.875)}; font-style: italic; }
 .vb-panel.vb-class-select { width: min(64rem, 100%); max-width: 100%; }
 .vb-class-cards {
   display: grid;

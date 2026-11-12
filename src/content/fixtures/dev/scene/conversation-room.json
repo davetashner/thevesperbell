@@ -1,0 +1,68 @@
+{
+  "$schema": "../../../data/scene.schema.json",
+  "id": "conversation-room",
+  "name": "Conversation room",
+  "description": "A walled 12 m room to try talking to someone (mw-e22.9), in debug builds only: a greybox villager walks a patrol route along the room, and the player can walk up, press Interact to talk, continue lines with Enter or E and pick options with 1 to 9. Walking more than 6 m away, or a creature turning on the player, ends the conversation and she walks her route again.",
+  "grid": 1,
+  "camera": {
+    "position": [0, 8, -12],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [6, 1, 6]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -6],
+      "scale": [6, 0.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 6],
+      "scale": [6, 0.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-6, 0, 0],
+      "yaw": 90,
+      "scale": [6, 0.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [6, 0, 0],
+      "yaw": 90,
+      "scale": [6, 0.5, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -4],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "villager",
+      "at": [-4, 0, 3],
+      "yaw": 90,
+      "creature": "greybox-villager",
+      "patrol": [
+        [-4, 0, 3],
+        [4, 0, 3]
+      ]
+    }
+  ],
+  "light": {
+    "ambient": 0.26,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.45, -1, 0.3],
+        "level": 0.5,
+        "reach": 60
+      }
+    ]
+  }
+}

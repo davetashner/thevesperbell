@@ -13,6 +13,7 @@ export * from './components/overlays';
 export * from './components/tabs';
 export * from './container-window';
 export * from './death-fade';
+export * from './dialogue-box';
 export * from './death-screen';
 export * from './focus';
 export * from './frame-data';
