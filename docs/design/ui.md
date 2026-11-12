@@ -389,3 +389,22 @@ pause.pointerUnlocked();       // the player's pointer lock ended (Esc, alt-tab)
   `src/ui/gallery.ts`, and the e2e suite then checks it for reachability, focus ring, axe and 2×
   text automatically. `?scale=2` sets the text scale; `?hudbench=N` runs the HUD perf probe
   (`e2e/ui-perf.spec.ts`).
+
+## Dialogue screen (mw-e22.10)
+
+`DialogueBox` (`src/ui/dialogue-box.ts`) is a HUD widget over a view model that the `Conversations`
+controller (`src/game/conversation`) builds from the dialogue runtime; the controller owns the cursor,
+the history and the keys, the widget owns the typing-out of a line.
+
+- **Keys**: Enter or E continues (first it shows the rest of a line being typed), 1 to 9 picks, Up and
+  Down move the cursor (or scroll the history), Enter takes the option under the cursor (a locked one
+  does nothing), H toggles the history, Esc closes it. The pad: D-pad or stick, A, X for the history,
+  B to close it. The mouse clicks an option, the line or the History button.
+- **Text**: locked reasons, tags, odds and breakdowns are English from the UI string table
+  (`src/content/strings.ts`, `logic.condition.*`, `dialogue.*`), formatted in `src/game/conversation/text.ts`.
+  Tags are placeholder glyphs until the icons land (mw-e37.137).
+- **Settings**: `accessibility.revealSpeed` (instant, slow, normal, fast), `accessibility.highContrast`
+  (white on black, `data-contrast` on the UI root), `accessibility.textBackground` (the plate is at least
+  90%), `accessibility.textScale`. The box scrolls instead of clipping at any size.
+- **History** keeps every line said and option chosen for the session (200 entries), across
+  conversations; it is not saved.

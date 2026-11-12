@@ -1,7 +1,7 @@
 {
   "$schema": "../../../data/dialogue.schema.json",
   "id": "greybox-greeting",
-  "notes": "Dev-only grey box (mw-e22.9), not shipped: the greybox villager's chat, to try walking up to someone and talking in a debug build (?scene=conversation-room&debug=1). Enter or E continues a line; 1 to 9 picks an option. The real conversations are written under E39.",
+  "notes": "Dev-only grey box (mw-e22.9), not shipped: the greybox villager's chat, to try walking up to someone and talking in a debug build (?scene=conversation-room&debug=1). Enter or E continues a line; 1 to 9 picks an option; the purse option is locked until you carry 99 gold, to show a locked reason (mw-e22.10). The real conversations are written under E39.",
   "speakers": [{ "id": "villager", "npc": "greybox-villager" }],
   "entries": [
     {
@@ -32,6 +32,13 @@
       "options": [
         { "id": "who", "text": "Who are you?", "once": true, "next": "who-line" },
         { "id": "news", "text": "Heard anything lately?", "once": true, "next": "news-line" },
+        {
+          "id": "bribe",
+          "text": "Here is a purse for your trouble.",
+          "when": { "kind": "gold", "op": "gte", "value": 99 },
+          "showWhenLocked": true,
+          "end": true
+        },
         { "id": "leave", "text": "Goodbye.", "end": true }
       ]
     },

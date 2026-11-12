@@ -458,6 +458,8 @@ import {
   setIndicatorPalette,
   awarenessColour,
   setTextBackdrop,
+  setHighContrast,
+  UiInputAdapter,
   setTextScale,
   UiRoot,
   WaterHud,
@@ -698,6 +700,10 @@ function startRenderer(
   settings.on('accessibility.indicatorPalette', (id) => {
     setIndicatorPalette(ui.element, id);
   });
+  setHighContrast(ui.element, settings.get('accessibility.highContrast'));
+  settings.on('accessibility.highContrast', (on) => {
+    setHighContrast(ui.element, on);
+  });
   setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
   settings.on('accessibility.textBackground', (opacity) => {
     setTextBackdrop(ui.element, opacity);
@@ -798,6 +804,8 @@ function startRenderer(
   let player: TestbedPlayer | undefined;
   // Talking to NPCs (mw-e22.9), once a scene with a talkable NPC has started.
   let conversations: Conversations | undefined;
+  let dialogueFrame: ((nowMs: number) => void) | undefined;
+  let dialoguePoll: (() => void) | undefined;
   // Area transitions (mw-e01.11): a page that arrives from another area shows the loading overlay
   // (area name) if it takes longer than half a second to become playable, and publishes how long
   // the whole transition took in #app[data-transit]; a page that leaves hands off through
@@ -1435,8 +1443,10 @@ function startRenderer(
       },
       draw: (frame) => {
         uiInput.poll();
+        dialoguePoll?.();
         bridge.frame();
         const { timeMs } = frame;
+        dialogueFrame?.(timeMs);
         const elapsedMs = timeMs - (lastFrameMs ?? timeMs);
         if (debugCamera?.update(elapsedMs) || publishLiveCamera) writeCameraData();
         lastFrameMs = timeMs;
@@ -2552,9 +2562,40 @@ function startRenderer(
           hostile: (entity) => npcBand(dispositions.get(entity)) === 'hostile',
           canParley: (dialogue, npc) => runtime.canParley(dialogue, npc),
         });
-        const dialogueBox = new DialogueBox();
+        // The dialogue screen (mw-e22.10): reveal speed and high contrast come from the settings, the
+        // text size and background opacity from the UI root; the mouse picks, the pad is polled below.
+        const dialogueBox = new DialogueBox({
+          choose: (index) => {
+            talking.activate(index);
+          },
+          focus: (index) => {
+            talking.focus(index);
+          },
+          advance: () => {
+            talking.advance();
+          },
+          toggleHistory: () => {
+            talking.toggleHistory();
+          },
+        });
         ui.hud.append(dialogueBox.element);
-        const talking = new Conversations({
+        dialogueBox.setRevealSpeed(settings.get('accessibility.revealSpeed'));
+        settings.on('accessibility.revealSpeed', (speed) => {
+          dialogueBox.setRevealSpeed(speed);
+        });
+        dialogueFrame = (ms) => {
+          dialogueBox.frame(ms);
+        };
+        const talking: Conversations = new Conversations({
+          reveal: {
+            active: () => dialogueBox.revealing,
+            finish: () => {
+              dialogueBox.finishReveal();
+            },
+          },
+          scrollHistory: (pixels) => {
+            dialogueBox.scrollHistory(pixels);
+          },
           world,
           player: player.entity,
           runtime,
@@ -2569,6 +2610,16 @@ function startRenderer(
           },
         });
         conversations = talking;
+        // The pad drives an open conversation (D-pad or stick, A, X for history, B closes it).
+        const dialoguePad = new UiInputAdapter((intent) => talking.intent(intent));
+        dialoguePad.attach({
+          window: { addEventListener: () => undefined, removeEventListener: () => undefined },
+          navigator: globalThis.navigator,
+          now: () => performance.now(),
+        });
+        dialoguePoll = () => {
+          dialoguePad.poll();
+        };
         // An open conversation takes Enter, E and the number keys before the game's own bindings.
         globalThis.window.addEventListener(
           'keydown',

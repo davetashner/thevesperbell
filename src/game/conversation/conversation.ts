@@ -15,13 +15,16 @@
 //   Alerted or Combat toward the player or no one yet) or anyone hitting the NPC or the player (cause
 //   `combat`), the NPC gone (`gone`). All are seen in the step they happen, so the conversation is over
 //   within one sim tick.
-// - It publishes `#app[data-dialogue]` (JSON; the e2e's readout) and the minimal box the player reads
-//   (`dialogueBoxModel`); mw-e22.10's real dialogue screen replaces the box and keeps the controller.
+// - It publishes `#app[data-dialogue]` (JSON; the e2e's readout) and the dialogue screen's view model
+//   (src/ui/dialogue-box.ts, mw-e22.10): the line or options with tags, locked reasons and odds, the
+//   cursor, the last check's breakdown and the history of what was said and chosen (kept across
+//   conversations for the session, not saved). The controller also owns the cursor and the keys.
 //
 // Persuasion checks and option tags are wired where the runtime is built (src/main.ts).
 
 import {
   AlertStateChanged,
+  DialogueCheckResolved,
   beginConversing,
   conversingEntities,
   DamageApplied,
@@ -35,23 +38,33 @@ import {
   PlacementComponent,
   CreatureComponent,
   type DialogueRuntime,
+  type DialogueChoice,
   type DialogueView,
   type EntityId,
   type Vec3,
   type World,
 } from '@sim/index';
-import type { DialogueBoxModel } from '@ui/index';
+import { formatString } from '@content/index';
+import type {
+  DialogueBoxChoice,
+  DialogueBoxModel,
+  DialogueBoxOutcome,
+  DialogueHistoryEntry,
+  UiIntent,
+} from '@ui/index';
 import { creatureIdOf } from './npcs';
+import { humanize, oddsView, outcomeView, reasonText, tagView } from './text';
 
 /** The player walking further from the NPC than this (metres) ends the conversation. */
 export const TALK_RANGE_M = 6;
 /** Where the camera looks at the NPC: this high above its feet, metres. */
 export const NPC_HEAD_M = 1.6;
 
-export const CONVERSATION_TEXT = Object.freeze({
-  line: 'Enter to continue',
-  choice: 'Press the number of your answer',
-});
+/** The most entries the history keeps; the oldest go first. */
+export const HISTORY_LIMIT = 200;
+
+/** Pixels the arrow keys scroll the open history by. */
+export const HISTORY_SCROLL_PX = 48;
 
 /** How a conversation ended, as the readout reports it. */
 export interface ConversationEnd {
@@ -70,6 +83,10 @@ export interface ConversationOptions {
   readonly speakerName?: (dialogue: string, speaker: string) => string;
   /** Metres the player may be from the NPC; default `TALK_RANGE_M`. */
   readonly maxDistance?: number;
+  /** The line being typed out (the box's reveal): Enter finishes it before it continues. */
+  readonly reveal?: { readonly active: () => boolean; readonly finish: () => void };
+  /** Scrolls the open history panel by this many pixels. */
+  readonly scrollHistory?: (pixels: number) => void;
   /** Shows the conversation (null hides it). */
   readonly show?: (model: DialogueBoxModel | null) => void;
   /** Publishes a `data-*` readout value. */
@@ -83,7 +100,16 @@ export interface ConversationReadout {
   readonly kind: 'line' | 'choice' | null;
   readonly speaker: string;
   readonly text: string;
-  readonly choices: readonly { readonly text: string; readonly locked: boolean }[];
+  readonly choices: readonly {
+    readonly text: string;
+    readonly locked: boolean;
+    readonly reason: string;
+  }[];
+  /** The option the cursor is on (0 while a line shows). */
+  readonly focus: number;
+  readonly historyOpen: boolean;
+  /** How many entries the history holds. */
+  readonly history: number;
   /** The NPC's routine is paused. */
   readonly conversing: boolean;
   /** How the last conversation ended; absent before the first. */
@@ -92,6 +118,12 @@ export interface ConversationReadout {
 
 const CHOICE_KEY = /^(?:Digit|Numpad)([1-9])$/;
 const ADVANCE_KEYS: readonly string[] = ['Enter', 'NumpadEnter', 'KeyE'];
+const KEY_INTENTS: Readonly<Record<string, UiIntent>> = {
+  ArrowUp: 'up',
+  ArrowDown: 'down',
+  KeyH: 'secondary',
+  Escape: 'back',
+};
 
 export class Conversations {
   readonly #world: World<never>;
@@ -104,6 +136,16 @@ export class Conversations {
   #alarm: string | undefined;
   #last: ConversationEnd | undefined;
   #published = '';
+  #focus = 0;
+  #historyOpen = false;
+  #history: DialogueHistoryEntry[] = [];
+  /** Counts the lines shown; the box restarts its reveal when it changes. */
+  #seq = 0;
+  #outcome: DialogueBoxOutcome | undefined;
+  /** Where in the history the check just chosen belongs (after the choice, before the answer). */
+  #checkAt = 0;
+  #lastLine = { speaker: '', text: '', portrait: '' };
+  #divide = false;
 
   constructor(options: ConversationOptions) {
     this.#world = options.world;
@@ -113,6 +155,18 @@ export class Conversations {
       events.on(interacted, ({ actor, target, verb }) => {
         if (actor !== options.player || verb !== 'talk' || this.#partner !== undefined) return;
         if (this.#dialogueOf(target) !== undefined) this.#pending = target;
+      }),
+      events.on(DialogueCheckResolved, ({ breakdown }) => {
+        if (this.#partner === undefined || breakdown === undefined) return;
+        const outcome = outcomeView(breakdown);
+        this.#outcome = outcome;
+        const at = Math.min(this.#checkAt, this.#history.length);
+        this.#history.splice(at, 0, {
+          kind: 'check',
+          speaker: '',
+          text: [outcome.title, ...outcome.lines].join('. '),
+        });
+        this.#checkAt = at + 1;
       }),
       events.on(AlertStateChanged, (change) => {
         if (this.#partner === undefined || change.entity === this.#partner) return;
@@ -162,6 +216,13 @@ export class Conversations {
   /** Moves past the current line. Returns whether a conversation was waiting on one. */
   advance(): boolean {
     if (this.#partner === undefined || this.#options.runtime.view?.kind !== 'line') return false;
+    const { reveal } = this.#options;
+    if (reveal?.active() === true) {
+      // Enter first shows the rest of the line, then goes on.
+      reveal.finish();
+      return true;
+    }
+    this.#outcome = undefined;
     this.#settle(this.#options.runtime.advance());
     this.#present();
     return true;
@@ -170,11 +231,79 @@ export class Conversations {
   /** Picks option `index` (from 0) of the current choice. Returns whether it was taken. */
   choose(index: number): boolean {
     if (this.#partner === undefined) return false;
+    const { view } = this.#options.runtime;
     const result = this.#options.runtime.choose(index);
     if (!result.ok) return false;
+    // The runtime's events are delivered at the next step, so the check's result lands after this.
+    this.#opening(humanize(this.#npc));
+    // A taken option exists, so the view was a choice that lists it.
+    const { choices } = view as Extract<DialogueView, { kind: 'choice' }>;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.#push({ kind: 'choice', speaker: '', text: choices[index]!.text });
+    this.#checkAt = this.#history.length;
+    this.#outcome = undefined;
     this.#settle(result.view);
     this.#present();
     return true;
+  }
+
+  /** Moves the cursor to option `index` (a pointer over it); returns whether there is one. */
+  focus(index: number): boolean {
+    const view = this.#partner === undefined ? undefined : this.#options.runtime.view;
+    if (view?.kind !== 'choice' || index < 0 || index >= view.choices.length) return false;
+    this.#focus = index;
+    this.#present();
+    return true;
+  }
+
+  /** A click on option `index`: the cursor goes there, and a free option is taken. */
+  activate(index: number): boolean {
+    return this.focus(index) && this.choose(index);
+  }
+
+  /** Opens or closes the history panel while a conversation is open. */
+  toggleHistory(): boolean {
+    if (this.#partner === undefined) return false;
+    this.#historyOpen = !this.#historyOpen;
+    this.#present();
+    return true;
+  }
+
+  /** Confirm: continues a line, or takes the option the cursor is on (a locked one does nothing). */
+  confirm(): boolean {
+    if (this.#partner === undefined) return false;
+    if (this.#historyOpen) return this.toggleHistory();
+    if (this.#options.runtime.view?.kind === 'choice') return this.choose(this.#focus);
+    return this.advance();
+  }
+
+  /**
+   * A menu intent (the pad, and the arrows, H and Esc of the keyboard): up and down move the cursor,
+   * or scroll the history; confirm continues or picks; secondary (X, H) toggles the history; back
+   * closes it. Returns whether the conversation took it.
+   */
+  intent(intent: UiIntent): boolean {
+    if (this.#partner === undefined) return false;
+    switch (intent) {
+      case 'up':
+      case 'down': {
+        const sign = intent === 'up' ? -1 : 1;
+        if (this.#historyOpen) {
+          this.#options.scrollHistory?.(sign * HISTORY_SCROLL_PX);
+          return true;
+        }
+        return this.#step(sign);
+      }
+      case 'confirm':
+        this.confirm();
+        return true;
+      case 'secondary':
+        return this.toggleHistory();
+      case 'back':
+        return this.#historyOpen && this.toggleHistory();
+      default:
+        return false;
+    }
   }
 
   /** Ends the conversation from outside, with `cause`. Returns whether one was running. */
@@ -187,17 +316,28 @@ export class Conversations {
   }
 
   /**
-   * The keys of an open conversation: Enter or E continues a line, 1 to 9 picks an option. Returns
-   * true for a key it took (every one of those, while a conversation is open, so none reaches the
-   * game); a held key's repeats are taken and ignored.
+   * The keys of an open conversation: Enter or E continues a line or takes the option under the
+   * cursor, 1 to 9 picks an option, Up and Down move the cursor (or scroll the history), H opens
+   * the history and Esc closes it. Returns true for a key it took (every one of those, while a
+   * conversation is open, so none reaches the game); a held key's repeats are taken and ignored,
+   * except that Up and Down repeat.
    */
   keydown(event: { readonly code: string; readonly repeat?: boolean }): boolean {
     if (this.#partner === undefined) return false;
     const digit = CHOICE_KEY.exec(event.code)?.[1];
-    if (digit === undefined && !ADVANCE_KEYS.includes(event.code)) return false;
-    if (event.repeat === true) return true;
-    if (digit === undefined) this.advance();
-    else this.choose(Number(digit) - 1);
+    const intent = KEY_INTENTS[event.code];
+    const advances = ADVANCE_KEYS.includes(event.code);
+    if (digit === undefined && intent === undefined && !advances) return false;
+    // Escape belongs to the pause menu unless the history is open to close.
+    if (event.code === 'Escape' && !this.#historyOpen) return false;
+    const moves = intent === 'up' || intent === 'down';
+    if (event.repeat === true && !moves) return true;
+    if (digit !== undefined) {
+      if (!this.#historyOpen) this.choose(Number(digit) - 1);
+    } else if (advances) this.confirm();
+    // Neither a digit nor an advance key, so one of the mapped intents.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    else this.intent(intent!);
     return true;
   }
 
@@ -214,17 +354,57 @@ export class Conversations {
       open: view !== undefined,
       npc: view === undefined ? null : this.#npc,
       conversing: this.#partner !== undefined && isConversing(this.#world, this.#partner),
+      focus: view?.kind === 'choice' ? this.#focus : 0,
+      historyOpen: view !== undefined && this.#historyOpen,
+      history: this.#history.length,
       ...(this.#last !== undefined && { last: this.#last }),
     };
     if (view?.kind === 'line') {
-      const speaker = this.#options.speakerName?.(view.dialogue, view.speaker) ?? view.speaker;
-      return { ...base, kind: 'line', speaker, text: view.text, choices: [] };
+      return {
+        ...base,
+        kind: 'line',
+        speaker: this.#speakerName(view),
+        text: view.text,
+        choices: [],
+      };
     }
     if (view?.kind === 'choice') {
-      const choices = view.choices.map(({ text, locked }) => ({ text, locked }));
+      const choices = view.choices.map(({ text, locked, reason, reasonParts }) => ({
+        text,
+        locked,
+        reason: locked ? this.#reason(reason, reasonParts) : '',
+      }));
       return { ...base, kind: 'choice', speaker: '', text: '', choices };
     }
     return { ...base, kind: null, speaker: '', text: '', choices: [] };
+  }
+
+  #speakerName(view: { readonly dialogue: string; readonly speaker: string }): string {
+    return this.#options.speakerName?.(view.dialogue, view.speaker) ?? view.speaker;
+  }
+
+  /** A locked option's reason in words; the key itself when the runtime gave no parts. */
+  #reason(key: string | undefined, parts: DialogueChoice['reasonParts']): string {
+    return parts === undefined ? (key ?? '') : reasonText(parts);
+  }
+
+  /** Moves the cursor one option, wrapping. */
+  #step(sign: number): boolean {
+    const view = this.#options.runtime.view;
+    if (view?.kind !== 'choice') return true;
+    const n = view.choices.length;
+    this.#focus = (this.#focus + sign + n) % n;
+    this.#present();
+    return true;
+  }
+
+  /** The option the cursor starts on: the first one that can be taken. */
+  #firstFree(view: Extract<DialogueView, { kind: 'choice' }>): number {
+    // The runtime ends a conversation with nothing to take, so there is one; 0 if there is not.
+    return Math.max(
+      0,
+      view.choices.findIndex((choice) => !choice.locked),
+    );
   }
 
   #dialogueOf(entity: EntityId): string | undefined {
@@ -259,6 +439,9 @@ export class Conversations {
     const dialogue = this.#dialogueOf(target);
     if (npc === undefined || dialogue === undefined) return;
     this.#alarm = undefined;
+    this.#divide = true;
+    this.#historyOpen = false;
+    this.#outcome = undefined;
     const from = this.#world.get(target, PlacementComponent);
     const to = this.#world.get(this.#options.player, PlacementComponent);
     const toward =
@@ -297,7 +480,34 @@ export class Conversations {
 
   /** Reacts to what a runtime call returned: when the conversation is over, the NPC walks on. */
   #settle(view: DialogueView): void {
+    this.#seq += 1;
     if (view.kind === 'ended') this.#finish(view.reason, view.cause);
+    else if (view.kind === 'choice') this.#focus = this.#firstFree(view);
+    else this.#remember(view);
+  }
+
+  /** Puts a line into the history (with a divider when it opens a conversation) and keeps it as the last said. */
+  #remember(view: Extract<DialogueView, { kind: 'line' }>): void {
+    const speaker = this.#speakerName(view);
+    this.#opening(speaker);
+    this.#push({ kind: 'line', speaker, text: view.text });
+    this.#lastLine = { speaker, text: view.text, portrait: view.speaker };
+  }
+
+  /** The first entry of a conversation starts with a divider naming who it is with. */
+  #opening(who: string): void {
+    if (!this.#divide) return;
+    this.#divide = false;
+    this.#push({
+      kind: 'divider',
+      speaker: '',
+      text: formatString('dialogue.history.divider', { speaker: who }),
+    });
+  }
+
+  #push(entry: DialogueHistoryEntry): void {
+    this.#history.push(entry);
+    if (this.#history.length > HISTORY_LIMIT) this.#history.shift();
   }
 
   #finish(reason: string, cause?: string): void {
@@ -306,31 +516,59 @@ export class Conversations {
     this.#last = { npc: this.#npc, reason, ...(cause !== undefined && { cause }) };
     this.#partner = undefined;
     this.#npc = '';
+    this.#historyOpen = false;
+    this.#outcome = undefined;
   }
 
   #present(): void {
     const readout = this.readout();
+    const model = this.#boxModel(readout);
     const json = JSON.stringify(readout);
-    if (json === this.#published) return;
-    this.#published = json;
+    const modelJson = JSON.stringify(model);
+    if (json + modelJson === this.#published) return;
+    this.#published = json + modelJson;
     this.#options.publish?.('dialogue', json);
-    this.#options.show?.(boxModel(readout));
+    this.#options.show?.(model);
   }
-}
 
-/** The box's view of a readout; null when no conversation is open. */
-export function boxModel(readout: ConversationReadout): DialogueBoxModel | null {
-  if (!readout.open || readout.kind === null) return null;
-  return {
-    speaker: readout.speaker,
-    text: readout.text,
-    hint: readout.kind === 'line' ? CONVERSATION_TEXT.line : CONVERSATION_TEXT.choice,
-    choices: readout.choices.map((choice, i) => ({
-      text: `${String(i + 1)}. ${choice.text}`,
-      locked: choice.locked,
-      reason: 'locked',
-    })),
-  };
+  /** The dialogue screen's view of now; null when no conversation is open. */
+  #boxModel(readout: ConversationReadout): DialogueBoxModel | null {
+    const view = this.#options.runtime.view;
+    if (!readout.open || readout.kind === null) return null;
+    const history = this.#historyOpen
+      ? formatString('dialogue.ui.historyOpen')
+      : formatString('dialogue.ui.history');
+    const last = this.#lastLine;
+    const choices: DialogueBoxChoice[] =
+      view?.kind === 'choice'
+        ? view.choices.map((choice) => ({
+            text: choice.text,
+            locked: choice.locked,
+            reason: choice.locked ? this.#reason(choice.reason, choice.reasonParts) : '',
+            tags: choice.tags.map(tagView),
+            ...(choice.check !== undefined && { odds: oddsView(choice.check) }),
+          }))
+        : [];
+    return {
+      speaker: readout.kind === 'line' ? readout.speaker : last.speaker,
+      portrait: readout.kind === 'line' && view?.kind === 'line' ? view.speaker : last.portrait,
+      text: readout.kind === 'line' ? readout.text : last.text,
+      lineKey: this.#seq,
+      choices,
+      focus: readout.focus,
+      hint: `${formatString(readout.kind === 'line' ? 'dialogue.ui.line' : 'dialogue.ui.choice')}. ${history}`,
+      ...(this.#outcome !== undefined && { outcome: this.#outcome }),
+      history: [...this.#history],
+      historyOpen: readout.historyOpen,
+      labels: {
+        replies: formatString('dialogue.ui.replies'),
+        locked: formatString('dialogue.ui.locked'),
+        history: formatString('dialogue.ui.historyButton'),
+        historyTitle: formatString('dialogue.ui.historyTitle'),
+        historyEmpty: formatString('dialogue.ui.historyEmpty'),
+      },
+    };
+  }
 }
 
 /** The id of the safety veto that holds autosaves back while the player is in conversation. */

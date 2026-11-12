@@ -38,6 +38,12 @@ export function setDyslexiaFont(root: HTMLElement, on: boolean): void {
   else delete root.dataset['font'];
 }
 
+/** Switches high contrast on or off (the stylesheet reads `data-contrast`; the dialogue box follows it). */
+export function setHighContrast(root: HTMLElement, on: boolean): void {
+  if (on) root.dataset['contrast'] = 'high';
+  else delete root.dataset['contrast'];
+}
+
 /**
  * Motion preference: `system` follows the OS `prefers-reduced-motion`, `reduce` forces it on, `full`
  * forces full motion even when the OS asks for less.

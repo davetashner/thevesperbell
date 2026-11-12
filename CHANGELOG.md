@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Conversations now have a proper dialogue screen: a speaker name and portrait slot, lines that type out at a speed you choose (Enter shows the rest), replies you pick with 1 to 9, the arrows, a controller or the mouse, [Knight]-style tags, locked replies that say what they need, difficulty labels before a persuasion and its score breakdown after, and a history you open with H; text size, text background and the new Dialogue text speed and High contrast dialogue options apply to it (mw-e22.10).
 - You can now talk to the greybox villager in the debug conversation room: walk up, press Interact, and she stops walking her route to chat, picking up where she left off when you say goodbye, walk away or danger turns up.
 - Climbing now asks how hard the climb is: ladders, ropes and ivy are easy for everyone, rough stone and timber is for the thief (a knight who jumps at it is told it is too hard to climb), harder faces tire you faster, and running out of stamina on a wall drops you, with fall damage and a loud landing. Levels mark climbable surfaces, and a climbing rope can be tied off at a level's rope hooks (Interact) so everyone, creatures included, has a way up until it is untied; try the ladder, the rough face and the hook on the rafter platform in `?scene=vertical-hall` (mw-e10.9).
 - You can now walk out of Briar Glen into the Briarwood: a woodside path at the north end of the shop lane leads to a 300 by 250 metre grey-box forest with its trails, clearings, bramble gates that burn open and a way back to town.
