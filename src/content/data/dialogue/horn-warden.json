@@ -1,0 +1,2255 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "horn-warden",
+  "notes": "Brother Horn (bible 5.8, 4.2, 4.3, 4.5), the Warden of the Knot. Not placed yet: Horn's Hall and the Fold belong to the Knot (E27 and later), so he stands in the debug conversation room. Voice: slow, short, plain sentences with pauses; he never roars words. One dialogue, entries tried in order: the endings (Vespers Rung lines, and the abbot-joined silence), the Act III shaft barks (horn.at-shaft), rescue remarks (horn.rescue-pending, by horn.rescues 1, 2, 3, 4 and 5+), the Fold confrontation after a trick and its 'angry, then weary' re-entry after the player fled (horn.fold-fled), the Trial of Horns won, the yield after a fight (spare or finish him), help-done, befriended, spared, tricked-return and the first meetings by class (knight, archer, sorcerer, thief, any), then return. Resolutions set horn.fate: kill-fx (dead), spare-fx, honest-fx (trick), befriend-fx, trial-fx2 and help-fx (alive). Befriend triggers each have their own scene behind befriend-gate: horn.hymn-hummed, horn.ring-held, horn.name-stone-held, snig.vouched, clatter.vouched, horn.weapon-lowered; the sorcerer can also read the axe runes (his name). The knight's Trial of Horns starts a duel the quest runs (horn.trial-offered, event horn.trial.begin) and sets horn.trial-won. The main quest (mw-e39.4) sets the facts named in horn-dialogue.json. The reveal is shown, not told: in the Fold the narrator describes the sleepers before Horn says a word.",
+  "speakers": [
+    {
+      "id": "horn",
+      "npc": "npc-horn"
+    }
+  ],
+  "entries": [
+    {
+      "id": "ending-joined",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "abbot.fate",
+            "op": "eq",
+            "value": "joined"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "alive"
+          }
+        ]
+      },
+      "node": "joined-1"
+    },
+    {
+      "id": "ending",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "abbot.fate",
+                "op": "eq",
+                "value": "at-rest"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "abbot.fate",
+                "op": "eq",
+                "value": "defeated"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "alive"
+          }
+        ]
+      },
+      "node": "end-1"
+    },
+    {
+      "id": "shaft",
+      "when": {
+        "kind": "fact",
+        "fact": "horn.at-shaft"
+      },
+      "node": "shaft-gate"
+    },
+    {
+      "id": "rescued",
+      "when": {
+        "kind": "fact",
+        "fact": "horn.rescue-pending"
+      },
+      "node": "rescue-gate"
+    },
+    {
+      "id": "fold-reentry",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "horn.tricked"
+          },
+          {
+            "kind": "fact",
+            "fact": "horn.fold-fled"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "fold-honest-1",
+            "op": "lt",
+            "value": 1
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "horn.befriended"
+            }
+          }
+        ]
+      },
+      "node": "reentry-1"
+    },
+    {
+      "id": "fold-confront",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "horn.tricked"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "fold-honest-1",
+            "op": "lt",
+            "value": 1
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "horn.befriended"
+            }
+          }
+        ]
+      },
+      "node": "fold-1"
+    },
+    {
+      "id": "trial-won",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "horn.trial-won"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "trial-won-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "trial-won-1"
+    },
+    {
+      "id": "yield",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "horn.defeated"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "horn.spared"
+            }
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "horn.befriended"
+            }
+          },
+          {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "alive"
+          }
+        ]
+      },
+      "node": "yield-1"
+    },
+    {
+      "id": "help-done",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "horn.befriended"
+          },
+          {
+            "kind": "fact",
+            "fact": "horn.bread-brought"
+          },
+          {
+            "kind": "fact",
+            "fact": "horn.healed"
+          },
+          {
+            "kind": "fact",
+            "fact": "knot.breach-sealed"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "horn.helped"
+            }
+          }
+        ]
+      },
+      "node": "help-1"
+    },
+    {
+      "id": "befriended",
+      "when": {
+        "kind": "fact",
+        "fact": "horn.befriended"
+      },
+      "node": "friend-1"
+    },
+    {
+      "id": "spared",
+      "when": {
+        "kind": "fact",
+        "fact": "horn.spared"
+      },
+      "node": "spared-1"
+    },
+    {
+      "id": "tricked-return",
+      "when": {
+        "kind": "fact",
+        "fact": "horn.tricked"
+      },
+      "node": "tricked-1"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "hall-menu",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "greet-knight-1"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "hall-menu",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "greet-archer-1"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "hall-menu",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "greet-sorcerer-1"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "hall-menu",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "greet-thief-1"
+    },
+    {
+      "id": "first-any",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hall-menu",
+        "op": "lt",
+        "value": 1
+      },
+      "node": "greet-any-1"
+    },
+    {
+      "id": "return",
+      "node": "again-1"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-any-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Stop.",
+      "next": "greet-any-2"
+    },
+    {
+      "id": "greet-any-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You are awake. That is... unusual. Most who come this far are not.",
+      "next": "who-sent-1"
+    },
+    {
+      "id": "greet-knight-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Stop.",
+      "next": "greet-knight-2"
+    },
+    {
+      "id": "greet-knight-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You stand like the barony's men stood. They were brave, and they were always leaving.",
+      "next": "who-sent-1"
+    },
+    {
+      "id": "greet-archer-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Stop. Your hand is on the string.",
+      "next": "greet-archer-2"
+    },
+    {
+      "id": "greet-archer-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You looked at me a long time before you drew. Look longer.",
+      "next": "who-sent-1"
+    },
+    {
+      "id": "greet-sorcerer-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Stop.",
+      "next": "greet-sorcerer-2"
+    },
+    {
+      "id": "greet-sorcerer-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You read my walls the way the monks read their books. Slowly. With your lips moving. I watched you do it.",
+      "next": "who-sent-1"
+    },
+    {
+      "id": "greet-thief-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Stop.",
+      "next": "greet-thief-2"
+    },
+    {
+      "id": "greet-thief-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Small steps. Careful hands. I do not mind a thief. I mind who sends one.",
+      "next": "who-sent-1"
+    },
+    {
+      "id": "who-sent-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Who sent you? The town? The abbot's new hands? I do not know which you are.",
+      "next": "who-sent-2"
+    },
+    {
+      "id": "who-sent-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Tell me, or turn around. I would rather you did not stay between the two.",
+      "next": "befriend-gate"
+    },
+    {
+      "id": "again-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You came back.",
+      "next": "again-2"
+    },
+    {
+      "id": "again-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Have you thought on it? Or have you only come to try the door again?",
+      "next": "befriend-gate"
+    },
+    {
+      "id": "befriend-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.hymn-hummed"
+          },
+          "next": "bf-hymn-1"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.ring-held"
+          },
+          "next": "bf-ring-1"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.name-stone-held"
+          },
+          "next": "bf-stone-1"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "snig.vouched"
+          },
+          "next": "bf-snig-1"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "clatter.vouched"
+          },
+          "next": "bf-clatter-1"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.weapon-lowered"
+          },
+          "next": "bf-lowered-1"
+        }
+      ],
+      "else": "after-gate"
+    },
+    {
+      "id": "after-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.spared"
+          },
+          "next": "open-spared-1"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.tricked"
+          },
+          "next": "open-tricked-1"
+        }
+      ],
+      "else": "hall-menu"
+    },
+    {
+      "id": "bf-hymn-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "You hum the Vesper hymn, low, the way the monks did at dusk. It is not very good. It is the right tune.",
+      "next": "bf-hymn-2"
+    },
+    {
+      "id": "bf-hymn-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "...Vespers.",
+      "next": "bf-hymn-3"
+    },
+    {
+      "id": "bf-hymn-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The monks sang that at the close of every day. I have not heard it from a living mouth in sixty-one years.",
+      "next": "bf-hymn-4"
+    },
+    {
+      "id": "bf-hymn-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You hum it badly. I do not mind. Hold the last note. Yes. There.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "bf-ring-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "You hold out the horn-ring. His hand closes around it as though it were hot.",
+      "next": "bf-ring-2"
+    },
+    {
+      "id": "bf-ring-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "My mother's. Bronze, and a little bent. She wore it on the left horn. I was small. I used to chew it.",
+      "next": "bf-ring-3"
+    },
+    {
+      "id": "bf-ring-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "A man prised it off a carving of her. You took it back. Through the dark. Through my halls.",
+      "next": "bf-ring-4"
+    },
+    {
+      "id": "bf-ring-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You could have sold it. Hornfolk bronze is heavy. I will remember this. Slowly. I remember everything slowly.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "bf-stone-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "You show him the name-stone, river-smooth, cut with one long, low word. It hums faintly in the air near his breath.",
+      "next": "bf-stone-2"
+    },
+    {
+      "id": "bf-stone-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Oorr. Thruum.",
+      "next": "bf-stone-3"
+    },
+    {
+      "id": "bf-stone-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "That is her name. My mother's. I thought it gone from the world. The one who could say it is... me. Only me.",
+      "next": "bf-stone-4"
+    },
+    {
+      "id": "bf-stone-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Keep it a moment. Let me hear it. ... There. Now I have heard it twice.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "bf-snig-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Snig told me you would come.",
+      "next": "bf-snig-2"
+    },
+    {
+      "id": "bf-snig-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "He talks very quickly. I caught a third. 'Pockets. Brave. Smells like soup.' I think it was praise.",
+      "next": "bf-snig-3"
+    },
+    {
+      "id": "bf-snig-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The goblins do not vouch for many. Never a human, to me. They are honest about what they dislike.",
+      "next": "bf-snig-4"
+    },
+    {
+      "id": "bf-snig-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Very well. I will hear you.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "bf-clatter-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Anselm sent you.",
+      "next": "bf-clatter-2"
+    },
+    {
+      "id": "bf-clatter-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The gardener. He tends his pale mushrooms in the Ossuary. He does not know me. I know him.",
+      "next": "bf-clatter-3"
+    },
+    {
+      "id": "bf-clatter-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Sixty-one years I have walked past him. Sometimes he apologises as he swings. He cannot even hit properly.",
+      "next": "bf-clatter-4"
+    },
+    {
+      "id": "bf-clatter-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "He would not speak for someone who meant harm. He has never learned how.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "bf-lowered-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "He circles you once. Twice. A third time, slowly, as large as a doorway. Then he stops.",
+      "next": "bf-lowered-2"
+    },
+    {
+      "id": "bf-lowered-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You waited. Sword down. You let me look.",
+      "next": "bf-lowered-3"
+    },
+    {
+      "id": "bf-lowered-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Everyone runs, or swings. No one has stood still in sixty-one years.",
+      "next": "bf-lowered-4"
+    },
+    {
+      "id": "bf-lowered-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I have looked. Speak, if you will. I will listen.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "befriend-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.befriended",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.fate",
+          "value": "alive"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 4
+        },
+        {
+          "kind": "emit",
+          "event": "horn.befriended"
+        }
+      ],
+      "next": "befriend-1"
+    },
+    {
+      "id": "befriend-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Come. I will not tell it. It is shorter to see.",
+      "next": "befriend-2"
+    },
+    {
+      "id": "befriend-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The way is open. Walk slowly. They are sleeping. Waking is the dangerous part.",
+      "end": true
+    },
+    {
+      "id": "hall-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-who",
+          "text": "Who are you?",
+          "once": true,
+          "next": "who-1"
+        },
+        {
+          "id": "ask-below",
+          "text": "What is down there? The missing...",
+          "once": true,
+          "next": "below-1"
+        },
+        {
+          "id": "bounty",
+          "text": "I came for the bounty on the beast of the old mine.",
+          "once": true,
+          "next": "bounty-1"
+        },
+        {
+          "id": "peace",
+          "text": "I am not here to fight.",
+          "once": true,
+          "next": "peace-1"
+        },
+        {
+          "id": "trial-knight",
+          "text": "I ask the Trial of Horns.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "trial-1"
+        },
+        {
+          "id": "runes-sorcerer",
+          "text": "Those runes on your axe. May I read them aloud?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "runes-1"
+        },
+        {
+          "id": "tracks-archer",
+          "text": "The ferns on the stair were trampled. Someone carries them down. Gently.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "tracks-1"
+        },
+        {
+          "id": "quiet-thief",
+          "text": "I could slip past you. We both know it.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "slip-1"
+        },
+        {
+          "id": "leave-hall",
+          "text": "I will go. For now.",
+          "next": "leave-hall-1"
+        }
+      ]
+    },
+    {
+      "id": "who-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The monks called me Brother Horn. It was a kindness. I have kept it.",
+      "next": "who-2"
+    },
+    {
+      "id": "who-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I keep this place. That is all I am. Go back up.",
+      "next": "hall-menu"
+    },
+    {
+      "id": "below-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Nothing that is yours.",
+      "next": "below-2"
+    },
+    {
+      "id": "below-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go back up the stair. Please. It is the easy way.",
+      "next": "hall-menu"
+    },
+    {
+      "id": "bounty-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Beast.",
+      "next": "bounty-2"
+    },
+    {
+      "id": "bounty-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "So that is the word, now. I understand it. It is not a lie. It is only not all of it.",
+      "next": "bounty-3"
+    },
+    {
+      "id": "bounty-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I will not let you pass. I would rather not hurt you. Do not make me choose.",
+      "next": "hall-menu"
+    },
+    {
+      "id": "peace-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Everyone says that. With a hand on the hilt.",
+      "next": "peace-2"
+    },
+    {
+      "id": "peace-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Put it down, then. And wait. I am slow. I am patient. I will watch what you do.",
+      "next": "hall-menu"
+    },
+    {
+      "id": "tracks-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You see well. Yes. I carry them.",
+      "next": "tracks-2"
+    },
+    {
+      "id": "tracks-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Gently. I would rather you did not follow. But you have already seen the ferns.",
+      "next": "hall-menu"
+    },
+    {
+      "id": "slip-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Perhaps. You walk quietly. So did the abbot.",
+      "next": "slip-2"
+    },
+    {
+      "id": "slip-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "If you go past me, I will find you where you stop. I would rather you asked.",
+      "next": "hall-menu"
+    },
+    {
+      "id": "leave-hall-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go carefully. The dark is not kind to the careless.",
+      "end": true
+    },
+    {
+      "id": "trial-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The Trial of Horns.",
+      "next": "trial-2"
+    },
+    {
+      "id": "trial-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "...You know the form. Who taught you? No. Do not say. It does not matter.",
+      "next": "trial-3"
+    },
+    {
+      "id": "trial-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "No killing. First to three clean parries or blocks earns the right to be heard.",
+      "next": "trial-4"
+    },
+    {
+      "id": "trial-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Few remember. I had thought none did. Take your stance. I will strike true, and not hard.",
+      "next": "trial-fx"
+    },
+    {
+      "id": "trial-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.trial-offered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "horn.trial.begin"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "runes-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The runes are a name, long, in low doubled sounds. You read them aloud. Slowly. You get it right.",
+      "next": "runes-2"
+    },
+    {
+      "id": "runes-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "...That is my name.",
+      "next": "runes-3"
+    },
+    {
+      "id": "runes-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "My true one. The monks never learned to say it. The last one who read that well took the bell's tongue.",
+      "next": "runes-4"
+    },
+    {
+      "id": "runes-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "But he never read it to me. Go on. Say it again. I am listening.",
+      "next": "befriend-fx"
+    },
+    {
+      "id": "trial-won-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "He makes a low sound like a landslide that has decided to be kind. It takes you a moment to understand that he is laughing.",
+      "next": "trial-won-2"
+    },
+    {
+      "id": "trial-won-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Three. Clean. The barony's men knew the form, once. They stopped keeping it.",
+      "next": "trial-won-3"
+    },
+    {
+      "id": "trial-won-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I am glad. I am very glad. You have the right now. Ask, and I will answer.",
+      "next": "trial-fx2"
+    },
+    {
+      "id": "trial-fx2",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.befriended",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.fate",
+          "value": "alive"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 4
+        },
+        {
+          "kind": "emit",
+          "event": "horn.befriended"
+        }
+      ],
+      "next": "befriend-1"
+    },
+    {
+      "id": "yield-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Enough.",
+      "next": "yield-2"
+    },
+    {
+      "id": "yield-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I am done. Hear me, or finish it.",
+      "next": "yield-menu"
+    },
+    {
+      "id": "yield-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "yield-why",
+          "text": "Why did you fight me?",
+          "once": true,
+          "next": "yield-why-1"
+        },
+        {
+          "id": "yield-listen",
+          "text": "Say it.",
+          "next": "spare-fx"
+        },
+        {
+          "id": "yield-finish",
+          "text": "Finish it.",
+          "next": "kill-fx"
+        }
+      ]
+    },
+    {
+      "id": "yield-why-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Because you came for them.",
+      "next": "yield-why-2"
+    },
+    {
+      "id": "yield-why-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I will tell it all, if you will listen. I cannot say it standing.",
+      "next": "yield-menu"
+    },
+    {
+      "id": "spare-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.spared",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.fate",
+          "value": "alive"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "horn.spared"
+        }
+      ],
+      "next": "spare-1"
+    },
+    {
+      "id": "spare-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You listened. Thank you.",
+      "next": "spare-2"
+    },
+    {
+      "id": "spare-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "There is a song under the mountain. It calls the sleeping. I catch them on the stair and lay them in the Fold, where the song is faint.",
+      "next": "spare-3"
+    },
+    {
+      "id": "spare-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Not to harm. Never to harm. The door is behind me. You will see, when I can stand.",
+      "next": "spare-4"
+    },
+    {
+      "id": "spare-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I am hurt, and I am old. I cannot hold the shaft when the song rises. Not as I am.",
+      "next": "spare-5"
+    },
+    {
+      "id": "spare-5",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Juniper's salve would help. Or a healer's craft. Or rest among the sleepers. Any of them.",
+      "end": true
+    },
+    {
+      "id": "kill-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.fate",
+          "value": "dead"
+        },
+        {
+          "kind": "emit",
+          "event": "horn.slain"
+        }
+      ],
+      "next": "kill-1"
+    },
+    {
+      "id": "kill-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Then it is done.",
+      "next": "kill-2"
+    },
+    {
+      "id": "kill-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "They are not dead. The ones below. They sleep. Let them sleep.",
+      "next": "kill-3"
+    },
+    {
+      "id": "kill-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Ring the bell. ...Waking is... the dangerous part.",
+      "end": true
+    },
+    {
+      "id": "fold-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Moss beds in rows. Six sleepers, and a girl, the youngest, breathing slowly, in time. Bread beside every one. Chalk tallies on the wall.",
+      "next": "fold-2"
+    },
+    {
+      "id": "fold-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Behind you, the floor shifts under a heavy tread.",
+      "next": "fold-gate"
+    },
+    {
+      "id": "fold-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "fold-thief-1"
+        }
+      ],
+      "else": "fold-any-1"
+    },
+    {
+      "id": "fold-thief-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You walk quietly. So did the abbot. Why are you here?",
+      "next": "fold-angry-1"
+    },
+    {
+      "id": "fold-any-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You are in the Fold.",
+      "next": "fold-angry-1"
+    },
+    {
+      "id": "reentry-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You ran.",
+      "next": "reentry-2"
+    },
+    {
+      "id": "reentry-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "And you came back. To the Fold. To them.",
+      "next": "fold-angry-1"
+    },
+    {
+      "id": "fold-angry-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Away from them.",
+      "next": "fold-angry-2"
+    },
+    {
+      "id": "fold-angry-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Away. Now.",
+      "next": "fold-weary-1"
+    },
+    {
+      "id": "fold-weary-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "...No. Sit.",
+      "next": "fold-weary-2"
+    },
+    {
+      "id": "fold-weary-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You have seen. It is done. I am not angry. I am tired. I have been tired for a long time.",
+      "next": "fold-menu"
+    },
+    {
+      "id": "fold-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "fold-listen",
+          "text": "Tell me. I am listening.",
+          "next": "fold-honest-1"
+        },
+        {
+          "id": "fold-flee",
+          "text": "Get out of my way.",
+          "next": "flee-fx"
+        }
+      ]
+    },
+    {
+      "id": "flee-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.fold-fled",
+          "value": true
+        }
+      ],
+      "next": "flee-1"
+    },
+    {
+      "id": "flee-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go, then. I will not stop you.",
+      "next": "flee-2"
+    },
+    {
+      "id": "flee-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I will be here. I am always here.",
+      "end": true
+    },
+    {
+      "id": "fold-honest-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "They walk in their sleep. The song calls them. Most nights I find one on the stair.",
+      "next": "fold-honest-2"
+    },
+    {
+      "id": "fold-honest-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I carry them here. Moss. Bread. A bandage. They do not wake. Waking is the dangerous part.",
+      "next": "fold-honest-3"
+    },
+    {
+      "id": "fold-honest-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The goblins bring the bread. They cannot hear the song. They do not dream. It is why I trust them.",
+      "next": "fold-honest-4"
+    },
+    {
+      "id": "fold-honest-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I should have asked for help. Sixty-one years. I never asked. Now you know. What you do with it is yours.",
+      "next": "honest-fx"
+    },
+    {
+      "id": "honest-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.fate",
+          "value": "alive"
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.fold-fled",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 2
+        }
+      ],
+      "next": "honest-1"
+    },
+    {
+      "id": "honest-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Stay as long as you like. Sit with them. I talk to them. They do not mind.",
+      "end": true
+    },
+    {
+      "id": "tricked-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You are still here. Good. They like company.",
+      "next": "befriend-gate"
+    },
+    {
+      "id": "spared-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Sit. I am still sore. I am glad you stayed your hand.",
+      "next": "befriend-gate"
+    },
+    {
+      "id": "open-spared-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Ask. I will answer what I can. I am not quick today.",
+      "next": "open-menu"
+    },
+    {
+      "id": "open-tricked-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Ask, if you want. Or sit. Both are allowed.",
+      "next": "open-menu"
+    },
+    {
+      "id": "friend-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Good. You came back.",
+      "next": "friend-2"
+    },
+    {
+      "id": "friend-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Ask, or sit. Both are allowed.",
+      "next": "open-menu"
+    },
+    {
+      "id": "open-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-sleepers",
+          "text": "Tell me about the sleepers.",
+          "once": true,
+          "next": "sleepers-1"
+        },
+        {
+          "id": "ask-song",
+          "text": "What is the song?",
+          "once": true,
+          "next": "song-1"
+        },
+        {
+          "id": "ask-hornfolk",
+          "text": "Tell me about the Hornfolk.",
+          "once": true,
+          "next": "hornfolk-1"
+        },
+        {
+          "id": "ask-axe",
+          "text": "What does the axe say?",
+          "once": true,
+          "next": "axe-1"
+        },
+        {
+          "id": "ask-novices",
+          "text": "You carried three novices out, sixty-one years ago.",
+          "once": true,
+          "next": "novices-1"
+        },
+        {
+          "id": "ask-abbot",
+          "text": "What was the abbot like?",
+          "once": true,
+          "next": "abbot-1"
+        },
+        {
+          "id": "ask-dying",
+          "text": "Are you well?",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "horn.befriended"
+              },
+              {
+                "kind": "disposition",
+                "npc": "npc-horn",
+                "op": "gte",
+                "value": 3
+              }
+            ]
+          },
+          "once": true,
+          "next": "dying-1"
+        },
+        {
+          "id": "ask-crypt",
+          "text": "Is there a way up to the priory that is not the shaft?",
+          "when": {
+            "kind": "fact",
+            "fact": "horn.befriended"
+          },
+          "once": true,
+          "next": "crypt-1"
+        },
+        {
+          "id": "ask-breach",
+          "text": "Can the breach be closed?",
+          "when": {
+            "kind": "fact",
+            "fact": "horn.befriended"
+          },
+          "once": true,
+          "next": "breach-1"
+        },
+        {
+          "id": "show-fold",
+          "text": "Show me the Fold.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "horn.tricked"
+            }
+          },
+          "once": true,
+          "next": "show-fold-1"
+        },
+        {
+          "id": "give-bread",
+          "text": "I brought bread for the sleepers.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "horn.befriended"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "horn.bread-brought"
+                }
+              },
+              {
+                "kind": "hasItem",
+                "item": "bread-loaf",
+                "count": 3
+              }
+            ]
+          },
+          "next": "bread-1"
+        },
+        {
+          "id": "give-heal",
+          "text": "Drink this. It will help.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "hasItem",
+                "item": "healing-draught",
+                "count": 1
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "horn.healed"
+                }
+              }
+            ]
+          },
+          "next": "heal-1"
+        },
+        {
+          "id": "rest-fold",
+          "text": "Rest, among them. I will stay close.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "horn.spared"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "horn.healed"
+                }
+              }
+            ]
+          },
+          "next": "rest-1"
+        },
+        {
+          "id": "leave-open",
+          "text": "Rest well, Horn.",
+          "next": "leave-open-1"
+        }
+      ]
+    },
+    {
+      "id": "sleepers-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Six from the glen. Moss, the tanner. Ettie. Rowan, Harlan, Mina. Fitch from the Ox. I know their breathing apart.",
+      "next": "sleepers-2"
+    },
+    {
+      "id": "sleepers-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "And a girl. The baker's. She walked to the gate on your first night. I carried her down. She hums, even asleep.",
+      "next": "open-menu"
+    },
+    {
+      "id": "song-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "It is a dream that hungers. It sleeps under the Cradle. The Hornfolk could not kill it, so they wrote a prison around it.",
+      "next": "song-2"
+    },
+    {
+      "id": "song-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The monks rang a bell each dusk, and it slept deeper. Then the abbot took the tongue. It has not slept well since.",
+      "next": "open-menu"
+    },
+    {
+      "id": "hornfolk-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "We were slow to speak. We are slow to die, too. I am the last. The others walked the Knot until they stopped.",
+      "next": "hornfolk-2"
+    },
+    {
+      "id": "hornfolk-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Our statues cover their ears. It is not shame. It is the work. You must not listen, to keep it.",
+      "next": "open-menu"
+    },
+    {
+      "id": "axe-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "My name. Hornfolk names are long. A mouth that cannot finish it should not start.",
+      "next": "axe-2"
+    },
+    {
+      "id": "axe-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You may call me Horn. The monks did. It was a kindness.",
+      "next": "open-menu"
+    },
+    {
+      "id": "novices-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Three. Small. They did not stop shaking for a day.",
+      "next": "novices-2"
+    },
+    {
+      "id": "novices-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Ysolde was one. She asked if the bell would ring again. I said yes. I was lying. I have been hoping since.",
+      "next": "open-menu"
+    },
+    {
+      "id": "abbot-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Corvin. A kind man. He laughed with his whole face.",
+      "next": "abbot-2"
+    },
+    {
+      "id": "abbot-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "He is not that now. He is a song that remembers being a man.",
+      "next": "abbot-3"
+    },
+    {
+      "id": "abbot-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "He will say I am in his way. He is right.",
+      "next": "open-menu"
+    },
+    {
+      "id": "dying-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "No.",
+      "next": "dying-2"
+    },
+    {
+      "id": "dying-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Old. Slowly. Like a stair going soft. I had thought to ask the goblins to keep the watch.",
+      "next": "dying-3"
+    },
+    {
+      "id": "dying-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "They would do it badly. They would do it. That is the thing.",
+      "next": "open-menu"
+    },
+    {
+      "id": "crypt-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The passage was mine to fall. I brought the roof down behind me, sixty-one years ago. With the novices.",
+      "next": "crypt-2"
+    },
+    {
+      "id": "crypt-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I can open it from this side. It is not easy. Go, then. I will hold the way.",
+      "next": "crypt-fx"
+    },
+    {
+      "id": "crypt-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.crypt-open",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "horn.crypt-opened"
+        }
+      ],
+      "next": "open-menu"
+    },
+    {
+      "id": "breach-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The Knot is a sentence. The man cut it in the middle. The song leaks through the gap.",
+      "next": "breach-2"
+    },
+    {
+      "id": "breach-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Close the gap, and it is whole. Collapse it. Freeze it, and shore it. Or have the goblins wall it. They build well.",
+      "next": "open-menu"
+    },
+    {
+      "id": "show-fold-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Come. Slowly.",
+      "next": "show-fold-fx"
+    },
+    {
+      "id": "show-fold-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "horn.fold-opened"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "bread-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "...Bread. For them.",
+      "next": "bread-2"
+    },
+    {
+      "id": "bread-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "They will be hungry, when they wake. I could not bring enough. I thank you.",
+      "next": "bread-fx"
+    },
+    {
+      "id": "bread-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "takeItem",
+          "item": "bread-loaf",
+          "count": 3
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.bread-brought",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 1
+        }
+      ],
+      "next": "open-menu"
+    },
+    {
+      "id": "heal-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "...It stings. Good.",
+      "next": "heal-2"
+    },
+    {
+      "id": "heal-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Sixty-one years, and no one has thought to ask. Thank you.",
+      "next": "heal-fx"
+    },
+    {
+      "id": "heal-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "takeItem",
+          "item": "healing-draught",
+          "count": 1
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.healed",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 2
+        }
+      ],
+      "next": "open-menu"
+    },
+    {
+      "id": "rest-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Yes. I will lie with them. I will hum.",
+      "next": "rest-2"
+    },
+    {
+      "id": "rest-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Do not go far. If the song rises, wake me. Waking is... it is only dangerous for them.",
+      "next": "rest-fx"
+    },
+    {
+      "id": "rest-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.healed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "horn.rests"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "leave-open-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go carefully.",
+      "end": true
+    },
+    {
+      "id": "help-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The breach is sealed. I can feel it. The sentence is whole.",
+      "next": "help-2"
+    },
+    {
+      "id": "help-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The sleepers have bread. I am mended. I did not think to say this to anyone.",
+      "next": "help-3"
+    },
+    {
+      "id": "help-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Thank you. For the bread. For the stone. For staying.",
+      "next": "help-fx"
+    },
+    {
+      "id": "help-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.helped",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.fate",
+          "value": "alive"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": 5
+        },
+        {
+          "kind": "emit",
+          "event": "horn.helped"
+        }
+      ],
+      "next": "help-end-1"
+    },
+    {
+      "id": "help-end-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go up. Ring it, when you can. I will keep the watch. I am not afraid of it now.",
+      "end": true
+    },
+    {
+      "id": "rescue-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.rescues",
+            "op": "eq",
+            "value": 1
+          },
+          "next": "rescue-1"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.rescues",
+            "op": "eq",
+            "value": 2
+          },
+          "next": "rescue-2"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.rescues",
+            "op": "eq",
+            "value": 3
+          },
+          "next": "rescue-3"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.rescues",
+            "op": "eq",
+            "value": 4
+          },
+          "next": "rescue-4"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.rescues",
+            "op": "gte",
+            "value": 5
+          },
+          "next": "rescue-5"
+        }
+      ],
+      "else": "rescue-1"
+    },
+    {
+      "id": "rescue-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You were on the stair. Not breathing well. I carried you down.",
+      "next": "rescue-1-2"
+    },
+    {
+      "id": "rescue-1-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "It is no trouble. Rest. The bandage is clean.",
+      "next": "rescue-clear"
+    },
+    {
+      "id": "rescue-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Again.",
+      "next": "rescue-2-2"
+    },
+    {
+      "id": "rescue-2-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Twice now. I do not mind. But the dark is not kind to the careless. Be less brave, or more careful. They are not the same.",
+      "next": "rescue-clear"
+    },
+    {
+      "id": "rescue-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Three.",
+      "next": "rescue-3-2"
+    },
+    {
+      "id": "rescue-3-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I keep a tally on the wall, in chalk. Your mark is three strokes. I would like it to stop at three.",
+      "next": "rescue-clear"
+    },
+    {
+      "id": "rescue-4",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Four.",
+      "next": "rescue-4-2"
+    },
+    {
+      "id": "rescue-4-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I am not angry. I am old, and you are heavy. Heavy, and stubborn.",
+      "next": "rescue-clear"
+    },
+    {
+      "id": "rescue-5",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Again.",
+      "next": "rescue-5-2"
+    },
+    {
+      "id": "rescue-5-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I ran out of wall to count on. I have stopped. Go slowly. I am not as strong as I was when you began.",
+      "next": "rescue-clear"
+    },
+    {
+      "id": "rescue-clear",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "horn.rescue-pending",
+          "value": false
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "shaft-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "horn.spared"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "horn.healed"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "horn.befriended"
+                }
+              }
+            ]
+          },
+          "next": "shaft-weak-1"
+        },
+        {
+          "when": {
+            "kind": "dialogue.visitedCount",
+            "id": "shaft-hold-1",
+            "op": "lt",
+            "value": 1
+          },
+          "next": "shaft-hold-1"
+        },
+        {
+          "when": {
+            "kind": "dialogue.visitedCount",
+            "id": "shaft-hold-2",
+            "op": "lt",
+            "value": 1
+          },
+          "next": "shaft-hold-2"
+        }
+      ],
+      "else": "shaft-hold-3"
+    },
+    {
+      "id": "shaft-weak-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I cannot hold it. Not like this.",
+      "next": "shaft-weak-2"
+    },
+    {
+      "id": "shaft-weak-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Heal me, or let me rest with them. Then I will stand.",
+      "end": true
+    },
+    {
+      "id": "shaft-hold-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go up. I have the foot. Nothing climbs past me.",
+      "end": true
+    },
+    {
+      "id": "shaft-hold-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "They are loud tonight. Let them be loud. Climb.",
+      "end": true
+    },
+    {
+      "id": "shaft-hold-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Ring it. I will be here. I am always here.",
+      "end": true
+    },
+    {
+      "id": "end-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The bell rang. I heard it from the foot of the shaft. Wrong, and beautiful.",
+      "next": "end-2"
+    },
+    {
+      "id": "end-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The song slept. And I slept, a little. A moment. No one came to harm.",
+      "next": "end-g1"
+    },
+    {
+      "id": "end-g1",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "knot.breach-sealed"
+          },
+          "next": "end-sealed-1"
+        }
+      ],
+      "else": "end-g2"
+    },
+    {
+      "id": "end-sealed-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The breach is closed. The Knot is a sentence again, a whole one. The song will not come to the town. You did that.",
+      "next": "end-g2"
+    },
+    {
+      "id": "end-g2",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          },
+          "next": "end-clatter-1"
+        }
+      ],
+      "else": "end-g3"
+    },
+    {
+      "id": "end-clatter-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Anselm walked past me this morning. Humming a real tune. He told me his name. I had it already. I let him tell it.",
+      "next": "end-g3"
+    },
+    {
+      "id": "end-g3",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "tansy.saved"
+          },
+          "next": "end-tansy-1"
+        }
+      ],
+      "else": "end-g4"
+    },
+    {
+      "id": "end-tansy-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The baker's girl asked who I was. I said Brother Horn. She said that was a funny thing to call a bull. I said it was a kindness. She did not understand. That is a kindness too.",
+      "next": "end-g4"
+    },
+    {
+      "id": "end-g4",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          "next": "end-goblins-1"
+        }
+      ],
+      "else": "end-g5"
+    },
+    {
+      "id": "end-goblins-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Kettleback's people will keep the watch when I cannot. Badly. With a great deal of noise. It will do.",
+      "next": "end-g5"
+    },
+    {
+      "id": "end-g5",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "horn.helped"
+          },
+          "next": "end-helped-1"
+        }
+      ],
+      "else": "end-last-1"
+    },
+    {
+      "id": "end-helped-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "The town brings bread to the gate now. Hale told me. I do not know what to do with it. I will learn.",
+      "next": "end-last-1"
+    },
+    {
+      "id": "end-last-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I will stay below. Someone must. Rest, when you can. I will. Soon. Not yet.",
+      "end": true
+    },
+    {
+      "id": "joined-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "You did not ring it.",
+      "next": "joined-2"
+    },
+    {
+      "id": "joined-2",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "I can hear all of it now. The whole valley breathing in time. I am awake. I am the only one.",
+      "next": "joined-3"
+    },
+    {
+      "id": "joined-3",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "Go on. Go to him. I will not stop you. I tried, once.",
+      "end": true
+    }
+  ]
+}
