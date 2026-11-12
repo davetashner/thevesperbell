@@ -172,3 +172,41 @@ export function loadDialogueFixtureContent(): GameContent {
     contentChecks,
   );
 }
+
+// Fixture quests (mw-e23.1): three small quests that exercise every part of the quest format
+// (givers, started by condition and by effect, stages, every objective flavour, several resolution
+// approaches, hidden and optional objectives, each kind of failure continuation) for the format's
+// and the runtime's tests (mw-e23.2+). Never shipped: the real quests are written under E39. They
+// name game NPCs and items, so they load with the game; their facts are the fixture fact file.
+const questFiles = import.meta.glob<string>('./fixtures/quest/*/*.json', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+/** Where the fixture quest files live, relative to the repo root. */
+export const QUEST_FIXTURE_ROOT = 'src/content/fixtures/quest';
+
+/** The fixture quest ids. */
+export const FIXTURE_QUEST_IDS = [
+  'the-captain-below',
+  'the-captains-boots',
+  'the-name-on-the-bones',
+] as const;
+
+/** Every fixture quest file (and its facts), with repo-relative paths. */
+export function questFixtureSources(): ContentSource[] {
+  return Object.entries(questFiles).map(([path, text]) => ({
+    path: `${QUEST_FIXTURE_ROOT}/${path.slice('./fixtures/quest/'.length)}`,
+    text,
+  }));
+}
+
+/** The game's content plus the fixture quests, loaded and validated together. */
+export function loadQuestFixtureContent(): GameContent {
+  return loadContent(
+    contentTypes,
+    [...gameContentSources(), ...questFixtureSources()],
+    contentChecks,
+  );
+}

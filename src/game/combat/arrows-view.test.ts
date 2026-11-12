@@ -112,6 +112,7 @@ describe('arrows on screen (mw-e05.21)', () => {
       flying: 0,
       stuck: 0,
       dropped: 0,
+      intact: 0,
       latest: null,
     });
     const arrow = fireArrow(world, combat.bow.arrows, {
@@ -180,6 +181,23 @@ describe('arrows on screen (mw-e05.21)', () => {
     });
     const both = arrowReadout(world, () => true);
     expect(both).toMatchObject({ flying: 1, stuck: 1, dropped: 1 });
+    // Only the dropped arrow was added whole; the one that stuck from flight need not be.
+    expect(both.intact).toBeGreaterThanOrEqual(1);
+    // A broken arrow lies there too but is not counted whole.
+    const broken = world.spawn();
+    world.add(broken, ArrowRestComponent, {
+      arrow: 'blunt',
+      shooter: null,
+      state: 'dropped',
+      position: { x: 2, y: 0, z: 1 },
+      direction: { x: 1, y: 0, z: 0 },
+      in: null,
+      tick: 0,
+      intact: false,
+    });
+    const after = arrowReadout(world, () => true);
+    expect(after.dropped).toBe(both.dropped + 1);
+    expect(after.intact).toBe(both.intact);
     expect(both.latest?.entity).toBe(dropped);
     expect(both.latest?.entity).toBeGreaterThan(next);
     // Anything else has no arrow transform.

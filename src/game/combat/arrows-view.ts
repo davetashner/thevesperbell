@@ -120,6 +120,8 @@ export interface ArrowReadout {
   readonly flying: number;
   readonly stuck: number;
   readonly dropped: number;
+  /** How many of the stuck and dropped arrows came to rest whole (the rest are broken; whole ones can be taken back). */
+  readonly intact: number;
   /** The arrow with the highest entity id (the latest loosed), or null with none. */
   readonly latest: LatestArrow | null;
 }
@@ -136,18 +138,22 @@ export function arrowReadout(
   isBound: (entity: EntityId) => boolean,
   project: ProjectToNdc = () => ({ x: 2, y: 2, z: 2 }),
 ): ArrowReadout {
-  const counts = { flying: 0, stuck: 0, dropped: 0 };
+  const counts = { flying: 0, stuck: 0, dropped: 0, intact: 0 };
   if (!world.isRegistered(ArrowComponent)) return { ...counts, latest: null };
   let latest: Omit<LatestArrow, 'drawn' | 'onScreen'> | undefined;
-  const note = (entry: Omit<LatestArrow, 'drawn' | 'onScreen'>): void => {
+  const note = (entry: Omit<LatestArrow, 'drawn' | 'onScreen'>, intact = false): void => {
     counts[entry.state] += 1;
+    if (intact) counts.intact += 1;
     if (latest === undefined || entry.entity > latest.entity) latest = entry;
   };
   world.query(ArrowComponent).forEach((entity, flight) => {
     note({ entity, arrow: flight.arrow, state: 'flying', position: flight.position, in: null });
   });
   world.query(ArrowRestComponent).forEach((entity, rest) => {
-    note({ entity, arrow: rest.arrow, state: rest.state, position: rest.position, in: rest.in });
+    note(
+      { entity, arrow: rest.arrow, state: rest.state, position: rest.position, in: rest.in },
+      rest.intact,
+    );
   });
   if (latest === undefined) return { ...counts, latest: null };
   const { x, y, z } = latest.position;

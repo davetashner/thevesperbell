@@ -31,6 +31,7 @@ import { checkRecoveryAnchors } from './recovery-checks.ts';
 import { checkSceneTransitions } from './transition-checks.ts';
 import { checkPrefabs } from './prefabs.ts';
 import { checkPuzzles } from './puzzle-checks.ts';
+import { checkWorld } from './world-checks.ts';
 import type { Catalogue, ContentCheck, EntryOf } from './loader.ts';
 import { animClipSchema } from './types/anim-clip.ts';
 import { ambienceSchema } from './types/ambience.ts';
@@ -68,6 +69,7 @@ import { materialSchema } from './types/material.ts';
 import { moveSchema } from './types/move.ts';
 import { checkNavmeshes, navmeshSchema } from './types/navmesh.ts';
 import { puzzleSchema } from './types/puzzle.ts';
+import { questSchema } from './types/quest.ts';
 import { checkRespawnRules, respawnRulesSchema } from './types/respawn-rules.ts';
 import { sandboxSchema } from './types/sandbox.ts';
 import { prefabSchema } from './types/prefab.ts';
@@ -87,6 +89,7 @@ import { testPropSchema } from './types/testprop.ts';
 import { checkUnlocks, unlockSchema } from './types/unlock.ts';
 import { vfxCueSheetSchema } from './types/vfx-cue-sheet.ts';
 import { vfxEffectSchema } from './types/vfx-effect.ts';
+import { worldSchema } from './types/world.ts';
 
 /** Content type name → schema of one entry. */
 export const contentTypes = {
@@ -126,6 +129,7 @@ export const contentTypes = {
   navmesh: navmeshSchema,
   prefab: prefabSchema,
   puzzle: puzzleSchema,
+  quest: questSchema,
   'reach-class': reachClassSchema,
   'respawn-rules': respawnRulesSchema,
   sandbox: sandboxSchema,
@@ -144,6 +148,7 @@ export const contentTypes = {
   unlock: unlockSchema,
   'vfx-cue-sheet': vfxCueSheetSchema,
   'vfx-effect': vfxEffectSchema,
+  world: worldSchema,
 };
 
 /** Checks across entries, run on every load of the registered types (see loader.ts). */
@@ -175,6 +180,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkSpellStatuses,
   checkSpellVfx,
   checkWeakpoints,
+  checkWorld,
 ];
 
 export type ContentTypes = typeof contentTypes;

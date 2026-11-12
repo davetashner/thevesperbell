@@ -2,7 +2,7 @@ name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
 # lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
-# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26) and puzzle-validate
+# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1) and puzzle-validate
 # (mw-e15.6) and size-budget (mw-e32.3) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
@@ -340,6 +340,18 @@ jobs:
           git fetch --depth=1 origin main
           git show origin/main:docs/design/puzzle-coverage.md > "$RUNNER_TEMP/base-coverage.md" || : > "$RUNNER_TEMP/base-coverage.md"
           pnpm puzzle:coverage --check --summary --base "$RUNNER_TEMP/base-coverage.md" >> "$GITHUB_STEP_SUMMARY"
+
+  # The world map validator (mw-e24.1, docs/design/world-map.md): every node of
+  # src/content/data/world/connectivity.json is reachable from the town spawn with the base classes'
+  # capabilities, the bible's loops exist, the main quest never needs Wendmouth or the barge. Shortcut
+  # facts no placed content writes yet are warnings. Runs in seconds.
+  world-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm world:validate
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.
