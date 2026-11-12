@@ -249,8 +249,13 @@ mw-e17.5). The door is iron, not wood, so it does not burn and the brazier canno
 
 Beyond the door, a 2 × 3 m vestibule holds the **slice-complete volume**. Entering it fires a signal
 graph whose `fact` receiver writes `slice.complete = true` (§5). The completion autosave follows, then
-a "Slice complete" card (run time, class, Return to title). The card is new bead
-`e01-slice-complete-card` (mw-e01.18); the e2e does not depend on it.
+a "Slice complete" card (run time, class, Return to title, Continue on the mountain road). The card is
+new bead `e01-slice-complete-card` (mw-e01.18); the e2e does not depend on it.
+
+The vestibule is no longer a dead end (mw-e24.21): its north wall opens onto a 2 × 6 m passage
+(z 40…46) whose `mountain-road` transition leads to valley-01's `arrive-from-slice` spawn, and
+valley-01's `south-gate` leads back to the slice's `arrive-from-valley-01` spawn. From there the road
+runs valley-01 → valley-02 → valley-03 → Briar Glen (see `docs/design/world-map.md` once merged).
 
 | System                                | Bead                                                         | Status |
 | ------------------------------------- | ------------------------------------------------------------ | ------ |
@@ -352,6 +357,7 @@ at the left edge to +10 at the right. Rows with nothing new are left out.
 | Arena         | x −6…6, z 25…37              | 12 × 12 m      | 0     | Open doorway (1.2 m) at (0, 25) |
 | Loot alcove   | x 6…9, z 33…37               | 3 × 4 m        | +1.4 m | Open to the arena along x = 6 (the sill) |
 | Exit vestibule | x −1…1, z 37…40             | 2 × 3 m        | 0     | Behind the iron door at (0, 37) |
+| Mountain-road passage | x −1…1, z 40…46      | 2 × 6 m        | 0     | Open doorway from the vestibule; transition to valley-01 at z 44.25…45.75 |
 
 ### Placements and volumes
 
