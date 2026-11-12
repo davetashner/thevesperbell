@@ -30,6 +30,7 @@
   "behaviour": {
     "profile": "shopkeeper"
   },
+  "dialogue": "nell-drowned-gull",
   "audio": {
     "idleLoop": "sfx-human-idle",
     "footsteps": "sfx-human-step",

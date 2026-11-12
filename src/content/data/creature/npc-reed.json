@@ -27,6 +27,7 @@
   "behaviour": {
     "profile": "shopkeeper"
   },
+  "dialogue": "reed-kestrel-lock",
   "audio": {
     "idleLoop": "sfx-human-idle",
     "footsteps": "sfx-human-step",
