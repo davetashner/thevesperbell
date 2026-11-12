@@ -240,6 +240,21 @@ export class World<TInput = unknown> {
     return this.stores.get(type.name)?.type === type;
   }
 
+  /**
+   * Drops a registered type that no entity holds, so the world hashes as if it had never been
+   * registered (rolling back the first use of an on-demand component). Does nothing, returning
+   * false, mid-step (changes may be queued), when the type is not this exact one or is in use.
+   */
+  unregisterIfEmpty(type: ComponentType<unknown>): boolean {
+    const store = this.stores.get(type.name);
+    if (this.stepping || store?.type !== type || store.size > 0) return false;
+    this.stores.delete(type.name);
+    for (const key of [...this.queries.keys()]) {
+      if ((JSON.parse(key) as string[]).includes(type.name)) this.queries.delete(key);
+    }
+    return true;
+  }
+
   /** Appends a system; systems run in the order they were added. */
   addSystem(system: System<TInput>): this {
     if (this.systems.some((s) => s.name === system.name)) {

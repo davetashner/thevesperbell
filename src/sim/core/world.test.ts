@@ -747,3 +747,40 @@ describe('World.restores (mw-e15.3)', () => {
     expect(world.snapshot()).toEqual(before);
   });
 });
+
+describe('unregisterIfEmpty (mw-e22.15)', () => {
+  const Tag = defineComponent<number>('Tag');
+  it('drops an unused type so the snapshot is as if it was never registered, and allows registering again', () => {
+    const w = new World<never>({ seed: 1 });
+    const bare = JSON.stringify(w.snapshot());
+    w.register(Tag);
+    w.query(Tag);
+    expect(w.unregisterIfEmpty(Tag)).toBe(true);
+    expect(JSON.stringify(w.snapshot())).toBe(bare);
+    expect(w.isRegistered(Tag)).toBe(false);
+    w.register(Tag);
+    const e = w.spawn();
+    w.add(e, Tag, 1);
+    expect(w.query(Tag).count).toBe(1);
+  });
+
+  it('refuses when the type is unknown, in use, or the world is mid-step', () => {
+    const w = new World<never>({ seed: 1 });
+    expect(w.unregisterIfEmpty(Tag)).toBe(false);
+    w.register(Tag);
+    const e = w.spawn();
+    w.add(e, Tag, 1);
+    expect(w.unregisterIfEmpty(Tag)).toBe(false);
+    w.remove(e, Tag);
+    let midStep: boolean | undefined;
+    w.addSystem({
+      name: 'probe',
+      run: () => {
+        midStep = w.unregisterIfEmpty(Tag);
+      },
+    });
+    w.step();
+    expect(midStep).toBe(false);
+    expect(w.isRegistered(Tag)).toBe(true);
+  });
+});
