@@ -151,6 +151,25 @@
       "node": "ending-rung-1"
     },
     {
+      "id": "dreamer",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "dreamer.marked"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "dreamer-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "dreamer-1"
+    },
+    {
       "id": "return",
       "when": {
         "kind": "dialogue.visitedCount",
@@ -913,6 +932,13 @@
       "kind": "line",
       "speaker": "mirela",
       "text": "I heard you were well paid. Everyone is paid, in the end. Do remember that a ledger is just a book that lies on purpose. The shop is open, and Mortimer is watching your hands.",
+      "next": "hub"
+    },
+    {
+      "id": "dreamer-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "You've the look the Nine Sleeps leaves on a reader. Dreamers listen to something past the shelves. I'll still serve you. I'll count the stock afterwards.",
       "next": "hub"
     }
   ]

@@ -329,6 +329,25 @@
       "node": "greet-any-1"
     },
     {
+      "id": "dreamer",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "dreamer.marked"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "dreamer-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "dreamer-1"
+    },
+    {
       "id": "return",
       "node": "again-1"
     }
@@ -2250,6 +2269,13 @@
       "speaker": "horn",
       "text": "Go on. Go to him. I will not stop you. I tried, once.",
       "end": true
+    },
+    {
+      "id": "dreamer-1",
+      "kind": "line",
+      "speaker": "horn",
+      "text": "There is a hum under your words. I know it. I carried sleepers who hummed so. I do not say you are lost. I say I trust you less.",
+      "next": "again-1"
     }
   ]
 }

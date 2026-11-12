@@ -39,5 +39,6 @@
   "presentation": {
     "mesh": "placeholder-capsule",
     "sfx": "placeholder"
-  }
+  },
+  "dialogue": "abbot-cradle"
 }
