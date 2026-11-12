@@ -47,12 +47,14 @@ import {
   isFriendlyToPlayer,
   installNoisePropagation,
   LineOfSight,
+  meshWithRopeLinks,
   NavMesh,
   navmeshNavigation,
   NavRouteComponent,
   perceptionSystem,
   perceptSourcePresent,
   PlacementComponent,
+  ropeLinkRows,
   soundGraphFromScene,
   straightDistance,
   surfaceAt,
@@ -66,6 +68,7 @@ import {
   type FactionTable,
   type LightField,
   type LoadedScene,
+  type NavDoorLookup,
   type NavmeshNavigation,
   type NoisePropagation,
   type PerceptionSystem,
@@ -142,10 +145,18 @@ export function sceneDoors(loaded: LoadedScene): ReadonlyMap<string, EntityId> {
   return doors;
 }
 
+/** The rope links of a world with no ropes hanging (JSON of their rows). */
+const NO_ROPES = '[]';
+
 /** AI travel on the loaded scene's navmesh, or in straight lines without one (see the file header). */
 export class SceneNavigation implements AiNavigation {
   #navmesh: NavmeshNavigation | undefined;
   #mesh: NavMesh | undefined;
+  /** The baked mesh without rope links, and the doors it travels with. */
+  #base: NavMesh | undefined;
+  #doors: NavDoorLookup | undefined;
+  /** The rope links `#mesh` was built with (JSON of their rows), to notice a change. */
+  #ropeKey = NO_ROPES;
 
   /** The loaded scene's navmesh, or undefined (straight-line travel). */
   get mesh(): NavMesh | undefined {
@@ -162,14 +173,41 @@ export class SceneNavigation implements AiNavigation {
     this.unload(world);
     const mesh = sceneNavMesh(content, loaded.id);
     if (mesh === undefined) return;
+    this.#base = mesh;
+    this.#doors = worldNavDoors(world, sceneDoors(loaded));
+    this.#ropeKey = NO_ROPES;
     this.#mesh = mesh;
-    this.#navmesh = navmeshNavigation({ mesh, doors: worldNavDoors(world, sceneDoors(loaded)) });
+    this.#navmesh = navmeshNavigation({ mesh, doors: this.#doors });
+  }
+
+  /**
+   * Gives the navmesh the climb links of the ropes hanging now (mw-e10.9) and takes away those of ropes
+   * that are gone; call it each tick (it only rebuilds when the ropes changed). Routes planned on the
+   * old links are dropped.
+   */
+  syncRopes(world: World<never>): void {
+    const base = this.#base;
+    if (base === undefined || this.#doors === undefined) return;
+    const rows = ropeLinkRows(base, world);
+    const key = JSON.stringify(rows);
+    if (key === this.#ropeKey) return;
+    this.#ropeKey = key;
+    const mesh = meshWithRopeLinks(base, world);
+    this.#mesh = mesh;
+    this.#navmesh = navmeshNavigation({ mesh, doors: this.#doors });
+    this.#dropRoutes(world);
   }
 
   /** Back to straight lines; every agent's route (planned on the old mesh) is dropped. */
   unload(world: World<never>): void {
     this.#mesh = undefined;
     this.#navmesh = undefined;
+    this.#base = undefined;
+    this.#doors = undefined;
+    this.#dropRoutes(world);
+  }
+
+  #dropRoutes(world: World<never>): void {
     if (!world.isRegistered(NavRouteComponent)) return;
     for (const entity of world.query(NavRouteComponent).ids()) {
       world.remove(entity, NavRouteComponent);

@@ -102,6 +102,7 @@ Load any scene with `?scene=<id>` (an unknown id lists the available ones):
 | `mechanism-room`  | Every mechanism: lever and portcullis, burnable wooden door, locked iron door, timed button door, crank and trapdoor. |
 | `weak-wall-room`  | A cracked wall to smash with a heavy attack and a breakable crate. |
 | `chandelier-room` | A chandelier and an anvil hanging from ropes, and a rope bridge rated for 150 kg: shoot or burn a rope, or load the bridge too heavily. |
+| `vertical-hall` | A 5 m rafter platform in a tall hall with a ladder up, a rough stone face for the thief and a hook to tie a climbing rope off (mw-e10.9). |
 | `lighting-room`   | Torches, a burning crate and moonlight, with dark corners to hide in. |
 | `kit-gallery`     | Every grey-box kit piece in a row (an art check, not gameplay). |
 | `skeleton-pen`    | A walled yard with the Forgotten roster at their posts - miner, archer, shield-bearer and brute - to fight one at a time (mw-ju8.19). |
