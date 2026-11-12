@@ -29,7 +29,10 @@ describe('dialogue format fixtures', () => {
   const content = loadDialogueFixtureContent();
 
   it('AC-1: both fixture dialogues load and their logic validates with resolved references', () => {
-    const dialogues = content.all('dialogue');
+    // The fixture content loads on top of the shipped content (src/content/data/dialogue, E39).
+    const dialogues = content
+      .all('dialogue')
+      .filter((d) => (FIXTURE_DIALOGUE_IDS as readonly string[]).includes(d.id));
     expect(dialogues.map((d) => d.id)).toEqual([...FIXTURE_DIALOGUE_IDS]);
     for (const dialogue of dialogues) {
       expect(validateDialogueLogic(dialogue as never, referencesIn(content)), dialogue.id).toEqual(
@@ -39,7 +42,10 @@ describe('dialogue format fixtures', () => {
   });
 
   it('the fixtures exercise class-gated options, a check, once options and visited counts', () => {
-    const nodes = content.all('dialogue').flatMap((d) => d.nodes);
+    const fixtures = content
+      .all('dialogue')
+      .filter((d) => (FIXTURE_DIALOGUE_IDS as readonly string[]).includes(d.id));
+    const nodes = fixtures.flatMap((d) => d.nodes);
     expect(nodes.map((n) => n.kind)).toEqual(
       expect.arrayContaining(['line', 'choice', 'check', 'effect']),
     );
@@ -50,7 +56,7 @@ describe('dialogue format fixtures', () => {
       o.when?.kind === 'playerClass' ? [o.when['class']] : [],
     );
     expect(new Set(classes)).toEqual(new Set(['knight', 'thief', 'archer']));
-    expect(JSON.stringify(content.all('dialogue'))).toContain('dialogue.visitedCount');
+    expect(JSON.stringify(fixtures)).toContain('dialogue.visitedCount');
   });
 
   it('a reference to unknown content is reported with its pointer', () => {

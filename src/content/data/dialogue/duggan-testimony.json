@@ -1,0 +1,230 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "duggan-testimony",
+  "notes": "Duggan Marl (bible 5.10, 6.1 Framed in Brass): Vane's foreman, guilty conscience, kept in a crate by Mother Kettleback's goblins for planting forty brass goblin trinkets at the vanish sites. He is not placed in a town scene (he is in the Rootcellar camp, E26); the creature has this dialogue ready for that placement. `ask-testify` is a persuade check; success sets duggan.testimony, which with the ledger unlocks Vane's confrontation outcomes (vane-bounty). The failure continues and can be retried; listening to his guilt (`ask-guilt`) and holding the ledger raise the odds.",
+  "speakers": [
+    {
+      "id": "duggan",
+      "npc": "npc-duggan"
+    }
+  ],
+  "entries": [
+    {
+      "id": "testified",
+      "when": {
+        "kind": "fact",
+        "fact": "duggan.testimony"
+      },
+      "node": "testified"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "crate-again"
+    },
+    {
+      "id": "first-meeting",
+      "node": "crate-greet"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "crate-greet",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Don't, oh. You're not one of them. Are you? Keep your voice down. They count in there. In the dark. They've counted me twice already this morning.",
+      "next": "hub"
+    },
+    {
+      "id": "crate-again",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "You came back. Nobody comes back. Mother Kettleback feeds me. That's the worst of it. She feeds me well, and she says it's courtesy, and I can't tell if she's joking.",
+      "next": "hub"
+    },
+    {
+      "id": "testified",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "I've said it. All of it, to anyone who'd stand still. Get me out of this box when you can and I'll say it to the Captain, the council, and the cat.",
+      "next": "testified-hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-trinkets",
+          "text": "You planted the goblin trinkets.",
+          "once": true,
+          "next": "trinkets-1"
+        },
+        {
+          "id": "ask-vane",
+          "text": "Did Vane know where the sleepers were going?",
+          "once": true,
+          "next": "vane-1"
+        },
+        {
+          "id": "ask-guilt",
+          "text": "Why did you do it?",
+          "once": true,
+          "effects": [
+            {
+              "kind": "disposition",
+              "npc": "npc-duggan",
+              "delta": 5
+            }
+          ],
+          "next": "guilt-1"
+        },
+        {
+          "id": "ask-goblins",
+          "text": "How have the goblins treated you?",
+          "once": true,
+          "next": "goblins-1"
+        },
+        {
+          "id": "ask-testify",
+          "text": "Will you tell Hale all of this?",
+          "next": "testify-check"
+        },
+        {
+          "id": "leave",
+          "text": "I'll be back.",
+          "next": "bye"
+        }
+      ]
+    },
+    {
+      "id": "testified-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-vane-again",
+          "text": "What do you want me to tell Hale?",
+          "once": true,
+          "next": "tell-hale-1"
+        },
+        {
+          "id": "leave-again",
+          "text": "Hold on a little longer.",
+          "next": "bye"
+        }
+      ]
+    },
+    {
+      "id": "trinkets-1",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Forty brass things, stamped on the back. One at each doorstep where someone'd gone, one on a mine rail. Orders came on a note, and I burned the note. I didn't ask what they were for. That's the whole of my talent, not asking.",
+      "next": "hub"
+    },
+    {
+      "id": "vane-1",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "He knew they were going. He didn't know where. Mr. Vane never says a thing outright. He says it'd be convenient if, and then the thing is done, and he's seen to be shocked. He's very good at being shocked.",
+      "next": "hub"
+    },
+    {
+      "id": "guilt-1",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Third generation Marl on the Vane payroll. My da's lungs, my sister's rent. That's not an excuse. That's a list. The list got longer, and I got quieter, and then it was forty brass trinkets.",
+      "next": "hub"
+    },
+    {
+      "id": "goblins-1",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "They're rude and they cook better than the camp ever did. One's taken my boots. Another reads to me, badly, from a stolen book. I've learnt more from them in a week than from Vane in twenty years.",
+      "next": "hub"
+    },
+    {
+      "id": "testify-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 8,
+      "target": "duggan",
+      "modifiers": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "vane.ledger.obtained"
+          },
+          "bonus": 4,
+          "label": "You hold Vane's ledger"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-duggan",
+            "op": "gte",
+            "value": 5
+          },
+          "bonus": 3,
+          "label": "He trusts you"
+        }
+      ],
+      "success": "testify-yes",
+      "failure": "testify-no"
+    },
+    {
+      "id": "testify-effects",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "duggan.testimony",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "duggan.testify"
+        }
+      ],
+      "next": "testify-done"
+    },
+    {
+      "id": "testify-yes",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Hale. Yes. God help me, yes. Get me out of this box and I'll say it all twice, once for the Captain and once for the Pells.",
+      "next": "testify-effects"
+    },
+    {
+      "id": "testify-done",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Tell him I'll not lie. I'm out of practice at it, anyway. The goblins have cured me.",
+      "next": "hub"
+    },
+    {
+      "id": "testify-no",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Hale's his friend. Hale drinks at his table. If I say it and nobody believes me, I'm in this box for good. Give me a reason. Anything. Show me something I can't be called a liar over.",
+      "next": "hub"
+    },
+    {
+      "id": "tell-hale-1",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "That it was the foreman and the foreman's masters. That I never touched a sleeper. That Vane said convenient and I heard command. Tell him I'll sign.",
+      "next": "testified-hub"
+    },
+    {
+      "id": "bye",
+      "kind": "line",
+      "speaker": "duggan",
+      "text": "Mind the goblins. And mind yourself. They'll be polite until they aren't.",
+      "end": true
+    }
+  ]
+}
