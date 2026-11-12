@@ -202,6 +202,21 @@ export const creatureSchema = z.strictObject({
         .describe(
           'Starting stance toward the player that overrides its faction’s; absent = the faction’s.',
         ),
+      baseline: z
+        .int()
+        .min(-100)
+        .max(100)
+        .optional()
+        .describe(
+          'Disposition toward the player (−100..100) it starts at and decays back to (mw-e12.9); absent = seeded from its stance toward the player.',
+        ),
+      decayPerMinute: z
+        .number()
+        .positive()
+        .optional()
+        .describe(
+          'Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets.',
+        ),
     })
     .prefault({})
     .describe('Default disposition; spawn points and runtime state can override it.'),
