@@ -6,6 +6,7 @@
 // them into file, node id and line).
 
 import type { DialogueDef } from '../../content/types/dialogue';
+import { conditionGates } from './tags';
 import { dialogueLogicRegistry } from '../logic/dialogue-kinds';
 import {
   validateLogicCondition,
@@ -22,7 +23,7 @@ export interface DialogueLogicIssue {
 }
 
 /** `of[1].condition` or `[0].x` → `/of/1/condition` or `/0/x`. */
-function pointerOf(path: string): string {
+export function pointerOf(path: string): string {
   return [...path.matchAll(/\[(\d+)\]|([^.[\]]+)/g)].map((m) => `/${m[1] ?? m[0]}`).join('');
 }
 
@@ -96,4 +97,42 @@ export function validateDialogueLogic(
     }
   });
   return issues;
+}
+
+/** A finding that does not stop a dialogue from loading: a hint to the writer. */
+export interface DialogueWarning {
+  /** RFC 6901 pointer into the dialogue file. */
+  readonly pointer: string;
+  /** Machine-readable kind: `class-options-narrow`. */
+  readonly code: string;
+  readonly message: string;
+}
+
+/**
+ * Warnings about `dialogue` (never errors, so the dialogue still loads): class-gated options that
+ * serve fewer than two classes (mw-e22.6). A conversation with a [Thief] option and nothing for the
+ * other three classes teaches players that classes are a one-off; give a second class its own way in.
+ * No class options at all is fine.
+ */
+export function dialogueWarnings(dialogue: DialogueDef): DialogueWarning[] {
+  const classes = new Set<string>();
+  let first: string | undefined;
+  dialogue.nodes.forEach((node, n) => {
+    if (node.kind !== 'choice') return;
+    node.options.forEach((option, o) => {
+      for (const gate of conditionGates(option.when)) {
+        if (gate.kind !== 'class') continue;
+        classes.add(gate.id);
+        first ??= `/nodes/${String(n)}/options/${String(o)}/when`;
+      }
+    });
+  });
+  if (first === undefined || classes.size >= 2) return [];
+  return [
+    {
+      pointer: first,
+      code: 'class-options-narrow',
+      message: `dialogue "${dialogue.id}" has class-gated options for only one class (${[...classes].join(', ')}); give at least two classes a way in`,
+    },
+  ];
 }

@@ -19,15 +19,26 @@
 // World.remove are deferred mid-step: call `start`, `advance`, `choose` and `abort` between sim
 // steps (from the UI or an input handler), never from inside a system.
 //
-// Persuasion checks are a seam (mw-e22.7): `check` nodes are decided by `DialogueOptions.checks`, a
-// `CheckResolver`. The default `failClosed` always fails the check, so an unwired runtime sends
-// every check to its `failure` node, which the format guarantees continues the story.
+// Persuasion checks are a seam: `check` nodes are decided by `DialogueOptions.checks`, a
+// `CheckResolver` (`createPersuasion` in ./persuasion.ts builds the deterministic one, mw-e22.7). The
+// default `failClosed` always fails the check, so an unwired runtime sends every check to its
+// `failure` node, which the format guarantees continues the story. A resolver may return the
+// breakdown it decided by; the runtime publishes it as `dialogue.checkResolved`, and an optional
+// `preview` computes the same breakdown ahead of time, so a choice whose option leads straight to a
+// check carries `check` (label, score, every modifier) for the UI to show the odds.
+//
+// Options carry `tags` (mw-e22.6, ./tags.ts), derived from their condition.
 //
 // Events (each carries the tick): `dialogue.started`, `dialogue.nodeVisited` (every node entered and
 // every option chosen), `dialogue.ended` { reason: completed | aborted, cause } and `dialogue.error`
 // (a refused effect batch, a missing node or dialogue, a loop).
 
-import type { DialogueDef, DialogueNode, DialogueOption } from '../../content/types/dialogue';
+import type {
+  DialogueApproach,
+  DialogueDef,
+  DialogueNode,
+  DialogueOption,
+} from '../../content/types/dialogue';
 import type { World } from '../core/world';
 import { entityFactKey } from '../facts/store';
 import { defineEvent, type EventType } from '../core/events';
@@ -41,6 +52,7 @@ import {
   type LogicHost,
   type LogicNode,
 } from '../logic';
+import { deriveOptionTags, type DialogueTag, type TagSources } from './tags';
 import {
   DIALOGUE_SERVICE,
   dialogueLogicRegistry,
@@ -88,22 +100,69 @@ export interface DialogueErrorEvent {
   readonly detail: string;
 }
 
+export interface DialogueCheckResolvedEvent {
+  readonly tick: number;
+  readonly dialogue: string;
+  readonly npc: string;
+  /** The check node. */
+  readonly node: string;
+  readonly success: boolean;
+  /** Present when the resolver explained itself (persuasion does). */
+  readonly breakdown?: CheckBreakdown;
+}
+
 export const DialogueStarted = defineEvent<DialogueStartedEvent>('dialogue.started');
 export const DialogueNodeVisited = defineEvent<DialogueNodeVisitedEvent>('dialogue.nodeVisited');
 export const DialogueEnded = defineEvent<DialogueEndedEvent>('dialogue.ended');
 export const DialogueError = defineEvent<DialogueErrorEvent>('dialogue.error');
+export const DialogueCheckResolved =
+  defineEvent<DialogueCheckResolvedEvent>('dialogue.checkResolved');
 
 /** What a `CheckResolver` is asked to decide. */
 export interface CheckRequest {
   readonly dialogue: string;
   readonly npc: string;
   readonly node: CheckNode;
+  /** The NPC being worked on: the check's `target` speaker's NPC, else the one being talked to. */
+  readonly target: string;
   /** A context to evaluate the node's modifiers against (includes the `dialogue` service). */
   readonly context: LogicHost;
 }
 
-/** Decides a persuasion check: true is success. Must be deterministic (mw-e22.7 fills this in). */
-export type CheckResolver = (request: CheckRequest) => boolean;
+/** One line of a check's score: where it comes from, why, and how much. */
+export interface ScoreModifier {
+  /** `base`, `disposition` (label is the band), `rule` (persuasion table), `node` or `personality`. */
+  readonly source: 'base' | 'disposition' | 'rule' | 'node' | 'personality';
+  /** Shown to the player (for `disposition`, the band name; for `base`, "base"). */
+  readonly label: string;
+  readonly value: number;
+}
+
+/** The odds label of a check, from how far the score is from the difficulty. */
+export type DifficultyLabel = 'easy' | 'fair' | 'hard' | 'impossible';
+
+/** Everything a persuasion check was decided by. */
+export interface CheckBreakdown {
+  readonly approach: DialogueApproach;
+  readonly difficulty: number;
+  readonly target: string;
+  /** Sum of `modifiers`. */
+  readonly score: number;
+  /** `score - difficulty`: the check succeeds from 0. */
+  readonly margin: number;
+  readonly label: DifficultyLabel;
+  readonly success: boolean;
+  readonly modifiers: readonly ScoreModifier[];
+}
+
+/** A decision with its explanation. */
+export interface CheckOutcome {
+  readonly success: boolean;
+  readonly breakdown?: CheckBreakdown;
+}
+
+/** Decides a persuasion check: true is success. Must be deterministic (`createPersuasion` is). */
+export type CheckResolver = (request: CheckRequest) => boolean | CheckOutcome;
 
 /** The default resolver: every check fails. */
 export const failClosed: CheckResolver = () => false;
@@ -119,6 +178,10 @@ export interface DialogueChoice {
   /** For a locked option: why, as a localization key with parameters (`describeCondition`). */
   readonly reason?: string;
   readonly reasonParts?: LogicDescription;
+  /** Class, capability and item tags derived from the option's condition (mw-e22.6). */
+  readonly tags: readonly DialogueTag[];
+  /** When the option leads straight to a check and the runtime has a `preview`: the odds. */
+  readonly check?: CheckBreakdown;
 }
 
 /** What the conversation is waiting on, or that it is over. */
@@ -160,6 +223,10 @@ export interface DialogueOptions {
   readonly dialogues: (id: string) => DialogueDef | undefined;
   /** Decides `check` nodes. Default: `failClosed`. */
   readonly checks?: CheckResolver;
+  /** Works out a check without deciding it, for `DialogueChoice.check`. */
+  readonly preview?: (request: CheckRequest) => CheckBreakdown;
+  /** Class tags and item icons for option tags. */
+  readonly tags?: TagSources;
 }
 
 /** Thrown for a call that cannot mean anything: an unknown dialogue at `start`, no entry holds. */
@@ -357,6 +424,8 @@ export class DialogueRuntime {
         id: option.id,
         text: option.text,
         textKey: option.textKey ?? textKey(session.dialogue.id, node.id, option.id),
+        tags: deriveOptionTags(option.when, this.options.tags),
+        ...this.oddsOf(session, option),
       };
       const choice: DialogueChoice =
         open || option.when === undefined
@@ -370,6 +439,30 @@ export class DialogueRuntime {
       listed.push({ choice, option });
     }
     return listed;
+  }
+
+  /** `{ check }` when `option` leads straight to a check node and a previewer is wired. */
+  private oddsOf(session: Position, option: DialogueOption): { check?: CheckBreakdown } {
+    const { preview } = this.options;
+    const target = option.next === undefined ? undefined : this.nodeOf(session, option.next);
+    return preview === undefined || target?.kind !== 'check'
+      ? {}
+      : { check: preview(this.requestFor(session, target)) };
+  }
+
+  private nodeOf(position: Position, id: string): DialogueNode | undefined {
+    return position.dialogue.nodes.find((n) => n.id === id);
+  }
+
+  private requestFor(position: Position, node: CheckNode): CheckRequest {
+    const speaker = position.dialogue.speakers.find((s) => s.id === node.target);
+    return {
+      dialogue: position.dialogue.id,
+      npc: position.npc,
+      node,
+      target: speaker?.npc?.id ?? position.npc,
+      context: this.contextFor(position.npc, position.dialogue.id),
+    };
   }
 
   private viewOf(session: Session): DialogueView {
@@ -418,7 +511,7 @@ export class DialogueRuntime {
   private enter(position: Position, nodeId: string): DialogueView {
     let target = nodeId;
     for (let steps = 0; steps < MAX_SILENT_STEPS; steps++) {
-      const node = position.dialogue.nodes.find((n) => n.id === target);
+      const node = this.nodeOf(position, target);
       if (node === undefined) {
         this.fail(position, target, 'unknown-node', `no node "${target}"`);
         return this.close(position, 'aborted', 'unknown-node');
@@ -451,11 +544,15 @@ export class DialogueRuntime {
           break;
         }
         case 'check': {
-          const success = (this.options.checks ?? failClosed)({
+          const decided = (this.options.checks ?? failClosed)(this.requestFor(position, node));
+          const outcome = typeof decided === 'boolean' ? { success: decided } : decided;
+          const success = outcome.success;
+          this.emit(DialogueCheckResolved, {
             dialogue: position.dialogue.id,
             npc: position.npc,
-            node,
-            context: this.contextFor(position.npc, position.dialogue.id),
+            node: node.id,
+            success,
+            ...(outcome.breakdown !== undefined && { breakdown: outcome.breakdown }),
           });
           const effects = (success ? node.successEffects : node.failureEffects) ?? [];
           this.apply(effects, position, node.id);

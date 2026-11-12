@@ -578,6 +578,14 @@ export {
   type SurfaceTableEntry,
 } from './types/surface-table.ts';
 export {
+  PERSUASION_BANDS,
+  PERSUASION_ID,
+  persuasionSchema,
+  type PersuasionDef,
+  type PersuasionDefInput,
+  type PersuasionEntry,
+} from './types/persuasion.ts';
+export {
   DOOR_SOUND_STATES,
   MAX_NOISE_LOSS_DB,
   MAX_STEALTH_WEIGHT,

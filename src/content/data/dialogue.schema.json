@@ -360,7 +360,7 @@
                 "description": "Score needed; the player’s score is computed from data."
               },
               "target": {
-                "description": "Speaker being worked on. Default: the first NPC speaker.",
+                "description": "Speaker being worked on (its NPC’s disposition and personality count). Default: the NPC being talked to.",
                 "type": "string",
                 "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
               },

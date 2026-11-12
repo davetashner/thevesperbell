@@ -50,7 +50,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].kind` | `"check"` | required | A deterministic persuasion check (mw-e22.7). |
 | `nodes[].approach` | `"persuade"` \| `"intimidate"` \| `"deceive"` \| `"charm"` | required | How the player tries. |
 | `nodes[].difficulty` | integer ≥ 1 | required | Score needed; the player’s score is computed from data. |
-| `nodes[].target` | id | — | Speaker being worked on. Default: the first NPC speaker. |
+| `nodes[].target` | id | — | Speaker being worked on (its NPC’s disposition and personality count). Default: the NPC being talked to. |
 | `nodes[].modifiers` | list of object | `[]` | Extra score from items, facts, class. |
 | `nodes[].modifiers[].when` | object | required | Condition (logic DSL) under which the modifier applies. |
 | `nodes[].modifiers[].when.kind` | string | required | The logic kind, e.g. "hasItem". |

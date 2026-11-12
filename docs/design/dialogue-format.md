@@ -127,9 +127,37 @@ nodes run silently in between; `abort(cause?)` ends a conversation from outside 
   (template `entity:*.visits`, content fact group `dialogue`, so the game's registry declares it and a production save
   load keeps it). `dialogue.visitedCount`, entry selection and `once` read it; a world that never talks hashes as
   before. The conversation in progress is not saved: a restored world drops it silently.
-- **Checks** are decided by the `checks` option, a `CheckResolver` (mw-e22.7 fills it in). The default `failClosed`
-  fails every check, so an unwired runtime takes each check's `failure` branch and its `failureEffects`.
+- **Checks** are decided by the `checks` option, a `CheckResolver`; `createPersuasion` builds the deterministic one
+  ([below](#class-options-and-persuasion)). The default `failClosed` fails every check, so an unwired runtime takes each
+  check's `failure` branch and its `failureEffects`. A resolver may return `{ success, breakdown }`; the runtime publishes
+  it as `dialogue.checkResolved`.
 - **Events:** `dialogue.started`, `dialogue.nodeVisited` (nodes and options), `dialogue.ended`
   `{ reason: completed | aborted, cause? }` and `dialogue.error`, each with the tick.
 - **Guards.** A choice with nothing choosable, a missing node or dialogue, or more than `MAX_SILENT_STEPS` silent nodes
   in a row aborts with an error and a `cause`; the graph validator (mw-e22.8) should catch these first.
+
+## Class options and persuasion
+
+Conversations react to who the player is (mw-e22.6) and let words solve problems (mw-e22.7).
+
+**Tags.** Every `DialogueChoice` has `tags`, derived from the option's `when` (`deriveOptionTags`, never written by hand):
+`playerClass` gives a class tag (the class's `dialogueTag`, via `DialogueOptions.tags.classTag`), `hasCapability` a
+capability tag (the capability id) and `hasItem` an item tag (the item id and its `icon` via `tags.itemIcon`). Conditions
+are walked through `all` and `any`; anything under `not` gives no tag. The UI localizes `labelKey`
+(`dialogue.tag.<kind>.<id>`) and draws the icon. Visibility is the option's `showWhenLocked`, default false: a class
+option is hidden from the other classes, and a designer who wants a locked, visible option (a capability the player
+could learn) sets it. `dialogueWarnings` warns (never errors) when a dialogue's class options serve fewer than two
+classes.
+
+**Checks.** The score is deterministic, with no hidden dice: `base` + the NPC's disposition band modifier + the table's
+global `modifiers` (class, capability, item, fact; each for some approaches) + the node's own `modifiers` + the NPC's
+personality modifiers; it succeeds when `score >= difficulty`. The numbers are the content table
+`src/content/data/persuasion/persuasion.json` (field reference: `docs/content/persuasion-schema.md`). The same state
+always gives the same outcome, so reloading cannot reroll a failure. A check's `target` speaker names the NPC whose
+disposition and personality count (default: the NPC being talked to); personality comes from a `PersonalityLookup` the
+game passes to `createPersuasion`. Wire it as `{ checks: p.resolve, preview: p.preview }`.
+
+**For the UI.** A `CheckBreakdown` lists every part (`modifiers`: `source`, `label`, `value`), the `score`, the `margin`
+(score minus difficulty) and a `label`: `easy` from `labels.easyFrom`, `fair` from `fairFrom`, `hard` from `hardFrom`,
+else `impossible`. A choice whose option leads straight to a check carries it as `check`, so the odds show before the
+player commits; after resolving, `dialogue.checkResolved` carries the same breakdown.

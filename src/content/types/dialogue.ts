@@ -147,7 +147,11 @@ const checkNode = z.strictObject({
   kind: z.literal('check').describe('A deterministic persuasion check (mw-e22.7).'),
   approach: z.enum(DIALOGUE_APPROACHES).describe('How the player tries.'),
   difficulty: z.int().min(1).describe('Score needed; the player’s score is computed from data.'),
-  target: localId.optional().describe('Speaker being worked on. Default: the first NPC speaker.'),
+  target: localId
+    .optional()
+    .describe(
+      'Speaker being worked on (its NPC’s disposition and personality count). Default: the NPC being talked to.',
+    ),
   modifiers: z.array(modifierSchema).default([]).describe('Extra score from items, facts, class.'),
   success: nodeRef.describe('Node entered when the score meets the difficulty.'),
   failure: nodeRef.describe('Node entered otherwise: failures must continue the story.'),
