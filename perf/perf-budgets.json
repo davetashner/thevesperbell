@@ -382,6 +382,36 @@
       "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
       "scene": "testbed",
       "note": "mw-e02.8 AC-2. Wall time of one orbit camera placement (collision boom, framing, clip probe and its readout), p95 per drawn frame over the same traversal."
+    },
+    {
+      "id": "briarwood-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briarwood",
+      "preset": "high",
+      "note": "mw-e25.1 AC-4. The 300 × 250 m Briarwood greybox with placeholder trunks and bramble gates. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "briarwood-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briarwood",
+      "preset": "high",
+      "note": "mw-e25.1 AC-4. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "briarwood-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briarwood",
+      "preset": "high",
+      "note": "mw-e25.1 AC-4. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
     }
   ]
 }
