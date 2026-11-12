@@ -692,6 +692,14 @@
       }
     },
     {
+      "id": "npc-vane",
+      "at": [3.0, 0.0, 57.5],
+      "yaw": 180,
+      "tags": ["npc", "council"],
+      "creature": "npc-vane",
+      "leash": { "radius": 2 }
+    },
+    {
       "id": "market-green",
       "at": [0.0, 0.0, 52.0],
       "tags": ["node", "region"]

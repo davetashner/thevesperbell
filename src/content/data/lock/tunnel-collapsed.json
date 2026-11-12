@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "tunnel-collapsed",
+  "name": "Mooring's Watch supply tunnel door",
+  "notes": "The cellar door in the courtyard's north wall (mw-e25.6): the old supply tunnel behind it has caved in and the door is stuck fast. No key exists, so it shows the locked prompt; a thief with lockpicks can pick the lock (tier 1) but finds only a sealed vestibule. The tunnel itself is the Deepworks bead mw-e26, and the class-gated way through the collapse (barge, firebolt) is mw-e25.9, which replaces this door with a transition.",
+  "tier": 1,
+  "pickTier": 1,
+  "hint": "Stuck fast. Rubble shows through the crack."
+}

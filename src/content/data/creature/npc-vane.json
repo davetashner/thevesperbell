@@ -30,6 +30,7 @@
   "behaviour": {
     "profile": "shopkeeper"
   },
+  "dialogue": "vane-bounty",
   "audio": {
     "idleLoop": "sfx-human-idle",
     "footsteps": "sfx-human-step",

@@ -999,6 +999,7 @@ describe('scene content', () => {
       'lighting-room',
       'marsh-store',
       'mechanism-room',
+      'moorings-watch',
       'perf-baseline',
       'prefab-gallery',
       'recoil-corridor',

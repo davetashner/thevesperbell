@@ -1,0 +1,552 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "vane-bounty",
+  "notes": "Harrow Vane (story bible 5.3), the mine owner: charming, generous in public, frightened of being the Vane who lost the warrant. He is hedged, not a villain: he pays the families of the missing and says so. Voice: long, reasonable sentences that never quite say the thing. OUTCOME TABLE (mw-e39.6 AC-2). The confrontation is the option `confront` (shown locked until the player holds proof). Facts: L = vane.ledger.obtained (his ledger of horn-coin sales), T = duggan.testimony (Duggan Marl will testify). Outcome options and the vane.fate they set: confront-expose = exposed, confront-confess = confessed, confront-bribe = bribed-player, confront-flee = fled. L=no,T=no: none (he denies; `confront` stays locked). L=yes,T=no: confesses (it is his own book), bribes. L=no,T=yes: bribes, flees (he hears Duggan has talked and has a coach waiting). L=yes,T=yes: exposed, confesses, bribes, flees. Exposing him needs both the ledger and the witness because neither alone would hold before the Captain and the council. Once vane.fate is set he only speaks the aftermath entry for it. The quest runtime (mw-e39.4) owns what else changes (bounty paid to the Pells, bell repair funded, Vane House shut).",
+  "speakers": [
+    {
+      "id": "vane",
+      "npc": "npc-vane"
+    }
+  ],
+  "entries": [
+    {
+      "id": "fate-exposed",
+      "when": {
+        "kind": "factCmp",
+        "fact": "vane.fate",
+        "op": "eq",
+        "value": "exposed"
+      },
+      "node": "aftermath-exposed"
+    },
+    {
+      "id": "fate-confessed",
+      "when": {
+        "kind": "factCmp",
+        "fact": "vane.fate",
+        "op": "eq",
+        "value": "confessed"
+      },
+      "node": "aftermath-confessed"
+    },
+    {
+      "id": "fate-bribed",
+      "when": {
+        "kind": "factCmp",
+        "fact": "vane.fate",
+        "op": "eq",
+        "value": "bribed-player"
+      },
+      "node": "aftermath-bribed"
+    },
+    {
+      "id": "fate-fled",
+      "when": {
+        "kind": "factCmp",
+        "fact": "vane.fate",
+        "op": "eq",
+        "value": "fled"
+      },
+      "node": "aftermath-fled"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "A knight, and not one of Hale's. Sit. I have a vacancy for a champion, and the pay is better than the Watch's. Better, and a good deal quieter.",
+      "next": "pitch"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "You'll be the hired help. Good. Hale's lot couldn't hit the Watch House from inside it, and this wants a steady eye. What do you need to see the thing dead?",
+      "next": "pitch"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "A caster. Tell me, quite idly: can you read old carvings? Old, deep ones, of no particular country. Purely a scholarly curiosity. I like a tidy library.",
+      "next": "pitch"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "timeOfDay",
+                "from": "06:00",
+                "to": "20:00"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "vane.ledger.obtained"
+                }
+              }
+            ]
+          },
+          "next": "thief-daylight"
+        }
+      ],
+      "else": "thief-night"
+    },
+    {
+      "id": "thief-daylight",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "I do receive callers by appointment, and it's broad daylight, and I'm sure we've never met. If we ever do, it will be after dark, and you will not have been seen.",
+      "end": true
+    },
+    {
+      "id": "thief-night",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Quietly. The lamps are lit but the shutters are not. I don't know you, you don't know me. Sit, if you like. What is it you want to ask a man who has never met you?",
+      "next": "pitch"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Come in, come in. Harrow Vane. You'll have seen the notice by the well. Five hundred crowns, and then eight, once it became clear how bad it was. Shall we talk about the monster?",
+      "next": "pitch"
+    },
+    {
+      "id": "pitch",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "I employ a third of this valley. When the mine sneezes, Briar Glen catches its death. So yes: I'd like the monster dead, and I'd like it done quietly.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Back so soon. Good. A man who comes back is a man with questions, and I'd rather answer them to your face than have you ask the well.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-bounty",
+          "text": "Why eight hundred crowns?",
+          "next": "bounty-1"
+        },
+        {
+          "id": "ask-mine",
+          "text": "What does the mine mean to Briar Glen?",
+          "next": "mine-1"
+        },
+        {
+          "id": "ask-missing",
+          "text": "Seven people are gone. What have you done about it?",
+          "next": "missing-1"
+        },
+        {
+          "id": "ask-breach",
+          "text": "Did the mine break into something?",
+          "once": true,
+          "next": "breach-1"
+        },
+        {
+          "id": "champion-knight",
+          "text": "I'll take the bounty. For the town.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "disposition",
+              "npc": "npc-vane",
+              "delta": 5
+            }
+          ],
+          "next": "champion-1"
+        },
+        {
+          "id": "terms-archer",
+          "text": "I'll want arrows and lamp oil on your account.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "terms-1"
+        },
+        {
+          "id": "carvings-sorcerer",
+          "text": "Which carvings? Where did you see them?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "carvings-1"
+        },
+        {
+          "id": "price-thief",
+          "text": "What would a quiet man pay for a quiet night?",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "price-1"
+        },
+        {
+          "id": "confront",
+          "text": "I want to talk about what is below the Bell Line.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.ledger.obtained"
+              },
+              {
+                "kind": "fact",
+                "fact": "duggan.testimony"
+              }
+            ]
+          },
+          "showWhenLocked": true,
+          "next": "confront-open"
+        },
+        {
+          "id": "leave",
+          "text": "That's all for now.",
+          "next": "bye"
+        }
+      ]
+    },
+    {
+      "id": "bye",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Then good day. Mind the mine road after dusk. I mean that as kindness; I've buried enough kindness already this month.",
+      "end": true
+    },
+    {
+      "id": "bounty-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Because three weeks of silence in Briar Glen costs more than five hundred crowns, and because people want to see that someone is paying. A purse is a promise. It is the only one I know how to make.",
+      "next": "bounty-2"
+    },
+    {
+      "id": "bounty-2",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "The families of the missing are on my payroll, mind. Wages, and no questions about the work. Call it conscience if you like. I would call it the least I can do, and notice it's very little.",
+      "next": "hub"
+    },
+    {
+      "id": "mine-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Five generations of Vanes, and every one of them burying someone to keep it open. My grandfather struck silver. I inherited the warrant, the wages, the widows and the debts. I intend to be the Vane who kept it.",
+      "next": "hub"
+    },
+    {
+      "id": "missing-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "I keep the lamps lit at the gate. I pay the families. I've asked Hale to double his rounds and he can't spare the men. If you know what more a man in my chair can do, tell me. I'd genuinely like to know.",
+      "next": "hub"
+    },
+    {
+      "id": "breach-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "A mine breaks into rock, my friend. That is the whole of the trade. If the rock has opinions, the foreman hasn't passed them on.",
+      "next": "hub"
+    },
+    {
+      "id": "champion-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Splendid. A knight in my cause. The council will like it. Word is that when you carry my banner, people sleep better, and I'm in no position to turn that down.",
+      "next": "hub"
+    },
+    {
+      "id": "terms-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Done. Ask at the Ox for whatever the kitchen has; Dot bills me, and she bills me double. Use it well. I am paying for the shot, not the story you tell about it.",
+      "next": "hub"
+    },
+    {
+      "id": "carvings-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Oh, nothing. A fragment. Square letters, hooked at the top, rather like horns. A man brought one up from below and I couldn't read it. I would very much like to be able to read it.",
+      "next": "hub"
+    },
+    {
+      "id": "price-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "I am quiet, and I pay for nothing I haven't asked for. But if I wanted a ledger and a foreman kept honest, I'd ask a clever man, and he'd name his own price. I haven't asked.",
+      "next": "hub"
+    },
+    {
+      "id": "confront-open",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "...Ah. You've been below. Of course you have. Sit down. I'd rather you didn't stand while we discuss what you think you've found. Tell me what you want.",
+      "next": "confront-choice"
+    },
+    {
+      "id": "confront-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "confront-expose",
+          "text": "I'm taking the ledger and Duggan's word to Hale, and the whole council.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.ledger.obtained"
+              },
+              {
+                "kind": "fact",
+                "fact": "duggan.testimony"
+              }
+            ]
+          },
+          "next": "expose-effects"
+        },
+        {
+          "id": "confront-confess",
+          "text": "Tell them yourself. Pay the Pells, fund the bell, and I'll stand beside you.",
+          "when": {
+            "kind": "fact",
+            "fact": "vane.ledger.obtained"
+          },
+          "next": "confess-effects"
+        },
+        {
+          "id": "confront-bribe",
+          "text": "Name a figure, Vane.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.ledger.obtained"
+              },
+              {
+                "kind": "fact",
+                "fact": "duggan.testimony"
+              }
+            ]
+          },
+          "next": "bribe-effects"
+        },
+        {
+          "id": "confront-flee",
+          "text": "Your foreman is talking, Vane. Duggan has told me everything.",
+          "when": {
+            "kind": "fact",
+            "fact": "duggan.testimony"
+          },
+          "next": "flee-effects"
+        },
+        {
+          "id": "confront-back",
+          "text": "Not yet.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "expose-effects",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "vane.fate",
+          "value": "exposed"
+        },
+        {
+          "kind": "emit",
+          "event": "vane.exposed"
+        }
+      ],
+      "next": "expose-1"
+    },
+    {
+      "id": "expose-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Then it's over, and I would rather it ended with me saying it was a bad bargain made by a frightened man. Hale will want my keys. Take them. I hope the bell is worth it. I'm afraid it may be.",
+      "end": true
+    },
+    {
+      "id": "confess-effects",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "vane.fate",
+          "value": "confessed"
+        },
+        {
+          "kind": "emit",
+          "event": "vane.confessed",
+          "data": {
+            "bountyTo": "pell",
+            "bell": "repair"
+          }
+        }
+      ],
+      "next": "confess-1"
+    },
+    {
+      "id": "confess-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Yes. All right. Yes. The Pells will have the bounty, and the belfry stair will be mended at my cost, and I will stand in the square and say what I did. I'll not sleep. I think I'm owed that.",
+      "end": true
+    },
+    {
+      "id": "bribe-effects",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "vane.fate",
+          "value": "bribed-player"
+        },
+        {
+          "kind": "gold",
+          "delta": 400
+        },
+        {
+          "kind": "emit",
+          "event": "vane.bribed"
+        }
+      ],
+      "next": "bribe-1"
+    },
+    {
+      "id": "bribe-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Four hundred crowns now and the bounty when it's done. You'll find I'm good for the rest. We needn't be seen speaking again. Mind the mine road, and the ledger stays where it is.",
+      "end": true
+    },
+    {
+      "id": "flee-effects",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "vane.fate",
+          "value": "fled"
+        },
+        {
+          "kind": "emit",
+          "event": "vane.fled"
+        }
+      ],
+      "next": "flee-1"
+    },
+    {
+      "id": "flee-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "He... talked. Of course he did. The coach at the Ox leaves at six; I find I've business with the factors. Tell Hale I'll write. Tell the Pells I'm sorry. I'd tell them myself.",
+      "end": true
+    },
+    {
+      "id": "aftermath-exposed",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Hale has my keys and half the town has my name. Say what you like to me; I've nothing left to be clever about. Only ring the bell. Please. Ring it.",
+      "end": true
+    },
+    {
+      "id": "aftermath-confessed",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "I told them in the square. Every word. The Pells have the bounty, the carpenters are on the belfry stair, and I find I sleep rather less than I did. Go on. Ring it.",
+      "end": true
+    },
+    {
+      "id": "aftermath-bribed",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "Our arrangement stands. We needn't be seen to talk. The mine will do well this year, and it will do well on what's below the Line. Try not to think too hard about that.",
+      "end": true
+    },
+    {
+      "id": "aftermath-fled",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Vane House is barred. A maid at the gate says the master took the mountain road before dawn, and left every lamp lit behind him.",
+      "end": true
+    }
+  ]
+}
