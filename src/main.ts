@@ -21,6 +21,7 @@ import {
   PLAYER_CAMERA_ID,
   PLAYER_CONTROLLER_ID,
   PLAYER_CLASSES,
+  PERSUASION_ID,
   PLAYER_LOCK_ON_ID,
   RESPAWN_RULES_ID,
   type GameContent,
@@ -82,6 +83,15 @@ import {
 } from '@game/items/index';
 import { startInventoryUi, type InventoryUi } from '@game/items/inventory-screen';
 import { startContainerUi, type ContainerUi } from '@game/items/container-window';
+import {
+  Conversations,
+  createGameDispositions,
+  creatureIdOf,
+  dialogueVeto,
+  DIALOGUE_VETO_ID,
+  npcResolver,
+} from '@game/conversation/index';
+import type { DialogueDef } from '@content/types/dialogue';
 import { startShopUi } from '@game/shop/shop-window';
 import {
   ContainerWatch,
@@ -389,6 +399,10 @@ import {
   WorldPersistence,
   worldItemSpawner,
   zeroHealth,
+  createPersuasion,
+  DialogueRuntime,
+  installTalkGate,
+  npcBand,
   DamageApplied,
   Died,
   hashWorld,
@@ -418,6 +432,7 @@ import { SpellDemoFigures } from '@render/spell-vfx/demo';
 import {
   CombatHud,
   DamageNumbers,
+  DialogueBox,
   TargetBar,
   BossBar,
   HitMarkers,
@@ -775,6 +790,8 @@ function startRenderer(
     },
   });
   let player: TestbedPlayer | undefined;
+  // Talking to NPCs (mw-e22.9), once a scene with a talkable NPC has started.
+  let conversations: Conversations | undefined;
   // Area transitions (mw-e01.11): a page that arrives from another area shows the loading overlay
   // (area name) if it takes longer than half a second to become playable, and publishes how long
   // the whole transition took in #app[data-transit]; a page that leaves hands off through
@@ -832,12 +849,18 @@ function startRenderer(
     // The logic host and the quest runtime (mw-e23.11), before any save loads so the quests' fact
     // keys are declared. Dialogue (mw-e22.9) and shops run their effects against `gameLogic.host`;
     // content with no quests installs nothing. The save registry refreshes the quests after a load.
+    // Dispositions are the NPCs' opinions of the player (mw-e22.4): blows and thefts move them, and
+    // dialogue reads and changes them by NPC id (the creature's content id, `npcResolver`). Their
+    // component is added on the first change, so a world where nobody's opinion moves hashes as before.
+    const dispositions = createGameDispositions(world, content, () => player?.entity);
+    dispositions.listen();
     const gameLogic = installGameLogic(world, {
       world,
       player: () => player?.entity,
       inventory: new InventoryRules(content.all('item')),
       capabilities,
       quests: questsOf(content),
+      disposition: { dispositions, resolve: npcResolver(world) },
     });
     root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
     // The knight's sword and shield (mw-e04.6): moves, socket tracks, the wood shield and the
@@ -1856,6 +1879,8 @@ function startRenderer(
             profile: (id) => content.get('targetable', id),
             defeated: zeroHealth,
           },
+          // While the player talks to an NPC the camera frames the two of them (mw-e22.9).
+          conversationFocus: () => conversations?.focusPoint(),
           publish: (readout) => {
             root.dataset['player'] = JSON.stringify(readout);
           },
@@ -2456,6 +2481,87 @@ function startRenderer(
       for (const line of sceneCreatureErrors(sceneCreatures)) console.error(line);
       // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
       watchPresence(world, creatures.spawn, loaded.layout.spawns);
+      // Talking to NPCs (mw-e22.9): a creature whose content names a `dialogue` gets Talk on the
+      // Interact verb; talking pauses its routine, faces the player, runs the dialogue against the
+      // game's logic host and ends in a walk away or danger. Only where content has talkable
+      // creatures (the shipped bestiary has none yet; debug builds add the conversation room).
+      // #app[data-dialogue] (JSON) is the e2e's readout; the box is mw-e22.10's to replace.
+      // Persuasion checks (mw-e22.7) read the NPC's personality from its creature definition; option
+      // tags (mw-e22.6) read the class dialogue tag and the item icon from content.
+      const dialogueOfCreature = new Map(
+        content
+          .all('creature')
+          .flatMap((creature) =>
+            creature.dialogue === undefined ? [] : [[creature.id, creature.dialogue.id] as const],
+          ),
+      );
+      if (player !== undefined && dialogueOfCreature.size > 0) {
+        const dialogues = new Map(
+          content
+            .all('dialogue')
+            .map((dialogue) => [dialogue.id, dialogue as unknown as DialogueDef]),
+        );
+        const personalities = new Map(
+          content.all('creature').map((creature) => [creature.id, creature.personality]),
+        );
+        const persuasion = createPersuasion({
+          rules: content.get('persuasion', PERSUASION_ID),
+          personality: (npc) => personalities.get(npc),
+        });
+        const runtime = new DialogueRuntime({
+          world,
+          host: gameLogic.host,
+          dialogues: (id) => dialogues.get(id),
+          checks: persuasion.resolve,
+          preview: persuasion.preview,
+          tags: {
+            classTag: (classId) =>
+              content.all('class').find((def) => def.id === classId)?.dialogueTag,
+            itemIcon: (itemId) => content.all('item').find((item) => item.id === itemId)?.icon,
+          },
+        });
+        const talkable = (entity: EntityId) => {
+          const npc = creatureIdOf(world, entity);
+          const dialogue = npc === undefined ? undefined : dialogueOfCreature.get(npc);
+          return npc === undefined || dialogue === undefined ? undefined : { dialogue, npc };
+        };
+        installTalkGate(world, {
+          talkable,
+          hostile: (entity) => npcBand(dispositions.get(entity)) === 'hostile',
+          canParley: (dialogue, npc) => runtime.canParley(dialogue, npc),
+        });
+        const dialogueBox = new DialogueBox();
+        ui.hud.append(dialogueBox.element);
+        const talking = new Conversations({
+          world,
+          player: player.entity,
+          runtime,
+          dialogueOf: (creature) => dialogueOfCreature.get(creature),
+          speakerName: (dialogue, speaker) =>
+            dialogues.get(dialogue)?.speakers.find((s) => s.id === speaker)?.name ?? speaker,
+          show: (model) => {
+            dialogueBox.update(model);
+          },
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        conversations = talking;
+        // An open conversation takes Enter, E and the number keys before the game's own bindings.
+        globalThis.window.addEventListener(
+          'keydown',
+          (event) => {
+            if (!talking.keydown(event)) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          },
+          true,
+        );
+        afterStep.push(() => {
+          talking.afterStep();
+        });
+        root.dataset['dialogue'] = JSON.stringify(talking.readout());
+      }
       // A placed creature's death sets its slain fact (mw-e01.7), e.g. entity:slice/skeleton.slain.
       installSlainFacts(world, scene.id, loaded.layout.spawns);
       // A dying creature drops what it carries and rolls its loot table (mw-e01.5): the slice's
@@ -2761,6 +2867,8 @@ function startRenderer(
       [COMBAT_VETO_ID]: combatVeto(world),
       // Nor while the player hides in a wardrobe (mw-e03.23).
       [HIDING_VETO_ID]: hidingVeto(world, () => player?.entity),
+      // Nor mid-conversation: the dialogue in progress is not saved (mw-e22.9).
+      [DIALOGUE_VETO_ID]: dialogueVeto(() => conversations),
     };
     const safety = new SafetyVetoes();
     for (const [id, veto] of Object.entries(saveVetoes)) safety.register(id, veto);

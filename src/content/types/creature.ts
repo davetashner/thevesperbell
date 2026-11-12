@@ -250,6 +250,11 @@ export const creatureSchema = z.strictObject({
     .array(contentId)
     .prefault([])
     .describe('Non-hostile affordances offered to the player, e.g. "feed", "talk", "pet".'),
+  dialogue: ref('dialogue')
+    .optional()
+    .describe(
+      'Dialogue the player starts by talking to it (mw-e22.9): with it, Interact offers Talk, the creature pauses its routine and faces the player, and the dialogue runs with this creature as the NPC (its id is the NPC id dialogue conditions and effects name). Absent = it cannot be talked to.',
+    ),
   loot: contentId.optional().describe('Loot table id (E18); absent = drops only what it carries.'),
   shield: ref('shield')
     .optional()

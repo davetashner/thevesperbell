@@ -29,3 +29,4 @@ Files in the ≥ 90% layers that are below 100% lines or branches, with the reas
 
 | File | Reason | Bead |
 |---|---|---|
+| `src/game/conversation/conversation.ts` | Defensive branches only (an NPC or player without a placement, a non-dialogue error rethrown, a conversation ended with no NPC id); every rule is unit tested and `e2e/npc-conversation.spec.ts` plays a whole conversation. | mw-e22.9 |

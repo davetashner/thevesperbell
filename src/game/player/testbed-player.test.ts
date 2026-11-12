@@ -1063,6 +1063,37 @@ describe('testbed lock-on (mw-e02.16)', () => {
   });
 });
 
+describe('conversation framing (mw-e22.9)', () => {
+  it('the camera swings to frame the NPC being talked to, without a lock, and back after', () => {
+    let focus: { x: number; y: number; z: number } | undefined;
+    const rig = testbed((physics) => ({
+      lockOn: {
+        tuning: content.get('lock-on', PLAYER_LOCK_ON_ID),
+        sight: new LineOfSight({ world: new RapierSightWorld(physics) }),
+        profile: (id: string) => content.get('targetable', id),
+      },
+      conversationFocus: () => focus,
+    }));
+    const { camera, state, run, player } = rig;
+    const offAxis = (point: { x: number; z: number }) => {
+      const look = Math.atan2(camera.target.x - camera.at.x, camera.target.z - camera.at.z);
+      const to = Math.atan2(point.x - camera.at.x, point.z - camera.at.z);
+      return Math.abs(Math.atan2(Math.sin(to - look), Math.cos(to - look)));
+    };
+    run(0.5);
+    const beforeOff = offAxis({ x: -6, z: 4 });
+    expect(beforeOff).toBeGreaterThan(toRadians(20));
+    focus = { x: -6, y: 1.6, z: 4 };
+    run(2);
+    expect(offAxis({ x: -6, z: 4 })).toBeLessThan(toRadians(10));
+    expect(state().lock).toBeNull();
+    expect(player.lockTarget()).toBeUndefined();
+    focus = undefined;
+    run(2);
+    expect(offAxis({ x: -6, z: 4 })).toBeGreaterThan(toRadians(20));
+  });
+});
+
 describe('yaw helpers', () => {
   it('round-trips a yaw through its rotation', () => {
     for (const yaw of [0, 1, -2.5, Math.PI - 1e-9])

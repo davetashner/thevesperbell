@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- You can now talk to the greybox villager in the debug conversation room: walk up, press Interact, and she stops walking her route to chat, picking up where she left off when you say goodbye, walk away or danger turns up.
 - You can now walk out of Briar Glen into the Briarwood: a woodside path at the north end of the shop lane leads to a 300 by 250 metre grey-box forest with its trails, clearings, bramble gates that burn open and a way back to town.
 - The dungeon no longer ends at a dead end: past the exit vestibule a short passage leads out onto the mountain road (valley-01), and the slice-complete card now offers Continue on the mountain road, so a new game walks on through the valley to Briar Glen; the valley road's first gate leads back into the dungeon, which remembers its opened doors and looted chest (mw-e24.21).
 - The shipped (release) build no longer carries the debug demos and probes (the animation, arrow, awareness, spell and effect demos, the F2 fly camera and the frame-time probe); they load only in debug builds, which keeps the first download smaller and the release free of developer tools.
