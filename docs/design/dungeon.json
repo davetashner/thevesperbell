@@ -1,0 +1,1189 @@
+{
+  "$comment": "Data for docs/design/dungeon.md (mw-e26.1), cross-checked against connectivity.json, the puzzle and fact registries and the route matrix by src/content/dungeon.test.ts. Ids are connectivity node/edge ids.",
+  "areas": [
+    {
+      "id": "mine-road",
+      "region": "deepworks",
+      "tier": "approach",
+      "intensity": "quiet",
+      "role": "connector",
+      "note": "Signposted road from Market Green to the gate (mw-e25.23)."
+    },
+    {
+      "id": "mine-gate",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "light",
+      "role": "gate",
+      "note": "Boarded gate; six ways in (route matrix mine-gate). Wolves let sleepwalkers pass; the gate is the first obstacle."
+    },
+    {
+      "id": "winch-house",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "quiet",
+      "role": "interior",
+      "note": "First interior space; the winch cage, the Bell Line rule, a safe room to learn the Deepworks' look."
+    },
+    {
+      "id": "old-galleries",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "heavy",
+      "role": "combat",
+      "note": "Square pillared halls; goblin patrols, Tallow Ooze in the half-cut blocks. The first real fight."
+    },
+    {
+      "id": "rootcellar-camp",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "quiet",
+      "role": "social",
+      "note": "Goblin camp in the old cutting hall: parley is the default, fighting or sneaking is the player's choice (bible 4.1 beat 6). Quiet by design; a hostile camp makes it heavy for that save."
+    },
+    {
+      "id": "silver-galleries",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "heavy",
+      "role": "combat",
+      "note": "Newer silver workings: Hollow patrols, mimics in the ore carts, loom-silk webs creeping in from the breach side."
+    },
+    {
+      "id": "vane-sealed-gallery",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "quiet",
+      "role": "lore",
+      "note": "Vane's ledger, the horn-ring, the breach; a hushed lore room."
+    },
+    {
+      "id": "breach",
+      "region": "deepworks",
+      "tier": "critical",
+      "intensity": "light",
+      "role": "transition",
+      "note": "The hole into the Knot; the dread beat before the Outer Ring."
+    },
+    {
+      "id": "lower-deepworks",
+      "region": "deepworks",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "puzzle",
+      "note": "Flooded gallery where the Weeping Adit enters; the Frozen Channel puzzle. A way past the goblin camp, never required."
+    },
+    {
+      "id": "moorings-courtyard",
+      "region": "moorings-watch",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "approach",
+      "note": "Goblin lookout below, the long way in."
+    },
+    {
+      "id": "moorings-tower",
+      "region": "moorings-watch",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "side-quest",
+      "note": "Hollow Sentinels above; the keeper's log and signal mirror."
+    },
+    {
+      "id": "supply-tunnel",
+      "region": "moorings-watch",
+      "tier": "optional",
+      "intensity": "quiet",
+      "role": "approach",
+      "note": "The collapsed tunnel into the upper mine (long way in, any class)."
+    },
+    {
+      "id": "weeping-adit-mouth",
+      "region": "river",
+      "tier": "optional",
+      "intensity": "quiet",
+      "role": "approach",
+      "note": "The river way in; swim, raft or barge."
+    },
+    {
+      "id": "priory-gate",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "quiet",
+      "role": "gate",
+      "note": "Head of the priory road; where the forest, the ridge path and the town road meet. PROPOSAL (bible silent)."
+    },
+    {
+      "id": "priory-nave",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "hub",
+      "note": "Roofless nave; the priory hub. Dormant Forgotten stir only if the bell is rung sour."
+    },
+    {
+      "id": "priory-choir",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "puzzle",
+      "note": "Singing-monk statues; the Watchers puzzle opens the hidden choir door."
+    },
+    {
+      "id": "scriptorium",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "lore",
+      "note": "Surviving pages and book mimics; the pact, the Sounding Shaft and the abbot's letters (bible 4.1 beat 9)."
+    },
+    {
+      "id": "priory-garden",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "quiet",
+      "role": "lore",
+      "note": "Dead pear tree; Clatter's memory made visible. Dead end by design."
+    },
+    {
+      "id": "priory-crypt-stair",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "quiet",
+      "role": "puzzle",
+      "note": "Stair down to the sealed crypt; the Sunbeam puzzle."
+    },
+    {
+      "id": "priory-crypt",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "quiet",
+      "role": "connector",
+      "note": "Sealed from this side until the Knot-side seal is broken (bible 4.1 beat 9, 4.2 Befriend)."
+    },
+    {
+      "id": "cistern",
+      "region": "priory",
+      "tier": "optional",
+      "intensity": "light",
+      "role": "connector",
+      "note": "Old cistern: Glen Well ladder-rung and jail drain meet here, then up to the nave."
+    },
+    {
+      "id": "belfry",
+      "region": "priory",
+      "tier": "critical",
+      "intensity": "quiet",
+      "role": "set-piece",
+      "note": "The cracked Vesper Bell and the top of the Sounding Shaft; the Vespers ending beat."
+    },
+    {
+      "id": "knot-outer-ring",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "heavy",
+      "role": "combat",
+      "note": "Hornfolk runes, loom spiders, the first Forgotten; the Scales puzzle gates the Hornfolk gate."
+    },
+    {
+      "id": "ossuary-galleries",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "light",
+      "role": "puzzle",
+      "note": "The Forgotten and Clatter; the Dark Crossing pit. Clatter fights or does not, depending on the hymn."
+    },
+    {
+      "id": "chapel-of-echoes",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "quiet",
+      "role": "puzzle",
+      "note": "Sound misbehaves; the Chimes puzzle and the portcullis trap. A trap and a puzzle, not a brawl."
+    },
+    {
+      "id": "horns-hall",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "heavy",
+      "role": "boss",
+      "note": "Brother Horn, outside the Fold (bible 4.2). Fight, trick, befriend or help."
+    },
+    {
+      "id": "the-fold",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "quiet",
+      "role": "rest",
+      "note": "Sealed vault of sleepers; the wake-up point. A dead end by design."
+    },
+    {
+      "id": "sounding-shaft-foot",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "light",
+      "role": "set-piece",
+      "note": "Foot of the shaft; the Climb. Held by Horn, goblins or Clatter, otherwise a chase (bible 4.1 beat 13)."
+    },
+    {
+      "id": "the-cradle",
+      "region": "knot",
+      "tier": "critical",
+      "intensity": "heavy",
+      "role": "boss",
+      "note": "The abbot and the Hushlings; the dream leaks into the world."
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Sunbeam",
+      "key": "sunbeam-hall",
+      "scene": "sunbeam-hall",
+      "area": "priory-crypt-stair",
+      "tier": "optional",
+      "reference": "e15-reference-puzzles-a",
+      "role": "Light the sensor so the stair's sealed carving can be read; reward is lore, the way through the crypt stays sealed (PROPOSAL, open question 3)."
+    },
+    {
+      "name": "Frozen Channel",
+      "key": "frozen-channel",
+      "scene": "frozen-channel",
+      "area": "lower-deepworks",
+      "tier": "optional",
+      "reference": "e15-reference-puzzles-a",
+      "role": "Weigh the far pad across the flooded channel (Frostglass, rope or raft); guards the cache behind the river entry (PROPOSAL)."
+    },
+    {
+      "name": "Scales",
+      "key": "scales-room",
+      "scene": "scales-room",
+      "area": "knot-outer-ring",
+      "tier": "critical",
+      "reference": "e15-reference-puzzles-b",
+      "role": "Balance the two plates to open the Hornfolk gate (route matrix outer-ring-gate)."
+    },
+    {
+      "name": "Watchers",
+      "key": "watchers",
+      "scene": "watchers",
+      "area": "priory-choir",
+      "tier": "optional",
+      "reference": "e15-reference-puzzles-b",
+      "role": "Turn the singing-monk statues to face the altar; opens the hidden choir door to the scriptorium (edge choir-scriptorium, fact watchers.solved)."
+    },
+    {
+      "name": "Dark Crossing",
+      "key": "dark-crossing",
+      "scene": "dark-crossing",
+      "area": "ossuary-galleries",
+      "tier": "critical",
+      "reference": "e15-reference-puzzles-b",
+      "role": "Reach the far pad across the Ossuary pit in the dark, or hum the hymn and let Clatter guide you (route matrix ossuary-crossing)."
+    },
+    {
+      "name": "Chimes",
+      "key": "chimes",
+      "scene": "chimes",
+      "area": "chapel-of-echoes",
+      "tier": "critical",
+      "reference": "e15-reference-puzzles-b",
+      "role": "Ring the bells in the order heard to settle the echoes and raise the portcullis (route matrix chapel-of-echoes)."
+    }
+  ],
+  "macroRoutes": [
+    {
+      "id": "front-gate",
+      "name": "Through the front gate",
+      "entry": "front-gate",
+      "gate": null,
+      "classes": ["knight", "archer", "sorcerer", "thief", "any"],
+      "status": "canon",
+      "nodes": [
+        "bridge-post",
+        "mine-gate",
+        "winch-house",
+        "old-galleries",
+        "rootcellar-camp",
+        "silver-galleries",
+        "vane-sealed-gallery",
+        "breach",
+        "knot-outer-ring",
+        "ossuary-galleries",
+        "chapel-of-echoes",
+        "horns-hall",
+        "the-cradle"
+      ],
+      "note": "Vane's key, the padlock or vent chimney, the side-boarding, the winch pulley or the inner bar (route matrix mine entries 1 to 4). The spine of the critical path."
+    },
+    {
+      "id": "supply-tunnel",
+      "name": "The long way, by Mooring's Watch",
+      "entry": "supply-tunnel",
+      "gate": null,
+      "classes": ["any"],
+      "status": "canon",
+      "nodes": [
+        "bridge-post",
+        "shop-lane",
+        "briarwood-edge",
+        "briarwood-hub",
+        "moorings-courtyard",
+        "supply-tunnel",
+        "old-galleries",
+        "rootcellar-camp",
+        "silver-galleries",
+        "vane-sealed-gallery",
+        "breach",
+        "knot-outer-ring",
+        "ossuary-galleries",
+        "chapel-of-echoes",
+        "horns-hall",
+        "the-cradle"
+      ],
+      "note": "Through the Briarwood and the watchtower, the supply-tunnel collapse, and out into the old galleries (bible 4.1 beat 5). Skips the gate, the winch house and the front-gate obstacle."
+    },
+    {
+      "id": "weeping-adit",
+      "name": "Up the river",
+      "entry": "weeping-adit",
+      "gate": null,
+      "classes": ["any"],
+      "status": "canon",
+      "nodes": [
+        "bridge-post",
+        "shop-lane",
+        "under-the-bridge",
+        "briar-glen-quay",
+        "weeping-adit-mouth",
+        "lower-deepworks",
+        "silver-galleries",
+        "vane-sealed-gallery",
+        "breach",
+        "knot-outer-ring",
+        "ossuary-galleries",
+        "chapel-of-echoes",
+        "horns-hall",
+        "the-cradle"
+      ],
+      "note": "Up the flooded Weeping Adit into the lower Deepworks and on to the silver galleries. Skips the winch house, old galleries and the goblin camp."
+    },
+    {
+      "id": "priory-shaft",
+      "name": "Down the Sounding Shaft",
+      "entry": "priory-shaft",
+      "gate": null,
+      "classes": ["any"],
+      "status": "proposal",
+      "nodes": [
+        "bridge-post",
+        "shop-lane",
+        "market-green",
+        "priory-road",
+        "priory-gate",
+        "priory-nave",
+        "belfry",
+        "sounding-shaft-foot",
+        "the-cradle"
+      ],
+      "note": "Through the forest to the priory, up to the belfry and down the shaft to its foot, a door from the Cradle. The bible's loop 'the priory crypt and the Sounding Shaft join the labyrinth' (3.1) makes this walkable; whether it is open before Act III is open question 1. Skips the whole Deepworks and the Knot's outer halls."
+    },
+    {
+      "id": "ridge-shaft",
+      "name": "The ridge path to the priory",
+      "entry": "priory-shaft",
+      "gate": null,
+      "classes": ["any"],
+      "status": "proposal",
+      "nodes": [
+        "bridge-post",
+        "shop-lane",
+        "briarwood-edge",
+        "briarwood-hub",
+        "moorings-courtyard",
+        "priory-road",
+        "priory-gate",
+        "priory-nave",
+        "belfry",
+        "sounding-shaft-foot",
+        "the-cradle"
+      ],
+      "note": "Mooring's Watch's ridge path (moorings-priory-ridge) to the priory road, then the shaft. Closes the forest-watchtower-priory loop (bible 3.1)."
+    },
+    {
+      "id": "priory-crypt",
+      "name": "Through the crypt",
+      "entry": "priory-crypt",
+      "gate": "world.priory-crypt.unsealed",
+      "classes": ["any"],
+      "status": "canon",
+      "nodes": [
+        "bridge-post",
+        "shop-lane",
+        "market-green",
+        "priory-road",
+        "priory-gate",
+        "priory-nave",
+        "priory-crypt-stair",
+        "priory-crypt",
+        "ossuary-galleries",
+        "chapel-of-echoes",
+        "horns-hall",
+        "the-cradle"
+      ],
+      "note": "The crypt shortcut: sealed from the priory side until the Knot-side seal is broken (befriending Horn opens it, bible 4.2). A return route, not a way in."
+    },
+    {
+      "id": "glen-well",
+      "name": "By the Glen Well and the cistern",
+      "entry": "glen-well",
+      "gate": null,
+      "classes": ["knight", "archer", "sorcerer", "thief"],
+      "status": "canon",
+      "nodes": [
+        "bridge-post",
+        "shop-lane",
+        "market-green",
+        "glen-well",
+        "cistern",
+        "priory-nave",
+        "belfry",
+        "sounding-shaft-foot",
+        "the-cradle"
+      ],
+      "note": "The loose ladder-rung into the cistern and up into the nave (bible 3.1, 3.5), then the same shaft descent as priory-shaft. Every class climbs the rung; the jail drain is the other way into the cistern."
+    }
+  ],
+  "classRoutes": {
+    "knight": [
+      {
+        "route": "front-gate",
+        "capabilities": ["technique.shoulder-barge"],
+        "how": "Smash the rotted side-boarding."
+      },
+      {
+        "route": "supply-tunnel",
+        "capabilities": ["technique.shoulder-barge"],
+        "how": "Barge the rotten cribbing at the collapse."
+      },
+      {
+        "route": "priory-shaft",
+        "capabilities": ["verb.climb.ledge"],
+        "how": "Climb the bell-ropes and ledges."
+      },
+      {
+        "route": "glen-well",
+        "capabilities": ["verb.climb.ledge"],
+        "how": "Climb down the Glen Well rung into the cistern."
+      }
+    ],
+    "archer": [
+      {
+        "route": "front-gate",
+        "capabilities": ["arrow.pinning-shot"],
+        "how": "Shoot the winch pulley so the cage drops."
+      },
+      {
+        "route": "weeping-adit",
+        "capabilities": ["arrow.rope"],
+        "how": "Anchor a rope across the flooded run."
+      },
+      {
+        "route": "priory-shaft",
+        "capabilities": ["arrow.rope"],
+        "how": "Shoot a rope line up the shaft to skip half the climb."
+      },
+      {
+        "route": "supply-tunnel",
+        "capabilities": ["arrow.rope"],
+        "how": "Rope arrow over the collapse."
+      }
+    ],
+    "sorcerer": [
+      {
+        "route": "front-gate",
+        "capabilities": ["spell.mage-hand"],
+        "how": "Mage Hand the inner bar."
+      },
+      {
+        "route": "supply-tunnel",
+        "capabilities": ["spell.firebolt"],
+        "how": "Burn the cribbing that holds the fall."
+      },
+      {
+        "route": "priory-shaft",
+        "capabilities": ["spell.mage-hand"],
+        "how": "Haul the counterweight chains into a stair."
+      },
+      {
+        "route": "weeping-adit",
+        "capabilities": [],
+        "how": "Frostglass the current's edge (needs spell.frostglass, mw-e08)."
+      }
+    ],
+    "thief": [
+      {
+        "route": "front-gate",
+        "capabilities": ["tool.lockpick"],
+        "how": "Pick the padlock or climb the vent chimney."
+      },
+      {
+        "route": "supply-tunnel",
+        "capabilities": ["verb.climb.rough"],
+        "how": "Squeeze up the cracked wall over the fall."
+      },
+      {
+        "route": "weeping-adit",
+        "capabilities": ["verb.climb.rough"],
+        "how": "Traverse the adit wall above the waterline."
+      },
+      {
+        "route": "priory-shaft",
+        "capabilities": ["verb.climb.rough"],
+        "how": "Free-climb the rough shaft wall."
+      }
+    ]
+  },
+  "criticalPath": [
+    {
+      "area": "mine-gate",
+      "intensity": "light",
+      "note": "Wolves, the barred gate and the choice of six ways in."
+    },
+    {
+      "area": "winch-house",
+      "intensity": "quiet",
+      "note": "Breathing room; mechanisms, the Bell Line rule."
+    },
+    {
+      "area": "old-galleries",
+      "intensity": "heavy",
+      "note": "First real fight: goblin patrols and Tallow Ooze."
+    },
+    {
+      "area": "rootcellar-camp",
+      "intensity": "quiet",
+      "note": "Parley by default; talking reveals what the goblins have seen."
+    },
+    {
+      "area": "silver-galleries",
+      "intensity": "heavy",
+      "note": "Hollow patrols and mimics."
+    },
+    {
+      "area": "vane-sealed-gallery",
+      "intensity": "quiet",
+      "note": "Ledger and horn-ring; the Knot's dread builds."
+    },
+    {
+      "area": "breach",
+      "intensity": "light",
+      "note": "The threshold; first sight of the Knot."
+    },
+    {
+      "area": "knot-outer-ring",
+      "intensity": "heavy",
+      "note": "First Forgotten and loom spiders; the Scales gate."
+    },
+    {
+      "area": "ossuary-galleries",
+      "intensity": "light",
+      "note": "Clatter and the Dark Crossing; fighting is optional if you hum the hymn."
+    },
+    {
+      "area": "chapel-of-echoes",
+      "intensity": "quiet",
+      "note": "The Chimes puzzle and the portcullis trap; no brawl."
+    },
+    {
+      "area": "horns-hall",
+      "intensity": "heavy",
+      "note": "The Warden encounter (bible 4.2)."
+    },
+    {
+      "area": "the-fold",
+      "intensity": "quiet",
+      "note": "The reveal: the sleepers on moss beds."
+    },
+    {
+      "area": "horns-hall",
+      "intensity": "quiet",
+      "note": "Revisit: Horn resolved, the abbot's voice, Tansy rises."
+    },
+    {
+      "area": "the-cradle",
+      "intensity": "heavy",
+      "note": "The abbot and the Hushlings."
+    },
+    {
+      "area": "sounding-shaft-foot",
+      "intensity": "light",
+      "note": "The Climb: held, or a chase, but a traversal set piece rather than a brawl."
+    },
+    {
+      "area": "belfry",
+      "intensity": "quiet",
+      "note": "Vespers: hang the tongue and ring the bell."
+    }
+  ],
+  "shortcuts": [
+    {
+      "edge": "supply-tunnel-collapse",
+      "opens": "Mooring's Watch supply tunnel into the old galleries (long way in, skips gate and winch house)."
+    },
+    {
+      "edge": "weeping-adit",
+      "opens": "River mouth into the lower Deepworks (skips the gate, galleries and goblin camp)."
+    },
+    {
+      "edge": "stone-stair",
+      "opens": "Cutting hall down to the quay: a fast way out of the Deepworks (one-way)."
+    },
+    {
+      "edge": "sleepers-path-mine-gate",
+      "opens": "The Sleepers' Path to the mine gate by a tracker's secret."
+    },
+    {
+      "edge": "glen-well-cistern",
+      "opens": "Town to the priory by the Glen Well rung, cistern and nave."
+    },
+    {
+      "edge": "jail-drain",
+      "opens": "The jail cell to the cistern and the priory (failure creates stories)."
+    },
+    {
+      "edge": "crypt-stair-crypt",
+      "opens": "Priory nave to the crypt, once the seal is broken (same fact as ossuary-crypt)."
+    },
+    {
+      "edge": "ossuary-crypt",
+      "opens": "Ossuary Galleries to the priory crypt: Horn's befriend reward and the way out of the Knot."
+    },
+    {
+      "edge": "sounding-shaft",
+      "opens": "Belfry to the Sounding Shaft's foot: the Climb up, or the shaft descent down (open question 1)."
+    },
+    {
+      "edge": "choir-scriptorium",
+      "opens": "The hidden choir door to the scriptorium, opened by the Watchers puzzle."
+    }
+  ],
+  "respawn": [
+    {
+      "id": "knot-horn-alive",
+      "region": "knot",
+      "destination": "the-fold",
+      "when": [
+        {
+          "fact": "horn.fate",
+          "value": "alive"
+        }
+      ],
+      "source": "canon",
+      "note": "Bible 4.5: you wake in the Fold on a moss bed, a bandage you did not tie. Each rescue counts in horn.rescues."
+    },
+    {
+      "id": "knot-horn-dead",
+      "region": "knot",
+      "destination": "rootcellar-camp",
+      "when": [
+        {
+          "fact": "horn.fate",
+          "value": "dead"
+        },
+        {
+          "fact": "goblins.standing",
+          "value": ["neutral", "friendly"]
+        }
+      ],
+      "source": "canon",
+      "note": "Bible 4.5: the goblin camp; Kettleback charges a carrying fee in coin or trinkets."
+    },
+    {
+      "id": "knot-horn-dead-goblins-hostile",
+      "region": "knot",
+      "destination": "ossuary-galleries",
+      "when": [
+        {
+          "fact": "horn.fate",
+          "value": "dead"
+        },
+        {
+          "fact": "goblins.standing",
+          "value": ["hostile"]
+        }
+      ],
+      "source": "canon",
+      "note": "Bible 4.5: among the Forgotten, who have laid you out like a monk for burial."
+    },
+    {
+      "id": "deepworks",
+      "region": "deepworks",
+      "destination": "rootcellar-camp",
+      "when": [
+        {
+          "fact": "goblins.standing",
+          "value": ["neutral", "friendly"]
+        }
+      ],
+      "source": "proposal",
+      "note": "Bible silent. Proposal: goblins carry you to their camp (same carrying fee), else the last save."
+    },
+    {
+      "id": "priory",
+      "region": "priory",
+      "destination": "sleeping-ox",
+      "when": [],
+      "source": "proposal",
+      "note": "Bible silent. Proposal: as the Briarwood, you wake at the Sleeping Ox and Juniper says where she found you (bible 4.5)."
+    }
+  ],
+  "facts": [
+    {
+      "key": "horn.fate",
+      "status": "registered"
+    },
+    {
+      "key": "abbot.fate",
+      "status": "registered"
+    },
+    {
+      "key": "vane.fate",
+      "status": "registered"
+    },
+    {
+      "key": "knot.breach-sealed",
+      "status": "registered",
+      "alias": "breach.sealed"
+    },
+    {
+      "key": "tansy.saved",
+      "status": "registered"
+    },
+    {
+      "key": "clatter.restored",
+      "status": "registered"
+    },
+    {
+      "key": "goblins.standing",
+      "status": "registered"
+    },
+    {
+      "key": "bell-tongue.destroyed",
+      "status": "registered"
+    },
+    {
+      "key": "wendmouth.visited",
+      "status": "registered"
+    },
+    {
+      "key": "crate.intercepted",
+      "status": "pending"
+    },
+    {
+      "key": "tern.sailed",
+      "status": "pending"
+    },
+    {
+      "key": "bell.rung",
+      "status": "pending",
+      "proposal": true
+    }
+  ],
+  "endings": [
+    {
+      "id": "vespers-rung",
+      "title": "Vespers Rung",
+      "decides": [
+        {
+          "fact": "horn.fate",
+          "value": "alive"
+        },
+        {
+          "fact": "abbot.fate",
+          "value": ["at-rest", "defeated"]
+        },
+        {
+          "fact": "bell.rung",
+          "value": true
+        }
+      ],
+      "modifiers": [
+        {
+          "fact": "knot.breach-sealed",
+          "value": true
+        },
+        {
+          "fact": "clatter.restored",
+          "value": true
+        },
+        {
+          "fact": "goblins.standing",
+          "value": ["friendly"]
+        },
+        {
+          "fact": "tansy.saved",
+          "value": true
+        },
+        {
+          "fact": "vane.fate",
+          "value": ["exposed", "confessed", "fled"]
+        },
+        {
+          "fact": "bell-tongue.destroyed",
+          "value": true
+        }
+      ],
+      "levelVariants": [
+        {
+          "area": "mine-gate",
+          "change": "The town brings bread to the gate; Horn's lantern burns in the winch house window.",
+          "when": []
+        },
+        {
+          "area": "belfry",
+          "change": "The bell rings each dusk; the goblins, Hale or Tansy pull the rope (an NPC at the rope).",
+          "when": [
+            {
+              "fact": "bell.rung",
+              "value": true
+            }
+          ]
+        },
+        {
+          "area": "breach",
+          "change": "Sealed: the collapsed tunnel is frozen and shored, or walled by goblins; the song never reaches the town again.",
+          "when": [
+            {
+              "fact": "knot.breach-sealed",
+              "value": true
+            }
+          ]
+        },
+        {
+          "area": "the-fold",
+          "change": "The Fold is empty and swept; Horn keeps the moss beds.",
+          "when": [
+            {
+              "fact": "horn.fate",
+              "value": "alive"
+            }
+          ]
+        },
+        {
+          "area": "ossuary-galleries",
+          "change": "Clatter walks the halls humming, apologising less.",
+          "when": [
+            {
+              "fact": "clatter.restored",
+              "value": true
+            }
+          ]
+        },
+        {
+          "area": "belfry",
+          "change": "A recast clapper hangs where the old tongue was (Oswin's recast, bible 5.7): the bell rings true.",
+          "when": [
+            {
+              "fact": "bell-tongue.destroyed",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "match": "all"
+    },
+    {
+      "id": "the-last-warden",
+      "title": "The Last Warden",
+      "decides": [
+        {
+          "fact": "horn.fate",
+          "value": "dead"
+        },
+        {
+          "fact": "vane.fate",
+          "value": ["exposed", "confessed", "fled"]
+        },
+        {
+          "fact": "bell.rung",
+          "value": true
+        }
+      ],
+      "modifiers": [
+        {
+          "fact": "goblins.standing",
+          "value": ["neutral", "friendly"]
+        },
+        {
+          "fact": "clatter.restored",
+          "value": true
+        },
+        {
+          "fact": "knot.breach-sealed",
+          "value": false
+        },
+        {
+          "fact": "tansy.saved",
+          "value": true
+        },
+        {
+          "fact": "bell-tongue.destroyed",
+          "value": true
+        }
+      ],
+      "levelVariants": [
+        {
+          "area": "horns-hall",
+          "change": "Empty: no Warden; Horn's horn on its hook (the item the player carries).",
+          "when": [
+            {
+              "fact": "horn.fate",
+              "value": "dead"
+            }
+          ]
+        },
+        {
+          "area": "rootcellar-camp",
+          "change": "The clan takes up the watch in its own way.",
+          "when": [
+            {
+              "fact": "goblins.standing",
+              "value": ["friendly"]
+            }
+          ]
+        },
+        {
+          "area": "ossuary-galleries",
+          "change": "Clatter walks the halls humming; or no one does.",
+          "when": [
+            {
+              "fact": "clatter.restored",
+              "value": true
+            }
+          ]
+        },
+        {
+          "area": "mine-gate",
+          "change": "The last slide: a lantern at the gate and a child's footprints going in.",
+          "when": [
+            {
+              "fact": "goblins.standing",
+              "value": ["hostile"]
+            }
+          ]
+        },
+        {
+          "area": "belfry",
+          "change": "The bell is rung; the sleepers go home and the bounty is paid.",
+          "when": [
+            {
+              "fact": "bell.rung",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "match": "all"
+    },
+    {
+      "id": "the-hirelings-silence",
+      "title": "The Hireling's Silence",
+      "decides": [
+        {
+          "fact": "vane.fate",
+          "value": "bribed-player"
+        },
+        {
+          "fact": "knot.breach-sealed",
+          "value": false
+        },
+        {
+          "fact": "bell.rung",
+          "value": true
+        }
+      ],
+      "modifiers": [
+        {
+          "fact": "horn.fate",
+          "value": ["alive", "dead"]
+        },
+        {
+          "fact": "tansy.saved",
+          "value": true
+        },
+        {
+          "fact": "wendmouth.visited",
+          "value": true
+        },
+        {
+          "fact": "bell-tongue.destroyed",
+          "value": true
+        }
+      ],
+      "levelVariants": [
+        {
+          "area": "breach",
+          "change": "Left open: Vane's tunnel keeps running silver and Hornfolk gold from below the Line.",
+          "when": [
+            {
+              "fact": "knot.breach-sealed",
+              "value": false
+            }
+          ]
+        },
+        {
+          "area": "mine-gate",
+          "change": "The gate stands open and busy; the mine prospers.",
+          "when": [
+            {
+              "fact": "vane.fate",
+              "value": "bribed-player"
+            }
+          ]
+        },
+        {
+          "area": "belfry",
+          "change": "The bell is rung, mostly; the rope is worn thin.",
+          "when": [
+            {
+              "fact": "bell.rung",
+              "value": true
+            }
+          ]
+        },
+        {
+          "area": "vane-sealed-gallery",
+          "change": "Ledger buried: the strongbox is empty.",
+          "when": [
+            {
+              "fact": "vane.fate",
+              "value": "bribed-player"
+            }
+          ]
+        }
+      ],
+      "match": "all"
+    },
+    {
+      "id": "the-long-vespers",
+      "title": "The Long Vespers",
+      "decides": [
+        {
+          "fact": "abbot.fate",
+          "value": "joined"
+        },
+        {
+          "fact": "bell.rung",
+          "value": false
+        }
+      ],
+      "modifiers": [
+        {
+          "fact": "tansy.saved",
+          "value": false
+        },
+        {
+          "fact": "horn.fate",
+          "value": ["alive", "dead"]
+        },
+        {
+          "fact": "goblins.standing",
+          "value": ["friendly", "neutral", "hostile"]
+        },
+        {
+          "fact": "bell-tongue.destroyed",
+          "value": true
+        }
+      ],
+      "levelVariants": [
+        {
+          "area": "the-cradle",
+          "change": "The player wakes here years later; the abbot is gone and a goblin pokes them with a stick.",
+          "when": [
+            {
+              "fact": "abbot.fate",
+              "value": "joined"
+            }
+          ]
+        },
+        {
+          "area": "belfry",
+          "change": "The bell stays silent; the tongue is gone or never hung.",
+          "when": [
+            {
+              "fact": "bell.rung",
+              "value": false
+            }
+          ]
+        },
+        {
+          "area": "the-fold",
+          "change": "The sleepers sleep on, snoring.",
+          "when": [
+            {
+              "fact": "abbot.fate",
+              "value": "joined"
+            }
+          ]
+        },
+        {
+          "area": "mine-gate",
+          "change": "Nobody comes to the gate; the town is asleep.",
+          "when": [
+            {
+              "fact": "abbot.fate",
+              "value": "joined"
+            }
+          ]
+        }
+      ],
+      "match": "any"
+    }
+  ],
+  "epilogueOnly": [
+    {
+      "fact": "wendmouth.visited",
+      "effect": "Adds slides; never changes the headline ending (bible 4.4)."
+    },
+    {
+      "fact": "crate.intercepted",
+      "effect": "The name-stone goes home to the Knot (adds a slide in Horn's Hall)."
+    },
+    {
+      "fact": "tern.sailed",
+      "effect": "Last slide: a man in a far city finds a tiny ox asleep on every coin (post-MVP hook)."
+    }
+  ],
+  "setPieces": [
+    {
+      "id": "sour-bell",
+      "name": "The sour bell",
+      "area": "belfry",
+      "note": "Ringing the cracked bell without its tongue (hammer, mace, arrow, Thunderclap) wakes every Forgotten in the priory and draws Hushlings up the shaft; Horn hears it and comes to you (bible 4.5)."
+    },
+    {
+      "id": "horns-hall",
+      "name": "Horn's Hall",
+      "area": "horns-hall",
+      "note": "The Warden encounter, outside the Fold; every resolution of 4.2 starts here."
+    },
+    {
+      "id": "cradle",
+      "name": "The Cradle",
+      "area": "the-cradle",
+      "note": "Round chamber where the dream leaks into the physical; the abbot conducts."
+    },
+    {
+      "id": "climb",
+      "name": "The Climb",
+      "area": "sounding-shaft-foot",
+      "note": "Vertical ascent up the shaft with the song rising behind (bible 4.1 beat 13)."
+    },
+    {
+      "id": "vespers",
+      "name": "Vespers",
+      "area": "belfry",
+      "note": "Hang the tongue and ring the bell; the song falters and the sleepers wake (bible 4.1 beat 14)."
+    }
+  ]
+}

@@ -359,6 +359,13 @@
       "notes": "Flooded lower galleries the Weeping Adit enters (bible 3.1)."
     },
     {
+      "id": "priory-gate",
+      "name": "The priory gate",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "The gate at the head of the priory road (mw-e26.5 'priory road gate'; PROPOSAL, the bible names only the road and the nave). Where the road from the forest, the ridge path from Mooring's Watch and the road from town all arrive (docs/design/dungeon.md)."
+    },
+    {
       "id": "priory-nave",
       "name": "The priory nave",
       "area": "priory",
@@ -373,6 +380,13 @@
       "notes": "Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6)."
     },
     {
+      "id": "priory-garden",
+      "name": "The priory garden",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "Garden with the dead pear tree Clatter remembers (bible 4.1 beat 8; mw-e26.5). Optional dead end off the nave."
+    },
+    {
       "id": "scriptorium",
       "name": "The scriptorium",
       "area": "priory",
@@ -385,6 +399,13 @@
       "area": "priory",
       "epic": "e26",
       "notes": "The cracked Vesper Bell (bible 3.5, mw-e26.8)."
+    },
+    {
+      "id": "priory-crypt-stair",
+      "name": "The crypt stair",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "The stair down from the nave to the sealed crypt door; the Sunbeam puzzle's place (mw-e26.1, docs/design/dungeon.md). PROPOSAL: the bible gives the crypt but no stair."
     },
     {
       "id": "priory-crypt",
@@ -1078,12 +1099,20 @@
       "notes": "Across the lock gates once both paddles are up (signal graph kestrel-lock-gates)."
     },
     {
-      "id": "priory-road-nave",
+      "id": "priory-road-gate",
       "from": "priory-road",
-      "to": "priory-nave",
+      "to": "priory-gate",
       "kind": "path",
       "bead": "mw-e25.25",
-      "notes": "Into the roofless nave."
+      "notes": "Up the priory road to the gate (PROPOSAL, mw-e26.1: the bible has the road and the nave but no gate between them)."
+    },
+    {
+      "id": "priory-gate-nave",
+      "from": "priory-gate",
+      "to": "priory-nave",
+      "kind": "path",
+      "bead": "mw-e26.5",
+      "notes": "Through the gate into the roofless nave."
     },
     {
       "id": "nave-choir",
@@ -1094,12 +1123,23 @@
       "notes": "Nave to choir."
     },
     {
+      "id": "nave-garden",
+      "from": "priory-nave",
+      "to": "priory-garden",
+      "kind": "path",
+      "bead": "mw-e26.5",
+      "notes": "Out of the nave to the garden and its dead pear tree (optional)."
+    },
+    {
       "id": "choir-scriptorium",
       "from": "priory-choir",
       "to": "scriptorium",
       "kind": "door",
       "bead": "mw-e26.7",
-      "notes": "Choir to scriptorium."
+      "notes": "The hidden choir door: solving the Watchers puzzle (every singing-monk statue faces the altar) opens it (mw-e26.1, docs/design/dungeon.md).",
+      "unlock": {
+        "fact": "watchers.solved"
+      }
     },
     {
       "id": "nave-belfry",
@@ -1110,12 +1150,23 @@
       "notes": "Stairs up to the belfry."
     },
     {
-      "id": "nave-crypt",
+      "id": "nave-crypt-stair",
       "from": "priory-nave",
-      "to": "priory-crypt",
+      "to": "priory-crypt-stair",
       "kind": "door",
       "bead": "mw-e26.5",
-      "notes": "Down to the crypt."
+      "notes": "Down the crypt stair, where the Sunbeam puzzle lights the way."
+    },
+    {
+      "id": "crypt-stair-crypt",
+      "from": "priory-crypt-stair",
+      "to": "priory-crypt",
+      "kind": "door",
+      "unlock": {
+        "fact": "world.priory-crypt.unsealed"
+      },
+      "bead": "mw-e26.5",
+      "notes": "The crypt door, sealed on this side (bible 4.1 beat 9) until the Knot-side seal is broken (mw-e26.5 AC-2): the same fact that opens ossuary-crypt."
     },
     {
       "id": "nave-cistern",
@@ -1341,7 +1392,8 @@
       "name": "Priory crypt and Sounding Shaft to the Knot",
       "edges": [
         "ossuary-crypt",
-        "nave-crypt",
+        "crypt-stair-crypt",
+        "nave-crypt-stair",
         "nave-belfry",
         "sounding-shaft",
         "cradle-shaft-foot",
@@ -1356,7 +1408,8 @@
       "edges": [
         "glen-well-cistern",
         "nave-cistern",
-        "priory-road-nave",
+        "priory-road-gate",
+        "priory-gate-nave",
         "hub-priory-road",
         "edge-hub",
         "lane-briarwood-edge",
