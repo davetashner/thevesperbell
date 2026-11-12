@@ -1,0 +1,154 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "tansy-after",
+  "notes": "Tansy Pell, twelve (bible 5.5), clever, reads everything she is not supposed to. Only talkable once tansy.saved (the entry `asleep` is the guard for a sleepwalking Tansy). Not placed in a town scene yet: until Vespers she is in the Fold, and scenes have no fact-gated presence, so the creature is unplaced and this dialogue is data-ready. Bible 4.1 beat 14: after the bell she asks who you are.",
+  "speakers": [
+    {
+      "id": "tansy",
+      "npc": "npc-tansy"
+    }
+  ],
+  "entries": [
+    {
+      "id": "asleep",
+      "when": {
+        "kind": "not",
+        "condition": {
+          "kind": "fact",
+          "fact": "tansy.saved"
+        }
+      },
+      "node": "asleep"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "again"
+    },
+    {
+      "id": "first-meeting",
+      "node": "who-are-you"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "asleep",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Tansy hums a tune with no words in it. Her eyes are open and she does not see you.",
+      "end": true
+    },
+    {
+      "id": "who-are-you",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "Who are you? You rang the bell, didn't you. I heard it from a very long way down. It sounded wrong. And then it sounded like somebody had finally said sorry.",
+      "next": "hub"
+    },
+    {
+      "id": "again",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "Oh, you. I'm not supposed to be out. Da's said so twice. I told him I'm only as far as the Stacks, which is true if you squint.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-dark",
+          "text": "What do you remember of the dark?",
+          "once": true,
+          "next": "dark-1"
+        },
+        {
+          "id": "ask-horn",
+          "text": "Who carried you?",
+          "once": true,
+          "next": "horn-check"
+        },
+        {
+          "id": "ask-books",
+          "text": "What were you reading, before?",
+          "once": true,
+          "next": "books-1"
+        },
+        {
+          "id": "ask-anselm",
+          "text": "Have you ever heard of a Brother Anselm Hobb?",
+          "once": true,
+          "next": "anselm-1"
+        },
+        {
+          "id": "leave",
+          "text": "Take care of yourself, Tansy.",
+          "next": "bye"
+        }
+      ]
+    },
+    {
+      "id": "dark-1",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "A soft room. Everyone breathing slowly, in time. And somebody big humming over us, and then a blanket, and then bread. Goblin bread. Da says goblins don't bake. They do. It was stale, which means somebody made it.",
+      "next": "hub"
+    },
+    {
+      "id": "horn-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "dead"
+          },
+          "next": "horn-dead"
+        }
+      ],
+      "else": "horn-alive"
+    },
+    {
+      "id": "horn-alive",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "He was careful of my head. Very careful. His hands were bigger than the oven door. Please don't let them hurt him. He smelled like a barn, but a clean one.",
+      "next": "hub"
+    },
+    {
+      "id": "horn-dead",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "He was careful of my head. Very careful. They told me he's, they told me. I don't think he meant to scare me. I think he'd had a very long time to practise being gentle.",
+      "next": "hub"
+    },
+    {
+      "id": "books-1",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "The Ox Beneath the Hill. Mirela says it's for little ones. It isn't. It's a map, with the road left out. I've nearly worked out where the road goes, and then Da says it's bedtime.",
+      "next": "hub"
+    },
+    {
+      "id": "anselm-1",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "Great-great-gran's brother? There's a letter in Da's Bible I'm not allowed to touch. I've read it twice. He talks about pears a lot. It's a very sad letter about pears.",
+      "next": "hub"
+    },
+    {
+      "id": "bye",
+      "kind": "line",
+      "speaker": "tansy",
+      "text": "Tell Da I'm only in the Stacks. And thank you. I don't know yet for what. I'll work it out.",
+      "end": true
+    }
+  ]
+}

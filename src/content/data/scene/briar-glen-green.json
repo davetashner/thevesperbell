@@ -692,6 +692,14 @@
       }
     },
     {
+      "id": "npc-vane",
+      "at": [3.0, 0.0, 57.5],
+      "yaw": 180,
+      "tags": ["npc", "council"],
+      "creature": "npc-vane",
+      "leash": { "radius": 2 }
+    },
+    {
       "id": "market-green",
       "at": [0.0, 0.0, 52.0],
       "tags": ["node", "region"]
@@ -844,6 +852,14 @@
       }
     },
     {
+      "id": "npc-mirela",
+      "at": [-42.5, 0.0, 72.5],
+      "yaw": 90,
+      "tags": ["npc", "shopkeeper"],
+      "creature": "npc-mirela",
+      "leash": { "radius": 1.5 }
+    },
+    {
       "id": "stacks-lean",
       "at": [-58.0, 10.5, 70.0],
       "tags": ["landmark", "leans"]
@@ -879,6 +895,14 @@
         "burning": true,
         "fuel": 28800
       }
+    },
+    {
+      "id": "npc-hale",
+      "at": [2.5, 0.0, 92.5],
+      "yaw": 180,
+      "tags": ["npc", "watch"],
+      "creature": "npc-hale",
+      "leash": { "radius": 2 }
     },
     {
       "id": "door-schoolhouse",
