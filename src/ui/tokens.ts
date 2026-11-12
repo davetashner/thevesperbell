@@ -22,6 +22,14 @@ export const PALETTE = Object.freeze({
   wayfinder: '#F2C94C',
 });
 
+/** The dialogue plate and text (mw-e22.10); the plate's alpha is at least 90%, 100% with the setting. */
+export const DIALOGUE_PLATE = PALETTE.ink;
+export const DIALOGUE_TEXT = PALETTE.cream;
+export const DIALOGUE_MUTED = PALETTE.parchment;
+/** High-contrast dialogue: white on solid black. */
+export const DIALOGUE_HIGH_CONTRAST_PLATE = '#000000';
+export const DIALOGUE_HIGH_CONTRAST_TEXT = '#FFFFFF';
+
 /** Token name (without the leading `--`) → default value. */
 export const UI_TOKENS: Readonly<Record<string, string>> = Object.freeze({
   // Colour (style bible §9: parchment panels, ink text, hearth hover, ember warnings).
@@ -983,27 +991,124 @@ ${tokens}
   transform: scaleX(0);
 }
 .vb-dialogue {
+  /* The plate is at least 90% so the line always reads; the text background setting can raise it. */
+  --vb-dialogue-plate: rgb(30 27 46 / max(90%, calc(var(--ui-text-backdrop-opacity) * 100%)));
+  --vb-dialogue-text: ${DIALOGUE_TEXT};
+  --vb-dialogue-muted: ${DIALOGUE_MUTED};
+  --vb-dialogue-accent: ${PALETTE.hearth};
   position: absolute;
   left: 50%;
-  bottom: 8%;
+  bottom: 4%;
   transform: translateX(-50%);
-  width: min(40rem, 90%);
+  width: min(44rem, calc(100% - 2 * var(--ui-space-3)));
+  max-height: 80%;
   display: flex;
   flex-direction: column;
-  gap: var(--ui-space-1);
+  gap: var(--ui-space-2);
   padding: var(--ui-space-3);
   font-size: ${size(1.125)};
-  background: var(--ui-color-panel-raised);
-  border: 2px solid var(--ui-color-text-muted);
+  color: var(--vb-dialogue-text);
+  background: var(--vb-dialogue-plate);
+  border: 2px solid var(--ui-color-border);
   border-radius: var(--ui-radius);
   text-shadow: none;
+  pointer-events: auto;
+}
+.vb-ui[data-contrast='high'] .vb-dialogue {
+  --vb-dialogue-plate: ${DIALOGUE_HIGH_CONTRAST_PLATE};
+  --vb-dialogue-text: ${DIALOGUE_HIGH_CONTRAST_TEXT};
+  --vb-dialogue-muted: ${DIALOGUE_HIGH_CONTRAST_TEXT};
+  --vb-dialogue-accent: ${DIALOGUE_HIGH_CONTRAST_TEXT};
+  border: 4px solid ${DIALOGUE_HIGH_CONTRAST_TEXT};
 }
 .vb-dialogue[hidden], .vb-dialogue [hidden] { display: none; }
-.vb-dialogue p, .vb-dialogue ol { margin: 0; }
-.vb-dialogue-speaker { font-weight: bold; }
-.vb-dialogue-choices { padding-left: 1.5em; }
-.vb-dialogue-choice[data-locked='true'] { opacity: 0.6; }
-.vb-dialogue-hint { font-size: ${size(0.875)}; font-style: italic; }
+.vb-dialogue p, .vb-dialogue ol, .vb-dialogue h2 { margin: 0; }
+.vb-dialogue-main { display: flex; gap: var(--ui-space-3); min-height: 0; overflow-y: auto; }
+.vb-dialogue-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.vb-dialogue-portrait {
+  flex: none;
+  position: relative;
+  width: 4.5em;
+  height: 4.5em;
+  overflow: hidden;
+  border: 2px solid var(--vb-dialogue-muted);
+  border-radius: var(--ui-radius);
+  background: rgb(255 255 255 / 8%);
+}
+.vb-dialogue-portrait::before, .vb-dialogue-portrait::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--vb-dialogue-muted);
+}
+.vb-dialogue-portrait::before { top: 18%; width: 34%; height: 34%; border-radius: 50%; }
+.vb-dialogue-portrait::after { top: 58%; width: 72%; height: 70%; border-radius: 50% 50% 0 0; }
+.vb-dialogue-speaker {
+  font-family: var(--ui-font-heading);
+  font-weight: bold;
+  color: var(--vb-dialogue-accent);
+  overflow-wrap: anywhere;
+}
+.vb-dialogue-text { overflow-wrap: anywhere; cursor: pointer; }
+.vb-dialogue-pending { color: transparent; }
+.vb-dialogue-outcome {
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border-left: 4px solid var(--vb-dialogue-accent);
+  font-size: ${size(0.875)};
+}
+.vb-dialogue-outcome-title { font-weight: bold; }
+.vb-dialogue-choices { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--ui-space-1); }
+.vb-dialogue-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25em 0.5em;
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border: 2px solid transparent;
+  border-radius: var(--ui-radius);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.vb-dialogue-choice[data-focused='true'] { border-color: var(--vb-dialogue-accent); background: rgb(255 255 255 / 12%); }
+.vb-dialogue-choice[data-locked='true'] { opacity: 0.75; cursor: not-allowed; }
+.vb-dialogue-choice[data-locked='true'] .vb-dialogue-choice-text { text-decoration: line-through; text-decoration-thickness: 1px; }
+.vb-dialogue-number { font-weight: bold; }
+.vb-dialogue-tag { display: inline-flex; gap: 0.25em; font-weight: bold; color: var(--vb-dialogue-accent); }
+.vb-dialogue-odds { font-size: ${size(0.875)}; font-style: italic; border: 1px solid currentColor; border-radius: var(--ui-radius); padding: 0 0.4em; }
+.vb-dialogue-reason { flex-basis: 100%; font-size: ${size(0.875)}; font-style: italic; }
+.vb-dialogue-history {
+  max-height: 14em;
+  overflow-y: auto;
+  padding: var(--ui-space-2);
+  border: 2px solid var(--vb-dialogue-muted);
+  border-radius: var(--ui-radius);
+}
+.vb-dialogue-history-title { font-size: ${size(1)}; font-family: var(--ui-font-heading); }
+.vb-dialogue-history-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--ui-space-1); }
+.vb-dialogue-history-entry[data-kind='choice'] { padding-left: 1.5em; font-style: italic; color: var(--vb-dialogue-accent); }
+.vb-dialogue-history-entry[data-kind='check'] { padding-left: 1.5em; font-size: ${size(0.875)}; }
+.vb-dialogue-history-entry[data-kind='divider'] { text-align: center; font-size: ${size(0.875)}; border-top: 1px solid var(--vb-dialogue-muted); padding-top: var(--ui-space-1); }
+.vb-dialogue-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--ui-space-2); flex-wrap: wrap; }
+.vb-dialogue-hint { font-size: ${size(0.875)}; font-style: italic; color: var(--vb-dialogue-muted); }
+.vb-dialogue-history-button {
+  font: inherit;
+  font-size: ${size(0.875)};
+  color: inherit;
+  background: transparent;
+  border: 2px solid var(--vb-dialogue-muted);
+  border-radius: var(--ui-radius);
+  padding: 0 var(--ui-space-2);
+  cursor: pointer;
+}
+.vb-dialogue-announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .vb-panel.vb-class-select { width: min(64rem, 100%); max-width: 100%; }
 .vb-class-cards {
   display: grid;

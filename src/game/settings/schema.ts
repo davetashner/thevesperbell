@@ -234,12 +234,28 @@ export const SETTINGS_SCHEMA = {
       }),
       textBackground: slider({
         label: 'Text background',
-        help: 'Puts a dark plate behind prompts, target names and other HUD text. 0 shows the text alone.',
+        help: 'Puts a dark plate behind prompts, target names, dialogue and other HUD text. 0 shows the text alone.',
         min: 0,
         max: 1,
         step: 0.05,
         default: 0,
         unit: 'percent',
+      }),
+      revealSpeed: choice({
+        label: 'Dialogue text speed',
+        help: 'How fast a line of dialogue types out. Instant shows the whole line at once. Enter shows the rest of a line.',
+        options: [
+          { value: 'instant', label: 'Instant' },
+          { value: 'slow', label: 'Slow' },
+          { value: 'normal', label: 'Normal' },
+          { value: 'fast', label: 'Fast' },
+        ],
+        default: 'normal',
+      }),
+      highContrast: toggle({
+        label: 'High contrast dialogue',
+        help: 'Draws dialogue in white on solid black with a bold outline.',
+        default: false,
       }),
       hudScale: slider({
         label: 'HUD size',
