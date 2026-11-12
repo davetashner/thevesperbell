@@ -1,0 +1,914 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "dot-sleeping-ox",
+  "notes": "Odette 'Dot' Farrow (bible 5.4), innkeeper of the Sleeping Ox and the main rumour source. Warm, sharp, calls everyone love, missing her barman Fitch more than she admits. Fears being useless in a crisis. Secrets: a quiet fencing business in the cellar (opens to thieves, dot.fence.open) and one 'goblin trinket' with a Vane Deepworks stamp (dot.trinket.confessed). Rumour trading is a HOOK only (bible 6.2): rumours are told through emit rumor.told events with the bible's number; the rumour set (e39-rumor-set) owns the content. Fence prices and shop rules are out of scope (emit dot.fence-trade). Class options: knight (the beams, her fear), archer (game), sorcerer (light the hearth, which can fail), thief (cellar). Drinks cost gold and raise disposition, which gates the trinket confidence.",
+  "speakers": [
+    {
+      "id": "dot",
+      "npc": "npc-dot"
+    }
+  ],
+  "entries": [
+    {
+      "id": "ending-long",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.fate",
+        "op": "eq",
+        "value": "joined"
+      },
+      "node": "ending-long-1"
+    },
+    {
+      "id": "ending-silence",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-silence-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-silence-1"
+    },
+    {
+      "id": "ending-warden",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "dead"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-warden-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-warden-1"
+    },
+    {
+      "id": "ending-rung",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "alive"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-rung-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-rung-1"
+    },
+    {
+      "id": "well-quip",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "well.player-fell"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "hub",
+            "op": "gte",
+            "value": 1
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "well-quip-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "well-quip-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Mind the beams, love. We built the Ox for people who stoop. Sit anywhere that isn't Fitch's stool, and ask me anything. I'll know it before you do.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "An archer! Lovely. Bring me a brace of anything with feathers and I'll feed you for a week. Now: a drink, or the news?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Oh, you're one of those. Don't light anything. I mean it; the hearth is temperamental and so is the ceiling. Now: a drink, or the news?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "You've a way of looking at a room, love: where's the door, where's the purse, who's watching. Don't mind me. I do it too. Drink, or news?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "The Sleeping Ox. Welcome, love. Rooms are let, drinks are poured, news is for sale. Sit where you like, though not that stool.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Back again! Sit. I'd say I kept your seat, but I haven't. I've kept the news, though.",
+      "next": "hub"
+    },
+    {
+      "id": "well-quip-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Oh, and love? The Glen Well says hello. It tells me you've been down it in a hurry. No, I won't tell a soul. I'll only mention it every Thursday.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-night",
+          "text": "The night Tansy walked. Did you see?",
+          "once": true,
+          "next": "night-1"
+        },
+        {
+          "id": "ask-fitch",
+          "text": "You're missing a barman.",
+          "once": true,
+          "next": "fitch-1"
+        },
+        {
+          "id": "ask-rumours",
+          "text": "What are people saying?",
+          "next": "rumours-1"
+        },
+        {
+          "id": "ask-trinkets",
+          "text": "They say goblins left brass trinkets where people vanished.",
+          "next": "trinkets-1"
+        },
+        {
+          "id": "beams-knight",
+          "text": "I'll mind the beams.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "beams-1"
+        },
+        {
+          "id": "game-archer",
+          "text": "I've game for your pot.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "game-1"
+        },
+        {
+          "id": "fire-sorcerer",
+          "text": "Shall I light the hearth?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "fire-check"
+        },
+        {
+          "id": "cellar-thief",
+          "text": "I hear the Ox has a very good cellar.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "cellar-1"
+        },
+        {
+          "id": "fence-deal",
+          "text": "What does the cellar pay?",
+          "when": {
+            "kind": "fact",
+            "fact": "dot.fence.open"
+          },
+          "next": "fence-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Mind how you go, love. And if you hear anything, you know where the bar is.",
+      "end": true
+    },
+    {
+      "id": "night-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "I was wiping down the bar like a fool. The Pell girl went by the window, barefoot, humming, and I told myself it was a trick of the lamp. Seven beds, love. Seven. I pull the shutters now.",
+      "next": "hub"
+    },
+    {
+      "id": "fitch-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Fitch. Twelve years behind that bar and he never let a glass run dry or a secret run out. I keep pouring his usual out of habit, and then I drink it, because it's a sin to waste.",
+      "next": "fitch-2"
+    },
+    {
+      "id": "fitch-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "If you're going where they've gone, tell him the Ox misses him. Don't tell him I said it like that. Tell him the stool's still his.",
+      "next": "hub"
+    },
+    {
+      "id": "rumours-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "A rumour's just the truth wearing someone else's coat. Buy a drink and I'll tell you whose. Or pay coin. Or bring me one I haven't heard; I always trade fair for those.",
+      "next": "rumour-choice"
+    },
+    {
+      "id": "rumour-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "drink-buy",
+          "text": "Buy a drink (2 crowns).",
+          "once": true,
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -2
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-dot",
+              "delta": 3
+            }
+          ],
+          "next": "rumour-drink",
+          "onFail": "no-coin"
+        },
+        {
+          "id": "coin-pay",
+          "text": "Pay for the proper news (10 crowns).",
+          "once": true,
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -10
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-dot",
+              "delta": 2
+            }
+          ],
+          "next": "rumour-coin",
+          "onFail": "no-coin"
+        },
+        {
+          "id": "swap-rumour",
+          "text": "I've heard something you haven't.",
+          "next": "swap-1"
+        },
+        {
+          "id": "rumours-back",
+          "text": "Another time.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "no-coin",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Ah. The coin's not in your purse, love. That's all right. News doesn't spoil. I'll still be here.",
+      "next": "rumour-choice"
+    },
+    {
+      "id": "rumour-drink",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "There. Not a drop wasted. Now: people say Vane has been buying drinks for the whole mine crew, and no one has dug a thing in months. I wonder where the money's from.",
+      "next": "rumour-drink-fx"
+    },
+    {
+      "id": "rumour-drink-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 6,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "rumour-choice"
+    },
+    {
+      "id": "rumour-coin",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Proper news, then. The captain looks like he's been sleeping in his boots. I'm not saying a word. I'm only saying look at the boots.",
+      "next": "rumour-coin-fx"
+    },
+    {
+      "id": "rumour-coin-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 8,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "rumour-choice"
+    },
+    {
+      "id": "swap-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Do you, now? Say it slowly. I like to hear how a liar breathes. If it's true, I'll tell you one back, and if it isn't, I'll tell you why.",
+      "next": "swap-fx"
+    },
+    {
+      "id": "swap-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "dot.rumor-swap-offered"
+        }
+      ],
+      "next": "rumour-choice"
+    },
+    {
+      "id": "trinkets-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Goblin trinkets, brass, little things. People bring me all sorts. I couldn't say.",
+      "next": "trinkets-route"
+    },
+    {
+      "id": "trinkets-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "dot.trinket.confessed"
+          },
+          "next": "trinkets-again"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-dot",
+            "op": "gte",
+            "value": 8
+          },
+          "next": "trinkets-confide"
+        }
+      ],
+      "else": "trinkets-deflect"
+    },
+    {
+      "id": "trinkets-again",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "I've shown you what I have, love, and I'll not show it twice. The back of it says what it says.",
+      "next": "hub"
+    },
+    {
+      "id": "trinkets-deflect",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "I hear a lot, love. I say less. Be a friend to the Ox first, and I'll see what falls out of my apron.",
+      "next": "trinkets-choice"
+    },
+    {
+      "id": "trinkets-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "trinkets-push",
+          "text": "I'd keep a secret for you.",
+          "next": "trinkets-check"
+        },
+        {
+          "id": "trinkets-drop",
+          "text": "Fair enough.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "trinkets-check",
+      "kind": "check",
+      "approach": "charm",
+      "difficulty": 11,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "dot.fence.open"
+          },
+          "bonus": 2,
+          "label": "You know her cellar"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-dot",
+            "op": "gte",
+            "value": 4
+          },
+          "bonus": 2,
+          "label": "She's warming to you"
+        }
+      ],
+      "success": "trinkets-confide",
+      "failure": "trinkets-deflect-2"
+    },
+    {
+      "id": "trinkets-deflect-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Not yet, love. You're nice, but the Ox has had nice. Come back with a story I can drink to.",
+      "next": "hub"
+    },
+    {
+      "id": "trinkets-confide",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "I'll tell you because you drink like someone with sense. I've one. Found it on the schoolteacher's lane, where they say she walked. Brass, goblin-style. On the back, a stamp: Vane Deepworks.",
+      "next": "trinkets-fx"
+    },
+    {
+      "id": "trinkets-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dot.trinket.confessed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "dot.trinket-shown"
+        }
+      ],
+      "next": "trinkets-2"
+    },
+    {
+      "id": "trinkets-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "No goblin ever stamped a thing in his life. Somebody's foundry does. I've shown no one, and I'll be sorry if I find I've shown two. Now you've seen it, you'd better do something.",
+      "next": "hub"
+    },
+    {
+      "id": "beams-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "You'll mind the lintel first; you're already losing to it. Hm. People look at you as if you know what to do. What do you do, when everyone's looking and you've no idea?",
+      "next": "beams-choice"
+    },
+    {
+      "id": "beams-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "beams-small",
+          "text": "Say the next small thing.",
+          "next": "beams-small-1"
+        },
+        {
+          "id": "beams-trick",
+          "text": "Nobody knows. That's the trick.",
+          "next": "beams-trick-1"
+        }
+      ]
+    },
+    {
+      "id": "beams-small-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "The next small thing. I can pour. I can tell. I can keep the shutters up. Hm. That isn't nothing, is it? I'll be useful, then. I'll just do it loudly.",
+      "next": "beams-small-fx"
+    },
+    {
+      "id": "beams-small-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-dot",
+          "delta": 5
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "beams-trick-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Tricks. I don't care for tricks. They're what you do when you've nothing left to pour. Still. Sit, love. Have a drink on a woman who's frightened too.",
+      "next": "hub"
+    },
+    {
+      "id": "game-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Game! Hang it in the cellar, not the hall; the cat's a fool for feathers. In return: a bed, a bowl, and what I hear, which is better than coin and a good deal more dangerous.",
+      "next": "game-fx"
+    },
+    {
+      "id": "game-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-dot",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "dot.game-offered"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "fire-check",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Oh, would you? The hearth's been sulking since the news. Don't singe the beams. I'm quite serious. Those beams are older than the Watch.",
+      "next": "fire-roll"
+    },
+    {
+      "id": "fire-roll",
+      "kind": "check",
+      "approach": "charm",
+      "difficulty": 9,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-dot",
+            "op": "gte",
+            "value": 5
+          },
+          "bonus": 2,
+          "label": "She half-trusts you"
+        }
+      ],
+      "success": "fire-ok",
+      "failure": "fire-singed"
+    },
+    {
+      "id": "fire-ok",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Look at that. Warm, and not a beam in flames. Steadier hands than the last lad, too.",
+      "next": "fire-ok-2"
+    },
+    {
+      "id": "fire-ok-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "If you want the old fire tricks, don't ask the college. Walk down to the water after dark, past the Watch. Somebody under the bridge keeps a lantern lit and takes coin. I never said so.",
+      "next": "fire-fx"
+    },
+    {
+      "id": "fire-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dot.hearth.lit",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-dot",
+          "delta": 5
+        },
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 19,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "fire-singed",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "(A beam begins to smoke. Dot throws a bucket without looking.) Right. Nobody move. We'll say the Ox has character. And love? You owe me a beam, and it's the one over Fitch's stool.",
+      "next": "fire-singed-fx"
+    },
+    {
+      "id": "fire-singed-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-dot",
+          "delta": -3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "cellar-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Cellar? Beer, mostly, and a rat named Reg. Why? What have you heard? Who's been saying?",
+      "next": "cellar-route"
+    },
+    {
+      "id": "cellar-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "dot.fence.open"
+          },
+          "next": "cellar-already"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-dot",
+            "op": "gte",
+            "value": 8
+          },
+          "next": "cellar-open"
+        }
+      ],
+      "else": "cellar-check"
+    },
+    {
+      "id": "cellar-check",
+      "kind": "check",
+      "approach": "deceive",
+      "difficulty": 10,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-dot",
+            "op": "gte",
+            "value": 3
+          },
+          "bonus": 2,
+          "label": "She likes a straight-faced liar"
+        }
+      ],
+      "success": "cellar-open",
+      "failure": "cellar-no"
+    },
+    {
+      "id": "cellar-already",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "I've told you what the cellar does, love. Keep it to yourself, and keep your prices to yourself.",
+      "next": "hub"
+    },
+    {
+      "id": "cellar-no",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Cellar's barrels, love. Beer, mostly, and Reg. Whoever told you different was having you on.",
+      "next": "cellar-no-fx"
+    },
+    {
+      "id": "cellar-no-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-dot",
+          "delta": -2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "cellar-open",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "...Well. You've the face for it. The cellar buys what the lamp shouldn't see. Come to the back door when the shutters are up, and don't tell me where it came from. I never ask.",
+      "next": "cellar-fx"
+    },
+    {
+      "id": "cellar-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dot.fence.open",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "dot.fence-opened"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "fence-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Depends whose it was. Don't tell me. Tell me what it weighs, and I'll tell you what it's worth, and then we'll both pretend I'm honest.",
+      "next": "fence-fx"
+    },
+    {
+      "id": "fence-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "dot.fence-trade"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "ending-long-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "(Dot is asleep with her cheek on the bar, a towel in her fist.) '...pour another, Fitch, the Pell girl's not walking, who's got the corner, mm, who's got the... stool's yours, love, stool's yours.'",
+      "next": "ending-long-2"
+    },
+    {
+      "id": "ending-long-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "(Behind her, the sign of the Sleeping Ox creaks. The lantern over the door is still lit.)",
+      "end": true
+    },
+    {
+      "id": "ending-rung-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "He's back! Fitch! Walked in like he'd popped out for lemons and asked whose stool that was. I cried on a cask, love, and then I charged him for the drink. And the bell rang. The whole Ox stood up.",
+      "next": "ending-rung-2"
+    },
+    {
+      "id": "ending-rung-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Every drink on the house for you, tonight. Tomorrow I'll start charging again. A rumour's just the truth wearing someone else's coat, and this one's the first true thing I've had in weeks.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-warden-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Fitch is home, and the Ox is full. But they say the big one is dead. Fitch says he was carried, and gently. He keeps asking whether anyone's said thank you. I've told him to ask you.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-silence-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Fitch is home, love, and I'm glad. But I've heard about the money. A rumour's just the truth wearing someone else's coat, and I know whose coat that money's wearing. First drink's on the house. The second's on you.",
+      "next": "hub"
+    }
+  ]
+}

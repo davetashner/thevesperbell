@@ -283,12 +283,15 @@ export async function sampleFrames(
     viewport: string;
     /** Quality preset to run at (`?quality=low` for Low). Omitted: High, the default. */
     preset?: 'low' | 'high';
+    /** Spawn to start at (`?spawn=`), e.g. a rooftop view. Omitted: the scene's player start. */
+    spawn?: string;
   },
 ): Promise<FrameSample> {
   const { scene, capS, minSamples, preset } = options;
   await page.goto(
     `/?scene=${scene}&perf=${String(capS)}&perfFrames=${String(SAMPLE_FRAMES)}&perfWarmup=${String(WARMUP_S)}` +
-      (preset === 'low' ? '&quality=low' : ''),
+      (preset === 'low' ? '&quality=low' : '') +
+      (options.spawn === undefined ? '' : `&spawn=${options.spawn}`),
   );
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-scene', scene, { timeout: 60_000 });
