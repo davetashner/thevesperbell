@@ -1,2 +1,3 @@
-// Dialogue (mw-e22): the format's logic validation now (mw-e22.3); the runtime (mw-e22.5) later.
+// Dialogue (mw-e22): the format's logic validation (mw-e22.3) and the graph runtime (mw-e22.5).
 export * from './validate';
+export * from './runtime';
