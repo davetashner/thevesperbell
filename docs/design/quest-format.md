@@ -67,3 +67,23 @@ continues, stage / resolution / successor references that name real things, uniq
 (`validateQuestLogic`): DSL kinds and fields, content references, the quest's own objectives.
 mw-e23.5 (the quest validator): every resolution is satisfiable, a non-combat resolution exists,
 successor chains are valid and cycle-free.
+
+## The runtime (mw-e23.2)
+
+`QuestRuntime` (src/sim/quest/runtime.ts) runs the quests: `unstarted → active → resolved(<id>) |
+failed(<id>)`. A quest starts by `startWhen` or a `startQuest` effect, ends the first time a
+resolution's `when` holds (priority, then file order; resolutions are checked before failures) and is
+terminal after that. Objectives not completed when it ends become `skipped` (resolved) or `failed`;
+an optional objective never blocks a resolution, and a resolution that wants an objective names it
+with `objectiveState`. A resolution's or failure's effects apply in the same atomic batch as the state
+change: if one refuses, nothing changes and the next satisfied resolution gets its turn.
+
+State is world facts, so saves, hashes and conditions see it: `quest.<id>.state`
+(`unstarted active resolved failed`), `.stage`, `.resolution`, `.failure` and
+`quest.<id>.objective.<oid>` (`inactive active complete skipped failed`). The runtime declares them
+when built (before a save loads) and writes none until a quest starts. Re-evaluation is incremental:
+conditions are indexed by the facts, items, capabilities and quests they read, and only dependent
+quests are evaluated; gold, time of day, disposition and unknown kinds are polled every 30 ticks.
+Run logic through `runtime.host` (the game's host with quest conditions and effects served by the
+runtime). `completeObjective` is the hook objective trackers call; `quest.started`, `.stage`,
+`.objective`, `.resolved`, `.failed` and `.refused` events feed the journal.
