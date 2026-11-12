@@ -26,7 +26,13 @@ the DSL itself, the objectives' content ids and the quest's own objective ids.
 - `givers`: NPCs who hand the quest out. `startWhen`: a condition that starts it; **omit it** and the
   quest is started by an effect (`startQuest` in a dialogue option or another quest).
 - `stages` (optional): ordered sequencing, with `initialStage` (default the first). An objective with a
-  `stage` is only active in it; `setStage` failure continuations move between stages.
+  `stage` is only active in it; `setStage` failure continuations move between stages. A stage's
+  `transitions` (`{ when, stage, effects? }`) move a branching quest on by condition: while the stage is
+  current, the first transition (file order) whose `when` holds moves the quest to `stage` and applies
+  its `effects` in the same atomic batch (a refusal changes nothing and the next transition is tried).
+  Resolutions are still checked first, so an ending can end the quest from any stage. One move per
+  evaluation pass, so a chain of stages settles over a few passes. The main quest
+  (`quest-labyrinth-beneath-briar-glen`, mw-e39.4) is written this way.
 - `objectives`: what the quest tracks (below). `optional` ones are not needed to resolve; `hidden`
   ones show only when complete; `activeWhen` gates when one is active.
 - `resolutions` (at least one): `{ id, approach, when, priority, effects, journal }`. `approach` is

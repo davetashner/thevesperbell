@@ -1,0 +1,1760 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-labyrinth-beneath-briar-glen",
+  "title": "The Labyrinth Beneath Briar Glen",
+  "summary": "Sleepers are walking out of Briar Glen at night and going into the mine, and Harrow Vane is paying five hundred crowns to whoever kills the beast that takes them. The beast, so far, has only ever carried them gently.",
+  "notes": "The main quest (mw-e39.4): bible 4.1 beats 1 to 16 as stages, with the four headline endings as resolutions (bible 4.4). The quest is started by class choice (arrival). Stages move by `transitions` (conditions over world facts and objective states), never by dialogue, so any order of dialogue, any class route and any resolution of Horn and the abbot all lead on. Wendmouth (bible 3.6) is optional: no required objective and no transition or resolution condition reads a harbour fact; the harbour only adds optional objectives and epilogue slides (quest-briar-glen-epilogue). Event, area and talk objectives are bound to sim events by mw-e23.3 and emitted or triggered by the level scripts (E26): until then they complete through completeObjective.",
+  "givers": ["npc-vane"],
+  "startWhen": {
+    "kind": "factCmp",
+    "fact": "player.class",
+    "op": "neq",
+    "value": "none"
+  },
+  "stages": [
+    {
+      "id": "arrival",
+      "text": "You have come down the mountain road to Briar Glen at dusk, just as the bounty goes up on the board: the Beast of the Deepworks, five hundred crowns, paid by H. Vane.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "reach-briar-glen",
+            "state": "complete"
+          },
+          "stage": "first-night"
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-front-gate",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-side-boarding",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-winch-cage",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-inner-bar",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-supply-tunnel",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-weeping-adit",
+                "state": "complete"
+              }
+            ]
+          },
+          "stage": "getting-in",
+          "note": "Safety net: a player who goes straight to the mine is never left behind."
+        }
+      ]
+    },
+    {
+      "id": "first-night",
+      "text": "The Sleeping Ox has one room left. Past midnight the town falls silent, and somebody is walking up the street humming.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "see-the-horned-shape",
+                "state": "complete"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "time.day",
+                "op": "gte",
+                "value": 2
+              }
+            ]
+          },
+          "stage": "morning",
+          "note": "Failure on night one is fine: the next day ends the beat anyway (bible 4.1 beat 2, 4.5)."
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-front-gate",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-side-boarding",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-winch-cage",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-inner-bar",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-supply-tunnel",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-weeping-adit",
+                "state": "complete"
+              }
+            ]
+          },
+          "stage": "getting-in"
+        }
+      ]
+    },
+    {
+      "id": "morning",
+      "text": "Briar Glen wakes angry. Hollis Pell cannot be comforted, Captain Hale is out of his depth and Harrow Vane has raised the bounty. You are, officially, the hireling.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "hear-the-bounty",
+                "state": "complete"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.list.shared"
+              },
+              {
+                "kind": "fact",
+                "fact": "mirela.hours.lent"
+              },
+              {
+                "kind": "fact",
+                "fact": "dot.trinket.confessed"
+              },
+              {
+                "kind": "fact",
+                "fact": "world.sleepers-path.revealed"
+              }
+            ]
+          },
+          "stage": "investigation",
+          "note": "Any thread of the hub, taken early, starts the hub."
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-front-gate",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-side-boarding",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-winch-cage",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-inner-bar",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-supply-tunnel",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "enter-by-weeping-adit",
+                "state": "complete"
+              }
+            ]
+          },
+          "stage": "getting-in"
+        }
+      ]
+    },
+    {
+      "id": "investigation",
+      "text": "Pull on the threads in whatever order suits you: the Captain's list, the bookseller's rhyme, the innkeeper's rumours, the fletcher's path.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "hales-list",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "mirelas-hymn",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "dots-rumours",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "junipers-path",
+                    "state": "complete"
+                  }
+                ]
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "enter-by-front-gate",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "enter-by-side-boarding",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "enter-by-winch-cage",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "enter-by-inner-bar",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "enter-by-supply-tunnel",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-labyrinth-beneath-briar-glen",
+                    "objective": "enter-by-weeping-adit",
+                    "state": "complete"
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "getting-in",
+          "note": "The hub is order-free (bible 4.1 beat 4): the four required threads complete in any order, or the player simply goes to the mine."
+        }
+      ]
+    },
+    {
+      "id": "getting-in",
+      "text": "The Deepworks is sealed by Vane's order, and there is more than one way past it.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "enter-by-front-gate",
+            "state": "complete"
+          },
+          "stage": "deepworks",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "deepworks.route",
+              "value": "front-gate"
+            }
+          ],
+          "note": "Records the route used (AC-4)."
+        },
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "enter-by-side-boarding",
+            "state": "complete"
+          },
+          "stage": "deepworks",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "deepworks.route",
+              "value": "side-boarding"
+            }
+          ],
+          "note": "Records the route used (AC-4)."
+        },
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "enter-by-winch-cage",
+            "state": "complete"
+          },
+          "stage": "deepworks",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "deepworks.route",
+              "value": "winch-cage"
+            }
+          ],
+          "note": "Records the route used (AC-4)."
+        },
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "enter-by-inner-bar",
+            "state": "complete"
+          },
+          "stage": "deepworks",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "deepworks.route",
+              "value": "inner-bar"
+            }
+          ],
+          "note": "Records the route used (AC-4)."
+        },
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "enter-by-supply-tunnel",
+            "state": "complete"
+          },
+          "stage": "deepworks",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "deepworks.route",
+              "value": "supply-tunnel"
+            }
+          ],
+          "note": "Records the route used (AC-4)."
+        },
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "enter-by-weeping-adit",
+            "state": "complete"
+          },
+          "stage": "deepworks",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "deepworks.route",
+              "value": "weeping-adit"
+            }
+          ],
+          "note": "Records the route used (AC-4)."
+        }
+      ]
+    },
+    {
+      "id": "deepworks",
+      "text": "The upper mine is goblin country, and below it the Knot waits behind Hornfolk runes.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "reach-horns-hall",
+                "state": "complete"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "horn.fate",
+                    "op": "eq",
+                    "value": "dead"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.spared"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.tricked"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.befriended"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.trial-won"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.helped"
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "warden"
+        }
+      ]
+    },
+    {
+      "id": "warden",
+      "text": "Horn will not let anyone pass until he knows what they are. However it goes, the road ends in the Fold.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "dead"
+              },
+              {
+                "kind": "fact",
+                "fact": "horn.spared"
+              },
+              {
+                "kind": "fact",
+                "fact": "horn.tricked"
+              },
+              {
+                "kind": "fact",
+                "fact": "horn.befriended"
+              },
+              {
+                "kind": "fact",
+                "fact": "horn.trial-won"
+              },
+              {
+                "kind": "fact",
+                "fact": "horn.helped"
+              }
+            ]
+          },
+          "stage": "second-reveal",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "tern.sailed",
+              "value": true
+            }
+          ],
+          "note": "Act III begins here: the Gilded Tern sails, with or without Vane's crate (bible 3.6). Always set; no harbour fact is read (AC-6)."
+        }
+      ]
+    },
+    {
+      "id": "second-reveal",
+      "text": "Act III. The friend below speaks aloud, the song swells, and in the Fold Tansy gets up and starts walking.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "reach-the-cradle",
+                "state": "complete"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "tansy.saved"
+                }
+              }
+            ]
+          },
+          "stage": "cradle-hostage",
+          "note": "Tansy was not stopped: the abbot holds her in the final scene (bible 4.5, AC-7)."
+        },
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "reach-the-cradle",
+            "state": "complete"
+          },
+          "stage": "cradle"
+        }
+      ]
+    },
+    {
+      "id": "cradle",
+      "text": "The Cradle: the abbot stands at the centre, conducting, with the Vesper Bell's tongue at his belt.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "abbot.fate",
+                "op": "eq",
+                "value": "at-rest"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "abbot.fate",
+                "op": "eq",
+                "value": "defeated"
+              }
+            ]
+          },
+          "stage": "the-tongue",
+          "note": "abbot.fate joined is a resolution of the quest (the Long Vespers), not a stage."
+        }
+      ]
+    },
+    {
+      "id": "cradle-hostage",
+      "text": "The Cradle, and the abbot has Tansy at his side. Every way of dealing with him is still open, with a child's life in it.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "abbot.fate",
+                "op": "eq",
+                "value": "at-rest"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "abbot.fate",
+                "op": "eq",
+                "value": "defeated"
+              }
+            ]
+          },
+          "stage": "the-tongue",
+          "note": "abbot.fate joined is a resolution of the quest (the Long Vespers), not a stage."
+        }
+      ]
+    },
+    {
+      "id": "the-tongue",
+      "text": "The abbot is done. What is left is the bell's tongue, and whether it is whole.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "tongue-destroyed",
+            "state": "complete"
+          },
+          "stage": "recast",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "bell-tongue.destroyed",
+              "value": true
+            }
+          ],
+          "note": "Sets exactly bell-tongue.destroyed (registered by mw-e39.6); Oswin's recast offer reads it."
+        },
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "alive"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "horn.befriended"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.trial-won"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "horn.helped"
+                  },
+                  {
+                    "kind": "all",
+                    "of": [
+                      {
+                        "kind": "fact",
+                        "fact": "horn.spared"
+                      },
+                      {
+                        "kind": "fact",
+                        "fact": "horn.healed"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "climb-with-horn",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "horn.at-shaft",
+              "value": true
+            }
+          ],
+          "note": "Horn lives and can hold the foot of the shaft (befriended, trial won, helped, or spared and healed). Bible 4.1 beat 13, 4.2."
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          "stage": "climb-with-goblins",
+          "note": "Horn is dead or cannot hold the shaft: the befriended goblins do."
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          },
+          "stage": "climb-with-clatter",
+          "note": "No Horn, no goblins: a restored Clatter holds it."
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "time.day",
+            "op": "gte",
+            "value": 1
+          },
+          "stage": "climb-chased",
+          "note": "Nobody holds the foot: the climb is a chase. Always true (the day count is at least 1), so the quest can never stall here (AC-5)."
+        }
+      ]
+    },
+    {
+      "id": "recast",
+      "text": "The old tongue is ruined. Oswin Brand still has his father's mould, and the bell must still be rung.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "collect-the-recast",
+                "state": "complete"
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "horn.fate",
+                    "op": "eq",
+                    "value": "alive"
+                  },
+                  {
+                    "kind": "any",
+                    "of": [
+                      {
+                        "kind": "fact",
+                        "fact": "horn.befriended"
+                      },
+                      {
+                        "kind": "fact",
+                        "fact": "horn.trial-won"
+                      },
+                      {
+                        "kind": "fact",
+                        "fact": "horn.helped"
+                      },
+                      {
+                        "kind": "all",
+                        "of": [
+                          {
+                            "kind": "fact",
+                            "fact": "horn.spared"
+                          },
+                          {
+                            "kind": "fact",
+                            "fact": "horn.healed"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "climb-with-horn",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "horn.at-shaft",
+              "value": true
+            }
+          ],
+          "note": "Horn lives and can hold the foot of the shaft (befriended, trial won, helped, or spared and healed). Bible 4.1 beat 13, 4.2."
+        },
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "collect-the-recast",
+                "state": "complete"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "goblins.standing",
+                "op": "eq",
+                "value": "friendly"
+              }
+            ]
+          },
+          "stage": "climb-with-goblins",
+          "note": "Horn is dead or cannot hold the shaft: the befriended goblins do."
+        },
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "collect-the-recast",
+                "state": "complete"
+              },
+              {
+                "kind": "fact",
+                "fact": "clatter.restored"
+              }
+            ]
+          },
+          "stage": "climb-with-clatter",
+          "note": "No Horn, no goblins: a restored Clatter holds it."
+        },
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "collect-the-recast",
+                "state": "complete"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "time.day",
+                "op": "gte",
+                "value": 1
+              }
+            ]
+          },
+          "stage": "climb-chased",
+          "note": "Nobody holds the foot: the climb is a chase. Always true (the day count is at least 1), so the quest can never stall here (AC-5)."
+        }
+      ]
+    },
+    {
+      "id": "climb-with-horn",
+      "text": "Horn holds the foot of the Sounding Shaft against the Hushlings while you climb with the song rising behind you.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "climb-the-shaft-with-horn",
+            "state": "complete"
+          },
+          "stage": "vespers"
+        }
+      ]
+    },
+    {
+      "id": "climb-with-goblins",
+      "text": "The goblins hold the foot of the Sounding Shaft. Mother Kettleback's clan is not sentimental about it, and it is enough.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "climb-the-shaft-with-goblins",
+            "state": "complete"
+          },
+          "stage": "vespers"
+        }
+      ]
+    },
+    {
+      "id": "climb-with-clatter",
+      "text": "Clatter holds the foot of the Sounding Shaft, apologising to the Hushlings and not giving an inch.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "climb-the-shaft-with-clatter",
+            "state": "complete"
+          },
+          "stage": "vespers"
+        }
+      ]
+    },
+    {
+      "id": "climb-chased",
+      "text": "Nobody holds the foot of the Sounding Shaft. Climb, and do not look down at what is climbing after you.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-labyrinth-beneath-briar-glen",
+            "objective": "climb-the-shaft-chased",
+            "state": "complete"
+          },
+          "stage": "vespers"
+        }
+      ]
+    },
+    {
+      "id": "vespers",
+      "text": "The belfry. The Vesper Bell is cracked and wants its tongue.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "bell.rung",
+            "op": "eq",
+            "value": "rung"
+          },
+          "stage": "morning-after",
+          "note": "A sour note (bell.rung = sour) leaves the quest here: the bell can still be rung true."
+        }
+      ]
+    },
+    {
+      "id": "morning-after",
+      "text": "The sleepers wake, confused and hungry. Briar Glen has to be told, and Vane has to be answered."
+    }
+  ],
+  "initialStage": "arrival",
+  "objectives": [
+    {
+      "id": "reach-briar-glen",
+      "kind": "enterArea",
+      "text": "Arrive in Briar Glen.",
+      "params": {
+        "area": "briar-glen"
+      },
+      "stage": "arrival"
+    },
+    {
+      "id": "follow-tansy",
+      "kind": "enterArea",
+      "text": "Follow Tansy Pell up the street, if you can.",
+      "params": {
+        "area": "mine-gate"
+      },
+      "stage": "first-night",
+      "optional": true
+    },
+    {
+      "id": "see-the-horned-shape",
+      "kind": "event",
+      "text": "Find out what took her through the mine gate.",
+      "params": {
+        "event": "horned-shape-seen"
+      },
+      "stage": "first-night"
+    },
+    {
+      "id": "hear-the-bounty",
+      "kind": "talkTo",
+      "text": "Hear what Harrow Vane has to say.",
+      "params": {
+        "npc": "npc-vane"
+      },
+      "stage": "morning"
+    },
+    {
+      "id": "hales-list",
+      "kind": "fact",
+      "text": "Get the Captain's list of the missing and his map of where the footprints ended.",
+      "params": {
+        "fact": "hale.list.shared"
+      },
+      "stage": "investigation"
+    },
+    {
+      "id": "mirelas-hymn",
+      "kind": "fact",
+      "text": "Ask Mirela about the rhyme and The Vesperine Hours.",
+      "params": {
+        "fact": "mirela.hours.lent"
+      },
+      "stage": "investigation"
+    },
+    {
+      "id": "dots-rumours",
+      "kind": "fact",
+      "text": "Listen to Dot's rumours, and the goblin trinket.",
+      "params": {
+        "fact": "dot.trinket.confessed"
+      },
+      "stage": "investigation"
+    },
+    {
+      "id": "junipers-path",
+      "kind": "fact",
+      "text": "Find the Sleepers' Path Juniper has been talking about.",
+      "params": {
+        "fact": "world.sleepers-path.revealed"
+      },
+      "stage": "investigation"
+    },
+    {
+      "id": "friend-below-note",
+      "kind": "event",
+      "text": "A note under your door, in an old-fashioned hand.",
+      "params": {
+        "event": "friend-note-found"
+      },
+      "stage": "investigation",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "enter-by-front-gate",
+      "kind": "event",
+      "text": "Go in by the front gate, with Vane's key, a padlock pick or the ventilation chimney.",
+      "params": {
+        "event": "deepworks-entered-front-gate"
+      }
+    },
+    {
+      "id": "enter-by-side-boarding",
+      "kind": "event",
+      "text": "Smash the rotted side-boarding and go in by the side.",
+      "params": {
+        "event": "deepworks-entered-side-boarding"
+      }
+    },
+    {
+      "id": "enter-by-winch-cage",
+      "kind": "event",
+      "text": "Drop the cage by the winch pulley and go in that way.",
+      "params": {
+        "event": "deepworks-entered-winch-cage"
+      }
+    },
+    {
+      "id": "enter-by-inner-bar",
+      "kind": "event",
+      "text": "Lift the inner bar or burn the rope latch and go in.",
+      "params": {
+        "event": "deepworks-entered-inner-bar"
+      }
+    },
+    {
+      "id": "enter-by-supply-tunnel",
+      "kind": "event",
+      "text": "Take the long way: the Briarwood, Mooring's Watch and the supply tunnel.",
+      "params": {
+        "event": "deepworks-entered-supply-tunnel"
+      }
+    },
+    {
+      "id": "enter-by-weeping-adit",
+      "kind": "event",
+      "text": "Go up the river, through the flooded Weeping Adit.",
+      "params": {
+        "event": "deepworks-entered-weeping-adit"
+      }
+    },
+    {
+      "id": "enter-the-knot",
+      "kind": "enterArea",
+      "text": "Go through the Rootcellar into the Knot.",
+      "params": {
+        "area": "knot-outer-ring"
+      },
+      "stage": "deepworks"
+    },
+    {
+      "id": "talk-to-the-goblins",
+      "kind": "talkTo",
+      "text": "Talk to Mother Kettleback, if you would rather not fight her.",
+      "params": {
+        "npc": "npc-kettleback"
+      },
+      "stage": "deepworks",
+      "optional": true
+    },
+    {
+      "id": "reach-the-ossuary",
+      "kind": "enterArea",
+      "text": "Cross the Outer Ring to the Ossuary.",
+      "params": {
+        "area": "ossuary-galleries"
+      },
+      "stage": "deepworks"
+    },
+    {
+      "id": "meet-clatter",
+      "kind": "talkTo",
+      "text": "The skeleton who keeps apologising wants a word.",
+      "params": {
+        "npc": "npc-clatter"
+      },
+      "stage": "deepworks",
+      "optional": true
+    },
+    {
+      "id": "visit-the-priory",
+      "kind": "enterArea",
+      "text": "See the Vesper Bell for yourself.",
+      "params": {
+        "area": "belfry"
+      },
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "reach-horns-hall",
+      "kind": "enterArea",
+      "text": "Reach Horn's Hall.",
+      "params": {
+        "area": "horns-hall"
+      },
+      "stage": "deepworks"
+    },
+    {
+      "id": "see-the-sleepers",
+      "kind": "enterArea",
+      "text": "See what is in the Fold.",
+      "params": {
+        "area": "the-fold"
+      },
+      "stage": "warden"
+    },
+    {
+      "id": "horn-slain",
+      "kind": "fact",
+      "text": "Horn fell to your blade.",
+      "params": {
+        "fact": "horn.fate",
+        "value": "dead"
+      },
+      "stage": "warden",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "horn-spared",
+      "kind": "fact",
+      "text": "You beat Horn and listened instead of finishing him.",
+      "params": {
+        "fact": "horn.spared"
+      },
+      "stage": "warden",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "horn-tricked",
+      "kind": "fact",
+      "text": "You reached the Fold without Horn.",
+      "params": {
+        "fact": "horn.tricked"
+      },
+      "stage": "warden",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "horn-befriended",
+      "kind": "fact",
+      "text": "Horn is your ally.",
+      "params": {
+        "fact": "horn.befriended"
+      },
+      "stage": "warden",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "horn-trial-won",
+      "kind": "fact",
+      "text": "You won the Trial of Horns.",
+      "params": {
+        "fact": "horn.trial-won"
+      },
+      "stage": "warden",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "horn-helped",
+      "kind": "fact",
+      "text": "You helped Horn, and the breach is sealed.",
+      "params": {
+        "fact": "horn.helped"
+      },
+      "stage": "warden",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "hear-the-friend-below",
+      "kind": "event",
+      "text": "Hear the friend below speak aloud.",
+      "params": {
+        "event": "abbot-revealed"
+      },
+      "stage": "second-reveal"
+    },
+    {
+      "id": "stop-tansy",
+      "kind": "fact",
+      "text": "Stop Tansy before she reaches the Cradle.",
+      "params": {
+        "fact": "tansy.saved"
+      },
+      "stage": "second-reveal",
+      "optional": true
+    },
+    {
+      "id": "reach-the-cradle",
+      "kind": "enterArea",
+      "text": "Go down to the Cradle.",
+      "params": {
+        "area": "the-cradle"
+      },
+      "stage": "second-reveal"
+    },
+    {
+      "id": "abbot-laid-to-rest",
+      "kind": "fact",
+      "text": "Persuade the abbot to rest.",
+      "params": {
+        "fact": "abbot.fate",
+        "value": "at-rest"
+      },
+      "stage": "cradle"
+    },
+    {
+      "id": "abbot-defeated",
+      "kind": "fact",
+      "text": "Break the abbot's song.",
+      "params": {
+        "fact": "abbot.fate",
+        "value": "defeated"
+      },
+      "stage": "cradle"
+    },
+    {
+      "id": "abbot-joined",
+      "kind": "fact",
+      "text": "Take the abbot's hand.",
+      "params": {
+        "fact": "abbot.fate",
+        "value": "joined"
+      },
+      "stage": "cradle",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "hostage-abbot-laid-to-rest",
+      "kind": "fact",
+      "text": "Persuade the abbot to rest.",
+      "params": {
+        "fact": "abbot.fate",
+        "value": "at-rest"
+      },
+      "stage": "cradle-hostage"
+    },
+    {
+      "id": "hostage-abbot-defeated",
+      "kind": "fact",
+      "text": "Break the abbot's song.",
+      "params": {
+        "fact": "abbot.fate",
+        "value": "defeated"
+      },
+      "stage": "cradle-hostage"
+    },
+    {
+      "id": "hostage-abbot-joined",
+      "kind": "fact",
+      "text": "Take the abbot's hand.",
+      "params": {
+        "fact": "abbot.fate",
+        "value": "joined"
+      },
+      "stage": "cradle-hostage",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "free-tansy",
+      "kind": "fact",
+      "text": "Get Tansy away from the abbot.",
+      "params": {
+        "fact": "tansy.saved"
+      },
+      "stage": "cradle-hostage",
+      "optional": true
+    },
+    {
+      "id": "tongue-destroyed",
+      "kind": "event",
+      "text": "The Vesper Bell's tongue is ruined.",
+      "params": {
+        "event": "bell-tongue-destroyed"
+      },
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "commission-the-recast",
+      "kind": "fact",
+      "text": "Ask Oswin Brand to cast a new tongue.",
+      "params": {
+        "fact": "oswin.recast-commissioned"
+      },
+      "stage": "recast"
+    },
+    {
+      "id": "collect-the-recast",
+      "kind": "event",
+      "text": "Collect the new tongue from Oswin.",
+      "params": {
+        "event": "recast-tongue-delivered"
+      },
+      "stage": "recast"
+    },
+    {
+      "id": "climb-the-shaft-with-horn",
+      "kind": "enterArea",
+      "text": "Climb the Sounding Shaft to the belfry.",
+      "params": {
+        "area": "belfry"
+      },
+      "stage": "climb-with-horn"
+    },
+    {
+      "id": "climb-the-shaft-with-goblins",
+      "kind": "enterArea",
+      "text": "Climb the Sounding Shaft to the belfry.",
+      "params": {
+        "area": "belfry"
+      },
+      "stage": "climb-with-goblins"
+    },
+    {
+      "id": "climb-the-shaft-with-clatter",
+      "kind": "enterArea",
+      "text": "Climb the Sounding Shaft to the belfry.",
+      "params": {
+        "area": "belfry"
+      },
+      "stage": "climb-with-clatter"
+    },
+    {
+      "id": "climb-the-shaft-chased",
+      "kind": "enterArea",
+      "text": "Climb the Sounding Shaft to the belfry, fast.",
+      "params": {
+        "area": "belfry"
+      },
+      "stage": "climb-chased"
+    },
+    {
+      "id": "ring-the-bell",
+      "kind": "fact",
+      "text": "Hang the tongue and ring the Vesper Bell.",
+      "params": {
+        "fact": "bell.rung",
+        "value": "rung"
+      },
+      "stage": "vespers"
+    },
+    {
+      "id": "sour-note",
+      "kind": "fact",
+      "text": "The bell has rung wrong.",
+      "params": {
+        "fact": "bell.rung",
+        "value": "sour"
+      },
+      "stage": "vespers",
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "return-to-briar-glen",
+      "kind": "enterArea",
+      "text": "Take the sleepers home to Briar Glen.",
+      "params": {
+        "area": "briar-glen"
+      },
+      "stage": "morning-after"
+    },
+    {
+      "id": "face-vane",
+      "kind": "talkTo",
+      "text": "Answer Harrow Vane.",
+      "params": {
+        "npc": "npc-vane"
+      },
+      "stage": "morning-after",
+      "optional": true
+    },
+    {
+      "id": "visit-wendmouth",
+      "kind": "fact",
+      "text": "Take Mags Oakum's barge to Wendmouth.",
+      "params": {
+        "fact": "wendmouth.visited"
+      },
+      "optional": true
+    },
+    {
+      "id": "harbour-evidence",
+      "kind": "fact",
+      "text": "Find Vane's honest manifest in the Customs House.",
+      "params": {
+        "fact": "evidence.honest-manifest"
+      },
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "name-stone",
+      "kind": "fact",
+      "text": "Carry the Hornfolk name-stone home.",
+      "params": {
+        "fact": "horn.name-stone-held"
+      },
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "intercept-the-crate",
+      "kind": "fact",
+      "text": "Stop Vane's crate sailing.",
+      "params": {
+        "fact": "crate.intercepted"
+      },
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "tern-sails",
+      "kind": "fact",
+      "text": "The Gilded Tern has sailed.",
+      "params": {
+        "fact": "tern.sailed"
+      },
+      "optional": true,
+      "hidden": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "long-vespers",
+      "approach": "other",
+      "priority": 40,
+      "when": {
+        "kind": "any",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "abbot.fate",
+            "op": "eq",
+            "value": "joined"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "bell.rung",
+            "op": "eq",
+            "value": "failed"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "ending.headline",
+          "value": "long-vespers"
+        },
+        {
+          "kind": "emit",
+          "event": "ending.reached",
+          "data": {
+            "ending": "long-vespers"
+          }
+        }
+      ],
+      "journal": "You took the abbot's hand, or the bell was never rung, and the song did not stop. You woke in the Cradle, and everyone else was asleep."
+    },
+    {
+      "id": "hirelings-silence",
+      "approach": "other",
+      "priority": 30,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "factCmp",
+                      "fact": "abbot.fate",
+                      "op": "eq",
+                      "value": "joined"
+                    },
+                    {
+                      "kind": "factCmp",
+                      "fact": "bell.rung",
+                      "op": "eq",
+                      "value": "failed"
+                    }
+                  ]
+                }
+              },
+              {
+                "kind": "factCmp",
+                "fact": "bell.rung",
+                "op": "eq",
+                "value": "rung"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "return-to-briar-glen",
+                "state": "complete"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "vane.fate",
+                    "op": "neq",
+                    "value": "unexposed"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "bounty.outcome",
+                    "op": "neq",
+                    "value": "unsettled"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "vane.fate",
+            "op": "eq",
+            "value": "bribed-player"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "ending.headline",
+          "value": "hirelings-silence"
+        },
+        {
+          "kind": "emit",
+          "event": "ending.reached",
+          "data": {
+            "ending": "hirelings-silence"
+          }
+        }
+      ],
+      "journal": "Vane paid, the ledger stayed buried, and the bell was rung, mostly. The mine prospers and the town is grateful. On still nights someone sits up in bed."
+    },
+    {
+      "id": "the-last-warden",
+      "approach": "combat",
+      "priority": 20,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "factCmp",
+                      "fact": "abbot.fate",
+                      "op": "eq",
+                      "value": "joined"
+                    },
+                    {
+                      "kind": "factCmp",
+                      "fact": "bell.rung",
+                      "op": "eq",
+                      "value": "failed"
+                    }
+                  ]
+                }
+              },
+              {
+                "kind": "factCmp",
+                "fact": "bell.rung",
+                "op": "eq",
+                "value": "rung"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "return-to-briar-glen",
+                "state": "complete"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "vane.fate",
+                    "op": "neq",
+                    "value": "unexposed"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "bounty.outcome",
+                    "op": "neq",
+                    "value": "unsettled"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "vane.fate",
+              "op": "eq",
+              "value": "bribed-player"
+            }
+          },
+          {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "dead"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "ending.headline",
+          "value": "last-warden"
+        },
+        {
+          "kind": "emit",
+          "event": "ending.reached",
+          "data": {
+            "ending": "last-warden"
+          }
+        }
+      ],
+      "journal": "The sleepers are home and the bounty is paid. The Knot has no warden now, and somebody will have to decide what that means."
+    },
+    {
+      "id": "vespers-rung",
+      "approach": "diplomacy",
+      "priority": 10,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "factCmp",
+                      "fact": "abbot.fate",
+                      "op": "eq",
+                      "value": "joined"
+                    },
+                    {
+                      "kind": "factCmp",
+                      "fact": "bell.rung",
+                      "op": "eq",
+                      "value": "failed"
+                    }
+                  ]
+                }
+              },
+              {
+                "kind": "factCmp",
+                "fact": "bell.rung",
+                "op": "eq",
+                "value": "rung"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-labyrinth-beneath-briar-glen",
+                "objective": "return-to-briar-glen",
+                "state": "complete"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "vane.fate",
+                    "op": "neq",
+                    "value": "unexposed"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "bounty.outcome",
+                    "op": "neq",
+                    "value": "unsettled"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "vane.fate",
+              "op": "eq",
+              "value": "bribed-player"
+            }
+          },
+          {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "alive"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "ending.headline",
+          "value": "vespers-rung"
+        },
+        {
+          "kind": "emit",
+          "event": "ending.reached",
+          "data": {
+            "ending": "vespers-rung"
+          }
+        }
+      ],
+      "journal": "The bell rings at dusk again. Horn is still below, and the town brings bread to the mine gate."
+    }
+  ]
+}

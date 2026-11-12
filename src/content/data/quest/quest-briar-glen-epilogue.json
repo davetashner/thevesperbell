@@ -1,0 +1,361 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-briar-glen-epilogue",
+  "title": "What Became of Briar Glen",
+  "summary": "The valley's story, told in the slides the ending leaves behind.",
+  "notes": "The epilogue-slide variants of the four headline endings (bible 4.4), as data. Started when the main quest resolves. Each slide is an objective whose `activeWhen` is its selection rule, so while this quest is active the set of active objectives IS the slide list (read it with QuestRuntime.activeObjectives); the slideshow completes each slide by emitting epilogue-slide-<id>, and sets epilogue.finished to close the quest. Slide text here is a description for the writers; the slide prose is mw-e39.16. Harbour slides (name-stone home, the Tern's crate) are added by facts alone and never change the headline ending.",
+  "startWhen": {
+    "kind": "questState",
+    "quest": "quest-labyrinth-beneath-briar-glen",
+    "state": "resolved"
+  },
+  "objectives": [
+    {
+      "id": "vr-bell-goblins",
+      "kind": "event",
+      "text": "The goblins ring the bell at dusk.",
+      "params": {
+        "event": "epilogue-slide-vr-bell-goblins"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "vespers-rung"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vr-bell-hale",
+      "kind": "event",
+      "text": "Captain Hale rings the bell at dusk.",
+      "params": {
+        "event": "epilogue-slide-vr-bell-hale"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "vespers-rung"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "goblins.standing",
+              "op": "eq",
+              "value": "friendly"
+            }
+          },
+          {
+            "kind": "fact",
+            "fact": "hale.testimony.given"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vr-bell-tansy",
+      "kind": "event",
+      "text": "Tansy insists on learning to ring the bell.",
+      "params": {
+        "event": "epilogue-slide-vr-bell-tansy"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "vespers-rung"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "goblins.standing",
+              "op": "eq",
+              "value": "friendly"
+            }
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "hale.testimony.given"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "vr-bread-at-the-gate",
+      "kind": "event",
+      "text": "The town brings bread to the mine gate; Horn remains below.",
+      "params": {
+        "event": "epilogue-slide-vr-bread-at-the-gate"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "vespers-rung"
+      }
+    },
+    {
+      "id": "vr-song-sealed",
+      "kind": "event",
+      "text": "The song never reaches the town again.",
+      "params": {
+        "event": "epilogue-slide-vr-song-sealed"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "vespers-rung"
+          },
+          {
+            "kind": "fact",
+            "fact": "knot.breach-sealed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vr-new-verse",
+      "kind": "event",
+      "text": "The children's rhyme gets a new last verse.",
+      "params": {
+        "event": "epilogue-slide-vr-new-verse"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "vespers-rung"
+          },
+          {
+            "kind": "fact",
+            "fact": "horn.spoken-for"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lw-sleepers-home",
+      "kind": "event",
+      "text": "The sleepers come home and the bounty is paid.",
+      "params": {
+        "event": "epilogue-slide-lw-sleepers-home"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "last-warden"
+      }
+    },
+    {
+      "id": "lw-goblins-watch",
+      "kind": "event",
+      "text": "Mother Kettleback's clan takes up the watch in their own way.",
+      "params": {
+        "event": "epilogue-slide-lw-goblins-watch"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "last-warden"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lw-clatter-hums",
+      "kind": "event",
+      "text": "Clatter walks the halls humming.",
+      "params": {
+        "event": "epilogue-slide-lw-clatter-hums"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "last-warden"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "goblins.standing",
+              "op": "eq",
+              "value": "friendly"
+            }
+          },
+          {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lw-lantern-and-footprints",
+      "kind": "event",
+      "text": "A lantern at the mine gate, and a child's footprints in the dust, going in.",
+      "params": {
+        "event": "epilogue-slide-lw-lantern-and-footprints"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "last-warden"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "goblins.standing",
+              "op": "eq",
+              "value": "friendly"
+            }
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "clatter.restored"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "hs-silver-from-below",
+      "kind": "event",
+      "text": "The mine prospers on silver from below the Line.",
+      "params": {
+        "event": "epilogue-slide-hs-silver-from-below"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "hirelings-silence"
+      }
+    },
+    {
+      "id": "hs-someone-sits-up",
+      "kind": "event",
+      "text": "On still nights, someone always sits up in bed.",
+      "params": {
+        "event": "epilogue-slide-hs-someone-sits-up"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "hirelings-silence"
+      }
+    },
+    {
+      "id": "lv-wake-in-the-cradle",
+      "kind": "event",
+      "text": "You wake in the Cradle and a goblin is poking you with a stick.",
+      "params": {
+        "event": "epilogue-slide-lv-wake-in-the-cradle"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "long-vespers"
+      }
+    },
+    {
+      "id": "harbor-name-stone-home",
+      "kind": "event",
+      "text": "The name-stone goes home to the Knot.",
+      "params": {
+        "event": "epilogue-slide-harbor-name-stone-home"
+      },
+      "activeWhen": {
+        "kind": "fact",
+        "fact": "crate.intercepted"
+      }
+    },
+    {
+      "id": "harbor-tern-ox",
+      "kind": "event",
+      "text": "In a far city a man prises open a crate and finds a tiny ox asleep on every coin.",
+      "params": {
+        "event": "epilogue-slide-harbor-tern-ox"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "crate.intercepted"
+            }
+          },
+          {
+            "kind": "fact",
+            "fact": "tern.sailed"
+          }
+        ]
+      }
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "finished",
+      "approach": "other",
+      "when": {
+        "kind": "fact",
+        "fact": "epilogue.finished"
+      },
+      "journal": "The last slide fades. Briar Glen goes on."
+    }
+  ]
+}

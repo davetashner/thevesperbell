@@ -29,6 +29,27 @@ describe('validateQuestLogic', () => {
     expect(validateQuestLogic(quest({ resolutions: [resolution] }))).toEqual([]);
   });
 
+  it('validates the conditions and effects of stage transitions, with pointers', () => {
+    const stages = [
+      {
+        id: 'one',
+        transitions: [
+          {
+            stage: 'two',
+            when: { kind: 'moonPhase' },
+            effects: [{ kind: 'giveItem', item: 'x', count: 0 }],
+          },
+        ],
+      },
+      { id: 'two', transitions: [] },
+    ];
+    const pointers = validateQuestLogic(quest({ stages })).map((i) => i.pointer);
+    expect(pointers).toContain('/stages/0/transitions/0/when');
+    expect(pointers.some((p) => p.startsWith('/stages/0/transitions/0/effects'))).toBe(true);
+    const fine = [{ id: 'one', transitions: [{ stage: 'one', when: fact('a.b') }] }];
+    expect(validateQuestLogic(quest({ stages: fine }))).toEqual([]);
+  });
+
   it('reports unknown kinds and bad fields with pointers into the file', () => {
     const issues = validateQuestLogic(
       quest({
