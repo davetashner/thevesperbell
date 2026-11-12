@@ -73,15 +73,15 @@ flowchart LR
     lower_deepworks["The lower Deepworks"]
   end
   subgraph priory["Bellwater Priory"]
-    priory_gate["The priory gate"]
-    priory_nave["The priory nave"]
-    priory_choir["The priory choir"]
-    priory_garden["The priory garden"]
-    scriptorium["The scriptorium"]
-    belfry["The belfry"]
-    priory_crypt_stair["The crypt stair"]
-    priory_crypt["The priory crypt"]
-    cistern["The cistern"]
+    priory_gate["The priory gate"]:::built
+    priory_nave["The priory nave"]:::built
+    priory_choir["The priory choir"]:::built
+    priory_garden["The priory garden"]:::built
+    scriptorium["The scriptorium"]:::built
+    belfry["The belfry"]:::built
+    priory_crypt_stair["The crypt stair"]:::built
+    priory_crypt["The priory crypt"]:::built
+    cistern["The cistern"]:::built
   end
   subgraph knot["The Knot"]
     knot_outer_ring["The Outer Ring"]
@@ -290,15 +290,15 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `vane-sealed-gallery` | Vane's sealed gallery | deepworks | e26 | planned | Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6). |
 | `breach` | The breach | deepworks | e26 | planned | Where the mine opened into the Knot (bible 3.5, mw-e26.4). |
 | `lower-deepworks` | The lower Deepworks | deepworks | e26 | planned | Flooded lower galleries the Weeping Adit enters (bible 3.1). |
-| `priory-gate` | The priory gate | priory | e26 | planned | The gate at the head of the priory road (mw-e26.5; PROPOSAL, mw-e26.1: the bible names only the road and the nave). |
-| `priory-nave` | The priory nave | priory | e26 | planned | Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5). |
-| `priory-choir` | The priory choir | priory | e26 | planned | Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6). |
-| `priory-garden` | The priory garden | priory | e26 | planned | Garden with the dead pear tree Clatter remembers (bible 4.1 beat 8; mw-e26.5). Optional dead end. |
-| `scriptorium` | The scriptorium | priory | e26 | planned | Book mimics (bible 3.5, mw-e26.7). |
-| `belfry` | The belfry | priory | e26 | planned | The cracked Vesper Bell (bible 3.5, mw-e26.8). |
-| `priory-crypt-stair` | The crypt stair | priory | e26 | planned | The stair down to the sealed crypt door; the Sunbeam puzzle (PROPOSAL, mw-e26.1). |
-| `priory-crypt` | The priory crypt | priory | e26 | planned | Sealed from below (bible 4.1 beat 9). |
-| `cistern` | The cistern | priory | e26 | planned | Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). |
+| `priory-gate` | The priory gate | priory | e26 | `bellwater-priory` | The gate at the head of the priory road (mw-e26.5 'priory road gate'; PROPOSAL, the bible names only the road and the nave). Where the road from the forest, the ridge path from Mooring's Watch and the road from town all arrive (docs/design/dungeon.md). Built as the precinct gate wall of the bellwater-priory scene (mw-e26.5); the way in from the Briarwood is its road gate (mw-e25.25). |
+| `priory-nave` | The priory nave | priory | e26 | `bellwater-priory` | Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5). Built (mw-e26.5): six metre walls and a colonnade open to the sky; the hub of the priory. |
+| `priory-choir` | The priory choir | priory | e26 | `bellwater-priory` | Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6). Built (mw-e26.5): the choir with four statue stubs and the altar; the puzzle is mw-e26.6. |
+| `priory-garden` | The priory garden | priory | e26 | `bellwater-priory` | Garden with the dead pear tree Clatter remembers (bible 4.1 beat 8; mw-e26.5). Optional dead end off the nave. Built (mw-e26.5): walled garden with the dead pear tree, one opening on the nave. |
+| `scriptorium` | The scriptorium | priory | e26 | `bellwater-priory` | Book mimics (bible 3.5, mw-e26.7). Built (mw-e26.5) as a shelved room behind the locked hidden choir door; its content is mw-e26.7. |
+| `belfry` | The belfry | priory | e26 | `bellwater-priory` | The cracked Vesper Bell (bible 3.5, mw-e26.8). Built (mw-e26.5): a 9 m tower with an interior stair, a free-climb and rope anchors; the Sounding Shaft top is its deck; the bell and the sour-bell consequence are mw-e26.8. |
+| `priory-crypt-stair` | The crypt stair | priory | e26 | `bellwater-priory` | The stair down from the nave to the sealed crypt door; the Sunbeam puzzle's place (mw-e26.1, docs/design/dungeon.md). PROPOSAL: the bible gives the crypt but no stair. Built (mw-e26.5): a 3 m stair down east of the nave to a landing; the Sunbeam puzzle is mw-e26.15. |
+| `priory-crypt` | The priory crypt | priory | e26 | `bellwater-priory` | Sealed from below (bible 4.1 beat 9). Built (mw-e26.5) as a sealed vestibule behind a tier-3 locked door: no walking route from the priory side until world.priory-crypt.unsealed (mw-e26.20). |
+| `cistern` | The cistern | priory | e26 | `bellwater-priory` | Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as the stub the Glen Well route joins: a sealed vestibule behind the nave west wall door; glen-well-cistern (mw-e24.10) and nave-cistern (mw-e26.20) open it. |
 | `knot-outer-ring` | The Outer Ring | knot | e26 | planned | Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). |
 | `ossuary-galleries` | The Ossuary Galleries | knot | e26 | planned | The Forgotten; Clatter (bible 3.5). |
 | `chapel-of-echoes` | The Chapel of Echoes | knot | e26 | planned | Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14). |
@@ -384,7 +384,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
-| `priory-road-gate` | `priory-road` | `priory-gate` | path |  |  | planned: mw-e25.25 |
+| `priory-road-gate` | `priory-road` | `priory-gate` | path |  |  | `briarwood/priory-road-gate`, `bellwater-priory/road-gate` |
 | `priory-gate-nave` | `priory-gate` | `priory-nave` | path |  |  | planned: mw-e26.5 |
 | `nave-choir` | `priory-nave` | `priory-choir` | path |  |  | planned: mw-e26.5 |
 | `nave-garden` | `priory-nave` | `priory-garden` | path |  |  | planned: mw-e26.5 |
@@ -448,11 +448,20 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briarwood` | `wolf-den` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `woodcutters-hut` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `millpond` | none (a marker spawn; its trails are walked inside the scene) |
-| `briarwood` | `priory-road` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `priory-road` | `briarwood/priory-road-gate` (priory-road-gate) |
 | `briarwood` | `millweir-far-bank` | none (a marker spawn; its trails are walked inside the scene) |
 | `moorings-watch` | `moorings-courtyard` | `moorings-watch/spur-gate` (hub-moorings) |
 | `moorings-watch` | `moorings-tower` | none (a marker spawn inside the tower; the door is walked in and the stair climbed inside the scene) |
 | `moorings-watch` | `supply-tunnel` | none (a locked door stub over a sealed vestibule; mw-e25.9 replaces it with a transition) |
+| `bellwater-priory` | `priory-gate` | `bellwater-priory/road-gate` (priory-road-gate) |
+| `bellwater-priory` | `priory-nave` | none (a marker spawn; the nave is walked inside the scene) |
+| `bellwater-priory` | `priory-choir` | none (a marker spawn; walked inside the scene) |
+| `bellwater-priory` | `priory-garden` | none (a marker spawn; walked inside the scene) |
+| `bellwater-priory` | `scriptorium` | none (a marker spawn behind the locked hidden choir door; mw-e26.6 and mw-e26.7 open it) |
+| `bellwater-priory` | `belfry` | none (a marker spawn at the tower foot; the doorway is walked in and the stair climbed inside the scene) |
+| `bellwater-priory` | `priory-crypt-stair` | none (a marker spawn at the foot of the crypt stair, inside the scene) |
+| `bellwater-priory` | `priory-crypt` | none (a tier-3 locked door stub over a sealed vestibule; opens with world.priory-crypt.unsealed, mw-e26.20) |
+| `bellwater-priory` | `cistern` | none (a barred door stub over a sealed vestibule; mw-e24.10 and mw-e26.20 open it) |
 
 Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `brazier-hall`, `combat-sandbox` and so on) are not part of the world; the puzzle rooms are placed into the dungeon by E26 (mw-e26.15) and will gain nodes then.
 
@@ -486,7 +495,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.22 | `lane-briarwood-edge` |
 | mw-e25.23 | `miners-bridge`, `green-mine-road`, `mine-road-gate` |
 | mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
-| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge`, `priory-road-gate` |
+| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge` |
 | mw-e26.2 | `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` |
 | mw-e26.4 | `silver-vane-gallery`, `vane-gallery-breach` |
 | mw-e26.5 | `priory-gate-nave`, `nave-choir`, `nave-garden`, `nave-crypt-stair`, `crypt-stair-crypt` |

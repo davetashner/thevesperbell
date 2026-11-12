@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "crypt-sealed",
+  "name": "Bellwater Priory crypt door",
+  "notes": "The crypt door at the foot of the crypt stair (mw-e26.5 AC-2): sealed from the priory side (bible 4.1 beat 9) whatever the player does. No key exists and the tier is 3 so no early pick opens it; the edge crypt-stair-crypt opens only when world.priory-crypt.unsealed is set, from the Knot side (mw-e26.20 replaces this lock with that fact).",
+  "tier": 3,
+  "pickTier": 3,
+  "hint": "Sealed. Cold air breathes through the crack, from the other side."
+}
