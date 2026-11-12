@@ -23,6 +23,12 @@ export const DIALOGUE_LOCAL_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** Speaker ids that need no declaration: the player's own lines and unattributed narration. */
 export const DIALOGUE_RESERVED_SPEAKERS = ['player', 'narrator'] as const;
 
+/**
+ * Longest `text` of a line or option the dialogue box shows without scrolling, in characters. The
+ * dialogue validator (pnpm dialogue:validate, mw-e22.8) warns above it; `--max-length` overrides it.
+ */
+export const DIALOGUE_MAX_TEXT_LENGTH = 240;
+
 /** How a `check` node tries to win the NPC over (mw-e22.7). */
 export const DIALOGUE_APPROACHES = ['persuade', 'intimidate', 'deceive', 'charm'] as const;
 export type DialogueApproach = (typeof DIALOGUE_APPROACHES)[number];

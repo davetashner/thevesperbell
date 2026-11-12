@@ -2,7 +2,7 @@ name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
 # lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
-# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1) and puzzle-validate
+# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1), dialogue-validate (mw-e22.8) and puzzle-validate
 # (mw-e15.6) and size-budget (mw-e32.3) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
@@ -352,6 +352,18 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm world:validate
+
+  # The dialogue validator (mw-e22.8, docs/design/dialogue-format.md): every dialogue under
+  # src/content/data/dialogue/ must parse, resolve its content references, have every node reachable
+  # from an entry, an exit on every step, no unanswerable choice and no loop with no way out. Over-long
+  # text and one-class option sets are warnings. Runs in seconds.
+  dialogue-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm dialogue:validate
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.

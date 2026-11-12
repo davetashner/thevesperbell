@@ -95,7 +95,9 @@ touching the graph. In-game text is British-leaning; ids and keys are US spellin
 | a line, effect or option neither continues nor ends | schema |
 | condition and effect kinds, fields, item/NPC/class/capability/fact references | `validateDialogueLogic` + a reference checker (`refCheckerFor`) |
 | `jump` to a node of another dialogue | load check (`src/content/dialogue-checks.ts`) |
-| reachability, dead ends, cycles, unsatisfiable choices, text length | mw-e22.8 |
+| every node reachable from an entry; every step has an exit; no choice whose options are all provably unsatisfiable (error), single unsatisfiable options (warning); no loop with no way out, reported with its path | `validateDialogueGraph` (`pnpm dialogue:validate`, mw-e22.8) |
+| line and option text over `DIALOGUE_MAX_TEXT_LENGTH` (240; `--max-length` overrides) | warning from `validateDialogueGraph` |
+| class-gated options for fewer than two classes | warning from `dialogueWarnings` |
 
 `validateDialogueText(file, text)` returns issues as `file:line (node "id"): message`; issues from
 `validateDialogueLogic` carry JSON pointers that `describeDialogueIssue` turns into the same form.
