@@ -136,6 +136,7 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
+import { installGameLogic, questsOf } from '@game/logic/index';
 import { fireSettleOptions, installGameFire } from '@game/fire';
 import {
   attachSpellBar,
@@ -406,6 +407,7 @@ import {
   type RapierPhysics,
   type Vec3,
   EquipmentRules,
+  InventoryRules,
   createSurfaceMap,
 } from '@sim/index';
 import { installLatencyProbe } from '@tools/perf/latency-probe';
@@ -825,6 +827,19 @@ function startRenderer(
     installFactRegistry(world.facts, content);
     // The in-game clock (mw-e27.12), first so every system sees the tick's time; its data is game.json.
     installGameClock(world, content.get('game', GAME_CONFIG_ID).clock);
+    // The capability registry (mw-e19.2) is the world's, built early so the logic host can grant.
+    const capabilities = createCapabilityRegistry(content);
+    // The logic host and the quest runtime (mw-e23.11), before any save loads so the quests' fact
+    // keys are declared. Dialogue (mw-e22.9) and shops run their effects against `gameLogic.host`;
+    // content with no quests installs nothing. The save registry refreshes the quests after a load.
+    const gameLogic = installGameLogic(world, {
+      world,
+      player: () => player?.entity,
+      inventory: new InventoryRules(content.all('item')),
+      capabilities,
+      quests: questsOf(content),
+    });
+    root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
     // The knight's sword and shield (mw-e04.6): moves, socket tracks, the wood shield and the
     // damage model with the shield rule; and the combat sandbox's tuning (mw-e04.9).
     const combat = prepareTestbedCombat(content);
@@ -1733,7 +1748,6 @@ function startRenderer(
       // ?allclasses unlocks every class.
       const playable = playableClasses(content, location.search, __DEBUG_CONSOLE__);
       const newGame = newGameRequest(location.search, playable);
-      const capabilities = createCapabilityRegistry(content);
       if (playerStart(loaded.layout.spawns) !== undefined) {
         // No class is chosen yet (mw-e19.5), so the player moves on the base profile.
         const tuning = controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID));
