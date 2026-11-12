@@ -1,0 +1,43 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-abbot",
+  "family": "wraith",
+  "tags": ["npc", "undead", "wraith", "leader"],
+  "stats": {
+    "health": 200,
+    "poise": 80,
+    "mass": 10,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "unaligned",
+  "disposition": {
+    "towardPlayer": "neutral"
+  },
+  "personality": {
+    "bravery": 0.8,
+    "curiosity": 0.9,
+    "aggression": 0,
+    "diligence": 0.9,
+    "sociability": 0.5,
+    "greed": 0
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
+  "presentation": {
+    "mesh": "placeholder-capsule",
+    "sfx": "placeholder"
+  }
+}

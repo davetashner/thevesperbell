@@ -1,0 +1,46 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-vane",
+  "family": "human",
+  "tags": ["npc", "noble", "mine-owner", "leader"],
+  "stats": {
+    "health": 60,
+    "poise": 20,
+    "mass": 75,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "townsfolk",
+  "disposition": {
+    "towardPlayer": "friendly",
+    "classAffinity": {
+      "knight": 10
+    }
+  },
+  "personality": {
+    "bravery": 0.5,
+    "curiosity": 0.5,
+    "aggression": 0.1,
+    "diligence": 0.7,
+    "sociability": 0.7,
+    "greed": 0.9
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
+  "presentation": {
+    "mesh": "placeholder-capsule",
+    "sfx": "placeholder"
+  }
+}

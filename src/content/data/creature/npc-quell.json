@@ -1,0 +1,43 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-quell",
+  "family": "human",
+  "tags": ["npc", "agent", "vane-deepworks"],
+  "stats": {
+    "health": 60,
+    "poise": 20,
+    "mass": 75,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "townsfolk",
+  "disposition": {
+    "towardPlayer": "neutral"
+  },
+  "personality": {
+    "bravery": 0.4,
+    "curiosity": 0.4,
+    "aggression": 0.1,
+    "diligence": 0.8,
+    "sociability": 0.6,
+    "greed": 0.8
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
+  "presentation": {
+    "mesh": "placeholder-capsule",
+    "sfx": "placeholder"
+  }
+}

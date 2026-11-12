@@ -8,9 +8,11 @@ import { createNpcModelLoader, NPC_MODEL_URLS, npcModelUrl } from './npc-model';
 const DATA = join(process.cwd(), 'src/content/data/creature');
 const PUBLIC = join(process.cwd(), 'public');
 
-function npcMeshes(): string[] {
+/** Mesh ids of the NPC creatures; `only` limits it to those ids (the roster NPCs without a model yet are capsules). */
+function npcMeshes(only?: readonly string[]): string[] {
   return readdirSync(DATA)
     .filter((f) => f.startsWith('npc-') && f.endsWith('.json'))
+    .filter((f) => only === undefined || only.includes(f.replace(/\.json$/, '')))
     .map((f) => {
       const def = JSON.parse(readFileSync(join(DATA, f), 'utf8')) as {
         presentation: { mesh: string };
@@ -53,11 +55,13 @@ describe('NPC models', () => {
     expect(Object.values(NPC_MODEL_URLS).length).toBe(9);
   });
 
-  it('AC-1: Hollis, Juniper and Oswin each have their own model, and no NPC is a capsule any more', () => {
+  it('AC-1: Hollis, Juniper and Oswin each have their own model, and no modelled NPC is a capsule', () => {
     for (const id of ['npc-hollis', 'npc-juniper', 'npc-oswin']) {
       expect(npcModelUrl(id), id).toBe(`/assets/model/model-${id}-01.glb`);
     }
-    expect(npcMeshes()).not.toContain('placeholder-capsule');
+    // The glossary roster (mw-e39.28) adds greybox NPCs that stay capsules until their models land.
+    const modelled = [...Object.keys(NPC_MODEL_URLS), 'npc-watchman-day', 'npc-watchman-night'];
+    expect(npcMeshes(modelled)).not.toContain('placeholder-capsule');
   });
 
   it('AC-2: a mesh id with no model, or no mesh id, stays a capsule', () => {
