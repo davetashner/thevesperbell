@@ -43,7 +43,7 @@ describe('quest format fixtures', () => {
   const content = loadQuestFixtureContent();
 
   it('AC-1: the fixture quests load and their logic validates with resolved references', () => {
-    const quests = content.all('quest');
+    const quests = content.all('quest').filter((q) => FIXTURE_QUEST_IDS.includes(q.id as never));
     expect(quests.map((q) => q.id)).toEqual([...FIXTURE_QUEST_IDS]);
     for (const quest of quests) {
       expect(validateQuestLogic(quest as never, referencesIn(content)), quest.id).toEqual([]);
@@ -51,7 +51,7 @@ describe('quest format fixtures', () => {
   });
 
   it('the fixtures exercise stages, resolutions of several approaches and every continuation', () => {
-    const quests = content.all('quest');
+    const quests = content.all('quest').filter((q) => FIXTURE_QUEST_IDS.includes(q.id as never));
     const approaches = new Set(quests.flatMap((q) => q.resolutions.map((r) => r.approach)));
     expect(approaches).toEqual(new Set(['other', 'diplomacy', 'trickery', 'stealth']));
     const continuations = quests.flatMap((q) => q.failures.map((f) => f.continuation.kind));

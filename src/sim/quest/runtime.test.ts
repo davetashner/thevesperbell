@@ -58,7 +58,7 @@ const failure = (id: string, when: LogicNode, over: Record<string, unknown> = {}
 });
 
 function quest(over: Record<string, unknown> = {}): QuestDef {
-  return {
+  const base = {
     givers: [],
     stages: [],
     objectives: [],
@@ -68,7 +68,10 @@ function quest(over: Record<string, unknown> = {}): QuestDef {
     summary: 'S',
     resolutions: [res('win', fact('q.won'))],
     ...over,
-  } as unknown as QuestDef;
+  };
+  // Loaded stages carry their defaults; the tests write them short.
+  const stages = (base.stages as { id: string }[]).map((stage) => ({ transitions: [], ...stage }));
+  return { ...base, stages } as unknown as QuestDef;
 }
 
 /** The game's host, for tests: items and gold in maps, facts in the world's store. */
@@ -688,6 +691,100 @@ describe('quest runtime: starting, stages and objectives', () => {
     expect(s.runtime.ids()).toEqual(['q']);
     expect(s.runtime.resolution('nope')).toBeUndefined();
     expect(s.runtime.failure('nope')).toBeUndefined();
+  });
+});
+
+describe('quest runtime: stage transitions', () => {
+  const to = (stage: string, when: LogicNode, over: Record<string, unknown> = {}) => ({
+    stage,
+    when,
+    ...over,
+  });
+  const branching = () =>
+    quest({
+      stages: [
+        {
+          id: 'one',
+          transitions: [
+            to('three', fact('q.three'), {
+              effects: [{ kind: 'setFact', fact: 'q.moved', value: 3 }],
+            }),
+            to('two', fact('q.two')),
+          ],
+        },
+        { id: 'two', transitions: [to('three', fact('q.on'))] },
+        { id: 'three' },
+      ],
+      resolutions: [res('win', fact('q.won'))],
+    });
+
+  it('a transition whose condition holds moves the quest and applies its effects with the move', () => {
+    const s = started([branching()]);
+    step(s, { 'q.three': true });
+    expect(s.runtime.stage('q')).toBe('three');
+    expect(s.world.facts.get('q.moved')).toBe(3);
+    expect(s.events).toContain('quest.stage {"quest":"q","stage":"three"}');
+  });
+
+  it('the first transition that holds, in file order, wins', () => {
+    const s = started([branching()]);
+    step(s, { 'q.two': true, 'q.three': true });
+    expect(s.runtime.stage('q')).toBe('three');
+  });
+
+  it('transitions chain: a move can satisfy the next stage at once', () => {
+    const s = started([branching()]);
+    step(s, { 'q.on': true });
+    expect(s.runtime.stage('q')).toBe('one');
+    step(s, { 'q.two': true });
+    expect(s.runtime.stage('q')).toBe('three');
+  });
+
+  it('a stage with no transition that holds stays put, and a resolution ends the quest from any stage', () => {
+    const s = started([branching()]);
+    step(s, {});
+    expect(s.runtime.stage('q')).toBe('one');
+    step(s, { 'q.won': true });
+    expect(s.runtime.questState('q')).toBe('resolved');
+  });
+
+  it('a transition whose effect refuses changes nothing and the next one is tried', () => {
+    const q = quest({
+      stages: [
+        {
+          id: 'one',
+          transitions: [
+            to('two', fact('q.go'), { effects: [{ kind: 'takeItem', item: 'key', count: 1 }] }),
+            to('three', fact('q.go')),
+          ],
+        },
+        { id: 'two' },
+        { id: 'three' },
+      ],
+    });
+    const s = started([q]);
+    step(s, { 'q.go': true });
+    expect(s.runtime.stage('q')).toBe('three');
+    expect(
+      s.events.some((e) => e.startsWith('quest.refused') && e.includes('transition:one/0')),
+    ).toBe(true);
+  });
+
+  it('a refused transition with nothing after it leaves the stage as it was', () => {
+    const q = quest({
+      stages: [
+        {
+          id: 'one',
+          transitions: [
+            to('two', fact('q.go'), { effects: [{ kind: 'takeItem', item: 'key', count: 1 }] }),
+          ],
+        },
+        { id: 'two' },
+      ],
+    });
+    const s = started([q]);
+    step(s, { 'q.go': true });
+    expect(s.runtime.stage('q')).toBe('one');
   });
 });
 

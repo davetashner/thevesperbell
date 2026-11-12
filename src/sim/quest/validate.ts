@@ -92,6 +92,13 @@ export function validateQuestLogic(
       if (problem !== undefined) issues.push({ pointer: `${at}/params`, message: problem });
     }
   });
+  quest.stages.forEach((stage, i) => {
+    stage.transitions.forEach((transition, j) => {
+      const at = `/stages/${String(i)}/transitions/${String(j)}`;
+      condition(`${at}/when`, transition.when);
+      effects(`${at}/effects`, transition.effects);
+    });
+  });
   quest.resolutions.forEach((resolution, i) => {
     condition(`/resolutions/${String(i)}/when`, resolution.when);
     effects(`/resolutions/${String(i)}/effects`, resolution.effects);

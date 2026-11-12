@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadQuestFixtureContent } from '../test-fixtures.ts';
+import { FIXTURE_QUEST_IDS, loadQuestFixtureContent } from '../test-fixtures.ts';
 import { QUEST_OBJECTIVE_KINDS, questSchema, questTextKey, type QuestDefInput } from './quest.ts';
 
 const fact = (key: string) => ({ kind: 'fact', fact: key });
@@ -31,6 +31,40 @@ function issues(json: unknown): string[] {
   return result.success ? [] : result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
 }
 
+describe('quest stage transitions', () => {
+  it('parse with their effects and default to none', () => {
+    const parsed = questSchema.parse(
+      quest({
+        stages: [
+          {
+            id: 'one',
+            transitions: [
+              { when: fact('t.go'), stage: 'two', effects: [{ kind: 'emit', event: 'e' }] },
+            ],
+          },
+          { id: 'two' },
+        ],
+      }),
+    );
+    expect(parsed.stages[0]?.transitions[0]?.stage).toBe('two');
+    expect(parsed.stages[1]?.transitions).toEqual([]);
+  });
+
+  it('must name a stage of the quest, and not their own', () => {
+    const at = (stage: string) =>
+      issues(
+        quest({
+          stages: [{ id: 'one', transitions: [{ when: fact('t.go'), stage }] }, { id: 'two' }],
+        }),
+      );
+    expect(at('three')).toEqual([
+      'stages.0.transitions.0.stage: stage "one" moves to unknown stage "three"',
+    ]);
+    expect(at('one')).toEqual(['stages.0.transitions.0.stage: stage "one" moves to itself']);
+    expect(at('two')).toEqual([]);
+  });
+});
+
 describe('quest format', () => {
   it('a valid quest parses and fills defaults', () => {
     const parsed = questSchema.parse(quest());
@@ -42,7 +76,9 @@ describe('quest format', () => {
 
   it('AC-1: the fixture quests load with the game and validate', () => {
     const content = loadQuestFixtureContent();
-    expect(content.all('quest').map((q) => q.id)).toEqual([
+    const ids = content.all('quest').map((q) => q.id);
+    // The game's own quests load beside the fixtures; the fixtures are always there.
+    expect(ids.filter((id) => FIXTURE_QUEST_IDS.includes(id as never))).toEqual([
       'quest-empty-barge',
       'the-captain-below',
       'the-captains-boots',

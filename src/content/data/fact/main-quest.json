@@ -1,0 +1,83 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "main-quest",
+  "name": "Main quest facts",
+  "notes": "Facts of the main quest The Labyrinth Beneath Briar Glen (mw-e39.4) that no dialogue or ending group registers yet: the entry route, the Act III bell, the morning-after bounty, Horn spoken for, the two harbour facts the quest and the epilogue read, and the ending itself. Horn, abbot, Vane, breach, Clatter, goblin and Tansy facts are in endings.json and the dialogue groups, and are reused as they are.",
+  "facts": [
+    {
+      "key": "briar-glen.arrived",
+      "type": "bool",
+      "default": false,
+      "description": "The player has arrived in Briar Glen on the mountain road at dusk (bible 4.1 beat 1). Starts the main quest. Written by the arrival scene (follow-up).",
+      "owner": "scene"
+    },
+    {
+      "key": "deepworks.route",
+      "type": "enum",
+      "values": [
+        "none",
+        "front-gate",
+        "side-boarding",
+        "winch-cage",
+        "inner-bar",
+        "supply-tunnel",
+        "weeping-adit"
+      ],
+      "default": "none",
+      "description": "Which of the six ways into the Deepworks the player used (bible 4.1 beat 5; route-matrix mine entries). Written by the main quest when the Getting in stage completes; read by level variants and class text.",
+      "owner": "quest"
+    },
+    {
+      "key": "bell.rung",
+      "type": "enum",
+      "values": ["unrung", "sour", "rung", "failed"],
+      "default": "unrung",
+      "description": "The Vesper Bell (bible 4.1 beat 14, 4.5): rung true with its tongue, rung sour without it (recoverable: it wakes the Knot and brings Horn), or failed for good (the climb or the ringing is lost: the Long Vespers). Written by the belfry scene.",
+      "owner": "quest"
+    },
+    {
+      "key": "bounty.outcome",
+      "type": "enum",
+      "values": ["unsettled", "paid", "refused", "given-to-pells"],
+      "default": "unsettled",
+      "description": "What became of Vane's bounty on the morning after (bible 4.1 beat 15): claimed, refused, or handed to the Pells. With vane.fate it tells the main quest that the town's reckoning is done. Written by Vane's and Hollis's dialogue (follow-up).",
+      "owner": "quest"
+    },
+    {
+      "key": "horn.spoken-for",
+      "type": "bool",
+      "default": false,
+      "description": "The player spoke for Horn publicly (bible 4.4 Vespers Rung): the children's rhyme gets a new last verse. Written by the town testimony (follow-up).",
+      "owner": "quest"
+    },
+    {
+      "key": "crate.intercepted",
+      "type": "bool",
+      "default": false,
+      "description": "Vane's crate (and the Hornfolk name-stone in it) was intercepted in Wendmouth before the Gilded Tern sailed (bible 3.6, 4.4). Optional: adds the name-stone epilogue slide and never changes the headline ending. Written by The Crate for Mr. S— (follow-up).",
+      "owner": "quest"
+    },
+    {
+      "key": "tern.sailed",
+      "type": "bool",
+      "default": false,
+      "description": "The Gilded Tern has sailed (bible 3.6: when Act III begins, with or without the crate). Written by the main quest at the start of Act III; read by the Wendmouth scene and the epilogue.",
+      "owner": "quest"
+    },
+    {
+      "key": "ending.headline",
+      "type": "enum",
+      "values": ["none", "vespers-rung", "last-warden", "hirelings-silence", "long-vespers"],
+      "default": "none",
+      "description": "The headline ending the main quest resolved with (bible 4.4). Written by the resolution; read by the epilogue quest and the ending level states.",
+      "owner": "quest"
+    },
+    {
+      "key": "epilogue.finished",
+      "type": "bool",
+      "default": false,
+      "description": "The epilogue slideshow has played its last slide. Written by the slideshow (follow-up); closes the epilogue quest.",
+      "owner": "quest"
+    }
+  ]
+}

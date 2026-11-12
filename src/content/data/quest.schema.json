@@ -82,6 +82,66 @@
             "type": "string",
             "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
           },
+          "transitions": {
+            "default": [],
+            "description": "Moves out of this stage, evaluated while it is current (branching quests: the first condition that holds picks the next stage).",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "when": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The logic kind, e.g. \"hasItem\"."
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": {},
+                  "description": "Condition (logic DSL) that moves the quest on. The first to hold, in file order, wins."
+                },
+                "stage": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                  "description": "The stage the quest moves to."
+                },
+                "effects": {
+                  "description": "Effects applied in the same atomic batch as the move (e.g. set a fact).",
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The logic kind, e.g. \"hasItem\"."
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ],
+                    "additionalProperties": {},
+                    "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                  }
+                },
+                "note": {
+                  "description": "A note for writers; never shown to players.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "when",
+                "stage"
+              ],
+              "additionalProperties": false
+            }
+          },
           "note": {
             "description": "A note for writers; never shown to players.",
             "type": "string",
