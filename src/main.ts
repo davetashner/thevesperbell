@@ -87,6 +87,7 @@ import { startInventoryUi, type InventoryUi } from '@game/items/inventory-screen
 import { startContainerUi, type ContainerUi } from '@game/items/container-window';
 import {
   Conversations,
+  conversationCapture,
   createGameDispositions,
   creatureIdOf,
   dialogueVeto,
@@ -788,6 +789,8 @@ function startRenderer(
     window: globalThis.window,
     document: globalThis.document,
     element: view.canvas,
+    // A menu or an open conversation keeps the pointer free: a click on the canvas does not lock it.
+    held: () => ui.capturesInput,
     gamepad: {
       navigator: globalThis.navigator,
       hasFocus: () => document.hasFocus(),
@@ -2605,6 +2608,8 @@ function startRenderer(
           show: (model) => {
             dialogueBox.update(model);
           },
+          // Talking is modal for input (mw-e22.19): gameplay frames are withheld, pointer lock goes.
+          capture: conversationCapture(ui),
           publish: (key, value) => {
             root.dataset[key] = value;
           },

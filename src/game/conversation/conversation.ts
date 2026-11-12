@@ -89,6 +89,11 @@ export interface ConversationOptions {
   readonly scrollHistory?: (pixels: number) => void;
   /** Shows the conversation (null hides it). */
   readonly show?: (model: DialogueBoxModel | null) => void;
+  /**
+   * Called when a conversation opens (true) and ends (false): the game takes input away from
+   * gameplay while it is open (the pointer is released, no action frames reach the sim).
+   */
+  readonly capture?: (open: boolean) => void;
   /** Publishes a `data-*` readout value. */
   readonly publish?: (key: string, value: string) => void;
 }
@@ -136,6 +141,7 @@ export class Conversations {
   #alarm: string | undefined;
   #last: ConversationEnd | undefined;
   #published = '';
+  #captured = false;
   #focus = 0;
   #historyOpen = false;
   #history: DialogueHistoryEntry[] = [];
@@ -521,6 +527,11 @@ export class Conversations {
   }
 
   #present(): void {
+    const open = this.#partner !== undefined;
+    if (open !== this.#captured) {
+      this.#captured = open;
+      this.#options.capture?.(open);
+    }
     const readout = this.readout();
     const model = this.#boxModel(readout);
     const json = JSON.stringify(readout);
