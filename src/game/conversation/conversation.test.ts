@@ -518,6 +518,45 @@ describe('framing and the box', () => {
     ).toEqual({ speaker: 'A', text: 'Hi', choices: [], hint: CONVERSATION_TEXT.line });
   });
 
+  it('defensive paths: no place to look at, dispose with nothing open, a target gone before the start, a foreign error', () => {
+    const a = setup();
+    a.talk(a.villager);
+    a.world.remove(a.villager, PlacementComponent);
+    expect(a.conversations.focusPoint()).toBeUndefined();
+    const b = setup();
+    b.conversations.dispose();
+    expect(b.conversations.active).toBe(false);
+    // The target dies between Interact and the step that would start the talk.
+    const c = setup();
+    c.world.events.emit(interacted, {
+      actor: c.player,
+      target: c.villager,
+      verb: 'talk',
+      affordance: 0,
+    });
+    c.world.events.flush();
+    c.world.destroy(c.villager);
+    c.step();
+    expect(c.conversations.active).toBe(false);
+    // The NPC has no place: it starts with no facing to compute, then is watched out as gone.
+    const d = setup();
+    d.world.remove(d.villager, PlacementComponent);
+    d.talk(d.villager);
+    expect(d.conversations.readout().last).toMatchObject({ npc: 'villager', cause: 'gone' });
+    // A runtime failure that is not a dialogue error is not swallowed.
+    const f = setup({
+      runtime: {
+        start: () => {
+          throw new Error('boom');
+        },
+        view: undefined,
+      } as unknown as ConversationOptions['runtime'],
+    });
+    expect(() => {
+      f.talk(f.villager);
+    }).toThrow('boom');
+  });
+
   it('dispose stops listening and ends a conversation', () => {
     const { world, player, villager, conversations, talk, step } = setup();
     talk(villager);

@@ -98,7 +98,8 @@ export class Conversations {
   readonly #options: ConversationOptions;
   readonly #offs: (() => void)[] = [];
   #partner: EntityId | undefined;
-  #npc: string | undefined;
+  /** The talking NPC's content id; meaningful only while `#partner` is set. */
+  #npc = '';
   #pending: EntityId | undefined;
   #alarm: string | undefined;
   #last: ConversationEnd | undefined;
@@ -211,7 +212,7 @@ export class Conversations {
     const view = this.#partner === undefined ? undefined : this.#options.runtime.view;
     const base = {
       open: view !== undefined,
-      npc: view === undefined ? null : (this.#npc ?? null),
+      npc: view === undefined ? null : this.#npc,
       conversing: this.#partner !== undefined && isConversing(this.#world, this.#partner),
       ...(this.#last !== undefined && { last: this.#last }),
     };
@@ -262,7 +263,8 @@ export class Conversations {
     const to = this.#world.get(this.#options.player, PlacementComponent);
     const toward =
       from === undefined || to === undefined ? undefined : { x: to.x - from.x, z: to.z - from.z };
-    if (!beginConversing(this.#world, target, this.#options.player, toward)) return;
+    // Alive (creatureIdOf found it) and free (afterStep released any orphan first), so this holds.
+    beginConversing(this.#world, target, this.#options.player, toward);
     this.#partner = target;
     this.#npc = npc;
     try {
@@ -301,9 +303,9 @@ export class Conversations {
   #finish(reason: string, cause?: string): void {
     const partner = this.#partner;
     if (partner !== undefined && this.#world.isAlive(partner)) endConversing(this.#world, partner);
-    this.#last = { npc: this.#npc ?? '', reason, ...(cause !== undefined && { cause }) };
+    this.#last = { npc: this.#npc, reason, ...(cause !== undefined && { cause }) };
     this.#partner = undefined;
-    this.#npc = undefined;
+    this.#npc = '';
   }
 
   #present(): void {
