@@ -33,16 +33,16 @@ flowchart LR
     bridgeward_college["The Bridgeward College"]:::built
     under_the_bridge["Under the Miners' Bridge"]:::built
     market_green["Market Green"]:::built
-    lamplit_stacks["The Lamplit Stacks"]
-    brands_forge["Brand's Forge"]
-    fenns_fletchery["Fenn's Fletchery & Simples"]
-    pells_bakery["Pell's Bakery"]
-    watch_house["The Watch House"]
+    lamplit_stacks["The Lamplit Stacks"]:::built
+    brands_forge["Brand's Forge"]:::built
+    fenns_fletchery["Fenn's Fletchery & Simples"]:::built
+    pells_bakery["Pell's Bakery"]:::built
+    watch_house["The Watch House"]:::built
     jail_cell["The jail cell"]
-    vane_house["Vane House"]
-    schoolhouse["The schoolhouse"]
-    cemetery["The lychgate cemetery"]
-    glen_well["The Glen Well"]
+    vane_house["Vane House"]:::built
+    schoolhouse["The schoolhouse"]:::built
+    cemetery["The lychgate cemetery"]:::built
+    glen_well["The Glen Well"]:::built
     town_rooftops["The town rooftops"]
   end
   subgraph briarwood["The Briarwood"]
@@ -62,6 +62,7 @@ flowchart LR
     supply_tunnel["The supply tunnel (watchtower end)"]
   end
   subgraph deepworks["The Deepworks"]
+    mine_road["The mine road"]
     mine_gate["The boarded mine gate"]
     winch_house["The winch house"]
     old_galleries["The old glenstone galleries"]
@@ -116,10 +117,13 @@ flowchart LR
   shop_lane ---|door| bridgeward_college
   shop_lane --- under_the_bridge
   shop_lane --- market_green
+  market_green --- mine_road
+  mine_road --- mine_gate
+  market_green -.-|planned| priory_road
   market_green ---|door| lamplit_stacks
-  market_green ---|door| brands_forge
-  market_green ---|door| fenns_fletchery
-  market_green ---|door| pells_bakery
+  shop_lane ---|door| brands_forge
+  shop_lane ---|door| fenns_fletchery
+  shop_lane ---|door| pells_bakery
   market_green ---|door| watch_house
   watch_house ---|door| jail_cell
   market_green --- vane_house
@@ -128,7 +132,7 @@ flowchart LR
   market_green --- glen_well
   shop_lane --- town_rooftops
   town_rooftops -.-|shortcut thief| vane_house
-  market_green --- briarwood_edge
+  shop_lane --- briarwood_edge
   briarwood_edge --- briarwood_hub
   briarwood_hub --- sleepers_path
   sleepers_path -.-|secret archer| mine_gate
@@ -199,13 +203,13 @@ Each loop is a simple cycle of edges the validator checks. "Every loop is a shor
 | Loop | Edges | Closed by |
 | --- | --- | --- |
 | `forest-watchtower-priory`: Forest, watchtower and priory | `hub-moorings`, `moorings-priory-ridge`, `hub-priory-road` | open paths |
-| `watchtower-tunnel-upper-mine`: Watchtower supply tunnel and upper mine | `market-green-briarwood-edge`, `edge-hub`, `hub-moorings`, `courtyard-supply-tunnel`, `supply-tunnel-collapse`, `winch-galleries`, `mine-gate-winch`, `miners-bridge`, `lane-bridge-post`, `lane-market-green` | `supply-tunnel-collapse`, `mine-gate-winch` |
+| `watchtower-tunnel-upper-mine`: Watchtower supply tunnel and upper mine | `lane-briarwood-edge`, `edge-hub`, `hub-moorings`, `courtyard-supply-tunnel`, `supply-tunnel-collapse`, `winch-galleries`, `mine-gate-winch`, `miners-bridge`, `lane-bridge-post` | `supply-tunnel-collapse`, `mine-gate-winch` |
 | `priory-crypt-sounding-shaft-knot`: Priory crypt and Sounding Shaft to the Knot | `ossuary-crypt`, `nave-crypt`, `nave-belfry`, `sounding-shaft`, `cradle-shaft-foot`, `horns-hall-cradle`, `chapel-horns-hall`, `ossuary-chapel` | `ossuary-crypt` |
-| `glen-well-cistern-priory`: Glen Well, cistern and priory | `glen-well-cistern`, `nave-cistern`, `priory-road-nave`, `hub-priory-road`, `edge-hub`, `market-green-briarwood-edge`, `green-glen-well` | `glen-well-cistern` |
+| `glen-well-cistern-priory`: Glen Well, cistern and priory | `glen-well-cistern`, `nave-cistern`, `priory-road-nave`, `hub-priory-road`, `edge-hub`, `lane-briarwood-edge`, `lane-market-green`, `green-glen-well` | `glen-well-cistern` |
 | `jail-drain-cistern`: Jail drain and cistern | `jail-drain`, `glen-well-cistern`, `green-glen-well`, `green-watch-house`, `watch-house-cell` | `jail-drain`, `glen-well-cistern` |
 | `weeping-adit-lower-deepworks`: Weeping Adit and lower Deepworks | `weeping-adit`, `quay-adit-mouth`, `under-the-bridge-quay`, `riverbank-path`, `lane-bridge-post`, `miners-bridge`, `mine-gate-winch`, `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` | `weeping-adit`, `mine-gate-winch` |
 | `stone-stair`: Stone Stair, cutting hall to quay | `stone-stair`, `under-the-bridge-quay`, `riverbank-path`, `lane-bridge-post`, `miners-bridge`, `mine-gate-winch`, `winch-galleries`, `galleries-rootcellar` | `stone-stair`, `mine-gate-winch` |
-| `millweir-far-bank`: Millweir sluice walk and the Briarwood far bank | `sluice-walk`, `hub-far-bank`, `edge-hub`, `market-green-briarwood-edge`, `lane-market-green`, `riverbank-path`, `under-the-bridge-quay`, `quay-millweir` | `sluice-walk` |
+| `millweir-far-bank`: Millweir sluice walk and the Briarwood far bank | `sluice-walk`, `hub-far-bank`, `edge-hub`, `lane-briarwood-edge`, `riverbank-path`, `under-the-bridge-quay`, `quay-millweir` | `sluice-walk` |
 | `towpath-barge`: Towpath and barge, quay to Kestrel Lock | `quay-millweir`, `millweir-kestrel-lock`, `barge-quay-lock` | `barge-quay-lock` |
 | `wendmouth-link`: Towpath and barge to Wendmouth | `towpath-lock-wharf`, `barge-lock-wharf` | `barge-lock-wharf` |
 
@@ -247,17 +251,17 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `sleeping-ox` | The Sleeping Ox | town | e24 | `sleeping-ox` | Dot's inn, its front door on the shop lane (bible 3.5). |
 | `bridgeward-college` | The Bridgeward College | town | e24 | `bridgeward-college` | Soldierly college at the far end of the lane's west side (bible 3.5, 5.16). |
 | `under-the-bridge` | Under the Miners' Bridge | town | e24 | `under-the-bridge` | Riverbank where Idris Quillon waits after dark (bible 3.5, 5.17); lit path down from the lane. |
-| `market-green` | Market Green | town | e24 | `briar-glen-lane` | The town's heart with the notice board (bible 3.5). Stand-in until mw-e24.2 builds the green: the north end of briar-glen-lane (its woodside path, mw-e25.22), which owns the way into the Briarwood. |
-| `lamplit-stacks` | The Lamplit Stacks | town | e24 | planned | Mirela's bookshop (bible 3.5, 5.1). |
-| `brands-forge` | Brand's Forge | town | e24 | planned | Oswin Brand's smithy (bible 3.5, 5.7). |
-| `fenns-fletchery` | Fenn's Fletchery & Simples | town | e24 | planned | Juniper Fenn's shop (bible 3.5, 5.6). |
-| `pells-bakery` | Pell's Bakery | town | e24 | planned | Hollis Pell's bakery (bible 3.5, 5.5). |
-| `watch-house` | The Watch House | town | e24 | planned | Captain Hale's post with its one-cell jail (bible 3.5, 5.2). |
+| `market-green` | Market Green | town | e24 | `briar-glen-green` | The town's heart with the notice board (bible 3.5): the open square of the briar-glen-green scene (mw-e24.2), reached from the shop lane's north end by the green-gate and lane-gate transitions. |
+| `lamplit-stacks` | The Lamplit Stacks | town | e24 | `briar-glen-green` | Mirela's bookshop (bible 3.5, 5.1). Three storeys leaning west onto the forge yard (mw-e24.2 greybox). |
+| `brands-forge` | Brand's Forge | town | e24 | `briar-glen-lane` | Oswin Brand's smithy (bible 3.5, 5.7). |
+| `fenns-fletchery` | Fenn's Fletchery & Simples | town | e24 | `briar-glen-lane` | Juniper Fenn's shop (bible 3.5, 5.6). |
+| `pells-bakery` | Pell's Bakery | town | e24 | `briar-glen-lane` | Hollis Pell's bakery (bible 3.5, 5.5). |
+| `watch-house` | The Watch House | town | e24 | `briar-glen-green` | Captain Hale's post with its one-cell jail (bible 3.5, 5.2). |
 | `jail-cell` | The jail cell | town | e24 | planned | The one cell, with a drain that leads out (mw-e24.8). |
-| `vane-house` | Vane House | town | e24 | planned | The mine owner's house on the rise (bible 3.5, 5.3). |
-| `schoolhouse` | The schoolhouse | town | e24 | planned | Empty; its teacher is missing (bible 3.5). |
-| `cemetery` | The lychgate cemetery | town | e24 | planned | Vesperine graves (bible 3.5). |
-| `glen-well` | The Glen Well | town | e24 | planned | A loose ladder-rung leads to the old cistern (bible 3.5). |
+| `vane-house` | Vane House | town | e24 | `briar-glen-green` | The mine owner's house on the rise (bible 3.5, 5.3). A 40 m tower on a 4 m rise: visible from everywhere in town (mw-e24.2). |
+| `schoolhouse` | The schoolhouse | town | e24 | `briar-glen-green` | Empty; its teacher is missing (bible 3.5). |
+| `cemetery` | The lychgate cemetery | town | e24 | `briar-glen-green` | Vesperine graves (bible 3.5). |
+| `glen-well` | The Glen Well | town | e24 | `briar-glen-green` | A loose ladder-rung leads to the old cistern (bible 3.5). |
 | `town-rooftops` | The town rooftops | town | e24 | planned | Roof routes for thieves and climbers (mw-e24.12). |
 | `briarwood-edge` | The Briarwood edge (town side) | briarwood | e25 | `briarwood` | Where the town's upper lane meets the forest (bible 3.1: above the town). Built as the south end of the briarwood scene: the town gate (mw-e25.1, mw-e25.22). |
 | `briarwood-hub` | The Briarwood paths and clearings | briarwood | e25 | `briarwood` | The forest hub joining the watchtower, priory road and far bank (bible 3.1, mw-e25.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
@@ -271,6 +275,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `moorings-courtyard` | Mooring's Watch courtyard | moorings-watch | e25 | planned | Goblin lookout below (bible 3.5, mw-e25.6). |
 | `moorings-tower` | Mooring's Watch tower and roof | moorings-watch | e25 | planned | Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). |
 | `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | planned | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). |
+| `mine-road` | The mine road | deepworks | e25 | planned | The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23. |
 | `mine-gate` | The boarded mine gate | deepworks | e25 | planned | Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior. |
 | `winch-house` | The winch house | deepworks | e26 | planned | First interior space inside the gate (bible 3.5, mw-e26.2). |
 | `old-galleries` | The old glenstone galleries | deepworks | e26 | planned | Square pillared halls; the upper mine (bible 3.5). |
@@ -295,17 +300,17 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `briar-glen-quay` | Briar Glen Quay | river | e25 | planned | Barge landing and slipway (bible 3.5, mw-e25.11). |
 | `millweir` | The Millweir | river | e25 | planned | Weir below town with its sluice walk (bible 3.1, mw-e25.12). |
 | `weeping-adit-mouth` | The Weeping Adit (river mouth) | river | e25 | planned | Where the Wend springs from the hill, a flooded drainage tunnel (bible 3.1, mw-e25.13). |
-| `kestrel-lock` | Kestrel Lock | river | e25 | planned (optional) | Lock on the towpath and barge route (bible 3.1, mw-e25.14). |
-| `lockkeepers-cottage` | The lock-keeper's cottage | river | e25 | planned (optional) | Across the lock gates (bible 3.5). |
-| `stone-wharf` | The Stone Wharf | wendmouth | e40 | planned (optional) | Barge landing and hub of the harbour (bible 3.6, mw-e40.2). |
-| `tidemarket` | The Tidemarket | wendmouth | e40 | planned (optional) | Covered import market (bible 3.6). |
-| `customs-house` | The Customs House | wendmouth | e40 | planned (optional) | Columned hall; Inspector Cray (bible 3.6). |
-| `bonded-warehouse` | The Bonded Warehouse | wendmouth | e40 | planned (optional) | Vaulted export bays; bay nine (bible 3.6). |
-| `drowned-gull` | The Drowned Gull | wendmouth | e40 | planned (optional) | Tavern on the breakwater end (bible 3.6). |
-| `undertow` | The Undertow | wendmouth | e40 | planned (optional) | Black market beneath the fish market (bible 3.6). |
-| `net-lofts` | The Net Lofts and rooftops | wendmouth | e40 | planned (optional) | Continuous waterfront roof route (bible 3.6). |
-| `gilded-tern` | The Gilded Tern | wendmouth | e40 | planned (optional) | Three-masted merchantman in the pool (bible 3.6). |
-| `breakwater` | The Breakwater | wendmouth | e40 | planned (optional) | Wall of rejected blocks; sunken figurehead (bible 3.6). |
+| `kestrel-lock` | Kestrel Lock | river | e25 | planned | Lock on the towpath and barge route (bible 3.1, mw-e25.14). |
+| `lockkeepers-cottage` | The lock-keeper's cottage | river | e25 | planned | Across the lock gates (bible 3.5). |
+| `stone-wharf` | The Stone Wharf | wendmouth | e40 | planned | Barge landing and hub of the harbour (bible 3.6, mw-e40.2). |
+| `tidemarket` | The Tidemarket | wendmouth | e40 | planned | Covered import market (bible 3.6). |
+| `customs-house` | The Customs House | wendmouth | e40 | planned | Columned hall; Inspector Cray (bible 3.6). |
+| `bonded-warehouse` | The Bonded Warehouse | wendmouth | e40 | planned | Vaulted export bays; bay nine (bible 3.6). |
+| `drowned-gull` | The Drowned Gull | wendmouth | e40 | planned | Tavern on the breakwater end (bible 3.6). |
+| `undertow` | The Undertow | wendmouth | e40 | planned | Black market beneath the fish market (bible 3.6). |
+| `net-lofts` | The Net Lofts and rooftops | wendmouth | e40 | planned | Continuous waterfront roof route (bible 3.6). |
+| `gilded-tern` | The Gilded Tern | wendmouth | e40 | planned | Three-masted merchantman in the pool (bible 3.6). |
+| `breakwater` | The Breakwater | wendmouth | e40 | planned | Wall of rejected blocks; sunken figurehead (bible 3.6). |
 
 ## Edges
 
@@ -320,20 +325,23 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `ox-door` | `shop-lane` | `sleeping-ox` | door |  |  | `briar-glen-lane/sleeping-ox-door`, `sleeping-ox/street-exit` |
 | `college-door` | `shop-lane` | `bridgeward-college` | door |  |  | `briar-glen-lane/bridgeward-college-door`, `bridgeward-college/street-exit` |
 | `riverbank-path` | `shop-lane` | `under-the-bridge` | path |  |  | `briar-glen-lane/riverbank-path`, `under-the-bridge/path-up` |
-| `lane-market-green` | `shop-lane` | `market-green` | path |  |  | planned: mw-e24.2 |
+| `lane-market-green` | `shop-lane` | `market-green` | path |  |  | `briar-glen-lane/green-gate`, `briar-glen-green/lane-gate` |
 | `green-stacks` | `market-green` | `lamplit-stacks` | door |  |  | planned: mw-e24.5 |
-| `green-forge` | `market-green` | `brands-forge` | door |  |  | planned: mw-e24.7 |
-| `green-fletchery` | `market-green` | `fenns-fletchery` | door |  |  | planned: mw-e24.7 |
-| `green-bakery` | `market-green` | `pells-bakery` | door |  |  | planned: mw-e24.7 |
+| `lane-forge` | `shop-lane` | `brands-forge` | door |  |  | planned: mw-e24.7 |
+| `lane-fletchery` | `shop-lane` | `fenns-fletchery` | door |  |  | planned: mw-e24.7 |
+| `lane-bakery` | `shop-lane` | `pells-bakery` | door |  |  | planned: mw-e24.7 |
 | `green-watch-house` | `market-green` | `watch-house` | door |  |  | planned: mw-e24.8 |
 | `watch-house-cell` | `watch-house` | `jail-cell` | door |  |  | planned: mw-e24.8 |
 | `green-vane-house` | `market-green` | `vane-house` | path |  |  | planned: mw-e24.9 |
+| `green-mine-road` | `market-green` | `mine-road` | path |  |  | planned: mw-e25.23 |
+| `mine-road-gate` | `mine-road` | `mine-gate` | path |  |  | planned: mw-e25.23 |
+| `green-priory-road` | `market-green` | `priory-road` | path |  |  | planned: mw-e25.25 |
 | `green-schoolhouse` | `market-green` | `schoolhouse` | door |  |  | planned: mw-e24.11 |
 | `green-cemetery` | `market-green` | `cemetery` | path |  |  | planned: mw-e24.11 |
 | `green-glen-well` | `market-green` | `glen-well` | path |  |  | planned: mw-e24.10 |
 | `lane-rooftops` | `shop-lane` | `town-rooftops` | path |  | `verb.climb.ledge` | planned: mw-e24.12 |
 | `rooftop-vane-house` | `town-rooftops` | `vane-house` | shortcut | `{"fact":"world.vane-house.roof-entered"}` | `verb.climb.rough` | planned: mw-e24.12 |
-| `market-green-briarwood-edge` | `market-green` | `briarwood-edge` | path |  |  | `briar-glen-lane/woodside-path`, `briarwood/town-gate` |
+| `lane-briarwood-edge` | `shop-lane` | `briarwood-edge` | path |  |  | `briar-glen-lane/woodside-path`, `briarwood/town-gate` |
 | `edge-hub` | `briarwood-edge` | `briarwood-hub` | path |  |  | planned: mw-e25.1 |
 | `hub-sleepers-path` | `briarwood-hub` | `sleepers-path` | path |  |  | planned: mw-e25.2 |
 | `sleepers-path-mine-gate` | `sleepers-path` | `mine-gate` | secret | `{"fact":"world.sleepers-path.revealed"}` | `sense.tracking` | planned: mw-e25.2 |
@@ -364,8 +372,8 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | planned: mw-e25.12 |
 | `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | planned: mw-e25.24 |
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | planned: mw-e40.26 |
-| `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) [dawn, day] |  |  | planned: mw-e25.15 |
-| `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) [dawn, day] |  |  | planned: mw-e40.26 |
+| `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
+| `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
 | `priory-road-nave` | `priory-road` | `priory-nave` | path |  |  | planned: mw-e25.25 |
 | `nave-choir` | `priory-nave` | `priory-choir` | path |  |  | planned: mw-e26.5 |
@@ -405,14 +413,23 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `valley-01` | `mountain-road` | `valley-01/south-gate` (slice-mountain-road), `valley-01/north-gate` (road-1) |
 | `valley-02` | `valley-mid` | `valley-02/south-gate` (road-1), `valley-02/north-gate` (road-2) |
 | `valley-03` | `valley-head` | `valley-03/south-gate` (road-2), `valley-03/bridge-gate` (road-bridge) |
-| `briar-glen-lane` | `bridge-post` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/woodside-path` (market-green-briarwood-edge) |
-| `briar-glen-lane` | `market-green` | `briar-glen-lane/woodside-path` (market-green-briarwood-edge) |
-| `briar-glen-lane` | `shop-lane` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/woodside-path` (market-green-briarwood-edge) |
+| `briar-glen-lane` | `bridge-post` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
+| `briar-glen-lane` | `shop-lane` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
+| `briar-glen-lane` | `brands-forge` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
+| `briar-glen-lane` | `fenns-fletchery` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
+| `briar-glen-lane` | `pells-bakery` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
+| `briar-glen-green` | `market-green` | `briar-glen-green/lane-gate` (lane-market-green) |
+| `briar-glen-green` | `lamplit-stacks` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
+| `briar-glen-green` | `watch-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
+| `briar-glen-green` | `vane-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
+| `briar-glen-green` | `schoolhouse` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
+| `briar-glen-green` | `cemetery` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
+| `briar-glen-green` | `glen-well` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
 | `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path) |
-| `briarwood` | `briarwood-edge` | `briarwood/town-gate` (market-green-briarwood-edge) |
+| `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
 | `briarwood` | `briarwood-hub` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `standing-horn` | none (a marker spawn; its trails are walked inside the scene) |
@@ -430,9 +447,9 @@ Every edge below has no scene transition yet. The first group needed new beads f
 
 | Bead | Edges |
 | --- | --- |
-| mw-e24.2 | `lane-bridge-post`, `lane-market-green` |
+| mw-e24.2 | `lane-bridge-post` |
 | mw-e24.5 | `green-stacks` |
-| mw-e24.7 | `green-forge`, `green-fletchery`, `green-bakery` |
+| mw-e24.7 | `lane-forge`, `lane-fletchery`, `lane-bakery` |
 | mw-e24.8 | `green-watch-house`, `watch-house-cell`, `jail-drain` |
 | mw-e24.9 | `green-vane-house` |
 | mw-e24.10 | `green-glen-well`, `glen-well-cistern` |
@@ -451,10 +468,10 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.13 | `quay-adit-mouth`, `weeping-adit` |
 | mw-e25.14 | `lock-gate-crossing` |
 | mw-e25.15 | `barge-quay-lock` |
-| mw-e25.22 | `market-green-briarwood-edge` |
-| mw-e25.23 | `miners-bridge` |
+| mw-e25.22 | `lane-briarwood-edge` |
+| mw-e25.23 | `miners-bridge`, `green-mine-road`, `mine-road-gate` |
 | mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
-| mw-e25.25 | `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge`, `priory-road-nave` |
+| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge`, `priory-road-nave` |
 | mw-e26.2 | `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` |
 | mw-e26.4 | `silver-vane-gallery`, `vane-gallery-breach` |
 | mw-e26.5 | `nave-choir`, `nave-crypt` |
@@ -482,7 +499,7 @@ Shortcut facts: `pnpm world:validate` warns (AC-2) for each shortcut fact no pla
 ## Open questions (canon gaps for the owner)
 
 - **Where does the Sleepers' Path end?** The bible gives it a place in the Briarwood (§3.5) and has the sleepwalkers go to the mine gate (§4.1 beat 2), but never says the path leads there. The map assumes it ends at the mine gate (`sleepers-path-mine-gate`, a tracker's secret); if it should lead to the priory or the Standing Horn, change that one edge.
-- **How does the town reach the Briarwood?** The bible says the forest is "above the town" without a gate or lane. The map has a `market-green-briarwood-edge` path; the real entry (a gate in the lane, the cemetery, Vane House's rise) is open.
+- **How does the town reach the Briarwood?** The bible says the forest is "above the town" without a gate or lane. The map has a `lane-briarwood-edge` path: the lane's woodside path (mw-e25.22), a few steps from the gate to Market Green (mw-e24.2); whether the town should also open onto the forest from the green is open.
 - **Where is the quay relative to the bridge?** Idris's riverbank (under the bridge) is built; the map puts the quay downriver of it and the Weeping Adit mouth upriver. If the adit sits much further up the valley it may need its own approach path.
 - **Which side is the Millweir far bank?** §3.1 says the sluice walk reaches "the Briarwood's far bank"; the map joins it to the forest hub by a path.
 - **Does the Fold have a second exit?** Only Horn's Hall reaches it, so it is a dead end by design.

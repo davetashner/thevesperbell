@@ -1,0 +1,104 @@
+{
+  "$schema": "../../../data/behaviour.schema.json",
+  "id": "greybox-villager",
+  "notes": "Dev-only grey box (mw-e22.9), not shipped: a villager who walks her patrol route, dwelling at each waypoint, and keeps walking when she notices someone (Suspicious here only means \"noticed someone\"; the creature smoke battery expects every creature to react to the player). She has no combat state and no attacks; struck from the unseen she is Alerted for a few seconds and then settles. Talking to her pauses the route (src/sim/ai/conversing.ts) and ending the conversation resumes it.",
+  "tuning": {
+    "alertedTimeoutS": 6,
+    "suspiciousTimeoutS": 5
+  },
+  "thinkHz": 10,
+  "inertia": 0.1,
+  "initial": "unaware",
+  "states": {
+    "unaware": {
+      "transitions": [
+        {
+          "to": "suspicious",
+          "when": {
+            "input": "awareness",
+            "gte": {
+              "tuning": "suspiciousAt"
+            }
+          }
+        },
+        {
+          "to": "alerted",
+          "when": {
+            "event": "damaged-by-unseen"
+          }
+        }
+      ],
+      "activities": ["patrol", "return-to-route"]
+    },
+    "alerted": {
+      "timeoutS": {
+        "tuning": "alertedTimeoutS"
+      },
+      "onTimeout": "unaware",
+      "activities": ["steady"]
+    },
+    "suspicious": {
+      "timeoutS": {
+        "tuning": "suspiciousTimeoutS"
+      },
+      "onTimeout": "unaware",
+      "transitions": [
+        {
+          "to": "alerted",
+          "when": {
+            "event": "damaged-by-unseen"
+          }
+        }
+      ],
+      "activities": ["patrol", "return-to-route"]
+    }
+  },
+  "activities": {
+    "patrol": {
+      "considerations": [
+        {
+          "input": "offRoute",
+          "curve": {
+            "kind": "step",
+            "at": 1.5,
+            "below": 1,
+            "above": 0
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "follow-route",
+          "dwellS": 2
+        }
+      ]
+    },
+    "return-to-route": {
+      "considerations": [
+        {
+          "input": "offRoute",
+          "curve": {
+            "kind": "step",
+            "at": 1.5,
+            "below": 0,
+            "above": 1
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "move-to",
+          "target": "nearest-waypoint"
+        }
+      ]
+    },
+    "steady": {
+      "steps": [
+        {
+          "do": "wait",
+          "seconds": 1
+        }
+      ]
+    }
+  }
+}

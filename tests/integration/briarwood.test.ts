@@ -164,8 +164,8 @@ describe('the bramble gates (mw-e25.1 AC-2)', () => {
 });
 
 describe('the woodside path (mw-e25.22)', () => {
-  it('AC-2: edge market-green-briarwood-edge lists both transitions, and each leads to a spawn of the other scene', () => {
-    const edge = world?.edges.find((e) => e.id === 'market-green-briarwood-edge');
+  it('AC-2: edge lane-briarwood-edge lists both transitions, and each leads to a spawn of the other scene', () => {
+    const edge = world?.edges.find((e) => e.id === 'lane-briarwood-edge');
     expect(edge?.transitions).toEqual(['briar-glen-lane/woodside-path', 'briarwood/town-gate']);
     const lane = content.get('scene', 'briar-glen-lane');
     const out = lane.transitions.find((t) => t.id === 'woodside-path');
