@@ -226,14 +226,72 @@ export function decayedScore(record: DispositionRecord, now: number): number {
     : Math.min(record.baseline, record.score + drift);
 }
 
+/** One open transaction: the first-seen record of each touched entity, and events held back. */
+interface Frame {
+  readonly undo: Map<EntityId, DispositionRecord | undefined>;
+  readonly held: (() => void)[];
+  /** This transaction (not an earlier one) registered the component. */
+  registered: boolean;
+}
+
 /** Disposition of creatures toward the player in one world. */
 export class Dispositions {
   readonly #world: World<never>;
   readonly #config: DispositionConfig;
+  readonly #frames: Frame[] = [];
 
   constructor(world: World<never>, config: DispositionConfig) {
     this.#world = world;
     this.#config = config;
+  }
+
+  /**
+   * Opens a transaction (mw-e22.15). Until it settles, changes apply immediately (reads see them)
+   * but their DispositionChanged / StanceChanged / BandChanged events are held. `commit` publishes
+   * them in order; `rollback` restores every touched record (removing components that were added)
+   * and drops them. Checkpoints nest and must settle innermost first, each exactly once: an inner
+   * commit folds into the enclosing one, so it is undone with it. If the batch registered the
+   * component and it ends up empty, it is unregistered again, so the world hashes as before.
+   */
+  checkpoint(): { commit(): void; rollback(): void } {
+    const frame: Frame = { undo: new Map(), held: [], registered: false };
+    this.#frames.push(frame);
+    const settle = (): Frame => {
+      if (this.#frames[this.#frames.length - 1] !== frame) {
+        throw new Error('disposition checkpoint settled twice or out of order');
+      }
+      this.#frames.pop();
+      return frame;
+    };
+    return {
+      commit: () => {
+        settle();
+        const parent = this.#frames[this.#frames.length - 1];
+        if (parent === undefined) {
+          for (const publish of frame.held) publish();
+          return;
+        }
+        for (const [entity, record] of frame.undo) {
+          if (!parent.undo.has(entity)) parent.undo.set(entity, record);
+        }
+        parent.held.push(...frame.held);
+        parent.registered ||= frame.registered;
+      },
+      rollback: () => {
+        settle();
+        for (const [entity, record] of frame.undo) {
+          if (record === undefined) this.#world.remove(entity, DispositionComponent);
+          else this.#world.set(entity, DispositionComponent, record);
+        }
+        if (frame.registered) this.#world.unregisterIfEmpty(DispositionComponent);
+      },
+    };
+  }
+
+  #publish(publish: () => void): void {
+    const frame = this.#frames[this.#frames.length - 1];
+    if (frame === undefined) publish();
+    else frame.held.push(publish);
   }
 
   #now(): number {
@@ -301,14 +359,25 @@ export class Dispositions {
     const after = clampDisposition(before + delta);
     if (after === before) return { after, moved: false };
     const next: DispositionRecord = Object.freeze({ ...record, score: after, at: now });
+    const frame = this.#frames[this.#frames.length - 1];
+    if (frame !== undefined && !frame.undo.has(entity)) {
+      frame.undo.set(
+        entity,
+        this.#world.isRegistered(DispositionComponent)
+          ? this.#world.get(entity, DispositionComponent)
+          : undefined,
+      );
+    }
     if (
       this.#world.isRegistered(DispositionComponent) &&
       this.#world.has(entity, DispositionComponent)
     ) {
       this.#world.set(entity, DispositionComponent, next);
     } else {
-      if (!this.#world.isRegistered(DispositionComponent))
+      if (!this.#world.isRegistered(DispositionComponent)) {
         this.#world.register(DispositionComponent);
+        if (frame !== undefined) frame.registered = true;
+      }
       this.#world.add(entity, DispositionComponent, next);
     }
     const stanceBefore = dispositionStance(before);
@@ -327,9 +396,12 @@ export class Dispositions {
       bandBefore,
       bandAfter,
     };
-    this.#world.events.emit(DispositionChanged, change);
-    if (stanceBefore !== stanceAfter) this.#world.events.emit(DispositionStanceChanged, change);
-    if (bandBefore !== bandAfter) this.#world.events.emit(DispositionBandChanged, change);
+    const { events } = this.#world;
+    this.#publish(() => {
+      events.emit(DispositionChanged, change);
+      if (stanceBefore !== stanceAfter) events.emit(DispositionStanceChanged, change);
+      if (bandBefore !== bandAfter) events.emit(DispositionBandChanged, change);
+    });
     return { after, moved: true };
   }
 
@@ -400,10 +472,12 @@ export function dispositionLogicHost(
   dispositions: Dispositions,
   resolve: (npc: string) => EntityId | undefined,
 ): {
+  checkpoint(): { commit(): void; rollback(): void };
   disposition(npc: string): number;
   adjustDisposition(npc: string, delta: number): string | undefined;
 } {
   return {
+    checkpoint: () => dispositions.checkpoint(),
     disposition(npc) {
       const entity = resolve(npc);
       return entity === undefined ? 0 : dispositions.get(entity);

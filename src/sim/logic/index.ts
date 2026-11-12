@@ -2,6 +2,7 @@
 // JSON-serializable language for dialogue, quests, shops, loot and deeds.
 export * from './apply';
 export * from './builtins';
+export * from './compose';
 export * from './evaluate';
 export * from './memory-host';
 export * from './registry';

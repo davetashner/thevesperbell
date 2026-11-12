@@ -46,22 +46,38 @@ test('AC-2: stuck arrows show "Take arrows (n)" and Interact puts them back in t
       { timeout: 30_000 },
     )
     .toBeLessThan(-4);
-  // Wait for three arrows to be stuck whole.
+  // Wait on game state, not time (mw-3xx). The readout's `latest` is the newest arrow, and right after
+  // each shot that one is still flying (its position is mid-room), so aiming at it once left the player
+  // facing the wrong way for good: CI trace, yaw -2.91 against -1.46 wanted. Wait until the newest arrow
+  // is stuck, three have stuck, and one of them came to rest whole: a stone wall breaks 60% of arrows,
+  // and a broken one has no prompt.
+  interface Readout {
+    stuck: number;
+    intact: number;
+    latest: { state: string; position: { x: number; z: number } } | null;
+  }
+  const arrows = async (): Promise<Readout | null> => {
+    const json = await app.getAttribute('data-arrows');
+    return json === null ? null : (JSON.parse(json) as Readout);
+  };
+  // Take the spot from the very reading that passed: a second read can find the next arrow in flight.
+  const rested: { at: { x: number; z: number } | null } = { at: null };
   await expect
     .poll(
       async () => {
-        const json = await app.getAttribute('data-arrows');
-        return json === null ? 0 : (JSON.parse(json) as { stuck: number }).stuck;
+        const r = await arrows();
+        const latest = r?.latest;
+        const ready = r !== null && r.stuck >= 3 && r.intact >= 1 && latest?.state === 'stuck';
+        rested.at = ready ? { x: latest.position.x, z: latest.position.z } : null;
+        return rested.at !== null;
       },
-      { timeout: 60_000 },
+      { timeout: 90_000 },
     )
-    .toBeGreaterThanOrEqual(3);
-  const latest = JSON.parse((await app.getAttribute('data-arrows')) ?? '{}') as {
-    latest: { position: { x: number; z: number } };
-  };
-  // One turnTo can run out of moves on a slow runner and leave the player facing the room (mw-fd3:
-  // CI failed all three tries that way), so keep turning until the aim is true.
-  const aim = { x: latest.latest.position.x, z: latest.latest.position.z };
+    .toBe(true);
+  // The pile is all one spot on the wall. One turnTo can run out of moves on a slow runner and leave
+  // the player facing the room (mw-fd3), so keep turning until the aim is true.
+  const aim = rested.at;
+  if (aim === null) throw new Error('no resting arrow');
   await expect
     .poll(async () => Math.abs((await turnTo(page, aim)).error), { timeout: 60_000 })
     .toBeLessThan(0.1);
