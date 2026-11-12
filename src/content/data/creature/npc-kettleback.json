@@ -1,0 +1,47 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-kettleback",
+  "family": "rootcellar-goblin",
+  "tags": ["npc", "goblin", "matriarch", "leader"],
+  "stats": {
+    "health": 50,
+    "poise": 20,
+    "mass": 40,
+    "size": "small"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "unaligned",
+  "disposition": {
+    "towardPlayer": "neutral",
+    "classAffinity": {
+      "thief": 15,
+      "knight": -10
+    }
+  },
+  "personality": {
+    "bravery": 0.7,
+    "curiosity": 0.6,
+    "aggression": 0.2,
+    "diligence": 0.8,
+    "sociability": 0.6,
+    "greed": 0.8
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
+  "presentation": {
+    "mesh": "placeholder-capsule",
+    "sfx": "placeholder"
+  }
+}

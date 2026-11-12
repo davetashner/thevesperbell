@@ -71,7 +71,7 @@ describe('validateDialogues', () => {
       ...ENV,
       references: contentReferences(content),
     });
-    expect(report.dialogues).toBe(2);
+    expect(report.dialogues).toBe(3);
     expect(report.errors).toEqual([]);
   });
 

@@ -1,0 +1,47 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-hale",
+  "family": "human",
+  "tags": ["npc", "guard", "captain", "leader"],
+  "stats": {
+    "health": 90,
+    "poise": 40,
+    "mass": 100,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "bridge-watch",
+  "disposition": {
+    "towardPlayer": "friendly",
+    "classAffinity": {
+      "knight": 10,
+      "thief": -15
+    }
+  },
+  "personality": {
+    "bravery": 0.8,
+    "curiosity": 0.4,
+    "aggression": 0,
+    "diligence": 0.9,
+    "sociability": 0.5,
+    "greed": 0.1
+  },
+  "behaviour": {
+    "profile": "watchman"
+  },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
+  "presentation": {
+    "mesh": "placeholder-capsule",
+    "sfx": "placeholder"
+  }
+}
