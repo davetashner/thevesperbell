@@ -1,0 +1,347 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "oswin-forge",
+  "notes": "Oswin Brand (bible 5.7), seventy, deaf in one ear and loud in both; swords for nobody until now. Secret: his father cast the replacement clapper of the Vesper Bell eighty years ago and Oswin still has the mould. AC-4: the option `recast-tongue` is offered only when fact bell-tongue.destroyed holds (registered by mw-e39.6; the main quest, mw-e39.4, sets it when the tongue is destroyed) and is `once`: it is gone after it is chosen. It sets oswin.recast-commissioned and emits smith.recast-tongue. The recast is imperfect by design (bible 5.7). Class reactions per bible: knight repairs armour free once, archer arrowheads, sorcerer asks to heat his forge (Ember) for a discount, thief lockpicks 'for miners', deadpan. Merchant greeting and farewell lines vary by class.",
+  "speakers": [
+    {
+      "id": "oswin",
+      "npc": "npc-oswin"
+    }
+  ],
+  "entries": [
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "A KNIGHT. In my forge. WHAT? No, don't touch the, I'll do it, give me that. Sit, sit, I'll have a look at that armour. Free, once. Don't tell the miners.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Archer! Good. Arrowheads. Broadheads, bodkins, whatever you like. Nobody's asked for a proper bodkin since Sergeant Mooring. What is it?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "WHAT? No. WHAT? Oh, a sorcerer. Fire. You do fire, don't you? Ember. Oh, I've always wanted to see that near a forge. Sit. Sit! What can I do?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "WHAT? Speak up, I'm deaf in the one ear and you're standing on it. Picks? For miners, yes. Very stubborn locks, down the mine. Very stubborn miners.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "WHAT? No. WHAT? Oh, a customer. Speak up, I'm deaf in the one ear and you're standing on it. Oh, you want it sharper. Everyone wants it sharper.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "WHAT? Oh, you. Back again. Good. Good! I was just thinking of you. Not you, specifically. Customers, in general. What is it?",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-sharper",
+          "text": "I need something sharper.",
+          "once": true,
+          "next": "sharper-1"
+        },
+        {
+          "id": "ask-commission",
+          "text": "Do you have any real work going?",
+          "once": true,
+          "next": "commission-1"
+        },
+        {
+          "id": "ask-mould",
+          "text": "I hear your family cast for the priory.",
+          "once": true,
+          "next": "mould-1"
+        },
+        {
+          "id": "recast-tongue",
+          "text": "The Vesper Bell's tongue is destroyed. Can you cast another?",
+          "when": {
+            "kind": "fact",
+            "fact": "bell-tongue.destroyed"
+          },
+          "once": true,
+          "next": "recast-effects"
+        },
+        {
+          "id": "repair-knight",
+          "text": "Could you look at my armour?",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "smith.repair-armour",
+              "data": {
+                "free": true
+              }
+            }
+          ],
+          "next": "repair-1"
+        },
+        {
+          "id": "heads-archer",
+          "text": "Arrowheads. What do you have?",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "heads-1"
+        },
+        {
+          "id": "ember-sorcerer",
+          "text": "I could heat the forge for you. Ember.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "smith.forge-heated",
+              "data": {
+                "discount": true
+              }
+            }
+          ],
+          "next": "ember-1"
+        },
+        {
+          "id": "picks-thief",
+          "text": "I hear you sell lockpicks. For miners.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "picks-1"
+        },
+        {
+          "id": "leave",
+          "text": "Never mind.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "sharper-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Everyone wants it sharper! Forty years! Nobody asks if it's the right shape. A sharp wrong blade's only a wrong blade that's more insulting. Shape first. Then sharp.",
+      "next": "hub"
+    },
+    {
+      "id": "commission-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Swords for nobody, forty years. Picks for the mine. Pick, pick, pick. My hands are going, and I'd like, WHAT? I'd like one more real thing before they go. A real commission. Hint hint.",
+      "next": "hub"
+    },
+    {
+      "id": "mould-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "My father cast the Vesper Bell's clapper, eighty years ago. The priory's own tongue had cracked, a sorry thing. I've still got the mould. In the loft. Under a sack. Don't ask the sack.",
+      "next": "hub"
+    },
+    {
+      "id": "recast-effects",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "oswin.recast-commissioned",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "smith.recast-tongue"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oswin",
+          "delta": 10
+        }
+      ],
+      "next": "recast-1"
+    },
+    {
+      "id": "recast-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Destroyed? WHAT? Gone? Then it's the mould, and the mould's in the loft. It won't ring true, the second cast never does, but it'll ring. Bring me bronze and I'll bring the fire. A real commission!",
+      "next": "hub"
+    },
+    {
+      "id": "repair-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Give it here, GIVE it here. Dented at the shoulder, aye, and the rivet's a disgrace. No charge. The miners can have their own customers. You're mine.",
+      "next": "hub"
+    },
+    {
+      "id": "heads-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Broadheads for deer, bodkins for armour, and a thing I do with a barb if you've a grudge. Ask at the counter. I'll do you a fair price. I'm deaf, not daft.",
+      "next": "hub"
+    },
+    {
+      "id": "ember-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "You'll do WHAT? Oh, lovely. Oh, go on, the coals, there, and mind the beard. Hah! A hundred years of bellows and you do it with a sentence. Discount, aye. Take the discount.",
+      "next": "hub"
+    },
+    {
+      "id": "picks-1",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Picks, yes. For miners. Very stubborn locks, down the mine. Very stubborn miners. Don't look at me like that, I've an honest face and a deaf ear.",
+      "next": "hub"
+    },
+    {
+      "id": "farewell",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "farewell-knight"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "farewell-archer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "farewell-sorcerer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "farewell-thief"
+        }
+      ],
+      "else": "farewell-any"
+    },
+    {
+      "id": "farewell-knight",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Mind that shoulder, knight! Come back and I'll make it sing!",
+      "end": true
+    },
+    {
+      "id": "farewell-archer",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Keep the heads sharp! Keep the shafts straight!",
+      "end": true
+    },
+    {
+      "id": "farewell-sorcerer",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Keep your Ember lit! I'll keep the coals warm!",
+      "end": true
+    },
+    {
+      "id": "farewell-thief",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "For miners! Remember, for MINERS!",
+      "end": true
+    },
+    {
+      "id": "farewell-any",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "WHAT? Oh, leaving. Mind the door. Door's a bit of a hazard.",
+      "end": true
+    }
+  ]
+}

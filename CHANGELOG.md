@@ -14,6 +14,7 @@ check enforces this).
 ### Added
 
 - Tansy Pell now stands at Pell's Bakery once you have rescued her, and is not there before: characters can appear in and leave a scene as the story changes (mw-e24.22).
+- You can now talk to people in Briar Glen: walk up to Juniper Fenn, Oswin Brand or Hollis Pell in the shop lane, or to Harrow Vane on Market Green, and press Interact to hear them. They greet each class differently, Hollis grieves for Tansy (or celebrates her return), Juniper confesses what her sleep-draughts may have done, Oswin offers to recast the Vesper Bell's tongue, and with Vane's ledger or Duggan Marl's word in hand you can confront the mine owner and make him confess, bribe you, flee or be exposed (mw-e39.6).
 - Briar Glen is now a whole town: at the north end of the shop lane a gate opens on Market Green, with its notice board, the Glen Well, the three-storey Lamplit Stacks leaning on the forge yard, the Watch House, the schoolhouse, the lychgate cemetery and Vane House's tower on its rise (visible from across town); doors to buildings without interiors yet are shut, and the mine road and priory road gates are signposted but not open (mw-e24.2).
 - Conversations now have a proper dialogue screen: a speaker name and portrait slot, lines that type out at a speed you choose (Enter shows the rest), replies you pick with 1 to 9, the arrows, a controller or the mouse, [Knight]-style tags, locked replies that say what they need, difficulty labels before a persuasion and its score breakdown after, and a history you open with H; text size, text background and the new Dialogue text speed and High contrast dialogue options apply to it (mw-e22.10).
 - You can now talk to the greybox villager in the debug conversation room: walk up, press Interact, and she stops walking her route to chat, picking up where she left off when you say goodbye, walk away or danger turns up.
@@ -505,6 +506,7 @@ check enforces this).
 
 ### Fixed
 
+- Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).
 - An arrow stuck in a wall can now be taken back when you stand right up against that wall: the wall no longer hides it from reach, so "Take arrow" no longer shows with nothing to take, or fails to show at all (mw-fh5, mw-5h9).
 - A chandelier, anvil or other heavy thing dropped on a creature or a training dummy now hurts it, and so does standing in fire: until now only the knight took crush and fire damage from the world, and whoever cut the rope gets the blame (mw-aps).
 - Walking past lights no longer sets you on fire: lanterns and glazed sconces never burn anyone, and open flames (torches, candles, braziers, fireplaces) burn only when you actually step into the flame, instead of within three quarters of a metre of anything alight. A burning crate or a kicked brazier still burns as before.

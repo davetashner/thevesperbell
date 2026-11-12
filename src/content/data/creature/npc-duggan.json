@@ -27,6 +27,7 @@
   "behaviour": {
     "profile": "shopkeeper"
   },
+  "dialogue": "duggan-testimony",
   "audio": {
     "idleLoop": "sfx-human-idle",
     "footsteps": "sfx-human-step",
