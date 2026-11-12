@@ -35,6 +35,14 @@
       "priority": 0,
       "destination": { "scene": "briarwood", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "moorings-watch-reload",
+      "notes": "Death at Mooring's Watch (mw-e25.6): the region is the whole scene; the death screen offers Load last save, and with no save the watch restarts at the head of the spur trail.",
+      "region": "moorings-watch",
+      "priority": 0,
+      "destination": { "scene": "moorings-watch", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }

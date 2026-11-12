@@ -122,6 +122,7 @@ describe('the walkable world (mw-e01.11)', () => {
       'briar-glen-lane',
       'briar-glen-green',
       'briarwood',
+      'moorings-watch',
       'marsh-store',
       'sleeping-ox',
     ];
