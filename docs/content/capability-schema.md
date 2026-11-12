@@ -20,3 +20,4 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `capabilities[].classAffinity` | `"knight"` \| `"archer"` \| `"sorcerer"` \| `"thief"` | — | The class whose fantasy it belongs to (ADR-0004); absent = any class. |
 | `capabilities[].crossClass` | boolean | — | Other classes may learn it through the same source (ADR-0004 "simple" rule); default false. |
 | `capabilities[].supporting` | boolean | — | A supporting (numeric) entry rather than a verb (ADR-0004 P1, P2); default false. |
+| `capabilities[].climbDifficulty` | integer 1–3 | — | The hardest climb difficulty (1 ladders, ropes and ivy; 2 rough stone and timber; 3 sheer faces) holding this capability lets the actor attempt (mw-e10.9); an actor attempts the highest of its capabilities, and 1 with none. Absent = grants none. |

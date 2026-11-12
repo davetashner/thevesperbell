@@ -1436,6 +1436,22 @@
           ],
           "additionalProperties": false,
           "description": "How it is equipped."
+        },
+        "rope": {
+          "description": "Makes the tool a climbing rope (mw-e10.9): tied at a level’s rope anchor with Interact, it hangs this far and climbs like any rope until untied.",
+          "type": "object",
+          "properties": {
+            "length": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 50,
+              "description": "How far the rope hangs from its anchor once tied, metres."
+            }
+          },
+          "required": [
+            "length"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [

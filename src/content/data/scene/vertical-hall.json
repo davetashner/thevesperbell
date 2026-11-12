@@ -1,0 +1,112 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "vertical-hall",
+  "name": "Vertical hall",
+  "description": "Grey-box tall hall for climbing (mw-e10.9), standing in for the stealth course's vertical hall until that course is built (mw-e10.17): a 10 \u00d7 7 m floor under 7.5 m walls with a 5 m rafter platform against the back wall. Three ways up: a ladder on the front face (every class: walk into it and hold forward), a rough stone face on the west end (the thief: jump at it; a knight is told it is too hard), and a climbing rope lying on the floor that ties off at the hook on the platform's east edge (stand on top, Interact, and it hangs for everyone). Reach it with ?scene=vertical-hall.",
+  "grid": 1,
+  "camera": {
+    "position": [0, 9, -12],
+    "target": [0, 2.5, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [5, 1, 3.5]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 3.5],
+      "scale": [5, 2.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -3.5],
+      "scale": [5, 2.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-5, 0, 0],
+      "yaw": 90,
+      "scale": [3.5, 2.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [5, 0, 0],
+      "yaw": 90,
+      "scale": [3.5, 2.5, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [2, 0, 2.25],
+      "scale": [1.5, 5, 0.875]
+    },
+    {
+      "piece": "platform",
+      "at": [2, 0, 1.25],
+      "scale": [0.4, 5, 0.125],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [0.25, 0, 2.25],
+      "scale": [0.25, 5, 0.4],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -2.5],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "hall-rope",
+      "at": [-3, 0, -2.5],
+      "item": {
+        "id": "climbing-rope"
+      }
+    },
+    {
+      "id": "rafter-hook",
+      "at": [3.75, 5, 2.25],
+      "tags": ["rope-anchor"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "climb",
+            "label": "Tie rope",
+            "requires": [
+              {
+                "item": "climbing-rope"
+              }
+            ],
+            "reason": "Needs a climbing rope"
+          },
+          {
+            "verb": "release",
+            "label": "Untie rope"
+          }
+        ],
+        "radius": 0.5
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.45,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [0.3, -1, 0.4],
+        "level": 0.5,
+        "reach": 40
+      }
+    ]
+  }
+}

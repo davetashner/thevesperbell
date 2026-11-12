@@ -28,6 +28,9 @@ const NOT_FOR_SALE = new Set([
   'bent-pick-head',
   'rusted-lamp-hook',
   'rusted-knife',
+  // The climbing rope is found in levels and tied at their rope hooks (mw-e10.9); whether and where
+  // a shop sells it is the economy pass's call.
+  'climbing-rope',
   // Starter weapons for the reach and wall recoil rules (mw-e04.15); weapon loot is e18.
   'spear',
   'mace',

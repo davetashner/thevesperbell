@@ -74,6 +74,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `climb.maxCornerAngle` | number 0–90 | required | Sharpest turn between two faces a climber follows round a corner, degrees. |
 | `climb.slipGraceMs` | integer 0–10000 | required | How long a climber holds a surface that became impossible to hold (frozen, burning) before falling, whole ms. |
 | `climb.staminaPerSecond` | number 0–1000 | required | Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9). |
+| `climb.staminaByDifficulty` | list of any (at least 3) | — | Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2. |
 | `climb.jumpOff` | object | required | Jumping off a climbed surface. |
 | `climb.jumpOff.away` | number 0–20 | required | Speed away from the surface, m/s. |
 | `climb.jumpOff.up` | number 0–20 | required | Upward speed, m/s. |
@@ -206,6 +207,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `classes.<key>.climb.maxCornerAngle` | number 0–90 | — | Sharpest turn between two faces a climber follows round a corner, degrees. |
 | `classes.<key>.climb.slipGraceMs` | integer 0–10000 | — | How long a climber holds a surface that became impossible to hold (frozen, burning) before falling, whole ms. |
 | `classes.<key>.climb.staminaPerSecond` | number 0–1000 | — | Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9). |
+| `classes.<key>.climb.staminaByDifficulty` | list of any (at least 3) | — | Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2. |
 | `classes.<key>.climb.jumpOff` | object | — |  |
 | `classes.<key>.climb.jumpOff.away` | number 0–20 | — | Speed away from the surface, m/s. |
 | `classes.<key>.climb.jumpOff.up` | number 0–20 | — | Upward speed, m/s. |

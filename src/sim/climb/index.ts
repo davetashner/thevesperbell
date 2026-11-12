@@ -5,3 +5,5 @@ export * from './surfaces';
 export * from './mantle';
 export * from './climb';
 export * from './ropes';
+export * from './rope-placement';
+export * from './rope-anchors';

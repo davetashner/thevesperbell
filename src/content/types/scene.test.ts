@@ -1012,6 +1012,7 @@ describe('scene content', () => {
       'valley-02',
       'valley-03',
       'variant-room',
+      'vertical-hall',
       'watchers',
       'weak-wall-room',
     ]);
@@ -1273,5 +1274,20 @@ describe('scene supports and rope bridges (mw-e03.13)', () => {
     expect(byId.get('anvil')?.suspendedFrom).toBe('anvil-rope');
     expect(byId.get('chandelier-rope')?.rope?.support?.resistances.pierce).toBe(0.3);
     expect(byId.get('rope-bridge')?.bridge).toMatchObject({ planks: 12, rating: 150 });
+  });
+
+  it('ships the vertical hall: a ladder, a rough face and a rope hook up to a 5 m rafter platform (mw-e10.9)', () => {
+    const scene = loadContent(contentTypes, gameContentSources(), contentChecks).get(
+      'scene',
+      'vertical-hall',
+    );
+    const grades = scene.placements.flatMap((p) =>
+      p.purpose === 'climbable' ? [p.properties?.climbable] : [],
+    );
+    expect(grades).toEqual(['ladder', 'rough']);
+    const hook = scene.spawns.find((s) => s.tags.includes('rope-anchor'));
+    expect(hook?.at).toEqual([3.75, 5, 2.25]);
+    expect(hook?.interact?.affordances.map((a) => a.verb)).toEqual(['climb', 'release']);
+    expect(scene.spawns.find((s) => s.item?.id.id === 'climbing-rope')).toBeDefined();
   });
 });

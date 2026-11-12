@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Climbing now asks how hard the climb is: ladders, ropes and ivy are easy for everyone, rough stone and timber is for the thief (a knight who jumps at it is told it is too hard to climb), harder faces tire you faster, and running out of stamina on a wall drops you, with fall damage and a loud landing. Levels mark climbable surfaces, and a climbing rope can be tied off at a level's rope hooks (Interact) so everyone, creatures included, has a way up until it is untied; try the ladder, the rough face and the hook on the rafter platform in `?scene=vertical-hall` (mw-e10.9).
 - You can now walk out of Briar Glen into the Briarwood: a woodside path at the north end of the shop lane leads to a 300 by 250 metre grey-box forest with its trails, clearings, bramble gates that burn open and a way back to town.
 - The dungeon no longer ends at a dead end: past the exit vestibule a short passage leads out onto the mountain road (valley-01), and the slice-complete card now offers Continue on the mountain road, so a new game walks on through the valley to Briar Glen; the valley road's first gate leads back into the dungeon, which remembers its opened doors and looted chest (mw-e24.21).
 - The shipped (release) build no longer carries the debug demos and probes (the animation, arrow, awareness, spell and effect demos, the F2 fly camera and the frame-time probe); they load only in debug builds, which keeps the first download smaller and the release free of developer tools.
