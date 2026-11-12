@@ -61,5 +61,16 @@ describe('world map load checks', () => {
     expect(check('marsh-door', { transitions: ['valley-01/north-gate'] })[0]!.message).toContain(
       'leads scene "valley-01" to "valley-02"',
     );
+    // Not a scene/transition reference at all.
+    expect(check('marsh-door', { transitions: ['no-slash'] })[0]!.message).toContain(
+      'no scene has',
+    );
+    // A built transition on an edge whose ends are not built yet.
+    const planned = real.edges.find((e) =>
+      [e.from, e.to].every((end) => real.nodes.find((n) => n.id === end)?.scene === undefined),
+    )!;
+    expect(check(planned.id, { transitions: ['valley-01/north-gate'] })[0]!.message).toContain(
+      'whose scenes are unbuilt and unbuilt',
+    );
   });
 });

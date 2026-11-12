@@ -68,10 +68,8 @@ export const checkWorld: ContentCheck = (entries: readonly LoadedEntry[]) => {
       }
       const ends = [nodes.get(edge.from), nodes.get(edge.to)];
       edge.transitions.forEach((t, k) => {
-        const [sceneId, transitionId] = TRANSITION_REF.exec(t)?.slice(1) ?? [];
-        const transition = scenes
-          .get(sceneId ?? '')
-          ?.transitions.find((x) => x.id === transitionId);
+        const [, sceneId = '', transitionId = ''] = TRANSITION_REF.exec(t) ?? [];
+        const transition = scenes.get(sceneId)?.transitions.find((x) => x.id === transitionId);
         const pointer = `${at('transitions')}/${String(k)}`;
         if (transition === undefined) {
           problem(pointer, `names transition "${t}", which no scene has`);
@@ -83,7 +81,7 @@ export const checkWorld: ContentCheck = (entries: readonly LoadedEntry[]) => {
         if (!joins) {
           problem(
             pointer,
-            `transition "${t}" leads scene "${sceneId ?? ''}" to "${target}", but the edge joins "${edge.from}" and "${edge.to}" whose scenes are ${ends.map((n) => n?.scene?.id ?? 'unbuilt').join(' and ')}`,
+            `transition "${t}" leads scene "${sceneId}" to "${target}", but the edge joins "${edge.from}" and "${edge.to}" whose scenes are ${ends.map((n) => n?.scene?.id ?? 'unbuilt').join(' and ')}`,
           );
         }
       });
