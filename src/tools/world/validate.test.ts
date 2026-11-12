@@ -255,10 +255,10 @@ describe('defensive edges of the producer scan and class lookup', () => {
           puzzle('elsewhere', []),
           puzzle('s', [{ kind: 'reset' }, { kind: 'reset', fact: 's.reset' }]),
         ],
-        'respawn-rules': [],
+        'respawn-rules': [{ rules: [{ factsToSet: [{ fact: 'r.respawned' }] }] }],
       })[type] ?? [];
     const produced = producedFacts({ all } as unknown as Parameters<typeof producedFacts>[0]);
-    expect([...produced].sort()).toEqual(['s.reset', 's.solved']);
+    expect([...produced].sort()).toEqual(['r.respawned', 's.reset', 's.solved']);
   });
 
   it('treats a missing class file as no capabilities, and names the bead of an unproduced shortcut', () => {
