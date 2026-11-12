@@ -420,7 +420,15 @@ describe('the four harbour dialogues', () => {
   });
 
   it('AC-5: no other Briar Glen dialogue names Nell, Mags or the Gull unless gated on wendmouth.visited', () => {
-    const harbour = new Set(FOUR);
+    // Wendmouth's own people may name the Gull and its regulars freely; the
+    // hearsay rule is for speakers outside the harbour.
+    const harbour = new Set<string>([
+      ...FOUR,
+      'cray-customs',
+      'tereza-arms-stall',
+      'quell-harbor-agent',
+      'hesketh-gilded-tern',
+    ]);
     for (const dialogue of content.all('dialogue')) {
       if (harbour.has(dialogue.id)) continue;
       for (const node of dialogue.nodes) {

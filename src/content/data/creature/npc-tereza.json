@@ -27,6 +27,7 @@
     "sociability": 0.6,
     "greed": 0.7
   },
+  "dialogue": "tereza-arms-stall",
   "behaviour": {
     "profile": "shopkeeper"
   },
