@@ -1,0 +1,1038 @@
+{
+  "$comment": "The MVP obstacle x class route matrix (mw-e16.1). docs/design/route-matrix.md explains it; src/content/route-matrix.test.ts proves it against the capability registry, class files and connectivity.json. mw-e16.2 turns it into validated content data.",
+  "classes": ["knight", "archer", "sorcerer", "thief"],
+  "mineEntries": [
+    {
+      "id": "front-gate",
+      "name": "Front gate: Vane's key, the padlock or the vent chimney",
+      "obstacle": "mine-gate"
+    },
+    {
+      "id": "side-boarding",
+      "name": "Smash the rotted side-boarding",
+      "obstacle": "mine-gate"
+    },
+    {
+      "id": "winch-cage",
+      "name": "Shoot the winch pulley to drop the cage",
+      "obstacle": "mine-gate"
+    },
+    {
+      "id": "inner-bar",
+      "name": "Mage Hand the inner bar or Ember the rope latch",
+      "obstacle": "mine-gate"
+    },
+    {
+      "id": "supply-tunnel",
+      "name": "The long way: Mooring's Watch and its supply tunnel",
+      "obstacle": "supply-tunnel"
+    },
+    {
+      "id": "weeping-adit",
+      "name": "Up the river through the flooded Weeping Adit",
+      "obstacle": "weeping-adit"
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "mine-gate",
+      "name": "The boarded mine gate",
+      "tier": "mandatory",
+      "area": "deepworks",
+      "node": "mine-gate",
+      "beat": "\u00a74.1 beat 5",
+      "summary": "The front of the Deepworks, sealed by Vane's order. Four class routes through the gate itself and a social route with the key.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Shoulder through the rotted side-boarding.",
+          "source": "\u00a74.1 beat 5; \u00a74.3 knight",
+          "status": "edge",
+          "entry": "side-boarding"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.pinning-shot"],
+          "how": "Shoot the winch pulley so the cage drops and the gate opens (the edge uses Pinning Shot for the pulley pin).",
+          "source": "\u00a74.1 beat 5",
+          "status": "edge",
+          "entry": "winch-cage"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand", "spell.ember"],
+          "how": "Mage Hand the inner bar, or Ember the rope latch.",
+          "source": "\u00a74.1 beat 5",
+          "status": "edge",
+          "entry": "inner-bar"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick", "verb.climb.rough"],
+          "how": "Pick the padlock, or climb the ventilation chimney.",
+          "source": "\u00a74.1 beat 5",
+          "status": "edge",
+          "entry": "front-gate"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Vane's key: persuade, bargain, or steal it (a thief can pickpocket it). Fact deepworks.gate-open.",
+          "source": "\u00a74.1 beat 5",
+          "status": "canon",
+          "entry": "front-gate"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Take the long way: supply-tunnel (Briarwood and Mooring's Watch) or weeping-adit (river).",
+          "source": "\u00a74.1 beat 5",
+          "status": "canon"
+        }
+      ],
+      "edge": "mine-gate-winch"
+    },
+    {
+      "id": "supply-tunnel",
+      "name": "The collapsed supply tunnel",
+      "tier": "mandatory",
+      "area": "moorings-watch",
+      "node": "supply-tunnel",
+      "beat": "\u00a74.1 beat 5",
+      "summary": "The 'long way' round the gate (bible \u00a74.1 beat 5). The edge lists only knight and sorcerer; the archer and thief routes are proposed edge additions (Open questions).",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Clear the collapse by hand: barge the rotted cribbing and heave the rubble.",
+          "source": "\u00a74.3 knight",
+          "status": "edge",
+          "entry": "supply-tunnel"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.firebolt"],
+          "how": "Burn the timber cribbing that holds the fall (the edge uses Firebolt).",
+          "source": "world-map edge",
+          "status": "edge",
+          "entry": "supply-tunnel"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.rope"],
+          "how": "Loose a rope arrow into the roof timber above the fall and climb over through the gap.",
+          "source": "proposal",
+          "status": "proposal",
+          "entry": "supply-tunnel"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough"],
+          "how": "Squeeze up the cracked wall and through the gap over the fall.",
+          "source": "proposal",
+          "status": "proposal",
+          "entry": "supply-tunnel"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Dig it out with the miners' picks left in the tunnel: slow and loud (game-time cost, noise event).",
+          "source": "proposal",
+          "status": "proposal",
+          "entry": "supply-tunnel"
+        }
+      ],
+      "edge": "supply-tunnel-collapse"
+    },
+    {
+      "id": "weeping-adit",
+      "name": "The Weeping Adit",
+      "tier": "mandatory",
+      "area": "river",
+      "node": "weeping-adit-mouth",
+      "beat": "\u00a74.1 beat 5",
+      "summary": "The river way in, found through Mags or a rumour. Every class can use the barge ride; the class routes are quicker.",
+      "routes": [
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": [],
+          "how": "Frostglass the current's edge to make a footing.",
+          "source": "\u00a74.1 beat 5",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "spell.frostglass",
+              "epic": "mw-e08"
+            }
+          ],
+          "entry": "weeping-adit"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.rope"],
+          "how": "Anchor a rope across the flooded run to the lower ledge.",
+          "source": "proposal",
+          "status": "proposal",
+          "entry": "weeping-adit"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough"],
+          "how": "Traverse the adit wall above the waterline.",
+          "source": "proposal",
+          "status": "proposal",
+          "entry": "weeping-adit"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Burst the rotted sluice boards to drop the water to a wadeable level.",
+          "source": "proposal",
+          "status": "proposal",
+          "entry": "weeping-adit"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Swim (needs verb.swim), raft, or ride an empty stone barge being winched back up (found via Mags Oakum or rumour 16).",
+          "source": "\u00a74.1 beat 5",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "verb.swim",
+              "epic": "mw-e02"
+            }
+          ],
+          "entry": "weeping-adit"
+        }
+      ],
+      "edge": "weeping-adit"
+    },
+    {
+      "id": "goblin-camp-passage",
+      "name": "The Rootcellar goblin camp passage",
+      "tier": "mandatory",
+      "area": "deepworks",
+      "node": "rootcellar-camp",
+      "beat": "\u00a74.1 beat 6",
+      "summary": "Wary, not murderous goblins hold the cutting hall on the critical path.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shield-bash", "technique.parry"],
+          "how": "Fight through: shield-bash the guards and parry the spears.",
+          "source": "\u00a74.1 beat 6",
+          "status": "canon"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.pinning-shot"],
+          "how": "Pin sentries to the timber from cover and slip past (Hushed shots).",
+          "source": "\u00a74.1 beat 6 (sneak)",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.fire-wall"],
+          "how": "Raise a Fire Wall that scares the camp off the passage (registry capability beyond the MVP set).",
+          "source": "\u00a74.1 beat 6",
+          "status": "proposal"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["trick.pickpocket"],
+          "how": "Walk through as kin (\"You smell like pockets\"); let Snig try his luck.",
+          "source": "\u00a74.3 thief",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Talk to Mother Kettleback; sneak past; the camp can be fought, sneaked or talked (fact tracked for Framed in Brass).",
+          "source": "\u00a74.1 beat 6",
+          "status": "canon"
+        }
+      ]
+    },
+    {
+      "id": "outer-ring-gate",
+      "name": "The Outer Ring gate",
+      "tier": "mandatory",
+      "area": "knot",
+      "node": "knot-outer-ring",
+      "beat": "\u00a74.1 beat 7",
+      "summary": "Where the player enters the Knot: Hornfolk runes and the Scales puzzle at the Outer Ring Hornfolk gate. The bible is silent on class routes; all four are proposals around the canon puzzle.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shield-bash"],
+          "how": "Bash the jammed pan-weights loose so the scales settle.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Cut the gate counterweight strap from range.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Lift the right weights onto the Hornfolk scales from a distance.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick"],
+          "how": "Pick the horn-lock under the scales.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "puzzle",
+          "capabilities": [],
+          "how": "Solve the Scales puzzle (puzzle scales-room, mw-e15 audits solutions).",
+          "source": "bible puzzle placement (mw-e26.1)",
+          "status": "canon"
+        }
+      ],
+      "edge": "breach-outer-ring"
+    },
+    {
+      "id": "ossuary-crossing",
+      "name": "The Ossuary crossing",
+      "tier": "mandatory",
+      "area": "knot",
+      "node": "ossuary-galleries",
+      "beat": "\u00a74.1 beat 8",
+      "summary": "The pit between the Outer Ring and the Chapel, home of Clatter and the Forgotten.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.parry"],
+          "how": "Hold the narrow span: parry the Forgotten across it.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.rope"],
+          "how": "Rope line across the pit from the near ledge.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.ember"],
+          "how": "Light the pit braziers one by one (the Dark Crossing puzzle needs light).",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough"],
+          "how": "Go round the pit wall by hand, in the dark.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "puzzle",
+          "capabilities": [],
+          "how": "Solve the Dark Crossing puzzle (dark-crossing); or hum the hymn and Clatter guides you across.",
+          "source": "\u00a74.1 beat 8; bible puzzle placement",
+          "status": "canon"
+        }
+      ],
+      "edge": "outer-ring-ossuary"
+    },
+    {
+      "id": "chapel-of-echoes",
+      "name": "The Chapel of Echoes",
+      "tier": "mandatory",
+      "area": "knot",
+      "node": "chapel-of-echoes",
+      "beat": "\u00a74.2",
+      "summary": "Where sound misbehaves; a portcullis bars the way to Horn's Hall.",
+      "routes": [
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Drop the Chapel portcullis with a single shot at the counterweight.",
+          "source": "\u00a74.2 Trick; \u00a74.3 archer",
+          "status": "canon"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Ring the chime ropes from range so the echoes settle.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick"],
+          "how": "Pick the winch-house lock beside the portcullis and raise it.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Burst the rotted rood screen beside the portcullis.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "puzzle",
+          "capabilities": [],
+          "how": "Solve the Chimes puzzle (chimes).",
+          "source": "bible puzzle placement",
+          "status": "canon"
+        }
+      ],
+      "edge": "ossuary-chapel"
+    },
+    {
+      "id": "horns-hall-fold-access",
+      "name": "Horn's Hall and the Fold",
+      "tier": "mandatory",
+      "area": "knot",
+      "node": "horns-hall",
+      "beat": "\u00a74.1 beat 10; \u00a74.2",
+      "summary": "The pivotal Warden encounter: every resolution lets the player into the Fold.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.parry"],
+          "how": "The Trial of Horns: first to three clean parries or blocks counts as Befriend.",
+          "source": "\u00a74.2 table; \u00a74.3 knight",
+          "status": "canon"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Trap Horn behind the dropped Chapel portcullis (shoot the counterweight).",
+          "source": "\u00a74.2 Trick",
+          "status": "canon"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": [],
+          "how": "Lure Horn away with a Mirror Self decoy, or read the runes on his axe aloud.",
+          "source": "\u00a74.2 Trick; \u00a74.3 sorcerer",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "spell.mirror-self",
+              "epic": "mw-e08"
+            }
+          ]
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["trick.pickpocket"],
+          "how": "Steal the Fold's horn-key from his belt, or sneak all the way to the Fold.",
+          "source": "\u00a74.2 Trick; \u00a74.3 thief",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Befriend (hum the hymn, return the horn-ring or name-stone, have Snig or Clatter vouch, lower your weapon) or fight (and spare or kill).",
+          "source": "\u00a74.2",
+          "status": "canon"
+        }
+      ],
+      "edge": "horns-hall-fold"
+    },
+    {
+      "id": "cradle",
+      "name": "The Cradle",
+      "tier": "mandatory",
+      "area": "knot",
+      "node": "the-cradle",
+      "beat": "\u00a74.1 beat 12",
+      "summary": "The heart of the Knot; the abbot holds the Bell's tongue.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.parry", "technique.riposte"],
+          "how": "Fight the abbot: parry and riposte the Hushlings; sound and light break his song.",
+          "source": "\u00a74.1 beat 12",
+          "status": "canon"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Shoot out the lanterns that anchor his form.",
+          "source": "\u00a74.3 archer",
+          "status": "canon"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": [],
+          "how": "Mirror Self sings the hymn in his voice so the Forgotten turn on him.",
+          "source": "\u00a74.1 beat 12; \u00a74.3 sorcerer",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "spell.mirror-self",
+              "epic": "mw-e08"
+            }
+          ]
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["trick.pickpocket"],
+          "how": "Lift the tongue from his belt mid-song.",
+          "source": "\u00a74.1 beat 12; \u00a74.3 thief",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Persuade him to rest (needs Clatter to remember his name), or fight him, or join him (dark path).",
+          "source": "\u00a74.1 beat 12; \u00a74.4",
+          "status": "canon"
+        }
+      ],
+      "edge": "horns-hall-cradle"
+    },
+    {
+      "id": "sounding-shaft",
+      "name": "The Sounding Shaft climb",
+      "tier": "mandatory",
+      "area": "knot",
+      "node": "sounding-shaft-foot",
+      "beat": "\u00a74.1 beat 13",
+      "summary": "The vertical ascent from the Cradle to the belfry.",
+      "routes": [
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.rope"],
+          "how": "Shoot a rope line up the shaft to skip half the climb.",
+          "source": "\u00a74.3 archer",
+          "status": "canon"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough"],
+          "how": "Free-climb the rough shaft wall past the counterweights.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Haul the counterweight chains to make a stair from range.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.ledge"],
+          "how": "Climb the bell-ropes and ledges; or hold the shaft foot while Clatter climbs with the tongue (sacrifice beat).",
+          "source": "\u00a74.3 knight",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Climb the old bell-ropes and counterweights with the song rising behind (a chase if nobody holds the foot).",
+          "source": "\u00a74.1 beat 13",
+          "status": "canon"
+        }
+      ],
+      "edge": "sounding-shaft"
+    },
+    {
+      "id": "belfry",
+      "name": "The belfry",
+      "tier": "mandatory",
+      "area": "priory",
+      "node": "belfry",
+      "beat": "\u00a74.1 beats 9 and 14",
+      "summary": "Reachable by the priory door in Act II or by the shaft in Act III; ringing the bell is the finale.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Burst the jammed stair door from the nave.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.rope"],
+          "how": "Rope arrow up the roofless stairwell and climb.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Lift the stair bar from the nave side; mending the crack (Frostglass) is a better ringing.",
+          "source": "\u00a74.3 sorcerer",
+          "status": "proposal",
+          "needs": [
+            {
+              "capability": "spell.frostglass",
+              "epic": "mw-e08"
+            }
+          ]
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick"],
+          "how": "Pick the stair-door lock.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Arrive from below by the Sounding Shaft; hang the tongue and ring the bell.",
+          "source": "\u00a74.1 beats 13 and 14",
+          "status": "canon"
+        }
+      ],
+      "edge": "nave-belfry"
+    },
+    {
+      "id": "bay-nine",
+      "name": "Bay nine (Bonded Warehouse)",
+      "tier": "quest",
+      "area": "wendmouth",
+      "node": "bonded-warehouse",
+      "beat": "\u00a73.6; Crate for Mr. S\u2014",
+      "summary": "Mandatory inside the Crate for Mr. S\u2014 quest; optional for the main quest.",
+      "routes": [
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough", "tool.lockpick"],
+          "how": "Skylight and hoist beams in, then pick the bay seal.",
+          "source": "\u00a73.6; \u00a74.3 thief",
+          "status": "canon"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Cut the hoist strap to drop the crate to the quay door.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Lift the seal and manifest from the desk while the watchman is away.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Force the bay door (loud: the night watchman responds).",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "item",
+          "capabilities": [],
+          "how": "Forged manifest and customs-seal stamp from the Undertow; dockhand disguise.",
+          "source": "\u00a73.6",
+          "status": "canon"
+        }
+      ],
+      "edge": "wharf-bonded-warehouse"
+    },
+    {
+      "id": "customs-strongroom",
+      "name": "The Customs House strongroom",
+      "tier": "quest",
+      "area": "wendmouth",
+      "node": "customs-house",
+      "beat": "\u00a73.6; \u00a74.3 sorcerer",
+      "summary": "Holds confiscated goods, including restricted spellbooks.",
+      "routes": [
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick"],
+          "how": "Pick the strongroom lock; the net-lofts roof route gives a way in (edge net-lofts-customs-roof).",
+          "source": "\u00a73.6",
+          "status": "edge"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Lift confiscated books through the grille.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.ricochet-shot"],
+          "how": "Bank an arrow off the vault stone to knock the key from its hook.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Break the door (loud: Inspector Cray's clerks respond).",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Bribe or talk Inspector Cray.",
+          "source": "\u00a73.6",
+          "status": "canon"
+        }
+      ],
+      "edge": "wharf-customs-house"
+    },
+    {
+      "id": "gilded-tern",
+      "name": "The Gilded Tern",
+      "tier": "quest",
+      "area": "wendmouth",
+      "node": "gilded-tern",
+      "beat": "\u00a73.6; \u00a74.3",
+      "summary": "Sails when Act III begins; the locked berth of Mr. S\u2014's agent.",
+      "routes": [
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": [],
+          "how": "Freeze the harbour pool and walk to the Tern.",
+          "source": "\u00a74.3 sorcerer",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "spell.frostglass",
+              "epic": "mw-e08"
+            }
+          ]
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Cut the cargo net as the crate is hoisted so it drops into the harbour.",
+          "source": "\u00a74.3 archer",
+          "status": "canon"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough", "tool.lockpick"],
+          "how": "Climb the rigging and pick the passenger berth lock.",
+          "source": "\u00a73.6; \u00a74.3 thief",
+          "status": "canon"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Brawl up the gangway and burst the berth door.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Bribe a lighter-man to row you out; stowaway among the cargo.",
+          "source": "proposal",
+          "status": "proposal"
+        }
+      ],
+      "edge": "wharf-gilded-tern"
+    },
+    {
+      "id": "undertow",
+      "name": "The Undertow",
+      "tier": "quest",
+      "area": "wendmouth",
+      "node": "undertow",
+      "beat": "\u00a73.6",
+      "summary": "The black market; thief tools and smuggled books.",
+      "routes": [
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["sense.tracking"],
+          "how": "Follow the smugglers' wet bootprints to the Drowned Gull trapdoor (edge gull-trapdoor).",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": ["technique.shoulder-barge"],
+          "how": "Burst the breakwater door.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick"],
+          "how": "Pick the breakwater door.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Lift the latch bar through the door slats.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Ask Nell Gannet at the Drowned Gull; she opens the trapdoor.",
+          "source": "\u00a73.6",
+          "status": "canon"
+        }
+      ],
+      "edge": "gull-trapdoor"
+    },
+    {
+      "id": "moorings-watch",
+      "name": "Mooring's Watch (Hollow Sentinels)",
+      "tier": "optional",
+      "area": "moorings-watch",
+      "node": "moorings-tower",
+      "beat": "\u00a74.3",
+      "summary": "Optional for the main quest (the tower can be skipped); gives the signal mirror and keeper's log.",
+      "routes": [
+        {
+          "classes": ["knight"],
+          "kind": "capability",
+          "capabilities": [],
+          "how": "Formally relieve the Hollow Sentinels by speaking the old words of the watch.",
+          "source": "\u00a74.3 knight",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "technique.old-words",
+              "epic": "mw-e04"
+            }
+          ]
+        },
+        {
+          "classes": ["archer"],
+          "kind": "capability",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Shoot the tower's bell cord to end the watch; turn the signal mirror.",
+          "source": "\u00a74.3 archer",
+          "status": "canon"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": [],
+          "how": "Dispel the Sentinels.",
+          "source": "\u00a74.1; \u00a74.3",
+          "status": "canon",
+          "needs": [
+            {
+              "capability": "spell.dispel",
+              "epic": "mw-e08"
+            }
+          ]
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough"],
+          "how": "Climb the tower wall and sneak past.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Sneak or shatter them.",
+          "source": "\u00a74.3",
+          "status": "canon"
+        }
+      ],
+      "edge": "courtyard-tower"
+    },
+    {
+      "id": "vane-strongbox",
+      "name": "Vane House strongbox",
+      "tier": "optional",
+      "area": "town",
+      "node": "vane-house",
+      "beat": "\u00a74.3 thief",
+      "summary": "The thief's commission; optional for everyone.",
+      "routes": [
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["verb.climb.rough", "tool.lockpick"],
+          "how": "Rooftop route, strongbox lock, ledger.",
+          "source": "\u00a74.3 thief",
+          "status": "edge"
+        },
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Lift the strongbox key from the desk through the study window.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Invited in by Vane (knight courted, bounty hirelings) and shown the ledger honestly.",
+          "source": "\u00a74.3 knight",
+          "status": "canon"
+        }
+      ],
+      "edge": "rooftop-vane-house"
+    },
+    {
+      "id": "restricted-shelf",
+      "name": "Mirela's restricted shelf",
+      "tier": "optional",
+      "area": "town",
+      "node": "lamplit-stacks",
+      "beat": "\u00a74.3 sorcerer",
+      "summary": "The back room of the Lamplit Stacks.",
+      "routes": [
+        {
+          "classes": ["sorcerer"],
+          "kind": "capability",
+          "capabilities": ["spell.mage-hand"],
+          "how": "Mirela opens the back room to you (restricted shelf access).",
+          "source": "\u00a74.3 sorcerer",
+          "status": "canon"
+        },
+        {
+          "classes": ["thief"],
+          "kind": "capability",
+          "capabilities": ["tool.lockpick"],
+          "how": "Pick the back-room door after hours.",
+          "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Earn Mirela's trust through the Vesperine Hours quest line.",
+          "source": "\u00a74.1 beat 4",
+          "status": "canon"
+        }
+      ],
+      "edge": "green-stacks"
+    }
+  ],
+  "gaps": [
+    {
+      "obstacle": "vane-strongbox",
+      "classes": ["thief", "sorcerer"],
+      "fix": "Add a secret edge vane-house-cellar-grate (market-green to vane-house, kind secret) with routes technique.shoulder-barge (knight breaks the cellar grate) and arrow.rope (archer, over the garden wall to the study roof). Owner: mw-e26.1 / mw-e24.",
+      "edge": {
+        "id": "vane-house-cellar-grate",
+        "from": "market-green",
+        "to": "vane-house",
+        "kind": "secret",
+        "routes": ["technique.shoulder-barge", "arrow.rope"]
+      }
+    },
+    {
+      "obstacle": "restricted-shelf",
+      "classes": ["sorcerer", "thief"],
+      "fix": "Make the back room a locked door edge lamplit-stacks-back-room (lamplit-stacks to the back room, kind door) with routes tool.lockpick, spell.mage-hand and technique.shoulder-barge (loud: Mirela's anger), giving thief, sorcerer and knight. Owner: mw-e24 (Lamplit Stacks).",
+      "edge": {
+        "id": "lamplit-stacks-back-room",
+        "from": "lamplit-stacks",
+        "to": "lamplit-stacks-back-room",
+        "kind": "door",
+        "routes": ["tool.lockpick", "spell.mage-hand", "technique.shoulder-barge"]
+      }
+    }
+  ]
+}
