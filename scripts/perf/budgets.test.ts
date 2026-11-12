@@ -57,6 +57,7 @@ describe('perf budgets (mw-e32.1)', () => {
         ['high', 'low'].map((preset) => ['reference', scene, preset, 0]),
       ),
       ['reference', 'briarwood', 'high', 0],
+      ['reference', 'briar-glen-green', 'high', 0],
     ]);
     expect(budgets.find((b) => b.id === 'frame-p95-high')).toMatchObject({
       max: 16.7,

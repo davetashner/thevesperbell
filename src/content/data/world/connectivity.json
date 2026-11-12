@@ -110,43 +110,48 @@
       "name": "Market Green",
       "area": "town",
       "epic": "e24",
-      "scene": "briar-glen-lane",
-      "notes": "The town's heart with the notice board (bible 3.5). Stand-in until mw-e24.2 builds the green: the north end of briar-glen-lane (its woodside path, mw-e25.22), which owns the way into the Briarwood."
+      "scene": "briar-glen-green",
+      "notes": "The town's heart with the notice board (bible 3.5): the open square of the briar-glen-green scene (mw-e24.2), reached from the shop lane's north end by the green-gate and lane-gate transitions."
     },
     {
       "id": "lamplit-stacks",
       "name": "The Lamplit Stacks",
       "area": "town",
       "epic": "e24",
-      "notes": "Mirela's bookshop (bible 3.5, 5.1)."
+      "notes": "Mirela's bookshop (bible 3.5, 5.1). Three storeys leaning west onto the forge yard (mw-e24.2 greybox).",
+      "scene": "briar-glen-green"
     },
     {
       "id": "brands-forge",
       "name": "Brand's Forge",
       "area": "town",
       "epic": "e24",
-      "notes": "Oswin Brand's smithy (bible 3.5, 5.7)."
+      "notes": "Oswin Brand's smithy (bible 3.5, 5.7).",
+      "scene": "briar-glen-lane"
     },
     {
       "id": "fenns-fletchery",
       "name": "Fenn's Fletchery & Simples",
       "area": "town",
       "epic": "e24",
-      "notes": "Juniper Fenn's shop (bible 3.5, 5.6)."
+      "notes": "Juniper Fenn's shop (bible 3.5, 5.6).",
+      "scene": "briar-glen-lane"
     },
     {
       "id": "pells-bakery",
       "name": "Pell's Bakery",
       "area": "town",
       "epic": "e24",
-      "notes": "Hollis Pell's bakery (bible 3.5, 5.5)."
+      "notes": "Hollis Pell's bakery (bible 3.5, 5.5).",
+      "scene": "briar-glen-lane"
     },
     {
       "id": "watch-house",
       "name": "The Watch House",
       "area": "town",
       "epic": "e24",
-      "notes": "Captain Hale's post with its one-cell jail (bible 3.5, 5.2)."
+      "notes": "Captain Hale's post with its one-cell jail (bible 3.5, 5.2).",
+      "scene": "briar-glen-green"
     },
     {
       "id": "jail-cell",
@@ -160,28 +165,32 @@
       "name": "Vane House",
       "area": "town",
       "epic": "e24",
-      "notes": "The mine owner's house on the rise (bible 3.5, 5.3)."
+      "notes": "The mine owner's house on the rise (bible 3.5, 5.3). A 40 m tower on a 4 m rise: visible from everywhere in town (mw-e24.2).",
+      "scene": "briar-glen-green"
     },
     {
       "id": "schoolhouse",
       "name": "The schoolhouse",
       "area": "town",
       "epic": "e24",
-      "notes": "Empty; its teacher is missing (bible 3.5)."
+      "notes": "Empty; its teacher is missing (bible 3.5).",
+      "scene": "briar-glen-green"
     },
     {
       "id": "cemetery",
       "name": "The lychgate cemetery",
       "area": "town",
       "epic": "e24",
-      "notes": "Vesperine graves (bible 3.5)."
+      "notes": "Vesperine graves (bible 3.5).",
+      "scene": "briar-glen-green"
     },
     {
       "id": "glen-well",
       "name": "The Glen Well",
       "area": "town",
       "epic": "e24",
-      "notes": "A loose ladder-rung leads to the old cistern (bible 3.5)."
+      "notes": "A loose ladder-rung leads to the old cistern (bible 3.5).",
+      "scene": "briar-glen-green"
     },
     {
       "id": "town-rooftops",
@@ -282,6 +291,13 @@
       "area": "moorings-watch",
       "epic": "e25",
       "notes": "Old supply tunnel up to the collapse (bible 3.5; mine side is E26)."
+    },
+    {
+      "id": "mine-road",
+      "name": "The mine road",
+      "area": "deepworks",
+      "epic": "e25",
+      "notes": "The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23."
     },
     {
       "id": "mine-gate",
@@ -578,8 +594,8 @@
       "from": "bridge-post",
       "to": "shop-lane",
       "kind": "path",
-      "bead": "mw-e24.2",
-      "notes": "Same scene: the post and the lane are one street."
+      "notes": "Same scene: the post and the lane are one street.",
+      "bead": "mw-e24.2"
     },
     {
       "id": "marsh-door",
@@ -618,8 +634,8 @@
       "from": "shop-lane",
       "to": "market-green",
       "kind": "path",
-      "bead": "mw-e24.2",
-      "notes": "The lane runs up to Market Green."
+      "notes": "The woodside pocket at the lane's north end opens east onto Market Green (mw-e24.2): briar-glen-lane/green-gate leads in, briar-glen-green/lane-gate back.",
+      "transitions": ["briar-glen-lane/green-gate", "briar-glen-green/lane-gate"]
     },
     {
       "id": "green-stacks",
@@ -630,28 +646,28 @@
       "notes": "Bookshop door."
     },
     {
-      "id": "green-forge",
-      "from": "market-green",
+      "id": "lane-forge",
+      "from": "shop-lane",
       "to": "brands-forge",
       "kind": "door",
       "bead": "mw-e24.7",
-      "notes": "Forge door."
+      "notes": "Forge door. The shop's counter is in the lane scene (mw-ju8.5); its interior is this bead."
     },
     {
-      "id": "green-fletchery",
-      "from": "market-green",
+      "id": "lane-fletchery",
+      "from": "shop-lane",
       "to": "fenns-fletchery",
       "kind": "door",
       "bead": "mw-e24.7",
-      "notes": "Fletchery door."
+      "notes": "Fletchery door. The shop's counter is in the lane scene (mw-ju8.5); its interior is this bead."
     },
     {
-      "id": "green-bakery",
-      "from": "market-green",
+      "id": "lane-bakery",
+      "from": "shop-lane",
       "to": "pells-bakery",
       "kind": "door",
       "bead": "mw-e24.7",
-      "notes": "Bakery door."
+      "notes": "Bakery door. The shop's counter is in the lane scene (mw-ju8.5); its interior is this bead."
     },
     {
       "id": "green-watch-house",
@@ -676,6 +692,30 @@
       "kind": "path",
       "bead": "mw-e24.9",
       "notes": "Up the rise to Vane House."
+    },
+    {
+      "id": "green-mine-road",
+      "from": "market-green",
+      "to": "mine-road",
+      "kind": "path",
+      "bead": "mw-e25.23",
+      "notes": "South wall gate of the green: the mine road. A planned edge stub (briar-glen-green exit-mine-road: signpost and shut gate) until mw-e25.23 builds the road."
+    },
+    {
+      "id": "mine-road-gate",
+      "from": "mine-road",
+      "to": "mine-gate",
+      "kind": "path",
+      "bead": "mw-e25.23",
+      "notes": "The mine road runs to the boarded gate (bible 3.5)."
+    },
+    {
+      "id": "green-priory-road",
+      "from": "market-green",
+      "to": "priory-road",
+      "kind": "path",
+      "bead": "mw-e25.25",
+      "notes": "East wall gate of the green: the priory road. A planned edge stub (briar-glen-green exit-priory-road: signpost and shut gate) until mw-e25.25 builds the way."
     },
     {
       "id": "green-schoolhouse",
@@ -725,11 +765,11 @@
       "notes": "Thieves climb the rough stonework of Vane House onto its roof; others take the front path."
     },
     {
-      "id": "market-green-briarwood-edge",
-      "from": "market-green",
+      "id": "lane-briarwood-edge",
+      "from": "shop-lane",
       "to": "briarwood-edge",
       "kind": "path",
-      "notes": "Upper lane / woodside path from the green into the forest. Market Green is not built yet (mw-e24.2), so the lane's north end (the woodside path past the Bridgeward College) stands in for it: briar-glen-lane/woodside-path leads into the Briarwood and briarwood/town-gate leads back (mw-e25.22).",
+      "notes": "The woodside path at the lane's north end leads into the forest: briar-glen-lane/woodside-path leads in and briarwood/town-gate back (mw-e25.22). It leaves the lane's woodside pocket, a few steps from the green-gate to Market Green (mw-e24.2 kept this exit in place).",
       "transitions": ["briar-glen-lane/woodside-path", "briarwood/town-gate"]
     },
     {
@@ -1282,7 +1322,7 @@
       "id": "watchtower-tunnel-upper-mine",
       "name": "Watchtower supply tunnel and upper mine",
       "edges": [
-        "market-green-briarwood-edge",
+        "lane-briarwood-edge",
         "edge-hub",
         "hub-moorings",
         "courtyard-supply-tunnel",
@@ -1290,8 +1330,7 @@
         "winch-galleries",
         "mine-gate-winch",
         "miners-bridge",
-        "lane-bridge-post",
-        "lane-market-green"
+        "lane-bridge-post"
       ]
     },
     {
@@ -1317,7 +1356,8 @@
         "priory-road-nave",
         "hub-priory-road",
         "edge-hub",
-        "market-green-briarwood-edge",
+        "lane-briarwood-edge",
+        "lane-market-green",
         "green-glen-well"
       ]
     },
@@ -1370,8 +1410,7 @@
         "sluice-walk",
         "hub-far-bank",
         "edge-hub",
-        "market-green-briarwood-edge",
-        "lane-market-green",
+        "lane-briarwood-edge",
         "riverbank-path",
         "under-the-bridge-quay",
         "quay-millweir"

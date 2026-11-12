@@ -1,0 +1,1064 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "briar-glen-green",
+  "name": "Briar Glen: Market Green",
+  "description": "Bead mw-e24.2: the rest of Briar Glen, a grey-box town square about 180 x 140 m behind the shop lane (briar-glen-lane stays the lane district; this scene is its second district, reached by the lane-gate transition from the lane's north end, the green-gate stub beside the woodside path; arrive-from-briar-glen-lane stands inside the west gate). Market Green is the open square in the middle (notice-board, the Glen Well with its loose-rung marker, stalls and street lanterns). Round it: the Lamplit Stacks on the west side, three storeys that visibly lean to the west onto the brands-forge-yard annex (the Forge's rear smithy, whose counter and front are in the lane); the Watch House on the north side; the schoolhouse on the east side; the lychgate cemetery south-east; and Vane House on a four metre rise in the north-east, reached by a broad stair, its 40 m tower the tallest thing in town so it can be seen from everywhere (the power geography). Brand's Forge, Fenn's Fletchery & Simples, Pell's Bakery, Marsh's General Store, the Sleeping Ox and the Bridgeward College are in the lane scene. Building shells are solid masses with a doorway and a vestibule; the interiors are later beads, so each door is a locked wooden door (lock town-closed) with the hint 'Closed'. The mine road (south wall, exit-mine-road) and the priory road (east wall, exit-priory-road) are planned edge stubs: a doorway with a locked door (lock road-not-open) and a signpost, tagged planned:<bead>; the way into the Briarwood is the lane's woodside path. A new scene load (?scene=briar-glen-green) starts the player in Market Green (player-start, the perf budget's viewpoint).",
+  "grid": 1,
+  "camera": {
+    "position": [-60, 60, -30],
+    "target": [0, 0, 60]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0.0, 0.0, 70.0],
+      "scale": [90, 1, 70]
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, 0.0, 140.0],
+      "scale": [90.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-15.5, 0.0, 0.0],
+      "scale": [74.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [75.5, 0.0, 0.0],
+      "scale": [14.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-90.0, 0.0, 8.5],
+      "yaw": 90,
+      "scale": [8.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-90.0, 0.0, 81.5],
+      "yaw": 90,
+      "scale": [58.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0.0, 49.5],
+      "yaw": 90,
+      "scale": [49.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0.0, 120.5],
+      "yaw": 90,
+      "scale": [19.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [60.0, 0.0, 0.0]
+    },
+    {
+      "piece": "doorway",
+      "at": [90.0, 0.0, 100.0],
+      "yaw": 90
+    },
+    {
+      "piece": "pillar",
+      "at": [-1.5, 0.0, 60.0],
+      "scale": [0.5, 0.8, 0.5]
+    },
+    {
+      "piece": "pillar",
+      "at": [1.5, 0.0, 60.0],
+      "scale": [0.5, 0.8, 0.5]
+    },
+    {
+      "piece": "platform",
+      "at": [0.0, 1.0, 60.0],
+      "scale": [1.5, 1.25, 0.1],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [14.0, 0.0, 49.0],
+      "scale": [1.5, 1, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [14.0, 0.0, 47.0],
+      "scale": [1.5, 1, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [13.0, 0.0, 48.0],
+      "scale": [0.4, 1, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [15.0, 0.0, 48.0],
+      "scale": [0.4, 1, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "crate",
+      "at": [-14.0, 0.0, 56.0],
+      "scale": [1.2, 1, 1.2]
+    },
+    {
+      "piece": "crate",
+      "at": [-12.5, 0.0, 56.5],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [-10.0, 0.0, 64.0],
+      "scale": [1.2, 1, 1.2]
+    },
+    {
+      "piece": "crate",
+      "at": [-8.5, 0.0, 64.5],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [10.0, 0.0, 64.0],
+      "scale": [1.2, 1, 1.2]
+    },
+    {
+      "piece": "crate",
+      "at": [11.5, 0.0, 64.5],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [-12.0, 0.0, 40.0],
+      "scale": [1.2, 1, 1.2]
+    },
+    {
+      "piece": "crate",
+      "at": [-10.5, 0.0, 40.5],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [20.0, 0.0, 58.0],
+      "scale": [1.2, 1, 1.2]
+    },
+    {
+      "piece": "crate",
+      "at": [21.5, 0.0, 58.5],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-18.0, 0.0, 48.0],
+      "scale": [0.25, 0.9, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [18.0, 0.0, 52.0],
+      "scale": [0.25, 0.9, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [-6.0, 0.0, 72.0],
+      "scale": [0.25, 0.9, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [8.0, 0.0, 40.0],
+      "scale": [0.25, 0.9, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [-30.0, 0.0, 56.0],
+      "scale": [0.25, 0.9, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [30.0, 0.0, 48.0],
+      "scale": [0.25, 0.9, 0.25]
+    },
+    {
+      "piece": "platform",
+      "at": [-60.5, 0.0, 70.0],
+      "scale": [3.5, 6, 6.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "pillar",
+      "at": [-61.0, 0.0, 67.0],
+      "scale": [2.5, 3, 2.5]
+    },
+    {
+      "piece": "platform",
+      "at": [-51.0, 0.0, 66.0],
+      "scale": [5.95, 3.5, 3.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-51.0, 0.0, 74.0],
+      "scale": [5.95, 3.5, 3.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-52.0, 0.0, 70.0],
+      "scale": [5.0, 3.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-46.0, 3.0, 70.0],
+      "scale": [0.95, 0.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "doorway",
+      "at": [-45.0, 0.0, 70.0],
+      "yaw": 90
+    },
+    {
+      "piece": "platform",
+      "at": [-51.75, 3.5, 70.0],
+      "scale": [6.0, 3.5, 7.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-52.5, 7.0, 70.0],
+      "scale": [6.0, 3.5, 7.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "pillar",
+      "at": [-57.5, 3.5, 64.5],
+      "scale": [0.25, 1.2, 0.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [-57.5, 3.5, 75.5],
+      "scale": [0.25, 1.2, 0.25]
+    },
+    {
+      "piece": "platform",
+      "at": [-5.0, 0.0, 102.0],
+      "scale": [4.0, 6, 5.95],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [5.0, 0.0, 102.0],
+      "scale": [4.0, 6, 5.95],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [0.0, 0.0, 103.0],
+      "scale": [1.0, 6, 5.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [0.0, 3.0, 97.0],
+      "scale": [1.0, 3, 0.95],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "doorway",
+      "at": [0.0, 0.0, 96.0]
+    },
+    {
+      "piece": "platform",
+      "at": [65.0, 0.0, 66.0],
+      "scale": [4.95, 5, 3.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [65.0, 0.0, 58.0],
+      "scale": [4.95, 5, 3.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [66.0, 0.0, 62.0],
+      "scale": [4.0, 5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [61.0, 3.0, 62.0],
+      "scale": [0.95, 2, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "doorway",
+      "at": [60.0, 0.0, 62.0],
+      "yaw": 270
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 0.0, 16.75],
+      "yaw": 90,
+      "scale": [6.75, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 0.0, 32.25],
+      "yaw": 90,
+      "scale": [5.75, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [42.5, 0.0, 38.0],
+      "scale": [12.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [42.5, 0.0, 10.0],
+      "scale": [12.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [55.0, 0.0, 24.0],
+      "yaw": 90,
+      "scale": [14.0, 1, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [30.0, 0.0, 23.5],
+      "scale": [0.6, 1, 0.6]
+    },
+    {
+      "piece": "pillar",
+      "at": [30.0, 0.0, 26.5],
+      "scale": [0.6, 1, 0.6]
+    },
+    {
+      "piece": "platform",
+      "at": [30.0, 3.0, 25.0],
+      "scale": [0.5, 0.6, 1.8],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [36.5, 0.0, 14.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [36.5, 0.0, 20.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [36.5, 0.0, 29.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [36.5, 0.0, 34.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.5, 0.0, 14.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.5, 0.0, 20.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.5, 0.0, 29.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.5, 0.0, 34.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [46.5, 0.0, 14.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [46.5, 0.0, 20.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [46.5, 0.0, 29.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [46.5, 0.0, 34.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [51.5, 0.0, 14.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [51.5, 0.0, 20.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [51.5, 0.0, 29.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [51.5, 0.0, 34.25],
+      "scale": [0.4, 0.9, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "stairs",
+      "at": [30.0, 0.0, 101.0],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [30.0, 1.0, 103.0],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [30.0, 0.0, 103.0],
+      "scale": [3.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "stairs",
+      "at": [30.0, 2.0, 105.0],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [30.0, 0.0, 105.0],
+      "scale": [3.0, 2, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "stairs",
+      "at": [30.0, 3.0, 107.0],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [30.0, 0.0, 107.0],
+      "scale": [3.0, 3, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [52.5, 0.0, 123.0],
+      "scale": [32.5, 4, 15.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [39.5, 4.0, 123.0],
+      "scale": [9.5, 8, 10.95],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [60.5, 4.0, 123.0],
+      "scale": [9.5, 8, 10.95],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [50.0, 4.0, 124.0],
+      "scale": [1.0, 8, 10.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [50.0, 7.0, 113.0],
+      "scale": [1.0, 5, 0.95],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "doorway",
+      "at": [50.0, 4.0, 112.0]
+    },
+    {
+      "piece": "platform",
+      "at": [65.0, 12.0, 127.0],
+      "scale": [3.0, 28, 3.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "pillar",
+      "at": [-1.25, 0.0, 114.75],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-69.25, 0.0, 29.5],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-74.0, 0.0, 97.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [36.0, 0.0, 65.75],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-77.25, 0.0, 7.75],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-31.75, 0.0, 130.75],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-31.75, 0.0, 91.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [77.5, 0.0, 45.75],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-77.0, 0.0, 45.0],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-68.0, 0.0, 112.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [85.0, 0.0, 39.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [76.0, 0.0, 16.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-70.75, 0.0, 90.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [78.0, 0.0, 92.5],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-71.0, 0.0, 66.75],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [74.5, 0.0, 15.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-29.5, 0.0, 89.0],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-0.75, 0.0, 31.25],
+      "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "pillar",
+      "at": [-74.75, 0.0, 66.0],
+      "scale": [0.8, 1.6, 0.8]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "door-exit-mine-road",
+      "at": [60.0, 0.0, 0.0],
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "road-not-open"
+      }
+    },
+    {
+      "id": "exit-mine-road",
+      "at": [60.0, 0.0, 3.0],
+      "yaw": 180,
+      "tags": ["node", "exit-stub", "planned:mw-e25.23"]
+    },
+    {
+      "id": "sign-exit-mine-road",
+      "at": [58.5, 1.25, 2.5],
+      "tags": ["sign", "exit-stub"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the mine road"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "door-exit-priory-road",
+      "at": [90.0, 0.0, 100.0],
+      "yaw": 90,
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "road-not-open"
+      }
+    },
+    {
+      "id": "exit-priory-road",
+      "at": [87.0, 0.0, 100.0],
+      "yaw": 270,
+      "tags": ["node", "exit-stub", "planned:mw-e25.25"]
+    },
+    {
+      "id": "sign-exit-priory-road",
+      "at": [87.0, 1.25, 98.5],
+      "yaw": 90,
+      "tags": ["sign", "exit-stub"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the priory road"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "notice-board",
+      "at": [0.0, 1.0, 59.5],
+      "yaw": 180,
+      "tags": ["node", "notice-board"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the notice board"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "market-green",
+      "at": [0.0, 0.0, 52.0],
+      "tags": ["node", "region"]
+    },
+    {
+      "id": "glen-well",
+      "at": [14.0, 0.0, 45.5],
+      "yaw": 0,
+      "tags": ["node", "well"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Look down the Glen Well"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "glen-well-rung",
+      "at": [14.0, 0.5, 47.0],
+      "tags": ["prop", "well-rung"]
+    },
+    {
+      "id": "stall-1",
+      "at": [-14.0, 0.0, 56.0],
+      "tags": ["stall", "prop"]
+    },
+    {
+      "id": "stall-2",
+      "at": [-10.0, 0.0, 64.0],
+      "tags": ["stall", "prop"]
+    },
+    {
+      "id": "stall-3",
+      "at": [10.0, 0.0, 64.0],
+      "tags": ["stall", "prop"]
+    },
+    {
+      "id": "stall-4",
+      "at": [-12.0, 0.0, 40.0],
+      "tags": ["stall", "prop"]
+    },
+    {
+      "id": "stall-5",
+      "at": [20.0, 0.0, 58.0],
+      "tags": ["stall", "prop"]
+    },
+    {
+      "id": "street-lantern-1",
+      "at": [-18.0, 2.5, 48.0],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "street-lantern-2",
+      "at": [18.0, 2.5, 52.0],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "street-lantern-3",
+      "at": [-6.0, 2.5, 72.0],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "street-lantern-4",
+      "at": [8.0, 2.5, 40.0],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "street-lantern-5",
+      "at": [-30.0, 2.5, 56.0],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "street-lantern-6",
+      "at": [30.0, 2.5, 48.0],
+      "tags": ["lantern", "street"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "brands-forge-yard",
+      "at": [-60.5, 0.0, 70.0],
+      "tags": ["landmark", "forge-yard"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 86400
+      }
+    },
+    {
+      "id": "door-lamplit-stacks",
+      "at": [-45.0, 0.0, 70.0],
+      "yaw": 90,
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "town-closed"
+      }
+    },
+    {
+      "id": "lamplit-stacks",
+      "at": [-42.5, 0.0, 70.0],
+      "yaw": 270,
+      "tags": ["node", "door-front"]
+    },
+    {
+      "id": "sign-lamplit-stacks",
+      "at": [-44.5, 3.25, 70.0],
+      "yaw": 90,
+      "tags": ["sign"]
+    },
+    {
+      "id": "lantern-lamplit-stacks",
+      "at": [-44.0, 2.5, 68.0],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "stacks-lean",
+      "at": [-58.0, 10.5, 70.0],
+      "tags": ["landmark", "leans"]
+    },
+    {
+      "id": "door-watch-house",
+      "at": [0.0, 0.0, 96.0],
+      "yaw": 0,
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "town-closed"
+      }
+    },
+    {
+      "id": "watch-house",
+      "at": [0.0, 0.0, 93.5],
+      "yaw": 180,
+      "tags": ["node", "door-front"]
+    },
+    {
+      "id": "sign-watch-house",
+      "at": [0.0, 3.25, 95.5],
+      "yaw": 0,
+      "tags": ["sign"]
+    },
+    {
+      "id": "lantern-watch-house",
+      "at": [-2.0, 2.5, 95.0],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "door-schoolhouse",
+      "at": [60.0, 0.0, 62.0],
+      "yaw": 270,
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "town-closed"
+      }
+    },
+    {
+      "id": "schoolhouse",
+      "at": [57.5, 0.0, 62.0],
+      "yaw": 90,
+      "tags": ["node", "door-front"]
+    },
+    {
+      "id": "sign-schoolhouse",
+      "at": [59.5, 3.25, 62.0],
+      "yaw": 270,
+      "tags": ["sign"]
+    },
+    {
+      "id": "lantern-schoolhouse",
+      "at": [59.0, 2.5, 64.0],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "cemetery",
+      "at": [27.0, 0.0, 25.0],
+      "yaw": 270,
+      "tags": ["node", "door-front", "lychgate"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the lychgate: Vesperine graves"
+          }
+        ],
+        "radius": 2
+      }
+    },
+    {
+      "id": "vesperine-graves",
+      "at": [46.0, 0.0, 24.0],
+      "tags": ["landmark", "graves"]
+    },
+    {
+      "id": "rise-foot",
+      "at": [30.0, 0.0, 98.0],
+      "tags": ["landmark", "rise"]
+    },
+    {
+      "id": "door-vane-house",
+      "at": [50.0, 4.0, 112.0],
+      "yaw": 0,
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "town-closed"
+      }
+    },
+    {
+      "id": "vane-house",
+      "at": [50.0, 4.0, 109.5],
+      "yaw": 180,
+      "tags": ["node", "door-front"]
+    },
+    {
+      "id": "sign-vane-house",
+      "at": [50.0, 7.25, 111.5],
+      "yaw": 0,
+      "tags": ["sign"]
+    },
+    {
+      "id": "lantern-vane-house",
+      "at": [48.0, 6.5, 111.0],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "vane-tower-top",
+      "at": [65.0, 40.0, 127.0],
+      "tags": ["landmark", "tower"]
+    },
+    {
+      "id": "vane-house-lookout",
+      "at": [50.0, 4.0, 109.0],
+      "tags": ["landmark"]
+    },
+    {
+      "id": "player-start",
+      "at": [0.0, 0.0, 50.0],
+      "yaw": 180,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "arrive-from-briar-glen-lane",
+      "at": [-85.5, 0.0, 20.0],
+      "yaw": 90,
+      "tags": ["arrival"]
+    }
+  ],
+  "light": {
+    "ambient": 0.28,
+    "directional": [
+      {
+        "id": "moon",
+        "direction": [0.3, -1, 0.4],
+        "level": 0.22,
+        "reach": 60
+      }
+    ],
+    "timeOfDay": {
+      "keyframes": [
+        {
+          "minute": 0,
+          "ambient": 0.1,
+          "directional": 0.08,
+          "sky": "#0B0A16"
+        },
+        {
+          "minute": 300,
+          "ambient": 0.12,
+          "directional": 0.08,
+          "sky": "#14142A"
+        },
+        {
+          "minute": 390,
+          "ambient": 0.28,
+          "directional": 0.2,
+          "sky": "#6B5A78"
+        },
+        {
+          "minute": 480,
+          "ambient": 0.55,
+          "directional": 0.55,
+          "sky": "#9CC4E8"
+        },
+        {
+          "minute": 1020,
+          "ambient": 0.55,
+          "directional": 0.55,
+          "sky": "#9CC4E8"
+        },
+        {
+          "minute": 1110,
+          "ambient": 0.32,
+          "directional": 0.25,
+          "sky": "#C07A50"
+        },
+        {
+          "minute": 1260,
+          "ambient": 0.14,
+          "directional": 0.1,
+          "sky": "#10101E"
+        }
+      ]
+    }
+  },
+  "environment": {
+    "sky": "#9CC4E8"
+  },
+  "transitions": [
+    {
+      "id": "lane-gate",
+      "min": [-90.75, -1, 18],
+      "max": [-89.5, 3, 22],
+      "scene": "briar-glen-lane",
+      "spawn": "arrive-from-briar-glen-green"
+    }
+  ]
+}
