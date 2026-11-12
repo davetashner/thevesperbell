@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Wendmouth's officials and traders can now talk, ahead of their scene: Inspector Cray (searches sorcerers, every bribe is written in her ledger, romances soften her, evidence about bay nine opens a legal seizure), Tereza Maelo (a knight's first-blood duel, the foreign spellbook for a story, a way aboard the Tern), Jasper Quell (nervous denials, collapse under the foundry invoice or his honest manifest, a head start for the crate) and Captain Hesketh (crew hiring, the shanghai scene) (mw-e39.20).
 - You can now talk to Briar Glen's three hub characters: Dot Farrow in the Sleeping Ox (drinks for rumours, her missing barman Fitch, a stamped brass trinket, a sorcerer's hearth that can go wrong, a cellar that buys for thieves), Mirela Thorne at the door of the Lamplit Stacks (the restricted shelf, Mortimer's day-long bans lifted by ginger biscuits, and one book she will never sell) and Captain Hale at the Watch House (the missing-persons list, the jail, and what he will say before the council); each greets every class differently and reacts to how the story ends (mw-e39.5).
 - Mooring's Watch: follow the Briarwood's spur trail east to the abandoned watchtower, with a goblin lookout camp below the walls, a courtyard, a four-floor tower you can take by the inner stair or by climbing the ivy outside, and a sealed cellar door to the supply tunnel.
 - Tansy Pell now stands at Pell's Bakery once you have rescued her, and is not there before: characters can appear in and leave a scene as the story changes (mw-e24.22).
