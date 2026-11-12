@@ -20,6 +20,7 @@ describe('creature smoke battery (mw-e12.15)', () => {
     const files = [
       ...readdirSync('src/content/data/creature'),
       ...readdirSync('src/content/fixtures/creatures/creature'),
+      ...readdirSync('src/content/fixtures/dev/creature'),
     ].filter((name) => name.endsWith('.json'));
     expect(files.length).toBeGreaterThan(0);
     expect(subjects).toHaveLength(files.length);

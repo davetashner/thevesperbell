@@ -314,6 +314,12 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   /** Gives the player lock-on (mw-e02.16); absent = none. */
   readonly lockOn?: TestbedLockOn;
   /**
+   * Where the camera looks while the player is in a conversation (mw-e22.9): the NPC's head, or
+   * undefined when not talking. The camera frames the two of them exactly as a lock-on does (a lock
+   * wins), so it needs `lockOn` for its framing; no cutscene, the player keeps control.
+   */
+  readonly conversationFocus?: () => Vec3 | undefined;
+  /**
    * Mantling and ledge hangs over the scene's ledges (mw-e02.12); the world must have the world
    * properties registered (a ledge's hold reads them). Absent = none.
    */
@@ -714,7 +720,9 @@ export function setupTestbedPlayer<TObject, TCommand>(
     const feet = shown.position;
     const simView = { yaw: yawOf(shown.rotation), pitch: drawnPitch(look.pitch, alpha) };
     const pivot = { x: feet.x, y: feet.y + cameraTuning.pivotHeight, z: feet.z };
-    const framed = framing?.update(simView, pivot, lockTarget()?.point, dt) ?? simView;
+    const framed =
+      framing?.update(simView, pivot, lockTarget()?.point ?? options.conversationFocus?.(), dt) ??
+      simView;
     const view =
       pulled === 0
         ? framed

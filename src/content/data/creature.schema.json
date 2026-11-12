@@ -1316,6 +1316,12 @@
         "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
       }
     },
+    "dialogue": {
+      "description": "Dialogue the player starts by talking to it (mw-e22.9): with it, Interact offers Talk, the creature pauses its routine and faces the player, and the dialogue runs with this creature as the NPC (its id is the NPC id dialogue conditions and effects name). Absent = it cannot be talked to.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "x-contentRef": "dialogue"
+    },
     "loot": {
       "description": "Loot table id (E18); absent = drops only what it carries.",
       "type": "string",
