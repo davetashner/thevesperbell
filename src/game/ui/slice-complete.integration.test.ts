@@ -132,6 +132,19 @@ describe('the slice-complete card over a running game (mw-e01.18)', () => {
     expect(loaded.card.shown).toBe(false);
   });
 
+  it('mw-e24.21: Continue closes the card, hands input back and the card does not reopen', () => {
+    const { ui, fake, card, bridge, sampled, complete } = game();
+    complete();
+    fake.frame(FRAME_MS);
+    document.querySelector<HTMLElement>('[data-testid="slice-complete-continue"]')?.click();
+    fake.frame(FRAME_MS);
+    expect(ui.top).toBeUndefined();
+    expect(document.querySelectorAll('[data-screen="slice-complete"]')).toHaveLength(0);
+    sampled.mockClear();
+    expect(bridge.sampleCommands(0)).toEqual(['move']);
+    expect(card.shown).toBe(true);
+  });
+
   it('the completion autosave lands and the card says it was saved; Return to title leaves', async () => {
     const { fake, scheduler, world, returnToTitle, complete } = game();
     complete();
