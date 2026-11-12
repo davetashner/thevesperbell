@@ -32,7 +32,7 @@ flowchart LR
     sleeping_ox["The Sleeping Ox"]:::built
     bridgeward_college["The Bridgeward College"]:::built
     under_the_bridge["Under the Miners' Bridge"]:::built
-    market_green["Market Green"]
+    market_green["Market Green"]:::built
     lamplit_stacks["The Lamplit Stacks"]
     brands_forge["Brand's Forge"]
     fenns_fletchery["Fenn's Fletchery & Simples"]
@@ -46,15 +46,15 @@ flowchart LR
     town_rooftops["The town rooftops"]
   end
   subgraph briarwood["The Briarwood"]
-    briarwood_edge["The Briarwood edge (town side)"]
-    briarwood_hub["The Briarwood paths and clearings"]
-    sleepers_path["The Sleepers' Path"]
-    standing_horn["The Standing Horn"]
-    wolf_den["The wolf den"]
-    woodcutters_hut["The woodcutter's empty hut"]
-    millpond["The millpond and drowned lane"]
-    priory_road["The priory road"]
-    millweir_far_bank["The Briarwood far bank"]
+    briarwood_edge["The Briarwood edge (town side)"]:::built
+    briarwood_hub["The Briarwood paths and clearings"]:::built
+    sleepers_path["The Sleepers' Path"]:::built
+    standing_horn["The Standing Horn"]:::built
+    wolf_den["The wolf den"]:::built
+    woodcutters_hut["The woodcutter's empty hut"]:::built
+    millpond["The millpond and drowned lane"]:::built
+    priory_road["The priory road"]:::built
+    millweir_far_bank["The Briarwood far bank"]:::built
   end
   subgraph moorings_watch["Mooring's Watch"]
     moorings_courtyard["Mooring's Watch courtyard"]
@@ -247,7 +247,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `sleeping-ox` | The Sleeping Ox | town | e24 | `sleeping-ox` | Dot's inn, its front door on the shop lane (bible 3.5). |
 | `bridgeward-college` | The Bridgeward College | town | e24 | `bridgeward-college` | Soldierly college at the far end of the lane's west side (bible 3.5, 5.16). |
 | `under-the-bridge` | Under the Miners' Bridge | town | e24 | `under-the-bridge` | Riverbank where Idris Quillon waits after dark (bible 3.5, 5.17); lit path down from the lane. |
-| `market-green` | Market Green | town | e24 | planned | The town's heart with the notice board (bible 3.5). |
+| `market-green` | Market Green | town | e24 | `briar-glen-lane` | The town's heart with the notice board (bible 3.5). Stand-in until mw-e24.2 builds the green: the north end of briar-glen-lane (its woodside path, mw-e25.22), which owns the way into the Briarwood. |
 | `lamplit-stacks` | The Lamplit Stacks | town | e24 | planned | Mirela's bookshop (bible 3.5, 5.1). |
 | `brands-forge` | Brand's Forge | town | e24 | planned | Oswin Brand's smithy (bible 3.5, 5.7). |
 | `fenns-fletchery` | Fenn's Fletchery & Simples | town | e24 | planned | Juniper Fenn's shop (bible 3.5, 5.6). |
@@ -259,15 +259,15 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `cemetery` | The lychgate cemetery | town | e24 | planned | Vesperine graves (bible 3.5). |
 | `glen-well` | The Glen Well | town | e24 | planned | A loose ladder-rung leads to the old cistern (bible 3.5). |
 | `town-rooftops` | The town rooftops | town | e24 | planned | Roof routes for thieves and climbers (mw-e24.12). |
-| `briarwood-edge` | The Briarwood edge (town side) | briarwood | e25 | planned | Where the town's upper lane meets the forest (bible 3.1: above the town). |
-| `briarwood-hub` | The Briarwood paths and clearings | briarwood | e25 | planned | The forest hub joining the watchtower, priory road and far bank (bible 3.1, mw-e25.1). |
-| `sleepers-path` | The Sleepers' Path | briarwood | e25 | planned | Line of trampled ferns, visible at night or to a sharp eye (bible 3.5, mw-e25.2). |
-| `standing-horn` | The Standing Horn | briarwood | e25 | planned | Hornfolk menhir, hands over its ears (bible 3.5, mw-e25.3). |
-| `wolf-den` | The wolf den | briarwood | e25 | planned | Encounter site (bible 3.5, mw-e25.4). |
-| `woodcutters-hut` | The woodcutter's empty hut | briarwood | e25 | planned | Bible 3.5. |
-| `millpond` | The millpond and drowned lane | briarwood | e25 | planned | Bible 3.5, mw-e25.5. |
-| `priory-road` | The priory road | briarwood | e25 | planned | Road through the forest to Bellwater Priory (bible 3.5). |
-| `millweir-far-bank` | The Briarwood far bank | briarwood | e25 | planned | Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1). |
+| `briarwood-edge` | The Briarwood edge (town side) | briarwood | e25 | `briarwood` | Where the town's upper lane meets the forest (bible 3.1: above the town). Built as the south end of the briarwood scene: the town gate (mw-e25.1, mw-e25.22). |
+| `briarwood-hub` | The Briarwood paths and clearings | briarwood | e25 | `briarwood` | The forest hub joining the watchtower, priory road and far bank (bible 3.1, mw-e25.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `sleepers-path` | The Sleepers' Path | briarwood | e25 | `briarwood` | Line of trampled ferns, visible at night or to a sharp eye (bible 3.5, mw-e25.2). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `standing-horn` | The Standing Horn | briarwood | e25 | `briarwood` | Hornfolk menhir, hands over its ears (bible 3.5, mw-e25.3). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `wolf-den` | The wolf den | briarwood | e25 | `briarwood` | Encounter site (bible 3.5, mw-e25.4). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `woodcutters-hut` | The woodcutter's empty hut | briarwood | e25 | `briarwood` | Bible 3.5. Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `millpond` | The millpond and drowned lane | briarwood | e25 | `briarwood` | Bible 3.5, mw-e25.5. Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `priory-road` | The priory road | briarwood | e25 | `briarwood` | Road through the forest to Bellwater Priory (bible 3.5). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
+| `millweir-far-bank` | The Briarwood far bank | briarwood | e25 | `briarwood` | Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
 | `moorings-courtyard` | Mooring's Watch courtyard | moorings-watch | e25 | planned | Goblin lookout below (bible 3.5, mw-e25.6). |
 | `moorings-tower` | Mooring's Watch tower and roof | moorings-watch | e25 | planned | Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). |
 | `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | planned | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). |
@@ -333,7 +333,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `green-glen-well` | `market-green` | `glen-well` | path |  |  | planned: mw-e24.10 |
 | `lane-rooftops` | `shop-lane` | `town-rooftops` | path |  | `verb.climb.ledge` | planned: mw-e24.12 |
 | `rooftop-vane-house` | `town-rooftops` | `vane-house` | shortcut | `{"fact":"world.vane-house.roof-entered"}` | `verb.climb.rough` | planned: mw-e24.12 |
-| `market-green-briarwood-edge` | `market-green` | `briarwood-edge` | path |  |  | planned: mw-e25.22 |
+| `market-green-briarwood-edge` | `market-green` | `briarwood-edge` | path |  |  | `briar-glen-lane/woodside-path`, `briarwood/town-gate` |
 | `edge-hub` | `briarwood-edge` | `briarwood-hub` | path |  |  | planned: mw-e25.1 |
 | `hub-sleepers-path` | `briarwood-hub` | `sleepers-path` | path |  |  | planned: mw-e25.2 |
 | `sleepers-path-mine-gate` | `sleepers-path` | `mine-gate` | secret | `{"fact":"world.sleepers-path.revealed"}` | `sense.tracking` | planned: mw-e25.2 |
@@ -405,12 +405,22 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `valley-01` | `mountain-road` | `valley-01/south-gate` (slice-mountain-road), `valley-01/north-gate` (road-1) |
 | `valley-02` | `valley-mid` | `valley-02/south-gate` (road-1), `valley-02/north-gate` (road-2) |
 | `valley-03` | `valley-head` | `valley-03/south-gate` (road-2), `valley-03/bridge-gate` (road-bridge) |
-| `briar-glen-lane` | `bridge-post` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path) |
-| `briar-glen-lane` | `shop-lane` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path) |
+| `briar-glen-lane` | `bridge-post` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/woodside-path` (market-green-briarwood-edge) |
+| `briar-glen-lane` | `market-green` | `briar-glen-lane/woodside-path` (market-green-briarwood-edge) |
+| `briar-glen-lane` | `shop-lane` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/woodside-path` (market-green-briarwood-edge) |
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
 | `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path) |
+| `briarwood` | `briarwood-edge` | `briarwood/town-gate` (market-green-briarwood-edge) |
+| `briarwood` | `briarwood-hub` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `standing-horn` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `wolf-den` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `woodcutters-hut` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `millpond` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `priory-road` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `millweir-far-bank` | none (a marker spawn; its trails are walked inside the scene) |
 
 Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `brazier-hall`, `combat-sandbox` and so on) are not part of the world; the puzzle rooms are placed into the dungeon by E26 (mw-e26.15) and will gain nodes then.
 

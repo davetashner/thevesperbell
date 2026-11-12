@@ -17,7 +17,14 @@ export interface LogicNode {
 export const LOGIC_QUEST_STATES = ['unstarted', 'active', 'resolved', 'failed'] as const;
 export type LogicQuestState = (typeof LOGIC_QUEST_STATES)[number];
 
-export const LOGIC_OBJECTIVE_STATES = ['inactive', 'active', 'complete', 'failed'] as const;
+/** `skipped`: left undone because the quest resolved another way; `failed`: the quest failed first. */
+export const LOGIC_OBJECTIVE_STATES = [
+  'inactive',
+  'active',
+  'complete',
+  'skipped',
+  'failed',
+] as const;
 export type LogicObjectiveState = (typeof LOGIC_OBJECTIVE_STATES)[number];
 
 /** What conditions read. Everything is a query: reading never changes the world. */

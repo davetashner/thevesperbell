@@ -3,5 +3,6 @@
 export * from './layout';
 export * from './loader';
 export * from './physics';
+export * from './regions';
 export * from './transitions';
 export * from './variants';

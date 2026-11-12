@@ -103,6 +103,42 @@ for (const preset of ['high', 'low'] as const) {
   });
 }
 
+// The Briarwood greybox (mw-e25.1 AC-4: 300 × 250 m of placeholder trunks and bramble gates) at the High
+// preset, the same sampling as the valleys. Reference machine only.
+test.describe('briarwood at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-4: briarwood at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'briarwood',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('briarwood high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'briarwood',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
 // The wall-clock load budgets that used to be PR e2e assertions (mw-e41.8): same moments, measured
 // in the page, enforced here against the reference machine. Budgets: perf/perf-budgets.json.
 test.describe('load budgets', () => {
