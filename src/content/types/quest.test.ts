@@ -43,6 +43,7 @@ describe('quest format', () => {
   it('AC-1: the fixture quests load with the game and validate', () => {
     const content = loadQuestFixtureContent();
     expect(content.all('quest').map((q) => q.id)).toEqual([
+      'quest-empty-barge',
       'the-captain-below',
       'the-captains-boots',
       'the-name-on-the-bones',
