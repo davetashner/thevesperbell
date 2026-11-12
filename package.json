@@ -55,6 +55,7 @@
     "puzzle:coverage": "node scripts/puzzle-coverage-cli.ts",
     "world:validate": "node scripts/world-validate-cli.ts",
     "dialogue:validate": "node scripts/dialogue-validate-cli.ts",
+    "narrative:lint": "node scripts/narrative-lint-cli.ts",
     "content:data-only": "node scripts/content-data-only-cli.ts"
   },
   "devDependencies": {

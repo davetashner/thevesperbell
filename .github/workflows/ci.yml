@@ -2,7 +2,7 @@ name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
 # lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
-# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1), dialogue-validate (mw-e22.8) and puzzle-validate
+# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1), dialogue-validate (mw-e22.8), narrative-lint (mw-e39.24) and puzzle-validate
 # (mw-e15.6) and size-budget (mw-e32.3) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
@@ -364,6 +364,18 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm dialogue:validate
+
+  # The narrative lint (mw-e39.24, docs/narrative/content-conventions.md): story content against the
+  # canon glossary. Near-miss names, canon numbers that contradict bible 11.3 and dangling fact, NPC,
+  # item, quest, scene or place ids are errors; class-gate, variants-fallback, tone and British-spelling
+  # findings are warnings. Runs in seconds.
+  narrative-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm narrative:lint
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.
