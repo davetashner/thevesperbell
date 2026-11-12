@@ -50,17 +50,21 @@ the DSL itself, the objectives' content ids and the quest's own objective ids.
 Each objective is `{ id, kind, text, params, optional, hidden, activeWhen, stage }`. The kind decides
 the `params` and (mw-e23.3) the sim events the objective listens to. An unknown kind fails naming it.
 
-| Kind | Params | Complete when |
+| Kind | Params | Complete when (bound in `src/game/logic/bindings.ts`, `src/sim/quest/runtime.ts`) |
 | --- | --- | --- |
-| `haveItem` | `item`, `count` | the player holds the item |
-| `deliverItem` | `item`, `npc`, `count` | the item is handed to the NPC |
+| `haveItem` | `item`, `count`, `latch` (default `false`) | the player holds the item; reverts when it is lost unless `latch` |
+| `deliverItem` | `item`, `npc`, `count` | a `deliverItem` effect (a dialogue option) hands the NPC the item |
 | `fact` | `fact`, `value` (default `true`) | the world fact has the value |
-| `entityState` | `creature`, `state` | `dead`, `befriended`, `fled`, `subdued` or `removed` |
-| `enterArea` | `area` | the player enters the area |
-| `talkTo` | `npc` | the player talks to the NPC |
-| `dialogueNode` | `dialogue`, `node` | the player reaches that node |
-| `learnCapability` | `capability` | the player learns it |
-| `event` | `event` | a named event is emitted |
+| `entityState` | `creature`, `state` | `dead` (`Died`), `befriended` (disposition reaches friendly), `fled`, `subdued` (`CreatureOutcome`), `removed` (died, or an outcome with `gone: true`) |
+| `enterArea` | `area` | the player enters a trigger volume whose node id (or graph id) is the area |
+| `talkTo` | `npc` | a dialogue with the NPC starts |
+| `dialogueNode` | `dialogue`, `node` | the node is visited |
+| `learnCapability` | `capability` | the player gains it |
+| `event` | `event` | a batch's `emit` effect publishes it |
+
+Event-bound kinds complete only while the objective is active (an event that happened earlier is not
+remembered); `fact` and `haveItem` read state, so they catch up. Pair a `deliverItem` option with
+`hasItem` so it shows as unavailable until the player carries the item.
 
 Prefer `entityState: removed` to `dead`, so stealth and diplomacy resolve combat-flavoured objectives.
 Adding a kind is one entry in `OBJECTIVE_SCHEMAS` and `QUEST_OBJECTIVE_KINDS` in the schema, its case in

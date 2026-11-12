@@ -39,10 +39,11 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `objectives[].activeWhen.kind` | string | required | The logic kind, e.g. "hasItem". |
 | `objectives[].stage` | id | — | Active only in this stage. Omit: in every stage. |
 | `objectives[].note` | string | — | A note for writers; never shown to players. |
-| `objectives[].kind` | `"haveItem"` | required | The player holds the item. |
+| `objectives[].kind` | `"haveItem"` | required | The player holds the item. Completes while held and reverts when it is lost, unless `latch`. |
 | `objectives[].params` | object | required |  |
 | `objectives[].params.item` | ref → item | required |  |
 | `objectives[].params.count` | integer ≥ 1 | `1` | How many. |
+| `objectives[].params.latch` | boolean | `false` | Stay complete once reached, even if the item is later dropped or spent. |
 | `objectives[].kind` | `"deliverItem"` | required | The player hands the item to an NPC. |
 | `objectives[].params.npc` | ref → creature | required |  |
 | `objectives[].kind` | `"fact"` | required | A world fact has a value. |
