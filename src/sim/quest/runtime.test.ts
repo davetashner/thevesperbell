@@ -20,7 +20,6 @@ import {
   QuestStageChanged,
   QuestStarted,
 } from './events';
-import { composeCheckpoints } from './host';
 import {
   declareQuestFacts,
   installQuests,
@@ -537,17 +536,6 @@ describe('quest runtime: atomic effects', () => {
     outer.commit();
     expect(s.runtime.questState('a')).toBe('active');
     expect(s.runtime.questState('b')).toBe('unstarted');
-  });
-
-  it('composeCheckpoints commits in order and rolls back in reverse', () => {
-    const log: string[] = [];
-    const mark = (name: string): LogicCheckpoint => ({
-      commit: () => log.push(`commit ${name}`),
-      rollback: () => log.push(`rollback ${name}`),
-    });
-    composeCheckpoints(mark('a'), mark('b')).commit();
-    composeCheckpoints(mark('a'), mark('b')).rollback();
-    expect(log).toEqual(['commit a', 'commit b', 'rollback b', 'rollback a']);
   });
 });
 

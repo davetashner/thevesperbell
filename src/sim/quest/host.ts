@@ -12,6 +12,7 @@ import type {
   LogicObjectiveState,
   LogicQuestState,
 } from '../logic/types';
+import { composeCheckpoints } from '../logic/compose';
 
 /** What the adapter needs from the runtime. */
 export interface QuestOps {
@@ -23,18 +24,6 @@ export interface QuestOps {
   failQuest(quest: string): LogicFailure | undefined;
   /** Opens an undo point over the quest state. */
   openBatch(): LogicCheckpoint;
-}
-
-/** One checkpoint over several: committing or rolling back one does so for all. */
-export function composeCheckpoints(...checkpoints: readonly LogicCheckpoint[]): LogicCheckpoint {
-  return {
-    commit: () => {
-      for (const checkpoint of checkpoints) checkpoint.commit();
-    },
-    rollback: () => {
-      for (const checkpoint of [...checkpoints].reverse()) checkpoint.rollback();
-    },
-  };
 }
 
 /** `base` with its quest conditions and effects served by `ops`. */
