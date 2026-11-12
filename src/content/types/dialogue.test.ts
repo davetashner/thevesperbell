@@ -13,6 +13,7 @@ import {
   nodeTargets,
   type DialogueDefInput,
   type DialogueNode,
+  dialogueSchema,
 } from './dialogue.ts';
 
 /** A minimal valid dialogue; tests change one thing about it. */
@@ -352,5 +353,22 @@ describe('dialogue content checks', () => {
     const json = base();
     json.speakers = [{ id: 'host', npc: 'npc-nobody' }];
     expect(load(json)[0]).toMatch(/references missing creature:npc-nobody/);
+  });
+});
+
+describe('check nodes need a fail branch (mw-e22.7)', () => {
+  it('e22.7 AC-4: a check without `failure` fails validation', () => {
+    const json = {
+      id: 'no-fail',
+      speakers: [{ id: 'n', name: 'N' }],
+      entries: [{ id: 'default', node: 'ck' }],
+      nodes: [
+        { id: 'ck', kind: 'check', approach: 'persuade', difficulty: 5, success: 'a' },
+        { id: 'a', kind: 'end' },
+      ],
+    };
+    const result = dialogueSchema.safeParse(json);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => i.path.join('.'))).toContain('nodes.0.failure');
   });
 });
