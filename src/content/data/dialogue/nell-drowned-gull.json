@@ -1,0 +1,683 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "nell-drowned-gull",
+  "notes": "Nell Gannet (bible 5.13), keeper of the Drowned Gull and queen of the Low Tide Company. Voice: gold-toothed, delighted, 'darling'; everything's for sale. THIEF COMMISSION DROP (bible 4.3, the thief commission): a thief holding the horn-coin (commission.coin-held, stand-in until the item exists) meets her first at the entry 'commission' and chooses deliver, keep or a fake; each sets commission.outcome and emits commission.dropped for the world consequences (follow-up bead). SECRETS: bay nine (only to a thief or at disposition >= 10, nell.bay-nine-told), the relic-skimming and her go-between role (disposition >= 8, nell.skimming-confessed), the Undertow (opened for a thief by her class deal, or at disposition >= 6). Class deals: knight (warning), archer (Gull Shoot sponsor), sorcerer (restricted books past customs), thief (Undertow access). Stock and prices are out of scope (E20, E21); jobs and quests are hooks.",
+  "speakers": [
+    {
+      "id": "nell",
+      "npc": "npc-nell"
+    }
+  ],
+  "entries": [
+    {
+      "id": "commission",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          {
+            "kind": "fact",
+            "fact": "commission.coin-held"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "any",
+              "of": [
+                {
+                  "kind": "factCmp",
+                  "fact": "commission.outcome",
+                  "op": "eq",
+                  "value": "delivered"
+                },
+                {
+                  "kind": "factCmp",
+                  "fact": "commission.outcome",
+                  "op": "eq",
+                  "value": "kept"
+                },
+                {
+                  "kind": "factCmp",
+                  "fact": "commission.outcome",
+                  "op": "eq",
+                  "value": "faked"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "node": "commission-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "commission-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Well, well. A quiet one, with quiet hands. And that bulge in your pocket isn't your lunch, is it, darling? Let's have a look, then, nice and slow.",
+      "next": "commission-choice"
+    },
+    {
+      "id": "commission-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "commission-deliver",
+          "text": "Here. One horn-coin, as agreed.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "commission.outcome",
+              "value": "delivered"
+            },
+            {
+              "kind": "setFact",
+              "fact": "commission.coin-held",
+              "value": false
+            },
+            {
+              "kind": "gold",
+              "delta": 30
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-nell",
+              "delta": 4
+            },
+            {
+              "kind": "emit",
+              "event": "commission.dropped",
+              "data": {
+                "outcome": "delivered",
+                "go-between": "npc-nell"
+              }
+            }
+          ],
+          "next": "commission-deliver-1"
+        },
+        {
+          "id": "commission-keep",
+          "text": "I'm keeping it. Tell your buyer I was never here.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "commission.outcome",
+              "value": "kept"
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-nell",
+              "delta": -2
+            },
+            {
+              "kind": "emit",
+              "event": "commission.dropped",
+              "data": {
+                "outcome": "kept",
+                "go-between": "npc-nell"
+              }
+            }
+          ],
+          "next": "commission-keep-1"
+        },
+        {
+          "id": "commission-fake",
+          "text": "Here you are. One horn-coin. Entirely genuine.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "commission.outcome",
+              "value": "faked"
+            },
+            {
+              "kind": "setFact",
+              "fact": "commission.coin-held",
+              "value": false
+            },
+            {
+              "kind": "emit",
+              "event": "commission.dropped",
+              "data": {
+                "outcome": "faked",
+                "go-between": "npc-nell"
+              }
+            }
+          ],
+          "next": "commission-fake-1"
+        }
+      ]
+    },
+    {
+      "id": "commission-deliver-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Lovely. Pleasure doing business, and a thirty-coin pleasure it is. Mr. S— will be delighted, and I'll be delighted on commission. Drinks on the house, thief to thief.",
+      "next": "hub"
+    },
+    {
+      "id": "commission-keep-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Keep it? Keep it! Oh, darling, you'll be wanting a new city, then. I'll tell him you never came. I'm very good at not seeing people. Don't make me practise.",
+      "next": "hub"
+    },
+    {
+      "id": "commission-fake-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Hm. It's a lovely piece. Warm in the hand, honest in the weight. You're either very good or very stupid, and I've known a lot of both. I'll pass it on, and we'll all find out together.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Break anything, you buy it, and then you own it, and then you'll have to sell it to me. Welcome to the Drowned Gull, darling. Nell Gannet. Sit, drink, don't swing that.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "A bow in the Gull! Lovely. Don't loose it indoors, but there's a gull shoot at the Tidefair and I'm always looking for someone who can hit the thing. Sit, darling.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Oh, you've a smell about you, darling. Ink, and ozone, and bad decisions. That's good. I sell restricted books, and I'll tell you how to get them past customs. For a little more.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Well. Hello, kin. You walk like you're not walking. Come in, sit, and I'll pour you something that isn't poison. Not yet.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Everything in Wendmouth's for sale, darling. Some of it's even ours. Nell Gannet, the Drowned Gull. What'll it be?",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Back again! The Gull's open, my pockets are not. What'll it be?",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-drink",
+          "text": "A drink, please.",
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -2
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-nell",
+              "delta": 2
+            }
+          ],
+          "next": "drink-1",
+          "onFail": "drink-broke"
+        },
+        {
+          "id": "ask-gossip",
+          "text": "What's the gossip?",
+          "next": "gossip-1"
+        },
+        {
+          "id": "ask-jobs",
+          "text": "Any work for the Low Tide Company?",
+          "next": "jobs-check"
+        },
+        {
+          "id": "ask-undertow",
+          "text": "I hear your cellar goes further than your cellar.",
+          "next": "undertow-check"
+        },
+        {
+          "id": "ask-bay-nine",
+          "text": "What's in bay nine?",
+          "next": "bay-check"
+        },
+        {
+          "id": "ask-skim",
+          "text": "Is it true you skim a coin from every relic crate?",
+          "next": "skim-check"
+        },
+        {
+          "id": "deal-knight",
+          "text": "I'm good at breaking things.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "deal-knight-1"
+        },
+        {
+          "id": "deal-archer",
+          "text": "I'll shoot for you at the Tidefair.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "nell.gull-shoot-sponsored",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "tidefair.gull-shoot-sponsored",
+              "data": {
+                "sponsor": "npc-nell"
+              }
+            }
+          ],
+          "next": "deal-archer-1"
+        },
+        {
+          "id": "deal-sorcerer",
+          "text": "I'm after something restricted.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "nell.books-offered",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "undertow.restricted-books-offered",
+              "data": {
+                "seller": "npc-nell"
+              }
+            }
+          ],
+          "next": "deal-sorcerer-1"
+        },
+        {
+          "id": "deal-thief",
+          "text": "I'm looking for the way down.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "nell.undertow-open",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "undertow.access-granted",
+              "data": {
+                "keeper": "npc-nell"
+              }
+            }
+          ],
+          "next": "deal-thief-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Mind how you go, darling. Mind the steps, mind the tide, mind your pockets. Not that you will.",
+      "end": true
+    },
+    {
+      "id": "drink-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Two coins, and the best thing you'll taste all day. Not that that's saying much. Cheers, darling.",
+      "next": "hub"
+    },
+    {
+      "id": "drink-broke",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Two coins, darling, not two sighs. The Gull's generous but she's not an idiot.",
+      "next": "hub"
+    },
+    {
+      "id": "gossip-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Vane crates go into bay nine and customs never cracks a seal. Funny, that. And the Inspector reads every book she confiscates, every single one. Even the ones with kissing. You didn't hear it from me.",
+      "next": "gossip-choice"
+    },
+    {
+      "id": "gossip-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "gossip-nine",
+          "text": "Bay nine. Go on.",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 13,
+                "source": "npc-nell"
+              }
+            }
+          ],
+          "next": "gossip-nine-1"
+        },
+        {
+          "id": "gossip-cray",
+          "text": "The Inspector reads romances?",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 14,
+                "source": "npc-nell"
+              }
+            }
+          ],
+          "next": "gossip-cray-1"
+        },
+        {
+          "id": "gossip-back",
+          "text": "Enough gossip.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "gossip-nine-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Seals nobody cracks, darling. That's all a smuggler needs to know. And, between us, all a smuggler wants to ask.",
+      "next": "gossip-choice"
+    },
+    {
+      "id": "gossip-cray-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Every one. She carries them home in a sack and brings back the empty sack. I'd be charmed, if she weren't trying to ruin me.",
+      "next": "gossip-choice"
+    },
+    {
+      "id": "jobs-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "jobs-thief"
+        }
+      ],
+      "else": "jobs-any"
+    },
+    {
+      "id": "jobs-thief",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "For you, darling? Always. There's a warehouse and a crate and a chap with a veil, and they all want visiting. Come back when you've seen the dock at night.",
+      "next": "jobs-effect"
+    },
+    {
+      "id": "jobs-effect",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "lowtide.job-offered",
+          "data": {
+            "giver": "npc-nell",
+            "class": "thief"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "jobs-any",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Work for the Company? You've an honest face, which is a terrible handicap. I'll find you something small. Ask the dock, ask Big Oona, ask the tide.",
+      "next": "hub"
+    },
+    {
+      "id": "undertow-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "nell.undertow-open"
+              },
+              {
+                "kind": "disposition",
+                "npc": "npc-nell",
+                "op": "gte",
+                "value": 6
+              }
+            ]
+          },
+          "next": "undertow-open"
+        }
+      ],
+      "else": "undertow-deflect"
+    },
+    {
+      "id": "undertow-deflect",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "My cellar goes down to the bilges, darling, and no further. Whoever told you different is selling something. Probably me.",
+      "next": "hub"
+    },
+    {
+      "id": "undertow-open",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "It goes further. It goes under the wharf, under the breakwater, and out to the sea-door where the cargo doesn't need a stamp. The Undertow, we call it. Don't call it anything else.",
+      "next": "hub"
+    },
+    {
+      "id": "bay-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "bay-open"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-nell",
+            "op": "gte",
+            "value": 10
+          },
+          "next": "bay-open"
+        }
+      ],
+      "else": "bay-deflect"
+    },
+    {
+      "id": "bay-deflect",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Bay nine? A very large cupboard, darling, with a very large lock. Ask me again when I like you better.",
+      "next": "hub"
+    },
+    {
+      "id": "bay-open",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Horn-coins, carvings, and a stone with a name on it. Forty of the first, three of the second. Vane's. And due on the Gilded Tern before the week's out, so don't wait too long.",
+      "next": "bay-effect"
+    },
+    {
+      "id": "bay-effect",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "nell.bay-nine-told",
+          "value": true
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "skim-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-nell",
+            "op": "gte",
+            "value": 8
+          },
+          "next": "skim-open"
+        }
+      ],
+      "else": "skim-deflect"
+    },
+    {
+      "id": "skim-deflect",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Skim? From the relics? Darling, I'm a respectable innkeeper. A coin from every crate is a tax, and I'm a very fair taxman.",
+      "next": "hub"
+    },
+    {
+      "id": "skim-open",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "One coin per crate, and not a coin more. A fee for being the middle of it all. I'm the go-between for Mr. S—'s agent, and it's a thankless trade. Don't repeat it.",
+      "next": "skim-effect"
+    },
+    {
+      "id": "skim-effect",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "nell.skimming-confessed",
+          "value": true
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "deal-knight-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Bless your heart. You break it, you buy it, you own it, and then you sell it to me. That's how the Gull works. Smash with confidence.",
+      "next": "hub"
+    },
+    {
+      "id": "deal-archer-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "The Gull Shoot! I'll sponsor you, darling, for a cut. Wooden gulls on a swinging boom, then a live one that nicked the prize ribbon. You'll hate it. I'll make a fortune.",
+      "next": "hub"
+    },
+    {
+      "id": "deal-sorcerer-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Restricted, lovely. I've shelves of it under the stairs. Pay me, and I'll tell you how to carry it past Cray. Pay me more, and I'll tell you where she keeps her own.",
+      "next": "hub"
+    },
+    {
+      "id": "deal-thief-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "The way down. Kin, you're in. Second step, loose board, and a knock I'll teach you. Don't tell the Inspector. Don't tell the Gull. Don't tell the tide.",
+      "next": "hub"
+    }
+  ]
+}
