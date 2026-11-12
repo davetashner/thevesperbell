@@ -476,6 +476,30 @@
           "maximum": 1000,
           "description": "Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9)."
         },
+        "staminaByDifficulty": {
+          "description": "Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2.",
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
         "jumpOff": {
           "type": "object",
           "properties": {
@@ -1424,6 +1448,30 @@
                 "minimum": 0,
                 "maximum": 1000,
                 "description": "Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9)."
+              },
+              "staminaByDifficulty": {
+                "description": "Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
               },
               "jumpOff": {
                 "type": "object",

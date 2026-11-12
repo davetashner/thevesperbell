@@ -44,13 +44,42 @@ import { radians } from '../character/greybox';
 import type { ClimbTraversal, TraversalContext, TraversalHook } from '../character/traversal';
 import { add, dot, flat, length, normalize, scale, sub, UP, vec, ZERO } from '../character/vec';
 import type { EntityId } from '../core/component';
+import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
+import { at } from '../geom/vec';
 import { cos } from '../math';
 import { readProperty } from '../properties/components';
 import type { Vec3 } from '../stimulus/shapes';
 import { moveVector, type LedgeTraversalHook } from './mantle';
 import { ClimbRopeComponent, type ClimbRope } from './ropes';
-import { canAttachClimb, ownerOfCollider, type ClimbableGrade } from './surfaces';
+import {
+  canAttachClimb,
+  climbabilityOf,
+  climbDifficulty,
+  CLIMB_REFUSAL_TEXT,
+  ownerOfCollider,
+  type ClimbableGrade,
+  type ClimbRefusal,
+} from './surfaces';
+
+/**
+ * A character pressed into a surface it may not climb (mw-e10.9): the knight at a rough wall, a
+ * climber at a face harder than its best. Fired once as the refusal begins, not on every tick of a
+ * held press; `text` is the prompt to show.
+ */
+export interface ClimbRefused {
+  readonly tick: number;
+  readonly actor: EntityId;
+  readonly surface: EntityId;
+  readonly refusal: ClimbRefusal;
+  readonly text: string;
+}
+
+/** Fired once as a character presses into a surface it may not climb (`climb.refused`). */
+export const climbRefused = defineEvent<ClimbRefused>('climb.refused');
+
+/** The last tick each actor's climb was refused, per world: a held press is one refusal. */
+const lastRefusal = new WeakMap<object, Map<EntityId, number>>();
 
 /**
  * The defaults when a controller profile has no `climb` block (the shipped player profile states its
@@ -67,11 +96,36 @@ export const DEFAULT_CLIMB_TUNING: Frozen<ClimbTuning> = Object.freeze({
   jumpOff: Object.freeze({ away: 4, up: 5 }),
 });
 
+/** Stamina drain multipliers by climb difficulty 1, 2, 3 when the tuning states none (mw-e10.9). */
+export const DEFAULT_STAMINA_BY_DIFFICULTY: readonly [number, number, number] = Object.freeze<
+  [number, number, number]
+>([1, 1.5, 2]);
+
+/**
+ * Stamina drained per second climbing `surface` (mw-e10.9): the tuning's base rate times the
+ * multiplier of the surface's difficulty (a rope or ladder 1, rough stone 2, a sheer face 3). A
+ * surface that stopped being climbable (burnt away) drains the base rate.
+ */
+export function climbDrainPerSecond(
+  world: World<never>,
+  surface: EntityId,
+  tuning: Frozen<ClimbTuning>,
+): number {
+  const difficulty = climbDifficulty(climbabilityOf(world, surface)) || 1;
+  const scale = tuning.staminaByDifficulty ?? DEFAULT_STAMINA_BY_DIFFICULTY;
+  return tuning.staminaPerSecond * at(scale, difficulty - 1);
+}
+
 export interface ClimbTraversalOptions {
   /** The sim world the climbable pieces and ropes live in (their properties decide). */
   readonly world: World<never>;
   /** A character's capabilities (class, tools); none by default. */
   readonly capabilities?: (entity: EntityId | undefined) => readonly string[];
+  /**
+   * The hardest climb difficulty (1-3) a character attempts (`maxClimbDifficulty` over its
+   * capabilities); unlimited by default. A harder surface is refused with a `climb.refused` prompt.
+   */
+  readonly maxDifficulty?: (entity: EntityId | undefined) => number;
   /** A character's stamina left, or undefined without a pool (never tires); none by default. */
   readonly stamina?: (entity: EntityId | undefined) => number | undefined;
   /** The ledge hook whose pull-up takes climbers over the top; absent = climbers stop at the top. */
@@ -149,13 +203,37 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
   const { world, ledges } = options;
   const capabilitiesOf = options.capabilities ?? (() => []);
   const staminaOf = options.stamina ?? (() => undefined);
+  const maxDifficultyOf = options.maxDifficulty ?? (() => Infinity);
   const hasRopes = world.isRegistered(ClimbRopeComponent);
 
   /** Whether hands can hold `entity` right now (see Grip). */
-  const gripOf = (entity: EntityId, capabilities: readonly string[]): Grip => {
-    const attach = canAttachClimb(world, entity, capabilities);
+  const gripOf = (entity: EntityId, capabilities: readonly string[], actor?: EntityId): Grip => {
+    const attach = canAttachClimb(world, entity, capabilities, maxDifficultyOf(actor));
     if (!attach.ok) return attach.reason === 'slippery' ? 'slip' : 'gone';
     return readProperty(world, entity, 'burning') ? 'slip' : 'hold';
+  };
+
+  /** Tells the player once, as it begins, that `actor` may not climb `surface` (see ClimbRefused). */
+  const refuse = (
+    actor: EntityId | undefined,
+    surface: EntityId,
+    capabilities: readonly string[],
+  ) => {
+    if (actor === undefined) return;
+    const refusal = canAttachClimb(world, surface, capabilities, maxDifficultyOf(actor));
+    if (refusal.ok || refusal.reason === 'not-climbable') return;
+    let ticks = lastRefusal.get(world);
+    if (ticks === undefined) lastRefusal.set(world, (ticks = new Map<EntityId, number>()));
+    const last = ticks.get(actor);
+    ticks.set(actor, world.tick);
+    if (last !== undefined && world.tick - last <= 1) return;
+    world.events.emit(climbRefused, {
+      tick: world.tick,
+      actor,
+      surface,
+      refusal,
+      text: CLIMB_REFUSAL_TEXT[refusal.reason],
+    });
   };
 
   /** The climbable surface a ray from `origin` along `direction` meets within `distance`. */
@@ -235,8 +313,11 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
     const hands = add(state.position, vec(0, ct.handHeight, 0));
     const found = touch(ctx.world, hands, move, radius + ct.reach);
     if (found === undefined || dot(move, found.normal) > -FACING) return undefined;
-    if (gripOf(found.entity, capabilities) !== 'hold') return undefined;
     if (!may(ctx, readProperty(world, found.entity, 'climbable') as ClimbableGrade)) {
+      return undefined;
+    }
+    if (gripOf(found.entity, capabilities, ctx.entity) !== 'hold') {
+      refuse(ctx.entity, found.entity, capabilities);
       return undefined;
     }
     // Hang the capsule WALL_GAP off the surface, measured along its normal.
@@ -264,7 +345,11 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
     });
     candidates.sort((a, b) => a.distance - b.distance || a.entity - b.entity);
     for (const { entity, rope, distance, away } of candidates) {
-      if (gripOf(entity, capabilities) !== 'hold' || !may(ctx, 'rope')) continue;
+      if (!may(ctx, 'rope')) continue;
+      if (gripOf(entity, capabilities, ctx.entity) !== 'hold') {
+        refuse(ctx.entity, entity, capabilities);
+        continue;
+      }
       const normal = distance > EPS ? scale(away, 1 / distance) : scale(move, -1);
       const position = onRope(ctx, rope, normal, state.position.y);
       if (!fits(ctx, position)) continue;
@@ -378,7 +463,7 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
         Math.abs(hit.normal.y) > MAX_LEAN ||
         dot(turned, n) < corner - EPS ||
         owner === undefined ||
-        gripOf(owner, capabilities) !== 'hold'
+        gripOf(owner, capabilities, ctx.entity) !== 'hold'
       ) {
         return hold(ctx, climb, state.position);
       }
@@ -392,7 +477,7 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
     if (
       found === undefined ||
       dot(found.normal, n) < corner - EPS ||
-      gripOf(found.entity, capabilities) !== 'hold'
+      gripOf(found.entity, capabilities, ctx.entity) !== 'hold'
     ) {
       return hold(ctx, climb, state.position);
     }
@@ -415,7 +500,7 @@ export function climbTraversal(options: ClimbTraversalOptions): TraversalHook {
     // A blow or a blast knocks the climber off, keeping the launch.
     if (state.launch !== undefined) return release(state, state.velocity);
     const capabilities = capabilitiesOf(ctx.entity);
-    const grip = gripOf(climb.surface, capabilities);
+    const grip = gripOf(climb.surface, capabilities, ctx.entity);
     if (grip === 'gone') return release(state, ZERO);
     const slipping = grip === 'slip' ? climb.slipping + 1 : 0;
     if (slipping >= ticksOf(ct.slipGraceMs, params.dt)) return release(state, ZERO);

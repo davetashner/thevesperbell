@@ -62,6 +62,14 @@ const capabilityDefSchema = z
       .describe(
         'A supporting (numeric) entry rather than a verb (ADR-0004 P1, P2); default false.',
       ),
+    climbDifficulty: z
+      .int()
+      .min(1)
+      .max(3)
+      .optional()
+      .describe(
+        'The hardest climb difficulty (1 ladders, ropes and ivy; 2 rough stone and timber; 3 sheer faces) holding this capability lets the actor attempt (mw-e10.9); an actor attempts the highest of its capabilities, and 1 with none. Absent = grants none.',
+      ),
   })
   .superRefine((def, ctx) => {
     if (def.crossClass === true && def.classAffinity === undefined) {
@@ -118,6 +126,27 @@ export function capabilityIds(entries: readonly LoadedEntry[]): ReadonlySet<stri
       .filter((entry) => entry.type === 'capability')
       .flatMap((entry) => (entry.value as CapabilityGroup).capabilities.map(({ id }) => id)),
   );
+}
+
+/**
+ * Capability id -> the climb difficulty it lets an actor attempt (mw-e10.9), for every declared
+ * capability that grants one. The sim reads it as a plain map (`maxClimbDifficulty`).
+ */
+export function climbDifficultyGrants(
+  groups: readonly {
+    readonly capabilities: readonly {
+      readonly id: string;
+      readonly climbDifficulty?: number | undefined;
+    }[];
+  }[],
+): Map<string, number> {
+  const grants = new Map<string, number>();
+  for (const { capabilities } of groups) {
+    for (const { id, climbDifficulty } of capabilities) {
+      if (climbDifficulty !== undefined) grants.set(id, climbDifficulty);
+    }
+  }
+  return grants;
 }
 
 /** The load check for the registry: a capability id is declared in one file only. */

@@ -261,6 +261,12 @@ export const climbTuningSchema = z
       .describe(
         'Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9).',
       ),
+    staminaByDifficulty: z
+      .tuple([z.number().min(0).max(10), z.number().min(0).max(10), z.number().min(0).max(10)])
+      .optional()
+      .describe(
+        'Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2.',
+      ),
     jumpOff: z
       .strictObject({
         away: z.number().min(0).max(20).describe('Speed away from the surface, m/s.'),
