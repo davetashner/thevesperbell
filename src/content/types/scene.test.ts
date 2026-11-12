@@ -984,6 +984,7 @@ describe('scene content', () => {
         .all('scene')
         .map((s) => s.id),
     ).toEqual([
+      'bellwater-priory',
       'brazier-hall',
       'briar-glen-green',
       'briar-glen-lane',

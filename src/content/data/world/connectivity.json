@@ -363,63 +363,72 @@
       "name": "The priory gate",
       "area": "priory",
       "epic": "e26",
-      "notes": "The gate at the head of the priory road (mw-e26.5 'priory road gate'; PROPOSAL, the bible names only the road and the nave). Where the road from the forest, the ridge path from Mooring's Watch and the road from town all arrive (docs/design/dungeon.md)."
+      "notes": "The gate at the head of the priory road (mw-e26.5 'priory road gate'; PROPOSAL, the bible names only the road and the nave). Where the road from the forest, the ridge path from Mooring's Watch and the road from town all arrive (docs/design/dungeon.md). Built as the precinct gate wall of the bellwater-priory scene (mw-e26.5); the way in from the Briarwood is its road gate (mw-e25.25).",
+      "scene": "bellwater-priory"
     },
     {
       "id": "priory-nave",
       "name": "The priory nave",
       "area": "priory",
       "epic": "e26",
-      "notes": "Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5)."
+      "notes": "Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5). Built (mw-e26.5): six metre walls and a colonnade open to the sky; the hub of the priory.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "priory-choir",
       "name": "The priory choir",
       "area": "priory",
       "epic": "e26",
-      "notes": "Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6)."
+      "notes": "Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6). Built (mw-e26.5): the choir with four statue stubs and the altar; the puzzle is mw-e26.6.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "priory-garden",
       "name": "The priory garden",
       "area": "priory",
       "epic": "e26",
-      "notes": "Garden with the dead pear tree Clatter remembers (bible 4.1 beat 8; mw-e26.5). Optional dead end off the nave."
+      "notes": "Garden with the dead pear tree Clatter remembers (bible 4.1 beat 8; mw-e26.5). Optional dead end off the nave. Built (mw-e26.5): walled garden with the dead pear tree, one opening on the nave.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "scriptorium",
       "name": "The scriptorium",
       "area": "priory",
       "epic": "e26",
-      "notes": "Book mimics (bible 3.5, mw-e26.7)."
+      "notes": "Book mimics (bible 3.5, mw-e26.7). Built (mw-e26.5) as a shelved room behind the locked hidden choir door; its content is mw-e26.7.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "belfry",
       "name": "The belfry",
       "area": "priory",
       "epic": "e26",
-      "notes": "The cracked Vesper Bell (bible 3.5, mw-e26.8)."
+      "notes": "The cracked Vesper Bell (bible 3.5, mw-e26.8). Built (mw-e26.5): a 9 m tower with an interior stair, a free-climb and rope anchors; the Sounding Shaft top is its deck; the bell and the sour-bell consequence are mw-e26.8.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "priory-crypt-stair",
       "name": "The crypt stair",
       "area": "priory",
       "epic": "e26",
-      "notes": "The stair down from the nave to the sealed crypt door; the Sunbeam puzzle's place (mw-e26.1, docs/design/dungeon.md). PROPOSAL: the bible gives the crypt but no stair."
+      "notes": "The stair down from the nave to the sealed crypt door; the Sunbeam puzzle's place (mw-e26.1, docs/design/dungeon.md). PROPOSAL: the bible gives the crypt but no stair. Built (mw-e26.5): a 3 m stair down east of the nave to a landing; the Sunbeam puzzle is mw-e26.15.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "priory-crypt",
       "name": "The priory crypt",
       "area": "priory",
       "epic": "e26",
-      "notes": "Sealed from below (bible 4.1 beat 9)."
+      "notes": "Sealed from below (bible 4.1 beat 9). Built (mw-e26.5) as a sealed vestibule behind a tier-3 locked door: no walking route from the priory side until world.priory-crypt.unsealed (mw-e26.20).",
+      "scene": "bellwater-priory"
     },
     {
       "id": "cistern",
       "name": "The cistern",
       "area": "priory",
       "epic": "e26",
-      "notes": "Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5)."
+      "notes": "Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as the stub the Glen Well route joins: a sealed vestibule behind the nave west wall door; glen-well-cistern (mw-e24.10) and nave-cistern (mw-e26.20) open it.",
+      "scene": "bellwater-priory"
     },
     {
       "id": "knot-outer-ring",
@@ -1103,8 +1112,8 @@
       "from": "priory-road",
       "to": "priory-gate",
       "kind": "path",
-      "bead": "mw-e25.25",
-      "notes": "Up the priory road to the gate (PROPOSAL, mw-e26.1: the bible has the road and the nave but no gate between them)."
+      "notes": "Up the priory road to the gate (PROPOSAL, mw-e26.1: the bible has the road and the nave but no gate between them). Built as a gap in the Briarwood's north wall (priory-road-gate) opening on the priory's south edge (road-gate), both ways (mw-e25.25, mw-e26.5). The road itself is the Briarwood's last stretch; if it grows its own scene the transition moves with it.",
+      "transitions": ["briarwood/priory-road-gate", "bellwater-priory/road-gate"]
     },
     {
       "id": "priory-gate-nave",
