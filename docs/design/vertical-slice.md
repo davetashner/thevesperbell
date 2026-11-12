@@ -255,7 +255,7 @@ new bead `e01-slice-complete-card` (mw-e01.18); the e2e does not depend on it.
 The vestibule is no longer a dead end (mw-e24.21): its north wall opens onto a 2 × 6 m passage
 (z 40…46) whose `mountain-road` transition leads to valley-01's `arrive-from-slice` spawn, and
 valley-01's `south-gate` leads back to the slice's `arrive-from-valley-01` spawn. From there the road
-runs valley-01 → valley-02 → valley-03 → Briar Glen (see `docs/design/world-map.md` once merged).
+runs valley-01 → valley-02 → valley-03 → Briar Glen.
 
 | System                                | Bead                                                         | Status |
 | ------------------------------------- | ------------------------------------------------------------ | ------ |
