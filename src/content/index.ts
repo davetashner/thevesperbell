@@ -296,6 +296,7 @@ export {
   capabilityId,
   capabilityIds,
   capabilitySchema,
+  climbDifficultyGrants,
   checkCapabilities,
   type CapabilityGroup,
   type CapabilityGroupInput,

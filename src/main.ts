@@ -9,6 +9,7 @@ import {
   listenerPose,
 } from '@audio/index';
 import {
+  climbDifficultyGrants,
   compileElementFeedback,
   controllerTuningFor,
   ELEMENT_FEEDBACK_ID,
@@ -71,6 +72,7 @@ import {
   watchPresence,
   type GameCreatures,
 } from '@game/creatures/index';
+import { startRopes } from '@game/climb/ropes';
 import { bindBreakLeftovers, BreakWatch, hasBreakables } from '@game/breakables/index';
 import {
   bindWorldItems,
@@ -207,6 +209,8 @@ import {
 } from '@game/light/index';
 import {
   attachPlayerInput,
+  climbHintModel,
+  climbHintOf,
   CONTROLLER_HOT_EVENT,
   DeathBeat,
   interactPromptModel,
@@ -214,6 +218,7 @@ import {
   readControllerFile,
   respawnRulesFrom,
   setupTestbedPlayer,
+  type ClimbHint,
   type ControllerHotUpdate,
   type TestbedPlayer,
   attachWaterHud,
@@ -403,6 +408,7 @@ import {
   DialogueRuntime,
   installTalkGate,
   npcBand,
+  climbRefused,
   DamageApplied,
   Died,
   hashWorld,
@@ -1387,6 +1393,7 @@ function startRenderer(
     let hitFlashes: HitFlashes | undefined;
     let frameClock: ((ms: number) => void) | undefined;
     let playerFade: OcclusionFade | undefined;
+    let climbHint: ClimbHint | undefined;
     let publishedProbe = '';
     // The AI debug overlay (mw-e11.17): loaded with the debug console (below), so release builds
     // never have it. `ai.freeze` holds the sim through simPaused; it draws before each render.
@@ -1456,7 +1463,8 @@ function startRenderer(
             gamepad: sampler.padBindings,
           });
           const dead = isPlayerDead(world, player.entity);
-          interactPrompt.update(interactPromptModel(dead ? undefined : player.prompt(), glyph));
+          const focus = interactPromptModel(dead ? undefined : player.prompt(), glyph);
+          interactPrompt.update(focus ?? climbHintModel(climbHint, performance.now()));
         }
         if (dummy !== undefined) {
           // The e2e reads the dummy's health here (mw-e04.6 AC-7).
@@ -1833,8 +1841,9 @@ function startRenderer(
           // through the capability registry below.
           ledges: {},
           // Ladders, ropes and ivy for every class (mw-e02.13); rough walls need the climbing
-          // capability, which class data (mw-e02.3) will grant the thief.
-          climb: {},
+          // capability, which class data (mw-e02.3) will grant the thief. A climb harder than the
+          // player's best (a capability's climbDifficulty, mw-e10.9) is refused with a prompt.
+          climb: { difficulty: climbDifficultyGrants(content.all('capability')) },
           // Wading, swimming and sinking in the scene's water regions (mw-e02.14): the armor load
           // class decides swim or sink; breath running out is drowning damage.
           water: playerWater({ content, world, damage: combat.damage, equipment: armorRules }),
@@ -2189,6 +2198,19 @@ function startRenderer(
       // yet (keys 1–4 are the abilities').
       const consumables = prepareConsumables(content, worldItems);
       startConsumables(world, consumables, player?.entity);
+      // Ropes (mw-e10.9): the scene's rope anchors take the climbing rope (tie and untie with
+      // Interact), and a refused climb says why on the Interact prompt.
+      startRopes(world, content, loaded, consumables.items.inventory, navigation);
+      // The e2e reads the latest refusal from #app[data-climb-refused] (the prompt itself is gone
+      // within a couple of seconds, which a slow runner's polling can miss).
+      world.events.on(climbRefused, (refused) => {
+        climbHint = climbHintOf(refused, performance.now());
+        root.dataset['climbRefused'] = JSON.stringify({
+          tick: refused.tick,
+          reason: refused.refusal.reason,
+          text: refused.text,
+        });
+      });
       // The inventory screen and the quick-slot strip (mw-e17.10): I or View opens the screen; its
       // actions reach the sim as commands. The e2e reads #app[data-inventory] (open/closed) and
       // #app[data-quick-slots].

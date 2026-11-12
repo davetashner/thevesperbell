@@ -54,6 +54,7 @@
     "puzzle:validate": "node scripts/puzzle-validate-cli.ts",
     "puzzle:coverage": "node scripts/puzzle-coverage-cli.ts",
     "world:validate": "node scripts/world-validate-cli.ts",
+    "dialogue:validate": "node scripts/dialogue-validate-cli.ts",
     "content:data-only": "node scripts/content-data-only-cli.ts"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
 import { SKIN } from '../character/controller';
 import { FakeCollisionWorld } from '../character/fake-collision-world';
 import { CharacterController } from '../character/system';
-import { DEFAULT_CLIMB_TUNING } from '../climb/climb';
+import { climbRefused, DEFAULT_CLIMB_TUNING, type ClimbRefused } from '../climb/climb';
 import { sceneLedges } from '../climb/ledges';
 import { ClimbRopeComponent, spawnRope } from '../climb/ropes';
 import { DEFAULT_LEDGE_TUNING, LEDGE_HANG_CAPABILITY } from '../climb/mantle';
@@ -292,6 +292,70 @@ describe('climbing through the player (mw-e02.13)', () => {
     const full = r.stamina() ?? 0;
     r.run(60);
     expect(full - (r.stamina() ?? 0)).toBeCloseTo(DEFAULT_CLIMB_TUNING.staminaPerSecond, 6);
+  });
+});
+
+describe('climb difficulty through the player (mw-e10.9)', () => {
+  const GRANTS = new Map([['verb.climb.rough', 3]]);
+
+  it('AC-1: a thief whose capability grants difficulty 3 climbs a difficulty-2 wall', () => {
+    const thief = room({
+      height: 3,
+      block: { climbable: 'rough' },
+      climb: { capabilities: ['verb.climb.rough'], difficulty: GRANTS },
+    });
+    thief.run(20, FORWARD);
+    thief.run(1, JUMP_FORWARD);
+    expect(thief.state().traversal).toBe('climb');
+  });
+
+  it('AC-2: a knight (best difficulty 1) is refused the same wall with a prompt, whatever it holds', () => {
+    const knight = room({
+      height: 3,
+      block: { climbable: 'rough' },
+      climb: { capabilities: ['verb.climb.rough'], difficulty: new Map() },
+    });
+    const refused: ClimbRefused[] = [];
+    knight.world.events.on(climbRefused, (event) => refused.push(event));
+    knight.run(20, FORWARD);
+    knight.run(1, JUMP_FORWARD);
+    knight.run(10, FORWARD);
+    expect(knight.state().traversal).toBeNull();
+    expect(refused).toHaveLength(1);
+    expect(refused[0]).toMatchObject({
+      refusal: { reason: 'too-difficult', difficulty: 2, max: 1 },
+      text: 'Too hard for you to climb',
+    });
+    // The easy grades are still its to climb.
+    const ladder = room({
+      height: 3,
+      block: { climbable: 'ladder' },
+      climb: { difficulty: new Map() },
+    });
+    let ticks = 0;
+    while (ladder.state().traversal !== 'climb' && ticks++ < 60) ladder.run(1, FORWARD);
+    expect(ladder.state().traversal).toBe('climb');
+  });
+
+  it('climbing drains stamina by the surface’s difficulty: 5 a second on a ladder, 7.5 on rough stone', () => {
+    const drain = (grade: 'ladder' | 'rough') => {
+      const r = room({
+        height: 6,
+        block: { climbable: grade },
+        climb: { capabilities: ['verb.climb.rough'] },
+        combat: true,
+      });
+      r.run(20, FORWARD);
+      if (grade === 'rough') r.run(1, JUMP_FORWARD);
+      let ticks = 0;
+      while (r.state().traversal !== 'climb' && ticks++ < 60) r.run(1, FORWARD);
+      const before = r.stamina() ?? 0;
+      r.run(60);
+      expect(r.state().traversal).toBe('climb');
+      return before - (r.stamina() ?? 0);
+    };
+    expect(drain('ladder')).toBeCloseTo(5, 6);
+    expect(drain('rough')).toBeCloseTo(7.5, 6);
   });
 });
 

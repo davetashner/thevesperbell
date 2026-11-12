@@ -11,3 +11,4 @@ export * from './path';
 export * from './queue';
 export * from './steering';
 export * from './scene';
+export * from './rope-links';

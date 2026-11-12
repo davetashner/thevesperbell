@@ -125,10 +125,11 @@ import {
   type ButtonAction,
 } from '../input/action-frame';
 import { cos, pow, sin } from '../math';
-import { climbTraversal, DEFAULT_CLIMB_TUNING } from '../climb/climb';
+import { climbDrainPerSecond, climbTraversal, DEFAULT_CLIMB_TUNING } from '../climb/climb';
 import type { LedgeIndex } from '../climb/ledges';
 import { ledgeTraversal, type LedgeTraversalHook } from '../climb/mantle';
 import { ClimbRopeComponent } from '../climb/ropes';
+import { maxClimbDifficulty } from '../climb/surfaces';
 import {
   CharacterBreath,
   DEFAULT_WATER_TUNING,
@@ -598,7 +599,9 @@ function climbStaminaSystem<TInput>(tuning: Frozen<ControllerTuning>): System<TI
       w.query(CharacterController, StaminaComponent).forEach((entity, state) => {
         if (state.traversal !== 'climb') return;
         const climb = characterTuning(w, entity, tuning).climb ?? DEFAULT_CLIMB_TUNING;
-        if (climb.staminaPerSecond > 0) drainStamina(w, entity, climb.staminaPerSecond / clock.hz);
+        if (climb.staminaPerSecond <= 0 || state.climb === undefined) return;
+        const perSecond = climbDrainPerSecond(w, state.climb.surface, climb);
+        drainStamina(w, entity, perSecond / clock.hz);
       });
     },
   };
@@ -673,6 +676,12 @@ export interface PlayerClimbOptions {
    * options' and whatever the capability registry grants the player (mw-e19.2) apply to both.
    */
   readonly capabilities?: readonly string[];
+  /**
+   * Capability id -> the climb difficulty (1-3) it lets the player attempt (content's capability
+   * `climbDifficulty`, mw-e10.9); the player's best is the highest of the capabilities it holds
+   * (1 with none). Absent = no limit beyond each grade's own capability.
+   */
+  readonly difficulty?: ReadonlyMap<string, number>;
 }
 
 /** The player's mantling and ledge hangs (mw-e02.12). */
@@ -822,11 +831,16 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   }
   if (climb !== undefined) {
     if (!world.isRegistered(ClimbRopeComponent)) world.register(ClimbRopeComponent);
+    const grants = climb.difficulty;
     hooks.push(
       climbTraversal({
         world,
         capabilities,
         handsFull: (entity) => refuseGrab(world, entity, 'climb'),
+        ...(grants !== undefined && {
+          maxDifficulty: (entity: EntityId | undefined) =>
+            maxClimbDifficulty(capabilities(entity), grants),
+        }),
         stamina: (entity) =>
           combat === undefined || entity === undefined
             ? undefined

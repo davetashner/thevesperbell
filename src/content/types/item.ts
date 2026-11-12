@@ -624,6 +624,18 @@ const itemOptions = [
       ...base,
       category: z.literal('tool'),
       equip: equipSchema(['tool-belt']).optional(),
+      rope: z
+        .strictObject({
+          length: z
+            .number()
+            .positive()
+            .max(50)
+            .describe('How far the rope hangs from its anchor once tied, metres.'),
+        })
+        .optional()
+        .describe(
+          'Makes the tool a climbing rope (mw-e10.9): tied at a level’s rope anchor with Interact, it hangs this far and climbs like any rope until untied.',
+        ),
     })
     .describe('A tool, e.g. lockpicks; usually grants its verb while carried (ADR-0004).'),
   z

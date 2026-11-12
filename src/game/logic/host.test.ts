@@ -3,12 +3,15 @@ import {
   addCapabilities,
   addInventory,
   applyLogicEffects,
+  capabilityGained,
   CapabilityRegistry,
   compileDispositionRules,
   Dispositions,
   hasCapability,
   installFactions,
   installGameClock,
+  itemAdded,
+  itemRemoved,
   InventoryRules,
   inventoryOf,
   PlayerClassComponent,
@@ -247,5 +250,90 @@ describe('game logic host dispositions (mw-e23.11)', () => {
     ).toMatchObject({ ok: false });
     expect(host.disposition('npc-juniper')).toBe(5);
     expect(host.adjustDisposition('nobody', 1)).toBe('unknown-npc:nobody');
+  });
+});
+
+describe('game logic host events (mw-e22.16)', () => {
+  const listen = (world: World<never>) => {
+    const log: string[] = [];
+    world.events.on(itemAdded, (e) => log.push(`added:${e.defId}`));
+    world.events.on(itemRemoved, (e) => log.push(`removed:${e.defId}`));
+    world.events.on(capabilityGained, (e) => log.push(`cap:${e.capability}`));
+    return log;
+  };
+  const give = { kind: 'giveItem', item: 'bellwort-root', count: 1 } as const;
+
+  it('AC-1: a rolled-back [giveItem, takeItem(missing)] batch emits no item event', () => {
+    const { world, host } = setup();
+    const log = listen(world);
+    expect(apply(host, give, { kind: 'takeItem', item: 'apple', count: 1 })).toMatchObject({
+      ok: false,
+    });
+    world.events.flush();
+    expect(log).toEqual([]);
+    expect(host.itemCount('bellwort-root')).toBe(0);
+  });
+
+  it('AC-2: a committed batch emits each event once, in order, after commit', () => {
+    const { world, host } = setup();
+    const log = listen(world);
+    const checkpoint = host.checkpoint();
+    host.giveItem('bellwort-root', 1);
+    host.takeItem('bellwort-root', 1);
+    host.learnCapability('spell.ember');
+    world.events.flush();
+    expect(log).toEqual([]);
+    checkpoint.commit();
+    world.events.flush();
+    expect(log).toEqual(['added:bellwort-root', 'removed:bellwort-root', 'cap:spell.ember']);
+  });
+
+  it('AC-3: a rolled-back capability effect emits no capability event', () => {
+    const { world, host } = setup();
+    const log = listen(world);
+    expect(
+      apply(
+        host,
+        { kind: 'learnCapability', capability: 'spell.ember' },
+        {
+          kind: 'takeItem',
+          item: 'apple',
+          count: 1,
+        },
+      ),
+    ).toMatchObject({ ok: false });
+    world.events.flush();
+    expect(log).toEqual([]);
+  });
+
+  it('AC-4: nested checkpoints fold into the parent', () => {
+    const { world, host } = setup();
+    const log = listen(world);
+    const outer = host.checkpoint();
+    host.giveItem('bellwort-root', 1);
+    const inner = host.checkpoint();
+    host.learnCapability('spell.ember');
+    inner.commit();
+    world.events.flush();
+    expect(log).toEqual([]);
+    outer.commit();
+    world.events.flush();
+    expect(log).toEqual(['added:bellwort-root', 'cap:spell.ember']);
+
+    const outer2 = host.checkpoint();
+    const inner2 = host.checkpoint();
+    host.giveItem('apple', 1);
+    inner2.commit();
+    outer2.rollback();
+    world.events.flush();
+    expect(log).toHaveLength(2);
+  });
+
+  it('AC-5: outside a batch events emit immediately', () => {
+    const { world, host } = setup();
+    const log = listen(world);
+    host.giveItem('bellwort-root', 1);
+    world.events.flush();
+    expect(log).toEqual(['added:bellwort-root']);
   });
 });

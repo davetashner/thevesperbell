@@ -373,6 +373,8 @@ export interface PeekView {
 export interface TestbedClimbOptions {
   /** The player's climbing capabilities (e.g. CLIMB_ROUGH_CAPABILITY), on top of the registry's (mw-e19.2). */
   readonly capabilities?: readonly string[];
+  /** Capability id -> the climb difficulty it lets the player attempt (mw-e10.9); absent = no limit. */
+  readonly difficulty?: ReadonlyMap<string, number>;
 }
 
 /** The player's water (mw-e02.14). */

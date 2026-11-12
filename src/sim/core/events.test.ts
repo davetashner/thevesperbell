@@ -159,3 +159,36 @@ describe('EventBus', () => {
     expect(() => defineEvent('')).toThrow(RangeError);
   });
 });
+
+describe('EventBus.hold (mw-e22.16)', () => {
+  const A = defineEvent<number>('hold.a');
+  const B = defineEvent<number>('hold.b');
+
+  it('holds only its types, releases in order on commit, drops on rollback', () => {
+    const bus = new EventBus();
+    const seen: string[] = [];
+    bus.on(A, (n) => seen.push(`a${String(n)}`));
+    bus.on(B, (n) => seen.push(`b${String(n)}`));
+    const kept = bus.hold([A]);
+    bus.emit(A, 1);
+    bus.emit(B, 1);
+    bus.emit(A, 2);
+    kept.commit();
+    const dropped = bus.hold([A]);
+    bus.emit(A, 3);
+    dropped.rollback();
+    bus.flush();
+    expect(seen).toEqual(['b1', 'a1', 'a2']);
+  });
+
+  it('settles in any order but only once', () => {
+    const bus = new EventBus();
+    const outer = bus.hold([A]);
+    const inner = bus.hold([A]);
+    outer.commit();
+    expect(() => {
+      outer.commit();
+    }).toThrow('settled twice');
+    inner.rollback();
+  });
+});

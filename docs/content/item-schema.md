@@ -283,6 +283,8 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `equip.nonProficient.drawTimeMultiplier` | number 1–3 | `1.5` | Multiplier on the time to draw, ready or raise it (combat reads it, mw-e04/mw-e05). 1 = no penalty; default 1.5. |
 | `equip.nonProficient.staminaCostMultiplier` | number 1–3 | `1.25` | Multiplier on the stamina its moves cost (combat reads it, mw-e04). 1 = no penalty; default 1.25. |
 | `equip.nonProficient.noiseMultiplier` | number 1–3 | `1` | Multiplier on the wearer’s noise, on top of the load class (clamped with it, ADR-0003). 1 = no penalty; default 1. |
+| `rope` | object | — | Makes the tool a climbing rope (mw-e10.9): tied at a level’s rope anchor with Interact, it hangs this far and climbs like any rope until untied. |
+| `rope.length` | number > 0 ≤ 50 | required | How far the rope hangs from its anchor once tied, metres. |
 
 ## 9. A quest item: noSell and noDrop by default.
 

@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameContent } from '@content/index';
 import {
+  ClimbRopeComponent,
   entitySource,
   FakeSightWorld,
   giveBrain,
+  NavRouteComponent,
   placeEntity,
+  placeRope,
   registerCreatureComponents,
+  registerWorldProperties,
+  retrieveRope,
+  ROPE_ANCHOR_TAG,
+  sceneRopeAnchors,
   straightLineNavigation,
   World,
   type EntityId,
@@ -114,5 +121,58 @@ describe('creature AI glue (mw-e11.21, mw-e11.23)', () => {
     expect(navigation.distance(world, walker, arena)).toBeGreaterThan(24);
     expect(navigation.travel(world, walker, { ...step, goal: arena })).toBe('running');
     expect(navigation.approach(world, walker, { ...step, goal: arena })).toBe('running');
+  });
+
+  it('follows the ropes that hang: a tied rope adds climb links to the mesh, untying takes them away (mw-e10.9)', () => {
+    const world = registerWorldProperties(
+      registerCreatureComponents(new World<never>({ seed: 1, hz: 60 })),
+    );
+    world.register(ClimbRopeComponent);
+    const navigation = new SceneNavigation();
+    // Without a navmesh there is nothing to sync.
+    navigation.syncRopes(world);
+    expect(navigation.mesh).toBeUndefined();
+    const hook = world.spawn();
+    const testbed = {
+      id: 'testbed',
+      spawns: [
+        {
+          entity: hook,
+          spawn: { id: 'hook', position: { x: -2.2, y: 3, z: 4.5 }, tags: [ROPE_ANCHOR_TAG] },
+        },
+      ],
+    } as unknown as Parameters<SceneNavigation['load']>[2];
+    sceneRopeAnchors(world, testbed);
+    navigation.load(world, content, testbed);
+    const base = navigation.mesh;
+    if (base === undefined) throw new Error('the testbed has a navmesh');
+    const walker = world.spawn();
+    placeEntity(world, walker, { x: 0, y: 0, z: -1 }, 0.4);
+    navigation.travel(world, walker, {
+      goal: { x: 0, y: 0, z: 10 },
+      within: 0.1,
+      speed: 1,
+      dt: 1,
+    });
+    expect(world.has(walker, NavRouteComponent)).toBe(true);
+    navigation.syncRopes(world);
+    expect(navigation.mesh).toBe(base);
+    expect(world.has(walker, NavRouteComponent)).toBe(true);
+
+    expect(placeRope(world, hook, { length: 3, item: 'climbing-rope' }).ok).toBe(true);
+    navigation.syncRopes(world);
+    expect(navigation.mesh?.linkCount).toBe(base.linkCount + 2);
+    // Routes planned on the old links are dropped, and an unchanged rope rebuilds nothing.
+    expect(world.has(walker, NavRouteComponent)).toBe(false);
+    const roped = navigation.mesh;
+    navigation.syncRopes(world);
+    expect(navigation.mesh).toBe(roped);
+
+    retrieveRope(world, hook);
+    navigation.syncRopes(world);
+    expect(navigation.mesh?.linkCount).toBe(base.linkCount);
+    navigation.unload(world);
+    navigation.syncRopes(world);
+    expect(navigation.mesh).toBeUndefined();
   });
 });

@@ -69,6 +69,24 @@ export function climbDifficulty(climbability: Climbability): 0 | 1 | 2 | 3 {
   return climbability === 'slippery' ? 3 : CLIMB_GRADE_RULES[climbability].difficulty;
 }
 
+/** The easiest climb difficulty (ladders, ropes, ivy): every actor can do it. */
+export const BASE_CLIMB_DIFFICULTY = 1;
+
+/**
+ * The hardest climb difficulty (1-3) an actor with `capabilities` attempts (mw-e10.9): the highest
+ * `climbDifficulty` any of them grants in `grants` (capability id -> difficulty, read from content's
+ * capability data, so a class's reach is its capabilities and never a class check here), and never
+ * below BASE_CLIMB_DIFFICULTY.
+ */
+export function maxClimbDifficulty(
+  capabilities: readonly string[],
+  grants: ReadonlyMap<string, number>,
+): number {
+  let best = BASE_CLIMB_DIFFICULTY;
+  for (const capability of capabilities) best = Math.max(best, grants.get(capability) ?? 0);
+  return best;
+}
+
 /** Why an actor may not attach to a surface. */
 export type ClimbRefusal =
   /** The surface has no climbing grade (or is gone). */
@@ -76,7 +94,17 @@ export type ClimbRefusal =
   /** It is frozen: only an actor with CLIMB_ICE_CAPABILITY holds on. */
   | { readonly reason: 'slippery'; readonly capability: string }
   /** The grade needs a capability the actor lacks. */
-  | { readonly reason: 'needs-capability'; readonly capability: string };
+  | { readonly reason: 'needs-capability'; readonly capability: string }
+  /** The climb is harder than the actor's best (mw-e10.9): `difficulty` asked, `max` it can do. */
+  | { readonly reason: 'too-difficult'; readonly difficulty: number; readonly max: number };
+
+/** The prompt text of each refusal (the HUD shows it where the climb was refused). */
+export const CLIMB_REFUSAL_TEXT: Readonly<Record<ClimbRefusal['reason'], string>> = Object.freeze({
+  'not-climbable': 'Nothing to hold on to',
+  slippery: 'Too slippery to climb',
+  'needs-capability': 'You do not know how to climb this',
+  'too-difficult': 'Too hard for you to climb',
+});
 
 /** Whether an actor may attach to a surface, and on which grade. */
 export type ClimbAttach =
@@ -86,15 +114,21 @@ export type ClimbAttach =
 /**
  * Whether an actor with `capabilities` may start climbing `entity` right now (mw-e03.22 AC-4): the
  * surface must have a grade, the actor must have the grade's capability, and a frozen surface also
- * needs CLIMB_ICE_CAPABILITY.
+ * needs CLIMB_ICE_CAPABILITY. With `maxDifficulty` (mw-e10.9) a grade harder than that is refused
+ * first, whatever the capabilities say.
  */
 export function canAttachClimb(
   world: World<never>,
   entity: EntityId,
   capabilities: readonly string[],
+  maxDifficulty = Infinity,
 ): ClimbAttach {
   const climbability = climbabilityOf(world, entity);
   if (climbability === 'none') return { ok: false, reason: 'not-climbable' };
+  const difficulty = climbDifficulty(climbability);
+  if (difficulty > maxDifficulty && climbability !== 'slippery') {
+    return { ok: false, reason: 'too-difficult', difficulty, max: maxDifficulty };
+  }
   if (climbability === 'slippery') {
     return capabilities.includes(CLIMB_ICE_CAPABILITY)
       ? { ok: true, climbability }
