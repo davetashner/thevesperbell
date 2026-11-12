@@ -24,6 +24,7 @@
     "sociability": 1,
     "greed": 0.3
   },
+  "dialogue": "dot-sleeping-ox",
   "behaviour": {
     "profile": "shopkeeper"
   },
