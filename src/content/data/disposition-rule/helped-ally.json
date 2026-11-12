@@ -1,0 +1,6 @@
+{
+  "$schema": "../disposition-rule.schema.json",
+  "id": "helped-ally",
+  "notes": "The player helped one of this creature's own.",
+  "delta": 25
+}

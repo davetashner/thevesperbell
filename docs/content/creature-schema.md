@@ -169,6 +169,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `faction` | ref → faction | — | Faction it belongs to (e12.8); absent = the "unaligned" faction. |
 | `disposition` | object | `{}` | Default disposition; spawn points and runtime state can override it. |
 | `disposition.towardPlayer` | `"ally"` \| `"friendly"` \| `"neutral"` \| `"wary"` \| `"hostile"` \| `"prey"` \| `"predator"` | — | Starting stance toward the player that overrides its faction’s; absent = the faction’s. |
+| `disposition.baseline` | integer -100–100 | — | Disposition toward the player (−100..100) it starts at and decays back to (mw-e12.9); absent = seeded from its stance toward the player. |
+| `disposition.decayPerMinute` | number > 0 | — | Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets. |
 | `fears` | list of object | `[]` | Stimuli that lower its morale (e12.10). |
 | `fears[].kind` | `"property"` \| `"faction"` \| `"event"` | required | What kind of stimulus it fears. |
 | `fears[].stimulus` | id | required | The world property, faction id or event name, e.g. "burning". |
