@@ -413,6 +413,12 @@ export {
   type FactionDefInput,
 } from './types/faction.ts';
 export {
+  ATTACKED_EVENT,
+  dispositionRuleSchema,
+  type DispositionRuleDef,
+  type DispositionRuleDefInput,
+} from './types/disposition-rule.ts';
+export {
   KIT_PURPOSES,
   KIT_SHAPES,
   kitPartSchema,
