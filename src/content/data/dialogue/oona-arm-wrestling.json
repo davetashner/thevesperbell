@@ -1,0 +1,179 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "oona-arm-wrestling",
+  "notes": "Big Oona (bible 5.14), dockhand and arm-wrestling champion of the Drowned Gull. Voice: loud, cheerful, bossy, teasing; 'love'. Tidefair barks (bible 6.1 quest 7). Class greetings only. The match itself is a hook: ask-wrestle emits armwrestle.requested, consumed by the Drowned Gull gameplay bead (mw-e40.6); the match, stakes and brawl are out of scope.",
+  "speakers": [
+    {
+      "id": "oona",
+      "npc": "npc-oona"
+    }
+  ],
+  "entries": [
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "A knight! Good. Finally, someone with a grip. Big Oona, champion of the Drowned Gull, and I've not lost a table since the autumn before last. Sit, if you dare.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "An archer. Soft hands. Lovely. Hands that can hit a gull at forty paces can't hold a table. Come on, have a go, I'll go easy. I won't.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Oh, a spellcaster! No magic at the table, love. The last one froze my elbow and I broke his chair. Sit, drink, and keep your fingers where I can see them.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Hands in the open, pickpocket, I know the look. Don't take anything off my table. I've two arms and a lot of friends. Sit, if you like.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Big Oona! Champion of the Drowned Gull and the Stone Wharf, the arm-wrestling table's right there. Sit, put your elbow down, and let's see what you're made of.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Back for another go? That's the spirit. Table's warm.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-wrestle",
+          "text": "I'll take you on.",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "armwrestle.requested",
+              "data": {
+                "opponent": "npc-oona",
+                "venue": "drowned-gull"
+              }
+            }
+          ],
+          "next": "wrestle-1"
+        },
+        {
+          "id": "ask-tidefair",
+          "text": "What happens at the Tidefair?",
+          "next": "tidefair-1"
+        },
+        {
+          "id": "ask-brawl",
+          "text": "I hear a tavern brawl can start in here.",
+          "next": "brawl-1"
+        },
+        {
+          "id": "ask-nell",
+          "text": "What's Nell like to work for?",
+          "next": "nell-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Come back when your arm's stronger! I'll be here. I'm always here. It's a very good table.",
+      "end": true
+    },
+    {
+      "id": "wrestle-1",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Elbow here, love, thumb up, and don't tell your mother. Ready? Three, two, one, and go!",
+      "end": true
+    },
+    {
+      "id": "tidefair-1",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Every market day the Stone Wharf's a riot. Arm-wrestling, that's me. The Gull Shoot, with wooden gulls on a boom. The Regatta, no magic, which means magic. And the Pocket Race. Hide your purse for that one.",
+      "next": "hub"
+    },
+    {
+      "id": "brawl-1",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Oh, it only takes one. Someone loses badly, someone laughs, someone's chair is suddenly in the air. If you lose gracefully, I'll buy you a drink and the Gull warms to you anyway. If you lose badly, run.",
+      "next": "hub"
+    },
+    {
+      "id": "nell-1",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Nell? She pays on time and hides in the cellar when Cray's about. That's all I know and all I'll say. Loud mouth, soft heart, and three hundred ways to lose a bet.",
+      "next": "hub"
+    }
+  ]
+}

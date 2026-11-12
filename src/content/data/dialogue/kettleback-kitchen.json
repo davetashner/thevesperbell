@@ -1,0 +1,1101 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "kettleback-kitchen",
+  "notes": "Mother Kettleback (bible 5.10), matriarch of the Rootcellar clan, in her camp (the Deepworks, E26: unplaced for now; reachable in the debug conversation room). Pragmatic, sarcastic, fond of anyone useful; calls everyone sweetling and her camp the kitchen. Opens by goblins.standing: hostile (parley only), neutral (wary; the shipped enum value 'neutral' is the bible's 'wary') and friendly. Captured by goblins (player.captured-by-goblins), even while hostile, opens negotiation, never a game over (bible 4.5): pay the carrying fee, work it off or talk her down; every path releases the player and cools a hostile standing to neutral. Dying with Horn dead wakes the player in the camp and she charges a carrying fee (player.woke-in-camp). Topics: goblins do not dream and the Big One feeds the sleepers; the arrangement with Horn (salvage rights for bread); Duggan Marl in his crate (Framed in Brass: persuade, the kettle from Dot's cellar, or take the planting kit); bread for coin; a class remark each (thief kin, knight told to stand over there, archer respected, sorcerer told not to do magic in her kitchen). Snig's vouching (snig.vouched) helps her checks. Not placed yet: the camp belongs to E26; the trade stock is E14.",
+  "speakers": [
+    {
+      "id": "kettleback",
+      "npc": "npc-kettleback"
+    }
+  ],
+  "entries": [
+    {
+      "id": "woke-in-camp",
+      "when": {
+        "kind": "fact",
+        "fact": "player.woke-in-camp"
+      },
+      "node": "fee-1"
+    },
+    {
+      "id": "captured",
+      "when": {
+        "kind": "fact",
+        "fact": "player.captured-by-goblins"
+      },
+      "node": "cap-1"
+    },
+    {
+      "id": "hostile-again",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "hostile"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "hostile-1",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "node": "hostile-again"
+    },
+    {
+      "id": "hostile",
+      "when": {
+        "kind": "factCmp",
+        "fact": "goblins.standing",
+        "op": "eq",
+        "value": "hostile"
+      },
+      "node": "hostile-1"
+    },
+    {
+      "id": "friendly-again",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "friendly-1",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "node": "friendly-again"
+    },
+    {
+      "id": "friendly",
+      "when": {
+        "kind": "factCmp",
+        "fact": "goblins.standing",
+        "op": "eq",
+        "value": "friendly"
+      },
+      "node": "friendly-1"
+    },
+    {
+      "id": "wary-again",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "wary-1",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "wary-again"
+    },
+    {
+      "id": "wary",
+      "node": "wary-1"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "hostile-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Well. Look what's wandered into the kitchen with its elbows out. You've left a lot of my cousins with headaches, sweetling, and you'll understand if I don't offer biscuits.",
+      "next": "hostile-1-b"
+    },
+    {
+      "id": "hostile-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Hands where the young ones can see them. Say your piece. Say it short, and say it kindly, and mind the kettle. It's hot, and I'm told I'm worse.",
+      "next": "parley-menu"
+    },
+    {
+      "id": "hostile-again",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "You again. Still breathing, I see, and still in my kitchen. Make it quick.",
+      "next": "parley-menu"
+    },
+    {
+      "id": "wary-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Oh, a visitor. Stay by the door, sweetling, where I can see you. Nothing personal. You'll have heard what they say about goblins. I've heard worse. I've said worse, mostly about them.",
+      "next": "wary-1-b"
+    },
+    {
+      "id": "wary-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Now. Are you buying, selling, or lost? Lost is the most expensive.",
+      "next": "hub"
+    },
+    {
+      "id": "wary-again",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Back, then. Mind the kettle, mind your pockets, and try not to tread on the young ones.",
+      "next": "hub"
+    },
+    {
+      "id": "friendly-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "There she is! The one with the good boots and the better manners. Come in, sweetling, sit on the good crate, the one that doesn't bite. The young ones talk about you all the time.",
+      "next": "friendly-1-b"
+    },
+    {
+      "id": "friendly-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "The one who gave bread. The one who didn't swing. You've got a reputation. It's a very small reputation, but we're a very small people.",
+      "next": "hub"
+    },
+    {
+      "id": "friendly-again",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Look who's come to see the old girl! Have a seat. Have a biscuit. They're older than they look. So am I.",
+      "next": "hub"
+    },
+    {
+      "id": "parley-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "parley-persuade",
+          "text": "I came to talk, not to fight. Hear me out.",
+          "next": "parley-check"
+        },
+        {
+          "id": "parley-bread",
+          "text": "I brought bread. For the kitchen.",
+          "when": {
+            "kind": "hasItem",
+            "item": "bread-loaf",
+            "count": 1
+          },
+          "showWhenLocked": true,
+          "next": "parley-bread-1"
+        },
+        {
+          "id": "parley-leave",
+          "text": "Then I'll go.",
+          "next": "parley-leave-1"
+        }
+      ]
+    },
+    {
+      "id": "parley-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 12,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "snig.vouched"
+          },
+          "bonus": 3,
+          "label": "Snig has vouched for you"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "bonus": 2,
+          "label": "You smell like pockets"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-kettleback",
+            "op": "gte",
+            "value": 0
+          },
+          "bonus": 1,
+          "label": "She has no grudge"
+        }
+      ],
+      "success": "parley-ok",
+      "failure": "parley-fail"
+    },
+    {
+      "id": "parley-ok",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Hmph. Well. Nobody's ever come in swinging and said that with a straight face, not twice. All right. All right! Sit. Not there. There. The young ones will stop glaring in a minute. They glare slow.",
+      "next": "parley-fx"
+    },
+    {
+      "id": "parley-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "neutral"
+        },
+        {
+          "kind": "emit",
+          "event": "goblins.standing-cooled"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "parley-fail",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Pretty. Pretty words from somebody still holding a sword. Come back when your hands are empty and your pockets are full of something useful. I'm not unreasonable. I'm only sensible.",
+      "next": "parley-menu"
+    },
+    {
+      "id": "parley-bread-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Bread? Real bread? Oh, you sly thing. You know what that does to a kitchen. Give it here. Don't think I'm softened. I'm merely buttered.",
+      "next": "parley-bread-fx"
+    },
+    {
+      "id": "parley-bread-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "takeItem",
+          "item": "bread-loaf",
+          "count": 1
+        },
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "neutral"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "goblins.standing-cooled"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "parley-leave-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Mind the door. It bites. Mind the young ones, too. They're better at it.",
+      "end": true
+    },
+    {
+      "id": "cap-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Well, well. Look what the nets caught. Put the sword down, sweetling, the net's heavier than your arguments. There now. Nobody's going to eat you. We don't. It's rude, and the gristle's terrible.",
+      "next": "cap-1-b"
+    },
+    {
+      "id": "cap-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "I'm not the type to make a fuss over a swing or two. I'm the type to ask what you're worth. Everyone's worth something. Let's find out what.",
+      "next": "cap-menu"
+    },
+    {
+      "id": "cap-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "cap-pay",
+          "text": "Pay the carrying fee (15 gold).",
+          "when": {
+            "kind": "gold",
+            "op": "gte",
+            "value": 15
+          },
+          "showWhenLocked": true,
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -15
+            }
+          ],
+          "next": "cap-pay-1"
+        },
+        {
+          "id": "cap-work",
+          "text": "I'll work it off.",
+          "next": "cap-work-1"
+        },
+        {
+          "id": "cap-persuade",
+          "text": "Let me go, and I'll make it worth your while.",
+          "next": "cap-check"
+        }
+      ]
+    },
+    {
+      "id": "cap-pay-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Fifteen, and you didn't even haggle. I could weep. I'll put it toward the good kettle. Off you go, sweetling, and if you're caught again, do ask for me. I do like a repeat customer.",
+      "next": "cap-end"
+    },
+    {
+      "id": "cap-work-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "A willing one! Splendid. There's a thing of mine somewhere between here and the cutting. Shiny. Ish. You'll know it when you trip over it. Bring it back, and we'll call it square.",
+      "next": "cap-work-fx"
+    },
+    {
+      "id": "cap-work-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "kettleback.errand",
+          "value": true
+        }
+      ],
+      "next": "cap-end"
+    },
+    {
+      "id": "cap-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 11,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "snig.vouched"
+          },
+          "bonus": 3,
+          "label": "Snig has vouched for you"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "bonus": 2,
+          "label": "You smell like pockets"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "hostile"
+          },
+          "bonus": -3,
+          "label": "You arrived swinging"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          "bonus": 3,
+          "label": "The clan likes you"
+        }
+      ],
+      "success": "cap-ok",
+      "failure": "cap-fail"
+    },
+    {
+      "id": "cap-ok",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Hm. You've a tongue. I like a tongue. Shall we say you owe me one, and I'll say I'm generous? Don't tell the young ones. They'll think I've gone soft, and then where would we be.",
+      "next": "cap-end"
+    },
+    {
+      "id": "cap-fail",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Oh, that was nearly good. Nearly. It's the nearly that's the trouble. Never mind: you can work it off. Everybody can work something off. It's the great equaliser.",
+      "next": "cap-work-fx"
+    },
+    {
+      "id": "cap-end",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "player.captured-by-goblins",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "kettleback.released"
+        }
+      ],
+      "next": "cap-standing"
+    },
+    {
+      "id": "cap-standing",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "hostile"
+          },
+          "next": "cap-cool"
+        }
+      ],
+      "else": "cap-after"
+    },
+    {
+      "id": "cap-cool",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "neutral"
+        }
+      ],
+      "next": "cap-after"
+    },
+    {
+      "id": "cap-after",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "And since you're here, and since I'm talking, and since you haven't yet tried to stab anyone: was there something you wanted? People generally want something. I'm very good at wanting.",
+      "next": "hub"
+    },
+    {
+      "id": "fee-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "There you are. Up you get. Don't thank me, we found you in a heap by the wall and dragged you down, and I'm told you weigh more than you look. That's a carrying fee, sweetling. Twenty gold or something shiny.",
+      "next": "fee-1-b"
+    },
+    {
+      "id": "fee-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "It's not extortion. It's cartage. There's a difference, and the difference is mine.",
+      "next": "fee-menu"
+    },
+    {
+      "id": "fee-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "fee-pay",
+          "text": "Pay the twenty gold.",
+          "when": {
+            "kind": "gold",
+            "op": "gte",
+            "value": 20
+          },
+          "showWhenLocked": true,
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -20
+            }
+          ],
+          "next": "fee-pay-1"
+        },
+        {
+          "id": "fee-owe",
+          "text": "I'll owe you.",
+          "next": "fee-owe-1"
+        }
+      ]
+    },
+    {
+      "id": "fee-pay-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Lovely. Pleasure doing business. Next time, if you could die somewhere flatter, I'd be obliged. The young ones strain their backs.",
+      "next": "fee-end"
+    },
+    {
+      "id": "fee-owe-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Owe. Well, I'll write it on the wall. Not literally. We can't write. But I'll remember, and so will the young ones, and they're better at remembering than at anything else.",
+      "next": "fee-owe-fx"
+    },
+    {
+      "id": "fee-owe-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": -2
+        }
+      ],
+      "next": "fee-end"
+    },
+    {
+      "id": "fee-end",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "player.woke-in-camp",
+          "value": false
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-dream",
+          "text": "Do goblins dream?",
+          "once": true,
+          "next": "dream-1"
+        },
+        {
+          "id": "ask-horn",
+          "text": "I hear you have an arrangement with Horn.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "kettleback.horn-deal-told"
+            }
+          },
+          "next": "horn-gate"
+        },
+        {
+          "id": "ask-duggan",
+          "text": "Is that Duggan Marl in the crate?",
+          "when": {
+            "kind": "factCmp",
+            "fact": "duggan.crate",
+            "op": "eq",
+            "value": "crated"
+          },
+          "next": "duggan-1"
+        },
+        {
+          "id": "ask-trade",
+          "text": "What do goblins buy?",
+          "once": true,
+          "next": "trade-1"
+        },
+        {
+          "id": "trade-bread",
+          "text": "I brought bread. Will you buy it?",
+          "when": {
+            "kind": "hasItem",
+            "item": "bread-loaf",
+            "count": 1
+          },
+          "showWhenLocked": true,
+          "next": "trade-bread-1"
+        },
+        {
+          "id": "kin-thief",
+          "text": "Quiet job. Anything the kitchen's missing?",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "kin-thief-1"
+        },
+        {
+          "id": "stand-knight",
+          "text": "I'm told I'm making the young ones nervous.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "stand-knight-1"
+        },
+        {
+          "id": "rat-archer",
+          "text": "I can hit a rat at forty paces.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "rat-archer-1"
+        },
+        {
+          "id": "kitchen-sorcerer",
+          "text": "May I show you a little magic?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "kitchen-sorcerer-1"
+        },
+        {
+          "id": "leave",
+          "text": "Goodbye, Mother Kettleback.",
+          "next": "bye-1"
+        }
+      ]
+    },
+    {
+      "id": "dream-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Goblins don't dream, sweetling. Nothing up here to sing to. It's the best thing about us. You lot lie down and the whole mountain goes into your head. We lie down and we sleep like a stone in a pocket.",
+      "next": "dream-1-b"
+    },
+    {
+      "id": "dream-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "That's why the singing never touched us. And it's why I've watched you lot walk past my fire at midnight, eyes shut, going where it tells you. Rude, I call that. Rude and sad.",
+      "next": "dream-1-c"
+    },
+    {
+      "id": "dream-1-c",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "The Big One carries the sleepers to the soft room, mind. Puts them in beds. Feeds them. We bring the bread; he does the lifting. Don't wake them. He minds terribly.",
+      "next": "dream-fx"
+    },
+    {
+      "id": "dream-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "kettleback.sleepers-told",
+          "value": true
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "horn-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          "next": "horn-friendly"
+        }
+      ],
+      "else": "horn-check"
+    },
+    {
+      "id": "horn-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 9,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "kettleback.sleepers-told"
+          },
+          "bonus": 2,
+          "label": "You know about the sleepers"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "snig.vouched"
+          },
+          "bonus": 3,
+          "label": "Snig has vouched for you"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "bonus": 1,
+          "label": "She likes your sort"
+        }
+      ],
+      "success": "horn-ok",
+      "failure": "horn-fail"
+    },
+    {
+      "id": "horn-friendly",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Oh, between us? Between us, then. The Big One lets us scavenge the Knot, safe tunnels and anything that isn't nailed to the dead, and we bring bread for his sleepers. Every week. He's never once been late.",
+      "next": "horn-friendly-b"
+    },
+    {
+      "id": "horn-friendly-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "It's a very good arrangement. Don't tell Vane's people. They'd go down there to sort it out, with torches, and that's how this whole mess started.",
+      "next": "horn-fx"
+    },
+    {
+      "id": "horn-ok",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Hm. You've got a sensible face. All right. Salvage rights for bread. The Big One lets us pick through what the dead leave, we feed his sleepers. That's the whole arrangement. It's not secret, exactly. It's merely unadvertised.",
+      "next": "horn-ok-b"
+    },
+    {
+      "id": "horn-ok-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Humans with torches coming down to sort it out is what I fear. You've a torch. Is that a bad sign? Do put it out.",
+      "next": "horn-fx"
+    },
+    {
+      "id": "horn-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "kettleback.horn-deal-told",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": 1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "horn-fail",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Arrangement? What arrangement? I've got an arrangement with my knees and nothing else. Ask me nicely, or ask me with something shiny.",
+      "next": "hub"
+    },
+    {
+      "id": "duggan-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "The crate that talks to itself? That's him. Planting my people's trinkets at every doorstep in Briar Glen. Brass, stamped on the back. Very pretty, very fake. We're not that good at brass.",
+      "next": "duggan-1-b"
+    },
+    {
+      "id": "duggan-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "I'm told he's a very sorry man. I'm told he's got a conscience. I'm told it keeps him up. It's the only thing in that crate that does.",
+      "next": "duggan-menu"
+    },
+    {
+      "id": "duggan-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "duggan-persuade",
+          "text": "Let him go, and he'll testify against Vane.",
+          "next": "duggan-check"
+        },
+        {
+          "id": "duggan-kettle",
+          "text": "I've got the kettle you wanted.",
+          "when": {
+            "kind": "fact",
+            "fact": "kettleback.kettle-brought"
+          },
+          "showWhenLocked": true,
+          "next": "duggan-kettle-1"
+        },
+        {
+          "id": "duggan-kit",
+          "text": "I'll take his planting kit as proof.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "duggan.kit-taken"
+            }
+          },
+          "once": true,
+          "next": "duggan-kit-1"
+        },
+        {
+          "id": "duggan-back",
+          "text": "Let me think about it.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "duggan-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 12,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          "bonus": 3,
+          "label": "The clan likes you"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "snig.vouched"
+          },
+          "bonus": 2,
+          "label": "Snig has vouched for you"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "kettleback.horn-deal-told"
+          },
+          "bonus": 2,
+          "label": "You know the arrangement"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "duggan.kit-taken"
+          },
+          "bonus": 2,
+          "label": "You hold his planting kit"
+        }
+      ],
+      "success": "duggan-ok",
+      "failure": "duggan-fail"
+    },
+    {
+      "id": "duggan-ok",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Testify. Stand in a room full of humans and say it was Vane. Hm. I'd pay to see that. Fine. Out he goes. But if the town doesn't listen, sweetling, I'll know whose fault it was, and I'm very good at remembering faults.",
+      "next": "duggan-free"
+    },
+    {
+      "id": "duggan-fail",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Oh, sweetling. He stays in his crate until somebody gives me a reason I can put in my pocket. The young ones like the company. He tells them stories. Bad ones, but they listen.",
+      "next": "duggan-menu"
+    },
+    {
+      "id": "duggan-kettle-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "The kettle! That's the one. Look at the shine. Like a baby's head. Oh, I've waited. All right, all right: he's yours. Take the crate. The crate's not his, mind. Leave the crate.",
+      "next": "duggan-kettle-fx"
+    },
+    {
+      "id": "duggan-kettle-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "kettleback.kettle-brought",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": 5
+        }
+      ],
+      "next": "duggan-free"
+    },
+    {
+      "id": "duggan-free",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "duggan.crate",
+          "value": "freed"
+        },
+        {
+          "kind": "emit",
+          "event": "duggan.released"
+        }
+      ],
+      "next": "duggan-freed"
+    },
+    {
+      "id": "duggan-freed",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Out you come, Mr Marl. Don't thank me, thank the nice person. Do say it loud. The young ones are listening, and they'll tell all their cousins.",
+      "next": "hub"
+    },
+    {
+      "id": "duggan-kit-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "The kit? Hammer, punch, and one very nervous little stamp. Take it. He won't miss it. He misses most things. I never had it, I never saw it, and it never walked out of my kitchen.",
+      "next": "duggan-kit-fx"
+    },
+    {
+      "id": "duggan-kit-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "duggan.kit-taken",
+          "value": true
+        }
+      ],
+      "next": "duggan-menu"
+    },
+    {
+      "id": "trade-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Shiny things. Safe tunnels. A better class of junk. A good spoon, a clock that still ticks, a bell with a clapper. We don't want your money so much as something to do with it. Bread's the best, though.",
+      "next": "trade-1-b"
+    },
+    {
+      "id": "trade-1-b",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Everyone wants to kill the goblins till they need something found. Remember that when you've lost your ring down a drain. I'm told it happens.",
+      "next": "hub"
+    },
+    {
+      "id": "trade-bread-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Bread! You do know how to flatter a woman. Here, four gold, and not a penny more, because I've a reputation. Don't spend it all in one place. I'd say don't spend it at all, but I'm not your mother.",
+      "next": "trade-bread-fx"
+    },
+    {
+      "id": "trade-bread-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "takeItem",
+          "item": "bread-loaf",
+          "count": 1
+        },
+        {
+          "kind": "gold",
+          "delta": 4
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": 1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "kin-thief-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Ah. You smell like pockets. Kin, then. I'd say we're the same, you and I, but I'm told that's rude, and also true. If you find anything shiny, the kitchen's open for business.",
+      "next": "kin-thief-fx"
+    },
+    {
+      "id": "kin-thief-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "stand-knight-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Big shiny one. Stand over there, you're making the young ones nervous. There. Lovely. Now you look like a cupboard, which is much less alarming. Take the helm off and they'll fight over who sits on you.",
+      "next": "stand-knight-fx"
+    },
+    {
+      "id": "stand-knight-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": -1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "rat-archer-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Forty paces! Hm. That's a lot of rat. I'll be the judge of it. The cutting's full of them, and they eat my bread. I'll respect anyone who can make them nervous. Do it quietly, mind.",
+      "next": "rat-archer-fx"
+    },
+    {
+      "id": "rat-archer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "kitchen-sorcerer-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Don't do magic in my kitchen. The last one set a ladle on fire and spent a week apologising. Take your sparkly fingers outside, sweetling. Show the rat. The rat won't mind.",
+      "next": "kitchen-sorcerer-fx"
+    },
+    {
+      "id": "kitchen-sorcerer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": -1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "bye-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Off you go, sweetling. Mind the tunnels, mind the pockets, and if you find anything shiny, you know where the kitchen is.",
+      "end": true
+    }
+  ]
+}

@@ -1,0 +1,794 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "cray-customs",
+  "notes": "mw-e39.20: Inspector Prudence Cray (bible 5.13), Lantern Court customs. Incorruptible: every bribe option sets cray.bribe.attempted, lowers disposition by 6 and is recorded; no branch lets a bribe succeed (AC-2). Never confiscates plot-critical or forbidden-plot items: the confiscate hook is an emit whose payload excludes both (AC-5). Sorcerer is searched on sight; romance novels (stand-in fact cray.romance-brought) raise disposition; evidence about bay nine (stand-in facts evidence.*) opens the legal seizure route; cold disposition still accepts evidence.",
+  "speakers": [
+    {
+      "id": "cray",
+      "npc": "npc-cray"
+    }
+  ],
+  "entries": [
+    {
+      "id": "distrust",
+      "when": {
+        "kind": "disposition",
+        "npc": "npc-cray",
+        "op": "lte",
+        "value": -10
+      },
+      "node": "cold-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Prudence Cray, Lantern Court customs. A knight: good. A respectable witness is worth three ledgers on this quay. Stand where I can see you, and tell me what you carry.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Inspector Cray. You have good eyes, I'd wager. This harbour hides more tonnage than it declares. Count me the ships at the pool and I shall count you honest.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Halt. Prudence Cray, Lantern Court. You have the look of the restricted schools about you. Spellbooks, scrolls, anything bound without a licence: I shall be searching you.",
+      "next": "sorcerer-search"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Inspector Cray. Customs. I have not searched you yet, which is odd, as I feel I should have. I cannot say why I have not. It is bothering me enormously.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Inspector Prudence Cray, Lantern Court, customs. State your cargo, your business and your licence, in that order. I write everything down.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "You again. Good. Declarations are quicker when one has been through them once. Proceed.",
+      "next": "hub"
+    },
+    {
+      "id": "sorcerer-search",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Restricted school, unlicensed binding, no writ: it stays with me. You may visit it. Or submit to the search now, and be spared the indignity of my guessing.",
+      "next": "sorcerer-choice"
+    },
+    {
+      "id": "sorcerer-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "submit-sorcerer",
+          "text": "Search me, then.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "search-fx"
+        },
+        {
+          "id": "refuse-sorcerer",
+          "text": "I carry nothing restricted.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "search-refused"
+        }
+      ]
+    },
+    {
+      "id": "search-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.searched",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "cray.confiscate",
+          "data": {
+            "scope": "restricted-spellbooks",
+            "exclude": "plot-critical,forbidden-plot",
+            "route": "strongroom"
+          }
+        }
+      ],
+      "next": "search-done"
+    },
+    {
+      "id": "search-done",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Thank you. Receipt attached; confiscated lore goes to the strongroom and may be visited. I take restricted spellbooks only. Anything sealed, or anything that matters to the Court's own business, I leave alone.",
+      "next": "hub"
+    },
+    {
+      "id": "search-refused",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Then you will not mind my looking, and I shall record that you did. I do not confiscate what is not restricted, nor anything under a seal I cannot break. Move along, Sorcerer.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-customs",
+          "text": "What does the customs house do?",
+          "once": true,
+          "next": "customs-1"
+        },
+        {
+          "id": "ask-writ",
+          "text": "Is there any way to get my books back?",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "sorcerer"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.writ.offered"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "writ-1"
+        },
+        {
+          "id": "ask-bay-nine",
+          "text": "What do you make of bay nine?",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.bay-nine.suspicion"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.seizure.agreed"
+                }
+              }
+            ]
+          },
+          "next": "bay-nine-1"
+        },
+        {
+          "id": "ask-seal",
+          "text": "You've noticed something about its seal.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "disposition",
+                "npc": "npc-cray",
+                "op": "gte",
+                "value": 10
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.bay-nine.suspicion"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "seal-1"
+        },
+        {
+          "id": "give-evidence",
+          "text": "I have evidence about bay nine.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.foundry-invoice"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.honest-manifest"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.dead-clerk-seal"
+                  }
+                ]
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.seizure.agreed"
+                }
+              }
+            ]
+          },
+          "next": "evidence-route"
+        },
+        {
+          "id": "ask-release",
+          "text": "About those impounded books. Off the record.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "cray.seizure.agreed"
+              },
+              {
+                "kind": "disposition",
+                "npc": "npc-cray",
+                "op": "gte",
+                "value": 5
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.books-released"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "release-1"
+        },
+        {
+          "id": "bribe-purse",
+          "text": "Perhaps a purse could speed the paperwork?",
+          "once": true,
+          "next": "bribe-purse-fx"
+        },
+        {
+          "id": "bribe-fund",
+          "text": "A donation to the Lantern Court widows' fund?",
+          "once": true,
+          "next": "bribe-fund-fx"
+        },
+        {
+          "id": "offer-romance",
+          "text": "I brought you reading material. For the evidence room.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "cray.romance-brought"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.romance-accepted"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "romance-1"
+        },
+        {
+          "id": "witness-knight",
+          "text": "If you need a witness, Inspector, call on me.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "witness-fx"
+        },
+        {
+          "id": "ledger-archer",
+          "text": "I'll count your ships.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "ledger-fx"
+        },
+        {
+          "id": "nothing-thief",
+          "text": "I have nothing to declare.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "thief-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Good day. Mind the gangways. And do not mistake my courtesy for slackness.",
+      "end": true
+    },
+    {
+      "id": "customs-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "We weigh, we stamp, we confiscate. Restricted school, unlicensed binding, no writ. It stays with me. You may visit it. Everything else, we merely tax.",
+      "next": "customs-2"
+    },
+    {
+      "id": "customs-2",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "I read what I confiscate, naturally. Due diligence. One cannot judge a book unread. That the shelf in my office is well-thumbed is a matter of professional thoroughness.",
+      "next": "hub"
+    },
+    {
+      "id": "writ-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A writ may be requested by post to the capital. It will be considered in six to eight months. Meanwhile, a council chair may sign one, at a price, or a forger. I did not say that.",
+      "next": "writ-fx"
+    },
+    {
+      "id": "writ-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.writ.offered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "cray.writ-explained"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "bay-nine-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Bay nine is Vane Deepworks'. Stone, declared. Heavy, sealed and stamped. I have no cause to open it. Bring me cause, and I will open it before the tide turns.",
+      "next": "hub"
+    },
+    {
+      "id": "seal-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Since you ask, and since you have not tried to buy me: the stamp on bay nine's seal is a clerk's. The clerk was buried a year ago. A dead man has been certifying Vane's stone. Bring me proof.",
+      "next": "seal-fx"
+    },
+    {
+      "id": "seal-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.bay-nine.suspicion",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "cray.suspicion-shared"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "bribe-purse-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.bribe.attempted",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": -6
+        },
+        {
+          "kind": "emit",
+          "event": "cray.bribe-recorded",
+          "data": {
+            "method": "purse"
+          }
+        }
+      ],
+      "next": "bribe-purse-1"
+    },
+    {
+      "id": "bribe-purse-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A purse. Offered to an officer of the Lantern Court, on the customs quay, in daylight. That is an offence, and I am writing it down. There. It is in the ledger. Do you wish to sign it?",
+      "next": "hub"
+    },
+    {
+      "id": "bribe-fund-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.bribe.attempted",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": -6
+        },
+        {
+          "kind": "emit",
+          "event": "cray.bribe-recorded",
+          "data": {
+            "method": "fund"
+          }
+        }
+      ],
+      "next": "bribe-fund-1"
+    },
+    {
+      "id": "bribe-fund-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "The widows' fund is audited by my own hand, and no coin has ever reached it this way. Magnificent try. I record it under attempted corruption. Your name is spelled as spoken.",
+      "next": "hub"
+    },
+    {
+      "id": "romance-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "This is not a bribe. I want that understood. I shall log it as contraband for the evidence room, where it will be kept with care. Thoroughly read. For the file. ... Thank you.",
+      "next": "romance-fx"
+    },
+    {
+      "id": "romance-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.romance-accepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.romance-brought",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 10
+        },
+        {
+          "kind": "emit",
+          "event": "cray.romance-received"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "witness-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "cray.witness-registered"
+        }
+      ],
+      "next": "witness-1"
+    },
+    {
+      "id": "witness-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Noted. I shall enter you as an independent witness. Honest knights are few, and rarer in Wendmouth than frost.",
+      "next": "hub"
+    },
+    {
+      "id": "ledger-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.ledger.counting",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "cray.ledger-offered"
+        }
+      ],
+      "next": "ledger-1"
+    },
+    {
+      "id": "ledger-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Excellent. Report by name, tonnage and flag, at dusk. If a ship leaves that I have not logged, I shall know it was your miscount. I shall be gracious, but I shall know.",
+      "next": "hub"
+    },
+    {
+      "id": "thief-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Nothing. Yes. Quite. And yet I can tell I have not caught you at anything, which I find offensive. Move along, and move along slowly, so I can watch you do it.",
+      "next": "hub"
+    },
+    {
+      "id": "evidence-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "evidence.dead-clerk-seal"
+          },
+          "next": "ev-seal"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "evidence.foundry-invoice"
+          },
+          "next": "ev-invoice"
+        }
+      ],
+      "else": "ev-manifest"
+    },
+    {
+      "id": "ev-seal",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A stamp from the dead clerk's own hand. A year dead, and he certified last week's stone. Mr. Vane keeps strange clerks. This is cause enough for anything.",
+      "next": "ev-accept"
+    },
+    {
+      "id": "ev-invoice",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Forty brass trinkets, 'goblin style, stamp as sample'. Over the sea, brass is brass. Here it is evidence of a crime. This goes into my files. Under seal.",
+      "next": "ev-accept"
+    },
+    {
+      "id": "ev-manifest",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A second manifest, honestly kept. It disagrees with the first on every line. Stone does not weigh what bay nine's crates weigh. This is cause. Procedure is on your side now.",
+      "next": "ev-accept"
+    },
+    {
+      "id": "ev-accept",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.seizure.agreed",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.evidence-given",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 8
+        },
+        {
+          "kind": "emit",
+          "event": "cray.seizure-opened",
+          "data": {
+            "target": "bay-nine"
+          }
+        }
+      ],
+      "next": "ev-done"
+    },
+    {
+      "id": "ev-done",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "I will seize bay nine's crate, lawfully, at the hoist, with witnesses and a seal of my own. That is what I do. If the Tern sails first, I will keep this copy. Go.",
+      "next": "hub"
+    },
+    {
+      "id": "release-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "The impounded books are... I cannot release them. A release in gratitude, however, is a matter of discretion. Off the record. Take them before I remember my duties.",
+      "next": "release-fx"
+    },
+    {
+      "id": "release-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.books-released",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "cray.books-released",
+          "data": {
+            "scope": "impounded-crate"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "cold-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "You have a file, and it is not thin. I will not trade pleasantries. I will accept evidence, for the law does not care for my feelings. Otherwise, good day.",
+      "next": "cold-hub"
+    },
+    {
+      "id": "cold-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "cold-evidence",
+          "text": "I have evidence about bay nine.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.foundry-invoice"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.honest-manifest"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.dead-clerk-seal"
+                  }
+                ]
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.seizure.agreed"
+                }
+              }
+            ]
+          },
+          "next": "evidence-route"
+        },
+        {
+          "id": "cold-leave",
+          "text": "I'll go.",
+          "next": "cold-farewell"
+        }
+      ]
+    },
+    {
+      "id": "cold-farewell",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Do.",
+      "end": true
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "harbor-folk-dialogue",
+  "name": "Harbour folk dialogue facts",
+  "notes": "mw-e39.19: world-state facts read and written by the Mags Oakum, Nell Gannet, Big Oona and Old Reed dialogues (bible 5.13, 5.14). Writers other than the dialogues (the travel system, the horn-coin item, the Wendmouth scene) are named in each description; each has a follow-up bead.",
+  "facts": [
+    {
+      "key": "wendmouth.visited",
+      "type": "bool",
+      "default": false,
+      "description": "The player has reached Wendmouth at least once. Gates Briar Glen hearsay about Nell Gannet and Mags Oakum (mw-e39.19 AC-5: no line implies a meeting before it). Written by the Wendmouth scene's arrival.",
+      "owner": "scene"
+    },
+    {
+      "key": "mags.fare-deal",
+      "type": "enum",
+      "values": ["none", "tow-rope", "herons", "gust", "tarpaulin"],
+      "default": "none",
+      "description": "The class deal the player struck with Mags in place of a fare (bible 5.13): knight on the tow-rope, archer clearing herons, sorcerer's Gust for the sail, thief under the tarpaulin (a five-coin fee paid at the deal). Set by mags-patient-ann.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mags.adit-open",
+      "type": "bool",
+      "default": false,
+      "description": "Mags has admitted the humming at the Weeping Adit and will run the Patient Ann there, in the morning (bible 5.13). Set by mags-patient-ann at disposition 4 or more.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mags.crates-confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Mags has told the player she carries Vane's special crates downriver for triple pay and doubts they are stone (bible 5.13 secret). Set by mags-patient-ann at disposition 8 or more.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mags.coin-confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Mags has admitted she kept one horn-coin that slipped through a split plank (bible 5.13 secret). Set by mags-patient-ann together with mags.crates-confessed.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "commission.coin-held",
+      "type": "bool",
+      "default": false,
+      "description": "The thief carries the horn-coin sample lifted from Vane's strongbox for the anonymous buyer (bible 4.3, thief commission). Stand-in until the horn-coin item exists: written by its pickup; cleared by nell-drowned-gull when the coin is delivered or a fake is handed over, and kept set if the thief keeps it.",
+      "owner": "item"
+    },
+    {
+      "key": "commission.outcome",
+      "type": "enum",
+      "values": ["none", "delivered", "kept", "faked"],
+      "default": "none",
+      "description": "What the thief did with the commission at the Drowned Gull drop (bible 4.3): handed over the real horn-coin, kept it, or handed over a fake. Set by nell-drowned-gull; the world consequences (the buyer's reaction, the epilogue) read it and are a follow-up.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.undertow-open",
+      "type": "bool",
+      "default": false,
+      "description": "Nell has shown the player the way down to the Undertow (bible 5.13): a thief's class deal. Set by nell-drowned-gull; the Undertow gate reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.gull-shoot-sponsored",
+      "type": "bool",
+      "default": false,
+      "description": "Nell sponsors the archer in the Gull Shoot at the Tidefair for a cut (bible 5.13). Set by nell-drowned-gull; the Tidefair quest reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.books-offered",
+      "type": "bool",
+      "default": false,
+      "description": "Nell has offered the sorcerer restricted books and the way past customs (bible 5.13). Set by nell-drowned-gull; stock and prices belong to the economy epic.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.bay-nine-told",
+      "type": "bool",
+      "default": false,
+      "description": "Nell has told the player what is in bay nine (bible 5.13): only to a thief or at disposition 10 or more. Set by nell-drowned-gull.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.skimming-confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Nell has admitted she skims a coin from every relic crate and is Mr. S-'s go-between (bible 5.13 secret). Set by nell-drowned-gull at disposition 8 or more.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "reed.toll-paid",
+      "type": "bool",
+      "default": false,
+      "description": "The player has paid Old Reed's toll at Kestrel Lock, in coin or in gossip (bible 7.2 toll board). Set by reed-kestrel-lock.",
+      "owner": "dialogue"
+    }
+  ]
+}

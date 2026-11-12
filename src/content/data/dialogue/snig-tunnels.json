@@ -1,0 +1,747 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "snig-tunnels",
+  "notes": "Snig (bible 5.11), young goblin scout of the Rootcellar clan (the cutting under the Deepworks, E26: unplaced for now; reachable in the debug conversation room). Quick, sticky-fingered, talks too much, wants to read one book start to finish; has a stolen primer in his hammock and four letters, all wrong. Canon: goblins cannot read (their language is gesture and smell) and do not dream. AC-5: until The Bookshop Burglar reaches its reading-lessons outcome (snig.lessons) he never reads a full sentence aloud and every reading attempt fails funnily; the lessons entry and the nodes behind it (lessons-*) are the only place he reads. Scenes: the Stacks burglar first meeting (burglar.outcome open: broker a deal, sell the book as a thief, turn him in, let him go), a first meeting once the burglar is settled, the scary reading one (a sorcerer's light, outcome light), reading attempts, the secret primer (needs disposition 3), vouching for the player with Kettleback (snig.vouched, once the burglar is settled), and a class remark each (thief followed, knight scary until the armour is off, sorcerer asked for the reading trick, archer challenged). Not placed yet: his tunnels and the Stacks stakeout belong to E26 and the side quest.",
+  "speakers": [
+    {
+      "id": "snig",
+      "npc": "npc-snig"
+    }
+  ],
+  "entries": [
+    {
+      "id": "scary-one",
+      "when": {
+        "kind": "factCmp",
+        "fact": "burglar.outcome",
+        "op": "eq",
+        "value": "light"
+      },
+      "node": "scary-1"
+    },
+    {
+      "id": "lessons",
+      "when": {
+        "kind": "fact",
+        "fact": "snig.lessons"
+      },
+      "node": "lessons-1"
+    },
+    {
+      "id": "hostile",
+      "when": {
+        "kind": "factCmp",
+        "fact": "goblins.standing",
+        "op": "eq",
+        "value": "hostile"
+      },
+      "node": "hostile-1"
+    },
+    {
+      "id": "first-meeting",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "meet-1",
+        "op": "lt",
+        "value": 1
+      },
+      "node": "meet-1"
+    },
+    {
+      "id": "return",
+      "node": "again-1"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "meet-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Whoa! Don't hit me! I'm very small and mostly string. Is that your face? It's a good one. Is that a book? It's not a book. Is it? Can I look at the pictures?",
+      "next": "meet-gate"
+    },
+    {
+      "id": "meet-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "open"
+          },
+          "next": "caught-1"
+        }
+      ],
+      "else": "plain-1"
+    },
+    {
+      "id": "caught-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "I wasn't stealing! I was borrowing. For ever. With no intention. It's got a snake in it. Look. Here. It's a snake. See? It's got the tail and everything. Is the whole book about snakes?",
+      "next": "caught-1-b"
+    },
+    {
+      "id": "caught-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Don't tell the scary one. The one with the teeth. He bit me. On the bum. I only wanted the pictures!",
+      "next": "caught-menu"
+    },
+    {
+      "id": "caught-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "deal-offer",
+          "text": "The bookseller might trade reading lessons for goblin salvage.",
+          "once": true,
+          "next": "deal-check"
+        },
+        {
+          "id": "caught-sell-thief",
+          "text": "I could sell you a book of your own. Cheap.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "sell-1"
+        },
+        {
+          "id": "caught-hale",
+          "text": "I'm taking you to Captain Hale.",
+          "next": "hale-1"
+        },
+        {
+          "id": "caught-let-go",
+          "text": "Go on, then. Run. Keep the picture book.",
+          "next": "go-1"
+        }
+      ]
+    },
+    {
+      "id": "deal-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 7,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "goblins.standing",
+            "op": "eq",
+            "value": "friendly"
+          },
+          "bonus": 3,
+          "label": "The clan likes you"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-snig",
+            "op": "gte",
+            "value": 3
+          },
+          "bonus": 2,
+          "label": "He trusts you"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "bonus": 1,
+          "label": "He follows thieves"
+        }
+      ],
+      "success": "deal-ok",
+      "failure": "deal-fail"
+    },
+    {
+      "id": "deal-ok",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Lessons? Real ones? With a teacher, and a book, and a floor? Oh! The scary one wouldn't be there, would he? Mother Kettleback pays for salvage, and I'm very good at finding salvage. It's finding it again that's hard.",
+      "next": "deal-ok-b"
+    },
+    {
+      "id": "deal-ok-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Yes. Yes! Tell the book lady. Tell her I'm Snig. She'll know. I've left a lot of fingerprints in her shop. Smudgy ones. Ink.",
+      "next": "deal-fx"
+    },
+    {
+      "id": "deal-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.outcome",
+          "value": "deal"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 4
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "deal-fail",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Lessons? From a big one? That's what they say right before the net. No. No, thank you. I'm clever. I'm only a little bit stuck.",
+      "next": "caught-menu"
+    },
+    {
+      "id": "sell-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "A book of my own! With my own snake! How much? How much is a snake? I've got three buttons and a spoon. And a very good feeling about you.",
+      "next": "sell-1-b"
+    },
+    {
+      "id": "sell-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Done. Done! I'll keep it in my hammock, under the other one, so they can talk. Don't tell Mother Kettleback. She'll want a cut. She always wants a cut.",
+      "next": "sell-fx"
+    },
+    {
+      "id": "sell-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.outcome",
+          "value": "sold-book"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 4
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "hale-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "The man with the keys? The one who counts doors? No! No, please! I'm a very bad prisoner. I'd cry, and nobody wants that, and the others would turn cold and never speak to you. Please!",
+      "next": "hale-fx"
+    },
+    {
+      "id": "hale-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.outcome",
+          "value": "turned-in"
+        },
+        {
+          "kind": "emit",
+          "event": "snig.turned-in"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "go-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Really? Really-really? Oh, you're nice. You're the nice sort of big. I'll bring you something. Something shiny. Or a thing. It'll be a thing. Don't open it at the table.",
+      "next": "go-fx"
+    },
+    {
+      "id": "go-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "plain-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "I'm Snig! I'm a scout. That's what I'm for. I scout. I scouted you. You're a person, I'm nearly certain. Are you the one the others talk about? The one with the pockets?",
+      "next": "hub"
+    },
+    {
+      "id": "again-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Oh, it's you! Hello again. I was just scouting nothing. Did you bring a book? You didn't bring a book. It's all right. I can look at your face again.",
+      "next": "hub"
+    },
+    {
+      "id": "scary-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Oh! It's you. The scary one. Don't do the thing with the light. The light made the teeth man shout and I haven't been back. I've been doing very quiet pictures with my fingers instead.",
+      "next": "scary-menu"
+    },
+    {
+      "id": "scary-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "scary-sorry",
+          "text": "Sorry about the light.",
+          "next": "scary-sorry-1"
+        },
+        {
+          "id": "scary-leave",
+          "text": "I'll leave you to it.",
+          "end": true
+        }
+      ]
+    },
+    {
+      "id": "scary-sorry-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "It's all right. It was a bit funny. A tiny bit. Only don't tell the others I laughed, they say I'm getting soft. I'm not soft. I'm mostly string.",
+      "next": "hub"
+    },
+    {
+      "id": "hostile-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Don't hit me! I'm very small and mostly string! Mother Kettleback says you're the sort who hits. Are you? You've got a hitting face. It's a nice one, but still.",
+      "next": "hostile-menu"
+    },
+    {
+      "id": "hostile-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "hostile-peace",
+          "text": "I'm not going to hit you.",
+          "next": "hostile-peace-1"
+        },
+        {
+          "id": "hostile-leave",
+          "text": "Run along.",
+          "end": true
+        }
+      ]
+    },
+    {
+      "id": "hostile-peace-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Oh. Oh! You're not hitting. Hello, then. I'm Snig. I'm bad at being scared, you'll find. I get bored. It's a flaw.",
+      "next": "hostile-fx"
+    },
+    {
+      "id": "hostile-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "try-primer",
+          "text": "Show me your book.",
+          "once": true,
+          "next": "primer-gate"
+        },
+        {
+          "id": "try-sign",
+          "text": "Can you read that sign?",
+          "once": true,
+          "next": "sign-1"
+        },
+        {
+          "id": "ask-goblins",
+          "text": "What's it like in the camp?",
+          "once": true,
+          "next": "goblins-1"
+        },
+        {
+          "id": "ask-vouch",
+          "text": "Would you speak for me to Mother Kettleback?",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "burglar.outcome",
+                "op": "eq",
+                "value": "deal"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "burglar.outcome",
+                "op": "eq",
+                "value": "sold-book"
+              }
+            ]
+          },
+          "showWhenLocked": true,
+          "once": true,
+          "next": "vouch-1"
+        },
+        {
+          "id": "follow-thief",
+          "text": "You can pick my pocket. Once.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "follow-1"
+        },
+        {
+          "id": "armour-knight",
+          "text": "I'll take the helm off, if it helps.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "armour-1"
+        },
+        {
+          "id": "trick-sorcerer",
+          "text": "Do you want to see a little light?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "trick-1"
+        },
+        {
+          "id": "contest-archer",
+          "text": "Throwing contest. Pebbles at that post.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "contest-1"
+        },
+        {
+          "id": "leave",
+          "text": "Goodbye, Snig.",
+          "next": "bye-1"
+        }
+      ]
+    },
+    {
+      "id": "primer-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-snig",
+            "op": "gte",
+            "value": 3
+          },
+          "next": "primer-yes"
+        }
+      ],
+      "else": "primer-no"
+    },
+    {
+      "id": "primer-no",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "What book? I haven't got a book. I've got no hammock. I've got a very nice hammock, but it's empty, and you've no reason to look. Look somewhere else. Look at my face!",
+      "next": "hub"
+    },
+    {
+      "id": "primer-yes",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Shh. All right. It's in the hammock. It's a sort of primer. It's got things in. Here. This one's an A. It's a tent. No, wait. A table with its legs together. Hm. It might be a mountain.",
+      "next": "primer-yes-b"
+    },
+    {
+      "id": "primer-yes-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "I know four letters. S, which is the snake. O, which is the egg. And two that look like each other. I'm very certain about every one. Is it a good number? I'd like it to be.",
+      "next": "primer-fx"
+    },
+    {
+      "id": "primer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "sign-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Sure! That's a door. With a hat. And a cow? Is it a cow? It's got legs. Mother Kettleback says signs are a human thing, like manners. I think this one's about food. It's got a lot of feeling in it.",
+      "next": "sign-1-b"
+    },
+    {
+      "id": "sign-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Don't tell me. I'll get it. Give me a minute. Give me a week. It's a long one. It's definitely a long one.",
+      "next": "hub"
+    },
+    {
+      "id": "goblins-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "It's lovely! There's a fire, and a kettle, and about twenty of us, and nobody has to be quiet. Mother Kettleback says I talk too much. She says it with her eyebrows. I've seen her do it.",
+      "next": "goblins-1-b"
+    },
+    {
+      "id": "goblins-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "And the Big One sleeps down below. The Big One doesn't eat people. He gives them beds. We bring the bread. And the bones in the flower room say sorry a lot. I like them.",
+      "next": "hub"
+    },
+    {
+      "id": "vouch-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Speak for you? To Mother Kettleback? Me? Oh, I'd be good at it. I'd say she's the one who didn't swing, she's the one who found the book lady. I'd say it very loud, and she'd say Quiet, Snig, and that's how you know it's gone in.",
+      "next": "vouch-fx"
+    },
+    {
+      "id": "vouch-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "snig.vouched",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "follow-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "You're letting me? On purpose? That's the best thing anyone's ever said. I'll be so gentle. You won't feel a thing. Oh. Oh, that was a button. Is that a good one? Was it important?",
+      "next": "follow-1-b"
+    },
+    {
+      "id": "follow-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "I'll put it back. I'm putting it back. I am. That was nearly my best one.",
+      "next": "follow-fx"
+    },
+    {
+      "id": "follow-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "armour-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Oh! There's a face in there! A real one! It's very nice. You've got eyebrows. Everyone should have eyebrows. I thought it was all metal, I thought it was a pot with feelings. I'm not scared. I'm only a bit.",
+      "next": "armour-fx"
+    },
+    {
+      "id": "armour-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "trick-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "The reading trick! The reading trick! Is it the one where the page glows and the words fall out? I've been asking everyone. Do it! Do it now! ...Oh. It's only light. It's a very nice light. But the words still aren't saying anything.",
+      "next": "trick-1-b"
+    },
+    {
+      "id": "trick-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Can you do it slower? I'll get it. I'll get it on the fourteenth. Is there a fourteenth?",
+      "next": "trick-fx"
+    },
+    {
+      "id": "trick-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "contest-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "A contest! I'll win. I always win. Mostly I win by having more pebbles, and by saying it first. Ready? One. Two. ... Oh, that was a bird. I didn't mean the bird. Sorry, bird. You win. Don't say you won. Say I lost nicely.",
+      "next": "contest-fx"
+    },
+    {
+      "id": "contest-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "bye-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Bye! If you see a book, think of me! If you see a snake, think of me harder.",
+      "end": true
+    },
+    {
+      "id": "lessons-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Hello! Hello! Listen. I've been to the lessons. Every day. I sit on the second step and the book lady says Again, Snig, and I say it again. I've got seventeen letters. Seventeen! Most of them are right!",
+      "next": "lessons-menu"
+    },
+    {
+      "id": "lessons-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "lessons-read",
+          "text": "Read me something.",
+          "once": true,
+          "next": "lessons-read-1"
+        },
+        {
+          "id": "lessons-vouch",
+          "text": "Will you speak for me to Mother Kettleback?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "snig.vouched"
+            }
+          },
+          "once": true,
+          "next": "lessons-vouch-1"
+        },
+        {
+          "id": "lessons-book",
+          "text": "What's the first whole book going to be?",
+          "once": true,
+          "next": "lessons-book-1"
+        },
+        {
+          "id": "lessons-leave",
+          "text": "Goodbye, Snig. Keep reading.",
+          "next": "lessons-bye"
+        }
+      ]
+    },
+    {
+      "id": "lessons-read-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "All right. Hold it still. Don't breathe. \"The cat sat on the mat.\" The cat sat on the mat! Did you hear me? I read it! I read a whole sentence! There was a cat, and everything! Say it was good!",
+      "next": "lessons-read-1-b"
+    },
+    {
+      "id": "lessons-read-1-b",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "And then this one: \"The mat was warm and the cat was glad.\" That's two. Two! Mother Kettleback says goblins can't read. I say we couldn't. I say it with my eyebrows.",
+      "next": "lessons-menu"
+    },
+    {
+      "id": "lessons-vouch-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Speak for you? I'll write it down! I'll write she is good on the kitchen wall. In real letters. Mother Kettleback will have a fit. Then she'll read it. Or she'll make me read it. Either way, you're in.",
+      "next": "lessons-vouch-fx"
+    },
+    {
+      "id": "lessons-vouch-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "snig.vouched",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-snig",
+          "delta": 2
+        }
+      ],
+      "next": "lessons-menu"
+    },
+    {
+      "id": "lessons-book-1",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "A whole one, start to finish. A snake book. All About Snakes, with Pictures. The book lady says it's got fourteen pages. Fourteen! I'll be old when I finish. I'll be nearly eleven.",
+      "next": "lessons-menu"
+    },
+    {
+      "id": "lessons-bye",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "Bye! Come back and I'll read you something with a verb in it! The book lady says it's the useful bit.",
+      "end": true
+    }
+  ]
+}

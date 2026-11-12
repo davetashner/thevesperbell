@@ -27,6 +27,7 @@
     "sociability": 1,
     "greed": 0.5
   },
+  "dialogue": "snig-tunnels",
   "behaviour": {
     "profile": "shopkeeper"
   },

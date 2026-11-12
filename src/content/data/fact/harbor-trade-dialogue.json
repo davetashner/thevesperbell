@@ -1,0 +1,241 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "harbor-trade-dialogue",
+  "name": "Harbour trade dialogue facts",
+  "notes": "mw-e39.20: world-state facts read and written by the Cray, Tereza, Quell and Hesketh dialogues (bible 5.13, 5.14). Writers other than the dialogues (the evidence items, the duel combat system, the Drowned Gull contest, the Wendmouth scene) are named in each description; the evidence.* facts and cray.romance-brought are stand-ins for items that do not exist yet.",
+  "facts": [
+    {
+      "key": "cray.bribe.attempted",
+      "type": "bool",
+      "default": false,
+      "description": "The player has tried to bribe Inspector Cray. Every attempt fails and is written in her ledger (AC-2); disposition drops each time. Set by cray-customs; quests (Contraband Pages) may read it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.searched",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has searched the sorcerer player and confiscated restricted spellbooks (never plot-critical or forbidden-plot items). Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.writ.offered",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has explained the writ-by-post (six to eight months) and the council-chair and forger routes (Contraband Pages). Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.bay-nine.suspicion",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has told the player that bay nine's customs seal was stamped by a clerk dead for a year (bible 5.13). Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.evidence-given",
+      "type": "bool",
+      "default": false,
+      "description": "The player gave Cray evidence about bay nine (invoice, manifest or dead-clerk seal). Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.seizure.agreed",
+      "type": "bool",
+      "default": false,
+      "description": "Cray will lawfully seize bay nine's crate: the legal route of The Crate for Mr. S. Set by cray-customs, read by the quest.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.books-released",
+      "type": "bool",
+      "default": false,
+      "description": "Cray released the impounded crate of books off the record in gratitude (Contraband Pages). Set by cray-customs, read by the quest.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.romance-brought",
+      "type": "bool",
+      "default": false,
+      "description": "The player carries a romance novel for Cray (bible 5.13, her secret weakness). Stand-in until the novel item exists: written by its pickup, cleared by cray-customs.",
+      "owner": "item"
+    },
+    {
+      "key": "cray.romance-accepted",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has accepted the romance novel. Raises her disposition (Contraband Pages). Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.ledger.counting",
+      "type": "bool",
+      "default": false,
+      "description": "The archer has agreed to count ships for Cray's ledger. Set by cray-customs; a future ledger activity reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "evidence.foundry-invoice",
+      "type": "bool",
+      "default": false,
+      "description": "The player holds Quell's foundry invoice: forty brass goblin trinkets (Framed in Brass). Stand-in until the invoice item exists: written by its pickup. Read by cray-customs and quell-harbor-agent.",
+      "owner": "item"
+    },
+    {
+      "key": "evidence.honest-manifest",
+      "type": "bool",
+      "default": false,
+      "description": "The player holds Quell's honest manifest for bay nine (Framed in Brass, The Crate for Mr. S). Stand-in until the manifest item exists: written by its pickup and by quell-harbor-agent when he hands it over.",
+      "owner": "item"
+    },
+    {
+      "key": "evidence.dead-clerk-seal",
+      "type": "bool",
+      "default": false,
+      "description": "The player holds proof of the dead clerk's seal on bay nine (The Crate for Mr. S). Stand-in until the seal item exists: written by its pickup. Read by cray-customs.",
+      "owner": "item"
+    },
+    {
+      "key": "quell.foundry.named",
+      "type": "bool",
+      "default": false,
+      "description": "Quell let slip that the brass trinkets came from a Quay Row foundry. Set by quell-harbor-agent when a knight stares him down.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "quell.desk-noticed",
+      "type": "bool",
+      "default": false,
+      "description": "A thief has mentioned Quell's locked drawer and he flinched. Set by quell-harbor-agent; the desk interaction may read it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "quell.collapsed",
+      "type": "bool",
+      "default": false,
+      "description": "Quell has cracked under evidence and offered a bargain. Set by quell-harbor-agent.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "quell.crate-access",
+      "type": "bool",
+      "default": false,
+      "description": "Quell has handed over access to bay nine's crate. Set by quell-harbor-agent; the Crate for Mr. S quest reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "quell.manifest-given",
+      "type": "bool",
+      "default": false,
+      "description": "Quell has handed over his honest manifest. Set by quell-harbor-agent.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "quell.head-start.given",
+      "type": "bool",
+      "default": false,
+      "description": "The player agreed to give Quell a head start on the mountain road. Set by quell-harbor-agent.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "quell.left",
+      "type": "bool",
+      "default": false,
+      "description": "Quell has left Wendmouth. Set by quell-harbor-agent with the head-start deal; the Wendmouth scene gates his presence on it and a visit to his office plays a narrator note only (AC-6).",
+      "owner": "scene"
+    },
+    {
+      "key": "tereza.duel.accepted",
+      "type": "bool",
+      "default": false,
+      "description": "A knight accepted Tereza's first-blood duel. Set by tereza-arms-stall before it emits tereza.duel-start.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.duel.declined",
+      "type": "bool",
+      "default": false,
+      "description": "A knight declined Tereza's duel. Set by tereza-arms-stall.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.duel.fought",
+      "type": "bool",
+      "default": false,
+      "description": "The duel with Tereza has been fought. Written by the duel combat system (E04 hook, mw-e04 follow-up); tereza-arms-stall reads it.",
+      "owner": "combat"
+    },
+    {
+      "key": "tereza.duel.victor",
+      "type": "enum",
+      "values": ["none", "player", "tereza"],
+      "default": "none",
+      "description": "Who won the first-blood duel with Tereza. Written by the duel combat system; tereza-arms-stall reads it and records the result.",
+      "owner": "combat"
+    },
+    {
+      "key": "tereza.duel.result",
+      "type": "enum",
+      "values": ["none", "won", "lost"],
+      "default": "none",
+      "description": "The recorded result of the duel with Tereza (AC-4). Set by the duel-won and duel-lost branches of tereza-arms-stall; a rematch resets it to none.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.under-counter",
+      "type": "bool",
+      "default": false,
+      "description": "Tereza has opened her under-the-counter stock after a duel win. Set by tereza-arms-stall; the Tidemarket stock (E40) reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.confided",
+      "type": "bool",
+      "default": false,
+      "description": "Tereza confided that she fears she enjoyed duelling too much. Set by tereza-arms-stall.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.spellbook-traded",
+      "type": "bool",
+      "default": false,
+      "description": "A sorcerer traded a story for Tereza's foreign spellbook. Set by tereza-arms-stall; the book itself is an emit hook until the item exists.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.tern-access",
+      "type": "bool",
+      "default": false,
+      "description": "Tereza vouched for the player at the Gilded Tern (the captain's debt of honour). Set by tereza-arms-stall, read by hesketh-gilded-tern.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hesketh.shanghaied",
+      "type": "bool",
+      "default": false,
+      "description": "The player lost the Drowned Gull drinking contest and woke in the Gilded Tern's hold (bible 4.5). Written by the contest system; hesketh-gilded-tern plays the scene and clears it.",
+      "owner": "contest"
+    },
+    {
+      "key": "hesketh.shanghai.served",
+      "type": "bool",
+      "default": false,
+      "description": "The player worked off Hesketh's articles after being shanghaied. Set by hesketh-gilded-tern.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hesketh.crew-hired",
+      "type": "bool",
+      "default": false,
+      "description": "The player signed Hesketh's crew articles. Set by hesketh-gilded-tern.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hesketh.gangway-open",
+      "type": "bool",
+      "default": false,
+      "description": "Hesketh opened the Tern's gangway on Tereza's word. Set by hesketh-gilded-tern.",
+      "owner": "dialogue"
+    }
+  ]
+}
