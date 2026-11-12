@@ -13,7 +13,7 @@ import {
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
 import { installFactRegistry } from '../facts';
-import { installGameLogic, questsOf } from './install';
+import { gameLogicOf, installGameLogic, questsOf } from './install';
 
 const content = loadQuestFixtureContent();
 const inventory = new InventoryRules(content.all('item'));
@@ -46,6 +46,8 @@ describe('installGameLogic (mw-e23.11)', () => {
     plain.step();
     const { world, logic } = boot([]);
     expect(logic.quests).toBeUndefined();
+    expect(gameLogicOf(world)).toBe(logic);
+    expect(gameLogicOf(plain)).toBeUndefined();
     expect(questRuntimeOf(world)).toBeUndefined();
     expect(world.facts.isDeclared('quest.the-captain-below.state')).toBe(false);
     world.step();
@@ -57,6 +59,7 @@ describe('installGameLogic (mw-e23.11)', () => {
   it('with quests: the runtime is installed and its host serves quest effects', () => {
     const { world, logic } = boot();
     expect(questRuntimeOf(world)).toBe(logic.quests);
+    expect(gameLogicOf(world)).toBe(logic);
     expect(logic.quests?.ids()).toContain('the-captain-below');
     const result = applyLogicEffects(
       [{ kind: 'startQuest', quest: 'the-captain-below' }],

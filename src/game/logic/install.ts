@@ -40,6 +40,21 @@ export interface GameLogicOptions extends GameLogicHostOptions {
   readonly quests: readonly QuestDef[];
 }
 
+const installed = new WeakMap<object, GameLogic>();
+
+function remember(world: object, logic: GameLogic): GameLogic {
+  installed.set(world, logic);
+  return logic;
+}
+
+/**
+ * The logic installed on `world`, if any: dialogue start-up (mw-e22.9) takes `.host` from here and
+ * passes it to `DialogueRuntime`.
+ */
+export function gameLogicOf(world: object): GameLogic | undefined {
+  return installed.get(world);
+}
+
 /**
  * Builds the game host and, when there are quests, installs the quest runtime over it (its `update`
  * runs every tick) and feeds it the item and capability changes it cannot see as facts.
@@ -50,7 +65,7 @@ export function installGameLogic(
   options: GameLogicOptions,
 ): GameLogic {
   const base = createGameLogicHost({ ...options, world });
-  if (options.quests.length === 0) return { host: base, quests: undefined };
+  if (options.quests.length === 0) return remember(world, { host: base, quests: undefined });
   const runtime = installQuests(world, { quests: options.quests, host: base });
   world.events.on(itemAdded, ({ defId }) => {
     runtime.notifyItem(defId);
@@ -64,5 +79,5 @@ export function installGameLogic(
   world.events.on(capabilityLost, ({ capability }) => {
     runtime.notifyCapability(capability);
   });
-  return { host: runtime.host, quests: runtime };
+  return remember(world, { host: runtime.host, quests: runtime });
 }
