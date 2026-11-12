@@ -6,6 +6,7 @@
   "towardPlayer": "friendly",
   "towardMembers": "ally",
   "towardOthers": "neutral",
+  "dispositionSpread": 0.5,
   "relations": [
     { "faction": "townsfolk", "stance": "ally", "mutual": true },
     { "faction": "unaligned", "stance": "hostile", "mutual": true }

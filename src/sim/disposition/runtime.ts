@@ -27,10 +27,17 @@ import { DamageApplied } from '../combat/damage/events';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
-import { factionOf, stanceTowardPlayer } from '../factions/runtime';
+import { FactionMemberComponent, factionOf, stanceTowardPlayer } from '../factions/runtime';
 import { PLAYER_FACTION, type FactionTable } from '../factions/table';
 import { gameClockOf } from '../gametime/clock';
-import { clampDisposition, dispositionStance, STANCE_SEED, type DispositionStance } from './bands';
+import {
+  clampDisposition,
+  dispositionStance,
+  npcBand,
+  STANCE_SEED,
+  type DispositionStance,
+  type NpcBand,
+} from './bands';
 
 /** Rule id of the one built-in source: the player hit a creature (mirrors content `ATTACKED_EVENT`). */
 export const ATTACKED = 'attacked';
@@ -91,6 +98,9 @@ export interface DispositionChange {
   readonly cause: string;
   readonly stanceBefore: DispositionStance;
   readonly stanceAfter: DispositionStance;
+  /** NPC band (mw-e22.4) before and after. */
+  readonly bandBefore: NpcBand;
+  readonly bandAfter: NpcBand;
 }
 
 /** A creature's disposition toward the player changed (UI, dialogue, AI and quests can react). */
@@ -98,6 +108,12 @@ export const DispositionChanged = defineEvent<DispositionChange>('DispositionCha
 
 /** A change moved a creature across a stance threshold (same payload as DispositionChanged). */
 export const DispositionStanceChanged = defineEvent<DispositionChange>('DispositionStanceChanged');
+
+/**
+ * A change moved an NPC across an NPC band threshold (same payload as DispositionChanged). The
+ * event id is `disposition.bandChanged`: dialogue, shops and quests react to it.
+ */
+export const DispositionBandChanged = defineEvent<DispositionChange>('disposition.bandChanged');
 
 /** Payload of DispositionTrigger. */
 export interface DispositionTriggerEvent {
@@ -113,26 +129,83 @@ export interface DispositionTriggerEvent {
  */
 export const DispositionTrigger = defineEvent<DispositionTriggerEvent>('DispositionTrigger');
 
-/** Modifier rules by event type → delta. */
-export type DispositionRules = ReadonlyMap<string, number>;
+/** One modifier rule: a delta, optionally scaled by the value tier of an item involved. */
+export interface DispositionRule {
+  readonly delta: number;
+  /** Ascending by `minValue`; empty = never scaled. */
+  readonly valueTiers: readonly { readonly minValue: number; readonly scale: number }[];
+}
+
+/** Modifier rules by event type. */
+export type DispositionRules = ReadonlyMap<string, DispositionRule>;
 
 /** The rules of the loaded `disposition-rule` content entries. */
 export function compileDispositionRules(
-  entries: readonly Pick<GameEntry<'disposition-rule'>, 'id' | 'delta'>[],
+  entries: readonly (Pick<GameEntry<'disposition-rule'>, 'id' | 'delta'> & {
+    readonly valueTiers?: DispositionRule['valueTiers'];
+  })[],
 ): DispositionRules {
-  return new Map(entries.map(({ id, delta }) => [id, delta]));
+  return new Map(
+    entries.map(({ id, delta, valueTiers }) => [id, { delta, valueTiers: valueTiers ?? [] }]),
+  );
 }
+
+/** `rule`'s delta for an item worth `value`: the highest tier it reaches scales it, else ×1. */
+export function ruleDelta(rule: DispositionRule, value = 0): number {
+  let scale = 1;
+  for (const tier of rule.valueTiers) if (value >= tier.minValue) scale = tier.scale;
+  return rule.delta * scale;
+}
+
+/** Disposition spread by faction id → fraction (0..1) of a member's change the others take. */
+export type FactionSpread = ReadonlyMap<string, number>;
+
+/** The spread of the loaded `faction` content entries (those with none are left out). */
+export function compileFactionSpread(
+  entries: readonly Pick<GameEntry<'faction'>, 'id' | 'dispositionSpread'>[],
+): FactionSpread {
+  return new Map(
+    entries.filter((e) => e.dispositionSpread > 0).map((e) => [e.id, e.dispositionSpread]),
+  );
+}
+
+/** Rule id of the owner's response to `crime.theft`, and of every other witness's. */
+export const THEFT_OWNER_RULE = 'theft';
+export const THEFT_WITNESS_RULE = 'witnessed-theft';
+
+/** Payload of CrimeTheft. */
+export interface CrimeTheftEvent {
+  /** Gold value of what was taken (the item's `value`; selects the value tier). */
+  readonly itemValue: number;
+  /** Who the item belonged to; they judge by the rule `theft`, scaled by value, if in `witnesses`. */
+  readonly owner?: EntityId;
+  /** Everyone who saw it; each who is not the owner answers the `witnessed-theft` rule. */
+  readonly witnesses: readonly EntityId[];
+}
+
+/**
+ * The player stole something in front of `witnesses` (event id `crime.theft`). Emitted by the
+ * stealing systems (pickpocketing, taking from a shelf; mw-e22.1 turns it into bounties); disposition
+ * is one listener. Minimal by design: it carries who saw it and what it was worth, nothing else.
+ */
+export const CrimeTheft = defineEvent<CrimeTheftEvent>('crime.theft');
 
 /** Per-creature overrides of the seed (from its definition; class affinity in mw-e22.4). */
 export interface DispositionDefaults {
   readonly baseline?: number;
   readonly decayPerMinute?: number;
+  /** Player class id → offset added to the baseline for a player of that class (default 0). */
+  readonly classAffinity?: Readonly<Record<string, number>>;
 }
 
 /** What the disposition system needs. */
 export interface DispositionConfig {
   readonly factions: FactionTable;
   readonly rules: DispositionRules;
+  /** Faction id → fraction of a member's change the other members take; absent = none. */
+  readonly spread?: FactionSpread;
+  /** The player's class id, for `classAffinity`; default: none chosen. */
+  readonly playerClass?: (world: World<never>) => string | undefined;
   /** Absolute game minute now; default: the world's game clock, else 0. */
   readonly now?: (world: World<never>) => number;
   /** A creature's baseline and decay when it has no record yet (e.g. from its definition). */
@@ -171,7 +244,9 @@ export class Dispositions {
   #seed(entity: EntityId, now: number): DispositionRecord {
     const defaults = this.#config.defaultsOf?.(this.#world, entity);
     const stance = stanceTowardPlayer(this.#world, this.#config.factions, entity) ?? 'neutral';
-    const baseline = clampDisposition(defaults?.baseline ?? STANCE_SEED[stance]);
+    const playerClass = this.#config.playerClass?.(this.#world);
+    const affinity = playerClass === undefined ? 0 : (defaults?.classAffinity?.[playerClass] ?? 0);
+    const baseline = clampDisposition((defaults?.baseline ?? STANCE_SEED[stance]) + affinity);
     return { score: baseline, baseline, decayPerMinute: defaults?.decayPerMinute ?? 0, at: now };
   }
 
@@ -199,13 +274,32 @@ export class Dispositions {
    * delta, or already at the limit) emits nothing and stores nothing. Returns the new score.
    */
   adjust(entity: EntityId, delta: number, cause: string): number {
+    const { after, moved } = this.#apply(entity, delta, cause);
+    if (moved) this.#spread(entity, delta, cause);
+    return after;
+  }
+
+  /** Gives the other members of `entity`'s faction their share of a change that moved `entity`. */
+  #spread(entity: EntityId, delta: number, cause: string): void {
+    const faction = factionOf(this.#world, entity);
+    const fraction = faction === undefined ? undefined : this.#config.spread?.get(faction);
+    if (fraction === undefined) return;
+    // Straight to #apply, not adjust: a share never spreads again, so no loop and no echo to the source.
+    this.#world.query(FactionMemberComponent).forEach((member, membership) => {
+      if (member !== entity && membership.faction === faction) {
+        this.#apply(member, delta * fraction, `faction:${cause}`);
+      }
+    });
+  }
+
+  #apply(entity: EntityId, delta: number, cause: string): { after: number; moved: boolean } {
     if (!Number.isFinite(delta))
       throw new RangeError('a disposition change must be a finite number');
     const now = this.#now();
     const record = this.#record(entity, now);
     const before = decayedScore(record, now);
     const after = clampDisposition(before + delta);
-    if (after === before) return after;
+    if (after === before) return { after, moved: false };
     const next: DispositionRecord = Object.freeze({ ...record, score: after, at: now });
     if (
       this.#world.isRegistered(DispositionComponent) &&
@@ -219,6 +313,8 @@ export class Dispositions {
     }
     const stanceBefore = dispositionStance(before);
     const stanceAfter = dispositionStance(after);
+    const bandBefore = npcBand(before);
+    const bandAfter = npcBand(after);
     const change: DispositionChange = {
       tick: this.#world.tick,
       entity,
@@ -228,10 +324,13 @@ export class Dispositions {
       cause,
       stanceBefore,
       stanceAfter,
+      bandBefore,
+      bandAfter,
     };
     this.#world.events.emit(DispositionChanged, change);
     if (stanceBefore !== stanceAfter) this.#world.events.emit(DispositionStanceChanged, change);
-    return after;
+    if (bandBefore !== bandAfter) this.#world.events.emit(DispositionBandChanged, change);
+    return { after, moved: true };
   }
 
   /**
@@ -239,10 +338,28 @@ export class Dispositions {
    * applied (not whether the score moved).
    */
   trigger(entity: EntityId, type: string): boolean {
-    const delta = this.#config.rules.get(type);
-    if (delta === undefined) return false;
-    this.adjust(entity, delta, type);
+    const rule = this.#config.rules.get(type);
+    if (rule === undefined) return false;
+    this.adjust(entity, ruleDelta(rule), type);
     return true;
+  }
+
+  /**
+   * Answers a theft the player was seen committing: the owner (if among the witnesses) takes the
+   * `theft` rule scaled by the item's value tier, every other witness the `witnessed-theft` rule.
+   */
+  crimeTheft({ itemValue, owner, witnesses }: CrimeTheftEvent): void {
+    const ownerRule = this.#config.rules.get(THEFT_OWNER_RULE);
+    const witnessRule = this.#config.rules.get(THEFT_WITNESS_RULE);
+    for (const witness of new Set(witnesses)) {
+      if (witness === owner) {
+        if (ownerRule !== undefined) {
+          this.adjust(witness, ruleDelta(ownerRule, itemValue), 'crime.theft');
+        }
+      } else if (witnessRule !== undefined) {
+        this.adjust(witness, ruleDelta(witnessRule), THEFT_WITNESS_RULE);
+      }
+    }
   }
 
   /**
@@ -255,6 +372,9 @@ export class Dispositions {
     const offTrigger = events.on(DispositionTrigger, ({ type, target }) => {
       this.trigger(target, type);
     });
+    const offTheft = events.on(CrimeTheft, (theft) => {
+      this.crimeTheft(theft);
+    });
     const offHit = events.on(DamageApplied, ({ target, packet }) => {
       const attacker = packet.instigator;
       if (attacker === null || attacker === target) return;
@@ -264,6 +384,7 @@ export class Dispositions {
     });
     return () => {
       offTrigger();
+      offTheft();
       offHit();
     };
   }

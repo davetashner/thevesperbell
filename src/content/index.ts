@@ -783,3 +783,12 @@ export {
   type AmbienceEntry,
   type AmbienceOneShot,
 } from './types/ambience.ts';
+export {
+  EDGE_KINDS,
+  OWNER_EPICS,
+  TRAVEL_MODES,
+  WORLD_AREAS,
+  worldSchema,
+  type WorldMap,
+  type WorldMapInput,
+} from './types/world.ts';

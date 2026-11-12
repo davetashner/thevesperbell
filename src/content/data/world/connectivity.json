@@ -1,0 +1,1381 @@
+{
+  "$schema": "../world.schema.json",
+  "id": "connectivity",
+  "name": "World connectivity map",
+  "notes": "The map every level bead builds from (mw-e24.1, docs/design/world-map.md): places, the ways between them, ability gates and the loops of story bible 3.1. Nodes with a scene are built; edges with transitions are built; every planned edge names the bead that builds it. Time gates read the game clock phases (mw-e27.12).",
+  "townSpawn": "bridge-post",
+  "mainQuest": [
+    "bridge-post",
+    "sleeping-ox",
+    "mine-gate",
+    "winch-house",
+    "old-galleries",
+    "rootcellar-camp",
+    "silver-galleries",
+    "vane-sealed-gallery",
+    "breach",
+    "knot-outer-ring",
+    "ossuary-galleries",
+    "chapel-of-echoes",
+    "horns-hall",
+    "the-fold",
+    "the-cradle",
+    "sounding-shaft-foot",
+    "belfry",
+    "market-green"
+  ],
+  "nodes": [
+    {
+      "id": "slice-vestibule",
+      "name": "The slice vestibule",
+      "area": "valley",
+      "epic": "e24",
+      "scene": "slice",
+      "notes": "The m1 slice scene's vestibule; a passage leads out onto the mountain road (mw-e24.21)."
+    },
+    {
+      "id": "mountain-road",
+      "name": "The mountain road",
+      "area": "valley",
+      "epic": "e24",
+      "scene": "valley-01",
+      "notes": "Where the player arrives at dusk (bible 4.1 beat 1); the road runs down to the town."
+    },
+    {
+      "id": "valley-mid",
+      "name": "The valley road (middle)",
+      "area": "valley",
+      "epic": "e24",
+      "scene": "valley-02",
+      "notes": "Middle stretch of the road down the steep green valley (bible 3.1)."
+    },
+    {
+      "id": "valley-head",
+      "name": "The valley road (river end)",
+      "area": "valley",
+      "epic": "e24",
+      "scene": "valley-03",
+      "notes": "Last stretch before the Miners' Bridge; the River Wend runs beside it."
+    },
+    {
+      "id": "bridge-post",
+      "name": "The Bridge Watch post",
+      "area": "town",
+      "epic": "e24",
+      "scene": "briar-glen-lane",
+      "notes": "Town end of the Miners' Bridge (bible 3.5); the town spawn: everything from the valley passes it first."
+    },
+    {
+      "id": "shop-lane",
+      "name": "The shop lane",
+      "area": "town",
+      "epic": "e24",
+      "scene": "briar-glen-lane",
+      "notes": "The lane past the post: Marsh's, the Sleeping Ox, the Bridgeward College (bible 3.5)."
+    },
+    {
+      "id": "marsh-store",
+      "name": "Marsh's General Store",
+      "area": "town",
+      "epic": "e24",
+      "scene": "marsh-store",
+      "notes": "First building past the bridge (bible 3.5, 5.15)."
+    },
+    {
+      "id": "sleeping-ox",
+      "name": "The Sleeping Ox",
+      "area": "town",
+      "epic": "e24",
+      "scene": "sleeping-ox",
+      "notes": "Dot's inn, its front door on the shop lane (bible 3.5)."
+    },
+    {
+      "id": "bridgeward-college",
+      "name": "The Bridgeward College",
+      "area": "town",
+      "epic": "e24",
+      "scene": "bridgeward-college",
+      "notes": "Soldierly college at the far end of the lane's west side (bible 3.5, 5.16)."
+    },
+    {
+      "id": "under-the-bridge",
+      "name": "Under the Miners' Bridge",
+      "area": "town",
+      "epic": "e24",
+      "scene": "under-the-bridge",
+      "notes": "Riverbank where Idris Quillon waits after dark (bible 3.5, 5.17); lit path down from the lane."
+    },
+    {
+      "id": "market-green",
+      "name": "Market Green",
+      "area": "town",
+      "epic": "e24",
+      "notes": "The town's heart with the notice board (bible 3.5)."
+    },
+    {
+      "id": "lamplit-stacks",
+      "name": "The Lamplit Stacks",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Mirela's bookshop (bible 3.5, 5.1)."
+    },
+    {
+      "id": "brands-forge",
+      "name": "Brand's Forge",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Oswin Brand's smithy (bible 3.5, 5.7)."
+    },
+    {
+      "id": "fenns-fletchery",
+      "name": "Fenn's Fletchery & Simples",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Juniper Fenn's shop (bible 3.5, 5.6)."
+    },
+    {
+      "id": "pells-bakery",
+      "name": "Pell's Bakery",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Hollis Pell's bakery (bible 3.5, 5.5)."
+    },
+    {
+      "id": "watch-house",
+      "name": "The Watch House",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Captain Hale's post with its one-cell jail (bible 3.5, 5.2)."
+    },
+    {
+      "id": "jail-cell",
+      "name": "The jail cell",
+      "area": "town",
+      "epic": "e24",
+      "notes": "The one cell, with a drain that leads out (mw-e24.8)."
+    },
+    {
+      "id": "vane-house",
+      "name": "Vane House",
+      "area": "town",
+      "epic": "e24",
+      "notes": "The mine owner's house on the rise (bible 3.5, 5.3)."
+    },
+    {
+      "id": "schoolhouse",
+      "name": "The schoolhouse",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Empty; its teacher is missing (bible 3.5)."
+    },
+    {
+      "id": "cemetery",
+      "name": "The lychgate cemetery",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Vesperine graves (bible 3.5)."
+    },
+    {
+      "id": "glen-well",
+      "name": "The Glen Well",
+      "area": "town",
+      "epic": "e24",
+      "notes": "A loose ladder-rung leads to the old cistern (bible 3.5)."
+    },
+    {
+      "id": "town-rooftops",
+      "name": "The town rooftops",
+      "area": "town",
+      "epic": "e24",
+      "notes": "Roof routes for thieves and climbers (mw-e24.12)."
+    },
+    {
+      "id": "briarwood-edge",
+      "name": "The Briarwood edge (town side)",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Where the town's upper lane meets the forest (bible 3.1: above the town)."
+    },
+    {
+      "id": "briarwood-hub",
+      "name": "The Briarwood paths and clearings",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "The forest hub joining the watchtower, priory road and far bank (bible 3.1, mw-e25.1)."
+    },
+    {
+      "id": "sleepers-path",
+      "name": "The Sleepers' Path",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Line of trampled ferns, visible at night or to a sharp eye (bible 3.5, mw-e25.2)."
+    },
+    {
+      "id": "standing-horn",
+      "name": "The Standing Horn",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Hornfolk menhir, hands over its ears (bible 3.5, mw-e25.3)."
+    },
+    {
+      "id": "wolf-den",
+      "name": "The wolf den",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Encounter site (bible 3.5, mw-e25.4)."
+    },
+    {
+      "id": "woodcutters-hut",
+      "name": "The woodcutter's empty hut",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Bible 3.5."
+    },
+    {
+      "id": "millpond",
+      "name": "The millpond and drowned lane",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Bible 3.5, mw-e25.5."
+    },
+    {
+      "id": "priory-road",
+      "name": "The priory road",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Road through the forest to Bellwater Priory (bible 3.5)."
+    },
+    {
+      "id": "millweir-far-bank",
+      "name": "The Briarwood far bank",
+      "area": "briarwood",
+      "epic": "e25",
+      "notes": "Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1)."
+    },
+    {
+      "id": "moorings-courtyard",
+      "name": "Mooring's Watch courtyard",
+      "area": "moorings-watch",
+      "epic": "e25",
+      "notes": "Goblin lookout below (bible 3.5, mw-e25.6)."
+    },
+    {
+      "id": "moorings-tower",
+      "name": "Mooring's Watch tower and roof",
+      "area": "moorings-watch",
+      "epic": "e25",
+      "notes": "Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5)."
+    },
+    {
+      "id": "supply-tunnel",
+      "name": "The supply tunnel (watchtower end)",
+      "area": "moorings-watch",
+      "epic": "e25",
+      "notes": "Old supply tunnel up to the collapse (bible 3.5; mine side is E26)."
+    },
+    {
+      "id": "mine-gate",
+      "name": "The boarded mine gate",
+      "area": "deepworks",
+      "epic": "e25",
+      "notes": "Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior."
+    },
+    {
+      "id": "winch-house",
+      "name": "The winch house",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "First interior space inside the gate (bible 3.5, mw-e26.2)."
+    },
+    {
+      "id": "old-galleries",
+      "name": "The old glenstone galleries",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "Square pillared halls; the upper mine (bible 3.5)."
+    },
+    {
+      "id": "rootcellar-camp",
+      "name": "The Rootcellar camp (cutting hall)",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "Goblin camp in the old cutting hall (bible 3.5, 5.10); top of the Stone Stair."
+    },
+    {
+      "id": "silver-galleries",
+      "name": "The silver galleries",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "Newer workings following the silver (bible 3.5)."
+    },
+    {
+      "id": "vane-sealed-gallery",
+      "name": "Vane's sealed gallery",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6)."
+    },
+    {
+      "id": "breach",
+      "name": "The breach",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "Where the mine opened into the Knot (bible 3.5, mw-e26.4)."
+    },
+    {
+      "id": "lower-deepworks",
+      "name": "The lower Deepworks",
+      "area": "deepworks",
+      "epic": "e26",
+      "notes": "Flooded lower galleries the Weeping Adit enters (bible 3.1)."
+    },
+    {
+      "id": "priory-nave",
+      "name": "The priory nave",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5)."
+    },
+    {
+      "id": "priory-choir",
+      "name": "The priory choir",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6)."
+    },
+    {
+      "id": "scriptorium",
+      "name": "The scriptorium",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "Book mimics (bible 3.5, mw-e26.7)."
+    },
+    {
+      "id": "belfry",
+      "name": "The belfry",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "The cracked Vesper Bell (bible 3.5, mw-e26.8)."
+    },
+    {
+      "id": "priory-crypt",
+      "name": "The priory crypt",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "Sealed from below (bible 4.1 beat 9)."
+    },
+    {
+      "id": "cistern",
+      "name": "The cistern",
+      "area": "priory",
+      "epic": "e26",
+      "notes": "Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5)."
+    },
+    {
+      "id": "knot-outer-ring",
+      "name": "The Outer Ring",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "Hornfolk runes, loom spiders (bible 3.5, mw-e26.9)."
+    },
+    {
+      "id": "ossuary-galleries",
+      "name": "The Ossuary Galleries",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "The Forgotten; Clatter (bible 3.5)."
+    },
+    {
+      "id": "chapel-of-echoes",
+      "name": "The Chapel of Echoes",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14)."
+    },
+    {
+      "id": "horns-hall",
+      "name": "Horn's Hall",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "The Warden's hall outside the Fold (bible 3.5, 4.2)."
+    },
+    {
+      "id": "the-fold",
+      "name": "The Fold",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "Sealed sleepers' vault; wake-up point (bible 3.5)."
+    },
+    {
+      "id": "sounding-shaft-foot",
+      "name": "The Sounding Shaft's foot",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "Foot of the shaft to the belfry (bible 3.5, mw-e26.18)."
+    },
+    {
+      "id": "the-cradle",
+      "name": "The Cradle",
+      "area": "knot",
+      "epic": "e26",
+      "notes": "Heart of the Knot (bible 3.5, 4.1 beat 12)."
+    },
+    {
+      "id": "briar-glen-quay",
+      "name": "Briar Glen Quay",
+      "area": "river",
+      "epic": "e25",
+      "notes": "Barge landing and slipway (bible 3.5, mw-e25.11)."
+    },
+    {
+      "id": "millweir",
+      "name": "The Millweir",
+      "area": "river",
+      "epic": "e25",
+      "notes": "Weir below town with its sluice walk (bible 3.1, mw-e25.12)."
+    },
+    {
+      "id": "weeping-adit-mouth",
+      "name": "The Weeping Adit (river mouth)",
+      "area": "river",
+      "epic": "e25",
+      "notes": "Where the Wend springs from the hill, a flooded drainage tunnel (bible 3.1, mw-e25.13)."
+    },
+    {
+      "id": "kestrel-lock",
+      "name": "Kestrel Lock",
+      "area": "river",
+      "epic": "e25",
+      "optional": true,
+      "notes": "Lock on the towpath and barge route (bible 3.1, mw-e25.14)."
+    },
+    {
+      "id": "lockkeepers-cottage",
+      "name": "The lock-keeper's cottage",
+      "area": "river",
+      "epic": "e25",
+      "optional": true,
+      "notes": "Across the lock gates (bible 3.5)."
+    },
+    {
+      "id": "stone-wharf",
+      "name": "The Stone Wharf",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Barge landing and hub of the harbour (bible 3.6, mw-e40.2)."
+    },
+    {
+      "id": "tidemarket",
+      "name": "The Tidemarket",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Covered import market (bible 3.6)."
+    },
+    {
+      "id": "customs-house",
+      "name": "The Customs House",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Columned hall; Inspector Cray (bible 3.6)."
+    },
+    {
+      "id": "bonded-warehouse",
+      "name": "The Bonded Warehouse",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Vaulted export bays; bay nine (bible 3.6)."
+    },
+    {
+      "id": "drowned-gull",
+      "name": "The Drowned Gull",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Tavern on the breakwater end (bible 3.6)."
+    },
+    {
+      "id": "undertow",
+      "name": "The Undertow",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Black market beneath the fish market (bible 3.6)."
+    },
+    {
+      "id": "net-lofts",
+      "name": "The Net Lofts and rooftops",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Continuous waterfront roof route (bible 3.6)."
+    },
+    {
+      "id": "gilded-tern",
+      "name": "The Gilded Tern",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Three-masted merchantman in the pool (bible 3.6)."
+    },
+    {
+      "id": "breakwater",
+      "name": "The Breakwater",
+      "area": "wendmouth",
+      "epic": "e40",
+      "optional": true,
+      "notes": "Wall of rejected blocks; sunken figurehead (bible 3.6)."
+    }
+  ],
+  "edges": [
+    {
+      "id": "slice-mountain-road",
+      "from": "slice-vestibule",
+      "to": "mountain-road",
+      "kind": "path",
+      "notes": "The slice vestibule leads out onto the mountain road (mw-e24.21).",
+      "transitions": ["slice/mountain-road", "valley-01/south-gate"]
+    },
+    {
+      "id": "road-1",
+      "from": "mountain-road",
+      "to": "valley-mid",
+      "kind": "path",
+      "transitions": ["valley-01/north-gate", "valley-02/south-gate"],
+      "notes": "Valley road."
+    },
+    {
+      "id": "road-2",
+      "from": "valley-mid",
+      "to": "valley-head",
+      "kind": "path",
+      "transitions": ["valley-02/north-gate", "valley-03/south-gate"],
+      "notes": "Valley road."
+    },
+    {
+      "id": "road-bridge",
+      "from": "valley-head",
+      "to": "bridge-post",
+      "kind": "path",
+      "transitions": ["valley-03/bridge-gate", "briar-glen-lane/bridge-gate"],
+      "notes": "The valley road crosses into town at the Bridge Watch post."
+    },
+    {
+      "id": "lane-bridge-post",
+      "from": "bridge-post",
+      "to": "shop-lane",
+      "kind": "path",
+      "bead": "mw-e24.2",
+      "notes": "Same scene: the post and the lane are one street."
+    },
+    {
+      "id": "marsh-door",
+      "from": "shop-lane",
+      "to": "marsh-store",
+      "kind": "door",
+      "transitions": ["briar-glen-lane/marsh-store-door", "marsh-store/street-exit"],
+      "notes": "Marsh's front door."
+    },
+    {
+      "id": "ox-door",
+      "from": "shop-lane",
+      "to": "sleeping-ox",
+      "kind": "door",
+      "transitions": ["briar-glen-lane/sleeping-ox-door", "sleeping-ox/street-exit"],
+      "notes": "The Sleeping Ox front door."
+    },
+    {
+      "id": "college-door",
+      "from": "shop-lane",
+      "to": "bridgeward-college",
+      "kind": "door",
+      "transitions": ["briar-glen-lane/bridgeward-college-door", "bridgeward-college/street-exit"],
+      "notes": "The college door."
+    },
+    {
+      "id": "riverbank-path",
+      "from": "shop-lane",
+      "to": "under-the-bridge",
+      "kind": "path",
+      "transitions": ["briar-glen-lane/riverbank-path", "under-the-bridge/path-up"],
+      "notes": "Lit path down to the riverbank past the post."
+    },
+    {
+      "id": "lane-market-green",
+      "from": "shop-lane",
+      "to": "market-green",
+      "kind": "path",
+      "bead": "mw-e24.2",
+      "notes": "The lane runs up to Market Green."
+    },
+    {
+      "id": "green-stacks",
+      "from": "market-green",
+      "to": "lamplit-stacks",
+      "kind": "door",
+      "bead": "mw-e24.5",
+      "notes": "Bookshop door."
+    },
+    {
+      "id": "green-forge",
+      "from": "market-green",
+      "to": "brands-forge",
+      "kind": "door",
+      "bead": "mw-e24.7",
+      "notes": "Forge door."
+    },
+    {
+      "id": "green-fletchery",
+      "from": "market-green",
+      "to": "fenns-fletchery",
+      "kind": "door",
+      "bead": "mw-e24.7",
+      "notes": "Fletchery door."
+    },
+    {
+      "id": "green-bakery",
+      "from": "market-green",
+      "to": "pells-bakery",
+      "kind": "door",
+      "bead": "mw-e24.7",
+      "notes": "Bakery door."
+    },
+    {
+      "id": "green-watch-house",
+      "from": "market-green",
+      "to": "watch-house",
+      "kind": "door",
+      "bead": "mw-e24.8",
+      "notes": "Watch House door."
+    },
+    {
+      "id": "watch-house-cell",
+      "from": "watch-house",
+      "to": "jail-cell",
+      "kind": "door",
+      "bead": "mw-e24.8",
+      "notes": "The cell door (locked on the player when jailed)."
+    },
+    {
+      "id": "green-vane-house",
+      "from": "market-green",
+      "to": "vane-house",
+      "kind": "path",
+      "bead": "mw-e24.9",
+      "notes": "Up the rise to Vane House."
+    },
+    {
+      "id": "green-schoolhouse",
+      "from": "market-green",
+      "to": "schoolhouse",
+      "kind": "door",
+      "bead": "mw-e24.11",
+      "notes": "Schoolhouse door."
+    },
+    {
+      "id": "green-cemetery",
+      "from": "market-green",
+      "to": "cemetery",
+      "kind": "path",
+      "bead": "mw-e24.11",
+      "notes": "Lychgate cemetery."
+    },
+    {
+      "id": "green-glen-well",
+      "from": "market-green",
+      "to": "glen-well",
+      "kind": "path",
+      "bead": "mw-e24.10",
+      "notes": "The well on the green."
+    },
+    {
+      "id": "lane-rooftops",
+      "from": "shop-lane",
+      "to": "town-rooftops",
+      "kind": "path",
+      "routes": ["verb.climb.ledge"],
+      "classesHint": ["archer", "knight", "sorcerer", "thief"],
+      "bead": "mw-e24.12",
+      "notes": "Ledge climb from the lane to the rooftops (every class has verb.climb.ledge)."
+    },
+    {
+      "id": "rooftop-vane-house",
+      "from": "town-rooftops",
+      "to": "vane-house",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "world.vane-house.roof-entered"
+      },
+      "routes": ["verb.climb.rough"],
+      "classesHint": ["thief"],
+      "bead": "mw-e24.12",
+      "notes": "Thieves climb the rough stonework of Vane House onto its roof; others take the front path."
+    },
+    {
+      "id": "market-green-briarwood-edge",
+      "from": "market-green",
+      "to": "briarwood-edge",
+      "kind": "path",
+      "bead": "mw-e25.22",
+      "notes": "Upper lane / woodside path from the green into the forest."
+    },
+    {
+      "id": "edge-hub",
+      "from": "briarwood-edge",
+      "to": "briarwood-hub",
+      "kind": "path",
+      "bead": "mw-e25.1",
+      "notes": "Forest path from the town side to the hub."
+    },
+    {
+      "id": "hub-sleepers-path",
+      "from": "briarwood-hub",
+      "to": "sleepers-path",
+      "kind": "path",
+      "bead": "mw-e25.2",
+      "notes": "The Sleepers' Path leaves the forest paths."
+    },
+    {
+      "id": "sleepers-path-mine-gate",
+      "from": "sleepers-path",
+      "to": "mine-gate",
+      "kind": "secret",
+      "unlock": {
+        "fact": "world.sleepers-path.revealed"
+      },
+      "routes": ["sense.tracking"],
+      "classesHint": ["archer"],
+      "bead": "mw-e25.2",
+      "notes": "Trampled ferns lead to the mine gate; visible at night or to a tracker. CANON GAP: bible does not say where the path ends."
+    },
+    {
+      "id": "hub-standing-horn",
+      "from": "briarwood-hub",
+      "to": "standing-horn",
+      "kind": "path",
+      "bead": "mw-e25.3",
+      "notes": "The menhir clearing."
+    },
+    {
+      "id": "hub-wolf-den",
+      "from": "briarwood-hub",
+      "to": "wolf-den",
+      "kind": "path",
+      "bead": "mw-e25.4",
+      "notes": "Wolf den."
+    },
+    {
+      "id": "hub-woodcutters-hut",
+      "from": "briarwood-hub",
+      "to": "woodcutters-hut",
+      "kind": "path",
+      "bead": "mw-e25.1",
+      "notes": "The hut."
+    },
+    {
+      "id": "hub-millpond",
+      "from": "briarwood-hub",
+      "to": "millpond",
+      "kind": "path",
+      "bead": "mw-e25.5",
+      "notes": "Millpond and drowned lane."
+    },
+    {
+      "id": "hub-priory-road",
+      "from": "briarwood-hub",
+      "to": "priory-road",
+      "kind": "path",
+      "bead": "mw-e25.25",
+      "notes": "Forest to priory road (loop edge)."
+    },
+    {
+      "id": "hub-moorings",
+      "from": "briarwood-hub",
+      "to": "moorings-courtyard",
+      "kind": "path",
+      "bead": "mw-e25.25",
+      "notes": "Forest to the watchtower (loop edge)."
+    },
+    {
+      "id": "moorings-priory-ridge",
+      "from": "moorings-courtyard",
+      "to": "priory-road",
+      "kind": "path",
+      "bead": "mw-e25.25",
+      "notes": "Ridge path from the watch to the priory road (loop edge)."
+    },
+    {
+      "id": "hub-far-bank",
+      "from": "briarwood-hub",
+      "to": "millweir-far-bank",
+      "kind": "path",
+      "bead": "mw-e25.1",
+      "notes": "Forest path to the far bank of the Wend."
+    },
+    {
+      "id": "courtyard-tower",
+      "from": "moorings-courtyard",
+      "to": "moorings-tower",
+      "kind": "door",
+      "bead": "mw-e25.6",
+      "notes": "Up the tower stairs to the roof."
+    },
+    {
+      "id": "courtyard-supply-tunnel",
+      "from": "moorings-courtyard",
+      "to": "supply-tunnel",
+      "kind": "door",
+      "bead": "mw-e25.6",
+      "notes": "Down into the supply tunnel."
+    },
+    {
+      "id": "supply-tunnel-collapse",
+      "from": "supply-tunnel",
+      "to": "old-galleries",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "world.supply-tunnel.cleared"
+      },
+      "routes": ["technique.shoulder-barge", "spell.firebolt"],
+      "classesHint": ["knight", "sorcerer"],
+      "bead": "mw-e25.9",
+      "notes": "The collapse: a knight shoulder-barges the rotten shoring, a sorcerer burns it away; the long way in for anyone via the gate."
+    },
+    {
+      "id": "miners-bridge",
+      "from": "bridge-post",
+      "to": "mine-gate",
+      "kind": "path",
+      "bead": "mw-e25.23",
+      "notes": "Across the Miners' Bridge to the Deepworks gate (bible 3.5)."
+    },
+    {
+      "id": "mine-gate-winch",
+      "from": "mine-gate",
+      "to": "winch-house",
+      "kind": "door",
+      "unlock": {
+        "fact": "deepworks.gate-open"
+      },
+      "routes": [
+        "technique.shoulder-barge",
+        "arrow.pinning-shot",
+        "spell.mage-hand",
+        "tool.lockpick"
+      ],
+      "classesHint": ["archer", "knight", "sorcerer", "thief"],
+      "bead": "mw-e25.10",
+      "notes": "Getting in (bible 4.1 beat 5): knight smashes the side-boarding, archer shoots the winch pulley, sorcerer Mage Hands the bar, thief picks the padlock; Vane's key is the social route."
+    },
+    {
+      "id": "winch-galleries",
+      "from": "winch-house",
+      "to": "old-galleries",
+      "kind": "path",
+      "bead": "mw-e26.2",
+      "notes": "Into the old galleries."
+    },
+    {
+      "id": "galleries-rootcellar",
+      "from": "old-galleries",
+      "to": "rootcellar-camp",
+      "kind": "path",
+      "bead": "mw-e26.2",
+      "notes": "Down to the cutting hall."
+    },
+    {
+      "id": "rootcellar-silver",
+      "from": "rootcellar-camp",
+      "to": "silver-galleries",
+      "kind": "path",
+      "bead": "mw-e26.2",
+      "notes": "On to the silver workings."
+    },
+    {
+      "id": "silver-lower",
+      "from": "silver-galleries",
+      "to": "lower-deepworks",
+      "kind": "path",
+      "bead": "mw-e26.2",
+      "notes": "Down to the lower galleries."
+    },
+    {
+      "id": "silver-vane-gallery",
+      "from": "silver-galleries",
+      "to": "vane-sealed-gallery",
+      "kind": "door",
+      "bead": "mw-e26.4",
+      "notes": "Vane's sealed gallery."
+    },
+    {
+      "id": "vane-gallery-breach",
+      "from": "vane-sealed-gallery",
+      "to": "breach",
+      "kind": "door",
+      "bead": "mw-e26.4",
+      "notes": "The breach, sealable."
+    },
+    {
+      "id": "under-the-bridge-quay",
+      "from": "under-the-bridge",
+      "to": "briar-glen-quay",
+      "kind": "path",
+      "bead": "mw-e25.24",
+      "notes": "The riverbank path continues downriver to the quay."
+    },
+    {
+      "id": "quay-adit-mouth",
+      "from": "briar-glen-quay",
+      "to": "weeping-adit-mouth",
+      "kind": "path",
+      "bead": "mw-e25.13",
+      "notes": "Upriver bank to the adit mouth."
+    },
+    {
+      "id": "weeping-adit",
+      "from": "weeping-adit-mouth",
+      "to": "lower-deepworks",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "world.weeping-adit.passage-open"
+      },
+      "bead": "mw-e25.13",
+      "notes": "Up the flooded Weeping Adit: swim, raft, Frostglass the current's edge, or ride an empty barge winched back up (bible 4.1 beat 5). Open to any class."
+    },
+    {
+      "id": "stone-stair",
+      "from": "rootcellar-camp",
+      "to": "briar-glen-quay",
+      "kind": "one-way",
+      "unlock": {
+        "fact": "world.stone-stair.lowered"
+      },
+      "bead": "mw-e25.11",
+      "notes": "The Stone Stair: from the cutting hall down to the quay, one-way until lowered from above."
+    },
+    {
+      "id": "quay-millweir",
+      "from": "briar-glen-quay",
+      "to": "millweir",
+      "kind": "path",
+      "bead": "mw-e25.24",
+      "notes": "Towpath downriver to the weir (always open)."
+    },
+    {
+      "id": "sluice-walk",
+      "from": "millweir",
+      "to": "millweir-far-bank",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "world.millweir.sluice-walk-open"
+      },
+      "routes": ["arrow.rope", "spell.mage-hand"],
+      "classesHint": ["archer", "sorcerer"],
+      "bead": "mw-e25.12",
+      "notes": "The sluice walk across the weir: an archer ropes the rail, a sorcerer lifts the sluice with Mage Hand."
+    },
+    {
+      "id": "millweir-kestrel-lock",
+      "from": "millweir",
+      "to": "kestrel-lock",
+      "kind": "path",
+      "bead": "mw-e25.24",
+      "notes": "Towpath on to Kestrel Lock (always open)."
+    },
+    {
+      "id": "towpath-lock-wharf",
+      "from": "kestrel-lock",
+      "to": "stone-wharf",
+      "kind": "path",
+      "bead": "mw-e40.26",
+      "notes": "Towpath on to Wendmouth (always open; bible 3.6)."
+    },
+    {
+      "id": "barge-quay-lock",
+      "from": "briar-glen-quay",
+      "to": "kestrel-lock",
+      "kind": "path",
+      "travel": "barge",
+      "time": ["dawn", "day"],
+      "bead": "mw-e25.15",
+      "notes": "Mags Oakum's barge, mornings only (bible 3.6)."
+    },
+    {
+      "id": "barge-lock-wharf",
+      "from": "kestrel-lock",
+      "to": "stone-wharf",
+      "kind": "path",
+      "travel": "barge",
+      "time": ["dawn", "day"],
+      "bead": "mw-e40.26",
+      "notes": "The barge arrives at the Stone Wharf (bible 3.6)."
+    },
+    {
+      "id": "lock-gate-crossing",
+      "from": "kestrel-lock",
+      "to": "lockkeepers-cottage",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "kestrel-lock.gate-open"
+      },
+      "bead": "mw-e25.14",
+      "notes": "Across the lock gates once both paddles are up (signal graph kestrel-lock-gates)."
+    },
+    {
+      "id": "priory-road-nave",
+      "from": "priory-road",
+      "to": "priory-nave",
+      "kind": "path",
+      "bead": "mw-e25.25",
+      "notes": "Into the roofless nave."
+    },
+    {
+      "id": "nave-choir",
+      "from": "priory-nave",
+      "to": "priory-choir",
+      "kind": "path",
+      "bead": "mw-e26.5",
+      "notes": "Nave to choir."
+    },
+    {
+      "id": "choir-scriptorium",
+      "from": "priory-choir",
+      "to": "scriptorium",
+      "kind": "door",
+      "bead": "mw-e26.7",
+      "notes": "Choir to scriptorium."
+    },
+    {
+      "id": "nave-belfry",
+      "from": "priory-nave",
+      "to": "belfry",
+      "kind": "door",
+      "bead": "mw-e26.8",
+      "notes": "Stairs up to the belfry."
+    },
+    {
+      "id": "nave-crypt",
+      "from": "priory-nave",
+      "to": "priory-crypt",
+      "kind": "door",
+      "bead": "mw-e26.5",
+      "notes": "Down to the crypt."
+    },
+    {
+      "id": "nave-cistern",
+      "from": "priory-nave",
+      "to": "cistern",
+      "kind": "door",
+      "bead": "mw-e26.20",
+      "notes": "Priory end of the cistern (E26)."
+    },
+    {
+      "id": "glen-well-cistern",
+      "from": "glen-well",
+      "to": "cistern",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "world.glen-well.rung-pulled"
+      },
+      "routes": ["verb.climb.ledge"],
+      "classesHint": ["archer", "knight", "sorcerer", "thief"],
+      "bead": "mw-e24.10",
+      "notes": "The loose ladder-rung under the Glen Well; any class can climb down."
+    },
+    {
+      "id": "jail-drain",
+      "from": "jail-cell",
+      "to": "cistern",
+      "kind": "secret",
+      "unlock": {
+        "fact": "world.jail-drain.open"
+      },
+      "routes": ["tool.lockpick", "technique.shoulder-barge"],
+      "classesHint": ["knight", "thief"],
+      "bead": "mw-e24.8",
+      "notes": "The cell drain leads out to the cistern: a thief picks the grate padlock, a knight shoulder-barges the rotten grate."
+    },
+    {
+      "id": "breach-outer-ring",
+      "from": "breach",
+      "to": "knot-outer-ring",
+      "kind": "door",
+      "bead": "mw-e26.9",
+      "notes": "Through the breach into the Knot."
+    },
+    {
+      "id": "outer-ring-ossuary",
+      "from": "knot-outer-ring",
+      "to": "ossuary-galleries",
+      "kind": "path",
+      "bead": "mw-e26.9",
+      "notes": "Outer Ring to the Ossuary."
+    },
+    {
+      "id": "ossuary-chapel",
+      "from": "ossuary-galleries",
+      "to": "chapel-of-echoes",
+      "kind": "path",
+      "bead": "mw-e26.9",
+      "notes": "Ossuary to the Chapel of Echoes."
+    },
+    {
+      "id": "chapel-horns-hall",
+      "from": "chapel-of-echoes",
+      "to": "horns-hall",
+      "kind": "path",
+      "bead": "mw-e26.10",
+      "notes": "Chapel to Horn's Hall."
+    },
+    {
+      "id": "horns-hall-fold",
+      "from": "horns-hall",
+      "to": "the-fold",
+      "kind": "door",
+      "bead": "mw-e26.16",
+      "notes": "The Fold, past the Warden."
+    },
+    {
+      "id": "horns-hall-cradle",
+      "from": "horns-hall",
+      "to": "the-cradle",
+      "kind": "path",
+      "bead": "mw-e26.10",
+      "notes": "Horn's Hall to the Cradle."
+    },
+    {
+      "id": "cradle-shaft-foot",
+      "from": "the-cradle",
+      "to": "sounding-shaft-foot",
+      "kind": "path",
+      "bead": "mw-e26.10",
+      "notes": "Cradle to the shaft's foot."
+    },
+    {
+      "id": "sounding-shaft",
+      "from": "sounding-shaft-foot",
+      "to": "belfry",
+      "kind": "path",
+      "bead": "mw-e26.18",
+      "notes": "The climb to the belfry (bible 4.1 beat 13)."
+    },
+    {
+      "id": "ossuary-crypt",
+      "from": "ossuary-galleries",
+      "to": "priory-crypt",
+      "kind": "door",
+      "unlock": {
+        "fact": "world.priory-crypt.unsealed"
+      },
+      "bead": "mw-e26.20",
+      "notes": "The crypt is sealed from the Knot side; opens once the seal is broken (bible 4.1 beat 9)."
+    },
+    {
+      "id": "wharf-tidemarket",
+      "from": "stone-wharf",
+      "to": "tidemarket",
+      "kind": "path",
+      "bead": "mw-e40.10",
+      "notes": "Stone Wharf to tidemarket."
+    },
+    {
+      "id": "wharf-customs-house",
+      "from": "stone-wharf",
+      "to": "customs-house",
+      "kind": "path",
+      "bead": "mw-e40.3",
+      "notes": "Stone Wharf to customs-house."
+    },
+    {
+      "id": "wharf-bonded-warehouse",
+      "from": "stone-wharf",
+      "to": "bonded-warehouse",
+      "kind": "path",
+      "bead": "mw-e40.4",
+      "notes": "Stone Wharf to bonded-warehouse."
+    },
+    {
+      "id": "wharf-drowned-gull",
+      "from": "stone-wharf",
+      "to": "drowned-gull",
+      "kind": "path",
+      "bead": "mw-e40.6",
+      "notes": "Stone Wharf to drowned-gull."
+    },
+    {
+      "id": "wharf-net-lofts",
+      "from": "stone-wharf",
+      "to": "net-lofts",
+      "kind": "path",
+      "bead": "mw-e40.13",
+      "notes": "Stone Wharf to net-lofts."
+    },
+    {
+      "id": "wharf-breakwater",
+      "from": "stone-wharf",
+      "to": "breakwater",
+      "kind": "path",
+      "bead": "mw-e40.15",
+      "notes": "Stone Wharf to breakwater."
+    },
+    {
+      "id": "wharf-gilded-tern",
+      "from": "stone-wharf",
+      "to": "gilded-tern",
+      "kind": "path",
+      "bead": "mw-e40.14",
+      "notes": "Stone Wharf to gilded-tern."
+    },
+    {
+      "id": "breakwater-undertow",
+      "from": "breakwater",
+      "to": "undertow",
+      "kind": "door",
+      "bead": "mw-e40.12",
+      "notes": "Smugglers' tunnel to the harbour wall."
+    },
+    {
+      "id": "gull-trapdoor",
+      "from": "drowned-gull",
+      "to": "undertow",
+      "kind": "secret",
+      "unlock": {
+        "fact": "world.undertow.trapdoor-found"
+      },
+      "bead": "mw-e40.12",
+      "notes": "Trapdoor from the Drowned Gull to the Undertow (bible 3.6)."
+    },
+    {
+      "id": "net-lofts-customs-roof",
+      "from": "net-lofts",
+      "to": "customs-house",
+      "kind": "shortcut",
+      "unlock": {
+        "fact": "world.wendmouth.rooftop-route"
+      },
+      "routes": ["verb.climb.rough"],
+      "classesHint": ["thief"],
+      "bead": "mw-e40.13",
+      "notes": "Rooftop route from the net lofts onto the Customs House roof; thieves only."
+    }
+  ],
+  "loops": [
+    {
+      "id": "forest-watchtower-priory",
+      "name": "Forest, watchtower and priory",
+      "edges": ["hub-moorings", "moorings-priory-ridge", "hub-priory-road"]
+    },
+    {
+      "id": "watchtower-tunnel-upper-mine",
+      "name": "Watchtower supply tunnel and upper mine",
+      "edges": [
+        "market-green-briarwood-edge",
+        "edge-hub",
+        "hub-moorings",
+        "courtyard-supply-tunnel",
+        "supply-tunnel-collapse",
+        "winch-galleries",
+        "mine-gate-winch",
+        "miners-bridge",
+        "lane-bridge-post",
+        "lane-market-green"
+      ]
+    },
+    {
+      "id": "priory-crypt-sounding-shaft-knot",
+      "name": "Priory crypt and Sounding Shaft to the Knot",
+      "edges": [
+        "ossuary-crypt",
+        "nave-crypt",
+        "nave-belfry",
+        "sounding-shaft",
+        "cradle-shaft-foot",
+        "horns-hall-cradle",
+        "chapel-horns-hall",
+        "ossuary-chapel"
+      ]
+    },
+    {
+      "id": "glen-well-cistern-priory",
+      "name": "Glen Well, cistern and priory",
+      "edges": [
+        "glen-well-cistern",
+        "nave-cistern",
+        "priory-road-nave",
+        "hub-priory-road",
+        "edge-hub",
+        "market-green-briarwood-edge",
+        "green-glen-well"
+      ]
+    },
+    {
+      "id": "jail-drain-cistern",
+      "name": "Jail drain and cistern",
+      "edges": [
+        "jail-drain",
+        "glen-well-cistern",
+        "green-glen-well",
+        "green-watch-house",
+        "watch-house-cell"
+      ]
+    },
+    {
+      "id": "weeping-adit-lower-deepworks",
+      "name": "Weeping Adit and lower Deepworks",
+      "edges": [
+        "weeping-adit",
+        "quay-adit-mouth",
+        "under-the-bridge-quay",
+        "riverbank-path",
+        "lane-bridge-post",
+        "miners-bridge",
+        "mine-gate-winch",
+        "winch-galleries",
+        "galleries-rootcellar",
+        "rootcellar-silver",
+        "silver-lower"
+      ]
+    },
+    {
+      "id": "stone-stair",
+      "name": "Stone Stair, cutting hall to quay",
+      "edges": [
+        "stone-stair",
+        "under-the-bridge-quay",
+        "riverbank-path",
+        "lane-bridge-post",
+        "miners-bridge",
+        "mine-gate-winch",
+        "winch-galleries",
+        "galleries-rootcellar"
+      ]
+    },
+    {
+      "id": "millweir-far-bank",
+      "name": "Millweir sluice walk and the Briarwood far bank",
+      "edges": [
+        "sluice-walk",
+        "hub-far-bank",
+        "edge-hub",
+        "market-green-briarwood-edge",
+        "lane-market-green",
+        "riverbank-path",
+        "under-the-bridge-quay",
+        "quay-millweir"
+      ]
+    },
+    {
+      "id": "towpath-barge",
+      "name": "Towpath and barge, quay to Kestrel Lock",
+      "edges": ["quay-millweir", "millweir-kestrel-lock", "barge-quay-lock"]
+    },
+    {
+      "id": "wendmouth-link",
+      "name": "Towpath and barge to Wendmouth",
+      "edges": ["towpath-lock-wharf", "barge-lock-wharf"]
+    }
+  ]
+}

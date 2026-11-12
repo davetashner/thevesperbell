@@ -1,0 +1,1154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Id of the quest; stable forever (saves track its state)."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The quest’s name in the journal."
+    },
+    "titleKey": {
+      "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the quest is about, as the journal first tells it."
+    },
+    "summaryKey": {
+      "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "notes": {
+      "description": "What the quest is for, for writers.",
+      "type": "string",
+      "minLength": 1
+    },
+    "givers": {
+      "description": "NPCs who hand the quest out (the journal and map point at them).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        "x-contentRef": "creature"
+      }
+    },
+    "startWhen": {
+      "description": "Condition (logic DSL) that starts the quest. Omit: it is started by an effect.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The logic kind, e.g. \"hasItem\"."
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": {}
+    },
+    "stages": {
+      "default": [],
+      "description": "Optional sequencing, in order. The quest begins in `initialStage`.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Id of the stage, unique in the quest."
+          },
+          "text": {
+            "description": "Journal text while the quest is in this stage.",
+            "type": "string",
+            "minLength": 1
+          },
+          "textKey": {
+            "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "note": {
+            "description": "A note for writers; never shown to players.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "initialStage": {
+      "description": "The stage the quest starts in. Default: the first stage.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "objectives": {
+      "description": "What the quest tracks.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "haveItem",
+                "description": "The player holds the item."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "item": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "x-contentRef": "item"
+                  },
+                  "count": {
+                    "default": 1,
+                    "description": "How many.",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "item"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "deliverItem",
+                "description": "The player hands the item to an NPC."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "item": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "x-contentRef": "item"
+                  },
+                  "npc": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "x-contentRef": "creature"
+                  },
+                  "count": {
+                    "default": 1,
+                    "description": "How many.",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "item",
+                  "npc"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "fact",
+                "description": "A world fact has a value."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "fact": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Key of a registered world fact."
+                  },
+                  "value": {
+                    "default": true,
+                    "description": "The value to wait for. Default: true.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "fact"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "entityState",
+                "description": "A creature reaches a state. Prefer `removed` so non-combat solutions count."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "creature": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "x-contentRef": "creature"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "dead",
+                      "befriended",
+                      "fled",
+                      "subdued",
+                      "removed"
+                    ],
+                    "description": "The state to wait for."
+                  }
+                },
+                "required": [
+                  "creature",
+                  "state"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "enterArea",
+                "description": "The player enters an area (a trigger volume)."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "area": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Id of the area."
+                  }
+                },
+                "required": [
+                  "area"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "talkTo",
+                "description": "The player talks to an NPC."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "npc": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "x-contentRef": "creature"
+                  }
+                },
+                "required": [
+                  "npc"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "dialogueNode",
+                "description": "The player reaches a node of a dialogue."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "dialogue": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Id of the dialogue."
+                  },
+                  "node": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Id of the node."
+                  }
+                },
+                "required": [
+                  "dialogue",
+                  "node"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "learnCapability",
+                "description": "The player learns a capability."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "capability": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Id of the capability."
+                  }
+                },
+                "required": [
+                  "capability"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the objective, unique in the quest; other logic names it."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The journal line, e.g. \"Find out who has been taking the books.\""
+              },
+              "textKey": {
+                "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "optional": {
+                "default": false,
+                "description": "Not needed to resolve; a bonus or a side thread.",
+                "type": "boolean"
+              },
+              "hidden": {
+                "default": false,
+                "description": "Not shown until complete (a surprise).",
+                "type": "boolean"
+              },
+              "activeWhen": {
+                "description": "Condition (logic DSL) from which the objective is active. Omit: with its stage.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"hasItem\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {}
+              },
+              "stage": {
+                "description": "Active only in this stage. Omit: in every stage.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "note": {
+                "description": "A note for writers; never shown to players.",
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "const": "event",
+                "description": "A named event is emitted (by an `emit` effect or a system)."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Name of the event."
+                  }
+                },
+                "required": [
+                  "event"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "resolutions": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Id of the resolution; written to the world as `quest.<id>.resolution`."
+          },
+          "approach": {
+            "type": "string",
+            "enum": [
+              "combat",
+              "stealth",
+              "diplomacy",
+              "magic",
+              "trickery",
+              "other"
+            ],
+            "description": "The way of solving it this stands for."
+          },
+          "when": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"hasItem\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {},
+            "description": "Condition (logic DSL) that resolves the quest this way. The first to hold, in priority order, wins."
+          },
+          "priority": {
+            "default": 0,
+            "description": "Higher wins when several conditions hold in the same tick. Ties: file order.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "effects": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The logic kind, e.g. \"hasItem\"."
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": {},
+              "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+            },
+            "description": "Effects (logic DSL) applied together: all or nothing."
+          },
+          "journal": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The journal entry written when the quest ends this way."
+          },
+          "journalKey": {
+            "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "note": {
+            "description": "A note for writers; never shown to players.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "approach",
+          "when",
+          "journal"
+        ],
+        "additionalProperties": false
+      },
+      "description": "The ways the quest ends well (or at least ends). At least one."
+    },
+    "failures": {
+      "description": "The ways the quest goes wrong.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Id of the failure, unique in the quest."
+          },
+          "when": {
+            "description": "Condition (logic DSL) under which the quest fails.",
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"hasItem\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {}
+          },
+          "npcRemoved": {
+            "description": "The quest fails when any of these NPCs is removed (killed, fled, gone).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "creature"
+            }
+          },
+          "itemDestroyed": {
+            "description": "The quest fails when the quest copy of any of these items is destroyed.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "item"
+            }
+          },
+          "deadlineDays": {
+            "description": "The quest fails this many in-game days after it started, if still open.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "effects": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The logic kind, e.g. \"hasItem\"."
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": {},
+              "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+            },
+            "description": "Effects (logic DSL) applied together: all or nothing."
+          },
+          "journal": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The journal entry written for this failure, in the story’s voice."
+          },
+          "journalKey": {
+            "description": "Localization key for the text. Default: `quest.<quest id>.<part>[.<id>]`.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "continuation": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "startQuest",
+                    "description": "A successor quest begins in the same tick."
+                  },
+                  "quest": {
+                    "description": "Id of the quest that starts.",
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "x-contentRef": "quest"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "quest"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "setStage",
+                    "description": "This quest carries on in another stage."
+                  },
+                  "stage": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Id of a stage of this quest."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "stage"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "resolve",
+                    "description": "This quest ends with a (bittersweet) resolution."
+                  },
+                  "resolution": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "description": "Id of a resolution of this quest."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "resolution"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "description": "How the story goes on. Required: a failure is never a dead end."
+          },
+          "note": {
+            "description": "A note for writers; never shown to players.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "journal",
+          "continuation"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "summary",
+    "resolutions"
+  ],
+  "additionalProperties": false
+}

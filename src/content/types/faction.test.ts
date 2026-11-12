@@ -33,8 +33,15 @@ describe('faction schema', () => {
       towardPlayer: 'neutral',
       towardMembers: 'ally',
       towardOthers: 'neutral',
+      dispositionSpread: 0,
       relations: [],
     });
+  });
+
+  it('AC-3: dispositionSpread is a fraction 0..1 of a member’s disposition change', () => {
+    expect(factionSchema.parse({ ...wolves, dispositionSpread: 0.5 }).dispositionSpread).toBe(0.5);
+    expect(problems({ ...wolves, dispositionSpread: 1.5 })).toHaveLength(1);
+    expect(problems({ ...wolves, dispositionSpread: -0.1 })).toHaveLength(1);
   });
 
   it('AC-2: relations are one-way refs and round-trip through serialize → parse', () => {

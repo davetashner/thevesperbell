@@ -1,0 +1,92 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "world",
+  "name": "World map facts",
+  "notes": "Facts the world connectivity map (src/content/data/world/connectivity.json, mw-e24.1) reads to open shortcuts and gates. Each is written by the level bead named in its description; until that content is placed the world validator warns the fact is unproduced.",
+  "facts": [
+    {
+      "key": "deepworks.gate-open",
+      "type": "bool",
+      "default": false,
+      "description": "The boarded Deepworks main gate is open: Vane's key used, the boarding smashed, the winch cage dropped, the bar lifted or the padlock picked (bible 4.1 beat 5). Written by the gate puzzle (mw-e25.10); read by the world map edge mine-gate-winch.",
+      "owner": "world"
+    },
+    {
+      "key": "world.glen-well.rung-pulled",
+      "type": "bool",
+      "default": false,
+      "description": "The loose ladder-rung under the Glen Well is pulled and the cistern route is open (mw-e24.10).",
+      "owner": "world"
+    },
+    {
+      "key": "world.jail-drain.open",
+      "type": "bool",
+      "default": false,
+      "description": "The jail cell drain grate is open and the cistern route is usable from the cell (mw-e24.8).",
+      "owner": "world"
+    },
+    {
+      "key": "world.supply-tunnel.cleared",
+      "type": "bool",
+      "default": false,
+      "description": "The collapse in Mooring's Watch supply tunnel is cleared (mw-e25.9).",
+      "owner": "world"
+    },
+    {
+      "key": "world.millweir.sluice-walk-open",
+      "type": "bool",
+      "default": false,
+      "description": "The Millweir sluice walk is passable to the Briarwood far bank (mw-e25.12).",
+      "owner": "world"
+    },
+    {
+      "key": "world.vane-house.roof-entered",
+      "type": "bool",
+      "default": false,
+      "description": "A climber has entered Vane House by its roof (mw-e24.9, mw-e24.12).",
+      "owner": "world"
+    },
+    {
+      "key": "world.sleepers-path.revealed",
+      "type": "bool",
+      "default": false,
+      "description": "The Sleepers' Path is revealed, by night or by a tracker's eye (mw-e25.2).",
+      "owner": "world"
+    },
+    {
+      "key": "world.weeping-adit.passage-open",
+      "type": "bool",
+      "default": false,
+      "description": "The flooded Weeping Adit has a way up into the lower Deepworks: raft moored, current crossed or barge winched (mw-e25.13).",
+      "owner": "world"
+    },
+    {
+      "key": "world.stone-stair.lowered",
+      "type": "bool",
+      "default": false,
+      "description": "The Stone Stair is lowered from the cutting hall so it can be taken down to the quay (mw-e25.11).",
+      "owner": "world"
+    },
+    {
+      "key": "world.priory-crypt.unsealed",
+      "type": "bool",
+      "default": false,
+      "description": "The priory crypt seal is broken from the Knot side (mw-e26.20).",
+      "owner": "world"
+    },
+    {
+      "key": "world.undertow.trapdoor-found",
+      "type": "bool",
+      "default": false,
+      "description": "The Drowned Gull trapdoor to the Undertow is found (mw-e40.12).",
+      "owner": "world"
+    },
+    {
+      "key": "world.wendmouth.rooftop-route",
+      "type": "bool",
+      "default": false,
+      "description": "The Net Lofts rooftop route onto the Customs House is climbed (mw-e40.13).",
+      "owner": "world"
+    }
+  ]
+}

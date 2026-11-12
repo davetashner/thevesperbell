@@ -21,6 +21,32 @@
       "minimum": -200,
       "maximum": 200,
       "description": "Change in disposition when the event happens (−100..100 scale; the result clamps)."
+    },
+    "valueTiers": {
+      "description": "Item value tiers that scale `delta` (crime.theft, mw-e22.4): the highest tier whose minValue the item reaches applies; below the first tier, or none listed = ×1. Ascending by minValue.",
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "minValue": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Item value (gold) at which this tier starts."
+          },
+          "scale": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Multiplier on `delta` for items in this tier."
+          }
+        },
+        "required": [
+          "minValue",
+          "scale"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [

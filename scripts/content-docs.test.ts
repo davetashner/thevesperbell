@@ -70,7 +70,7 @@ describe('content-docs', () => {
       expect(doc).toContain(row);
     }
     const documented = [...doc.matchAll(/^\| `([^`]+)`/gm)].map((m) => m[1]);
-    expect(documented).toHaveLength(196);
+    expect(documented).toHaveLength(197);
   });
 
   it('AC-1 (mw-e15.1): every puzzle field, and every field the example puzzle uses, is documented', () => {
