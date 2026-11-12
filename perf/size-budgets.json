@@ -1,5 +1,5 @@
 {
-  "$comment": "Size budgets enforced per PR by pnpm size:check over the production build (mw-e32.3). Sizes are decimal (1 MB = 1,000,000 bytes), like perf-budgets.json. Initial JS is gzipped at level 9. The 50 MB ceiling is the initial download cap of docs/backlog-contract.md \u00a71 Hardware baseline. A waiver names one file, its own byte ceiling, why, and the bead that removes it; never raise a cap to make a build pass. toolWaivers are the src/tools modules known to leak into the release bundle; each prefix must go (the check warns when one matches nothing).",
+  "$comment": "Size budgets enforced per PR by pnpm size:check over the production build (mw-e32.3). Sizes are decimal (1 MB = 1,000,000 bytes), like perf-budgets.json. Initial JS is gzipped at level 9. The 50 MB ceiling is the initial download cap of docs/backlog-contract.md §1 Hardware baseline. A waiver names one file, its own byte ceiling, why, and the bead that removes it; never raise a cap to make a build pass. toolWaivers are the src/tools modules known to leak into the release bundle; each prefix must go (the check warns when one matches nothing).",
   "initialJsGzipBytes": 1500000,
   "initialPayloadBytes": 50000000,
   "assetCaps": [
@@ -27,46 +27,5 @@
       "bead": "mw-e32.19"
     }
   ],
-  "toolWaivers": [
-    {
-      "prefix": "src/tools/index.ts",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/anim-demo/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/arrow-demo/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/awareness-demo/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/debug-camera/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/perf/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/spell-vfx-demo/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    },
-    {
-      "prefix": "src/tools/vfx-demo/",
-      "reason": "src/main.ts imports it statically and the release build still bundles it into the main chunk; it has to move behind a dynamic import gated on the scene or debug flag.",
-      "bead": "mw-e32.18"
-    }
-  ]
+  "toolWaivers": []
 }
