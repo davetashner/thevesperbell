@@ -1,0 +1,284 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "reed-kestrel-lock",
+  "notes": "Old Reed (bible 5.14), keeper of Kestrel Lock; the toll board says gossip is accepted in lieu at his discretion (bible 7.2). Voice: dry, patient, unhurried. Tolls in gossip: a coin (reed.toll-paid) or a piece of gossip; both set the fact and gossip emits lock.gossip-paid for the lock's gameplay (follow-up bead). Rumour 17 is told through emit rumor.told. Class greetings only.",
+  "speakers": [
+    {
+      "id": "reed",
+      "npc": "npc-reed"
+    }
+  ],
+  "entries": [
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "A knight. Respectable. The barony's men came through this lock in my father's day, and they paid their toll in full. Gate's up and the board's there. Read it, and don't mind the flaking.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Archer. Bow stays strung down, if you please. The herons on the sill have never been shot and they're the best gossips I've got. Read the board.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Spells off the sill, thank you. Water goes where I tell it. The lock's been dredged, built, and rebuilt by better than you. Read the board.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "I count everything that passes this lock. Boats, coin, gossip. You I'm counting twice. Read the board, and don't read it as a menu.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Kestrel Lock. Old Reed, keeper, forty years. There's a toll, there's a board, there's a kettle. Read the first, ignore the third.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Back. Toll's the same. Gossip's gone up.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-toll",
+          "text": "What's the toll?",
+          "next": "toll-1"
+        },
+        {
+          "id": "ask-lock",
+          "text": "Tell me about the lock.",
+          "next": "lock-1"
+        },
+        {
+          "id": "ask-barges",
+          "text": "Who passes through here?",
+          "next": "barges-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Mind the sill. It's slippery. Everything here is.",
+      "end": true
+    },
+    {
+      "id": "toll-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Stone barge, laden, two pennies. Empty, one. Silver barge, by imperial warrant. Pleasure craft, five. Gossip accepted in lieu at the keeper's discretion, and the keeper's discretion is generous. Well?",
+      "next": "toll-choice"
+    },
+    {
+      "id": "toll-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "toll-coin",
+          "text": "A coin, then.",
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -1
+            },
+            {
+              "kind": "setFact",
+              "fact": "reed.toll-paid",
+              "value": true
+            }
+          ],
+          "next": "toll-coin-1",
+          "onFail": "toll-broke"
+        },
+        {
+          "id": "toll-gossip",
+          "text": "Gossip, please.",
+          "next": "gossip-pick"
+        },
+        {
+          "id": "toll-no",
+          "text": "Later.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "toll-coin-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Fair and square. Gate's open. Nobody pays in coin these days, so I'll remember you.",
+      "next": "hub"
+    },
+    {
+      "id": "toll-broke",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "A penny short, I see. Well, gossip's a legal tender here. Try that.",
+      "next": "gossip-pick"
+    },
+    {
+      "id": "gossip-pick",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "gossip-vane",
+          "text": "Seven beds have gone cold in Briar Glen.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "reed.toll-paid",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "lock.gossip-paid",
+              "data": {
+                "keeper": "npc-reed",
+                "topic": "valley"
+              }
+            }
+          ],
+          "next": "gossip-vane-1"
+        },
+        {
+          "id": "gossip-tern",
+          "text": "The Gilded Tern pays double for crew who ask nothing.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "reed.toll-paid",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "lock.gossip-paid",
+              "data": {
+                "keeper": "npc-reed",
+                "topic": "tern"
+              }
+            },
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 17,
+                "source": "npc-reed"
+              }
+            }
+          ],
+          "next": "gossip-tern-1"
+        },
+        {
+          "id": "gossip-none",
+          "text": "I haven't got any.",
+          "next": "gossip-none-1"
+        }
+      ]
+    },
+    {
+      "id": "gossip-vane-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Seven beds. That'll do for tuppence, and I'll not repeat it. Pass, friend.",
+      "next": "hub"
+    },
+    {
+      "id": "gossip-tern-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "The Tern. Aye, that's the one with the locked berth. Worth a penny and a half. We'll call it paid.",
+      "next": "hub"
+    },
+    {
+      "id": "gossip-none-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "No gossip. You'll find the river rather quiet, then. Come back with some.",
+      "next": "hub"
+    },
+    {
+      "id": "lock-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "The barony dredged the Wend and built this lock halfway down, so the stone barges could get to the sea. It's older than me, and I've been at it forty years. The gates stick. So do I.",
+      "next": "hub"
+    },
+    {
+      "id": "barges-1",
+      "kind": "line",
+      "speaker": "reed",
+      "text": "Mags Oakum's Patient Ann, three times a week, laden. Lately a bit lower in the water than glenstone ought to sit. I've said nothing. It's none of my business, and I charge double for opinions.",
+      "next": "hub"
+    }
+  ]
+}

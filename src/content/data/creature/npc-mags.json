@@ -27,6 +27,7 @@
   "behaviour": {
     "profile": "shopkeeper"
   },
+  "dialogue": "mags-patient-ann",
   "audio": {
     "idleLoop": "sfx-human-idle",
     "footsteps": "sfx-human-step",

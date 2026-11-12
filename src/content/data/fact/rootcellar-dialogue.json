@@ -1,0 +1,116 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "rootcellar-dialogue",
+  "name": "Rootcellar dialogue facts",
+  "notes": "mw-e39.8: world-state facts read and written by the Clatter, Mother Kettleback and Snig dialogues (bible 5.9, 5.10, 5.11, 6.1, 4.5). Writers other than the dialogues (the quests, the song, the goblin camp, respawn, items) are named in each description; goblins.standing and clatter.restored are in endings.json.",
+  "facts": [
+    {
+      "key": "clatter.memories",
+      "type": "int",
+      "default": 0,
+      "description": "How many pieces of The Name on the Bones Clatter has recovered, 0 to 3 (psalter, pear tree, sister's letter; bible 6.1). Written by the quest; a sorcerer's memory-reading in clatter-garden moves it up or down by one. Dropped back to 0 when the song swells before he is restored. Read by clatter-garden for his memory stage.",
+      "owner": "quest"
+    },
+    {
+      "key": "clatter.song-swelled",
+      "type": "bool",
+      "default": false,
+      "description": "The song swelled before Clatter was restored, so he lost what he had recovered (bible 5.9). Set with clatter.memories back at 0 by the song system; cleared by clatter-garden after he notices.",
+      "owner": "song"
+    },
+    {
+      "key": "clatter.hostile",
+      "type": "bool",
+      "default": false,
+      "description": "The Forgotten's reflex has Clatter swinging at the player (bible 5.9: he apologises while he fights). Set by the Forgotten AI when he is aggravated; cleared by clatter-garden when the player lowers a weapon or hums the hymn.",
+      "owner": "forgotten-ai"
+    },
+    {
+      "key": "clatter.fate",
+      "type": "enum",
+      "values": ["waiting", "joined", "rested"],
+      "default": "waiting",
+      "description": "What Clatter chose once restored (bible 6.1): waiting, joined (comes to the Cradle, enabling the abbot's Persuade resolution) or rested. Set by clatter-garden.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "player.captured-by-goblins",
+      "type": "bool",
+      "default": false,
+      "description": "The goblins have netted and carried the player to Mother Kettleback (bible 4.5). Set by the goblin capture system; cleared by kettleback-kitchen when the negotiation ends. Capture never ends in a game over.",
+      "owner": "goblin-camp"
+    },
+    {
+      "key": "player.woke-in-camp",
+      "type": "bool",
+      "default": false,
+      "description": "The player died while Horn is dead and woke in the goblin camp (bible 4.5), where Kettleback charges a carrying fee. Set by the respawn system; cleared by kettleback-kitchen.",
+      "owner": "respawn"
+    },
+    {
+      "key": "kettleback.errand",
+      "type": "bool",
+      "default": false,
+      "description": "The player owes Mother Kettleback an errand (a shiny thing in the cutting) for a carrying fee worked off. Set by kettleback-kitchen; read and cleared by the future errand quest.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "kettleback.horn-deal-told",
+      "type": "bool",
+      "default": false,
+      "description": "Kettleback has told the player about her arrangement with Horn: salvage rights in exchange for feeding the sleepers (bible 5.10). Set by kettleback-kitchen.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "kettleback.sleepers-told",
+      "type": "bool",
+      "default": false,
+      "description": "Kettleback has told the player that goblins do not dream and that the Big One keeps the sleepers in the soft room (bible Act II beat 6). Set by kettleback-kitchen.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "kettleback.kettle-brought",
+      "type": "bool",
+      "default": false,
+      "description": "The player carries the copper kettle Kettleback wants from Dot's cellar (Framed in Brass, bible 6.1). Stand-in until the item exists: written by its pickup, read and cleared by kettleback-kitchen.",
+      "owner": "item"
+    },
+    {
+      "key": "duggan.crate",
+      "type": "enum",
+      "values": ["crated", "freed"],
+      "default": "crated",
+      "description": "Where Vane's foreman Duggan Marl is (Framed in Brass, bible 5.10): crated in Kettleback's camp, or freed. Set to freed by kettleback-kitchen; read by it and by the quest.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "duggan.kit-taken",
+      "type": "bool",
+      "default": false,
+      "description": "The player took Duggan's planting kit (hammer, punch and stamp) as proof (bible 6.1). Set by kettleback-kitchen; read by the Vane confrontation.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "burglar.outcome",
+      "type": "enum",
+      "values": ["open", "deal", "sold-book", "light", "turned-in"],
+      "default": "open",
+      "description": "How The Bookshop Burglar went (bible 6.1): open, deal (reading lessons for salvage), sold-book (a thief sold Snig a book), light (a sorcerer's light, Snig does not come back) or turned-in (to Captain Hale). The first two and turned-in are set by snig-tunnels; the quest sets light and the rest of the aftermath.",
+      "owner": "quest"
+    },
+    {
+      "key": "snig.lessons",
+      "type": "bool",
+      "default": false,
+      "description": "The Bookshop Burglar reached its reading-lessons outcome: Snig has had lessons and can read short sentences (bible 5.11). Set by the quest; until then snig-tunnels never has him read a sentence (lint in tests/integration/rootcellar-dialogue.test.ts).",
+      "owner": "quest"
+    },
+    {
+      "key": "snig.vouched",
+      "type": "bool",
+      "default": false,
+      "description": "Snig has vouched for the player to the Rootcellar clan (bible 6.1, later with Horn). Set by snig-tunnels; read by kettleback-kitchen as a bonus on its checks.",
+      "owner": "dialogue"
+    }
+  ]
+}
