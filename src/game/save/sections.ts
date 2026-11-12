@@ -11,6 +11,7 @@ import {
   PlayerClassComponent,
   PuzzleCriticalComponent,
   PuzzleStateComponent,
+  questRuntimeOf,
   RecoveryAnchorComponent,
   settleHeldObjects,
   settleHidden,
@@ -68,6 +69,13 @@ export function createGameSaveRegistry(options: GameSaveOptions = {}): SaveRegis
       settlePushes(world);
       // Nor a hide: whoever is inside a wardrobe steps out first (mw-e03.23).
       settleHidden(world);
+    },
+    // A load replaces facts without announcing them: the quest runtime, built before the load so
+    // its keys were declared, re-evaluates against what loaded (mw-e23.11). No quests: no-op.
+    afterRead: (world) => {
+      const quests = questRuntimeOf(world);
+      quests?.refresh();
+      quests?.settle();
     },
   })
     .register(inventorySaveSection(options))

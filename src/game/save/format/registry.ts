@@ -132,6 +132,12 @@ export interface SaveRegistryOptions {
    * deterministic and leave the world valid.
    */
   readonly beforeWrite?: (world: World) => void;
+  /**
+   * Runs after every section of a load applied, so systems that cache state derived from what a
+   * load replaced (the quest runtime's evaluations, mw-e23.11) can bring it up to date. A throw
+   * fails the load like a section's: the world is restored.
+   */
+  readonly afterRead?: (world: World) => void;
 }
 
 /** Sections that make up a save, in apply order (the world section first). */
@@ -144,10 +150,12 @@ export class SaveRegistry {
   private factsOwner: string | undefined;
 
   private readonly beforeWrite: ((world: World) => void) | undefined;
+  private readonly afterRead: ((world: World) => void) | undefined;
 
   constructor(options: SaveRegistryOptions = {}) {
     const onDemand = options.onDemand ?? [];
     this.beforeWrite = options.beforeWrite;
+    this.afterRead = options.afterRead;
     this.ordered = [
       defineSaveSection<WorldSnapshot>({
         id: WORLD_SECTION_ID,
@@ -287,6 +295,8 @@ export class SaveRegistry {
         if (entry.missing === true) entry.section.missing?.(world, context(applying));
         else entry.section.deserialize(world, entry.data, context(applying));
       }
+      applying = 'after-read';
+      this.afterRead?.(world);
     } catch (cause) {
       world.restore(before);
       return { ok: false, error: new SaveApplyError(applying, cause) };
