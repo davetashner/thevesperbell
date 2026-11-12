@@ -276,21 +276,24 @@
       "name": "Mooring's Watch courtyard",
       "area": "moorings-watch",
       "epic": "e25",
-      "notes": "Goblin lookout below (bible 3.5, mw-e25.6)."
+      "scene": "moorings-watch",
+      "notes": "Goblin lookout below (bible 3.5, mw-e25.6). Built as the spur trail, the lookout camp and the walled courtyard of the moorings-watch scene; the way in from the Briarwood is its spur gate (mw-e25.6, mw-e25.25)."
     },
     {
       "id": "moorings-tower",
       "name": "Mooring's Watch tower and roof",
       "area": "moorings-watch",
       "epic": "e25",
-      "notes": "Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5)."
+      "scene": "moorings-watch",
+      "notes": "Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). Built inside the moorings-watch scene (mw-e25.6): four floors, an interior stair and two exterior climbs to the roof; the Sentinels and the mirror puzzle are later beads."
     },
     {
       "id": "supply-tunnel",
       "name": "The supply tunnel (watchtower end)",
       "area": "moorings-watch",
       "epic": "e25",
-      "notes": "Old supply tunnel up to the collapse (bible 3.5; mine side is E26)."
+      "scene": "moorings-watch",
+      "notes": "Old supply tunnel up to the collapse (bible 3.5; mine side is E26). Built as the cellar door (supply-tunnel-door, locked, tunnel-collapsed) over a sealed vestibule in the courtyard's north wall (mw-e25.6); the tunnel beyond is mw-e26 and the way through it mw-e25.9."
     },
     {
       "id": "mine-road",
@@ -846,8 +849,8 @@
       "from": "briarwood-hub",
       "to": "moorings-courtyard",
       "kind": "path",
-      "bead": "mw-e25.25",
-      "notes": "Forest to the watchtower (loop edge)."
+      "transitions": ["briarwood/moorings-gate", "moorings-watch/spur-gate"],
+      "notes": "Forest to the watchtower (loop edge): the Briarwood's spur trail ends at the moorings gate in its east wall, which opens on the watch's spur approach; the spur gate leads back (mw-e25.25)."
     },
     {
       "id": "moorings-priory-ridge",

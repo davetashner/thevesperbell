@@ -57,9 +57,9 @@ flowchart LR
     millweir_far_bank["The Briarwood far bank"]:::built
   end
   subgraph moorings_watch["Mooring's Watch"]
-    moorings_courtyard["Mooring's Watch courtyard"]
-    moorings_tower["Mooring's Watch tower and roof"]
-    supply_tunnel["The supply tunnel (watchtower end)"]
+    moorings_courtyard["Mooring's Watch courtyard"]:::built
+    moorings_tower["Mooring's Watch tower and roof"]:::built
+    supply_tunnel["The supply tunnel (watchtower end)"]:::built
   end
   subgraph deepworks["The Deepworks"]
     mine_road["The mine road"]
@@ -272,9 +272,9 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `millpond` | The millpond and drowned lane | briarwood | e25 | `briarwood` | Bible 3.5, mw-e25.5. Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
 | `priory-road` | The priory road | briarwood | e25 | `briarwood` | Road through the forest to Bellwater Priory (bible 3.5). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
 | `millweir-far-bank` | The Briarwood far bank | briarwood | e25 | `briarwood` | Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
-| `moorings-courtyard` | Mooring's Watch courtyard | moorings-watch | e25 | planned | Goblin lookout below (bible 3.5, mw-e25.6). |
-| `moorings-tower` | Mooring's Watch tower and roof | moorings-watch | e25 | planned | Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). |
-| `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | planned | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). |
+| `moorings-courtyard` | Mooring's Watch courtyard | moorings-watch | e25 | `moorings-watch` | Goblin lookout below (bible 3.5, mw-e25.6). Built as the spur trail, goblin lookout camp and walled courtyard of moorings-watch; the Briarwood reaches it by `hub-moorings`. |
+| `moorings-tower` | Mooring's Watch tower and roof | moorings-watch | e25 | `moorings-watch` | Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). Built in moorings-watch (mw-e25.6): four floors, an interior stair and two exterior climbs to the roof; Sentinels and the mirror puzzle are later beads. |
+| `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | `moorings-watch` | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). Built as a locked cellar door over a sealed vestibule in the courtyard wall (mw-e25.6); the tunnel itself is mw-e26, the way through the collapse mw-e25.9. |
 | `mine-road` | The mine road | deepworks | e25 | planned | The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23. |
 | `mine-gate` | The boarded mine gate | deepworks | e25 | planned | Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior. |
 | `winch-house` | The winch house | deepworks | e26 | planned | First interior space inside the gate (bible 3.5, mw-e26.2). |
@@ -350,7 +350,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `hub-woodcutters-hut` | `briarwood-hub` | `woodcutters-hut` | path |  |  | planned: mw-e25.1 |
 | `hub-millpond` | `briarwood-hub` | `millpond` | path |  |  | planned: mw-e25.5 |
 | `hub-priory-road` | `briarwood-hub` | `priory-road` | path |  |  | planned: mw-e25.25 |
-| `hub-moorings` | `briarwood-hub` | `moorings-courtyard` | path |  |  | planned: mw-e25.25 |
+| `hub-moorings` | `briarwood-hub` | `moorings-courtyard` | path |  |  | `briarwood/moorings-gate`, `moorings-watch/spur-gate` |
 | `moorings-priory-ridge` | `moorings-courtyard` | `priory-road` | path |  |  | planned: mw-e25.25 |
 | `hub-far-bank` | `briarwood-hub` | `millweir-far-bank` | path |  |  | planned: mw-e25.1 |
 | `courtyard-tower` | `moorings-courtyard` | `moorings-tower` | door |  |  | planned: mw-e25.6 |
@@ -430,7 +430,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
 | `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path) |
 | `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
-| `briarwood` | `briarwood-hub` | none (a marker spawn; its trails are walked inside the scene) |
+| `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings); its other trails are walked inside the scene |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `standing-horn` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `wolf-den` | none (a marker spawn; its trails are walked inside the scene) |
@@ -438,6 +438,9 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briarwood` | `millpond` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `priory-road` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `millweir-far-bank` | none (a marker spawn; its trails are walked inside the scene) |
+| `moorings-watch` | `moorings-courtyard` | `moorings-watch/spur-gate` (hub-moorings) |
+| `moorings-watch` | `moorings-tower` | none (a marker spawn inside the tower; the door is walked in and the stair climbed inside the scene) |
+| `moorings-watch` | `supply-tunnel` | none (a locked door stub over a sealed vestibule; mw-e25.9 replaces it with a transition) |
 
 Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `brazier-hall`, `combat-sandbox` and so on) are not part of the world; the puzzle rooms are placed into the dungeon by E26 (mw-e26.15) and will gain nodes then.
 
@@ -502,5 +505,6 @@ Shortcut facts: `pnpm world:validate` warns (AC-2) for each shortcut fact no pla
 - **How does the town reach the Briarwood?** The bible says the forest is "above the town" without a gate or lane. The map has a `lane-briarwood-edge` path: the lane's woodside path (mw-e25.22), a few steps from the gate to Market Green (mw-e24.2); whether the town should also open onto the forest from the green is open.
 - **Where is the quay relative to the bridge?** Idris's riverbank (under the bridge) is built; the map puts the quay downriver of it and the Weeping Adit mouth upriver. If the adit sits much further up the valley it may need its own approach path.
 - **Which side is the Millweir far bank?** §3.1 says the sluice walk reaches "the Briarwood's far bank"; the map joins it to the forest hub by a path.
+- **Which way does the ridge path leave Mooring's Watch?** The map has `moorings-priory-ridge` from the courtyard to the priory road (mw-e25.25), but the bible never says where the path starts. The watch greybox (mw-e25.6) leaves the courtyard's east wall solid and makes the valley beyond it a plain of crags to look at from the roof; when the ridge path is built it needs an exit, most simply a gate at the north end of that wall.
 - **Does the Fold have a second exit?** Only Horn's Hall reaches it, so it is a dead end by design.
 - Guard names, shift times and what the Bridge Watch does with armed strangers remain open in the bible; the map treats the post as always passable.

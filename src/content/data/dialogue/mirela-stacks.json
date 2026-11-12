@@ -1,0 +1,919 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "mirela-stacks",
+  "notes": "Mirela Thorne (bible 5.1), bookseller of the Lamplit Stacks. Dry, bookish, ink-stained; protective of a shop that is the town's secret heart. Voice: 'Don't touch the red shelf. It's not cursed. It's expensive.' Class reactions per bible: sorcerer a colleague with back-room access, knight teased about reading, archer maps and bestiaries, thief watched like Mortimer watches and offered a job. BANNED: modelled as the fact mirela.banned, not a disposition band (the band is her mood, the ban is Mortimer's rule): the banned entry plays while mirela.banned holds and not mirela.banned-days >= 1; it lifts when the player brings biscuits (mirela.biscuits-brought, a stand-in for the ginger-biscuits item) or a full in-game day has passed (mirela.banned-days >= 1, counted by the ban system), via the ban-lapsed entry. Secret: she owns Nine Sleeps and will never sell it, lend it or give it; no option transfers the book (AC-4). The restricted shelf opens with restricted-access (sorcerer trust, a persuasion, or disposition). Rumour and shop content are out of scope: emit hooks only.",
+  "speakers": [
+    {
+      "id": "mirela",
+      "npc": "npc-mirela"
+    }
+  ],
+  "entries": [
+    {
+      "id": "banned",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "mirela.banned"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "mirela.banned-days",
+              "op": "gte",
+              "value": 1
+            }
+          }
+        ]
+      },
+      "node": "banned-1"
+    },
+    {
+      "id": "ban-lapsed",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "mirela.banned"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "mirela.banned-days",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ban-lapsed-fx"
+    },
+    {
+      "id": "ending-long",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.fate",
+        "op": "eq",
+        "value": "joined"
+      },
+      "node": "ending-long-1"
+    },
+    {
+      "id": "ending-silence",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-silence-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-silence-1"
+    },
+    {
+      "id": "ending-warden",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "dead"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-warden-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-warden-1"
+    },
+    {
+      "id": "ending-rung",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tansy.saved"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "horn.fate",
+                "op": "eq",
+                "value": "alive"
+              }
+            ]
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "ending-rung-1",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "node": "ending-rung-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "A knight. Mind the shelves; the armour is louder than the books. Can you read, or do you just carry things?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "An archer. Maps and bestiaries are on the left. No, the bestiary doesn't say where to aim. Don't touch the red shelf. It's not cursed. It's expensive.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Ah. A colleague, or near enough: ink on the cuffs and no regard for the ceiling. The Stacks are yours to browse. Mostly. I'll tell you which parts are 'mostly'.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer woke up the moment you opened the door. Don't look at him. Don't look at the till. Browse as long as you like, and we shall get on very well.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Welcome to the Lamplit Stacks. Mind the stairs; they lean, like everything else here. If you want something, ask. If you want the red shelf, ask twice.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Back again. Mortimer's pleased; he can tell a regular by the rustle of the coat. What can I do for you?",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-red-shelf",
+          "text": "What's behind the curtain?",
+          "once": true,
+          "next": "shelf-1"
+        },
+        {
+          "id": "ask-hours",
+          "text": "I'm looking for something about the Vesper bell.",
+          "once": true,
+          "next": "hours-1"
+        },
+        {
+          "id": "ask-mortimer",
+          "text": "Tell me about Mortimer.",
+          "once": true,
+          "next": "mortimer-1"
+        },
+        {
+          "id": "ask-court",
+          "text": "You seem uneasy. Is it the Lantern Court?",
+          "once": true,
+          "next": "court-1"
+        },
+        {
+          "id": "ask-nine-sleeps",
+          "text": "Is there a book in here you won't sell?",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "mirela.restricted-access"
+              },
+              {
+                "kind": "disposition",
+                "npc": "npc-mirela",
+                "op": "gte",
+                "value": 5
+              }
+            ]
+          },
+          "once": true,
+          "next": "ns-1"
+        },
+        {
+          "id": "read-knight",
+          "text": "I can read.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "read-1"
+        },
+        {
+          "id": "maps-archer",
+          "text": "I hear you sell maps.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "maps-1"
+        },
+        {
+          "id": "teacher-sorcerer",
+          "text": "Who teaches the old fire tricks, besides the college?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "teacher-1"
+        },
+        {
+          "id": "job-thief",
+          "text": "I heard you have something that needs retrieving.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "job-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mind the stairs. And mind whatever is behind you, which is probably Mortimer.",
+      "end": true
+    },
+    {
+      "id": "shelf-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Books the Lantern Court would like a word with. Illusion, Conjuration, Gravity, Shadow. They want a writ and a seal. I have a wink, which is cheaper and a good deal less legal.",
+      "next": "shelf-choice"
+    },
+    {
+      "id": "shelf-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "shelf-colleague",
+          "text": "One scholar to another: may I look?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "shelf-sorcerer"
+        },
+        {
+          "id": "shelf-persuade",
+          "text": "I'm careful with old books.",
+          "next": "shelf-check"
+        },
+        {
+          "id": "shelf-back",
+          "text": "Never mind.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "shelf-sorcerer",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "A colleague. Of course. Behind the curtain, left side, and the cloth on the red shelf is to be put back, not draped. Don't tell the Court. I'll tell them you were reading Herbals.",
+      "next": "shelf-open"
+    },
+    {
+      "id": "shelf-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 11,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-mirela",
+            "op": "gte",
+            "value": 10
+          },
+          "bonus": 3,
+          "label": "She trusts you"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "mirela.hours.lent"
+          },
+          "bonus": 2,
+          "label": "You asked after the Hours"
+        }
+      ],
+      "success": "shelf-granted",
+      "failure": "shelf-refused"
+    },
+    {
+      "id": "shelf-granted",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Hm. You hold a book like a person who has been told off for dog-ears. Very well. Behind the curtain, the left side. If Mortimer has a view, I'll ask you to hear it politely.",
+      "next": "shelf-open"
+    },
+    {
+      "id": "shelf-open",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.restricted-access",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.shelf-opened"
+        }
+      ],
+      "next": "shelf-open-2"
+    },
+    {
+      "id": "shelf-open-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "It is not a favour. It's an arrangement, and I never forget one. Don't light anything.",
+      "next": "hub"
+    },
+    {
+      "id": "shelf-refused",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "No. Not yet. Come back when you've something I'd be sorry to see burned. I mean that kindly.",
+      "next": "hub"
+    },
+    {
+      "id": "hours-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "The priory had a bell that was rung against something. My grandmother said so, and she never said anything twice. The skipping rhyme is older than the town. Ask any child; they'll skip right past you.",
+      "next": "hours-2"
+    },
+    {
+      "id": "hours-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "The Vesperine Hours has the hymn in it. I have the one copy. I'll lend it to someone who brings it back, and I'll lend it to you.",
+      "next": "hours-fx"
+    },
+    {
+      "id": "hours-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.hours.lent",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.hours-offered"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 2
+        }
+      ],
+      "next": "hours-3"
+    },
+    {
+      "id": "hours-3",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "A book about a thing is not the thing. That's the first lesson and the last one people forget. Read it, but don't sing it near the well.",
+      "next": "hub"
+    },
+    {
+      "id": "mortimer-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer is a book mimic. He guards the rare shelf, eats paper, and bites shoplifters. Customers he tolerates. Dust he adores.",
+      "next": "mortimer-2"
+    },
+    {
+      "id": "mortimer-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "If he catches you at something, I shut the door on you for a day. Or you can bring me ginger biscuits, which I forgive anything for. He doesn't get any, which is why he's cross.",
+      "next": "mortimer-fx"
+    },
+    {
+      "id": "mortimer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "court-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "One inspection and the Stacks is a bonfire with a sign on it. Three more years and I might call it a library. Do be quiet about the red shelf around anyone in grey.",
+      "next": "court-2"
+    },
+    {
+      "id": "court-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I keep it for the town. Someone has to keep books alive in a town that's shrinking. It's lonely work. Thank you for asking; most people only ask the price.",
+      "next": "court-fx"
+    },
+    {
+      "id": "court-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 3
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "ns-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "There is. There's always one, and anyone who says otherwise is selling it. Nine Sleeps. The abbot's own treatise on Somnomancy. It lives in the back room and it will stay there.",
+      "next": "ns-fx"
+    },
+    {
+      "id": "ns-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.nine-sleeps.confessed",
+          "value": true
+        }
+      ],
+      "next": "ns-2"
+    },
+    {
+      "id": "ns-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I've read it. All of it. Sometimes, on still nights, I dream the song it describes and I wake up with the page number in my mouth.",
+      "next": "ns-choice"
+    },
+    {
+      "id": "ns-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ns-why",
+          "text": "Why keep it at all?",
+          "once": true,
+          "next": "ns-ysolde"
+        },
+        {
+          "id": "ns-buy",
+          "text": "Name a price.",
+          "next": "ns-price"
+        },
+        {
+          "id": "ns-read-sorcerer",
+          "text": "May I read just the first chapter?",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "ns-chapter"
+        },
+        {
+          "id": "ns-lock-thief",
+          "text": "Everything has a price. Or a lock.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "ns-lock"
+        },
+        {
+          "id": "ns-done",
+          "text": "I won't ask again.",
+          "next": "ns-peace"
+        }
+      ]
+    },
+    {
+      "id": "ns-ysolde",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "My grandmother Ysolde was one of three novices carried out of the priory the night the bell stopped. She never said by whom. Only 'great, careful hands'. She left me the book. I've never decided if it was a gift or a warning.",
+      "next": "ns-choice"
+    },
+    {
+      "id": "ns-price",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "There isn't one. Not for you, not for the Court, not for the abbot himself should he come knocking. Nine Sleeps stays where it is.",
+      "next": "ns-choice"
+    },
+    {
+      "id": "ns-chapter",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "The first chapter teaches Lull to whoever finishes it, and I've seen what Lull does. If I catch you in that back room I'll throw you out myself, and Mortimer will see to the rest.",
+      "next": "ns-choice"
+    },
+    {
+      "id": "ns-lock",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer has the first and the second is a very old lock. Try it, and discover how quickly a mimic finds a thief.",
+      "next": "ns-lock-fx"
+    },
+    {
+      "id": "ns-lock-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": -5
+        }
+      ],
+      "next": "ns-choice"
+    },
+    {
+      "id": "ns-peace",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Thank you. I'd rather you knew it's there than wondered. Wondering is how people start picking locks.",
+      "next": "ns-peace-fx"
+    },
+    {
+      "id": "ns-peace-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 5
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "read-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Can you? Truly? Oh, I do like a surprise. Most knights carry books for the weight. Take the lending shelf by the window. Third shelf, a manual of siege geometry, annotated by someone who plainly lost.",
+      "next": "read-fx"
+    },
+    {
+      "id": "read-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 8
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "maps-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Maps, bestiaries, and a book on goblin trade routes by a man who plainly never met a goblin. The bestiary was annotated by an archer. His notes are better than the print.",
+      "next": "maps-fx"
+    },
+    {
+      "id": "maps-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "mirela.maps-offered"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "teacher-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "The Court's list of teachers is very short, and the best one isn't on it. He's under the Miners' Bridge from dusk, if you can bear the damp. Buy a book first; he hates teaching people who can't read.",
+      "next": "teacher-fx"
+    },
+    {
+      "id": "teacher-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 20,
+            "source": "npc-mirela"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "job-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer talks. There's a book. Someone borrowed it permanently. Fetch it quietly and I'll find a use for you in the back room, and a price for it that isn't insulting.",
+      "next": "job-choice"
+    },
+    {
+      "id": "job-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "job-yes",
+          "text": "Consider it retrieved.",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "mirela.thief-job.accepted",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "mirela.thief-job-offered"
+            }
+          ],
+          "next": "job-accepted"
+        },
+        {
+          "id": "job-no",
+          "text": "Not today.",
+          "next": "job-declined"
+        }
+      ]
+    },
+    {
+      "id": "job-accepted",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Good. Quietly. And don't let anyone see you leaving with something that looks like a book. It makes them think.",
+      "next": "hub"
+    },
+    {
+      "id": "job-declined",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Then the offer stands, and so does Mortimer.",
+      "next": "hub"
+    },
+    {
+      "id": "banned-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer says you're not welcome today, and I've learned to take his word. Come back tomorrow. Or come back with ginger biscuits and I shall forget I ever heard of the incident.",
+      "next": "banned-hub"
+    },
+    {
+      "id": "banned-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ban-biscuits",
+          "text": "I brought biscuits. Ginger.",
+          "when": {
+            "kind": "fact",
+            "fact": "mirela.biscuits-brought"
+          },
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "mirela.banned",
+              "value": false
+            },
+            {
+              "kind": "setFact",
+              "fact": "mirela.banned-days",
+              "value": 0
+            },
+            {
+              "kind": "setFact",
+              "fact": "mirela.biscuits-brought",
+              "value": false
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-mirela",
+              "delta": 3
+            }
+          ],
+          "next": "ban-forgiven"
+        },
+        {
+          "id": "ban-plead",
+          "text": "I only wanted to browse.",
+          "once": true,
+          "next": "ban-plead-1"
+        },
+        {
+          "id": "ban-leave",
+          "text": "Tomorrow, then.",
+          "next": "ban-farewell"
+        }
+      ]
+    },
+    {
+      "id": "ban-plead-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "So does Mortimer. See where it's got him. Tomorrow.",
+      "next": "banned-hub"
+    },
+    {
+      "id": "ban-farewell",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Tomorrow. Mind the door; it sticks when I'm cross.",
+      "end": true
+    },
+    {
+      "id": "ban-forgiven",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Ginger. The proper sort. Mortimer, sit. There. All is forgotten, and nobody is to say how much I wanted those. Come in; touch nothing red.",
+      "next": "hub"
+    },
+    {
+      "id": "ban-lapsed-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.banned",
+          "value": false
+        },
+        {
+          "kind": "setFact",
+          "fact": "mirela.banned-days",
+          "value": 0
+        }
+      ],
+      "next": "ban-lapsed-1"
+    },
+    {
+      "id": "ban-lapsed-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "A day has passed, and Mortimer has put it behind him, so I shall too. Come in. Touch nothing red.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-long-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "(Mirela is asleep at her desk, a book open under her cheek. She reads aloud without waking.) '...the ninth sleep is the one you choose. Nobody tells you it's a door. Mortimer. Mortimer, don't.'",
+      "next": "ending-long-2"
+    },
+    {
+      "id": "ending-long-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "(Mortimer sits beside her, awake, watching every page. The lamp in the window of the Stacks is still lit.)",
+      "end": true
+    },
+    {
+      "id": "ending-rung-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I heard it at dusk, the bell. I stopped what I was doing and sat on the stairs. I hadn't heard it since I was a girl. I do believe in unfinished books. Thank you for finishing this one.",
+      "next": "ending-rung-2"
+    },
+    {
+      "id": "ending-rung-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Ysolde would have liked to hear it. She'd have said it sounded wrong. Then she'd have said that was the point.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-warden-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I've been reading about the Warden since I heard. If he's dead, the Knot has lost its only reader. I've put a lamp in the window of the Stacks. It isn't much. It is what I can do.",
+      "next": "hub"
+    },
+    {
+      "id": "ending-silence-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I heard you were well paid. Everyone is paid, in the end. Do remember that a ledger is just a book that lies on purpose. The shop is open, and Mortimer is watching your hands.",
+      "next": "hub"
+    }
+  ]
+}
