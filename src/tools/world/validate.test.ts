@@ -238,6 +238,55 @@ describe('AC-2: shortcut unlock facts', () => {
   });
 });
 
+describe('defensive edges of the producer scan and class lookup', () => {
+  it('skips unknown graphs, unplaced puzzles and reset policies without a fact', () => {
+    const scene = { id: 's', signals: [{ graph: { id: 'missing-graph' } }] };
+    const puzzle = (sceneId: string, recovery: object[]) => ({
+      scene: { id: sceneId },
+      outputs: { solvedFact: `${sceneId}.solved`, set: [] },
+      hints: [],
+      policy: { recovery },
+    });
+    const all = (type: string): unknown[] =>
+      ({
+        scene: [scene],
+        'signal-graph': [],
+        puzzle: [
+          puzzle('elsewhere', []),
+          puzzle('s', [{ kind: 'reset' }, { kind: 'reset', fact: 's.reset' }]),
+        ],
+        'respawn-rules': [],
+      })[type] ?? [];
+    const produced = producedFacts({ all } as unknown as Parameters<typeof producedFacts>[0]);
+    expect([...produced].sort()).toEqual(['s.reset', 's.solved']);
+  });
+
+  it('treats a missing class file as no capabilities, and names the bead of an unproduced shortcut', () => {
+    const world = fixture({
+      edges: [
+        edge('ab', 'a', 'b'),
+        edge('bc', 'b', 'c', { kind: 'shortcut', unlock: { fact: 'q.r' }, bead: 'mw-e24.99' }),
+        edge('cw', 'c', 'w'),
+      ],
+    });
+    const report = validateWorld(world, { classes: [], produced: new Set() });
+    expect(report.warnings.some((w) => w.endsWith('(mw-e24.99)'))).toBe(true);
+    const beadless = validateWorld(
+      fixture({
+        edges: [
+          edge('ab', 'a', 'b'),
+          edge('bc', 'b', 'c', { kind: 'shortcut', unlock: { fact: 'q.r' }, bead: undefined }),
+          edge('cw', 'c', 'w'),
+        ],
+      }),
+      envOf({}),
+    );
+    expect(beadless.warnings).toContain(
+      'AC-2: shortcut "bc" unlocks on fact "q.r", which no placed content produces yet',
+    );
+  });
+});
+
 describe('AC-3: loops and class shortcuts', () => {
   it('fails for a missing required loop, a non-cycle and absent Wendmouth links', () => {
     const world = fixture({

@@ -31,7 +31,7 @@
       "area": "valley",
       "epic": "e24",
       "scene": "slice",
-      "notes": "The m1 slice scene's vestibule; mw-e24.21 leads it out onto the mountain road."
+      "notes": "The m1 slice scene's vestibule; a passage leads out onto the mountain road (mw-e24.21)."
     },
     {
       "id": "mountain-road",
@@ -536,8 +536,8 @@
       "from": "slice-vestibule",
       "to": "mountain-road",
       "kind": "path",
-      "bead": "mw-e24.21",
-      "notes": "The slice vestibule leads out onto the mountain road (mw-e24.21 in flight)."
+      "notes": "The slice vestibule leads out onto the mountain road (mw-e24.21).",
+      "transitions": ["slice/mountain-road", "valley-01/south-gate"]
     },
     {
       "id": "road-1",

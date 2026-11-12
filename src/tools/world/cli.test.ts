@@ -39,11 +39,15 @@ describe('pnpm world:validate', () => {
               townSpawn: 'the-cradle',
               mainQuest: ['the-cradle', 'wolf-den'],
               loops: [],
+              edges: w.edges.map((e) =>
+                e.transitions.length === 0 ? { ...e, bead: undefined } : e,
+              ),
             }))
           : content.all(type as 'class')) as GameContent['all'],
     } as GameContent;
-    const { code, lines } = run([], () => broken);
+    const { code, lines } = run(['--plan'], () => broken);
     expect(code).toBe(1);
+    expect(lines.some((l) => l.startsWith('planned:') && l.endsWith(' no bead'))).toBe(true);
     expect(lines.some((l) => l.startsWith('::error title=World map::'))).toBe(true);
   });
 

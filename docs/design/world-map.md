@@ -237,7 +237,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 
 | Node | Name | Area | Epic | Scene | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `slice-vestibule` | The slice vestibule | valley | e24 | `slice` | The m1 slice scene's vestibule; mw-e24.21 leads it out onto the mountain road. |
+| `slice-vestibule` | The slice vestibule | valley | e24 | `slice` | The m1 slice scene's vestibule; a passage leads out onto the mountain road (mw-e24.21). |
 | `mountain-road` | The mountain road | valley | e24 | `valley-01` | Where the player arrives at dusk (bible 4.1 beat 1); the road runs down to the town. |
 | `valley-mid` | The valley road (middle) | valley | e24 | `valley-02` | Middle stretch of the road down the steep green valley (bible 3.1). |
 | `valley-head` | The valley road (river end) | valley | e24 | `valley-03` | Last stretch before the Miners' Bridge; the River Wend runs beside it. |
@@ -311,7 +311,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 
 | Edge | From | To | Kind | Unlock | Routes | Built by |
 | --- | --- | --- | --- | --- | --- | --- |
-| `slice-mountain-road` | `slice-vestibule` | `mountain-road` | path |  |  | planned: mw-e24.21 |
+| `slice-mountain-road` | `slice-vestibule` | `mountain-road` | path |  |  | `slice/mountain-road`, `valley-01/south-gate` |
 | `road-1` | `mountain-road` | `valley-mid` | path |  |  | `valley-01/north-gate`, `valley-02/south-gate` |
 | `road-2` | `valley-mid` | `valley-head` | path |  |  | `valley-02/north-gate`, `valley-03/south-gate` |
 | `road-bridge` | `valley-head` | `bridge-post` | path |  |  | `valley-03/bridge-gate`, `briar-glen-lane/bridge-gate` |
@@ -401,8 +401,8 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 
 | Scene | Node | Transitions that exist |
 | --- | --- | --- |
-| `slice` | `slice-vestibule` | none yet (mw-e24.21 links it to the mountain road) |
-| `valley-01` | `mountain-road` | `valley-01/north-gate` (road-1) |
+| `slice` | `slice-vestibule` | `slice/mountain-road` (slice-mountain-road) |
+| `valley-01` | `mountain-road` | `valley-01/south-gate` (slice-mountain-road), `valley-01/north-gate` (road-1) |
 | `valley-02` | `valley-mid` | `valley-02/south-gate` (road-1), `valley-02/north-gate` (road-2) |
 | `valley-03` | `valley-head` | `valley-03/south-gate` (road-2), `valley-03/bridge-gate` (road-bridge) |
 | `briar-glen-lane` | `bridge-post` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path) |
@@ -428,7 +428,6 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e24.10 | `green-glen-well`, `glen-well-cistern` |
 | mw-e24.11 | `green-schoolhouse`, `green-cemetery` |
 | mw-e24.12 | `lane-rooftops`, `rooftop-vane-house` |
-| mw-e24.21 | `slice-mountain-road` |
 | mw-e25.1 | `edge-hub`, `hub-woodcutters-hut`, `hub-far-bank` |
 | mw-e25.2 | `hub-sleepers-path`, `sleepers-path-mine-gate` |
 | mw-e25.3 | `hub-standing-horn` |
