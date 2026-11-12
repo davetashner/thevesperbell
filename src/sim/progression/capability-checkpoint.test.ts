@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { World } from '../core/world';
-import { addCapabilities, CapabilityRegistry, capabilitiesOf } from './capabilities';
+import {
+  addCapabilities,
+  capabilitiesOf,
+  CapabilityRegistry,
+  capabilityGained,
+} from './capabilities';
 import { capabilityCheckpoint } from './capability-checkpoint';
 
 function setup() {
@@ -35,5 +40,46 @@ describe('capabilityCheckpoint (mw-e23.11)', () => {
     expect(() => {
       capabilityCheckpoint(world, actor).rollback();
     }).not.toThrow();
+  });
+});
+
+describe('capabilityCheckpoint events (mw-e22.16)', () => {
+  const heard = (world: World<never>) => {
+    const log: string[] = [];
+    world.events.on(capabilityGained, (e) => log.push(e.capability));
+    return log;
+  };
+
+  it('holds gained events until commit, in order', () => {
+    const { world, actor, registry } = setup();
+    const log = heard(world);
+    const checkpoint = capabilityCheckpoint(world, actor);
+    registry.grant(world, actor, 'a', 'learned');
+    registry.grant(world, actor, 'b', 'learned');
+    world.events.flush();
+    expect(log).toEqual([]);
+    checkpoint.commit();
+    world.events.flush();
+    expect(log).toEqual(['a', 'b']);
+  });
+
+  it('drops them on rollback and folds nested commits into the parent', () => {
+    const { world, actor, registry } = setup();
+    const log = heard(world);
+    const outer = capabilityCheckpoint(world, actor);
+    const inner = capabilityCheckpoint(world, actor);
+    registry.grant(world, actor, 'a', 'learned');
+    inner.commit();
+    outer.rollback();
+    world.events.flush();
+    expect(log).toEqual([]);
+  });
+
+  it('emits at once outside a checkpoint', () => {
+    const { world, actor, registry } = setup();
+    const log = heard(world);
+    registry.grant(world, actor, 'a', 'learned');
+    world.events.flush();
+    expect(log).toEqual(['a']);
   });
 });
