@@ -17,7 +17,10 @@ interface Dialogue {
   npc: string | null;
   kind: 'line' | 'choice' | null;
   text: string;
-  choices: { text: string }[];
+  choices: { text: string; locked?: boolean; reason?: string }[];
+  focus?: number;
+  historyOpen?: boolean;
+  history?: number;
   conversing: boolean;
   last?: { npc: string; reason: string; cause?: string };
 }
@@ -38,7 +41,7 @@ const villager = async (page: Page): Promise<Ai['agents'][number] | undefined> =
     return json === undefined ? undefined : (JSON.parse(json) as Ai).agents[0];
   });
 
-test('mw-e22.9 AC-5: talk to the greybox villager, pick two options, say goodbye; she walks her route again', async ({
+test('mw-e22.9 AC-5, mw-e22.10: talk to the greybox villager, pick options by number, see a locked reason, open the history, say goodbye; she walks her route again', async ({
   page,
 }) => {
   test.setTimeout(240_000);
@@ -101,24 +104,49 @@ test('mw-e22.9 AC-5: talk to the greybox villager, pick two options, say goodbye
   });
   await expect(page.getByTestId('dialogue-box')).toContainText(first.text);
   const stopped = await villager(page);
-  await page.keyboard.press('Enter');
-  await expect.poll(async () => (await dialogue(page)).kind, POLL).toBe('choice');
+  // The line types out: Enter shows the rest first, then goes on. Press until it has.
+  const continueLine = async (): Promise<void> => {
+    for (let i = 0; i < 6 && (await dialogue(page)).kind === 'line'; i += 1) {
+      await page.keyboard.press('Enter');
+    }
+    await expect.poll(async () => (await dialogue(page)).kind, POLL).toBe('choice');
+  };
+  await continueLine();
   expect((await dialogue(page)).choices.map((c) => c.text)).toEqual([
     'Who are you?',
     'Heard anything lately?',
+    'Here is a purse for your trouble.',
     'Goodbye.',
   ]);
 
-  // Two options, each answered by a line, then Goodbye.
+  // A locked option shows why when the cursor is on it, and Enter does nothing there.
+  const purse = (await dialogue(page)).choices[2];
+  expect(purse).toMatchObject({ locked: true, reason: 'Needs gold at least 99' });
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await expect.poll(async () => (await dialogue(page)).focus, POLL).toBe(2);
+  await expect(page.getByTestId('dialogue-box')).toContainText('Needs gold at least 99');
+  await page.keyboard.press('Enter');
+  expect((await dialogue(page)).kind).toBe('choice');
+
+  // Pick an option with a number key, read its answer, and open the history.
   await page.keyboard.press('Digit1');
   await expect.poll(async () => (await dialogue(page)).kind, POLL).toBe('line');
-  await page.keyboard.press('Enter');
-  await expect.poll(async () => (await dialogue(page)).kind, POLL).toBe('choice');
+  await page.keyboard.press('KeyH');
+  await expect.poll(async () => (await dialogue(page)).historyOpen, POLL).toBe(true);
+  const box = page.getByTestId('dialogue-box');
+  await expect(box.locator('.vb-dialogue-history')).toContainText('Who are you?');
+  await expect(box.locator('.vb-dialogue-history')).toContainText(first.text);
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await dialogue(page)).historyOpen, POLL).toBe(false);
+  await continueLine();
+
+  // A second option, then Goodbye.
   await page.keyboard.press('Digit1'); // "Heard anything lately?" is first now
   await expect.poll(async () => (await dialogue(page)).kind, POLL).toBe('line');
-  await page.keyboard.press('Enter');
-  await expect.poll(async () => (await dialogue(page)).choices.length, POLL).toBe(1);
-  await page.keyboard.press('Digit1'); // Goodbye
+  await continueLine();
+  await expect.poll(async () => (await dialogue(page)).choices.length, POLL).toBe(2);
+  await page.keyboard.press('Digit2'); // Goodbye (the locked purse is first)
   await expect.poll(async () => (await dialogue(page)).open, POLL).toBe(false);
   expect((await dialogue(page)).last).toEqual({ npc: 'greybox-villager', reason: 'completed' });
   await expect(page.getByTestId('dialogue-box')).toBeHidden();

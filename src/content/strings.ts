@@ -31,8 +31,70 @@ const CAPTION_STRINGS = {
   'caption.direction.ahead-left': 'ahead left',
 } as const;
 
+/**
+ * Dialogue screen strings (mw-e22.10): the locked-option reasons (`logic.condition.<kind>`, filled
+ * from the condition's fields), option tags, persuasion odds and outcomes, and the box's hints.
+ */
+const DIALOGUE_STRINGS = {
+  'logic.condition.fact': 'Requires {fact}',
+  'logic.condition.factCmp': 'Requires {fact} {op} {value}',
+  'logic.condition.hasItem': 'Needs {item}',
+  'logic.condition.hasItem.many': 'Needs {count} x {item}',
+  'logic.condition.hasCapability': 'Needs the {capability} ability',
+  'logic.condition.playerClass': 'For the {class} only',
+  'logic.condition.disposition': 'Needs {npc} to feel {op} {value}',
+  'logic.condition.questState': 'Quest {quest} must be {state}',
+  'logic.condition.objectiveState': 'Objective {objective} of {quest} must be {state}',
+  'logic.condition.gold': 'Needs gold {op} {value}',
+  'logic.condition.timeOfDay': 'Only between {from} and {to}',
+  'logic.condition.dialogue.visitedCount': 'Needs {id} discussed {op} {value} times',
+  'logic.condition.all': '{parts}',
+  'logic.condition.any': 'Any of: {parts}',
+  'logic.condition.not': 'Not: {parts}',
+  'logic.condition.unknown': 'Requirement not met',
+  'logic.op.eq': 'exactly',
+  'logic.op.neq': 'other than',
+  'logic.op.gt': 'above',
+  'logic.op.gte': 'at least',
+  'logic.op.lt': 'below',
+  'logic.op.lte': 'at most',
+  'dialogue.tag.format': '[{label}]',
+  'dialogue.tag.class.knight': 'Knight',
+  'dialogue.tag.class.archer': 'Archer',
+  'dialogue.tag.class.sorcerer': 'Sorcerer',
+  'dialogue.tag.class.thief': 'Thief',
+  'dialogue.approach.persuade': 'Persuade',
+  'dialogue.approach.intimidate': 'Intimidate',
+  'dialogue.approach.deceive': 'Deceive',
+  'dialogue.approach.charm': 'Charm',
+  'dialogue.odds': '{approach}: {label}',
+  'dialogue.difficulty.easy': 'easy',
+  'dialogue.difficulty.fair': 'fair',
+  'dialogue.difficulty.hard': 'hard',
+  'dialogue.difficulty.impossible': 'impossible',
+  'dialogue.outcome.success': '{approach} worked',
+  'dialogue.outcome.failure': '{approach} failed',
+  'dialogue.outcome.modifier': '{label} {value}',
+  'dialogue.outcome.total': 'Score {score} against {difficulty}',
+  'dialogue.modifier.base': 'Base',
+  'dialogue.modifier.disposition': 'Disposition ({label})',
+  'dialogue.history.divider': 'Conversation with {speaker}',
+  'dialogue.ui.line': 'Enter to continue',
+  'dialogue.ui.choice': 'Up and Down or 1 to 9 to choose, Enter to confirm',
+  'dialogue.ui.history': 'H for history',
+  'dialogue.ui.historyButton': 'History',
+  'dialogue.ui.historyOpen': 'H or Esc to close history',
+  'dialogue.ui.historyTitle': 'History',
+  'dialogue.ui.historyEmpty': 'Nothing said yet.',
+  'dialogue.ui.replies': 'Replies',
+  'dialogue.ui.locked': 'Locked',
+} as const;
+
 /** Every string by key. */
-export const UI_STRINGS: Readonly<Record<string, string>> = CAPTION_STRINGS;
+export const UI_STRINGS: Readonly<Record<string, string>> = {
+  ...CAPTION_STRINGS,
+  ...DIALOGUE_STRINGS,
+};
 
 /** Whether `key` has a string. */
 export function hasString(key: string): boolean {
