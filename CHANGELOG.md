@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Tansy Pell now stands at Pell's Bakery once you have rescued her, and is not there before: characters can appear in and leave a scene as the story changes (mw-e24.22).
 - You can now talk to people in Briar Glen: walk up to Juniper Fenn, Oswin Brand or Hollis Pell in the shop lane, or to Harrow Vane on Market Green, and press Interact to hear them. They greet each class differently, Hollis grieves for Tansy (or celebrates her return), Juniper confesses what her sleep-draughts may have done, Oswin offers to recast the Vesper Bell's tongue, and with Vane's ledger or Duggan Marl's word in hand you can confront the mine owner and make him confess, bribe you, flee or be exposed (mw-e39.6).
 - You can now talk to Clatter the skeleton, Mother Kettleback and Snig the goblin scout in the debug conversation room (`?scene=conversation-room&debug=1`): Clatter's memories grow as The Name on the Bones progresses, Kettleback opens differently for hostile, wary and friendly goblins and negotiates with a captured player, and Snig cannot read until his lessons (mw-e39.8).
 - Briar Glen is now a whole town: at the north end of the shop lane a gate opens on Market Green, with its notice board, the Glen Well, the three-storey Lamplit Stacks leaning on the forge yard, the Watch House, the schoolhouse, the lychgate cemetery and Vane House's tower on its rise (visible from across town); doors to buildings without interiors yet are shut, and the mine road and priory road gates are signposted but not open (mw-e24.2).
