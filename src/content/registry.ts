@@ -69,6 +69,7 @@ import { materialSchema } from './types/material.ts';
 import { moveSchema } from './types/move.ts';
 import { checkNavmeshes, navmeshSchema } from './types/navmesh.ts';
 import { puzzleSchema } from './types/puzzle.ts';
+import { questSchema } from './types/quest.ts';
 import { checkRespawnRules, respawnRulesSchema } from './types/respawn-rules.ts';
 import { sandboxSchema } from './types/sandbox.ts';
 import { prefabSchema } from './types/prefab.ts';
@@ -128,6 +129,7 @@ export const contentTypes = {
   navmesh: navmeshSchema,
   prefab: prefabSchema,
   puzzle: puzzleSchema,
+  quest: questSchema,
   'reach-class': reachClassSchema,
   'respawn-rules': respawnRulesSchema,
   sandbox: sandboxSchema,
