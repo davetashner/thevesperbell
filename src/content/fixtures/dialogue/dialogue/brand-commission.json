@@ -1,0 +1,115 @@
+{
+  "$schema": "../../../data/dialogue.schema.json",
+  "id": "brand-commission",
+  "notes": "Format fixture (mw-e22.3), not shipped: Oswin Brand at the forge (story bible §5.7). Exercises class-gated options (knight, thief), a locked option that shows its reason (the tally stick), a persuasion check with modifiers and a failure that continues the story, and effects. The real conversation is written under E39.",
+  "speakers": [{ "id": "oswin", "npc": "npc-oswin" }],
+  "entries": [{ "id": "default", "node": "greet" }],
+  "nodes": [
+    {
+      "id": "greet",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "WHAT? No. WHAT? Oh, a customer. Speak up, I'm deaf in the one ear and you're standing on it.",
+      "next": "ask"
+    },
+    {
+      "id": "ask",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "credit",
+          "text": "I need a real blade, and I can't pay for it yet.",
+          "next": "haggle"
+        },
+        {
+          "id": "knight-armour",
+          "text": "My armour has seen better days.",
+          "when": { "kind": "playerClass", "class": "knight" },
+          "once": true,
+          "effects": [{ "kind": "emit", "event": "smith.repair-armour", "data": { "free": true } }],
+          "next": "knight-reply"
+        },
+        {
+          "id": "thief-picks",
+          "text": "I hear you sell lockpicks. For miners.",
+          "when": { "kind": "playerClass", "class": "thief" },
+          "next": "thief-reply"
+        },
+        {
+          "id": "tally",
+          "text": "Do you know this tally stick? The notches stop halfway down.",
+          "when": { "kind": "hasItem", "item": "miners-tally-stick" },
+          "showWhenLocked": true,
+          "next": "tally-reply"
+        },
+        { "id": "leave", "text": "Never mind.", "end": true }
+      ]
+    },
+    {
+      "id": "haggle",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 10,
+      "target": "oswin",
+      "modifiers": [
+        {
+          "when": { "kind": "disposition", "npc": "npc-oswin", "op": "gte", "value": 10 },
+          "bonus": 4,
+          "label": "He likes you"
+        },
+        {
+          "when": { "kind": "hasItem", "item": "miners-tally-stick" },
+          "bonus": 3,
+          "label": "You carry the mine's business"
+        }
+      ],
+      "success": "agreed",
+      "failure": "refused",
+      "failureEffects": [{ "kind": "disposition", "npc": "npc-oswin", "delta": -5 }]
+    },
+    {
+      "id": "agreed",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "A commission. A REAL one. Swords for nobody, forty years, and now this. Pay me when you're back. Come back.",
+      "next": "agreed-effects"
+    },
+    {
+      "id": "agreed-effects",
+      "kind": "effect",
+      "effects": [
+        { "kind": "disposition", "npc": "npc-oswin", "delta": 5 },
+        { "kind": "emit", "event": "smith.commission", "data": { "credit": true } }
+      ],
+      "end": true
+    },
+    {
+      "id": "refused",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "No. WHAT? No. Credit's how smiths end up making spoons. Come back with coin.",
+      "next": "ask"
+    },
+    {
+      "id": "knight-reply",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "A knight! In my forge! Give me that, give it HERE. No charge. Don't tell the miners.",
+      "next": "ask"
+    },
+    {
+      "id": "thief-reply",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Picks, yes. For miners. Very stubborn locks, down the mine. Very stubborn miners.",
+      "next": "ask"
+    },
+    {
+      "id": "tally-reply",
+      "kind": "line",
+      "speaker": "oswin",
+      "text": "Hazel, notched by a man who counted every bucket. Mine work, that. Keep it safe. Someone should keep counting.",
+      "next": "ask"
+    }
+  ]
+}

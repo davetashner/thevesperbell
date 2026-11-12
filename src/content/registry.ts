@@ -19,6 +19,7 @@ import { checkWeapons } from './weapon-checks.ts';
 import { checkBehaviours } from './behaviour-checks.ts';
 import { checkCreatureAudio } from './creature-audio-checks.ts';
 import { checkConditions } from './condition-checks.ts';
+import { checkDialogues } from './dialogue-checks.ts';
 import { checkFacts } from './fact-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
 import { checkSpellStatuses } from './spell-status-checks.ts';
@@ -45,11 +46,13 @@ import { checkClasses, classSchema } from './types/class.ts';
 import { namedConditionSchema } from './types/condition.ts';
 import { controllerSchema } from './types/controller.ts';
 import { creatureSchema } from './types/creature.ts';
+import { dialogueSchema } from './types/dialogue.ts';
 import { cueSheetSchema } from './types/cue-sheet.ts';
 import { doorSchema } from './types/door.ts';
 import { elementFeedbackSchema } from './types/element-feedback.ts';
 import { environmentDamageSchema } from './types/environment-damage.ts';
 import { factSchema } from './types/fact.ts';
+import { dispositionRuleSchema } from './types/disposition-rule.ts';
 import { factionSchema } from './types/faction.ts';
 import { gameSchema } from './types/game.ts';
 import { checkItems, itemSchema } from './types/item.ts';
@@ -102,7 +105,9 @@ export const contentTypes = {
   condition: namedConditionSchema,
   controller: controllerSchema,
   creature: creatureSchema,
+  dialogue: dialogueSchema,
   'cue-sheet': cueSheetSchema,
+  'disposition-rule': dispositionRuleSchema,
   door: doorSchema,
   'element-feedback': elementFeedbackSchema,
   'environment-damage': environmentDamageSchema,
@@ -151,6 +156,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkSocketTracks,
   checkCapabilities,
   checkPuzzles,
+  checkDialogues,
   checkPrefabs,
   checkCreatureAttacks,
   checkWeapons,

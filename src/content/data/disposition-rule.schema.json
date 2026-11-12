@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "The event type this rule answers, e.g. \"attacked\", \"fed\". Unique; stable once shipped."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Why this event moves disposition, and by this much."
+    },
+    "delta": {
+      "type": "integer",
+      "minimum": -200,
+      "maximum": 200,
+      "description": "Change in disposition when the event happens (−100..100 scale; the result clamps)."
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "delta"
+  ],
+  "additionalProperties": false
+}
