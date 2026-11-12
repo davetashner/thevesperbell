@@ -307,6 +307,19 @@
           "next": "fence-1"
         },
         {
+          "id": "ask-downriver",
+          "text": "Anyone worth knowing downriver?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "wendmouth.visited"
+            }
+          },
+          "once": true,
+          "next": "downriver-1"
+        },
+        {
           "id": "leave",
           "text": "That's all.",
           "next": "farewell"
@@ -319,6 +332,13 @@
       "speaker": "dot",
       "text": "Mind how you go, love. And if you hear anything, you know where the bar is.",
       "end": true
+    },
+    {
+      "id": "downriver-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Downriver? So the carters tell me, there's a bargewoman, Mags Oakum, who'd carry a church if it paid, and a Nell Gannet at the Drowned Gull who sells everything twice. I've never met either, love. Only heard, and heard plenty.",
+      "next": "hub"
     },
     {
       "id": "night-1",

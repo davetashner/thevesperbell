@@ -1,0 +1,615 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "mags-patient-ann",
+  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. Barge booking is a hook: the ride option emits barge.ride-booked (morning 05:00-12:00 only; a night window 21:00-05:00 refuses outright, mid-day and evening say come back at first light; no event and no gold at night). Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4). Rumours 16 and 18 are told through emit rumor.told. The barge ride itself and travel are consumed elsewhere (follow-up bead).",
+  "speakers": [
+    {
+      "id": "mags",
+      "npc": "npc-mags"
+    }
+  ],
+  "entries": [
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Mind the ropes, love. No, not those ones, the ones you're about to touch. You've the shoulders for the tow-line, mind. Patient Ann, Oakum skipper, and I've room in the hold if you've a bit of a back.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Archer! Sit in the middle and keep that bow pointing at the sky. Herons have been at my stone blocks since spring and I'd pay good money to see one regret it.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Careful where you wave your fingers, love, the sail's old and so am I. Though if you've a Gust about you, I could do with one. River doesn't care who you are. Sit in the middle.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "You've a customs sort of face, love, the kind that wants to be somewhere else. I'm Mags, this is the Patient Ann, and I've a tarpaulin that's seen more than the Inspector ever will.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "River doesn't care who you are, love. Sit in the middle and don't touch the ropes. Mags Oakum, skipper of the Patient Ann. Thirty years on the Wend, and she's not drowned me yet.",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Back aboard? Good. Sit where I can see you. What'll it be, the river or the gossip?",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-ride",
+          "text": "Can I book a ride on the Patient Ann?",
+          "next": "ride-check"
+        },
+        {
+          "id": "ask-river",
+          "text": "Tell me about the river.",
+          "next": "river-1"
+        },
+        {
+          "id": "ask-son",
+          "text": "Have you family on the water?",
+          "once": true,
+          "next": "son-1"
+        },
+        {
+          "id": "ask-hum",
+          "text": "Anything strange on the Wend lately?",
+          "next": "hum-check"
+        },
+        {
+          "id": "ask-crates",
+          "text": "What are you hauling downriver these days?",
+          "next": "crates-check"
+        },
+        {
+          "id": "fare-knight",
+          "text": "I'll take the tow-rope. Fare in sweat.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "mags.fare-deal",
+              "value": "tow-rope"
+            }
+          ],
+          "next": "fare-knight-1"
+        },
+        {
+          "id": "fare-archer",
+          "text": "I'll clear your herons off the blocks.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "mags.fare-deal",
+              "value": "herons"
+            }
+          ],
+          "next": "fare-archer-1"
+        },
+        {
+          "id": "fare-sorcerer",
+          "text": "I could put a Gust in your sail.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "mags.fare-deal",
+              "value": "gust"
+            }
+          ],
+          "next": "fare-sorcerer-1"
+        },
+        {
+          "id": "fare-thief",
+          "text": "I might need to miss customs. Quietly.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "mags.fare-deal",
+              "value": "tarpaulin"
+            },
+            {
+              "kind": "gold",
+              "delta": -5
+            }
+          ],
+          "next": "fare-thief-1",
+          "onFail": "fare-thief-broke"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Mind the gap, love. Morning tide, first light. The Ann doesn't wait and neither does the river.",
+      "end": true
+    },
+    {
+      "id": "ride-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "timeOfDay",
+            "from": "21:00",
+            "to": "05:00"
+          },
+          "next": "ride-night"
+        },
+        {
+          "when": {
+            "kind": "timeOfDay",
+            "from": "05:00",
+            "to": "12:00"
+          },
+          "next": "ride-morning"
+        }
+      ],
+      "else": "ride-late"
+    },
+    {
+      "id": "ride-night",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Not in the dark, love. Not for gold, not for love, not for the Court itself. River's got teeth at night and I've the scars to show it. First light, and I'll take you gladly.",
+      "next": "hub"
+    },
+    {
+      "id": "ride-late",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "You've missed the morning tide, love. The Ann sails with the light and not after it. Come back at first light and we'll see what the river's feeling.",
+      "next": "hub"
+    },
+    {
+      "id": "ride-morning",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Morning tide, and a fair wind. Four coins to the Wendmouth stones, down by Kestrel Lock. Sit in the middle, don't touch the ropes. Well?",
+      "next": "ride-offer"
+    },
+    {
+      "id": "ride-offer",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ride-pay",
+          "text": "Four coins. Done.",
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -4
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-booked",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-deal",
+          "text": "I'll work my passage, as agreed.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tow-rope"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "herons"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "gust"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tarpaulin"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            }
+          ],
+          "next": "ride-booked-deal"
+        },
+        {
+          "id": "ride-adit",
+          "text": "Take me up to the Weeping Adit.",
+          "when": {
+            "kind": "fact",
+            "fact": "mags.adit-open"
+          },
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -4
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "weeping-adit",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-adit-booked",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-no",
+          "text": "Not just yet.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "ride-booked",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Done. Step aboard, mind your head on the boom, and for pity's sake don't touch the ropes.",
+      "end": true
+    },
+    {
+      "id": "ride-booked-deal",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "A deal's a deal. Step aboard. I'll tell you which rope is yours when we cast off.",
+      "end": true
+    },
+    {
+      "id": "ride-adit-booked",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "The Adit, then. I'll go as far as the humming lets me, and not a fathom more. Step aboard.",
+      "end": true
+    },
+    {
+      "id": "ride-broke",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Four coins, love, not four promises. The river takes coin. Come back with some, or find a deal with me.",
+      "next": "hub"
+    },
+    {
+      "id": "river-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "The Wend rises up by the Deepworks and goes down past Briar Glen Quay, through Kestrel Lock, to the Wendmouth stones. I know every eddy and every sandbar. The river's been good to me, and I've never trusted it for a second.",
+      "next": "river-choice"
+    },
+    {
+      "id": "river-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "river-fish",
+          "text": "They say the fish won't bite by the Weeping Adit.",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 16,
+                "source": "npc-mags"
+              }
+            }
+          ],
+          "next": "river-fish-1"
+        },
+        {
+          "id": "river-serpent",
+          "text": "Is there really a sea serpent under the breakwater?",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 18,
+                "source": "npc-mags"
+              }
+            }
+          ],
+          "next": "river-serpent-1"
+        },
+        {
+          "id": "river-back",
+          "text": "That's enough river for now.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "river-fish-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Humming. That's the word for it, love. Up by the Weeping Adit the water hums, and the fish go off like they've heard their own names. Don't ask me more yet.",
+      "next": "river-choice"
+    },
+    {
+      "id": "river-serpent-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Serpent! Big as a barge, eyes like lanterns. I laughed so hard I nearly rammed the quay. It's a figurehead, love. Old wood, sunk, and it's been frightening idiots for fifty years.",
+      "next": "river-choice"
+    },
+    {
+      "id": "son-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "A son. Gone to the Deepworks crew, and now they've laid half of them off and he's not home yet. I want a full hold and I want him back, and I'll take the hold first, because I know where it is.",
+      "next": "hub"
+    },
+    {
+      "id": "hum-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-mags",
+            "op": "gte",
+            "value": 4
+          },
+          "next": "hum-open"
+        }
+      ],
+      "else": "hum-deflect"
+    },
+    {
+      "id": "hum-deflect",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "River's the river, love. Fish bite where they bite. Come and ask me again when I've decided whether I like you.",
+      "next": "hub"
+    },
+    {
+      "id": "hum-open",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "All right. There's a humming at the Weeping Adit. I hear it at the helm, low as a kettle. It's not the river and it's not the wind. I'll take you up, if you want to hear it for yourself. Morning only.",
+      "next": "hum-effect"
+    },
+    {
+      "id": "hum-effect",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mags.adit-open",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "barge.adit-route-offered",
+          "data": {
+            "skipper": "npc-mags"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "crates-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "mags.crates-confessed"
+          },
+          "next": "crates-again"
+        },
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-mags",
+            "op": "gte",
+            "value": 8
+          },
+          "next": "crates-open"
+        }
+      ],
+      "else": "crates-deflect"
+    },
+    {
+      "id": "crates-deflect",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Stone, love. Glenstone for the quays, same as always. Don't look at the hold, it's embarrassing.",
+      "next": "hub"
+    },
+    {
+      "id": "crates-again",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Same as I told you. Vane's crates, triple pay, and I keep my eyes on the water. Don't make me say it twice.",
+      "next": "hub"
+    },
+    {
+      "id": "crates-open",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Stone doesn't weigh like that, love. Vane's been giving me crates for two months, triple pay, no questions, and I've asked myself plenty. One split a plank. I've a horn-coin in my pocket I shouldn't have. If it comes to it, I never said.",
+      "next": "crates-effect"
+    },
+    {
+      "id": "crates-effect",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mags.crates-confessed",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "mags.coin-confessed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "mags.crates-confided",
+          "data": {
+            "skipper": "npc-mags"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "fare-knight-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Useful for once! The rope's the grey one, there's a lot of it, and the Ann doesn't tow herself. Pull when I say pull, stop when I say stop, and your passage is paid.",
+      "next": "hub"
+    },
+    {
+      "id": "fare-archer-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Herons, love. Grey ones, with a look. Hit them where they stand and I'll call it fare. And not the blocks, mind, those are glenstone.",
+      "next": "hub"
+    },
+    {
+      "id": "fare-sorcerer-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "A Gust! Oh, you're a good one. The sail hasn't had a decent puff since Michaelmas. Sit near the mast, and your passage is paid, as long as it doesn't tear.",
+      "next": "hub"
+    },
+    {
+      "id": "fare-thief-1",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Five coins, love, and you lie flat under the tarpaulin when Customs counts. You'll be a lump of glenstone. A good lump. Your passage is paid with it, mind, and you never heard me say any of it.",
+      "next": "hub"
+    },
+    {
+      "id": "fare-thief-broke",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Five coins, love. The tarpaulin's cheap, but it's not free. Come back with the fee and I'll tuck you in.",
+      "next": "hub"
+    }
+  ]
+}

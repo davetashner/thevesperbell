@@ -51,8 +51,8 @@ function outcome(pressTick: number) {
   return { world, started, damage, parries, freezes, parried };
 }
 
-/** 100 replays take a few seconds alone but far longer on a loaded runner: allow a minute. */
-const REPLAY_TIMEOUT_MS = 60_000;
+/** 100 replays take a few seconds alone but far longer on a loaded CI runner (60 s timed out in Nov 2026): allow three minutes. */
+const REPLAY_TIMEOUT_MS = 180_000;
 
 const variants = [
   { file: 'parry-first-tick.json', scenario: parryFirstTickScenario },
