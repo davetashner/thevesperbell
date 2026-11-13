@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-lantern-court-register",
+  "category": "book",
+  "name": "Register of the Licensed Schools",
+  "description": "Register of the Licensed Schools, by The Lantern Court, Office of Seals.",
+  "notes": "Inventory item for the story book text data/book/book-lantern-court-register.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-lantern-court-register.page-<n>. Value 40 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-lantern-court-register-01",
+  "value": 40,
+  "stackable": false,
+  "book": {
+    "title": "Register of the Licensed Schools",
+    "author": "The Lantern Court, Office of Seals",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-lantern-court-register.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}

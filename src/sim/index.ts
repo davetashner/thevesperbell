@@ -87,6 +87,7 @@ export * from './inventory';
 export * from './items';
 export * from './progression';
 export * from './puzzle';
+export * from './contest';
 export * from './quest';
 export * from './properties';
 export * from './push';

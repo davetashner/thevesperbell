@@ -1,0 +1,41 @@
+{
+  "$schema": "../contest.schema.json",
+  "id": "drowned-gull-dice",
+  "name": "Dice at the Drowned Gull",
+  "notes": "mw-e40.5. A short dice game against a Gull regular (mw-e40.6 stages it). PLACEHOLDER TUNING for the owner: fee, first to 3 rounds, the regular wins one round in three on average (a round every 120 ticks, spread 1). The scene reports `dice.round-won` for the player; a loaded die is the cheat and Nell watches the table.",
+  "entry": {
+    "fee": 1
+  },
+  "participants": [
+    {
+      "id": "gull-regular",
+      "name": "A Gull regular",
+      "pace": { "everyTicks": 120, "points": 1, "spread": 1 }
+    }
+  ],
+  "scoring": [{ "event": "dice.round-won", "where": {}, "points": 1 }],
+  "finish": { "firstTo": 3 },
+  "win": {
+    "placement": 1,
+    "effects": [{ "kind": "gold", "delta": 5 }]
+  },
+  "lose": {
+    "effects": [{ "kind": "disposition", "npc": "npc-nell", "delta": 1 }]
+  },
+  "cheats": [
+    {
+      "id": "loaded-die",
+      "event": "dice.loaded",
+      "where": {},
+      "observedBy": ["npc-nell"],
+      "bonusPoints": 1,
+      "detected": {
+        "disqualify": true,
+        "effects": [{ "kind": "disposition", "npc": "npc-nell", "delta": -2 }]
+      },
+      "undetected": {
+        "effects": [{ "kind": "disposition", "npc": "npc-nell", "delta": -1 }]
+      }
+    }
+  ]
+}

@@ -50,6 +50,7 @@ import { controllerSchema } from './types/controller.ts';
 import { creatureSchema } from './types/creature.ts';
 import { dialogueSchema } from './types/dialogue.ts';
 import { persuasionSchema } from './types/persuasion.ts';
+import { contestSchema } from './types/contest.ts';
 import { cueSheetSchema } from './types/cue-sheet.ts';
 import { doorSchema } from './types/door.ts';
 import { elementFeedbackSchema } from './types/element-feedback.ts';
@@ -92,6 +93,7 @@ import { checkUnlocks, unlockSchema } from './types/unlock.ts';
 import { vfxCueSheetSchema } from './types/vfx-cue-sheet.ts';
 import { vfxEffectSchema } from './types/vfx-effect.ts';
 import { worldSchema } from './types/world.ts';
+import { rumorSchema } from './types/rumor.ts';
 import { bookTextSchema, inscriptionSchema, noteSchema } from './types/readable.ts';
 
 /** Content type name → schema of one entry. */
@@ -137,7 +139,9 @@ export const contentTypes = {
   puzzle: puzzleSchema,
   quest: questSchema,
   persuasion: persuasionSchema,
+  contest: contestSchema,
   'reach-class': reachClassSchema,
+  rumor: rumorSchema,
   'respawn-rules': respawnRulesSchema,
   sandbox: sandboxSchema,
   scene: sceneSchema,

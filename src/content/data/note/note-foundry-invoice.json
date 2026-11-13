@@ -4,6 +4,7 @@
   "title": "Foundry invoice",
   "author": "Anonymous founder",
   "notes": "Bible 7.2: Quell's desk. The 40 brass trinkets ordered (11.3); ties to Duggan's instructions.",
+  "evidence": ["evidence.foundry-invoice"],
   "locations": ["place-customs-house", "place-wendmouth"],
   "pages": [
     {
