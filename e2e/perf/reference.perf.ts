@@ -249,27 +249,27 @@ test.describe('bellwater-priory at high', () => {
   });
 });
 
-// Wendmouth Harbour (mw-e40.1 AC-4: 200 × 160 m, viewed from the Stone Wharf along the quay) at the High
-// preset, the same sampling as the priory. Reference machine only.
-test.describe('wendmouth-harbour at high', () => {
+// The Deepworks (mw-e26.2 AC-3: about 220 × 335 m over three levels, viewed from the south end of the cutting hall) at the High
+// preset, the same sampling as Mooring's Watch. Reference machine only.
+test.describe('deepworks at high', () => {
   test.use({
     viewport: PRESETS.high.viewport,
     deviceScaleFactor: PRESETS.high.deviceScaleFactor,
   });
-  test('AC-4: the Stone Wharf view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+  test('AC-3: the cutting hall view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
     page,
   }, testInfo) => {
     test.setTimeout((FRAME_CAP_S + 120) * 1_000);
     await instrument(page);
     const sample = await sampleFrames(page, {
-      scene: 'wendmouth-harbour',
-      spawn: 'wharf-view',
+      scene: 'deepworks',
+      spawn: 'cutting-hall-view',
       preset: 'high',
       capS: FRAME_CAP_S,
       minSamples: SAMPLE_FRAMES,
       viewport: PRESETS.high.label,
     });
-    console.log(describeLongTasks('wendmouth-harbour high sampling', sample.longTasks));
+    console.log(describeLongTasks('deepworks high sampling', sample.longTasks));
     await enforce(testInfo, 'reference', {
       browser: browserName(page),
       frames: sample.run,
@@ -278,7 +278,7 @@ test.describe('wendmouth-harbour at high', () => {
         {
           metric: 'longTasksOver200ms',
           value: sample.longTasks.over200,
-          scene: 'wendmouth-harbour',
+          scene: 'deepworks',
           preset: 'high',
         },
       ],
@@ -357,6 +357,43 @@ test.describe('load budgets', () => {
     await enforce(testInfo, 'reference', {
       browser: browserName(page),
       measurements: [{ metric: 'transitionToPlayableMs', value, scene: 'valley-02' }],
+    });
+  });
+});
+
+// Wendmouth Harbour (mw-e40.1 AC-4: 200 × 160 m, viewed from the Stone Wharf along the quay) at the High
+// preset, the same sampling as the priory. Reference machine only.
+test.describe('wendmouth-harbour at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-4: the Stone Wharf view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'wendmouth-harbour',
+      spawn: 'wharf-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('wendmouth-harbour high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'wendmouth-harbour',
+          preset: 'high',
+        },
+      ],
     });
   });
 });

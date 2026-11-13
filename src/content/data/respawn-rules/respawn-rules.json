@@ -53,6 +53,14 @@
       "mode": "reload"
     },
     {
+      "id": "deepworks-reload",
+      "notes": "Death in the Deepworks (mw-e26.2): the region is the whole scene; the death screen offers Load last save, and with no save the mine restarts at the head of the mine road. Waking in the goblin camp, carried by Kettleback for a fee, is the PROPOSAL in docs/design/dungeon.md (Fold respawn logic, the `deepworks` rule); a later bead replaces this with that fact-conditioned rule.",
+      "region": "deepworks",
+      "priority": 0,
+      "destination": { "scene": "deepworks", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
       "id": "wendmouth-harbour-reload",
       "notes": "Death in Wendmouth (mw-e40.1): the region is the whole harbour scene; the death screen offers Load last save, and with no save the harbour restarts on the Stone Wharf. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
       "region": "wendmouth-harbour",
