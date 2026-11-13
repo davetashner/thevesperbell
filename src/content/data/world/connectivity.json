@@ -300,63 +300,72 @@
       "name": "The mine road",
       "area": "deepworks",
       "epic": "e25",
-      "notes": "The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23."
+      "notes": "The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23. Built (mw-e26.2) as the road strip at the south end of the deepworks scene, entered from the green by the mine-road-gate transition.",
+      "scene": "deepworks"
     },
     {
       "id": "mine-gate",
       "name": "The boarded mine gate",
       "area": "deepworks",
       "epic": "e25",
-      "notes": "Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior."
+      "notes": "Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior. Built (mw-e26.2) as the forecourt and gate wall of the deepworks scene, with the four ways in from outside; the gate puzzle that sets deepworks.gate-open is mw-e25.10.",
+      "scene": "deepworks"
     },
     {
       "id": "winch-house",
       "name": "The winch house",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "First interior space inside the gate (bible 3.5, mw-e26.2)."
+      "notes": "First interior space inside the gate (bible 3.5, mw-e26.2). Built (mw-e26.2): the first hall inside the gate wall, with the winch lever and the cage lift gate.",
+      "scene": "deepworks"
     },
     {
       "id": "old-galleries",
       "name": "The old glenstone galleries",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Square pillared halls; the upper mine (bible 3.5)."
+      "notes": "Square pillared halls; the upper mine (bible 3.5). Built (mw-e26.2): pillared halls with half-cut blocks, mine-cart rails and the supply tunnel collapse in the west wall.",
+      "scene": "deepworks"
     },
     {
       "id": "rootcellar-camp",
       "name": "The Rootcellar camp (cutting hall)",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Goblin camp in the old cutting hall (bible 3.5, 5.10); top of the Stone Stair."
+      "notes": "Goblin camp in the old cutting hall (bible 3.5, 5.10); top of the Stone Stair. Built (mw-e26.2): the cutting hall with camp markers and the Stone Stair head; the goblins are mw-e26.3.",
+      "scene": "deepworks"
     },
     {
       "id": "silver-galleries",
       "name": "The silver galleries",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Newer workings following the silver (bible 3.5)."
+      "notes": "Newer workings following the silver (bible 3.5). Built (mw-e26.2): narrow galleries one level down, reached by the stair from the cutting hall or by the cage lift.",
+      "scene": "deepworks"
     },
     {
       "id": "vane-sealed-gallery",
       "name": "Vane's sealed gallery",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6)."
+      "notes": "Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6). Built (mw-e26.2) as a bare hall with ledger and horn-ring markers; the content is mw-e26.4.",
+      "scene": "deepworks"
     },
     {
       "id": "breach",
       "name": "The breach",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Where the mine opened into the Knot (bible 3.5, mw-e26.4)."
+      "notes": "Where the mine opened into the Knot (bible 3.5, mw-e26.4). Built (mw-e26.2) as a rubble room ending at the breach-threshold marker; the Outer Ring beyond is mw-e26.9.",
+      "scene": "deepworks"
     },
     {
       "id": "lower-deepworks",
       "name": "The lower Deepworks",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Flooded lower galleries the Weeping Adit enters (bible 3.1)."
+      "notes": "Flooded lower galleries the Weeping Adit enters (bible 3.1). Built (mw-e26.2): the flooded lower gallery with the channel marked for the Frozen Channel (mw-e26.15) and the Weeping Adit arrival beyond it.",
+      "scene": "deepworks"
     },
     {
       "id": "priory-gate",
@@ -731,8 +740,8 @@
       "from": "market-green",
       "to": "mine-road",
       "kind": "path",
-      "bead": "mw-e25.23",
-      "notes": "South wall gate of the green: the mine road. A planned edge stub (briar-glen-green exit-mine-road: signpost and shut gate) until mw-e25.23 builds the road."
+      "notes": "South wall gate of the green: the mine road. Built as the open doorway of briar-glen-green (exit-mine-road, mine-road-gate) opening on the south end of the deepworks scene (road-gate), both ways (mw-e26.2). The road itself is a strip of that scene; if it grows its own scene (mw-e25.23) the transition moves with it.",
+      "transitions": ["briar-glen-green/mine-road-gate", "deepworks/road-gate"]
     },
     {
       "id": "mine-road-gate",
