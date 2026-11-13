@@ -139,6 +139,10 @@ describe('harbour rumours 13-18', () => {
     // player has been to the harbour.
     expect(rumourPool(rumours, 'npc-mags', false).every((h) => !h.secondHand)).toBe(true);
     expect(rumourPool(rumours, 'npc-dot', true)).toEqual([]);
+    // A valley rumour is never in the harbour pool, even from its own first-hand source.
+    const valley = rumorSchema.parse({ ...base, region: 'valley' });
+    expect(rumourPool([valley], 'npc-nell', false)).toEqual([]);
+    expect(rumourPool([valley], 'npc-dot', false)).toEqual([]);
   });
 });
 
