@@ -14,4 +14,5 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `locations` | list of string (at least 1) | required | Where it can be found: one or more glossary place ids (at least one). |
 | `pages` | list of object (at least 1) | required | The text, in page order; a note or inscription is usually one page. |
 | `pages[].text` | string | required | The page as the reader shows it; plain text, paragraphs split by a blank line. |
+| `evidence` | list of string (at least 1) | — | Evidence tags (mw-e39.23): the `evidence.*` facts that holding this text proves. Quest and dialogue conditions read the fact; the text names it so the two stay together. |
 | `damaged` | boolean | `false` | True exactly when the text carries `[illegible]` or `[missing]` markers. |

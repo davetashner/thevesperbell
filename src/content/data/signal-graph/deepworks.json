@@ -1,0 +1,24 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "deepworks",
+  "name": "Deepworks winch, pulley and inner bar",
+  "notes": "The wiring of the Deepworks blockout (scene deepworks, mw-e26.2). The winch lever inside the winch house and the shootable winch pulley over the cage bay both call the cage down: a latch keeps it down and opens the cage lift's gate (cage-gate, onto the shaft to the silver level) and the cage bay's gate (cage-bay-gate, the winch-cage way in from the forecourt). The inner-bar lever, which a sorcerer can pull from range through the slit, raises the inner-bar portcullis. Binding names are the scene's spawn ids.",
+  "nodes": [
+    { "id": "winch-lever", "kind": "lever", "entity": "winch-lever" },
+    { "id": "winch-pulley", "kind": "lever", "entity": "winch-pulley" },
+    { "id": "cage-called", "kind": "or" },
+    { "id": "cage-down", "kind": "latch" },
+    { "id": "cage-gate", "kind": "receiver", "receiver": "door", "entity": "cage-gate" },
+    { "id": "cage-bay", "kind": "receiver", "receiver": "door", "entity": "cage-bay-gate" },
+    { "id": "inner-bar-lever", "kind": "lever", "entity": "inner-bar-lever" },
+    { "id": "inner-bar", "kind": "receiver", "receiver": "door", "entity": "inner-bar-door" }
+  ],
+  "wires": [
+    { "from": "winch-lever", "to": "cage-called" },
+    { "from": "winch-pulley", "to": "cage-called" },
+    { "from": "cage-called", "to": "cage-down.set" },
+    { "from": "cage-down", "to": "cage-gate" },
+    { "from": "cage-down", "to": "cage-bay" },
+    { "from": "inner-bar-lever", "to": "inner-bar" }
+  ]
+}

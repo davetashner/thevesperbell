@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "briar-glen-green",
   "name": "Briar Glen: Market Green",
-  "description": "Bead mw-e24.2: the rest of Briar Glen, a grey-box town square about 180 x 140 m behind the shop lane (briar-glen-lane stays the lane district; this scene is its second district, reached by the lane-gate transition from the lane's north end, the green-gate stub beside the woodside path; arrive-from-briar-glen-lane stands inside the west gate). Market Green is the open square in the middle (notice-board, the Glen Well with its loose-rung marker, stalls and street lanterns). Round it: the Lamplit Stacks on the west side, three storeys that visibly lean to the west onto the brands-forge-yard annex (the Forge's rear smithy, whose counter and front are in the lane); the Watch House on the north side; the schoolhouse on the east side; the lychgate cemetery south-east; and Vane House on a four metre rise in the north-east, reached by a broad stair, its 40 m tower the tallest thing in town so it can be seen from everywhere (the power geography). Brand's Forge, Fenn's Fletchery & Simples, Pell's Bakery, Marsh's General Store, the Sleeping Ox and the Bridgeward College are in the lane scene. Building shells are solid masses with a doorway and a vestibule; the interiors are later beads, so each door is a locked wooden door (lock town-closed) with the hint 'Closed'. The mine road (south wall, exit-mine-road) and the priory road (east wall, exit-priory-road) are planned edge stubs: a doorway with a locked door (lock road-not-open) and a signpost, tagged planned:<bead>; the way into the Briarwood is the lane's woodside path. A new scene load (?scene=briar-glen-green) starts the player in Market Green (player-start, the perf budget's viewpoint).",
+  "description": "Bead mw-e24.2: the rest of Briar Glen, a grey-box town square about 180 x 140 m behind the shop lane (briar-glen-lane stays the lane district; this scene is its second district, reached by the lane-gate transition from the lane's north end, the green-gate stub beside the woodside path; arrive-from-briar-glen-lane stands inside the west gate). Market Green is the open square in the middle (notice-board, the Glen Well with its loose-rung marker, stalls and street lanterns). Round it: the Lamplit Stacks on the west side, three storeys that visibly lean to the west onto the brands-forge-yard annex (the Forge's rear smithy, whose counter and front are in the lane); the Watch House on the north side; the schoolhouse on the east side; the lychgate cemetery south-east; and Vane House on a four metre rise in the north-east, reached by a broad stair, its 40 m tower the tallest thing in town so it can be seen from everywhere (the power geography). Brand's Forge, Fenn's Fletchery & Simples, Pell's Bakery, Marsh's General Store, the Sleeping Ox and the Bridgeward College are in the lane scene. Building shells are solid masses with a doorway and a vestibule; the interiors are later beads, so each door is a locked wooden door (lock town-closed) with the hint 'Closed'. The mine road (south wall, exit-mine-road) is an open doorway with a signpost and the mine-road-gate transition into the Deepworks (arrive-from-deepworks stands inside the wall; mw-e26.2). The priory road (east wall, exit-priory-road) is still a planned edge stub: a doorway with a locked door (lock road-not-open) and a signpost, tagged planned:<bead>; the way into the Briarwood is the lane's woodside path. A new scene load (?scene=briar-glen-green) starts the player in Market Green (player-start, the perf budget's viewpoint).",
   "grid": 1,
   "camera": {
     "position": [-60, 60, -30],
@@ -617,24 +617,21 @@
   ],
   "spawns": [
     {
-      "id": "door-exit-mine-road",
-      "at": [60.0, 0.0, 0.0],
-      "tags": [],
-      "door": {
-        "profile": "wooden-door",
-        "lock": "road-not-open"
-      }
-    },
-    {
       "id": "exit-mine-road",
       "at": [60.0, 0.0, 3.0],
       "yaw": 180,
-      "tags": ["node", "exit-stub", "planned:mw-e25.23"]
+      "tags": ["node", "exit", "mine-road"]
+    },
+    {
+      "id": "arrive-from-deepworks",
+      "at": [60.0, 0.0, 7.0],
+      "yaw": 0,
+      "tags": ["arrival"]
     },
     {
       "id": "sign-exit-mine-road",
       "at": [58.5, 1.25, 2.5],
-      "tags": ["sign", "exit-stub"],
+      "tags": ["sign", "exit"],
       "interact": {
         "affordances": [
           {
@@ -1082,6 +1079,13 @@
       "min": [-90.75, -1, 18],
       "max": [-89.5, 3, 22],
       "scene": "briar-glen-lane",
+      "spawn": "arrive-from-briar-glen-green"
+    },
+    {
+      "id": "mine-road-gate",
+      "min": [58.5, -1, -0.5],
+      "max": [61.5, 3, 1.5],
+      "scene": "deepworks",
       "spawn": "arrive-from-briar-glen-green"
     }
   ]

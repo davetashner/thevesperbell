@@ -994,6 +994,7 @@ describe('scene content', () => {
       'chimes',
       'combat-sandbox',
       'dark-crossing',
+      'deepworks',
       'frozen-channel',
       'hiding-room',
       'kit-gallery',

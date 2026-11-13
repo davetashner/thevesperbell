@@ -1,0 +1,15 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-15-nells-cellar",
+  "notes": "Bible 6.2: the Undertow under the Drowned Gull (3.6). Nell admits it in nell-drowned-gull once pressed.",
+  "region": "harbour",
+  "source": ["npc-nell"],
+  "sourceTags": ["tidemarket"],
+  "truth": "true",
+  "target": "place-undertow",
+  "text": "Nell's cellar goes further than her cellar.",
+  "secondHand": {
+    "teller": "npc-dot",
+    "text": "Down at Wendmouth they say Nell's cellar goes further than her cellar. I never asked what that means."
+  }
+}
