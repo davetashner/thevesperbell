@@ -228,6 +228,10 @@
         {
           "kind": "emit",
           "event": "abbot.reveal-spoken"
+        },
+        {
+          "kind": "emit",
+          "event": "abbot-revealed"
         }
       ],
       "next": "reveal-leave"

@@ -86,5 +86,20 @@ test('AC-3: slice vestibule, valley-01, back, then valley-02, valley-03 and the 
     'data-transit',
     /"kind":"arrived".*"to":"briar-glen-lane".*"spawn":"arrive-from-valley-03"/,
   );
+  // mw-e39.38: stepping off the bridge writes briar-glen.arrived, which starts the main quest.
+  await expect
+    .poll(async () => (await data<Record<string, unknown>>(page, 'facts'))['briar-glen.arrived'], {
+      timeout: 30_000,
+    })
+    .toBe(true);
+  await expect
+    .poll(
+      async () =>
+        (await data<Record<string, unknown>>(page, 'facts'))[
+          'quest.quest-labyrinth-beneath-briar-glen.state'
+        ],
+      { timeout: 30_000 },
+    )
+    .toBe('active');
   expect(problems).toEqual([]);
 });

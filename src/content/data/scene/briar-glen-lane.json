@@ -900,6 +900,11 @@
   "environment": {
     "sky": "#1E1B2E"
   },
+  "signals": [
+    {
+      "graph": "briar-glen-arrival"
+    }
+  ],
   "transitions": [
     {
       "id": "bridge-gate",

@@ -1,0 +1,29 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "briar-glen-arrival",
+  "name": "Briar Glen arrival",
+  "notes": "The town end of the Miners' Bridge on the shop lane (scene briar-glen-lane, mw-e39.38). The first time the player steps off the bridge into Briar Glen the latch writes briar-glen.arrived = true and keeps it, so walking back over the bridge never undoes it. That fact starts the main quest (quest-labyrinth-beneath-briar-glen, bible 4.1 beat 1). The volume sits around the arrive-from-valley-03 spawn, so every arrival from the valley (and a debug load straight into the lane) starts the quest. Its node id is not an enterArea area of any quest: the lane is the town hub, and an area objective would be remembered by its early visits.",
+  "nodes": [
+    {
+      "id": "town-end",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": { "x": 0, "y": 1, "z": 5 },
+        "halfExtents": { "x": 3.5, "y": 1.5, "z": 3 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    { "id": "arrived", "kind": "latch" },
+    {
+      "id": "arrived-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "briar-glen.arrived"
+    }
+  ],
+  "wires": [
+    { "from": "town-end.enter", "to": "arrived.set" },
+    { "from": "arrived", "to": "arrived-fact" }
+  ]
+}

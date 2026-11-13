@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The main quest now starts and tracks in play: stepping off the Miners' Bridge into Briar Glen starts The Labyrinth Beneath Briar Glen, talking to Harrow Vane in the morning starts the investigation, and reaching the belfry deck at Bellwater Priory counts as visiting the priory (mw-e39.38).
 - Contests are data the game can run: you pay to enter, rivals and your own hits and wins score points, the first to a target (or the clock) decides it, and winning, losing gracefully or being disqualified each have their own rewards; magic or a loaded die is always possible but costs you if the right person sees it, and even unseen it leaves a mark; Nell's book takes a stake on you or pays you to throw the match and holds a grudge if you win anyway. Oona's arm-wrestling table and the Drowned Gull's dice game are defined (mw-e40.5).
 - The story books can be carried and read: each of the 18 books has its inventory item, with its title, author, pages, rarity and torn state, and Nine Sleeps is forbidden, unique and never sold (mw-e39.44).
 - Wendmouth's gossip and paperwork: harbour rumours 13-18 (the sea serpent is false and can be debunked by diving at the breakwater or by asking Mags; Dot repeats them only second-hand), evidence tags on the manifests, invoice and dead clerk's seal, and the one readable line of Mr. S—'s sealed letter (mw-e39.23).
