@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-friend-below-spiders",
+  "title": "A note tucked into a ribcage",
+  "author": "A friend below",
+  "notes": "Bible 4.1 beat 7 (first loom spiders): practical warning. Re-read: 'the song' as something he enjoys, and 'I would not have you hurt'.",
+  "locations": ["place-knot"],
+  "pages": [
+    {
+      "text": "There is a loom in the next hall and it is not the kind that makes cloth. Go round by the low gallery on the left, where the floor is dry and the threads are old.\n\nI would not have you hurt. You are of so much more use whole.\n\nThe song is louder here. Do not mind it. It is a lovely thing, when one has the ear.\n\n— A friend below."
+    }
+  ]
+}

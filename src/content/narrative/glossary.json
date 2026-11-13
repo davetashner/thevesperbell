@@ -984,6 +984,41 @@
       "id": "note-foundry-invoice",
       "name": "Foundry invoice",
       "section": "7.2"
+    },
+    {
+      "id": "note-friend-below-door",
+      "name": "A folded note under your door",
+      "section": "7.5"
+    },
+    {
+      "id": "note-friend-below-deepworks",
+      "name": "Chalk and a folded page at the Deepworks gate",
+      "section": "7.5"
+    },
+    {
+      "id": "note-friend-below-outer-ring",
+      "name": "A page pinned beneath a chalk arrow",
+      "section": "7.5"
+    },
+    {
+      "id": "note-friend-below-spiders",
+      "name": "A note tucked into a ribcage",
+      "section": "7.5"
+    },
+    {
+      "id": "note-friend-below-ossuary",
+      "name": "A note under a monk's skull",
+      "section": "7.5"
+    },
+    {
+      "id": "note-friend-below-warden",
+      "name": "A note left on the stair to the Warden's hall",
+      "section": "7.5"
+    },
+    {
+      "id": "note-friend-below-cradle",
+      "name": "A last note, in a very steady hand",
+      "section": "7.5"
     }
   ]
 }
