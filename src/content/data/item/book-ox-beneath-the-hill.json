@@ -1,0 +1,36 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-ox-beneath-the-hill",
+  "category": "book",
+  "name": "The Ox Beneath the Hill",
+  "description": "The Ox Beneath the Hill, by Written down by Marigold Teague.",
+  "notes": "Inventory item for the story book text data/book/book-ox-beneath-the-hill.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-ox-beneath-the-hill.page-<n>. Value 20 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads. Damaged: page(s) 4 unreadable (missingPages [3]).",
+  "icon": "icon-item-book-ox-beneath-the-hill-01",
+  "value": 20,
+  "stackable": false,
+  "book": {
+    "title": "The Ox Beneath the Hill",
+    "author": "Written down by Marigold Teague",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-ox-beneath-the-hill.page-1"
+      },
+      {
+        "textKey": "book.book-ox-beneath-the-hill.page-2"
+      },
+      {
+        "textKey": "book.book-ox-beneath-the-hill.page-3"
+      },
+      {
+        "textKey": "book.book-ox-beneath-the-hill.page-4"
+      }
+    ],
+    "condition": {
+      "state": "damaged",
+      "missingPages": [3]
+    },
+    "legality": "licensed",
+    "rarity": "uncommon"
+  }
+}

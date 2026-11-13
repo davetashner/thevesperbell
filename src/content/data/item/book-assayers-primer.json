@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-assayers-primer",
+  "category": "book",
+  "name": "The Imperial Assayer's Primer",
+  "description": "The Imperial Assayer's Primer, by Ludovic Marrow, assayer.",
+  "notes": "Inventory item for the story book text data/book/book-assayers-primer.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-assayers-primer.page-<n>. Value 40 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-assayers-primer-01",
+  "value": 40,
+  "stackable": false,
+  "book": {
+    "title": "The Imperial Assayer's Primer",
+    "author": "Ludovic Marrow, assayer",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-assayers-primer.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}

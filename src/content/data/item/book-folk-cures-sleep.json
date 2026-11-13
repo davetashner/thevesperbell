@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-folk-cures-sleep",
+  "category": "book",
+  "name": "Folk Cures for Poor Sleep",
+  "description": "Folk Cures for Poor Sleep, by Mother Odell Brisk.",
+  "notes": "Inventory item for the story book text data/book/book-folk-cures-sleep.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-folk-cures-sleep.page-<n>. Value 25 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-folk-cures-sleep-01",
+  "value": 25,
+  "stackable": false,
+  "book": {
+    "title": "Folk Cures for Poor Sleep",
+    "author": "Mother Odell Brisk",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-folk-cures-sleep.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}

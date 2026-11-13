@@ -1,0 +1,26 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-nine-sleeps",
+  "category": "book",
+  "name": "Nine Sleeps",
+  "description": "Nine Sleeps, by Corvin Ashgrove.",
+  "notes": "Inventory item for the story book text data/book/book-nine-sleeps.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-nine-sleeps.page-<n>. Value 400 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads. Forbidden by the Lantern Court, unique and never sold (bible 7.2).",
+  "icon": "icon-item-book-nine-sleeps-01",
+  "value": 400,
+  "flags": {
+    "unique": true,
+    "noSell": true
+  },
+  "book": {
+    "title": "Nine Sleeps",
+    "author": "Corvin Ashgrove",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-nine-sleeps.page-1"
+      }
+    ],
+    "legality": "forbidden",
+    "rarity": "unique"
+  }
+}

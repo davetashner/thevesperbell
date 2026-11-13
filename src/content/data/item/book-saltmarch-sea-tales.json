@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-saltmarch-sea-tales",
+  "category": "book",
+  "name": "Saltmarch Sea Tales",
+  "description": "Saltmarch Sea Tales, by Anonymous, translated.",
+  "notes": "Inventory item for the story book text data/book/book-saltmarch-sea-tales.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-saltmarch-sea-tales.page-<n>. Value 35 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-saltmarch-sea-tales-01",
+  "value": 35,
+  "stackable": false,
+  "book": {
+    "title": "Saltmarch Sea Tales",
+    "author": "Anonymous, translated",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-saltmarch-sea-tales.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}
