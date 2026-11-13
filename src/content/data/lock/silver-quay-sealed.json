@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "silver-quay-sealed",
+  "name": "Silver Quay gate",
+  "notes": "The iron gate to the Silver Quay at the far end of the Stone Wharf (mw-e40.1, mw-e40.2): imperial guards keep it; seen, not entered in the MVP (bible 3.6). Tier 5, cannot be picked, no key exists.",
+  "tier": 5,
+  "pickTier": null,
+  "hint": "Imperial guards. Nobody goes through."
+}

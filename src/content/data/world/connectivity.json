@@ -522,7 +522,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Barge landing and hub of the harbour (bible 3.6, mw-e40.2)."
+      "notes": "Barge landing and hub of the harbour (bible 3.6, mw-e40.2).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "tidemarket",
@@ -530,7 +531,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Covered import market (bible 3.6)."
+      "notes": "Covered import market (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "customs-house",
@@ -538,7 +540,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Columned hall; Inspector Cray (bible 3.6)."
+      "notes": "Columned hall; Inspector Cray (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "bonded-warehouse",
@@ -546,7 +549,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Vaulted export bays; bay nine (bible 3.6)."
+      "notes": "Vaulted export bays; bay nine (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "drowned-gull",
@@ -554,7 +558,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Tavern on the breakwater end (bible 3.6)."
+      "notes": "Tavern on the breakwater end (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "undertow",
@@ -562,7 +567,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Black market beneath the fish market (bible 3.6)."
+      "notes": "Black market beneath the fish market (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "net-lofts",
@@ -570,7 +576,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Continuous waterfront roof route (bible 3.6)."
+      "notes": "Continuous waterfront roof route (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "gilded-tern",
@@ -578,7 +585,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Three-masted merchantman in the pool (bible 3.6)."
+      "notes": "Three-masted merchantman in the pool (bible 3.6).",
+      "scene": "wendmouth-harbour"
     },
     {
       "id": "breakwater",
@@ -586,7 +594,8 @@
       "area": "wendmouth",
       "epic": "e40",
       "optional": true,
-      "notes": "Wall of rejected blocks; sunken figurehead (bible 3.6)."
+      "notes": "Wall of rejected blocks; sunken figurehead (bible 3.6).",
+      "scene": "wendmouth-harbour"
     }
   ],
   "edges": [

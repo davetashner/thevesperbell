@@ -1018,6 +1018,7 @@ describe('scene content', () => {
       'vertical-hall',
       'watchers',
       'weak-wall-room',
+      'wendmouth-harbour',
     ]);
   });
 
