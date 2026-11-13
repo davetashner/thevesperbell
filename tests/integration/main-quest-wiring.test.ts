@@ -111,6 +111,45 @@ describe('the main quest plays through the built levels (mw-e39.38)', () => {
     expect(g.runtime.objectiveState(MAIN, 'visit-the-priory')).toBe('complete');
   });
 
+  it('AC-2: an early belfry visit does not complete the Climb once its stage starts', () => {
+    const g = play('bellwater-priory', { x: 60, y: 0.9, z: 6 });
+    g.world.facts.set('briar-glen.arrived', true);
+    g.settle();
+    // The priory may be visited before Act II: the deck counts as a visit and nothing more.
+    g.stand({ x: 85, y: 9.9, z: 73 });
+    g.settle();
+    expect(g.runtime.objectiveState(MAIN, 'visit-the-priory')).toBe('complete');
+    for (const variant of ['with-horn', 'with-goblins', 'with-clatter', 'chased']) {
+      expect(
+        g.world.facts.get(`quest.${MAIN}.seen.climb-the-shaft-${variant}`),
+        variant,
+      ).toBeUndefined();
+    }
+    // Play on to the chased climb (nobody to help): the shaft climb itself is not built, so the
+    // objective is still waiting for someone to arrive at the top of the Sounding Shaft.
+    const done = (...ids: string[]): void => {
+      for (const id of ids) {
+        expect(g.runtime.completeObjective(MAIN, id), id).toBeUndefined();
+        g.settle(2);
+      }
+    };
+    done('see-the-horned-shape', 'hear-the-bounty');
+    g.world.facts.set('hale.list.shared', true);
+    g.world.facts.set('mirela.hours.lent', true);
+    g.world.facts.set('dot.trinket.confessed', true);
+    g.world.facts.set('world.sleepers-path.revealed', true);
+    g.settle();
+    done('enter-by-front-gate', 'enter-the-knot', 'reach-the-ossuary', 'reach-horns-hall');
+    g.world.facts.set('horn.fate', 'dead');
+    g.world.facts.set('horn.defeated', true);
+    g.settle();
+    done('hear-the-friend-below', 'reach-the-cradle');
+    g.world.facts.set('abbot.fate', 'defeated');
+    g.settle();
+    expect(g.runtime.stage(MAIN)).toBe('climb-chased');
+    expect(g.runtime.objectiveState(MAIN, 'climb-the-shaft-chased')).toBe('active');
+  });
+
   it('AC-3: talking to Harrow Vane in the morning completes hear-the-bounty and starts the hub', () => {
     const g = play('briar-glen-lane', { x: 0, y: 0.9, z: 5 });
     g.settle();
