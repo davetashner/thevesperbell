@@ -579,6 +579,12 @@ export {
   type SurfaceTableEntry,
 } from './types/surface-table.ts';
 export {
+  contestSchema,
+  type ContestDef,
+  type ContestDefInput,
+  type ContestEntry,
+} from './types/contest.ts';
+export {
   PERSUASION_BANDS,
   PERSUASION_ID,
   persuasionSchema,

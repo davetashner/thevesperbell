@@ -1321,7 +1321,7 @@
       "kind": "enterArea",
       "text": "Climb the Sounding Shaft to the belfry.",
       "params": {
-        "area": "belfry"
+        "area": "sounding-shaft-top"
       },
       "stage": "climb-with-horn"
     },
@@ -1330,7 +1330,7 @@
       "kind": "enterArea",
       "text": "Climb the Sounding Shaft to the belfry.",
       "params": {
-        "area": "belfry"
+        "area": "sounding-shaft-top"
       },
       "stage": "climb-with-goblins"
     },
@@ -1339,7 +1339,7 @@
       "kind": "enterArea",
       "text": "Climb the Sounding Shaft to the belfry.",
       "params": {
-        "area": "belfry"
+        "area": "sounding-shaft-top"
       },
       "stage": "climb-with-clatter"
     },
@@ -1348,7 +1348,7 @@
       "kind": "enterArea",
       "text": "Climb the Sounding Shaft to the belfry, fast.",
       "params": {
-        "area": "belfry"
+        "area": "sounding-shaft-top"
       },
       "stage": "climb-chased"
     },

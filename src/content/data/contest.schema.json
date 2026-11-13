@@ -1,0 +1,563 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The contest’s name."
+    },
+    "notes": {
+      "description": "A note for writers; never shown to players.",
+      "type": "string",
+      "minLength": 1
+    },
+    "entry": {
+      "type": "object",
+      "properties": {
+        "fee": {
+          "default": 0,
+          "description": "Gold paid to enter.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "when": {
+          "description": "Condition (logic DSL) to be let in. Omit: anyone.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The logic kind, e.g. \"gold\"."
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": {}
+        },
+        "effects": {
+          "description": "Applied with the fee as the player enters.",
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"gold\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {},
+            "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Who may enter and what it costs."
+    },
+    "participants": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Id of the participant in this contest; events name it as `actor`."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Shown in the standings."
+          },
+          "creature": {
+            "description": "The NPC competing, when there is one.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "creature"
+          },
+          "pace": {
+            "description": "Scores on its own at this pace. Omit: scored only by reported events.",
+            "type": "object",
+            "properties": {
+              "everyTicks": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991,
+                "description": "Ticks between scores."
+              },
+              "points": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991,
+                "description": "Points per score."
+              },
+              "spread": {
+                "default": 0,
+                "description": "Up to this many extra points, drawn from the seeded stream.",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "everyTicks",
+              "points"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "A rival."
+      },
+      "description": "The rivals; the player is always entered."
+    },
+    "scoring": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "description": "The sim event the rule listens for, as reported to the runner."
+          },
+          "where": {
+            "default": {},
+            "description": "Fields the event data must equal, e.g. `{ \"targetTag\": \"gull\" }`.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1
+            },
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          },
+          "points": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "description": "Added to the actor."
+          },
+          "note": {
+            "description": "A note for writers; never shown to players.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "event",
+          "points"
+        ],
+        "additionalProperties": false,
+        "description": "Turns a matching event into points for the actor who caused it."
+      },
+      "description": "How events turn into points."
+    },
+    "finish": {
+      "type": "object",
+      "properties": {
+        "firstTo": {
+          "description": "Ends the moment anyone reaches this score.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "afterTicks": {
+          "description": "Ends this many ticks after it starts.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "additionalProperties": false,
+      "description": "When it ends."
+    },
+    "win": {
+      "type": "object",
+      "properties": {
+        "placement": {
+          "default": 1,
+          "description": "Placing this high or better wins.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "effects": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"gold\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {},
+            "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+          },
+          "description": "Prizes and reputation."
+        }
+      },
+      "required": [
+        "effects"
+      ],
+      "additionalProperties": false,
+      "description": "The player placed."
+    },
+    "lose": {
+      "type": "object",
+      "properties": {
+        "effects": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"gold\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {},
+            "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+          },
+          "description": "What losing gracefully earns."
+        }
+      },
+      "required": [
+        "effects"
+      ],
+      "additionalProperties": false,
+      "description": "The player did not place, or forfeited."
+    },
+    "disqualified": {
+      "description": "The player was disqualified.",
+      "type": "object",
+      "properties": {
+        "effects": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"gold\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {},
+            "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+          },
+          "description": "On top of whatever the cheat itself costs."
+        }
+      },
+      "required": [
+        "effects"
+      ],
+      "additionalProperties": false
+    },
+    "cheats": {
+      "description": "Ways to cheat. Cheating is always possible and always has a consequence.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "event": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "description": "The sim event the rule listens for, as reported to the runner."
+          },
+          "where": {
+            "default": {},
+            "description": "Fields the event data must equal, e.g. `{ \"targetTag\": \"gull\" }`.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1
+            },
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          },
+          "when": {
+            "description": "Extra condition (logic DSL) that must hold as it happens.",
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"gold\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {}
+          },
+          "observedBy": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "creature"
+            },
+            "description": "Creatures who would catch it. The first that perceives the event does."
+          },
+          "bonusPoints": {
+            "default": 0,
+            "description": "What the cheat is worth to the player; voided on disqualification.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "detected": {
+            "type": "object",
+            "properties": {
+              "disqualify": {
+                "default": true,
+                "description": "Remove the player from the contest.",
+                "type": "boolean"
+              },
+              "effects": {
+                "description": "Applied when it is caught (a fine, a grudge).",
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The logic kind, e.g. \"gold\"."
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": {},
+                  "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                }
+              }
+            },
+            "additionalProperties": false,
+            "description": "What happens when a watcher perceives it."
+          },
+          "undetected": {
+            "type": "object",
+            "properties": {
+              "effects": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The logic kind, e.g. \"gold\"."
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": {},
+                  "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+                },
+                "description": "Applied when the contest ends and nobody caught it: cheating always has a consequence."
+              }
+            },
+            "required": [
+              "effects"
+            ],
+            "additionalProperties": false,
+            "description": "What a cheat nobody saw still costs."
+          },
+          "note": {
+            "description": "A note for writers; never shown to players.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "event",
+          "observedBy",
+          "detected",
+          "undetected"
+        ],
+        "additionalProperties": false,
+        "description": "A way to cheat, and who would notice."
+      }
+    },
+    "betting": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "description": "Who runs the book.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-contentRef": "creature"
+        },
+        "onPlayer": {
+          "description": "A stake on the player winning, paid at fixed odds.",
+          "type": "object",
+          "properties": {
+            "minStake": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "maxStake": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "odds": {
+              "type": "object",
+              "properties": {
+                "numerator": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "denominator": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "numerator",
+                "denominator"
+              ],
+              "additionalProperties": false,
+              "description": "Winnings are stake x numerator / denominator (rounded down), plus the stake back."
+            }
+          },
+          "required": [
+            "minStake",
+            "maxStake",
+            "odds"
+          ],
+          "additionalProperties": false
+        },
+        "throwMatch": {
+          "description": "The book pays the player to lose.",
+          "type": "object",
+          "properties": {
+            "payout": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"gold\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {},
+                "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+              },
+              "description": "Applied when the player loses (a clean loss)."
+            },
+            "grudge": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The logic kind, e.g. \"gold\"."
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": {},
+                "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+              },
+              "description": "Applied when the player wins, or is disqualified, instead."
+            }
+          },
+          "required": [
+            "payout",
+            "grudge"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "book"
+      ],
+      "additionalProperties": false,
+      "description": "The betting book."
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "entry",
+    "participants",
+    "scoring",
+    "finish",
+    "win",
+    "lose"
+  ],
+  "additionalProperties": false,
+  "description": "A contest."
+}

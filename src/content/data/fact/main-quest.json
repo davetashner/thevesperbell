@@ -8,7 +8,7 @@
       "key": "briar-glen.arrived",
       "type": "bool",
       "default": false,
-      "description": "The player has arrived in Briar Glen on the mountain road at dusk (bible 4.1 beat 1). Starts the main quest. Written by the arrival scene (follow-up).",
+      "description": "The player has arrived in Briar Glen on the mountain road at dusk (bible 4.1 beat 1). Starts the main quest. Written by the briar-glen-arrival signal graph (scene briar-glen-lane, mw-e39.38).",
       "owner": "scene"
     },
     {

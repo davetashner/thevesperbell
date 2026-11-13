@@ -1,0 +1,15 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-13-bay-nine-seals",
+  "notes": "Bible 6.2: the bonded-warehouse seal that customs never cracks; leads to The Crate for Mr. S— (bible 6.1 quest 6). Nell tells it in nell-drowned-gull.",
+  "region": "harbour",
+  "source": ["npc-nell"],
+  "sourceTags": ["tidemarket"],
+  "truth": "true",
+  "target": "place-bay-nine",
+  "text": "Vane crates go into bay nine and customs never cracks a seal. Funny, that.",
+  "secondHand": {
+    "teller": "npc-dot",
+    "text": "Barge folk say Vane's crates go into some bay nine down at Wendmouth and customs never cracks a seal. Funny, that."
+  }
+}

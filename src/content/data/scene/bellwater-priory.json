@@ -956,6 +956,11 @@
       "tags": ["region", "tower"]
     }
   ],
+  "signals": [
+    {
+      "graph": "belfry-deck"
+    }
+  ],
   "transitions": [
     {
       "id": "road-gate",
