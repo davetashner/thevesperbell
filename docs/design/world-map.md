@@ -100,15 +100,15 @@ flowchart LR
     lockkeepers_cottage["The lock-keeper's cottage"]
   end
   subgraph wendmouth["Wendmouth (optional)"]
-    stone_wharf["The Stone Wharf"]
-    tidemarket["The Tidemarket"]
-    customs_house["The Customs House"]
-    bonded_warehouse["The Bonded Warehouse"]
-    drowned_gull["The Drowned Gull"]
-    undertow["The Undertow"]
-    net_lofts["The Net Lofts and rooftops"]
-    gilded_tern["The Gilded Tern"]
-    breakwater["The Breakwater"]
+    stone_wharf["The Stone Wharf"]:::built
+    tidemarket["The Tidemarket"]:::built
+    customs_house["The Customs House"]:::built
+    bonded_warehouse["The Bonded Warehouse"]:::built
+    drowned_gull["The Drowned Gull"]:::built
+    undertow["The Undertow"]:::built
+    net_lofts["The Net Lofts and rooftops"]:::built
+    gilded_tern["The Gilded Tern"]:::built
+    breakwater["The Breakwater"]:::built
   end
   slice_vestibule --- mountain_road
   mountain_road --- valley_mid
@@ -311,15 +311,15 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `weeping-adit-mouth` | The Weeping Adit (river mouth) | river | e25 | planned | Where the Wend springs from the hill, a flooded drainage tunnel (bible 3.1, mw-e25.13). |
 | `kestrel-lock` | Kestrel Lock | river | e25 | planned | Lock on the towpath and barge route (bible 3.1, mw-e25.14). |
 | `lockkeepers-cottage` | The lock-keeper's cottage | river | e25 | planned | Across the lock gates (bible 3.5). |
-| `stone-wharf` | The Stone Wharf | wendmouth | e40 | planned | Barge landing and hub of the harbour (bible 3.6, mw-e40.2). |
-| `tidemarket` | The Tidemarket | wendmouth | e40 | planned | Covered import market (bible 3.6). |
-| `customs-house` | The Customs House | wendmouth | e40 | planned | Columned hall; Inspector Cray (bible 3.6). |
-| `bonded-warehouse` | The Bonded Warehouse | wendmouth | e40 | planned | Vaulted export bays; bay nine (bible 3.6). |
-| `drowned-gull` | The Drowned Gull | wendmouth | e40 | planned | Tavern on the breakwater end (bible 3.6). |
-| `undertow` | The Undertow | wendmouth | e40 | planned | Black market beneath the fish market (bible 3.6). |
-| `net-lofts` | The Net Lofts and rooftops | wendmouth | e40 | planned | Continuous waterfront roof route (bible 3.6). |
-| `gilded-tern` | The Gilded Tern | wendmouth | e40 | planned | Three-masted merchantman in the pool (bible 3.6). |
-| `breakwater` | The Breakwater | wendmouth | e40 | planned | Wall of rejected blocks; sunken figurehead (bible 3.6). |
+| `stone-wharf` | The Stone Wharf | wendmouth | e40 | `wendmouth-harbour` | Barge landing and hub of the harbour (bible 3.6, mw-e40.2). Built (mw-e40.1): the open flagstone quay (player-start, Tidefair ground, crane piers, block yards, the sealed Silver Quay gate at its east end) with the Great Stair down to the barge berth. |
+| `tidemarket` | The Tidemarket | wendmouth | e40 | `wendmouth-harbour` | Covered import market (bible 3.6). Built (mw-e40.1): a covered hall open to the wharf, stalls, the arms stall and the book cart as markers; content is mw-e40.10. |
+| `customs-house` | The Customs House | wendmouth | e40 | `wendmouth-harbour` | Columned hall; Inspector Cray (bible 3.6). Built (mw-e40.1): the columned hall, Cray's office, a locked strongroom and a roof reachable from the net lofts; content is mw-e40.3. |
+| `bonded-warehouse` | The Bonded Warehouse | wendmouth | e40 | `wendmouth-harbour` | Vaulted export bays; bay nine (bible 3.6). Built (mw-e40.1): two doors, nine bays with bay nine sealed, a skylit roof with a rough climb on its north face; content is mw-e40.4. |
+| `drowned-gull` | The Drowned Gull | wendmouth | e40 | `wendmouth-harbour` | Tavern on the breakwater end (bible 3.6). Built (mw-e40.1): the bar, arm-wrestling and dice tables, and the cellar stair to the Undertow behind a locked door; content is mw-e40.6. |
+| `undertow` | The Undertow | wendmouth | e40 | `wendmouth-harbour` | Black market beneath the fish market (bible 3.6). Built (mw-e40.1): the vault 4 m below the fish market and a tunnel under the breakwater, entered only through two locked doors (the harbour-wall stair and the Gull cellar); content is mw-e40.12. |
+| `net-lofts` | The Net Lofts and rooftops | wendmouth | e40 | `wendmouth-harbour` | Continuous waterfront roof route (bible 3.6). Built (mw-e40.1): three timber lofts, roofs joined by planks and stairs to the Customs House roof; the way up is a rough-stone climb; content is mw-e40.13. |
+| `gilded-tern` | The Gilded Tern | wendmouth | e40 | `wendmouth-harbour` | Three-masted merchantman in the pool (bible 3.6). Built (mw-e40.1): the ship at anchor off the wharf, gangway behind a locked gate, deck, rigging climb, cabin and locked berth; content is mw-e40.14. |
+| `breakwater` | The Breakwater | wendmouth | e40 | `wendmouth-harbour` | Wall of rejected blocks; sunken figurehead (bible 3.6). Built (mw-e40.1): a block wall running north from the quay to the Gull, with the sea-door and sunken-figurehead markers; content is mw-e40.15. |
 
 ## Edges
 
@@ -471,6 +471,15 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `deepworks` | `vane-sealed-gallery` | none (a marker spawn two levels down; mw-e26.4 builds its content and the seal) |
 | `deepworks` | `breach` | none (a marker spawn and the breach-threshold stub; mw-e26.9 builds the Outer Ring and the transition) |
 | `deepworks` | `lower-deepworks` | none (a marker spawn; the Weeping Adit arrives beyond the channel, mw-e25.13) |
+| `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; debug entry ?scene=wendmouth-harbour until the river legs exist, mw-e40.26) |
+| `wendmouth-harbour` | `tidemarket` | none (a marker spawn; walked inside the scene) |
+| `wendmouth-harbour` | `customs-house` | none (a marker spawn; walked inside the scene) |
+| `wendmouth-harbour` | `bonded-warehouse` | none (a marker spawn; walked inside the scene) |
+| `wendmouth-harbour` | `drowned-gull` | none (a marker spawn; walked inside the scene) |
+| `wendmouth-harbour` | `undertow` | none (a marker spawn; behind two locked doors, the harbour-wall stair door and the Gull cellar door; mw-e40.12 opens them) |
+| `wendmouth-harbour` | `net-lofts` | none (a marker spawn; a marker on the roofs; climbers only) |
+| `wendmouth-harbour` | `gilded-tern` | none (a marker spawn; a marker aboard; the gangway gate is locked, mw-e40.14) |
+| `wendmouth-harbour` | `breakwater` | none (a marker spawn; walked inside the scene) |
 
 Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `brazier-hall`, `combat-sandbox` and so on) are not part of the world; the puzzle rooms are placed into the dungeon by E26 (mw-e26.15) and will gain nodes then.
 

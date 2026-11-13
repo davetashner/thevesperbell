@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "tern-gangway",
+  "name": "Gilded Tern gangway gate",
+  "notes": "The gate at the head of the Gilded Tern's gangway (mw-e40.1, route is mw-e40.14): Captain Hesketh's crew keep it until the debt of honour or the crew deal opens it (hesketh.gangway-open). Tier 3, cannot be picked.",
+  "tier": 3,
+  "pickTier": null,
+  "hint": "The crew keep the gangway. Ask the Captain."
+}
