@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-duggan-instructions",
+  "title": "Instructions for Duggan",
+  "author": "Harrow Vane",
+  "notes": "Bible 7.5: Duggan's planting instructions. Vane's own hand to his foreman; the 40 brass trinkets match the foundry invoice. Burn-after-reading, which Duggan did not.",
+  "locations": ["place-vane-house", "place-deepworks"],
+  "pages": [
+    {
+      "text": "Duggan.\n\nThe brass is in the blue chest. Forty pieces, goblin pattern. Place them where the Watch will find them and not all in one place: a few at the fletchery wall, a few by the well, the rest in the lower yard of the forge. Do it at night. Do not be seen.\n\nIt is for the town. If the town has someone to be angry at, it will not look at the mine.\n\nBurn this.\n\nH. V."
+    }
+  ]
+}

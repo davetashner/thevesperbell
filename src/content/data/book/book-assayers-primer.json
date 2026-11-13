@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-assayers-primer",
+  "title": "The Imperial Assayer's Primer",
+  "author": "Ludovic Marrow, assayer",
+  "notes": "Extra shelf book: the silver, the crown and the Measure (3.2, 3.4). Shows the empire only through paper and weight, as the bible asks.",
+  "locations": ["place-customs-house", "place-vane-house"],
+  "pages": [
+    {
+      "text": "Silver is struck into crowns at the imperial mint, and every crown carries the weight of the empire on its face. The Measure is the yearly quantity of silver owed under a warrant, reckoned by the assayer and sealed by the Inspector.\n\nAssay the Glen silver at the seam, at the winch house and at the quay. If the three weights disagree, assume the quay is wrong, the winch house is cheating and the seam is honest.\n\nA crown of Glen silver is whiter than any other. Hold it to a candle and the flame will lean toward it. This is a trick of the eye, and the assayer must not mention it to the mine owner, who is already convinced."
+    }
+  ]
+}

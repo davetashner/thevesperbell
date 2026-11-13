@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-kestrel-lock-toll-board",
+  "title": "Kestrel Lock Toll Board",
+  "notes": "Bible 7.2: painted, flaking. Old Reed takes gossip in lieu (5.14).",
+  "locations": ["place-kestrel-lock"],
+  "pages": [
+    {
+      "text": "Stone barge, laden: 2 pennies.\nStone barge, empty: 1 penny.\nSilver barge: by imperial warrant.\nPleasure craft: 5 pennies.\nGossip accepted in lieu at keeper's discretion."
+    }
+  ]
+}

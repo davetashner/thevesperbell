@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-vane-panegyric",
+  "title": "The Vanes of the Deepworks",
+  "author": "Printed for the house of Vane",
+  "notes": "Extra shelf book: a flattering family history that contradicts the Ledger (bible 7.1: three sources that disagree). Five generations (11.3), the silver strike; leaves out the Bell Line.",
+  "locations": ["place-vane-house", "place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "In five generations the house of Vane has raised the Deepworks from a quarry to a pillar of the empire. Each has added a gallery, a hall or a chapel.\n\nThe silver, struck by the grandfather of the present master, has made the barony the envy of its neighbours and the empire the master of its own. The valley has never been richer; the cutters have never been paid better.\n\nOf the lower galleries nothing need be said. The house keeps the old Rule with piety, and where the Rule forbids digging, the house digs nowhere.\n\nThe present master, Harrow Vane, is a man of the highest character. The printer was very clear on this point."
+    }
+  ]
+}

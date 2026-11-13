@@ -1,0 +1,12 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-sleepwalker-scrawl-cistern",
+  "title": "A scrawl in the cistern",
+  "notes": "A second sleepwalker's mark, in the town well cistern (3.1 loop), reinforcing the mine scrawl.",
+  "locations": ["place-glen-well"],
+  "pages": [
+    {
+      "text": "dont wake me dont wake me i am almost at the end of it"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "$comment": "The lore map (mw-e39.13, bible 7.1: three sources that disagree). For each major canon fact, the in-world sources that speak of it: a book, an object (note or inscription) and a person (dialogue), each at least once and at least three in all. `pattern` is a case-insensitive regular expression the source's text must match, so a source cannot be listed without actually mentioning the fact. lore-map.test.ts checks it (AC-4).",
+  "topics": {
+    "long-vespers": {
+      "label": "The Long Vespers: the night the bell was silenced and the priory walked into the Knot",
+      "pattern": "long vespers|bell stopped|matter at bellwater|take out the tongue",
+      "sources": [
+        { "kind": "book", "id": "book-abbots-letters" },
+        { "kind": "book", "id": "book-folk-cures-sleep" },
+        { "kind": "book", "id": "book-lantern-court-register" },
+        { "kind": "object", "id": "inscription-lychgate-graves" },
+        { "kind": "person", "id": "abbot-cradle" }
+      ]
+    },
+    "horn": {
+      "label": "Horn's role: the Warden of the Knot, who stays awake so the valley can sleep",
+      "pattern": "warden|\\box\\b",
+      "sources": [
+        { "kind": "book", "id": "book-ox-beneath-the-hill" },
+        { "kind": "book", "id": "book-hornfolk-hand" },
+        { "kind": "object", "id": "inscription-standing-horn" },
+        { "kind": "person", "id": "horn-warden" }
+      ]
+    },
+    "bell": {
+      "label": "The Vesper Bell: rung at dusk, its note quiets what sleeps below",
+      "pattern": "\\bbell\\b",
+      "sources": [
+        { "kind": "book", "id": "book-vesperine-hours" },
+        { "kind": "book", "id": "book-keepers-log" },
+        { "kind": "object", "id": "inscription-vesper-bell" },
+        { "kind": "object", "id": "inscription-bell-line-marker" },
+        { "kind": "person", "id": "oswin-forge" }
+      ]
+    }
+  }
+}

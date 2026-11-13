@@ -21,6 +21,7 @@ import { checkCreatureAudio } from './creature-audio-checks.ts';
 import { checkConditions } from './condition-checks.ts';
 import { checkDialogues } from './dialogue-checks.ts';
 import { checkFacts } from './fact-checks.ts';
+import { checkReadables } from './readable-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
 import { checkSpellStatuses } from './spell-status-checks.ts';
 import { checkWeakpoints } from './weakpoint-checks.ts';
@@ -91,6 +92,7 @@ import { checkUnlocks, unlockSchema } from './types/unlock.ts';
 import { vfxCueSheetSchema } from './types/vfx-cue-sheet.ts';
 import { vfxEffectSchema } from './types/vfx-effect.ts';
 import { worldSchema } from './types/world.ts';
+import { bookTextSchema, inscriptionSchema, noteSchema } from './types/readable.ts';
 
 /** Content type name → schema of one entry. */
 export const contentTypes = {
@@ -100,6 +102,7 @@ export const contentTypes = {
   arrow: arrowSchema,
   attack: attackSchema,
   behaviour: behaviourSchema,
+  book: bookTextSchema,
   bow: bowSchema,
   breakable: breakableSchema,
   camera: cameraSchema,
@@ -118,6 +121,7 @@ export const contentTypes = {
   faction: factionSchema,
   game: gameSchema,
   'hit-stop': hitStopSchema,
+  inscription: inscriptionSchema,
   item: itemSchema,
   kit: kitSchema,
   lock: lockSchema,
@@ -128,6 +132,7 @@ export const contentTypes = {
   merchant: merchantSchema,
   move: moveSchema,
   navmesh: navmeshSchema,
+  note: noteSchema,
   prefab: prefabSchema,
   puzzle: puzzleSchema,
   quest: questSchema,
@@ -183,6 +188,7 @@ export const contentChecks: readonly ContentCheck[] = [
   checkSpellVfx,
   checkWeakpoints,
   checkWorld,
+  checkReadables,
 ];
 
 export type ContentTypes = typeof contentTypes;
