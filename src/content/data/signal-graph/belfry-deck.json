@@ -1,0 +1,20 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "belfry-deck",
+  "name": "Belfry deck",
+  "notes": "The deck of the belfry tower in the bellwater-priory scene (mw-e39.38). The player-filtered volume `belfry` is the main quest's area `belfry`: entering it completes visit-the-priory and, in the climb stages, the climb objectives (the quest remembers an early visit and credits it when the climb stage starts). Reached by the interior stair, the south free-climb or the roped parapet; the Sounding Shaft climb from below is mw-e26.18.",
+  "nodes": [
+    {
+      "id": "belfry",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 85, "y": 10, "z": 73 },
+        "halfExtents": { "x": 3, "y": 1.5, "z": 3 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    }
+  ],
+  "wires": []
+}
