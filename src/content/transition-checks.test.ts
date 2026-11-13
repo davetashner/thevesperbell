@@ -124,6 +124,7 @@ describe('the walkable world (mw-e01.11)', () => {
       'briarwood',
       'moorings-watch',
       'bellwater-priory',
+      'deepworks',
       'marsh-store',
       'sleeping-ox',
     ];
