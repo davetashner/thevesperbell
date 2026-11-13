@@ -1042,6 +1042,60 @@ describe('quest runtime: installation and host', () => {
   });
 });
 
+describe('quest runtime: haveItem objectives (mw-e23.3)', () => {
+  const have = (latch: boolean) =>
+    quest({
+      objectives: [
+        objective('key', {
+          kind: 'haveItem',
+          params: { item: { id: 'silver-key' }, count: 1, latch },
+        }),
+      ],
+    });
+  const hold = (s: Setup, item: string, delta: number): void => {
+    if (delta > 0) s.host.giveItem(item, delta);
+    else s.host.takeItem(item, -delta);
+    s.runtime.notifyItem(item);
+    s.runtime.settle();
+  };
+
+  it('AC-2: completes when the item is acquired and reverts when it is dropped', () => {
+    const s = started([have(false)]);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('active');
+    hold(s, 'silver-key', 1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+    hold(s, 'silver-key', -1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('active');
+    hold(s, 'silver-key', 1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+  });
+
+  it('AC-2: with latch the objective stays complete after the item is gone', () => {
+    const s = started([have(true)]);
+    hold(s, 'silver-key', 1);
+    hold(s, 'silver-key', -1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+  });
+
+  it('counts a stack, and an item held when the quest starts completes at once', () => {
+    const two = quest({
+      objectives: [
+        objective('key', {
+          kind: 'haveItem',
+          params: { item: { id: 'bone' }, count: 2, latch: false },
+        }),
+      ],
+    });
+    const s = setup([two]);
+    s.host.giveItem('bone', 1);
+    s.runtime.startQuest('q');
+    s.runtime.settle();
+    expect(s.runtime.objectiveState('q', 'key')).toBe('active');
+    hold(s, 'bone', 1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+  });
+});
+
 describe('quest dependency index', () => {
   it('collects what every built-in condition kind reads, through combinators', () => {
     const deps = emptyDependencies();

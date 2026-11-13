@@ -98,6 +98,9 @@ interface ObjectiveMeta {
   readonly key: string;
   /** For `fact` objectives: what to watch. */
   readonly watch: { readonly fact: string; readonly value: FactValue } | undefined;
+  /** For `haveItem` objectives: the stack to hold, and whether reaching it is permanent. */
+  readonly holds:
+    { readonly item: string; readonly count: number; readonly latch: boolean } | undefined;
 }
 
 interface QuestMeta {
@@ -222,7 +225,16 @@ export class QuestRuntime implements QuestOps {
           ? { fact: objective.params.fact, value: objective.params.value }
           : undefined;
       if (watch !== undefined) deps.facts.add(watch.fact);
-      return { def: objective, key: questObjectiveFactKey(def.id, objective.id), watch };
+      const holds =
+        objective.kind === 'haveItem'
+          ? {
+              item: objective.params.item.id,
+              count: objective.params.count,
+              latch: objective.params.latch,
+            }
+          : undefined;
+      if (holds !== undefined) deps.items.add(holds.item);
+      return { def: objective, key: questObjectiveFactKey(def.id, objective.id), watch, holds };
     });
     for (const stage of def.stages) for (const t of stage.transitions) need(t.when);
     for (const resolution of def.resolutions) need(resolution.when);
@@ -501,16 +513,21 @@ export class QuestRuntime implements QuestOps {
     return evaluateLogic(condition, this.host, this.registry);
   }
 
-  /** Recomputes which objectives are active and completes `fact` objectives whose fact holds. */
+  /** Recomputes which objectives are active and completes `fact` and `haveItem` objectives that hold. */
   private refreshObjectives(meta: QuestMeta): void {
     const stage = this.read(meta.stageKey);
     for (const o of meta.objectives) {
-      if (CLOSED.has(this.read(o.key) as string)) continue;
+      const now = this.read(o.key) as string;
+      // A held-item objective that is not latched follows the stack: complete while held, active again after.
+      const follows = now === 'complete' && o.holds !== undefined && !o.holds.latch;
+      if (CLOSED.has(now) && !follows) continue;
       const active =
         (o.def.stage === undefined || o.def.stage === stage) &&
         (o.def.activeWhen === undefined || this.holds(o.def.activeWhen));
       const done =
-        active && o.watch !== undefined && this.facts.get(o.watch.fact) === o.watch.value;
+        active &&
+        ((o.watch !== undefined && this.facts.get(o.watch.fact) === o.watch.value) ||
+          (o.holds !== undefined && this.host.itemCount(o.holds.item) >= o.holds.count));
       this.setObjective(meta, o, done ? 'complete' : active ? 'active' : 'inactive');
     }
   }

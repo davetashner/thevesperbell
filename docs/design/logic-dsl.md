@@ -28,7 +28,8 @@ evaluate it over the context's facts, so a fact means one thing everywhere.
 
 ## Effects
 
-`setFact`, `giveItem`, `takeItem`, `gold` (`delta`), `disposition` (`npc`, `delta`), `startQuest`,
+`setFact`, `giveItem`, `takeItem`, `deliverItem` (`item`, `npc`, `count`: takes the item and announces
+the hand-over for `deliverItem` quest objectives), `gold` (`delta`), `disposition` (`npc`, `delta`), `startQuest`,
 `completeObjective`, `resolveQuest` (optional `resolution`), `failQuest`, `learnCapability`, `emit`
 (`event`, scalar `data`) and `revealRumor`. A batch is **atomic**: `applyLogicEffects(effects, host)` opens
 a checkpoint, applies in order, and on the first refusal (or throw) rolls everything back and returns

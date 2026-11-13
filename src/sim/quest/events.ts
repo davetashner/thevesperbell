@@ -46,3 +46,22 @@ export const QuestObjectiveChanged = defineEvent<QuestObjectiveEvent>('quest.obj
 export const QuestResolved = defineEvent<QuestResolvedEvent>('quest.resolved');
 export const QuestFailed = defineEvent<QuestFailedEvent>('quest.failed');
 export const QuestRefused = defineEvent<QuestRefusedEvent>('quest.refused');
+
+/** Where a creature ended up, for `entityState` quest objectives (mw-e23.3). */
+export interface CreatureOutcomeEvent {
+  /** The creature's content id (not the entity). */
+  readonly creature: string;
+  readonly state: 'dead' | 'befriended' | 'fled' | 'subdued';
+  /**
+   * It is out of the way for good (fled for good, subdued and bound, befriended into leaving):
+   * `entityState` objectives waiting for `removed` complete on it.
+   */
+  readonly gone: boolean;
+}
+
+/**
+ * Emit it when a creature is removed from play by any means that is not a death (death is read from
+ * `Died`; befriending from the disposition band): a flee that does not come back, a sleep spell that
+ * holds, a trapdoor. Quests only listen; emitters need not know them.
+ */
+export const CreatureOutcome = defineEvent<CreatureOutcomeEvent>('creature.outcome');

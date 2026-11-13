@@ -21,6 +21,7 @@ import {
   type LogicHost,
   type QuestRuntime,
 } from '@sim/index';
+import { bindQuestObjectives } from './bindings';
 import { createGameLogicHost, type GameLogicHostOptions } from './host';
 
 /** The content's quests, in file order. Content entries are deeply readonly; the runtime never writes them. */
@@ -79,5 +80,6 @@ export function installGameLogic(
   world.events.on(capabilityLost, ({ capability }) => {
     runtime.notifyCapability(capability);
   });
+  bindQuestObjectives(world, runtime, { player: options.player });
   return remember(world, { host: runtime.host, quests: runtime });
 }
