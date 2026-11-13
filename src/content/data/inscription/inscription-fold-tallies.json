@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-fold-tallies",
+  "title": "Chalk tallies in the Fold",
+  "notes": "Bible 7.5: chalk tallies in the Fold, Horn counting the sleepers. Six strokes then a seventh in a smaller hand. The player's rescues are added later by the Fold work (mw-e39 follow-up), not here.",
+  "locations": ["place-fold"],
+  "pages": [
+    {
+      "text": "(On the stone by the door, in chalk: five strokes and a sixth, counted over and over until the chalk has gone through the stone. Beneath, in a smaller, steadier hand:)\n\nOne more tonight."
+    }
+  ]
+}

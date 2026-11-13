@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-wend-pilot",
+  "title": "The Wend: A Bargeman's Pilot",
+  "author": "Tobias Garrow, bargemaster",
+  "notes": "Extra shelf book: the river route (3.1, 11.3 barge journey 1 day downriver, 2 up). Millweir bell-mark luck, Kestrel Lock tolls.",
+  "locations": ["place-river-wend", "place-kestrel-lock", "place-briar-glen-quay"],
+  "pages": [
+    {
+      "text": "From the quay at Briar Glen to the harbour at Wendmouth is a day downriver and two days up, towed, with the horses on the towpath and the bargemaster on the tiller. Do not hurry it.\n\nThe Millweir is the first danger. Cross it on the sluice walk, and touch the bell-mark on the keystone for luck. Every bargeman does. The monks built the weir, and nobody remembers why a bell is on it, only that the barges that touch it come home.\n\nAt Kestrel Lock pay the toll, and pay it in coin if you can. The keeper will take gossip, but he tends to keep the better stories.\n\nTie up before dark. The river is quiet at night, and it is the wrong kind of quiet."
+    }
+  ]
+}

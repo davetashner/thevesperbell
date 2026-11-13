@@ -1,0 +1,17 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-keepers-log",
+  "title": "Keeper's Log, Mooring's Watch",
+  "author": "Sergeant Aldric Mooring",
+  "notes": "Bible 7.2: watchtower book; Mooring died at his post (11.3: Mooring's Watch abandoned ~40 years ago). Damaged by damp. Lore: the silent bell from a soldier's ear, the Hollow Sentinels in their earliest form.",
+  "locations": ["place-mooring-watch"],
+  "pages": [
+    {
+      "text": "Day 1 alone. The garrison marched out at dawn under orders. I was told to follow. I did not.\n\nDay 12 alone. No traffic on the road. Still no bell from the priory; the hill has been quiet of it all my years here, and the quiet is not the restful kind.\n\nDay 31 alone. [illegible] the lamp oil is [illegible]. Spoke to the men on the stairs today. They do not mind."
+    },
+    {
+      "text": "Day 39 alone. The wind carries a singing from the east on still nights. I stop my ears with wax and keep the watch.\n\nDay 40 alone. Wrote the men's names on their armour stands so I'd remember. Gave the stands the order. Foolish. They seemed to listen.\n\n[missing]"
+    }
+  ],
+  "damaged": true
+}

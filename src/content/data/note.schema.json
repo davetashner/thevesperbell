@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "`note-<slug>`; for a book, the id of its inventory item."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "Title on the cover (at most 40 characters, as the item's), or heading of a note or inscription (at most 60)."
+    },
+    "author": {
+      "description": "Who wrote it, in the world; required for a book, optional for the others.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Author-facing: bible section it comes from, who it contradicts, what it hints."
+    },
+    "locations": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^place-[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "description": "Where it can be found: one or more glossary place ids (at least one)."
+    },
+    "pages": {
+      "minItems": 1,
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The page as the reader shows it; plain text, paragraphs split by a blank line."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "description": "One page of a readable."
+      },
+      "description": "The text, in page order; a note or inscription is usually one page."
+    },
+    "damaged": {
+      "default": false,
+      "description": "True exactly when the text carries `[illegible]` or `[missing]` markers.",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "notes",
+    "locations",
+    "pages"
+  ],
+  "additionalProperties": false,
+  "description": "A loose note, letter or notice (mw-e39.13)."
+}

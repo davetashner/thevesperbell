@@ -1,0 +1,23 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-ox-beneath-the-hill",
+  "title": "The Ox Beneath the Hill",
+  "author": "Written down by Marigold Teague",
+  "notes": "Bible 7.2: children's book, Tansy's copy; the last page is torn out (damaged-book convention, AC-5). Horn source for the valley's children: the ox is Brother Horn. The skipping rhyme of 3.2.",
+  "locations": ["place-pells-bakery", "place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "The ox beneath the hill has a very big door and a very small light, and he stays awake so we can sleep."
+    },
+    {
+      "text": "He has horns like two moons going down, and a voice like a cart a long way off. When the wind is wrong he hums, and the hill hums back."
+    },
+    {
+      "text": "If you hear a song in the night, do not follow it. Pull the blanket over your ears, like the ox, and count the stairs to your bed. One, two, three.\n\n(Inside the cover, in crayon: TANSY PELL HER BOOK. Someone has drawn a bow on the ox.)"
+    },
+    {
+      "text": "[missing]"
+    }
+  ],
+  "damaged": true
+}

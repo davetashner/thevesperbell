@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-cargo-manifest",
+  "title": "Cargo Manifest — Gilded Tern, Bay Nine",
+  "author": "Customs clerk E. Ardley (sealed)",
+  "notes": "Bible 7.2: customs house copy. Clerk E. Ardley has been dead a year (11.3), so the seal predates a problem nobody checked; \"S— token\" is the unnamed buyer.",
+  "locations": ["place-customs-house", "place-bay-nine"],
+  "pages": [
+    {
+      "text": "Consignor: Vane Deepworks.\nContents: GLENSTONE SAMPLES, dressed, 1 crate (heavy).\nCustoms seal: No. 114, clerk E. Ardley.\nConsignee: to be collected at destination by bearer of the S— token."
+    }
+  ]
+}

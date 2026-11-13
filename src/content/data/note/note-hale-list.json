@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-hale-list",
+  "title": "Hale's List of the Missing",
+  "author": "Captain Brannoc Hale",
+  "notes": "Bible 7.5: Hale's missing-persons list, Watch House. Six names; the seventh line is left empty (Tansy walks on the first night). 3 weeks, 6 missing before the game.",
+  "locations": ["place-watch-house"],
+  "pages": [
+    {
+      "text": "MISSING, Briar Glen. For the Watch. Do not lose this.\n\n1. Moss Greaves, tanner. Left his boots by the door.\n2. Ettie Lark, milkmaid. Pails full, cow unmilked.\n3. Rowan Tate, miner. Not on the shift roll.\n4. Harlan Burr, miner. Ditto.\n5. Mina Coles, schoolteacher. Slate unwiped.\n6. Fitch, barman at the Sleeping Ox. Barrel left running.\n\nThree weeks. Six beds gone cold.\n\n7.\n\n(Space left. I do not like the space.)"
+    }
+  ]
+}
