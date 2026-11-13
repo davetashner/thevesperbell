@@ -4,7 +4,7 @@
 //
 // The runtime already completes `fact` objectives from facts and `haveItem` objectives from the
 // inventory (it re-evaluates when `notifyItem` fires). This file covers the kinds that are one-shot
-// happenings, by completing the matching ACTIVE objectives of the active quests, which is idempotent:
+// happenings, by reporting each happening to `QuestRuntime.observe`, which is idempotent:
 //   enterArea        the player enters a trigger volume whose node id (or graph id) is the area
 //   talkTo           a dialogue with the NPC starts
 //   dialogueNode     the node of the dialogue is visited
@@ -14,8 +14,8 @@
 //   entityState      the creature dies (`Died`), is befriended (disposition band), or an emitter
 //                    publishes `CreatureOutcome`; `removed` completes on any outcome that leaves
 //                    it gone, so stealth, diplomacy and magic count as much as a sword
-// An objective that is not active when its event happens does not remember it (the event is gone);
-// state-shaped kinds (facts, items) do catch up.
+// An objective that is not active yet when its event happens remembers it in a saved fact
+// (`QuestRuntime.observe`, mw-e23.12) and completes when it becomes active, as facts and items do.
 
 import type { QuestObjective } from '@content/types/quest';
 import {
@@ -44,11 +44,9 @@ type EntityStateName = Extract<QuestObjective, { kind: 'entityState' }>['params'
 
 const FRIENDLY = NPC_BANDS.indexOf('friendly');
 
-/** Completes every active objective of `runtime` that `matches`. */
+/** Reports the happening to the runtime: active objectives complete, later ones remember it. */
 function complete(runtime: QuestRuntime, matches: (objective: QuestObjective) => boolean): void {
-  for (const { quest, objective } of runtime.activeObjectives()) {
-    if (matches(objective)) runtime.completeObjective(quest, objective.id);
-  }
+  runtime.observe(matches);
 }
 
 /** Subscribes the objective bindings on `world`; returns the function that unsubscribes them. */
