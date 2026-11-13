@@ -2108,7 +2108,7 @@
     },
     {
       "id": "npc-mags",
-      "at": [-9.5, -2.0, 106.0],
+      "at": [-9.5, -1.75, 106.0],
       "yaw": 90,
       "tags": ["npc", "barge"],
       "creature": "npc-mags",
