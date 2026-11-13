@@ -1124,3 +1124,78 @@ describe('quest dependency index', () => {
     expect(unknown.polled).toBe(true);
   });
 });
+
+describe('quest runtime: observe (events before their stage, mw-e23.12)', () => {
+  const staged = () =>
+    quest({
+      stages: [
+        { id: 'early', transitions: [{ when: fact('q.go'), stage: 'late' }] },
+        { id: 'late' },
+      ],
+      objectives: [
+        objective('now', { params: { event: 'a' } }),
+        objective('later', { stage: 'late', params: { event: 'a' } }),
+        objective('other', { stage: 'late', params: { event: 'b' } }),
+        objective('fact', {
+          kind: 'fact',
+          stage: 'late',
+          params: { fact: 'q.f', value: true },
+        }),
+      ],
+    });
+  const isA = (o: { kind: string; params: unknown }) =>
+    o.kind === 'event' && (o.params as { event: string }).event === 'a';
+  const state = (s: Setup, id: string) => s.runtime.objectiveState('q', id);
+
+  it('AC-1: an active objective completes now and writes no seen fact', () => {
+    const s = started([staged()]);
+    s.runtime.observe(isA);
+    expect(state(s, 'now')).toBe('complete');
+    expect(s.world.facts.get('quest.q.seen.now')).toBeUndefined();
+    // The same happening again leaves the completed objective alone.
+    s.runtime.observe(isA);
+    expect(state(s, 'now')).toBe('complete');
+    expect(s.world.facts.get('quest.q.seen.now')).toBeUndefined();
+  });
+
+  it('AC-1: an objective of a later stage remembers the event and completes on activation', () => {
+    const s = started([staged()]);
+    s.runtime.observe(isA);
+    expect(state(s, 'later')).toBe('inactive');
+    expect(s.world.facts.get('quest.q.seen.later')).toBe(true);
+    expect(s.world.facts.get('quest.q.seen.other')).toBeUndefined();
+    step(s, { 'q.go': true });
+    expect(s.runtime.stage('q')).toBe('late');
+    expect(state(s, 'later')).toBe('complete');
+    expect(state(s, 'other')).toBe('active');
+  });
+
+  it('ignores unstarted and ended quests, closed objectives and objectives of other kinds', () => {
+    const idle = setup([staged()]);
+    idle.runtime.observe(() => true);
+    expect(idle.world.facts.snapshot()).toEqual({});
+
+    const s = started([staged()]);
+    s.runtime.observe(() => true); // also matches the fact objective, which has no seen fact
+    expect(s.world.facts.get('quest.q.seen.fact')).toBeUndefined();
+    expect(s.world.facts.get('quest.q.seen.later')).toBe(true);
+    step(s, { 'q.go': true, 'q.won': true });
+    expect(state(s, 'later')).toBe('skipped');
+    const before = s.world.facts.hash();
+    s.runtime.observe(() => true);
+    expect(s.world.facts.hash()).toBe(before);
+  });
+
+  it('the remembered event is saved and survives a load', () => {
+    const a = started([staged()]);
+    a.runtime.observe(isA);
+    a.world.events.flush();
+    const b = setup([staged()]);
+    b.world.facts.prepareRestore(a.world.facts.snapshot())();
+    b.runtime.refresh();
+    b.runtime.settle();
+    expect(b.world.facts.get('quest.q.seen.later')).toBe(true);
+    step(b, { 'q.go': true });
+    expect(state(b, 'later')).toBe('complete');
+  });
+});

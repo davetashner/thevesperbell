@@ -383,3 +383,125 @@ describe('bindQuestObjectives', () => {
     expect(logic.host.objectiveState('bindings', 'gone')).toBe('complete');
   });
 });
+
+describe('events before the objective is active (mw-e23.12)', () => {
+  const crossing = (entity: EntityId) => ({
+    graph: 1 as EntityId,
+    graphId: 'mine',
+    node: 'mine-entrance',
+    entity,
+    tick: 0,
+  });
+  const talk: DialogueDef = {
+    id: 'mirela-talk',
+    speakers: [{ id: 'npc', name: 'Mirela' }],
+    entries: [{ id: 'default', node: 'hello' }],
+    nodes: [{ id: 'hello', kind: 'line', speaker: 'npc', text: 'Hello.', end: true }],
+  } as unknown as DialogueDef;
+
+  /** One objective per event-bound kind, all of stage `late`; the quest starts in `early`. */
+  function staged() {
+    const late = (id: string, kind: string, params: Record<string, unknown>) => ({
+      ...objective(id, kind, params),
+      stage: 'late',
+    });
+    const def = {
+      ...questOf([
+        late('chief', 'entityState', { creature: ref('goblin-chief'), state: 'removed' }),
+        late('area', 'enterArea', { area: 'mine-entrance' }),
+        late('talk', 'talkTo', { npc: ref('mirela') }),
+        late('node', 'dialogueNode', { dialogue: 'mirela-talk', node: 'hello' }),
+        late('cap', 'learnCapability', { capability: 'spell.ember' }),
+        late('ev', 'event', { event: 'alarm' }),
+        late('give', 'deliverItem', { item: ref('bellwort-root'), npc: ref('mirela'), count: 1 }),
+      ]),
+      stages: [
+        {
+          id: 'early',
+          transitions: [{ when: { kind: 'fact', fact: 'stage.go' }, stage: 'late' }],
+        },
+        { id: 'late', transitions: [] },
+      ],
+    } as unknown as QuestDef;
+    return { def };
+  }
+
+  function start(def: QuestDef) {
+    const world = new World<never>({ seed: 4 });
+    installFactRegistry(world.facts, content, true);
+    world.facts.declare('stage.go', { type: 'bool', default: false });
+    const player = world.spawn();
+    addInventory(world, player, 0);
+    addCapabilities(world, player);
+    world.register(CreatureComponent);
+    world.step();
+    const logic = installGameLogic(world, {
+      world,
+      player: () => player,
+      inventory,
+      capabilities,
+      quests: [def],
+    });
+    logic.quests?.startQuest('bindings');
+    const settle = (): void => {
+      world.events.flush();
+      world.step();
+    };
+    settle();
+    return { world, player, logic, settle };
+  }
+
+  function happenAll(t: ReturnType<typeof start>) {
+    const chief = t.world.spawn();
+    t.world.add(chief, CreatureComponent, {
+      origin: { creature: 'goblin-chief', at: { x: 0, y: 0, z: 0 }, facing: { x: 0, y: 0, z: 1 } },
+      behaviour: 'idle',
+      tuning: {},
+      needs: {},
+    });
+    t.world.events.emit(Died, { tick: 0, target: chief, killer: null, source: null, tags: [] });
+    t.world.events.emit(volumeEntered, crossing(t.player));
+    const dialogue = new DialogueRuntime({
+      world: t.world,
+      host: t.logic.host,
+      dialogues: (id) => (id === 'mirela-talk' ? talk : undefined),
+    });
+    dialogue.start('mirela-talk', 'mirela');
+    dialogue.advance();
+    capabilities.grant(t.world, t.player, 'spell.ember', 'learned');
+    t.logic.host.emit('alarm', {});
+    t.logic.host.emit('item-delivered', { item: 'bellwort-root', npc: 'mirela', count: 1 });
+    t.settle();
+  }
+
+  const ids = ['chief', 'area', 'talk', 'node', 'cap', 'ev', 'give'];
+
+  it('AC-1: every event-bound kind that happened in an earlier stage completes on activation', () => {
+    const t = start(staged().def);
+    happenAll(t);
+    for (const id of ids) expect(t.logic.host.objectiveState('bindings', id)).toBe('inactive');
+    t.world.facts.set('stage.go', true);
+    t.settle();
+    t.settle();
+    for (const id of ids) expect(t.logic.host.objectiveState('bindings', id)).toBe('complete');
+  });
+
+  it('AC-2: the remembered events are saved, and complete after a load', () => {
+    const def = staged().def;
+    const a = start(def);
+    happenAll(a);
+    const saved = a.world.facts.snapshot();
+    const b = start(def);
+    b.world.facts.prepareRestore(saved)();
+    b.logic.quests?.refresh();
+    b.world.facts.set('stage.go', true);
+    b.settle();
+    b.settle();
+    for (const id of ids) expect(b.logic.host.objectiveState('bindings', id)).toBe('complete');
+  });
+
+  it('AC-3: a game where nothing happened saves no remembered events', () => {
+    const t = start(staged().def);
+    expect(Object.keys(t.world.facts.snapshot()).filter((k) => k.includes('.seen.'))).toEqual([]);
+  });
+});

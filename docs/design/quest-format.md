@@ -62,8 +62,12 @@ the `params` and (mw-e23.3) the sim events the objective listens to. An unknown 
 | `learnCapability` | `capability` | the player gains it |
 | `event` | `event` | a batch's `emit` effect publishes it |
 
-Event-bound kinds complete only while the objective is active (an event that happened earlier is not
-remembered); `fact` and `haveItem` read state, so they catch up. Pair a `deliverItem` option with
+Event-bound kinds catch up too: an event that happens while the objective is not active yet (a later
+stage, an unmet `activeWhen`) but its quest is active is remembered in the saved fact
+`quest.<id>.seen.<oid>`, and the objective completes the moment it becomes active (so killing the
+chief or entering an area early still counts). The fact is written only in that case: an event for an
+objective that is active completes it directly, and play no quest cares about saves nothing. Events
+before the quest starts are not remembered. `fact` and `haveItem` read state, so they catch up. Pair a `deliverItem` option with
 `hasItem` so it shows as unavailable until the player carries the item.
 
 Prefer `entityState: removed` to `dead`, so stealth and diplomacy resolve combat-flavoured objectives.
@@ -90,7 +94,8 @@ change: if one refuses, nothing changes and the next satisfied resolution gets i
 
 State is world facts, so saves, hashes and conditions see it: `quest.<id>.state`
 (`unstarted active resolved failed`), `.stage`, `.resolution`, `.failure` and
-`quest.<id>.objective.<oid>` (`inactive active complete skipped failed`). The runtime declares them
+`quest.<id>.objective.<oid>` (`inactive active complete skipped failed`) and, for event-bound
+objectives, `quest.<id>.seen.<oid>` (see above). The runtime declares them
 when built (before a save loads) and writes none until a quest starts. Re-evaluation is incremental:
 conditions are indexed by the facts, items, capabilities and quests they read, and only dependent
 quests are evaluated; gold, time of day, disposition and unknown kinds are polled every 30 ticks.
