@@ -1,7 +1,7 @@
 name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
-# lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
+# lint, typecheck, unit, coverage-gate (aggregates the coverage-shard jobs), coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
 # e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1), dialogue-validate (mw-e22.8), narrative-lint (mw-e39.24) and puzzle-validate
 # (mw-e15.6) and size-budget (mw-e32.3) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
@@ -46,16 +46,53 @@ jobs:
     steps:
       - run: echo "Unit tests run in coverage-gate; vitest bench runs nightly (docs/ci-gates.md)."
 
-  # The only job that runs the unit and integration tests (mw-e41.2); a failing test fails it.
-  coverage-gate:
+  # The unit and integration tests run here, in 6 parallel vitest shards (mw-e41.2, mw-txg): the
+  # whole run took 13-23 min on hosted runners, sharded each job is a few minutes. A shard enforces
+  # no coverage thresholds (it sees a slice of the suite; VESPER_COVERAGE_SHARD=1 turns them off in
+  # vite.config.ts) and uploads its blob report; coverage-gate merges them. A failing test fails its shard.
+  coverage-shard:
     runs-on: ubuntu-latest
-    # The full run takes 13-20 min on hosted runners (mw-e00.39); sharding is mw-txg.
-    timeout-minutes: 30
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    env:
+      VESPER_COVERAGE_SHARD: '1'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      # Per-layer thresholds from coverage-layers.json; fails naming the file and metric.
-      - run: pnpm test:coverage
+      - run: pnpm exec vitest run --coverage --coverage.reporter=json-summary --reporter=default --reporter=blob --shard=${{ matrix.shard }}/6
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vitest-blob-${{ matrix.shard }}
+          path: .vitest/blob/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+
+  # Required aggregate (mw-txg): merges the shards' blob reports into one run, so the per-layer
+  # thresholds of coverage-layers.json are enforced once on the merged coverage and the content
+  # reporter sees every shard's tests; then the checks that read that output.
+  coverage-gate:
+    needs: coverage-shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Every coverage shard passed
+        run: test "${{ needs.coverage-shard.result }}" = success
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: vitest-blob-*
+          merge-multiple: true
+          path: .vitest/blob
+      # Per-layer thresholds from coverage-layers.json; fails naming the file and metric. Rewrites
+      # coverage/content-coverage.json from every shard's passing tests.
+      - run: pnpm test:coverage:merge
       # coverage-exclusions.md is the only source of exclusions and glue-layer gaps.
       - run: pnpm coverage:exclusions
       # Every content entry is exercised by a passing test (contract §3, mw-e00.18); reads the report
