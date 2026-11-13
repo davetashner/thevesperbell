@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
+  ITEM_DELIVERED_EVENT,
   LogicError,
   LogicRegistry,
   LogicRegistryError,
@@ -164,6 +165,21 @@ describe('effects', () => {
     expect(host.questState('mill')).toBe('unstarted');
     expect(host.emitted).toEqual([]);
     expect(host.rumors).toEqual([]);
+  });
+
+  it('mw-e23.3: deliverItem takes the stack and announces the hand-over after commit; without the item it refuses', () => {
+    const host = new MemoryLogicHost({ items: { ring: 1 } });
+    const deliver = effects([{ kind: 'deliverItem', item: 'ring', npc: 'mirela' }]);
+    expect(applyLogicEffects(deliver, host)).toEqual({ ok: true, applied: 1 });
+    expect(host.itemCount('ring')).toBe(0);
+    expect(host.emitted).toEqual([
+      { event: ITEM_DELIVERED_EVENT, data: { item: 'ring', npc: 'mirela', count: 1 } },
+    ]);
+    expect(applyLogicEffects(deliver, host)).toMatchObject({
+      ok: false,
+      reason: 'missing-item:ring',
+    });
+    expect(host.emitted).toHaveLength(1);
   });
 
   it('AC-2: a successful batch applies every effect in order and publishes after commit', () => {
@@ -526,6 +542,7 @@ describe('describe', () => {
       { kind: 'learnCapability', capability: 'swim' },
       { kind: 'emit', event: 'rang', data: { n: 1 } },
       { kind: 'revealRumor', rumor: 'cellar' },
+      { kind: 'deliverItem', item: 'a', npc: 'miller', count: 1 },
     ]);
     expect(new Set(batch.map((e) => e.kind))).toEqual(new Set(logicRegistry.effectNames()));
     for (const effect of batch) {

@@ -24,6 +24,9 @@ const factValue = z.union([z.boolean(), z.int(), z.string().min(1)]);
 const count = z.int().min(1).default(1);
 const clock = z.string().regex(CLOCK_PATTERN, 'expected a time such as "21:30"');
 
+/** The event a `deliverItem` effect emits (data: `item`, `npc`, `count`). */
+export const ITEM_DELIVERED_EVENT = 'item-delivered';
+
 export const LOGIC_COMPARISONS = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'] as const;
 export type LogicComparison = (typeof LOGIC_COMPARISONS)[number];
 const comparison = z.enum(LOGIC_COMPARISONS);
@@ -163,6 +166,22 @@ export function registerLogicBuiltins(registry: LogicRegistry): void {
     schema: z.strictObject({ item: id, count }),
     apply: (node, host) => host.takeItem(node.item, node.count),
     refs: (node) => [ref('item', node.item)],
+  });
+  registry.registerEffect({
+    kind: 'deliverItem',
+    schema: z.strictObject({ item: id, npc: id, count }),
+    // Takes the stack from the player (refusing when it is not there, so the batch changes nothing)
+    // and announces the hand-over once the batch committed: `deliverItem` quest objectives (mw-e23.3)
+    // complete on it. Pair it with `hasItem` on the option so it reads as unavailable without the item.
+    apply: (node, host, defer) => {
+      const refused = host.takeItem(node.item, node.count);
+      if (refused !== undefined) return refused;
+      defer(() => {
+        host.emit(ITEM_DELIVERED_EVENT, { item: node.item, npc: node.npc, count: node.count });
+      });
+      return undefined;
+    },
+    refs: (node) => [ref('item', node.item), ref('npc', node.npc)],
   });
   registry.registerEffect({
     kind: 'gold',
