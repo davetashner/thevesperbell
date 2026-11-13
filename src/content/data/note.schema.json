@@ -58,6 +58,15 @@
       },
       "description": "The text, in page order; a note or inscription is usually one page."
     },
+    "evidence": {
+      "description": "Evidence tags (mw-e39.23): the `evidence.*` facts that holding this text proves. Quest and dialogue conditions read the fact; the text names it so the two stay together.",
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
+      }
+    },
     "damaged": {
       "default": false,
       "description": "True exactly when the text carries `[illegible]` or `[missing]` markers.",

@@ -19,6 +19,7 @@
 
 import { z } from 'zod';
 import { contentId } from '../schema.ts';
+import { FACT_KEY_PATTERN } from './fact.ts';
 import { MAX_BOOK_PAGES, MAX_ITEM_NAME_LENGTH } from './item.ts';
 
 /** The three kinds of readable, which are also their content type names. */
@@ -120,6 +121,15 @@ function readableSchema(kind: ReadableKind) {
         .min(1)
         .max(MAX_BOOK_PAGES)
         .describe('The text, in page order; a note or inscription is usually one page.'),
+      evidence: z
+        .array(
+          z.string().regex(FACT_KEY_PATTERN, 'must be a fact key, e.g. "evidence.honest-manifest"'),
+        )
+        .min(1)
+        .optional()
+        .describe(
+          'Evidence tags (mw-e39.23): the `evidence.*` facts that holding this text proves. Quest and dialogue conditions read the fact; the text names it so the two stay together.',
+        ),
       damaged: z
         .boolean()
         .default(false)
@@ -132,6 +142,9 @@ function readableSchema(kind: ReadableKind) {
       if (!readable.id.startsWith(`${kind}-`)) issue(['id'], `a ${kind} id starts with "${kind}-"`);
       if (kind === 'book' && readable.author === undefined)
         issue(['author'], 'a book has an author');
+      if (readable.evidence?.some((key) => !key.startsWith('evidence.')) === true) {
+        issue(['evidence'], 'evidence tags are `evidence.*` facts');
+      }
       if (new Set(readable.locations).size !== readable.locations.length) {
         issue(['locations'], 'lists a location twice');
       }

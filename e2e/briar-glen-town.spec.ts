@@ -115,7 +115,7 @@ test('AC-3: the town tour visits every landmark and exits to Briarwood, the mine
 
   // Every landmark, the two road stubs included.
   for (const id of LANDMARKS) await visit(page, id);
-  expect(spawn('exit-mine-road').tags).toContain('planned:mw-e25.23');
+  expect(spawn('exit-mine-road').tags).toContain('mine-road');
   expect(spawn('exit-priory-road').tags).toContain('planned:mw-e25.25');
   await expect(app).toHaveAttribute('data-scene', 'briar-glen-green');
 

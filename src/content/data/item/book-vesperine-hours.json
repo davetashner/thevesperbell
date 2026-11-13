@@ -1,0 +1,26 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-vesperine-hours",
+  "category": "book",
+  "name": "The Vesperine Hours",
+  "description": "The Vesperine Hours, by The Vesperine Order.",
+  "notes": "Inventory item for the story book text data/book/book-vesperine-hours.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-vesperine-hours.page-<n>. Value 80 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-vesperine-hours-01",
+  "value": 80,
+  "stackable": false,
+  "book": {
+    "title": "The Vesperine Hours",
+    "author": "The Vesperine Order",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-vesperine-hours.page-1"
+      },
+      {
+        "textKey": "book.book-vesperine-hours.page-2"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "rare"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-abbots-letters",
+  "category": "book",
+  "name": "Letters of Abbot Corvin Ashgrove",
+  "description": "Letters of Abbot Corvin Ashgrove, by Abbot Corvin Ashgrove.",
+  "notes": "Inventory item for the story book text data/book/book-abbots-letters.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-abbots-letters.page-<n>. Value 90 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads. Damaged: page(s) 2 unreadable (missingPages [1]).",
+  "icon": "icon-item-book-abbots-letters-01",
+  "value": 90,
+  "stackable": false,
+  "book": {
+    "title": "Letters of Abbot Corvin Ashgrove",
+    "author": "Abbot Corvin Ashgrove",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-abbots-letters.page-1"
+      },
+      {
+        "textKey": "book.book-abbots-letters.page-2"
+      }
+    ],
+    "condition": {
+      "state": "damaged",
+      "missingPages": [1]
+    },
+    "legality": "licensed",
+    "rarity": "rare"
+  }
+}
