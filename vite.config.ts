@@ -125,7 +125,10 @@ export default defineConfig({
       reporter: ['text', 'json-summary', 'lcov'],
       reportsDirectory: 'coverage',
       // Per-layer gates (contract §3) from coverage-layers.json; the ratchet reads the same file.
-      thresholds: vitestThresholds(readLayers()),
+      // A coverage shard (CI's coverage-shard jobs, mw-txg) sees only a slice of the suite, so
+      // it must not enforce them; the merge job checks them once on the merged coverage.
+      thresholds:
+        process.env['VESPER_COVERAGE_SHARD'] === '1' ? {} : vitestThresholds(readLayers()),
     },
   },
 });
