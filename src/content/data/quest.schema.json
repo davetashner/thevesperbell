@@ -220,7 +220,7 @@
               "kind": {
                 "type": "string",
                 "const": "haveItem",
-                "description": "The player holds the item."
+                "description": "The player holds the item. Completes while held and reverts when it is lost, unless `latch`."
               },
               "params": {
                 "type": "object",
@@ -236,6 +236,11 @@
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 9007199254740991
+                  },
+                  "latch": {
+                    "default": false,
+                    "description": "Stay complete once reached, even if the item is later dropped or spent.",
+                    "type": "boolean"
                   }
                 },
                 "required": [

@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-bell-line-marker",
+  "title": "The Bell Line",
+  "notes": "Painted marker on the old gallery wall, the Bell Line itself (3.2); the Rule seen at the depth (bell source, object).",
+  "locations": ["place-deepworks"],
+  "pages": [
+    {
+      "text": "BELL LINE. GO NO LOWER. THE BELL CAN BE HEARD NO FURTHER DOWN THAN THIS."
+    }
+  ]
+}

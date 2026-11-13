@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-deepworks-ledger",
+  "title": "Deepworks Ledger",
+  "author": "Vane Deepworks, clerk's hand",
+  "notes": "Bible 7.2: Vane's gallery. The \"12 pcs\" entry is the first relic shipment (11.3). Wage and Measure lines show the debt pressure of 3.2.",
+  "locations": ["place-deepworks", "place-vane-house"],
+  "pages": [
+    {
+      "text": "Silver gallery 4: yield short again. The Measure will not be met by midwinter at this rate.\n\nHorn-coin, 12 pcs, to Mr. S— of the city. No questions. Below the Line, gallery 9: carvings. Men uneasy. Double wages.\n\nLamp oil, 40 flasks. Rope, 200 fathoms. Wages, paid. Rowan Tate and Harlan Burr both refused the lower shift; not asked a second time.\n\nFactor's letter received. Answered. Not answered well."
+    }
+  ]
+}

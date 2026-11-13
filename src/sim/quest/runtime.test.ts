@@ -1042,6 +1042,60 @@ describe('quest runtime: installation and host', () => {
   });
 });
 
+describe('quest runtime: haveItem objectives (mw-e23.3)', () => {
+  const have = (latch: boolean) =>
+    quest({
+      objectives: [
+        objective('key', {
+          kind: 'haveItem',
+          params: { item: { id: 'silver-key' }, count: 1, latch },
+        }),
+      ],
+    });
+  const hold = (s: Setup, item: string, delta: number): void => {
+    if (delta > 0) s.host.giveItem(item, delta);
+    else s.host.takeItem(item, -delta);
+    s.runtime.notifyItem(item);
+    s.runtime.settle();
+  };
+
+  it('AC-2: completes when the item is acquired and reverts when it is dropped', () => {
+    const s = started([have(false)]);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('active');
+    hold(s, 'silver-key', 1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+    hold(s, 'silver-key', -1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('active');
+    hold(s, 'silver-key', 1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+  });
+
+  it('AC-2: with latch the objective stays complete after the item is gone', () => {
+    const s = started([have(true)]);
+    hold(s, 'silver-key', 1);
+    hold(s, 'silver-key', -1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+  });
+
+  it('counts a stack, and an item held when the quest starts completes at once', () => {
+    const two = quest({
+      objectives: [
+        objective('key', {
+          kind: 'haveItem',
+          params: { item: { id: 'bone' }, count: 2, latch: false },
+        }),
+      ],
+    });
+    const s = setup([two]);
+    s.host.giveItem('bone', 1);
+    s.runtime.startQuest('q');
+    s.runtime.settle();
+    expect(s.runtime.objectiveState('q', 'key')).toBe('active');
+    hold(s, 'bone', 1);
+    expect(s.runtime.objectiveState('q', 'key')).toBe('complete');
+  });
+});
+
 describe('quest dependency index', () => {
   it('collects what every built-in condition kind reads, through combinators', () => {
     const deps = emptyDependencies();
@@ -1068,5 +1122,80 @@ describe('quest dependency index', () => {
     const unknown = emptyDependencies();
     collectDependencies({ kind: 'shop.stocked' }, unknown);
     expect(unknown.polled).toBe(true);
+  });
+});
+
+describe('quest runtime: observe (events before their stage, mw-e23.12)', () => {
+  const staged = () =>
+    quest({
+      stages: [
+        { id: 'early', transitions: [{ when: fact('q.go'), stage: 'late' }] },
+        { id: 'late' },
+      ],
+      objectives: [
+        objective('now', { params: { event: 'a' } }),
+        objective('later', { stage: 'late', params: { event: 'a' } }),
+        objective('other', { stage: 'late', params: { event: 'b' } }),
+        objective('fact', {
+          kind: 'fact',
+          stage: 'late',
+          params: { fact: 'q.f', value: true },
+        }),
+      ],
+    });
+  const isA = (o: { kind: string; params: unknown }) =>
+    o.kind === 'event' && (o.params as { event: string }).event === 'a';
+  const state = (s: Setup, id: string) => s.runtime.objectiveState('q', id);
+
+  it('AC-1: an active objective completes now and writes no seen fact', () => {
+    const s = started([staged()]);
+    s.runtime.observe(isA);
+    expect(state(s, 'now')).toBe('complete');
+    expect(s.world.facts.get('quest.q.seen.now')).toBeUndefined();
+    // The same happening again leaves the completed objective alone.
+    s.runtime.observe(isA);
+    expect(state(s, 'now')).toBe('complete');
+    expect(s.world.facts.get('quest.q.seen.now')).toBeUndefined();
+  });
+
+  it('AC-1: an objective of a later stage remembers the event and completes on activation', () => {
+    const s = started([staged()]);
+    s.runtime.observe(isA);
+    expect(state(s, 'later')).toBe('inactive');
+    expect(s.world.facts.get('quest.q.seen.later')).toBe(true);
+    expect(s.world.facts.get('quest.q.seen.other')).toBeUndefined();
+    step(s, { 'q.go': true });
+    expect(s.runtime.stage('q')).toBe('late');
+    expect(state(s, 'later')).toBe('complete');
+    expect(state(s, 'other')).toBe('active');
+  });
+
+  it('ignores unstarted and ended quests, closed objectives and objectives of other kinds', () => {
+    const idle = setup([staged()]);
+    idle.runtime.observe(() => true);
+    expect(idle.world.facts.snapshot()).toEqual({});
+
+    const s = started([staged()]);
+    s.runtime.observe(() => true); // also matches the fact objective, which has no seen fact
+    expect(s.world.facts.get('quest.q.seen.fact')).toBeUndefined();
+    expect(s.world.facts.get('quest.q.seen.later')).toBe(true);
+    step(s, { 'q.go': true, 'q.won': true });
+    expect(state(s, 'later')).toBe('skipped');
+    const before = s.world.facts.hash();
+    s.runtime.observe(() => true);
+    expect(s.world.facts.hash()).toBe(before);
+  });
+
+  it('the remembered event is saved and survives a load', () => {
+    const a = started([staged()]);
+    a.runtime.observe(isA);
+    a.world.events.flush();
+    const b = setup([staged()]);
+    b.world.facts.prepareRestore(a.world.facts.snapshot())();
+    b.runtime.refresh();
+    b.runtime.settle();
+    expect(b.world.facts.get('quest.q.seen.later')).toBe(true);
+    step(b, { 'q.go': true });
+    expect(state(b, 'later')).toBe('complete');
   });
 });

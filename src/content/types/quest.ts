@@ -120,7 +120,18 @@ const objective = <K extends QuestObjectiveKind, P extends z.ZodType>(
   });
 
 const OBJECTIVE_SCHEMAS = [
-  objective('haveItem', 'The player holds the item.', z.strictObject({ item: ref('item'), count })),
+  objective(
+    'haveItem',
+    'The player holds the item. Completes while held and reverts when it is lost, unless `latch`.',
+    z.strictObject({
+      item: ref('item'),
+      count,
+      latch: z
+        .boolean()
+        .default(false)
+        .describe('Stay complete once reached, even if the item is later dropped or spent.'),
+    }),
+  ),
   objective(
     'deliverItem',
     'The player hands the item to an NPC.',

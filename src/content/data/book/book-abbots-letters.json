@@ -1,0 +1,17 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-abbots-letters",
+  "title": "Letters of Abbot Corvin Ashgrove",
+  "author": "Abbot Corvin Ashgrove",
+  "notes": "Bible 7.2: priory scriptorium, fragments. The abbot's own voice on the Long Vespers (before and after), cut short by damage. The \"friend below\" notes are mw-e39.42 and are not here.",
+  "locations": ["place-bellwater-priory"],
+  "pages": [
+    {
+      "text": "To a correspondent in the city.\n\nAnselm thinks it is a threat. It is a sentence, and we have spent three hundred years shouting over it. What if it is trying to tell us something? I have spent the winter at the foot of the shaft with a candle and a slate. It repeats. It is not noise. [illegible]"
+    },
+    {
+      "text": "Later.\n\nAnselm will not speak to me. The brothers keep the bell as they keep the Rule, which is to say without asking what it is for. I do not blame them. I will take out the tongue for one night only. One night, to listen.\n\nI have told no one but you. If I am wrong, the bell is a day's work to put right. If I am right, [missing]"
+    }
+  ],
+  "damaged": true
+}

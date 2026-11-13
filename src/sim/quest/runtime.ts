@@ -17,6 +17,9 @@
 //   quest.<id>.resolution  the resolution id once resolved
 //   quest.<id>.failure     the failure id once failed
 //   quest.<id>.objective.<oid>   inactive | active | complete | skipped | failed
+//   quest.<id>.seen.<oid>        true: an event-bound objective's event happened before it was
+//                                active (see `observe`); written only then, so play that no quest
+//                                cares about saves nothing
 // `declareQuestFacts` declares them (the constructor does it), and it must run before a save loads,
 // or the load drops them as undeclared. A world that never builds a runtime never gets a key.
 //
@@ -98,6 +101,11 @@ interface ObjectiveMeta {
   readonly key: string;
   /** For `fact` objectives: what to watch. */
   readonly watch: { readonly fact: string; readonly value: FactValue } | undefined;
+  /** For `haveItem` objectives: the stack to hold, and whether reaching it is permanent. */
+  readonly holds:
+    { readonly item: string; readonly count: number; readonly latch: boolean } | undefined;
+  /** For event-bound kinds: the fact that remembers the event happened before the objective was active. */
+  readonly seenKey: string | undefined;
 }
 
 interface QuestMeta {
@@ -114,6 +122,9 @@ interface QuestMeta {
 
 export const questFactKey = (quest: string, part: 'state' | 'stage' | 'resolution' | 'failure') =>
   `quest.${quest}.${part}`;
+/** Remembers that the event of an event-bound objective happened while it was not yet active. */
+export const questSeenFactKey = (quest: string, objective: string) =>
+  `quest.${quest}.seen.${objective}`;
 export const questObjectiveFactKey = (quest: string, objective: string) =>
   `quest.${quest}.objective.${objective}`;
 
@@ -153,9 +164,15 @@ export function declareQuestFacts(store: FactStore, quests: readonly QuestDef[])
         values: [...LOGIC_OBJECTIVE_STATES],
         default: 'inactive',
       });
+      if (isEventBound(objective))
+        declare(questSeenFactKey(quest.id, objective.id), { type: 'bool' });
     }
   }
 }
+
+/** Event-bound kinds are one-shot happenings; `fact` and `haveItem` read durable state instead. */
+export const isEventBound = (objective: QuestObjective): boolean =>
+  objective.kind !== 'fact' && objective.kind !== 'haveItem';
 
 function index<T>(map: Map<string, T[]>, key: string, value: T): void {
   const list = map.get(key);
@@ -222,7 +239,22 @@ export class QuestRuntime implements QuestOps {
           ? { fact: objective.params.fact, value: objective.params.value }
           : undefined;
       if (watch !== undefined) deps.facts.add(watch.fact);
-      return { def: objective, key: questObjectiveFactKey(def.id, objective.id), watch };
+      const holds =
+        objective.kind === 'haveItem'
+          ? {
+              item: objective.params.item.id,
+              count: objective.params.count,
+              latch: objective.params.latch,
+            }
+          : undefined;
+      if (holds !== undefined) deps.items.add(holds.item);
+      return {
+        def: objective,
+        key: questObjectiveFactKey(def.id, objective.id),
+        watch,
+        holds,
+        seenKey: isEventBound(objective) ? questSeenFactKey(def.id, objective.id) : undefined,
+      };
     });
     for (const stage of def.stages) for (const t of stage.transitions) need(t.when);
     for (const resolution of def.resolutions) need(resolution.when);
@@ -342,6 +374,30 @@ export class QuestRuntime implements QuestOps {
       if (this.read(found.key) === 'complete') return undefined;
       this.setObjective(meta, found, 'complete');
       this.touch(meta);
+      return undefined;
+    });
+  }
+
+  /**
+   * Reports a happening to the event-bound objectives (mw-e23.12): every objective of an active quest
+   * that `matches` and is not closed. An active one completes now. One that is not active yet (a later
+   * stage, an unmet `activeWhen`) records the event in its `seen` fact, so it completes the moment it
+   * becomes active: killing the chief or entering an area early still counts. The fact is saved with
+   * the world and is written only in that case.
+   */
+  observe(matches: (objective: QuestObjective) => boolean): void {
+    this.run(() => {
+      for (const meta of this.list) {
+        if (this.read(meta.stateKey) !== 'active') continue;
+        for (const o of meta.objectives) {
+          if (o.seenKey === undefined || !matches(o.def)) continue;
+          const now = this.read(o.key);
+          if (now === 'active') this.setObjective(meta, o, 'complete');
+          else if (now === 'inactive') this.put(o.seenKey, true);
+          else continue;
+          this.touch(meta);
+        }
+      }
       return undefined;
     });
   }
@@ -501,16 +557,22 @@ export class QuestRuntime implements QuestOps {
     return evaluateLogic(condition, this.host, this.registry);
   }
 
-  /** Recomputes which objectives are active and completes `fact` objectives whose fact holds. */
+  /** Recomputes which objectives are active and completes `fact` and `haveItem` objectives that hold. */
   private refreshObjectives(meta: QuestMeta): void {
     const stage = this.read(meta.stageKey);
     for (const o of meta.objectives) {
-      if (CLOSED.has(this.read(o.key) as string)) continue;
+      const now = this.read(o.key) as string;
+      // A held-item objective that is not latched follows the stack: complete while held, active again after.
+      const follows = now === 'complete' && o.holds !== undefined && !o.holds.latch;
+      if (CLOSED.has(now) && !follows) continue;
       const active =
         (o.def.stage === undefined || o.def.stage === stage) &&
         (o.def.activeWhen === undefined || this.holds(o.def.activeWhen));
       const done =
-        active && o.watch !== undefined && this.facts.get(o.watch.fact) === o.watch.value;
+        active &&
+        ((o.seenKey !== undefined && this.read(o.seenKey) === true) ||
+          (o.watch !== undefined && this.facts.get(o.watch.fact) === o.watch.value) ||
+          (o.holds !== undefined && this.host.itemCount(o.holds.item) >= o.holds.count));
       this.setObjective(meta, o, done ? 'complete' : active ? 'active' : 'inactive');
     }
   }

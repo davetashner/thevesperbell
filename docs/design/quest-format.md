@@ -50,17 +50,25 @@ the DSL itself, the objectives' content ids and the quest's own objective ids.
 Each objective is `{ id, kind, text, params, optional, hidden, activeWhen, stage }`. The kind decides
 the `params` and (mw-e23.3) the sim events the objective listens to. An unknown kind fails naming it.
 
-| Kind | Params | Complete when |
+| Kind | Params | Complete when (bound in `src/game/logic/bindings.ts`, `src/sim/quest/runtime.ts`) |
 | --- | --- | --- |
-| `haveItem` | `item`, `count` | the player holds the item |
-| `deliverItem` | `item`, `npc`, `count` | the item is handed to the NPC |
+| `haveItem` | `item`, `count`, `latch` (default `false`) | the player holds the item; reverts when it is lost unless `latch` |
+| `deliverItem` | `item`, `npc`, `count` | a `deliverItem` effect (a dialogue option) hands the NPC the item |
 | `fact` | `fact`, `value` (default `true`) | the world fact has the value |
-| `entityState` | `creature`, `state` | `dead`, `befriended`, `fled`, `subdued` or `removed` |
-| `enterArea` | `area` | the player enters the area |
-| `talkTo` | `npc` | the player talks to the NPC |
-| `dialogueNode` | `dialogue`, `node` | the player reaches that node |
-| `learnCapability` | `capability` | the player learns it |
-| `event` | `event` | a named event is emitted |
+| `entityState` | `creature`, `state` | `dead` (`Died`), `befriended` (disposition reaches friendly), `fled`, `subdued` (`CreatureOutcome`), `removed` (died, or an outcome with `gone: true`) |
+| `enterArea` | `area` | the player enters a trigger volume whose node id (or graph id) is the area |
+| `talkTo` | `npc` | a dialogue with the NPC starts |
+| `dialogueNode` | `dialogue`, `node` | the node is visited |
+| `learnCapability` | `capability` | the player gains it |
+| `event` | `event` | a batch's `emit` effect publishes it |
+
+Event-bound kinds catch up too: an event that happens while the objective is not active yet (a later
+stage, an unmet `activeWhen`) but its quest is active is remembered in the saved fact
+`quest.<id>.seen.<oid>`, and the objective completes the moment it becomes active (so killing the
+chief or entering an area early still counts). The fact is written only in that case: an event for an
+objective that is active completes it directly, and play no quest cares about saves nothing. Events
+before the quest starts are not remembered. `fact` and `haveItem` read state, so they catch up. Pair a `deliverItem` option with
+`hasItem` so it shows as unavailable until the player carries the item.
 
 Prefer `entityState: removed` to `dead`, so stealth and diplomacy resolve combat-flavoured objectives.
 Adding a kind is one entry in `OBJECTIVE_SCHEMAS` and `QUEST_OBJECTIVE_KINDS` in the schema, its case in
@@ -86,7 +94,8 @@ change: if one refuses, nothing changes and the next satisfied resolution gets i
 
 State is world facts, so saves, hashes and conditions see it: `quest.<id>.state`
 (`unstarted active resolved failed`), `.stage`, `.resolution`, `.failure` and
-`quest.<id>.objective.<oid>` (`inactive active complete skipped failed`). The runtime declares them
+`quest.<id>.objective.<oid>` (`inactive active complete skipped failed`) and, for event-bound
+objectives, `quest.<id>.seen.<oid>` (see above). The runtime declares them
 when built (before a save loads) and writes none until a quest starts. Re-evaluation is incremental:
 conditions are indexed by the facts, items, capabilities and quests they read, and only dependent
 quests are evaluated; gold, time of day, disposition and unknown kinds are polled every 30 ticks.

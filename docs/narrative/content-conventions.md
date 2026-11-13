@@ -15,7 +15,7 @@ page is wrong. The formats are [dialogue-format](../design/dialogue-format.md),
 | Dialogue | `src/content/data/dialogue/<id>.json` | `<npc>-<topic>`, e.g. `ottilie-bridge-talk` | `playerClass` entries and options | `<subject>.<state>` | `pnpm dialogue:validate`, loader, `content:coverage` | mw-e22.3 (exists) |
 | Quest | `src/content/data/quest/<id>.json` | `quest-<slug>` | `variants` on journal text (see below) | `<subject>.<state>` | loader, `validateQuestLogic` | mw-e23.1 (exists) |
 | Rumour | `src/content/data/rumor/<id>.json` | `rumor-<nn>-<slug>` | `variants` | `<subject>.<state>` | none yet (the `rumor` reference passes) | mw-e39.12 adds the type |
-| Book, note, inscription | books: `src/content/data/item/<id>.json` (item `category: "book"`); notes and inscriptions: `src/content/data/note/`, `.../inscription/` | `book-<slug>`, `note-<slug>`, `inscription-<slug>` | `variants` on a page only where the text really differs | `<subject>.<state>` | books: item schema and `content:coverage`; notes and inscriptions: none yet | books exist (mw-e07.1); notes and inscriptions: mw-e39.13 |
+| Book, note, inscription | text: `src/content/data/book/<id>.json`, `.../note/<id>.json`, `.../inscription/<id>.json`; a book's inventory item stays `src/content/data/item/<id>.json` (item `category: "book"`) | `book-<slug>`, `note-<slug>`, `inscription-<slug>` | `variants` on a page only where the text really differs (none do yet) | `<subject>.<state>` | loader schema, `checkReadables`, `readable.test.ts`, `lore-map.test.ts`, `pnpm narrative:lint`, `content:coverage` | mw-e39.13 (exists) |
 | Description | item text stays on the item (`description`, `descKey`); creature and bestiary text in `src/content/data/description/<id>.json` | `desc-<subject id>`, e.g. `desc-species-hushlings` | `variants` | none | none yet | items exist; standalone descriptions: mw-e39.15 |
 | Narrative reference | `src/content/narrative/glossary.json` (plus `class-variants.ts`) | `npc-`, `place-`, `species-`, `term-`, and the text ids above | defines the class list | defines canon numbers | `glossary.test.ts` | mw-e39.3 |
 
@@ -124,6 +124,43 @@ missing or counted twice. When the bible changes, change the glossary in the sam
 already requires a lint update). Canon numbers carry the bible's own bold phrase as `quote`, so a number
 changed in the bible fails the test until the glossary follows.
 
+## Books, notes and inscriptions
+
+Set by mw-e39.13. Code: `src/content/types/readable.ts` (schema, hymn, page keys),
+`src/content/readable-checks.ts` (item pairing), lore map `src/content/narrative/lore-map.json`.
+
+- **Three content types, one shape.** `book`, `note` and `inscription` are registered content types
+  (`data/book/`, `data/note/`, `data/inscription/`), each file `{ id, title, author?, notes, locations,
+  pages: [{ text }], damaged? }`. The full text is content data validated by the schema, so the narrative
+  lint reads it (`book` joined `note` and `inscription` in `isNarrativeSource`) and checks names and canon
+  numbers. A book's `id` is its inventory item id; the item carries icon, value, legality and study.
+- **Resolving text.** A book item's `book.pages[n].textKey` is `book.<id>.page-<n+1>` (`bookPageKey`),
+  and `bookPageText(textKey, lookup)` returns that page's text. `checkReadables` fails the load if an
+  item whose id has a text file disagrees (title, author, page count, keys, damaged) or if a `book-<slug>`
+  item has no text file. Spell tomes and scrolls (`mage-hand`, `scroll-of-ember`...) keep their own keys
+  and are not story books; their text belongs to the spellbook-flavour work.
+- **Items are added with placement.** The texts exist first; the beads that place a book or stock it
+  add its item (an `icon-item-...` icon needs art) with the keys above. A book with no item is simply not
+  yet findable.
+- **Locations.** `locations` lists one or more glossary `place-` ids; the placement beads map them to
+  scenes. `readable.test.ts` checks each is a glossary place (AC-1).
+- **Length.** A book has 40 to 400 words in all (the bible's norm is 100 to 300; AC-2). A note or
+  inscription is as short as it is; a title is at most 40 characters for a book (the item's limit) and 60
+  for a note or inscription.
+- **Damaged texts.** `damaged: true` exactly when a page carries `[illegible]` (words that cannot be
+  read) or `[missing]` (a lost passage; a page that is wholly `[missing]` is a torn-out page). The reader
+  UI renders the markers (`DAMAGE_MARKERS`). The item's `condition` must say damaged too.
+- **The Vesper hymn** is `VESPER_HYMN`. Any text that opens it ("Sleep, you who were not born") must give
+  all of it byte for byte; the schema rejects an altered copy in a readable and `readable.test.ts` sweeps
+  every content file, dialogue included (AC-3). It lives in `book-vesperine-hours` and the rim of
+  `inscription-vesper-bell`; quote single lines ("The day is rung") freely.
+- **Lore map.** `lore-map.json` lists, for each of the Long Vespers, Horn's role and the bell, the
+  books, objects (notes and inscriptions) and people (dialogue files) that speak of it, each with a
+  `pattern` its text must match; every topic needs a book, an object and a person and at least three
+  sources (AC-4, bible 7.1). Add a source here when you write a text that touches one of them.
+- **Not here.** The abbot's "friend below" notes (mw-e39.42), spell tomes and scrolls, and bookshop
+  stock rules.
+
 ## Worked examples
 
 Shipped content is real canon written under E39, so the examples are fixtures: they load with the
@@ -144,8 +181,8 @@ its worked example to its own PR.
   "target": "place-glen-well",
   "text": "The Glen Well echoes wrong. Drop a stone and you hear it land twice." }
 
-// book-vesperine-hours: an item with category "book" and teaches { "kind": "lore" } (exists today)
-// note-hale-list.json, inscription-rules-of-the-mine.json (types arrive with mw-e39.13)
+// book-vesperine-hours: text in data/book/, its item (category "book", teaches lore) comes with its placement
+// note-hale-list.json, inscription-rules-of-the-mine.json: see "Books, notes and inscriptions" below
 // desc-species-hushlings.json (type arrives with mw-e39.15): { "id", "seen", "studied", "variants?" }
 ```
 
