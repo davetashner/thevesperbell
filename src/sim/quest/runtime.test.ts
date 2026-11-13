@@ -1152,6 +1152,10 @@ describe('quest runtime: observe (events before their stage, mw-e23.12)', () => 
     s.runtime.observe(isA);
     expect(state(s, 'now')).toBe('complete');
     expect(s.world.facts.get('quest.q.seen.now')).toBeUndefined();
+    // The same happening again leaves the completed objective alone.
+    s.runtime.observe(isA);
+    expect(state(s, 'now')).toBe('complete');
+    expect(s.world.facts.get('quest.q.seen.now')).toBeUndefined();
   });
 
   it('AC-1: an objective of a later stage remembers the event and completes on activation', () => {
