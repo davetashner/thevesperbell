@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-friend-below-door",
+  "title": "A folded note under your door",
+  "author": "A friend below",
+  "notes": "The first friend-below note (bible 4.1 beat 4): found under the player's door; Hale delivered it asleep, so nothing here says how it came (his boots reveal stays in hale-watch.json). Re-read after the reveal: 'I will guide you', 'the beast', and the claim to be a friend.",
+  "locations": ["place-briar-glen"],
+  "pages": [
+    {
+      "text": "The beast keeps them in the dark. Come down and I will guide you. I have walked these ways a long while and I do not like to see good people lost in them.\n\n— A friend below."
+    }
+  ]
+}

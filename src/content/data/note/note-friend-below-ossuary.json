@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-friend-below-ossuary",
+  "title": "A note under a monk's skull",
+  "author": "A friend below",
+  "notes": "Bible 4.1 beat 8 (the Ossuary and Clatter): points the player at the apologising skeleton, true and useful. Re-read: he knows exactly who Clatter is and what he remembers, and wants the name kept quiet. Does not quote the hymn (only book-vesperine-hours may).",
+  "locations": ["place-knot"],
+  "pages": [
+    {
+      "text": "One of the dead here keeps apologising. Do not strike him. Hum something slow and old, the evening tune the monks sang, and he will sit down and listen.\n\nHe was a good gardener once. He may tell you about a pear tree; he tells everybody. It is a sweet story and a sad one and you need not trouble yourself over the rest of it.\n\n— A friend below."
+    }
+  ]
+}

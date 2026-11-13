@@ -256,7 +256,15 @@ describe('glossary against the story bible', () => {
       .filter((line) => line.startsWith('**'))
       .map((line) => normaliseName(/^\*\*([^*]+)\*\*/.exec(line)?.[1] ?? ''));
     expect(titles).toHaveLength(13);
-    expect(glossary.texts.map((t) => normaliseName(t.name)).sort()).toEqual([...titles].sort());
+    const listed = glossary.texts.filter((t) => t.section === '7.2');
+    expect(listed.map((t) => normaliseName(t.name)).sort()).toEqual([...titles].sort());
+  });
+
+  it('every friend-below note of 7.5 is a registered text', () => {
+    const notes = glossary.texts.filter((t) => t.section === '7.5');
+    expect(notes.length).toBeGreaterThanOrEqual(6);
+    expect(notes.length).toBeLessThanOrEqual(8);
+    for (const t of notes) expect(t.id).toMatch(/^note-friend-below-/);
   });
 
   it('keeps each id and canonical NPC id unique across the whole file', () => {
