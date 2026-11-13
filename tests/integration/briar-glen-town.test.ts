@@ -86,7 +86,7 @@ describe('Briar Glen town nodes (mw-e24.2 AC-1)', () => {
     }
   });
 
-  it('AC-1: the lane and the green are joined both ways, and the mine and priory roads are marked planned stubs', () => {
+  it('AC-1: the lane and the green are joined both ways, and the mine road is built and the priory road is a marked planned stub', () => {
     const edge = world?.edges.find((e) => e.id === 'lane-market-green');
     expect(edge?.transitions).toEqual(['briar-glen-lane/green-gate', 'briar-glen-green/lane-gate']);
     expect(lane.transitions.find((t) => t.id === 'green-gate')).toMatchObject({
@@ -97,17 +97,26 @@ describe('Briar Glen town nodes (mw-e24.2 AC-1)', () => {
       scene: { id: 'briar-glen-lane' },
       spawn: 'arrive-from-briar-glen-green',
     });
-    for (const [road, bead] of [
-      ['exit-mine-road', 'planned:mw-e25.23'],
-      ['exit-priory-road', 'planned:mw-e25.25'],
-    ] as const) {
-      expect(green.spawns.find((s) => s.id === road)?.tags).toContain(bead);
-      expect(green.spawns.find((s) => s.id === `door-${road}`)?.door?.lock?.id).toBe(
-        'road-not-open',
-      );
-      expect(green.spawns.find((s) => s.id === `sign-${road}`)?.interact).toBeDefined();
-    }
-    expect(world?.edges.find((e) => e.id === 'green-mine-road')?.bead).toBe('mw-e25.23');
+    // The mine road is built (mw-e26.2): an open doorway with a signpost and a transition into the Deepworks.
+    expect(green.spawns.find((s) => s.id === 'exit-mine-road')?.tags).toContain('node');
+    expect(green.spawns.find((s) => s.id === 'door-exit-mine-road')).toBeUndefined();
+    expect(green.spawns.find((s) => s.id === 'sign-exit-mine-road')?.interact).toBeDefined();
+    expect(green.transitions.find((t) => t.id === 'mine-road-gate')).toMatchObject({
+      scene: { id: 'deepworks' },
+      spawn: 'arrive-from-briar-glen-green',
+    });
+    // The priory road is still a planned stub.
+    expect(green.spawns.find((s) => s.id === 'exit-priory-road')?.tags).toContain(
+      'planned:mw-e25.25',
+    );
+    expect(green.spawns.find((s) => s.id === 'door-exit-priory-road')?.door?.lock?.id).toBe(
+      'road-not-open',
+    );
+    expect(green.spawns.find((s) => s.id === 'sign-exit-priory-road')?.interact).toBeDefined();
+    expect(world?.edges.find((e) => e.id === 'green-mine-road')?.transitions).toEqual([
+      'briar-glen-green/mine-road-gate',
+      'deepworks/road-gate',
+    ]);
     expect(world?.edges.find((e) => e.id === 'green-priory-road')?.bead).toBe('mw-e25.25');
   });
 });
@@ -126,7 +135,7 @@ describe('Briar Glen town navigation (mw-e24.2 AC-2)', () => {
       (s) =>
         s.tags.includes('door-front') || s.tags.includes('exit-stub') || s.tags.includes('node'),
     );
-    expect(fronts.length).toBeGreaterThanOrEqual(12);
+    expect(fronts.length).toBeGreaterThanOrEqual(11); // the mine road signpost is no longer an exit stub (mw-e26.2)
     const metres = reach(
       'briar-glen-green',
       'arrive-from-briar-glen-lane',

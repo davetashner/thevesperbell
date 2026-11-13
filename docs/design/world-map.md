@@ -62,15 +62,15 @@ flowchart LR
     supply_tunnel["The supply tunnel (watchtower end)"]:::built
   end
   subgraph deepworks["The Deepworks"]
-    mine_road["The mine road"]
-    mine_gate["The boarded mine gate"]
-    winch_house["The winch house"]
-    old_galleries["The old glenstone galleries"]
-    rootcellar_camp["The Rootcellar camp (cutting hall)"]
-    silver_galleries["The silver galleries"]
-    vane_sealed_gallery["Vane's sealed gallery"]
-    breach["The breach"]
-    lower_deepworks["The lower Deepworks"]
+    mine_road["The mine road"]:::built
+    mine_gate["The boarded mine gate"]:::built
+    winch_house["The winch house"]:::built
+    old_galleries["The old glenstone galleries"]:::built
+    rootcellar_camp["The Rootcellar camp (cutting hall)"]:::built
+    silver_galleries["The silver galleries"]:::built
+    vane_sealed_gallery["Vane's sealed gallery"]:::built
+    breach["The breach"]:::built
+    lower_deepworks["The lower Deepworks"]:::built
   end
   subgraph priory["Bellwater Priory"]
     priory_gate["The priory gate"]:::built
@@ -281,15 +281,15 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `moorings-courtyard` | Mooring's Watch courtyard | moorings-watch | e25 | `moorings-watch` | Goblin lookout below (bible 3.5, mw-e25.6). Built as the spur trail, goblin lookout camp and walled courtyard of moorings-watch; the Briarwood reaches it by `hub-moorings`. |
 | `moorings-tower` | Mooring's Watch tower and roof | moorings-watch | e25 | `moorings-watch` | Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). Built in moorings-watch (mw-e25.6): four floors, an interior stair and two exterior climbs to the roof; Sentinels and the mirror puzzle are later beads. |
 | `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | `moorings-watch` | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). Built as a locked cellar door over a sealed vestibule in the courtyard wall (mw-e25.6); the tunnel itself is mw-e26, the way through the collapse mw-e25.9. |
-| `mine-road` | The mine road | deepworks | e25 | planned | The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23. |
-| `mine-gate` | The boarded mine gate | deepworks | e25 | planned | Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior. |
-| `winch-house` | The winch house | deepworks | e26 | planned | First interior space inside the gate (bible 3.5, mw-e26.2). |
-| `old-galleries` | The old glenstone galleries | deepworks | e26 | planned | Square pillared halls; the upper mine (bible 3.5). |
-| `rootcellar-camp` | The Rootcellar camp (cutting hall) | deepworks | e26 | planned | Goblin camp in the old cutting hall (bible 3.5, 5.10); top of the Stone Stair. |
-| `silver-galleries` | The silver galleries | deepworks | e26 | planned | Newer workings following the silver (bible 3.5). |
-| `vane-sealed-gallery` | Vane's sealed gallery | deepworks | e26 | planned | Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6). |
-| `breach` | The breach | deepworks | e26 | planned | Where the mine opened into the Knot (bible 3.5, mw-e26.4). |
-| `lower-deepworks` | The lower Deepworks | deepworks | e26 | planned | Flooded lower galleries the Weeping Adit enters (bible 3.1). |
+| `mine-road` | The mine road | deepworks | e25 | `deepworks` | The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23. Built (mw-e26.2) as the road strip at the south end of the deepworks scene, entered from the green by the mine-road-gate transition. |
+| `mine-gate` | The boarded mine gate | deepworks | e25 | `deepworks` | Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior. Built (mw-e26.2) as the forecourt and gate wall of the deepworks scene, with the four ways in from outside; the gate puzzle that sets deepworks.gate-open is mw-e25.10. |
+| `winch-house` | The winch house | deepworks | e26 | `deepworks` | First interior space inside the gate (bible 3.5, mw-e26.2). Built (mw-e26.2): the first hall inside the gate wall, with the winch lever and the cage lift gate. |
+| `old-galleries` | The old glenstone galleries | deepworks | e26 | `deepworks` | Square pillared halls; the upper mine (bible 3.5). Built (mw-e26.2): pillared halls with half-cut blocks, mine-cart rails and the supply tunnel collapse in the west wall. |
+| `rootcellar-camp` | The Rootcellar camp (cutting hall) | deepworks | e26 | `deepworks` | Goblin camp in the old cutting hall (bible 3.5, 5.10); top of the Stone Stair. Built (mw-e26.2): the cutting hall with camp markers and the Stone Stair head; the goblins are mw-e26.3. |
+| `silver-galleries` | The silver galleries | deepworks | e26 | `deepworks` | Newer workings following the silver (bible 3.5). Built (mw-e26.2): narrow galleries one level down, reached by the stair from the cutting hall or by the cage lift. |
+| `vane-sealed-gallery` | Vane's sealed gallery | deepworks | e26 | `deepworks` | Ledger, horn-ring and the breach (bible 3.5, 4.1 beat 6). Built (mw-e26.2) as a bare hall with ledger and horn-ring markers; the content is mw-e26.4. |
+| `breach` | The breach | deepworks | e26 | `deepworks` | Where the mine opened into the Knot (bible 3.5, mw-e26.4). Built (mw-e26.2) as a rubble room ending at the breach-threshold marker; the Outer Ring beyond is mw-e26.9. |
+| `lower-deepworks` | The lower Deepworks | deepworks | e26 | `deepworks` | Flooded lower galleries the Weeping Adit enters (bible 3.1). Built (mw-e26.2): the flooded lower gallery with the channel marked for the Frozen Channel (mw-e26.15) and the Weeping Adit arrival beyond it. |
 | `priory-gate` | The priory gate | priory | e26 | `bellwater-priory` | The gate at the head of the priory road (mw-e26.5 'priory road gate'; PROPOSAL, the bible names only the road and the nave). Where the road from the forest, the ridge path from Mooring's Watch and the road from town all arrive (docs/design/dungeon.md). Built as the precinct gate wall of the bellwater-priory scene (mw-e26.5); the way in from the Briarwood is its road gate (mw-e25.25). |
 | `priory-nave` | The priory nave | priory | e26 | `bellwater-priory` | Roofless nave of Bellwater Priory (bible 3.5, mw-e26.5). Built (mw-e26.5): six metre walls and a colonnade open to the sky; the hub of the priory. |
 | `priory-choir` | The priory choir | priory | e26 | `bellwater-priory` | Singing-monk statues, the Watchers puzzle (bible 3.5, mw-e26.6). Built (mw-e26.5): the choir with four statue stubs and the altar; the puzzle is mw-e26.6. |
@@ -342,7 +342,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `green-watch-house` | `market-green` | `watch-house` | door |  |  | planned: mw-e24.8 |
 | `watch-house-cell` | `watch-house` | `jail-cell` | door |  |  | planned: mw-e24.8 |
 | `green-vane-house` | `market-green` | `vane-house` | path |  |  | planned: mw-e24.9 |
-| `green-mine-road` | `market-green` | `mine-road` | path |  |  | planned: mw-e25.23 |
+| `green-mine-road` | `market-green` | `mine-road` | path |  |  | `briar-glen-green/mine-road-gate`, `deepworks/road-gate` |
 | `mine-road-gate` | `mine-road` | `mine-gate` | path |  |  | planned: mw-e25.23 |
 | `green-priory-road` | `market-green` | `priory-road` | path |  |  | planned: mw-e25.25 |
 | `green-schoolhouse` | `market-green` | `schoolhouse` | door |  |  | planned: mw-e24.11 |
@@ -462,6 +462,15 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `bellwater-priory` | `priory-crypt-stair` | none (a marker spawn at the foot of the crypt stair, inside the scene) |
 | `bellwater-priory` | `priory-crypt` | none (a tier-3 locked door stub over a sealed vestibule; opens with world.priory-crypt.unsealed, mw-e26.20) |
 | `bellwater-priory` | `cistern` | none (a barred door stub over a sealed vestibule; mw-e24.10 and mw-e26.20 open it) |
+| `deepworks` | `mine-road` | `deepworks/road-gate` (green-mine-road) |
+| `deepworks` | `mine-gate` | none (a marker spawn in the forecourt; the four ways in from outside are the gate wall's doorways, and mw-e25.10 writes deepworks.gate-open) |
+| `deepworks` | `winch-house` | none (a marker spawn; walked inside the scene, behind the gate wall) |
+| `deepworks` | `old-galleries` | none (a marker spawn; walked inside the scene; its west wall holds the supply tunnel collapse, mw-e25.9) |
+| `deepworks` | `rootcellar-camp` | none (a marker spawn; walked inside the scene) |
+| `deepworks` | `silver-galleries` | none (a marker spawn one level down; the stair from the cutting hall and the cage lift lead to it) |
+| `deepworks` | `vane-sealed-gallery` | none (a marker spawn two levels down; mw-e26.4 builds its content and the seal) |
+| `deepworks` | `breach` | none (a marker spawn and the breach-threshold stub; mw-e26.9 builds the Outer Ring and the transition) |
+| `deepworks` | `lower-deepworks` | none (a marker spawn; the Weeping Adit arrives beyond the channel, mw-e25.13) |
 
 Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `brazier-hall`, `combat-sandbox` and so on) are not part of the world; the puzzle rooms are placed into the dungeon by E26 (mw-e26.15) and will gain nodes then.
 
@@ -493,7 +502,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.14 | `lock-gate-crossing` |
 | mw-e25.15 | `barge-quay-lock` |
 | mw-e25.22 | `lane-briarwood-edge` |
-| mw-e25.23 | `miners-bridge`, `green-mine-road`, `mine-road-gate` |
+| mw-e25.23 | `miners-bridge`, `mine-road-gate` |
 | mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
 | mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge` |
 | mw-e26.2 | `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` |
