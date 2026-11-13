@@ -4,6 +4,7 @@
   "title": "Cargo Manifest — Gilded Tern, Bay Nine",
   "author": "Customs clerk E. Ardley (sealed)",
   "notes": "Bible 7.2: customs house copy. Clerk E. Ardley has been dead a year (11.3), so the seal predates a problem nobody checked; \"S— token\" is the unnamed buyer.",
+  "evidence": ["evidence.dead-clerk-seal"],
   "locations": ["place-customs-house", "place-bay-nine"],
   "pages": [
     {
