@@ -1,0 +1,1024 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "abbot-cradle",
+  "notes": "The Sleepless Abbot (Corvin Ashgrove, bible 5.12), mw-e39.9: the Act III reveal (bible 4.1 beat 11: thanks the player and, if Horn lives, asks them to finish him), the class-aimed temptation in the Cradle (sorcerer Somnomancy/Lull, knight duty, archer the hunt, thief treasure; accepting any leaves the dreamer.marked mark that Horn and Mirela read), and the four Cradle resolutions of beat 12, each writing abbot.fate (fight: unresolved until the wraith is down, written when the combat system sets abbot.wraith-down; trick: thief lifts the tongue, sorcerer's Mirror Self sings the hymn in his voice, archer shoots out the anchoring lanterns; persuade: only when Clatter has remembered his name and chose to come to the Cradle; join: the Long Vespers). Voice: courteous, never raises his voice, no exclamation marks. The wraith combat (E13) and the Lull spell (E08/E06) are out of scope: the dialogue only sets facts and emits hooks. The six to eight friend-below notes moved to mw-e39.42. Not placed yet: the Cradle belongs to E26; reachable in the debug conversation room. The reveal fires wherever the Act III scene starts it; abbot.in-cradle (written by the Cradle scene) switches to the Cradle talk.",
+  "speakers": [
+    {
+      "id": "abbot",
+      "npc": "npc-abbot"
+    },
+    {
+      "id": "clatter",
+      "npc": "npc-clatter"
+    }
+  ],
+  "entries": [
+    {
+      "id": "fight-won",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "abbot.wraith-down"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "abbot.fate",
+            "op": "eq",
+            "value": "unresolved"
+          }
+        ]
+      },
+      "node": "fightwon-1"
+    },
+    {
+      "id": "joined",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.fate",
+        "op": "eq",
+        "value": "joined"
+      },
+      "node": "joined-1"
+    },
+    {
+      "id": "at-rest",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.fate",
+        "op": "eq",
+        "value": "at-rest"
+      },
+      "node": "rest-echo-1"
+    },
+    {
+      "id": "defeated",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.fate",
+        "op": "eq",
+        "value": "defeated"
+      },
+      "node": "defeated-echo-1"
+    },
+    {
+      "id": "fighting",
+      "when": {
+        "kind": "factCmp",
+        "fact": "abbot.resolution",
+        "op": "eq",
+        "value": "fight"
+      },
+      "node": "fighting-1"
+    },
+    {
+      "id": "cradle-again",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "abbot.in-cradle"
+          },
+          {
+            "kind": "dialogue.visitedCount",
+            "id": "cradle-1",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "node": "cradle-2"
+    },
+    {
+      "id": "cradle",
+      "when": {
+        "kind": "fact",
+        "fact": "abbot.in-cradle"
+      },
+      "node": "cradle-1"
+    },
+    {
+      "id": "reveal",
+      "when": {
+        "kind": "not",
+        "condition": {
+          "kind": "fact",
+          "fact": "abbot.reveal-heard"
+        }
+      },
+      "node": "reveal-gate"
+    },
+    {
+      "id": "waiting",
+      "node": "wait-1"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "reveal-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "horn.fate",
+            "op": "eq",
+            "value": "dead"
+          },
+          "next": "reveal-dead-1"
+        }
+      ],
+      "else": "reveal-alive-1"
+    },
+    {
+      "id": "reveal-alive-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Forgive me. I have been rude, speaking through paper for so long. Corvin Ashgrove, abbot of Bellwater, at your service. You have been my hands and my eyes, and I thank you with all my heart.",
+      "next": "reveal-alive-2"
+    },
+    {
+      "id": "reveal-alive-2",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "You will have guessed that the friend below was never quite a friend. That is true, and it is also not untrue. Every word I wrote you was meant, and every word helped. I would have you remember that.",
+      "next": "reveal-alive-3"
+    },
+    {
+      "id": "reveal-alive-3",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Now. There is an old creature at the foot of my shaft. He is old, and he is in my way, and you are so very good at this. You needn't hate him. Just move him.",
+      "next": "reveal-menu"
+    },
+    {
+      "id": "reveal-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "reveal-notes",
+          "text": "You wrote the notes.",
+          "next": "reveal-notes-1"
+        },
+        {
+          "id": "reveal-refuse",
+          "text": "I will not hurt Horn.",
+          "next": "reveal-refuse-1"
+        },
+        {
+          "id": "reveal-tansy",
+          "text": "Where is Tansy?",
+          "next": "reveal-tansy-1"
+        }
+      ]
+    },
+    {
+      "id": "reveal-notes-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Every one, in a hand not my own. Captain Hale carried the first and does not know it. Do not think ill of him. Hands are such obliging things when their owners are asleep.",
+      "next": "reveal-end"
+    },
+    {
+      "id": "reveal-refuse-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Of course. You must do as your conscience asks. I only ask that it be quick. The song will not wait for sentiment, and nor, I find, will I.",
+      "next": "reveal-end"
+    },
+    {
+      "id": "reveal-tansy-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Walking. Gently, and in the right direction. She is quite safe while she is useful, and she is so very useful. We shall speak of her in the Cradle.",
+      "next": "reveal-end"
+    },
+    {
+      "id": "reveal-dead-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "There you are. The friend below, as you will have guessed, and so very glad of you. I am Corvin Ashgrove, once abbot of Bellwater. I will not keep you. I only wished to say thank you.",
+      "next": "reveal-dead-2"
+    },
+    {
+      "id": "reveal-dead-2",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "He is gone, then, the old warden. I heard the horn go quiet. I find I am sorry and glad in nearly equal measure, which is a lesson in itself.",
+      "next": "reveal-dead-3"
+    },
+    {
+      "id": "reveal-dead-3",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Forgive me if I walk past. The song is so very near, and I have waited so long for the end of the sentence.",
+      "next": "reveal-end"
+    },
+    {
+      "id": "reveal-end",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.reveal-heard",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.reveal-spoken"
+        }
+      ],
+      "next": "reveal-leave"
+    },
+    {
+      "id": "reveal-leave",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Come down when you are ready. I shall be conducting.",
+      "end": true
+    },
+    {
+      "id": "wait-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "I am only a little ahead of you. Mind the stairs. They are older than my patience, and I have a great deal of that.",
+      "end": true
+    },
+    {
+      "id": "cradle-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Ah. Here you are, and here is the whole of it. Listen. Sixty-one years I have had to admire it, and I have not reached the end of a single phrase.",
+      "next": "tempt-gate"
+    },
+    {
+      "id": "cradle-2",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Still here. So am I. It is a pleasure to have company who listens.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tempt-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "tempt-sorcerer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "tempt-knight"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "tempt-archer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "tempt-thief"
+        }
+      ],
+      "else": "cradle-hub"
+    },
+    {
+      "id": "tempt-sorcerer",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "You read as I read. I can see it on you. Let me teach you what I found: Somnomancy. Lull. A sleep to lay on anything that breathes, gentle as a hand on a brow. You will find it genuinely excellent. Only take it.",
+      "next": "tempt-sorcerer-menu"
+    },
+    {
+      "id": "tempt-sorcerer-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tempt-sorcerer-yes",
+          "text": "Take the Lull.",
+          "next": "tempt-sorcerer-take"
+        },
+        {
+          "id": "tempt-sorcerer-no",
+          "text": "No. I know what that costs.",
+          "next": "tempt-no-1"
+        }
+      ]
+    },
+    {
+      "id": "tempt-sorcerer-take",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dreamer.marked",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": -3
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.help-accepted",
+          "data": {
+            "class": "sorcerer"
+          }
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.lull-taught"
+        }
+      ],
+      "next": "tempt-sorcerer-ok"
+    },
+    {
+      "id": "tempt-sorcerer-ok",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Then it is yours. There. Do you hear it under the town? You will.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tempt-knight",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "These poor bones about you were brothers once, and they are not at rest. You have sworn to be of use. Let me show you how to loose them, one by one. Take my help, and free them.",
+      "next": "tempt-knight-menu"
+    },
+    {
+      "id": "tempt-knight-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tempt-knight-yes",
+          "text": "Show me how.",
+          "next": "tempt-knight-take"
+        },
+        {
+          "id": "tempt-knight-no",
+          "text": "Their rest is not yours to give.",
+          "next": "tempt-no-1"
+        }
+      ]
+    },
+    {
+      "id": "tempt-knight-take",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dreamer.marked",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": -3
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.help-accepted",
+          "data": {
+            "class": "knight"
+          }
+        }
+      ],
+      "next": "tempt-knight-ok"
+    },
+    {
+      "id": "tempt-knight-ok",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Thank you. You will find it kind work. Hold still. Listen. There.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tempt-archer",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "I have watched you from the dark, the patience of you, the clean line. Nothing here has ever been hunted so well. Take my sight, and I will show you where every one of them sleeps. You shall not miss.",
+      "next": "tempt-archer-menu"
+    },
+    {
+      "id": "tempt-archer-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tempt-archer-yes",
+          "text": "Show me where they sleep.",
+          "next": "tempt-archer-take"
+        },
+        {
+          "id": "tempt-archer-no",
+          "text": "I choose my own targets.",
+          "next": "tempt-no-1"
+        }
+      ]
+    },
+    {
+      "id": "tempt-archer-take",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dreamer.marked",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": -3
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.help-accepted",
+          "data": {
+            "class": "archer"
+          }
+        }
+      ],
+      "next": "tempt-archer-ok"
+    },
+    {
+      "id": "tempt-archer-ok",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Look, then. There, and there, and there. Do you hear them breathing? You will, always.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tempt-thief",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Do you know what lies under this floor? Sixty-one years of monks' plate, and the Deepworks' lost coin, and one thing I will not name. All of it yours. Take my hand and I will show you every door.",
+      "next": "tempt-thief-menu"
+    },
+    {
+      "id": "tempt-thief-menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tempt-thief-yes",
+          "text": "Show me the doors.",
+          "next": "tempt-thief-take"
+        },
+        {
+          "id": "tempt-thief-no",
+          "text": "I don't take gifts I can't check.",
+          "next": "tempt-no-1"
+        }
+      ]
+    },
+    {
+      "id": "tempt-thief-take",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "dreamer.marked",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-horn",
+          "delta": -3
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.help-accepted",
+          "data": {
+            "class": "thief"
+          }
+        }
+      ],
+      "next": "tempt-thief-ok"
+    },
+    {
+      "id": "tempt-thief-ok",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Here, then. This door, and this. Whatever you take, you will hear the song while you carry it.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tempt-no-1",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.temptation-refused",
+          "value": true
+        }
+      ],
+      "next": "tempt-no-2"
+    },
+    {
+      "id": "tempt-no-2",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "A pity, and a wise one, which is the worse pity. The offer will stand as long as I do.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "cradle-hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-song",
+          "text": "Why did you take the bell's tongue?",
+          "once": true,
+          "next": "song-1"
+        },
+        {
+          "id": "ask-fear",
+          "text": "What are you afraid of?",
+          "once": true,
+          "next": "fear-1"
+        },
+        {
+          "id": "ask-tansy",
+          "text": "Where is Tansy?",
+          "once": true,
+          "next": "tansy-gate"
+        },
+        {
+          "id": "fight",
+          "text": "Then I will stop you here.",
+          "next": "fight-1"
+        },
+        {
+          "id": "trick-thief",
+          "text": "Lift the tongue from his belt while he conducts.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "trick-thief-1"
+        },
+        {
+          "id": "trick-sorcerer",
+          "text": "Cast Mirror Self and sing the hymn in his voice.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "trick-sorcerer-1"
+        },
+        {
+          "id": "trick-archer",
+          "text": "Shoot out the lanterns that anchor his form.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "trick-archer-1"
+        },
+        {
+          "id": "persuade",
+          "text": "Let Clatter speak to him.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "clatter.restored"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "clatter.fate",
+                "op": "eq",
+                "value": "joined"
+              }
+            ]
+          },
+          "next": "persuade-1"
+        },
+        {
+          "id": "join",
+          "text": "Teach me the song. I will stay.",
+          "next": "join-1"
+        }
+      ]
+    },
+    {
+      "id": "song-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Because it is a sentence, and we shouted over it for three hundred years. I took the tongue for one night, to listen. That was a long night, and I am not sure it has ended.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "fear-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "I am not afraid. I am attentive. Silence is only the song's absence, and I do not care for absence. It is so very quiet where it has been.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tansy-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "tansy.saved"
+          },
+          "next": "tansy-safe"
+        }
+      ],
+      "else": "tansy-held"
+    },
+    {
+      "id": "tansy-safe",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Safe above, I am told, and well done. I would have liked to meet her. Do not look so cross. I am only a little disappointed.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "tansy-held",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Here, and quite comfortable. She walks so well in her sleep. You will not mind if she stays by me while we talk.",
+      "next": "cradle-hub"
+    },
+    {
+      "id": "fight-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "A pity. I do not raise my voice, you will notice, so be sure to hear this. Noise troubles me, and so does a steady light. Everything else is the song. Do not tell me I told you.",
+      "next": "fight-begin"
+    },
+    {
+      "id": "fight-begin",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.resolution",
+          "value": "fight"
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fight-begun"
+        }
+      ],
+      "next": "fight-end"
+    },
+    {
+      "id": "fight-end",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Then let us begin. Gently, if you would.",
+      "end": true
+    },
+    {
+      "id": "fighting-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "We have begun, I think. Do take care of the light. And the noise. Or rather, do not take care of them at all.",
+      "end": true
+    },
+    {
+      "id": "fightwon-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Enough. Quite right. I did say you were good at this. The song has gone out of me, and the tongue is on the floor. I think it was never mine.",
+      "next": "fightwon-fx"
+    },
+    {
+      "id": "fightwon-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.fate",
+          "value": "defeated"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.tongue-recovered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fate-set",
+          "data": {
+            "fate": "defeated"
+          }
+        }
+      ],
+      "next": "fightwon-end"
+    },
+    {
+      "id": "fightwon-end",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Ring it softly. It has been a long time since it was asked to say anything.",
+      "end": true
+    },
+    {
+      "id": "trick-thief-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Oh. Oh, that was neatly done. My belt is lighter. I find I cannot hold the note. Where did the hymn go? Please, the tongue is not a thing to be passed about.",
+      "next": "trick-thief-fx"
+    },
+    {
+      "id": "trick-thief-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.fate",
+          "value": "defeated"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.resolution",
+          "value": "trick"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.tongue-recovered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.trick-sprung",
+          "data": {
+            "method": "thief"
+          }
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fate-set",
+          "data": {
+            "fate": "defeated"
+          }
+        }
+      ],
+      "next": "trick-end"
+    },
+    {
+      "id": "trick-sorcerer-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "That is my voice. That is the hymn, in my voice, and I am not singing it. Who is singing? Why are they all turning to look at me? Please. Please, I did not mean it so.",
+      "next": "trick-sorcerer-fx"
+    },
+    {
+      "id": "trick-sorcerer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.fate",
+          "value": "defeated"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.resolution",
+          "value": "trick"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.tongue-recovered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.trick-sprung",
+          "data": {
+            "method": "sorcerer"
+          }
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fate-set",
+          "data": {
+            "fate": "defeated"
+          }
+        }
+      ],
+      "next": "trick-end"
+    },
+    {
+      "id": "trick-archer-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "My lanterns. Those were, please, not the one on the left. I have not been so thin in sixty years. I can see the wall through my hands. What a very clean line you have.",
+      "next": "trick-archer-fx"
+    },
+    {
+      "id": "trick-archer-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.fate",
+          "value": "defeated"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.resolution",
+          "value": "trick"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.tongue-recovered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.trick-sprung",
+          "data": {
+            "method": "archer"
+          }
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fate-set",
+          "data": {
+            "fate": "defeated"
+          }
+        }
+      ],
+      "next": "trick-end"
+    },
+    {
+      "id": "trick-end",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Go and ring it, then. I will be here, being very quiet. I do not think I shall be good at it.",
+      "end": true
+    },
+    {
+      "id": "persuade-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Corvin.",
+      "next": "persuade-2"
+    },
+    {
+      "id": "persuade-2",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "I beg your pardon? Do I know you? You have the look of, no. Forgive me. No.",
+      "next": "persuade-3"
+    },
+    {
+      "id": "persuade-3",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Anselm. Anselm Hobb. You promised we would go back up for pears. Corvin. When the walls were done, we would go back up for pears. The tree is still there. I have been told it is.",
+      "next": "persuade-4"
+    },
+    {
+      "id": "persuade-4",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "A pear tree. There was a pear tree. There was a sister, and I was going to write to her. It was so quiet in the house. That is why I came down. Anselm?",
+      "next": "persuade-5"
+    },
+    {
+      "id": "persuade-5",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "It is quiet down here as well, Corvin. It is not a bad quiet. I will sit with you. I will hum, if you like. You never did like the silence.",
+      "next": "persuade-6"
+    },
+    {
+      "id": "persuade-6",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "No. I never did. I have been so afraid, Anselm, that if I stopped listening there would be nothing under it. Take the tongue. Hang it where it belongs. I should like to see the tree.",
+      "next": "persuade-7"
+    },
+    {
+      "id": "persuade-7",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "As long as it takes.",
+      "next": "persuade-fx"
+    },
+    {
+      "id": "persuade-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.fate",
+          "value": "at-rest"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.resolution",
+          "value": "persuade"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.tongue-recovered",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.persuaded"
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fate-set",
+          "data": {
+            "fate": "at-rest"
+          }
+        }
+      ],
+      "next": "persuade-end"
+    },
+    {
+      "id": "persuade-end",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Sixty-one years. It is a long time to be wrong. Ring it gently.",
+      "end": true
+    },
+    {
+      "id": "join-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Oh. Oh, how lovely. Sit, sit. You need not do anything at all. Only listen with me. It has such a lovely turn, just here.",
+      "next": "join-fx"
+    },
+    {
+      "id": "join-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "abbot.fate",
+          "value": "joined"
+        },
+        {
+          "kind": "setFact",
+          "fact": "abbot.resolution",
+          "value": "join"
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.joined"
+        },
+        {
+          "kind": "emit",
+          "event": "abbot.fate-set",
+          "data": {
+            "fate": "joined"
+          }
+        }
+      ],
+      "next": "join-end"
+    },
+    {
+      "id": "join-end",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "There. We shall have all the time in the world. I have always wanted a student who stayed.",
+      "end": true
+    },
+    {
+      "id": "joined-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "You came back to the song. Sit. Listen with me. It has such a lovely turn just here.",
+      "end": true
+    },
+    {
+      "id": "rest-echo-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "Pears. Yes. Thank you.",
+      "end": true
+    },
+    {
+      "id": "defeated-echo-1",
+      "kind": "line",
+      "speaker": "abbot",
+      "text": "I am only fog now, and a little regret. Go and ring it. Do not mind me.",
+      "end": true
+    }
+  ]
+}
