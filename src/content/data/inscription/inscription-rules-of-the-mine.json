@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-rules-of-the-mine",
+  "title": "Rules of the Mine",
+  "notes": "Bible 7.2: carved over the Deepworks gate; the Bell Line rule. Long Vespers and the hill, as the founders saw it.",
+  "locations": ["place-deepworks"],
+  "pages": [
+    {
+      "text": "No shaft below the Bell Line. The hill is kept."
+    }
+  ]
+}

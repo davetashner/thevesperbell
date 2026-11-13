@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-folk-cures-sleep",
+  "title": "Folk Cures for Poor Sleep",
+  "author": "Mother Odell Brisk",
+  "notes": "Extra shelf book: the valley's folk memory of the Long Vespers and the bell; an unreliable, affectionate source (bible 7.1: sources disagree). Does not give the canon figure of years.",
+  "locations": ["place-sleeping-ox", "place-pells-bakery", "place-marshs-general-store"],
+  "pages": [
+    {
+      "text": "For the sleepless: iron under the bed, a shoe by the door, and the window latched on the hill side.\n\nOur grandmothers say the trouble began the night the bell stopped, and that the old monks walked out of their beds and down into the hill like lambs. Some say they were called. Some say they were sent. Nobody agrees on which is worse.\n\nThe children still skip to a rhyme about the ox beneath the hill, who stays awake for us. I have never known a child to skip it at night.\n\nIf you wake and hear singing: do not sing back. That is the whole of the cure."
+    }
+  ]
+}

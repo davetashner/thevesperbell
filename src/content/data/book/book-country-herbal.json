@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-country-herbal",
+  "title": "A Country Herbal for the Glen",
+  "author": "Hester Lowe, midwife",
+  "notes": "Extra shelf book: bellwort root and dried nightshade are real items in the game; the bell line is folk memory (bell source, lightly).",
+  "locations": ["place-fenns-fletchery", "place-briarwood"],
+  "pages": [
+    {
+      "text": "Bellwort. A pale, nodding flower, the root bitter and steadying. Grows thickest along the priory road, where old women say the bell was once heard clearest. Chewed, it settles a racing heart and a restless night.\n\nNightshade. Dried, a drop of the tincture will let a person sleep who has not slept in a week. Too much and they will not wake. I have been asked to make it stronger. I have not.\n\nFor a child who will not sleep: warm milk, a little honey, a cloth over the window, and a song. Any song. Not the one from the hill."
+    }
+  ]
+}

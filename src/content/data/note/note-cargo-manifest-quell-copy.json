@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-cargo-manifest-quell-copy",
+  "title": "Cargo Manifest — the honest copy",
+  "author": "Jasper Quell",
+  "notes": "Bible 7.2: Quell's honest copy, hidden in his desk; the true crate contents are canon (11.3: 40 horn-coins, 3 carved stones, 1 name-stone).",
+  "locations": ["place-bonded-warehouse", "place-bay-nine"],
+  "pages": [
+    {
+      "text": "Kept for my own safety. If it comes to it, I never knew.\n\nHorn-coin, 40 pcs. Carved stone (ox-headed), 3. Name-stone, 1 — do NOT let the men see this one."
+    }
+  ]
+}

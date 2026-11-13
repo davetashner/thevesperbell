@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-knot-carved-faces",
+  "title": "The turned faces",
+  "notes": "Bible 7.1: near the Cradle every carved face in the Knot is turned toward the centre. A runic line the player can half-read; the Knot as a sentence (3.2).",
+  "locations": ["place-knot"],
+  "pages": [
+    {
+      "text": "(Every carved face along the wall is turned the same way, toward the centre. Beneath the nearest, in runes you only half read:)\n\nTHE SENTENCE HAS NO END. DO NOT LOOK FOR IT."
+    }
+  ]
+}
