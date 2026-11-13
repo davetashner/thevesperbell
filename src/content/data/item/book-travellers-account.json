@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-travellers-account",
+  "category": "book",
+  "name": "A Traveller's Account of the Glen",
+  "description": "A Traveller's Account of the Glen, by Perpetua Wyld, gentlewoman.",
+  "notes": "Inventory item for the story book text data/book/book-travellers-account.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-travellers-account.page-<n>. Value 30 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-travellers-account-01",
+  "value": 30,
+  "stackable": false,
+  "book": {
+    "title": "A Traveller's Account of the Glen",
+    "author": "Perpetua Wyld, gentlewoman",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-travellers-account.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}

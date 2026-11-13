@@ -140,8 +140,14 @@ describe('the village shop row merchants (mw-ju8.5)', () => {
   });
 
   it('AC-1: every catalogue item is stocked by at least one shop', () => {
+    // Story books (book-<slug>, mw-e39.44) are placed by the world and bookshop-stock beads, not the village shop row.
     const unstocked = items
-      .filter((item) => !NOT_FOR_SALE.has(item.id) && stockedBy(item.id).length === 0)
+      .filter(
+        (item) =>
+          !NOT_FOR_SALE.has(item.id) &&
+          !item.id.startsWith('book-') &&
+          stockedBy(item.id).length === 0,
+      )
       .map((item) => item.id);
     expect(unstocked).toEqual([]);
   });
