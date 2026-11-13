@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "`rumor-<nn>-<slug>`; `<nn>` is the bible 6.2 number."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Author-facing: what it points at and why it is told."
+    },
+    "region": {
+      "type": "string",
+      "enum": [
+        "valley",
+        "harbour"
+      ],
+      "description": "Where it circulates: the valley (1-12, 19-20) or the river and harbour (13-18)."
+    },
+    "source": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^npc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "description": "The NPCs who tell it first-hand (glossary NPC ids)."
+    },
+    "sourceTags": {
+      "description": "Crowd sources, e.g. \"tidemarket\" for gossip with no single teller.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+(?:-[a-z]+)*$"
+      }
+    },
+    "truth": {
+      "type": "string",
+      "enum": [
+        "true",
+        "half",
+        "false"
+      ],
+      "description": "Whether the rumour is true, half-true or false."
+    },
+    "target": {
+      "type": "string",
+      "pattern": "^(?:place|npc|term|quest)-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "What it points at: a glossary place, NPC or term id, or a quest id."
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "description": "The rumour as it is told, in the bible."
+    },
+    "secondHand": {
+      "description": "How a valley teller repeats it; hearing it this way never marks the target visited.",
+      "type": "object",
+      "properties": {
+        "teller": {
+          "type": "string",
+          "pattern": "^npc-[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Who repeats it second-hand (Dot, in the valley)."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "teller",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "debunk": {
+      "description": "Required when false: the ways the player can learn it is false.",
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "via": {
+                "type": "string",
+                "const": "dive"
+              },
+              "place": {
+                "type": "string",
+                "pattern": "^place-[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Where the player goes to see for themselves."
+              }
+            },
+            "required": [
+              "via",
+              "place"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "via": {
+                "type": "string",
+                "const": "ask"
+              },
+              "npc": {
+                "type": "string",
+                "pattern": "^npc-[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Who laughs it off or sets the player straight."
+              }
+            },
+            "required": [
+              "via",
+              "npc"
+            ],
+            "additionalProperties": false
+          }
+        ],
+        "description": "One way to learn a rumour is false."
+      }
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "region",
+    "source",
+    "truth",
+    "target",
+    "text"
+  ],
+  "additionalProperties": false,
+  "description": "A rumour (story bible 6.2): source, truth value and target (mw-e39.23)."
+}
