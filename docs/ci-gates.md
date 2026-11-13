@@ -21,7 +21,8 @@ one definition.
 | `lint` (ci.yml) | per-PR | Fast; includes the sim determinism and layer-import rules; required. |
 | `typecheck` (ci.yml) | per-PR | Fast; required. |
 | `unit` (ci.yml) | per-PR | Required context name. A no-op that points at `coverage-gate`; vitest bench left it for the nightly tier. |
-| `coverage-gate` (ci.yml) | per-PR | The only unit and integration test run; enforces the per-layer thresholds of contract §3; required. |
+| `coverage-shard` 1 to 6 (ci.yml) | per-PR | The only unit and integration test run, split into 6 parallel `vitest --shard=i/6` jobs that each upload a blob report and enforce no thresholds (`VESPER_COVERAGE_SHARD=1`); a failing test fails its shard (mw-txg). Not a required context itself; `coverage-gate` fails when any shard does. |
+| `coverage-gate` (ci.yml) | per-PR | Required aggregate: fails unless every shard passed, then `pnpm test:coverage:merge` (`vitest --merge-reports --coverage`) merges the blobs into one run, so the per-layer thresholds of contract §3 are enforced once on the merged coverage and `coverage/content-coverage.json` holds the union of every shard's exercised content; then `coverage:exclusions`, `content:coverage`, `content:loot` and the `coverage-summary` artifact the ratchet reads. |
 | `coverage-ratchet` (ci.yml) | per-PR | Coverage must not decrease versus `main`; seconds; required. |
 | `e2e-shard` 1 to 6 (ci.yml) | per-PR | Chromium e2e smoke in duration-weighted shards (`e2e/shards.json`); the behaviour gate for gameplay changes. |
 | `e2e-playthrough` (ci.yml) | per-PR | The slice playthrough replays a whole run; kept on every PR until path-aware selection lands (mw-e41.4). |
@@ -61,7 +62,7 @@ one definition.
 | `ci` (playwright.perf.config.ts) | nightly, release (and `main` pushes for the baseline) | Perf budget suite in CI mode, including the wall-clock load budgets. |
 | `reference` (playwright.perf.config.ts) | manual | Absolute frame-time budgets on the reference machine; not runnable on CI hardware. |
 | `latency` (playwright.perf.config.ts) | manual (`pnpm perf:ref`, `pnpm perf:latency`) | Input-to-motion latency (≤ 100 ms p95 High, ≤ 133 ms Low at 30 fps) and controller (≤ 0.3 ms/tick) and camera (≤ 0.2 ms/frame) cost on the reference machine, headed Chrome with vsync on (mw-e02.8); not runnable on CI hardware. |
-| vitest unit and integration (`vite.config.ts`) | per-PR | Run once, inside `coverage-gate`. |
+| vitest unit and integration (`vite.config.ts`) | per-PR | Run once, sharded across `coverage-shard`, merged in `coverage-gate`. Locally `pnpm test:coverage` is still the whole run in one process. |
 | vitest bench (`pnpm bench`) | nightly, release | See `bench` above. |
 
 ## Rules for changing tiers

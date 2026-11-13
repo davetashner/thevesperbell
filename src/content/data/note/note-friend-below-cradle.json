@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-friend-below-cradle",
+  "title": "A last note, in a very steady hand",
+  "author": "A friend below",
+  "notes": "Bible 4.1 beats 10-12 (the way on to the Cradle): the last note, nearly all warmth. Re-read: the tongue, the song, and 'so very good at this' echo the Act III reveal in abbot-cradle.json.",
+  "locations": ["place-cradle"],
+  "pages": [
+    {
+      "text": "You have done so much. I have watched you, and you have been so very good at this.\n\nThe way to the middle lies past the Warden, as you know. When you are through, come and find me. I have the bell's tongue, and there is a great deal I should like you to hear.\n\nBring nobody who would be unhappy at what they hear.\n\n— A friend below."
+    }
+  ]
+}

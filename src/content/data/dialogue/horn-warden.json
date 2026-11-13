@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "horn-warden",
-  "notes": "Brother Horn (bible 5.8, 4.2, 4.3, 4.5), the Warden of the Knot. Not placed yet: Horn's Hall and the Fold belong to the Knot (E27 and later), so he stands in the debug conversation room. Voice: slow, short, plain sentences with pauses; he never roars words. One dialogue, entries tried in order: the endings (Vespers Rung lines, and the abbot-joined silence), the Act III shaft barks (horn.at-shaft), rescue remarks (horn.rescue-pending, by horn.rescues 1, 2, 3, 4 and 5+), the Fold confrontation after a trick and its 'angry, then weary' re-entry after the player fled (horn.fold-fled), the Trial of Horns won, the yield after a fight (spare or finish him), help-done, befriended, spared, tricked-return and the first meetings by class (knight, archer, sorcerer, thief, any), then return. Resolutions set horn.fate: kill-fx (dead), spare-fx, honest-fx (trick), befriend-fx, trial-fx2 and help-fx (alive). Befriend triggers each have their own scene behind befriend-gate: horn.hymn-hummed, horn.ring-held, horn.name-stone-held, snig.vouched, clatter.vouched, horn.weapon-lowered; the sorcerer can also read the axe runes (his name). The knight's Trial of Horns starts a duel the quest runs (horn.trial-offered, event horn.trial.begin) and sets horn.trial-won. The main quest (mw-e39.4) sets the facts named in horn-dialogue.json. The reveal is shown, not told: in the Fold the narrator describes the sleepers before Horn says a word.",
+  "notes": "Brother Horn (bible 5.8, 4.2, 4.3, 4.5), the Warden of the Knot. Not placed yet: Horn's Hall and the Fold belong to the Knot (E27 and later), so he stands in the debug conversation room. Voice: slow, short, plain sentences with pauses; he never roars words. One dialogue, entries tried in order: the endings (Vespers Rung lines, and the abbot-joined silence), the Act III shaft barks (horn.at-shaft), rescue remarks (horn.rescue-pending, by horn.rescues 1, 2, 3, 4 and 5+), the Fold confrontation after a trick and its 'angry, then weary' re-entry after the player fled (horn.fold-fled), the Trial of Horns won, the yield after a fight (spare or finish him), help-done, befriended, spared, tricked-return and the first meetings by class (knight, archer, sorcerer, thief, any), then return. Resolutions set horn.fate: kill-fx (dead), spare-fx, honest-fx (trick), befriend-fx, trial-fx2 and help-fx (alive). Befriend triggers each have their own scene behind befriend-gate: horn.hymn-hummed, horn.ring-held, horn.name-stone-held or namestone.obtained (written by The Crate for Mr. S—), snig.vouched, clatter.vouched, horn.weapon-lowered; the sorcerer can also read the axe runes (his name). The knight's Trial of Horns starts a duel the quest runs (horn.trial-offered, event horn.trial.begin) and sets horn.trial-won. The main quest (mw-e39.4) sets the facts named in horn-dialogue.json. The reveal is shown, not told: in the Fold the narrator describes the sleepers before Horn says a word.",
   "speakers": [
     {
       "id": "horn",
@@ -471,8 +471,17 @@
         },
         {
           "when": {
-            "kind": "fact",
-            "fact": "horn.name-stone-held"
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "horn.name-stone-held"
+              },
+              {
+                "kind": "fact",
+                "fact": "namestone.obtained"
+              }
+            ]
           },
           "next": "bf-stone-1"
         },
