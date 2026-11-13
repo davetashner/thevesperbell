@@ -50,6 +50,7 @@ import { controllerSchema } from './types/controller.ts';
 import { creatureSchema } from './types/creature.ts';
 import { dialogueSchema } from './types/dialogue.ts';
 import { persuasionSchema } from './types/persuasion.ts';
+import { contestSchema } from './types/contest.ts';
 import { cueSheetSchema } from './types/cue-sheet.ts';
 import { doorSchema } from './types/door.ts';
 import { elementFeedbackSchema } from './types/element-feedback.ts';
@@ -138,6 +139,7 @@ export const contentTypes = {
   puzzle: puzzleSchema,
   quest: questSchema,
   persuasion: persuasionSchema,
+  contest: contestSchema,
   'reach-class': reachClassSchema,
   rumor: rumorSchema,
   'respawn-rules': respawnRulesSchema,
