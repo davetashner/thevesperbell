@@ -33,6 +33,9 @@ describe('watchPresence (mw-ju8.14)', () => {
     expect(teachers()).toBe(1);
     sim.facts.set(PHASE_FACT, 'dawn');
     game.world.step();
+    // mw-8551: he walks to the way out and is gone there; he does not vanish where he stands.
+    expect(teachers()).toBe(1);
+    for (let i = 0; i < 60 * 120 && teachers() > 0; i++) game.world.step();
     expect(teachers()).toBe(0);
   });
 

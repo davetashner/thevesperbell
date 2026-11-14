@@ -106,8 +106,10 @@ describe('the sorcery teacher under the bridge, headless (mw-ju8.14)', () => {
       ['night', true],
     ] as const) {
       t.setPhase(phase);
-      expect(t.teachers()).toHaveLength(present ? 1 : 0);
       expect(t.talks()).toBe(present);
+      // A leaver walks to the way out (mw-8551): the lessons stop at once, he is gone on arrival.
+      for (let i = 0; i < 60 * 120 && !present && t.teachers().length > 0; i++) t.game.world.step();
+      expect(t.teachers()).toHaveLength(present ? 1 : 0);
     }
   });
 
