@@ -19,7 +19,8 @@
         "first-night",
         "barge",
         "ending",
-        "epilogue"
+        "epilogue",
+        "class-beat"
       ],
       "description": "What the sequences are, which sets the rules they follow."
     },
@@ -94,7 +95,106 @@
               ],
               "additionalProperties": false
             },
-            "description": "The pages, in the order they are shown."
+            "description": "The pages, in the order they are shown. For a class beat these are the generic text every class without its own variant sees."
+          },
+          "variants": {
+            "description": "Class beats only: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`.",
+            "type": "object",
+            "properties": {
+              "knight": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The page as the player reads it."
+                    },
+                    "beat": {
+                      "description": "A named story beat this page lands (the first night ends on `horned-shadow`).",
+                      "type": "string",
+                      "pattern": "^[a-z]+(?:-[a-z]+)*$"
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "archer": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The page as the player reads it."
+                    },
+                    "beat": {
+                      "description": "A named story beat this page lands (the first night ends on `horned-shadow`).",
+                      "type": "string",
+                      "pattern": "^[a-z]+(?:-[a-z]+)*$"
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "sorcerer": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The page as the player reads it."
+                    },
+                    "beat": {
+                      "description": "A named story beat this page lands (the first night ends on `horned-shadow`).",
+                      "type": "string",
+                      "pattern": "^[a-z]+(?:-[a-z]+)*$"
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "thief": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The page as the player reads it."
+                    },
+                    "beat": {
+                      "description": "A named story beat this page lands (the first night ends on `horned-shadow`).",
+                      "type": "string",
+                      "pattern": "^[a-z]+(?:-[a-z]+)*$"
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": [

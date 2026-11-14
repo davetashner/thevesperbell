@@ -1,0 +1,279 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-class-beats",
+  "kind": "class-beat",
+  "notes": "Class-specific arrival text, first journal entry and signature-beat text (bible 4.3, mw-e39.17). One sequence per beat in CLASS_BEAT_IDS: `variants` hold each class's pages and `pages` the generic text a class without a variant would see (none should: the lint warns). Looked up with classBeat() keyed by player.class. Bible 4.3 moments that need unbuilt encounters are bound by the beads named in docs/narrative/class-beat-audit.md.",
+  "sequences": [
+    {
+      "id": "arrival",
+      "title": "Why you came",
+      "notes": "Bible 4.1 beat 1 and 4.3: the four arrival reasons, shown after the road at dusk and before the bounty board. Selected by player.class.",
+      "pages": [
+        {
+          "text": "You came down the mountain road to Briar Glen for the money, like everyone else who reads a notice twice."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "The Oath for Hire. The Baron's household was disbanded the winter his line failed, and an oath with nobody to swear it to is a weight a sword can carry only so long. You have a good blade, a name that still means something in this valley, and a purse that does not."
+          },
+          {
+            "text": "The town sees it at once: the way you stand, the way you look at the gate. Before you reach the green, Harrow Vane's man has already told his master that a proper sword has come to Briar Glen."
+          }
+        ],
+        "archer": [
+          {
+            "text": "The Silent Wolves. In the Greenmarch the packs have gone quiet, and a ranger knows that is worse than howling. You followed one pack's old trails south for nine days, through thinning pines, down to the edge of Briar Glen, where the tracks bend toward the mine and stop."
+          },
+          {
+            "text": "You came for the wolves. The notice on the board is somebody else's trouble. You have a feeling it is going to become yours."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "The Letter from the Lamplit Stacks. It was brief and unsigned except for a bookmark: I have come by something you will want to read. Come before the Lantern Court does. You know the handwriting of Mirela Thorne, who does not ask favours of anyone."
+          },
+          {
+            "text": "You have the letter in your sleeve and a spellbook in your pack that Inspector Cray's colleagues would love to meet. The glen smells of woodsmoke and old paper, and, faintly, of a song that has not been written down."
+          }
+        ],
+        "thief": [
+          {
+            "text": "A Commission from the City. The buyer never gave a name, only a signature that ended in a dash, and a price paid half in advance: one horn-coin, a sample, from Vane's own strongbox. After that you take it to a drop in Wendmouth, at a tavern called the Drowned Gull, and ask for the go-between."
+          },
+          {
+            "text": "Nobody has asked what you really do for a living. You have a fair idea why Briar Glen's innkeeper is going to guess it in about a minute."
+          }
+        ]
+      }
+    },
+    {
+      "id": "first-journal",
+      "title": "Journal: first entry",
+      "notes": "Bible 4.3: the first journal line of a new game. Shown when the main quest's arrival stage opens, in place of its generic text.",
+      "pages": [
+        {
+          "text": "Briar Glen, dusk. A bounty on a beast in the mine, and a town that does not say what it is afraid of."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "Briar Glen, dusk. Five hundred crowns, paid by H. Vane, for the Beast of the Deepworks. I was an oath-bound sword; I am a hired one. I will see what the money is for before I spend a drop of anyone's blood on it."
+          }
+        ],
+        "archer": [
+          {
+            "text": "Briar Glen, dusk. The wolves I followed have gone quiet in these hills, and the tracks bend toward the mine. A bounty on a beast, nailed up this evening. Find Juniper Fenn, who sells arrows and may know the woods. Find out why they stopped howling."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "Briar Glen, dusk. Mirela's letter said to come before the Lantern Court does. Her shop is on the green. A bounty on a beast in the mine, nailed up as I arrived, and a song nobody in the street wants to name. Go to the bookshop first."
+          }
+        ],
+        "thief": [
+          {
+            "text": "Briar Glen, dusk. The job: one horn-coin from Vane's strongbox, a drop in Wendmouth, and no questions. Vane House is the big roofline above the green. Find the innkeeper who sees everything. Do not sell her what she has not paid for."
+          }
+        ]
+      }
+    },
+    {
+      "id": "night-one",
+      "title": "The first night, as you are",
+      "notes": "Bible 4.1 beat 2 and 4.3: the line that shows when the player first spots Tansy in the street, by class.",
+      "pages": [
+        {
+          "text": "Someone is humming under your window, slow and sweet and a little flat. You get up and go to see."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "You are dressed and armed before you have decided to be. Old habit: a household sleeps in its boots. The girl in the street is no threat you can name, but you tighten your belt as if she were."
+          }
+        ],
+        "archer": [
+          {
+            "text": "From the window you see what the town would miss: a line of bare footprints printing the dew, a trampled path through the ferns behind the stables, straight up the hill. Someone has walked this way before. Many, and carefully. The Sleepers' Path."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "The tune is wrong in a way you almost recognise: not a hymn, not a lullaby, something older that sounds like a lullaby wearing a hymn's coat. You mouth the notes without meaning to, and your fingers are warm, as if the spellbook in your pack had noticed too."
+          }
+        ],
+        "thief": [
+          {
+            "text": "You are out the window and down the ox-shed roof without waking the beams. The girl is easy to follow, and you take the shadows anyway. A town with a secret is a town that sets its lamps wrong, and you mark which doors are barred from the outside."
+          }
+        ]
+      }
+    },
+    {
+      "id": "getting-in",
+      "title": "Getting into the Deepworks",
+      "notes": "Bible 4.3 'Getting in': the class-flavoured prompt at the mine's other ways in.",
+      "pages": [
+        {
+          "text": "The mine does not want to be entered. There is a way in, if you do not mind how you get there."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "[Knight] Put your shoulder to the rotted boards. They have held against rats and rain for forty years. They do not hold against a man who has spent a decade breaking down doors in a baron's name."
+          },
+          {
+            "text": "[Knight] The supply tunnel has fallen in. Stone by stone, you clear it by hand. It takes an hour, and nobody tells you that you do not have to."
+          }
+        ],
+        "archer": [
+          {
+            "text": "[Archer] From the old wood bridge you pick out a rope hanging from the winch house beam, thirty paces off. One shot, a knot you trust, and you cross high, above the barred gate and the men guarding it."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "[Sorcerer] The inner bar is sealed with a word, and the word is not a spell. Mirela's notes call it a Hornfolk gate-name. You read it aloud, uncertain and quiet, and the bar lifts as though it had been waiting for someone to say it correctly."
+          }
+        ],
+        "thief": [
+          {
+            "text": "[Thief] There is always a way over, and tonight it is Vane House: a drainpipe, a lead roof, a skylight whose latch was oiled yesterday by a man who is not the servant he claims to be. Someone has been here before you."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mooring-watch",
+      "title": "Mooring's Watch",
+      "notes": "Bible 4.3: the Hollow Sentinels guard the tower; each class has its own way past them.",
+      "pages": [
+        {
+          "text": "The Hollow Sentinels stand watch over the tower still. They have been standing so long that they have forgotten why, and they cannot be told otherwise."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "[Knight] Relieve the watch. You know the words; every household of the old barony taught them. 'Hold the post. Hold it well. Stand down, and well done.' The Sentinels, who have waited sixty years for someone to say it, salute with a sound like dry leaves, and fall still."
+          }
+        ],
+        "archer": [
+          {
+            "text": "[Archer] Turn the signal mirror. The valley is dark, the light is a single bright thread, and it lands on the priory's hidden choir door two miles off. Then the bell cord: one shot, clean. The watch is ended, and the Sentinels know it."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "[Sorcerer] The keeper's log is full of old words, and the Sentinels answer to them. You read the dismissal aloud from the page, and then a second time with the pitch of the mark under your breath, the way the book says. The armour loosens, and the watch dissolves."
+          }
+        ],
+        "thief": [
+          {
+            "text": "[Thief] The Sentinels hear footsteps, not shadow. You wait for the light to turn and go by on the outside wall, hand over hand across stones the mortar gave up on. When you reach the top, the guard is still facing the valley, still on watch."
+          }
+        ]
+      }
+    },
+    {
+      "id": "wendmouth",
+      "title": "Wendmouth, your way",
+      "notes": "Bible 4.3: one hijinks beat per class in Wendmouth, shown as the player takes it on at the harbour.",
+      "pages": [
+        {
+          "text": "Wendmouth never stops. There is always something on the water that wants doing, and somebody willing to pay for it."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "[Knight] The arm-wrestling table at the Drowned Gull is a rite, not a game. Big Oona has not lost in four years and is bored. Tereza Maelo, who retired from duelling, watches you across the room. She is looking for a reason not to pick up her sword again. You may be it."
+          }
+        ],
+        "archer": [
+          {
+            "text": "[Archer] The Gull Shoot at the Tidefair is a poor contest and a great stage. Past the targets, a crate is rising on a hoist toward the deck of the Tern, and the net holding it has a single knot you can reach from the net lofts. The harbour is very still."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "[Sorcerer] The regatta crowd has bet on the wrong boat. A gust, nothing a sailor would blame on anyone, fills one sail and empties another. And if the Tern must be reached, the harbour pool freezes at a word, thin as glass, and just thick enough to walk on."
+          }
+        ],
+        "thief": [
+          {
+            "text": "[Thief] Wendmouth is your level. A bonded warehouse, a dock-hand's jacket, a manifest that wants its numbers changed. The Undertow sells the rope and the boots. At the Tidefair, a pickpocket race: half the harbour is in it, and the other half does not yet know."
+          }
+        ]
+      }
+    },
+    {
+      "id": "horn",
+      "title": "Horn in the Hall",
+      "notes": "Bible 4.3: the Warden's Trial, by class. Horn's spoken lines are in dialogue/horn-warden; this is the approach text and the action prompt.",
+      "pages": [
+        {
+          "text": "Brother Horn waits in the Hall. He is very large, and very still, and does not seem pleased to see anyone."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "[Knight] The Trial of Horns is older than the priory, and the Hornfolk gave it to every guest who would claim the road. You walk the length of the Hall with your sword sheathed. He watches you stand the way a baron's man stood, and he does not say whether that is a compliment."
+          }
+        ],
+        "archer": [
+          {
+            "text": "[Archer] The chapel portcullis hangs by one rotted chain above the doorway behind Horn, a long way up. You nock, breathe, and look at him a long time before you draw. Then, the shot. The iron drops between you with a sound like a bell, and the Warden stops walking."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "[Sorcerer] The axe on his belt is carved with runes, and you have read nothing so beautiful in your life. They are not a spell. They are a name. Say it aloud, wrong and he will strike you down; say it right and the Hall goes quiet. You start at the first mark."
+          }
+        ],
+        "thief": [
+          {
+            "text": "[Thief] You came the whole way without being seen: the Fold, past the goblin watch, past the sleepers on their moss beds, among whom you sat down to wait. When the Warden finds you there, he does not reach for the axe. He asks one question, and you have until the end of it to have an answer."
+          }
+        ]
+      }
+    },
+    {
+      "id": "climax",
+      "title": "The Sounding Shaft",
+      "notes": "Bible 4.3 climax: the last stretch to the bell, by class. Which ending plays is the main quest's; this is the beat on the way.",
+      "pages": [
+        {
+          "text": "The Sounding Shaft is a long way up. Somewhere above, the Abbot is still singing."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "[Knight] At the shaft's foot you plant your feet. Clatter climbs with the tongue; the Hushlings come, soft as breath, and you meet them with a wall of steel and the old words of a household that has nowhere left to be. You hold until the bell rings, and they dissolve around you like frost."
+          }
+        ],
+        "archer": [
+          {
+            "text": "[Archer] You loose a line into the dark and it takes: the shot rises, and the rope pays out behind it. Half the climb is gone in a breath. Then, one at a time, the anchor lanterns that hold the Abbot to this world. Every one goes out."
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "[Sorcerer] Before the ringing, you mend the crack. Frostglass and Alteration, the repair thin as breath along the lip of the bell. The note that follows is truer than any before it, and somewhere beneath the hill the Nightjar sleeps a little easier."
+          }
+        ],
+        "thief": [
+          {
+            "text": "[Thief] The Abbot is mid-song, arms spread, the tongue of the bell hanging from his belt like a trophy he has forgotten. You step into the chorus as if you belonged there. Your fingers are the quietest thing in the valley. When he finishes the verse, the tongue is gone from his belt, and he has not noticed."
+          }
+        ]
+      }
+    }
+  ]
+}
