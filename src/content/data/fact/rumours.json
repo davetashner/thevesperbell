@@ -1,0 +1,36 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "rumours",
+  "name": "Rumour facts",
+  "notes": "mw-e22.11: what the player has heard and what came of it (src/game/rumours/rumours.ts). Keyed entity:rumours/<rumour id>.<state>. Written only when the player hears a rumour (a new game holds none), so a save keeps the whole journal state in facts.",
+  "facts": [
+    {
+      "key": "entity:*.heard",
+      "type": "bool",
+      "default": false,
+      "description": "The player has heard this rumour (a `rumor.told` emit from a teller, or a `revealRumor` effect). Its target is now a lead. Never reset.",
+      "owner": "rumours"
+    },
+    {
+      "key": "entity:*.investigated",
+      "type": "bool",
+      "default": false,
+      "description": "A heard rumour's target has been visited (arrival volume entered, NPC spoken to, quest started). Written with the logic event rumor.resolved. Dot's follow-up line is offered once this is set.",
+      "owner": "rumours"
+    },
+    {
+      "key": "entity:*.debunked",
+      "type": "bool",
+      "default": false,
+      "description": "The player learned a false or half-true rumour is wrong: they saw for themselves (a debunk `dive` place visited) or were told by the debunker (the `rumor.corrected` emit). Written with the logic event rumor.debunked.",
+      "owner": "rumours"
+    },
+    {
+      "key": "entity:*.followed",
+      "type": "bool",
+      "default": false,
+      "description": "Dot has traded back the follow-up line for this rumour (once only, her dialogue sets it).",
+      "owner": "rumours"
+    }
+  ]
+}
