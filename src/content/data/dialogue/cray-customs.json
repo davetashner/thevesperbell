@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "cray-customs",
-  "notes": "mw-e39.20: Inspector Prudence Cray (bible 5.13), Lantern Court customs. Incorruptible: every bribe option sets cray.bribe.attempted, lowers disposition by 6 and is recorded; no branch lets a bribe succeed (AC-2). Never confiscates plot-critical or forbidden-plot items: the confiscate hook is an emit whose payload excludes both (AC-5). Sorcerer is searched on sight; romance novels (stand-in fact cray.romance-brought) raise disposition; evidence about bay nine (stand-in facts evidence.*) opens the legal seizure route; cold disposition still accepts evidence. mw-e39.22 (The Tidefair, Contraband Pages): ask-crate names the impounded crate (books.impounded, also set by the sorcerer search); ask-swap releases the books after the romance novel (cray.books-traded); present-writ checks a writ (Vane's passes, Mirela's forged seal passes unless the player already tried a bribe); ask-regatta explains rule four; entries thanks, regatta-fine, pocket-ribbon and theft-noticed react to the quests' facts. Still incorruptible: no bribe works.",
+  "notes": "mw-e39.20: Inspector Prudence Cray (bible 5.13), Lantern Court customs. Incorruptible: every bribe option sets cray.bribe.attempted, lowers disposition by 6 and is recorded; no branch lets a bribe succeed (AC-2). Never confiscates plot-critical or forbidden-plot items: the confiscate hook is an emit whose payload excludes both (AC-5). Sorcerer is searched on sight; romance novels (item romance-hearts-against-the-tide, mw-m97i) raise disposition; evidence about bay nine (stand-in facts evidence.*) opens the legal seizure route; cold disposition still accepts evidence. mw-e39.22 (The Tidefair, Contraband Pages): ask-crate names the impounded crate (books.impounded, also set by the sorcerer search); ask-swap releases the books after the romance novel (cray.books-traded); present-writ checks the writ in the pack (writ-vane-chair passes; writ-forged-lantern passes unless the player already tried a bribe) and takes it; ask-regatta explains rule four; entries thanks, regatta-fine, pocket-ribbon and theft-noticed react to the quests' facts. Still incorruptible: no bribe works.",
   "speakers": [
     {
       "id": "cray",
@@ -457,8 +457,9 @@
             "kind": "all",
             "of": [
               {
-                "kind": "fact",
-                "fact": "cray.romance-brought"
+                "kind": "hasItem",
+                "item": "romance-hearts-against-the-tide",
+                "count": 1
               },
               {
                 "kind": "not",
@@ -551,8 +552,19 @@
             "kind": "all",
             "of": [
               {
-                "kind": "fact",
-                "fact": "writ.held"
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "hasItem",
+                    "item": "writ-vane-chair",
+                    "count": 1
+                  },
+                  {
+                    "kind": "hasItem",
+                    "item": "writ-forged-lantern",
+                    "count": 1
+                  }
+                ]
               },
               {
                 "kind": "not",
@@ -727,14 +739,14 @@
       "kind": "effect",
       "effects": [
         {
-          "kind": "setFact",
-          "fact": "cray.romance-accepted",
-          "value": true
+          "kind": "takeItem",
+          "item": "romance-hearts-against-the-tide",
+          "count": 1
         },
         {
           "kind": "setFact",
-          "fact": "cray.romance-brought",
-          "value": false
+          "fact": "cray.romance-accepted",
+          "value": true
         },
         {
           "kind": "disposition",
@@ -1044,10 +1056,9 @@
             "kind": "all",
             "of": [
               {
-                "kind": "factCmp",
-                "fact": "writ.source",
-                "op": "eq",
-                "value": "forged"
+                "kind": "hasItem",
+                "item": "writ-forged-lantern",
+                "count": 1
               },
               {
                 "kind": "fact",
@@ -1059,10 +1070,9 @@
         },
         {
           "when": {
-            "kind": "factCmp",
-            "fact": "writ.source",
-            "op": "eq",
-            "value": "forged"
+            "kind": "hasItem",
+            "item": "writ-forged-lantern",
+            "count": 1
           },
           "next": "writ-forged-1"
         }
@@ -1081,14 +1091,14 @@
       "kind": "effect",
       "effects": [
         {
-          "kind": "setFact",
-          "fact": "cray.writ.accepted",
-          "value": true
+          "kind": "takeItem",
+          "item": "writ-vane-chair",
+          "count": 1
         },
         {
           "kind": "setFact",
-          "fact": "writ.held",
-          "value": false
+          "fact": "cray.writ.accepted",
+          "value": true
         },
         {
           "kind": "disposition",
@@ -1117,14 +1127,14 @@
       "kind": "effect",
       "effects": [
         {
-          "kind": "setFact",
-          "fact": "cray.writ.accepted",
-          "value": true
+          "kind": "takeItem",
+          "item": "writ-forged-lantern",
+          "count": 1
         },
         {
           "kind": "setFact",
-          "fact": "writ.held",
-          "value": false
+          "fact": "cray.writ.accepted",
+          "value": true
         },
         {
           "kind": "emit",
@@ -1148,14 +1158,14 @@
       "kind": "effect",
       "effects": [
         {
-          "kind": "setFact",
-          "fact": "cray.writ.rejected",
-          "value": true
+          "kind": "takeItem",
+          "item": "writ-forged-lantern",
+          "count": 1
         },
         {
           "kind": "setFact",
-          "fact": "writ.held",
-          "value": false
+          "fact": "cray.writ.rejected",
+          "value": true
         },
         {
           "kind": "setFact",

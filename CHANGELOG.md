@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Contraband Pages now uses real items: Mirela's crate of impounded books, Vane's writ (bought for 100 crowns), Mirela's forged Lantern writ and a romance novel for Cray are carried in the pack, handed over at the desk and taken by Cray or Mirela (mw-m97i).
 - The folded note from "a friend below" now waits on the floor of your room at the Sleeping Ox, and a second one is pinned by the Deepworks mine gate; reading either counts toward the main quest (mw-nro9).
 - Notes, notices and inscriptions placed in the world can now be read: Interact on one opens a reader window with its title and text (several pages turn with the arrow keys), Esc or Interact closes it, and the first read of a text records the evidence it proves so characters and quests can react to it (mw-kf4c).
 - Wendmouth's harbour texts now have places to be read (the customs house, bay nine, the Stone Wharf, Cray's desk and the Kestrel Lock toll board; the reader itself is still to come), Nell tells the rumour about her cellar, and Dot repeats the six harbour rumours second-hand until you have been to Wendmouth (mw-18w, mw-ily9).

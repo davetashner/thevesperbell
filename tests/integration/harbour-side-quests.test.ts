@@ -19,6 +19,10 @@ import { Rng } from '@sim/rng';
 
 const TIDE = 'quest-tidefair';
 const PAGES = 'quest-contraband-pages';
+const CRATE_ITEM = 'crate-impounded-books';
+const VANE_WRIT = 'writ-vane-chair';
+const FORGED_WRIT = 'writ-forged-lantern';
+const ROMANCE = 'romance-hearts-against-the-tide';
 const CRATE = 'quest-crate-for-mr-s';
 const MAIN = 'quest-labyrinth-beneath-briar-glen';
 const EVENTS = ['arm-wrestling', 'gull-shoot', 'regatta', 'pocket-race'] as const;
@@ -512,6 +516,7 @@ describe('Contraband Pages', () => {
     talk(g, 'cray-customs', ['ask-release']);
     expect(state(g, PAGES)).toBe('resolved');
     expect(resolution(g, PAGES)).toBe('evidence-gratitude');
+    expect(g.host.itemCount(CRATE_ITEM)).toBe(1);
     expect(fact(g, 'books.recovered')).toBe(true);
     expect(fact(g, 'books.method')).toBe('evidence');
     expect(['grateful', 'fond']).toContain(fact(g, 'cray.disposition'));
@@ -526,14 +531,21 @@ describe('Contraband Pages', () => {
 
   it('the romance novel route: Cray accepts it and the books go quietly', () => {
     const g = boot();
-    startedBy(g, { 'books.impounded': true, 'cray.romance-brought': true });
+    startedBy(g, { 'books.impounded': true });
+    expect(offered(g, 'cray-customs')).not.toContain('offer-romance');
+    g.host.giveItem(ROMANCE, 1);
+    g.runtime.notifyItem(ROMANCE);
+    tick(g);
+    expect(g.runtime.objectiveState(PAGES, 'find-a-romance')).toBe('complete');
     talk(g, 'cray-customs', ['offer-romance']);
+    expect(g.host.itemCount(ROMANCE)).toBe(0);
     expect(fact(g, 'cray.romance-accepted')).toBe(true);
     expect(state(g, PAGES)).toBe('active');
     talk(g, 'cray-customs', ['ask-swap']);
     expect(resolution(g, PAGES)).toBe('romance-trade');
     expect(fact(g, 'cray.disposition')).toBe('fond');
     expect(fact(g, 'books.method')).toBe('romance');
+    expect(g.host.itemCount(CRATE_ITEM)).toBe(1);
   });
 
   it("Vane's writ costs a hundred crowns and Cray accepts it", () => {
@@ -543,10 +555,14 @@ describe('Contraband Pages', () => {
     talk(g, 'vane-bounty', ['ask-writ', 'writ-pay']);
     expect(g.host.gold()).toBe(50);
     expect(fact(g, 'writ.source')).toBe('vane');
-    expect(fact(g, 'writ.held')).toBe(true);
+    expect(g.host.itemCount(VANE_WRIT)).toBe(1);
+    tick(g);
+    expect(g.runtime.objectiveState(PAGES, 'buy-vanes-writ')).toBe('complete');
+    expect(offered(g, 'vane-bounty')).not.toContain('ask-writ');
     talk(g, 'cray-customs', ['present-writ']);
     expect(resolution(g, PAGES)).toBe('vane-writ');
-    expect(fact(g, 'writ.held')).toBe(false);
+    expect(g.host.itemCount(VANE_WRIT)).toBe(0);
+    expect(g.host.itemCount(CRATE_ITEM)).toBe(1);
     expect(fact(g, 'cray.disposition')).toBe('neutral');
   });
 
@@ -567,7 +583,9 @@ describe('Contraband Pages', () => {
     set(g, { 'cray.writ.offered': true });
     talk(g, 'mirela-stacks', ['ask-forge']);
     expect(fact(g, 'writ.source')).toBe('forged');
+    expect(g.host.itemCount(FORGED_WRIT)).toBe(1);
     talk(g, 'cray-customs', ['present-writ']);
+    expect(g.host.itemCount(FORGED_WRIT)).toBe(0);
     expect(resolution(g, PAGES)).toBe('forged-writ');
     expect(fact(g, 'books.method')).toBe('forged-writ');
   });
@@ -580,6 +598,8 @@ describe('Contraband Pages', () => {
     const said = talk(g, 'cray-customs', ['present-writ']);
     expect(said.join(' | ')).toMatch(/wrong side of the lamp/);
     expect(fact(g, 'cray.writ.rejected')).toBe(true);
+    expect(g.host.itemCount(FORGED_WRIT)).toBe(0);
+    expect(g.host.itemCount(CRATE_ITEM)).toBe(0);
     expect(fact(g, 'cray.disposition')).toBe('wary');
     expect(state(g, PAGES)).toBe('active');
     expect(fact(g, 'books.recovered')).toBe(false);
@@ -593,6 +613,7 @@ describe('Contraband Pages', () => {
     done(g, PAGES, 'reach-the-strongroom', 'lift-the-books');
     expect(resolution(g, PAGES)).toBe('strongroom-theft');
     expect(fact(g, 'books.method')).toBe('strongroom');
+    expect(g.host.itemCount(CRATE_ITEM)).toBe(1);
     expect(fact(g, 'cray.disposition')).toBe('wary');
     expect(talk(g, 'cray-customs').join(' | ')).toMatch(/Someone has been in my strongroom/);
   });
@@ -603,6 +624,7 @@ describe('Contraband Pages', () => {
     done(g, PAGES, 'wear-the-coat');
     expect(resolution(g, PAGES)).toBe('inspector-guise');
     expect(fact(g, 'books.method')).toBe('guise');
+    expect(g.host.itemCount(CRATE_ITEM)).toBe(1);
     const h = boot();
     startedBy(h, { 'books.impounded': true });
     done(h, PAGES, 'guise-blown');
@@ -617,19 +639,36 @@ describe('Contraband Pages', () => {
   it("Mirela's book is delivered or kept, and she knows which", () => {
     const delivered = boot();
     set(delivered, { 'books.recovered': true });
+    expect(offered(delivered, 'mirela-stacks')).not.toContain('deliver-order');
+    delivered.host.giveItem(CRATE_ITEM, 1);
     talk(delivered, 'mirela-stacks', ['deliver-order']);
+    expect(delivered.host.itemCount(CRATE_ITEM)).toBe(0);
     expect(fact(delivered, 'mirela.order.delivered')).toBe(true);
     expect(fact(delivered, 'mirela.illusion-stocked')).toBe(true);
     expect(delivered.host.gold()).toBe(80);
     expect(delivered.host.disposition('npc-mirela')).toBe(4);
     const kept = boot();
     set(kept, { 'books.recovered': true });
+    kept.host.giveItem(CRATE_ITEM, 1);
     talk(kept, 'mirela-stacks', ['keep-order']);
+    expect(kept.host.itemCount(CRATE_ITEM)).toBe(0);
     expect(fact(kept, 'mirela.order.kept')).toBe(true);
     expect(fact(kept, 'mirela.order.delivered')).toBe(false);
     expect(kept.host.disposition('npc-mirela')).toBe(-3);
     expect(offered(kept, 'mirela-stacks')).not.toContain('deliver-order');
     expect(offered(boot(), 'mirela-stacks')).not.toContain('deliver-order');
+  });
+
+  it('AC-4: every resolution puts the crate in the pack, and no route leaves a stand-in fact behind', ({
+    task,
+  }) => {
+    for (const id of [CRATE_ITEM, VANE_WRIT, FORGED_WRIT, ROMANCE]) markExercised(task, 'item', id);
+    for (const r of quests.pages.resolutions) {
+      expect(JSON.stringify(r.effects), r.id).toContain(`"item":"${CRATE_ITEM}"`);
+    }
+    for (const key of ['writ.held', 'cray.romance-brought']) {
+      expect(lookupFact(factIndex(content.all('fact')), key), key).toBeUndefined();
+    }
   });
 
   it('Cray stays incorruptible: no new option takes a bribe', () => {
