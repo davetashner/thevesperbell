@@ -2400,6 +2400,8 @@ function startRenderer(
             world,
             quests: gameLogic.quests,
             content,
+            // A debug boot into a named scene (?scene=) fires no beats (it sets arrival facts at once).
+            triggers: !new URLSearchParams(location.search).has('scene'),
             publish: (key, value) => {
               root.dataset[key] = value;
             },

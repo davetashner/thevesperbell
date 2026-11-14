@@ -37,7 +37,7 @@ function failSetup(): never {
   throw new Error('the game content has quests');
 }
 
-function setup(playerClass: string | null = 'archer') {
+function setup(playerClass: string | null = 'archer', triggers = true) {
   const world = new World<never>({ seed: 5 });
   installFactRegistry(world.facts, content, true);
   const player = world.spawn();
@@ -60,6 +60,7 @@ function setup(playerClass: string | null = 'archer') {
     world,
     quests,
     content,
+    triggers,
     publish: (_key, value) => published.push(JSON.parse(value) as ClassBeatReading),
   });
   const step = () => {
@@ -163,6 +164,17 @@ describe('class beats at existing triggers (mw-aw1y)', () => {
     t.step();
     expect(t.ui.top).toBeUndefined();
     expect(t.published.at(-1)?.shown).toEqual(['wendmouth']);
+  });
+
+  it('AC-2: a debug scene boot (triggers off) shows no beat, though wendmouth.visited is set at once', () => {
+    const t = setup('sorcerer', false);
+    t.world.facts.set('wendmouth.visited', true);
+    t.step();
+    expect(t.ui.top).toBeUndefined();
+    expect(t.world.facts.get(beatShownFact('wendmouth'))).toBe(false);
+    t.beats.controller.startNewGame();
+    t.step();
+    expect(t.ui.top?.id).toBe(CLASS_BEAT_SCREEN);
   });
 
   it.each([

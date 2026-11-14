@@ -12,6 +12,7 @@
 //   `class-beat.<beat>.shown` so a save and load does not repeat it: getting-in (the player's own class
 //   route into the Deepworks: its enter-by objective completes, or the Vane House roof is entered) and
 //   wendmouth (`wendmouth.visited`). The other beats wait for their encounters (follow-up bead).
+//   A debug boot into a named scene (`?scene=`) fires none of them (`triggers: false`).
 // - The sim is paused while the window is open (the UI's `pausesSim`). Nothing here changes game state
 //   but the `shown` facts.
 
@@ -81,6 +82,12 @@ export interface ClassBeatControllerOptions {
   readonly quests: Pick<QuestRuntime, 'objectiveState'>;
   readonly content: Pick<GameContent, 'all'>;
   readonly onChange?: (reading: ClassBeatReading) => void;
+  /**
+   * Whether the beats fire from their triggers (default true). A debug boot (`?scene=`) turns them off:
+   * it places the player straight into a scene, so arrival facts such as `wendmouth.visited` are set
+   * at once and the window would block the e2e and anyone testing a scene.
+   */
+  readonly triggers?: boolean;
 }
 
 /** Plays the class arrival and the class beats. Call `afterStep` each step. */
@@ -115,6 +122,7 @@ export class ClassBeatController {
       this.#play(OPENING_BEAT, this.#openingSlides(playerClass));
       return;
     }
+    if (this.#options.triggers === false) return;
     for (const trigger of BEAT_TRIGGERS) {
       if (world.facts.get(beatShownFact(trigger.beat)) === true) continue;
       if (!trigger.fires(world, quests, playerClass)) continue;
