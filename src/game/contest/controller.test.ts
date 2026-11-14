@@ -438,6 +438,47 @@ describe('contests in progress (mw-opf6)', () => {
     expect(second.playing).toBe(ARM);
   });
 
+  it('AC-3: a resumed contest takes its walk-away anchor on the first step, then forfeits past it', () => {
+    let x = 3;
+    const first = setup();
+    first.installed.runner.enter(ARM, 0);
+    const resumed = new ContestController({
+      ui: first.ui,
+      world: first.world,
+      player: first.player,
+      runner: first.installed.runner,
+      contests: defs,
+      host: first.host,
+      publish: () => undefined,
+      positionOf: () => ({ x, y: 0, z: 0 }),
+    });
+    resumed.afterStep(); // no anchor was saved: this step takes it where the player stands
+    x = 3 + WALK_AWAY_METRES - 1;
+    resumed.afterStep();
+    expect(first.installed.runner.isActive(ARM)).toBe(true);
+    x = 3 + WALK_AWAY_METRES + 1;
+    resumed.afterStep();
+    expect(first.installed.runner.result(ARM)).toBe('forfeit');
+    resumed.dispose();
+  });
+
+  it('the push key is not taken by a contest that is neither arm-wrestling nor dice', () => {
+    const first = setup();
+    first.installed.runner.enter(ARM, 0);
+    const odd = new ContestController({
+      ui: first.ui,
+      world: first.world,
+      player: first.player,
+      runner: first.installed.runner,
+      contests: [{ ...def(ARM), scoring: [] }],
+      host: first.host,
+      publish: () => undefined,
+    });
+    expect(odd.playing).toBe(ARM);
+    expect(odd.keydown({ code: PUSH_KEY, repeat: false })).toBe(false);
+    odd.dispose();
+  });
+
   it('a contest that ends refused says so in the toast, and the unknown outcome text falls back', () => {
     const t = setup();
     t.world.events.emit(ContestEnded, {
