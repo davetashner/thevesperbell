@@ -95,6 +95,7 @@ import {
   npcResolver,
 } from '@game/conversation/index';
 import type { DialogueDef } from '@content/types/dialogue';
+import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
 import { ContestController } from '@game/contest/controller';
 import { contestsIn, installContests } from '@game/contest/install';
@@ -102,7 +103,8 @@ import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beat
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
 import { buildJournal, JournalController, journalSources } from '@game/journal/journal';
-import { rumoursOf, startRumourUi } from '@game/rumours/rumours';
+import { JournalNotices } from '@game/journal/journal-notices';
+import { rumoursOf, startRumourUi, type RumourBook } from '@game/rumours/rumours';
 import {
   ContainerWatch,
   hasContainers,
@@ -453,6 +455,8 @@ import {
   HitMarkers,
   DeathFade,
   InteractPrompt,
+  JournalHud,
+  type JournalModel,
   KitPanel,
   LockMarker,
   openClassSelect,
@@ -730,6 +734,8 @@ function startRenderer(
   let inventoryUi: InventoryUi | undefined;
   // The journal (mw-e23.6): the Journal action (J) toggles it, and the pause menu opens it.
   let journalUi: JournalController | undefined;
+  let journalNotices: JournalNotices | undefined;
+  let rumourBook: RumourBook | undefined;
   // The container window and pickup toasts (mw-e18.4), once the player exists.
   let containerUi: ContainerUi | undefined;
   // The pause menu (mw-e01.3), once the world has a player: the Pause action (Esc, P, Menu) opens it
@@ -2394,10 +2400,14 @@ function startRenderer(
           rumours: rumoursOf(content),
           quests: gameLogic.quests,
           player: () => rumourHero,
+          onChange: () => {
+            journalNotices?.syncRumours();
+          },
           publish: (key, value) => {
             root.dataset[key] = value;
           },
         });
+        rumourBook = rumours.book;
         afterStep.push(() => {
           rumours.afterStep();
         });
@@ -3265,15 +3275,51 @@ function startRenderer(
       // The journal (mw-e23.6): only on the player's key or the pause menu, never by itself, so
       // debug scene boots stay clear. #app[data-journal] (open or closed) is the e2e's readout.
       const questRuntime = gameLogic.quests;
-      const journal =
+      const journalModel =
         questRuntime === undefined
+          ? undefined
+          : (): JournalModel =>
+              buildJournal(
+                journalSources(content, {
+                  quests: questRuntime,
+                  facts: world.facts,
+                  rumours: rumourBook,
+                }),
+              );
+      if (journalModel !== undefined) {
+        // The new-entry toast, the unread mark and the pinned tracker (mw-e23.6.1): small HUD pieces
+        // that take no focus, so debug scene boots stay clear.
+        const journalHud = new JournalHud({
+          trackerEnabled: settings.get('gameplay.questTracker'),
+        });
+        ui.hud.append(journalHud.element);
+        settings.on('gameplay.questTracker', (on) => {
+          journalHud.setTrackerEnabled(on);
+        });
+        journalNotices = new JournalNotices({
+          events: world.events,
+          defs: content.all('quest') as unknown as readonly QuestDef[],
+          model: journalModel,
+          hud: journalHud,
+          now: () => performance.now(),
+          rumours: rumourBook,
+        });
+        afterStep.push(() => {
+          journalNotices?.afterStep();
+        });
+      }
+      const journal =
+        journalModel === undefined
           ? undefined
           : new JournalController({
               ui,
               canOpen: () => inPlay && playerInput.enabled && !isPlayerDead(world, hero),
               keys: () => sampler.bindings.journal,
-              model: () =>
-                buildJournal(journalSources(content, { quests: questRuntime, facts: world.facts })),
+              model: journalModel,
+              unread: () => journalNotices?.unread() ?? {},
+              onViewed: (tab) => {
+                journalNotices?.viewed(tab);
+              },
               publish: (state) => {
                 root.dataset['journal'] = state;
               },

@@ -290,6 +290,24 @@ describe('the rumour UI', () => {
     return { world, sim, ui, readings, player };
   }
 
+  it('mw-wbr7: calls onChange after the readout, at start and on each change', () => {
+    const world = new World<unknown>({ seed: 8 });
+    const sim = world as unknown as World<never>;
+    installFactRegistry(sim.facts, content, true);
+    const player = world.spawn();
+    let calls = 0;
+    const ui = startRumourUi({
+      world: sim,
+      rumours,
+      quests: undefined,
+      player: () => player,
+      onChange: () => (calls += 1),
+    });
+    expect(calls).toBe(1);
+    ui.book.hear(id('10'));
+    expect(calls).toBe(2);
+  });
+
   it('AC-2: publishes the empty readout at start and again whenever the book changes', () => {
     const { world, sim, readings, ui, player } = start();
     expect(readings).toEqual([{ heard: [], leads: [], investigated: [], debunked: [] }]);

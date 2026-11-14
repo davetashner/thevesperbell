@@ -24,6 +24,7 @@ export const JOURNAL_TEXT = Object.freeze({
   todo: 'To do',
   optional: 'optional',
   hint: 'Q / E or LB / RB: Switch section. Esc or B: Close.',
+  unread: 'new',
 });
 
 /** The sections, in tab order. */
@@ -66,6 +67,13 @@ export interface JournalWindowOptions {
   readonly tab?: JournalTabId;
   /** The window closed (Esc, B or Close). */
   readonly onClose?: () => void;
+  /**
+   * Entry ids not yet seen, by tab (mw-e23.6.1 AC-3): the tab carries a mark and the entry a "new"
+   * tag until its tab is viewed. Viewing the tab (opening on it, or switching to it) reports it.
+   */
+  readonly unread?: Readonly<Partial<Record<JournalTabId, readonly string[]>>>;
+  /** A tab was viewed: its unread entries are read. */
+  readonly onViewed?: (tab: JournalTabId) => void;
 }
 
 export interface JournalWindow {
@@ -76,8 +84,11 @@ export interface JournalWindow {
   close(): void;
 }
 
-function entryElement(entry: JournalEntryModel): HTMLElement {
+function entryElement(entry: JournalEntryModel, unread: boolean): HTMLElement {
   const head = h('h2', { text: entry.title });
+  if (unread) {
+    head.append(' ', h('span', { className: 'vb-journal-new', text: `(${JOURNAL_TEXT.unread})` }));
+  }
   const article = h(
     'article',
     {
@@ -124,7 +135,9 @@ export function openJournalWindow(ui: UiRoot, options: JournalWindowOptions): Jo
     panel.append(
       ...(entries.length === 0
         ? [h('p', { className: 'vb-journal-empty', text: spec.empty })]
-        : entries.map(entryElement)),
+        : entries.map((entry) =>
+            entryElement(entry, options.unread?.[spec.id]?.includes(entry.id) === true),
+          )),
     );
     return panel;
   });
@@ -136,7 +149,27 @@ export function openJournalWindow(ui: UiRoot, options: JournalWindowOptions): Jo
       panel: panels[i] as HTMLElement,
     })),
     ...(options.tab !== undefined && { selected: options.tab }),
+    onChange: (id) => {
+      viewed(id as JournalTabId);
+    },
   });
+  const tabButton = (id: string): HTMLElement | null =>
+    strip.element.querySelector<HTMLElement>(`[role="tab"][data-tab="${id}"]`);
+  for (const spec of JOURNAL_TABS) {
+    if ((options.unread?.[spec.id]?.length ?? 0) > 0) {
+      const button = tabButton(spec.id);
+      button?.setAttribute('data-unread', 'true');
+      button?.append(h('span', { className: 'vb-journal-sr', text: ` (${JOURNAL_TEXT.unread})` }));
+    }
+  }
+  function viewed(id: JournalTabId): void {
+    const button = tabButton(id);
+    if (button?.dataset['unread'] === 'true') {
+      delete button.dataset['unread'];
+      button.querySelector('.vb-journal-sr')?.remove();
+      options.onViewed?.(id);
+    }
+  }
   const closeButton = button({
     label: JOURNAL_TEXT.close,
     onPress: () => {
@@ -162,6 +195,7 @@ export function openJournalWindow(ui: UiRoot, options: JournalWindowOptions): Jo
     h('p', { className: 'vb-journal-hint', text: JOURNAL_TEXT.hint }),
     h('div', { className: 'vb-row' }, closeButton),
   );
+  viewed(options.tab ?? 'active');
   const screen = ui.push({
     id: JOURNAL_SCREEN,
     label: JOURNAL_TEXT.title,
