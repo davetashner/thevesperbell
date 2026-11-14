@@ -102,7 +102,7 @@ describe('ActionSampler', () => {
 
   it('ignores unbound codes', () => {
     const sampler = new ActionSampler();
-    sampler.down('KeyJ');
+    sampler.down('KeyN');
     expect(sampler.sample()).toEqual(IDLE_ACTION_FRAME);
   });
 

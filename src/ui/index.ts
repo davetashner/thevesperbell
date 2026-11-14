@@ -24,6 +24,7 @@ export * from './input';
 export * from './interact-prompt';
 export * from './inventory';
 export * from './item-icons';
+export * from './journal-window';
 export * from './kit-panel';
 export * from './pause-menu';
 export * from './lock-marker';
