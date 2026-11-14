@@ -435,8 +435,18 @@ export function lintNarrative(sources: readonly ContentSource[], env: LintEnv): 
       }
     }
     for (const variants of file.variants) {
-      const missing = missingClassVariants(Object.fromEntries(variants.keys.map((k) => [k, 'x'])));
-      if (missing.length > 0) {
+      const missing = variants.fallback
+        ? NARRATIVE_CLASSES.filter((c) => !variants.keys.includes(c))
+        : missingClassVariants(Object.fromEntries(variants.keys.map((k) => [k, 'x'])));
+      if (missing.length > 0 && variants.fallback) {
+        add({
+          level: 'warning',
+          check: 'class-variants',
+          file: file.path,
+          line: variants.line,
+          message: `class beat has no variant for: ${missing.join(', ')} (they see the generic text)`,
+        });
+      } else if (missing.length > 0) {
         add({
           level: 'warning',
           check: 'class-variants',
