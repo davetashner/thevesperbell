@@ -405,6 +405,9 @@ export function playerView(
 
 const NO_BODIES: readonly BodyId[] = Object.freeze([]);
 
+/** How far above an object's focus point its reach ray ends, metres (see `reachable`). */
+const REACH_LIFT = 0.1;
+
 /**
  * An entity's own colliders in the physics port: its physics object's body and its bound level
  * colliders (mw-e03.10). Pass it as `bodiesOf` once the physics-object components are registered
@@ -431,9 +434,16 @@ export function interactionSystem<TInput>(
     ((world: World<TInput>, actor: EntityId) => playerView(world, actor, settings.reachHeight));
   const inputOf = options.input ?? ((inputs: readonly TInput[]) => actionFrameOf(inputs)?.interact);
 
-  /** Whether nothing solid but the target's own colliders lies between `from` and `to`. */
-  const reachable = (world: World<TInput>, target: EntityId, from: Vec3, to: Vec3): boolean => {
+  /**
+   * Whether nothing solid but the target's own colliders lies between `from` and `to`. The ray ends
+   * `REACH_LIFT` above `to`: a creature's placement is its feet, which rest exactly on a floor's top face,
+   * and whether a ray ending on a face counts as touching it is down to rounding (it did at some floor
+   * heights and not at others), so the floor under it would hide it from Talk.
+   */
+  const reachable = (world: World<TInput>, target: EntityId, from: Vec3, point: Vec3): boolean => {
     if (sight === undefined) return true;
+    if (from.x === point.x && from.y === point.y && from.z === point.z) return true;
+    const to = { x: point.x, y: point.y + REACH_LIFT, z: point.z };
     if (from.x === to.x && from.y === to.y && from.z === to.z) return true;
     const own = [...bodiesOf(world, target)];
     for (const rule of reachHosts.get(world) ?? []) {
