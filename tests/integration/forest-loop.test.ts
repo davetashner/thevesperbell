@@ -24,7 +24,10 @@ const spot = (from: Scene, id: string) => {
 const leadsTo = (from: Scene, id: string, to: Scene, spawn: string) => {
   const t = from.transitions.find((x) => x.id === id);
   expect(t, `${from.id}/${id}`).toMatchObject({ scene: { id: to.id }, spawn });
-  expect(to.spawns.find((s) => s.id === spawn), `${to.id}/${spawn}`).toBeDefined();
+  expect(
+    to.spawns.find((s) => s.id === spawn),
+    `${to.id}/${spawn}`,
+  ).toBeDefined();
   expect(from.spawns.find((s) => s.id === id)?.tags).toContain('transition');
 };
 
