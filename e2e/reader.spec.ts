@@ -1,18 +1,18 @@
 import { expect, test, type Page } from '@playwright/test';
 import { stubPointerLock, takeControl, turnTo } from './helpers/player';
 
-// mw-kf4c: reading a placed text against the production build (Chromium, 1280x720). The testbed's
-// read-manifest spawn (tagged readable + note-cargo-manifest, a `read` affordance) opens the reader on
+// mw-kf4c: reading a placed text against the production build (Chromium, 1280x720). The Wendmouth
+// harbour's clerk-desk spawn (tagged readable + note-cargo-manifest, a `read` affordance) opens the reader on
 // Interact; Interact closes it again; reading a second time does not read it "first" again.
 // #app[data-reader] (JSON: open, text, read) is the readout.
 
-const MANIFEST = { x: 2, z: 1 };
+const MANIFEST = { x: -21, z: 58.5 };
 
-async function openTestbed(page: Page): Promise<void> {
-  await page.goto('/?scene=testbed&debug=1');
+async function openHarbour(page: Page): Promise<void> {
+  await page.goto('/?scene=wendmouth-harbour&debug=1');
   const app = page.locator('#app');
-  await expect(app).toHaveAttribute('data-scene', 'testbed', { timeout: 10_000 });
-  await expect(app).toHaveAttribute('data-player', /"grounded":true/, { timeout: 10_000 });
+  await expect(app).toHaveAttribute('data-scene', 'wendmouth-harbour', { timeout: 60_000 });
+  await expect(app).toHaveAttribute('data-player', /"grounded":true/, { timeout: 60_000 });
 }
 
 async function readout(
@@ -28,9 +28,9 @@ async function readout(
 test('AC-1: Interact on the manifest opens the reader; Interact closes it; a second read adds nothing', async ({
   page,
 }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(300_000);
   await stubPointerLock(page);
-  await openTestbed(page);
+  await openHarbour(page);
   expect(await readout(page)).toEqual({ open: false, text: null, read: [] });
   await takeControl(page);
   await page.keyboard.press('Backquote');
