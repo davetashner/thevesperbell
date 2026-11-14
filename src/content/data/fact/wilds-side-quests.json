@@ -1,0 +1,171 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "wilds-side-quests",
+  "name": "The Watch Still Stands, Framed in Brass and The Name on the Bones facts",
+  "notes": "mw-e39.11: facts written and read by quest-watch-still-stands, quest-framed-in-brass and quest-name-on-the-bones and by the dialogues and scenes that carry them. clatter.restored, clatter.memories, clatter.fate, duggan.crate, duggan.kit-taken, duggan.testimony, vane.fate and vane.ledger.obtained are registered with the dialogues and endings that read them and reused as they are. The bead's clatter.choice is the existing clatter.fate (waiting, joined, rested), which the Cradle dialogue already reads.",
+  "facts": [
+    {
+      "key": "watch.told",
+      "type": "bool",
+      "default": false,
+      "description": "The player has heard that Old Mooring never left his tower and his armour still keeps the watch (rumour 2, bible 6.2). Set by dot-sleeping-ox (ask-mooring); starts The Watch Still Stands with evidence.keepers-last-leaf.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "sentinels.method",
+      "type": "enum",
+      "values": ["none", "watchword", "knight", "bell-cord", "dispel", "sneak", "smash"],
+      "default": "none",
+      "description": "How the player settled the Hollow Sentinels of Mooring's Watch (The Watch Still Stands, bible 6.1): the watchword from the keeper's last leaf, the knight's formal relief, the archer's shot at the bell cord, the sorcerer's dispelling, the thief's unseen walk or a slow smashing. Set by sentinel-watch; each way is one resolution.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "sentinels.relieved",
+      "type": "bool",
+      "default": false,
+      "description": "The Hollow Sentinels have stood down: relieved by the watchword, the knight's words, the bell cord or a dispelling, or smashed. False when the thief only slipped past them. Set by sentinel-watch; read by the quest to give the tower as a safe base.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "moorings.safe-base",
+      "type": "bool",
+      "default": false,
+      "description": "Mooring's Watch tower is a safe base and a fast route to the mine (bible 6.1 reward). Set by The Watch Still Stands whenever the Sentinels have stood down. Resting and the fast-travel link are later beads.",
+      "owner": "quest"
+    },
+    {
+      "key": "watch.key-held",
+      "type": "bool",
+      "default": false,
+      "description": "The player holds Sergeant Mooring's watch-key (The Watch Still Stands reward). A fact stand-in until the key has an icon and a lock to open. Set by the quest.",
+      "owner": "quest"
+    },
+    {
+      "key": "watch.mirror-held",
+      "type": "bool",
+      "default": false,
+      "description": "The player holds the tower's signal mirror (reward; the priory light puzzle is E25). A fact stand-in until the item exists. Set by the quest.",
+      "owner": "quest"
+    },
+    {
+      "key": "framed.crate-found",
+      "type": "bool",
+      "default": false,
+      "description": "The player has found Duggan Marl in his crate in Mother Kettleback's camp (Framed in Brass, bible 6.1). Set by kettleback-kitchen (ask-duggan); starts the quest with dot.trinket.confessed and evidence.foundry-invoice.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "framed.method",
+      "type": "enum",
+      "values": ["none", "force", "trade", "persuade", "kit"],
+      "default": "none",
+      "description": "How the player dealt with Duggan Marl's crate: by force (the goblins turn hostile), the kettle, persuading Kettleback, or leaving him and taking his planting kit. Set by kettleback-kitchen; each way is one resolution of Framed in Brass.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "vane.exposed",
+      "type": "bool",
+      "default": false,
+      "description": "Harrow Vane has been confronted with the proof in public (vane.fate exposed or confessed) and the town knows what he did. Set by Framed in Brass; bribed-player and fled do not set it.",
+      "owner": "quest"
+    },
+    {
+      "key": "framed.undeniable",
+      "type": "bool",
+      "default": false,
+      "description": "Quell's foundry invoice (evidence.foundry-invoice) backed the case when Vane was exposed: forty brass trinkets, goblin style, stamp as sample. Set by Framed in Brass with vane.exposed.",
+      "owner": "quest"
+    },
+    {
+      "key": "clatter.met",
+      "type": "bool",
+      "default": false,
+      "description": "The player has met Clatter in the Ossuary garden. Set by clatter-garden; starts The Name on the Bones.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "bones.psalter-given",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter has been shown his burnt psalter from among the Forgotten (a piece of The Name on the Bones, bible 6.1). Set by clatter-garden; the reading is evidence.clatter-psalter.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "bones.pear-bloomed",
+      "type": "bool",
+      "default": false,
+      "description": "The dead pear tree in the priory garden has bloomed once, by Juniper's graft (a piece of The Name on the Bones). Set by juniper-fenn; the placed tree and its bloom are E29.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "bones.pear-given",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter has been told the pear tree bloomed (a piece of The Name on the Bones). Set by clatter-garden.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "bones.letter-stolen",
+      "type": "bool",
+      "default": false,
+      "description": "The player took Anselm's letter from the Pell family Bible while Hollis was at the oven (a thief's way of getting it; hollis.bible-lent is also set). Set by hollis-pell; Hollis learns of it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "bones.letter-given",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter has been read his sister's letter from the Pell family Bible (a piece of The Name on the Bones). Set by clatter-garden.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "clatter.read-success",
+      "type": "bool",
+      "default": false,
+      "description": "A sorcerer's memory-reading of Clatter succeeded, which skips a piece (bible 6.1). Set by clatter-garden; only one reading is offered.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "clatter.memories.max",
+      "type": "int",
+      "default": 3,
+      "description": "The most memories Clatter can recover: 3, and 2 after a sorcerer's failed memory-reading costs him one for good (bible 6.1; The Name on the Bones is still completable). Set by clatter-garden; read by the quest, which restores him once clatter.memories reaches it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tansy.kin.known",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter remembered that Tansy Pell is family: his sister Amabel Hobb was her great-great-great-aunt (bible 6.1 outcome; epilogue slide vr-clatter-name). Set by The Name on the Bones with clatter.restored.",
+      "owner": "quest"
+    },
+    {
+      "key": "clatter.rites",
+      "type": "bool",
+      "default": false,
+      "description": "A knight gave Clatter the Vesperine burial rites when he asked to rest (bible 5.9, 6.1). Set by clatter-garden (rest-knight); picks the quest's rites resolution over the altar one.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "evidence.keepers-last-leaf",
+      "type": "bool",
+      "default": false,
+      "description": "The player has read the keeper's last leaf at Mooring's Watch, which gives the watchword Vespers-and-home (The Watch Still Stands). Written by the reader on the first read of note-keepers-last-leaf.",
+      "owner": "reader"
+    },
+    {
+      "key": "evidence.clatter-psalter",
+      "type": "bool",
+      "default": false,
+      "description": "The player has found Clatter's burnt psalter among the Forgotten in the Ossuary (The Name on the Bones). Written by the reader on the first read of note-clatter-psalter.",
+      "owner": "reader"
+    },
+    {
+      "key": "evidence.vane-ledger",
+      "type": "bool",
+      "default": false,
+      "description": "The player has read Vane's Deepworks ledger in his sealed gallery (Framed in Brass). Written by the reader on the first read of book-deepworks-ledger; the quest then sets vane.ledger.obtained for the confrontation.",
+      "owner": "reader"
+    }
+  ]
+}

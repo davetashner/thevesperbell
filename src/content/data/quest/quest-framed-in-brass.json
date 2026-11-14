@@ -1,0 +1,619 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-framed-in-brass",
+  "title": "Framed in Brass",
+  "summary": "Brass goblin trinkets keep turning up where people vanished, stamped on the back with the Deepworks mark. Someone is blaming the goblins.",
+  "notes": "Side quest of the Deepworks (bible 6.1 quest 4; mw-e39.11), any class. Started by Dot's trinket confession (dot.trinket.confessed), by finding Duggan in his crate (framed.crate-found, kettleback-kitchen) or by Quell's foundry invoice (evidence.foundry-invoice). Duggan Marl is got four ways in kettleback-kitchen, each writing framed.method and each a resolution: by force (the goblins turn hostile), the kettle from Dot's cellar (trade), persuading Kettleback (he then testifies in duggan-testimony), or leaving him and taking the planting kit (duggan.kit-taken, which vane-bounty counts as a witness). The proof is combined with Vane's ledger (read in his sealed gallery: evidence.vane-ledger, then vane.ledger.obtained) and the confrontation in vane-bounty writes vane.fate (exposed, confessed, bribed-player, fled). The quest sets vane.exposed when the fate is exposed or confessed, and framed.undeniable too when Quell's foundry invoice (evidence.foundry-invoice, Wendmouth) backed it; it resolves once the fate is anything but unexposed. Harbour evidence is optional and never required. Placing Duggan and the goblin camp (E26) is later.",
+  "givers": ["npc-kettleback"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "dot.trinket.confessed"
+      },
+      {
+        "kind": "fact",
+        "fact": "framed.crate-found"
+      },
+      {
+        "kind": "fact",
+        "fact": "evidence.foundry-invoice"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "hunt",
+      "text": "Forty brass goblin trinkets, stamped with the Deepworks mark, and the goblins blamed for every door. Mother Kettleback has Duggan Marl in a crate; Vane's ledger is in his sealed gallery. Get a witness, or proof, and the ledger.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.vane-ledger"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "vane.ledger.obtained"
+                  }
+                ]
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "any",
+                    "of": [
+                      {
+                        "kind": "factCmp",
+                        "fact": "duggan.crate",
+                        "op": "eq",
+                        "value": "freed"
+                      },
+                      {
+                        "kind": "fact",
+                        "fact": "duggan.kit-taken"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "factCmp",
+                      "fact": "vane.fate",
+                      "op": "eq",
+                      "value": "unexposed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "confront",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "vane.ledger.obtained",
+              "value": true
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "evidence.vane-ledger"
+              },
+              {
+                "kind": "fact",
+                "fact": "vane.ledger.obtained"
+              }
+            ]
+          },
+          "stage": "hunt-ledger",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "vane.ledger.obtained",
+              "value": true
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "duggan.crate",
+                "op": "eq",
+                "value": "freed"
+              },
+              {
+                "kind": "fact",
+                "fact": "duggan.kit-taken"
+              }
+            ]
+          },
+          "stage": "hunt-proof"
+        }
+      ]
+    },
+    {
+      "id": "hunt-ledger",
+      "text": "Vane's ledger is in your hands. You still need Duggan, or his planting kit, to say who put the brass at the doors.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.vane-ledger"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "vane.ledger.obtained"
+                  }
+                ]
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "any",
+                    "of": [
+                      {
+                        "kind": "factCmp",
+                        "fact": "duggan.crate",
+                        "op": "eq",
+                        "value": "freed"
+                      },
+                      {
+                        "kind": "fact",
+                        "fact": "duggan.kit-taken"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "factCmp",
+                      "fact": "vane.fate",
+                      "op": "eq",
+                      "value": "unexposed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "confront"
+        }
+      ]
+    },
+    {
+      "id": "hunt-proof",
+      "text": "Duggan, or his planting kit, will say who put the brass at the doors. You still need Vane's ledger from his sealed gallery.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.vane-ledger"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "vane.ledger.obtained"
+                  }
+                ]
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "any",
+                    "of": [
+                      {
+                        "kind": "factCmp",
+                        "fact": "duggan.crate",
+                        "op": "eq",
+                        "value": "freed"
+                      },
+                      {
+                        "kind": "fact",
+                        "fact": "duggan.kit-taken"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "factCmp",
+                      "fact": "vane.fate",
+                      "op": "eq",
+                      "value": "unexposed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "confront",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "vane.ledger.obtained",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "confront",
+      "text": "The proof is in your hands. Take it to Harrow Vane at his house, or to Captain Hale and the town. Quell's foundry invoice at Wendmouth would make it undeniable.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "vane.fate",
+                    "op": "eq",
+                    "value": "exposed"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "vane.fate",
+                    "op": "eq",
+                    "value": "confessed"
+                  }
+                ]
+              },
+              {
+                "kind": "fact",
+                "fact": "evidence.foundry-invoice"
+              }
+            ]
+          },
+          "stage": "known",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "vane.exposed",
+              "value": true
+            },
+            {
+              "kind": "setFact",
+              "fact": "framed.undeniable",
+              "value": true
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "exposed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "confessed"
+              }
+            ]
+          },
+          "stage": "known",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "vane.exposed",
+              "value": true
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "fled"
+              }
+            ]
+          },
+          "stage": "known"
+        }
+      ]
+    },
+    {
+      "id": "known",
+      "text": "Vane has had his answer. The brass is no longer the goblins' doing."
+    }
+  ],
+  "initialStage": "hunt",
+  "objectives": [
+    {
+      "id": "hear-of-the-brass",
+      "kind": "fact",
+      "text": "Hear that Dot has a goblin trinket stamped with the Deepworks mark.",
+      "params": {
+        "fact": "dot.trinket.confessed"
+      },
+      "optional": true
+    },
+    {
+      "id": "find-duggan",
+      "kind": "fact",
+      "text": "Find Duggan Marl in his crate in Mother Kettleback's camp.",
+      "params": {
+        "fact": "framed.crate-found"
+      }
+    },
+    {
+      "id": "free-duggan",
+      "kind": "fact",
+      "text": "Free Duggan: by force, the kettle, or by talking Kettleback round.",
+      "params": {
+        "fact": "duggan.crate",
+        "value": "freed"
+      },
+      "optional": true
+    },
+    {
+      "id": "take-the-kit",
+      "kind": "fact",
+      "text": "Or leave him in the crate and take his planting kit.",
+      "params": {
+        "fact": "duggan.kit-taken"
+      },
+      "optional": true
+    },
+    {
+      "id": "duggan-testifies",
+      "kind": "fact",
+      "text": "Have Duggan agree to testify against Vane.",
+      "params": {
+        "fact": "duggan.testimony"
+      },
+      "optional": true,
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "duggan.crate",
+        "op": "eq",
+        "value": "freed"
+      }
+    },
+    {
+      "id": "read-the-ledger",
+      "kind": "fact",
+      "text": "Read Vane's ledger in his sealed gallery.",
+      "params": {
+        "fact": "evidence.vane-ledger"
+      }
+    },
+    {
+      "id": "quell-invoice",
+      "kind": "fact",
+      "text": "Optional: find Quell's foundry invoice in Wendmouth.",
+      "params": {
+        "fact": "evidence.foundry-invoice"
+      },
+      "optional": true
+    },
+    {
+      "id": "confront-vane",
+      "kind": "fact",
+      "text": "Expose Harrow Vane to the town with the proof.",
+      "params": {
+        "fact": "vane.exposed"
+      },
+      "optional": true,
+      "hidden": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "by-force",
+      "approach": "combat",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "framed.method",
+            "op": "eq",
+            "value": "force"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.exposed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "fled"
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "framed-resolved",
+          "data": {
+            "method": "force"
+          }
+        }
+      ],
+      "journal": "You broke the crate open and half the clan with it. Duggan Marl is out and the goblins hate you, but the proof was good and Vane has had to answer for the brass."
+    },
+    {
+      "id": "kettle-trade",
+      "approach": "other",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "framed.method",
+            "op": "eq",
+            "value": "trade"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.exposed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "fled"
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "framed-resolved",
+          "data": {
+            "method": "trade"
+          }
+        }
+      ],
+      "journal": "A kettle from Dot's cellar bought Duggan out of his crate, and a goblin clan that still speaks to you. Between the foreman and the ledger, Vane has had to answer for the brass."
+    },
+    {
+      "id": "talked-out",
+      "approach": "diplomacy",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "framed.method",
+            "op": "eq",
+            "value": "persuade"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.exposed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "fled"
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "framed-resolved",
+          "data": {
+            "method": "persuade"
+          }
+        }
+      ],
+      "journal": "Mother Kettleback let Duggan go on the strength of your word that he would testify, and she will remember whose word it was. Between the foreman and the ledger, Vane has had to answer for the brass."
+    },
+    {
+      "id": "planting-kit",
+      "approach": "stealth",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "framed.method",
+            "op": "eq",
+            "value": "kit"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "vane.exposed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "bribed-player"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "fled"
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "framed-resolved",
+          "data": {
+            "method": "kit"
+          }
+        }
+      ],
+      "journal": "You left Duggan in his crate and took his planting kit: a hammer, a punch and one nervous stamp. It was proof enough with the ledger, and Vane has had to answer for the brass."
+    }
+  ]
+}
