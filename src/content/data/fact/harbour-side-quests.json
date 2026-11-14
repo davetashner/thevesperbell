@@ -182,7 +182,7 @@
       "key": "books.impounded",
       "type": "bool",
       "default": false,
-      "description": "Cray holds the crate of books addressed to Mirela and, for a searched sorcerer, the player's own restricted spellbooks (bible 6.1 quest 8). Set by cray-customs; starts quest-contraband-pages. Stand-in until the crate's book items exist.",
+      "description": "Cray holds the crate of books addressed to Mirela and, for a searched sorcerer, the player's own restricted spellbooks (bible 6.1 quest 8). Set by cray-customs; starts quest-contraband-pages.",
       "owner": "dialogue"
     },
     {
@@ -276,13 +276,6 @@
       "type": "bool",
       "default": false,
       "description": "Cray has remarked on the missing books. Set by cray-customs.",
-      "owner": "dialogue"
-    },
-    {
-      "key": "writ.held",
-      "type": "bool",
-      "default": false,
-      "description": "The player holds a writ for the impounded books (Vane's, or a forged Lantern seal). Stand-in until the writ item exists: set by vane-bounty and mirela-stacks, cleared by cray-customs.",
       "owner": "dialogue"
     },
     {

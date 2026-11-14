@@ -1,0 +1,11 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "crate-impounded-books",
+  "category": "quest",
+  "name": "Mirela's crate of books",
+  "description": "Crate seven from the Saltmarch boat: eleven volumes in waxed cloth, one damp at the corner, nobody's stamp on any of them. The Glasswright's Primer is among them.",
+  "notes": "mw-m97i: the impounded crate of Contraband Pages as one quest item (the eleven volumes, including The Glasswright's Primer, Illusion). Given by the quest's resolutions; taken by Mirela when delivered or kept. Placement: the customs strongroom crate for the roof and guise routes is left to mw-r5nw/mw-ily9; those routes still resolve through the books-lifted and inspector-guise-passed events. Value is nominal (quest item, never sold).",
+  "icon": "icon-item-crate-impounded-books-01",
+  "value": 80,
+  "stackable": false
+}

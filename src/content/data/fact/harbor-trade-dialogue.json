@@ -2,7 +2,7 @@
   "$schema": "../fact.schema.json",
   "id": "harbor-trade-dialogue",
   "name": "Harbour trade dialogue facts",
-  "notes": "mw-e39.20: world-state facts read and written by the Cray, Tereza, Quell and Hesketh dialogues (bible 5.13, 5.14). Writers other than the dialogues (the evidence items, the duel combat system, the Drowned Gull contest, the Wendmouth scene) are named in each description; the evidence.* facts and cray.romance-brought are stand-ins for items that do not exist yet.",
+  "notes": "mw-e39.20: world-state facts read and written by the Cray, Tereza, Quell and Hesketh dialogues (bible 5.13, 5.14). Writers other than the dialogues (the evidence items, the duel combat system, the Drowned Gull contest, the Wendmouth scene) are named in each description; the evidence.* facts are stand-ins for items that do not exist yet.",
   "facts": [
     {
       "key": "cray.bribe.attempted",
@@ -52,13 +52,6 @@
       "default": false,
       "description": "Cray released the impounded crate of books off the record in gratitude (Contraband Pages). Set by cray-customs, read by the quest.",
       "owner": "dialogue"
-    },
-    {
-      "key": "cray.romance-brought",
-      "type": "bool",
-      "default": false,
-      "description": "The player carries a romance novel for Cray (bible 5.13, her secret weakness). Stand-in until the novel item exists: written by its pickup, cleared by cray-customs.",
-      "owner": "item"
     },
     {
       "key": "cray.romance-accepted",

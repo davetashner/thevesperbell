@@ -285,13 +285,6 @@
                 "kind": "not",
                 "condition": {
                   "kind": "fact",
-                  "fact": "writ.held"
-                }
-              },
-              {
-                "kind": "not",
-                "condition": {
-                  "kind": "fact",
                   "fact": "cray.writ.accepted"
                 }
               },
@@ -300,6 +293,22 @@
                 "fact": "vane.fate",
                 "op": "eq",
                 "value": "unexposed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "hasItem",
+                  "item": "writ-vane-chair",
+                  "count": 1
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "hasItem",
+                  "item": "writ-forged-lantern",
+                  "count": 1
+                }
               }
             ]
           },
@@ -620,9 +629,9 @@
           "delta": -100
         },
         {
-          "kind": "setFact",
-          "fact": "writ.held",
-          "value": true
+          "kind": "giveItem",
+          "item": "writ-vane-chair",
+          "count": 1
         },
         {
           "kind": "setFact",
