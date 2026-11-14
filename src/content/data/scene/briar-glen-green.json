@@ -1242,6 +1242,7 @@
       "presence": { "hours": [11, 15] }
     }
   ],
+  "signals": [{ "graph": "briar-glen-green-areas" }],
   "light": {
     "ambient": 0.28,
     "directional": [

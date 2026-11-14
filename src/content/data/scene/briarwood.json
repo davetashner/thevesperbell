@@ -1546,6 +1546,7 @@
       "tags": ["transition"]
     }
   ],
+  "signals": [{ "graph": "briarwood-areas" }],
   "light": {
     "ambient": 0.38,
     "directional": [

@@ -75,6 +75,30 @@
           "tag": "player"
         }
       ]
+    },
+    {
+      "id": "breakwater",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 76,
+          "y": 2.5,
+          "z": 125
+        },
+        "halfExtents": {
+          "x": 8,
+          "y": 4,
+          "z": 30
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
     }
   ],
   "wires": []
