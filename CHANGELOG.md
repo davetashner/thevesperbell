@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- A journal screen (J, or Journal in the pause menu) lists your active, completed and failed quests with their objectives, your heard rumours and your notes, and opens with your class's first entry in place of the generic arrival text (mw-e23.6, mw-1myt).
 - Choosing a class at the title now opens a narration window: why your class came to Briar Glen, then its first journal entry. A class also sees its own text once when it takes its own way into the Deepworks and when it first reaches Wendmouth. E or X advances, Esc or B skips.
 - The valley's rumours are written: fourteen lines (bible rumours 1-12, 19 and 20) with who tells them, whether they are true, half-true (Old Mooring's tower) or false (the goblins took them), and the place, person or quest each points at. Juniper now tells of the silent wolves and the stone horn that covers its ears, Dot adds the Glen Well, the priory bell, Mirela's shelf and the millpond, Snig and Mother Kettleback tell the goblin rumours, and Dot has a line to trade back once you have been there (mw-e39.12).
 - Briar Glen keeps a daily routine: shops open and close with their keepers (the forge, the fletchery, the bakery and Marsh's store), Mirela, Hale, Vane, Oswin, Juniper and Ottilie are at their posts by day and elsewhere or at home at night, and ten townsfolk go from lane and green to the market at midday and the Sleeping Ox in the evening; people never pop in or out in front of you and finish a conversation before they leave.

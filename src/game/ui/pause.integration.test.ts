@@ -69,6 +69,7 @@ function game() {
     saveBlocked: () => safety.active()[0]?.reason ?? null,
     unsavedProgress: () => progress.unsaved,
     pauseKeys: () => ['Escape', 'KeyP'],
+    openJournal: vi.fn(),
     openSettings: vi.fn(),
     openSave,
     openLoad: vi.fn(),

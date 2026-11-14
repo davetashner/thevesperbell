@@ -1,4 +1,4 @@
-// The pause menu (mw-e01.3): Resume, Settings, Save, Load and Quit to Title over the paused game. The
+// The pause menu (mw-e01.3): Resume, Journal (mw-e23.6), Settings, Save, Load and Quit to Title over the paused game. The
 // options stack vertically, so up/down (arrows, d-pad, left stick) reach every one of them and Enter
 // or A presses the focused one; Back (Esc, B) resumes. Resume takes focus on open. When saving is
 // unsafe (a creature in Combat), Save stays in place but is disabled: aria-disabled, so it keeps its
@@ -19,6 +19,7 @@ export const PAUSE_MENU_TEXT = Object.freeze({
   title: 'Paused',
   menu: 'Pause menu',
   resume: 'Resume',
+  journal: 'Journal',
   settings: 'Settings',
   save: 'Save',
   load: 'Load',
@@ -26,7 +27,7 @@ export const PAUSE_MENU_TEXT = Object.freeze({
 });
 
 /** The pause menu's options, written to each button's `data-action`. */
-export type PauseAction = 'resume' | 'settings' | 'save' | 'load' | 'quit';
+export type PauseAction = 'resume' | 'journal' | 'settings' | 'save' | 'load' | 'quit';
 
 export interface PauseMenuOptions {
   /** Why saving is unavailable right now (e.g. "Can't save during combat"); undefined: Save works. */
@@ -61,12 +62,19 @@ export function openPauseMenu(ui: UiRoot, options: PauseMenuOptions): PauseMenu 
   };
   const buttons: Record<PauseAction, HTMLButtonElement> = {
     resume: make('resume', PAUSE_MENU_TEXT.resume),
+    journal: make('journal', PAUSE_MENU_TEXT.journal),
     settings: make('settings', PAUSE_MENU_TEXT.settings),
     save: make('save', PAUSE_MENU_TEXT.save),
     load: make('load', PAUSE_MENU_TEXT.load),
     quit: make('quit', PAUSE_MENU_TEXT.quit),
   };
-  const column = h('div', { className: 'vb-title-menu' }, buttons.resume, buttons.settings);
+  const column = h(
+    'div',
+    { className: 'vb-title-menu' },
+    buttons.resume,
+    buttons.journal,
+    buttons.settings,
+  );
   column.append(buttons.save);
   if (saveBlocked !== undefined) {
     // Disabled but focusable, described by its reason, which is also shown under it.

@@ -55,6 +55,8 @@ export const ACTIONS = {
   spellNext: { kind: 'button', label: 'Next spell', context: 'gameplay' },
   spellWheel: { kind: 'button', label: 'Spell wheel (hold)', context: 'gameplay' },
   inventory: { kind: 'button', label: 'Inventory', context: 'gameplay' },
+  // The journal (mw-e23.6): quests, rumours and notes.
+  journal: { kind: 'button', label: 'Journal', context: 'gameplay' },
   // The selected item (mw-e17.7): drop its stack in front of you, or throw one along your look.
   drop: { kind: 'button', label: 'Drop item', context: 'gameplay' },
   throw: { kind: 'button', label: 'Throw item', context: 'gameplay' },
