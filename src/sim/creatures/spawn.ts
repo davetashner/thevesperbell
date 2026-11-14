@@ -85,6 +85,8 @@ export interface CreatureSpawnRequest {
   readonly creature: string;
   /** Its feet, metres. */
   readonly at: Vec3;
+  /** Where it appears when that is not `at` (an arrival at an exit); its origin is still `at`. */
+  readonly from?: Vec3;
   /** Direction it faces (horizontal part); absent or without a horizontal part = +z. */
   readonly facing?: Vec3;
   /** The scene spawn point it comes from. */
@@ -242,7 +244,7 @@ export function spawnCreature(
   const { def, nav } = creature;
   const facing = unitFacing(request.facing);
   const entity = world.spawn();
-  placeEntity(world, entity, request.at, nav.radius);
+  placeEntity(world, entity, request.from ?? request.at, nav.radius);
   giveFacing(world, entity, facing);
   const top = Math.max(nav.height - nav.radius, nav.radius);
   giveHurtboxes(world, entity, {
