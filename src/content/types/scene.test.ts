@@ -998,6 +998,7 @@ describe('scene content', () => {
       'frozen-channel',
       'hiding-room',
       'kit-gallery',
+      'knot-outer',
       'lighting-room',
       'marsh-store',
       'mechanism-room',

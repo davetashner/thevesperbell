@@ -1,6 +1,6 @@
-// mw-nro9: where the seven friend-below notes are placed and what reading one publishes. Two are
-// placed (the Sleeping Ox room, the Deepworks gate); the other five belong to the Knot and the
-// Cradle, which are not built (beads filed from mw-nro9).
+// mw-nro9: where the seven friend-below notes are placed and what reading one publishes. Six are
+// placed (the Sleeping Ox room, the Deepworks gate, and four in the Knot's outer half, mw-cqfn); the
+// last belongs to the Cradle, which is not built (bead filed from mw-nro9).
 import { describe, expect, it } from 'vitest';
 import { loadGameContent } from './game-content.ts';
 
@@ -17,6 +17,10 @@ const NOTES = content.all('note').filter((n) => n.id.startsWith('note-friend-bel
 const PLACED: Record<string, { scene: string; spawn: string }> = {
   'note-friend-below-door': { scene: 'sleeping-ox', spawn: 'read-friend-note-door' },
   'note-friend-below-deepworks': { scene: 'deepworks', spawn: 'read-friend-note-gate' },
+  'note-friend-below-outer-ring': { scene: 'knot-outer', spawn: 'read-friend-note-outer-ring' },
+  'note-friend-below-spiders': { scene: 'knot-outer', spawn: 'read-friend-note-spiders' },
+  'note-friend-below-ossuary': { scene: 'knot-outer', spawn: 'read-friend-note-ossuary' },
+  'note-friend-below-warden': { scene: 'knot-outer', spawn: 'read-friend-note-warden' },
 };
 
 describe('the friend-below notes (mw-nro9)', () => {
@@ -25,7 +29,7 @@ describe('the friend-below notes (mw-nro9)', () => {
     for (const note of NOTES) expect(note.emits, note.id).toEqual(['friend-note-found']);
   });
 
-  it('AC-1: the door and Deepworks notes are readable spawns with a read affordance', () => {
+  it('AC-1: the six placed notes are readable spawns with a read affordance', () => {
     for (const [text, { scene, spawn }] of Object.entries(PLACED)) {
       const found = content.get('scene', scene).spawns.filter((s) => s.tags.includes(text));
       expect(found.map((s) => s.id)).toEqual([spawn]);
@@ -62,5 +66,32 @@ describe('the friend-below notes (mw-nro9)', () => {
     expect(onFloor).toBe(true);
     const room = at(scene, 'room-door');
     expect(Math.hypot(note[0] - room[0], note[2] - room[2])).toBeLessThan(2);
+  });
+
+  it('AC-2 (mw-cqfn): each Knot note stands on baked navmesh in the area the bible puts it in', () => {
+    const scene = content.get('scene', 'knot-outer');
+    const nav = content.get('navmesh', 'knot-outer');
+    const [ox, oz] = nav.origin;
+    const cell = nav.settings.cellSize;
+    const onMesh = (p: readonly [number, number, number]) =>
+      nav.polys.some(
+        (q) =>
+          p[0] >= ox + q[0] * cell &&
+          p[0] < ox + q[2] * cell &&
+          p[2] >= oz + q[1] * cell &&
+          p[2] < oz + q[3] * cell,
+      );
+    const where: Record<string, readonly [number, number]> = {
+      'read-friend-note-outer-ring': [0, 90],
+      'read-friend-note-spiders': [0, 90],
+      'read-friend-note-ossuary': [90, 162],
+      'read-friend-note-warden': [242, 262],
+    };
+    for (const [spawn, [z0, z1]] of Object.entries(where)) {
+      const p = at(scene, spawn);
+      expect(onMesh(p), spawn).toBe(true);
+      expect(p[2], spawn).toBeGreaterThanOrEqual(z0);
+      expect(p[2], spawn).toBeLessThan(z1);
+    }
   });
 });

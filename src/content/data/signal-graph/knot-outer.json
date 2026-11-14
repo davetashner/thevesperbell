@@ -1,0 +1,31 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "knot-outer",
+  "name": "Knot outer half: quest areas",
+  "notes": "The main quest's Knot areas in the knot-outer scene (mw-e26.9). The player-filtered volume `knot-outer-ring` is the quest area of that id (enter-the-knot: the breach landing and the whole ring), and `ossuary-galleries` is the area reach-the-ossuary (the entry hall, the pit, the garden and the east gallery). The quest reads both, so they are not wired. The Chapel's portcullis has its own graph (chapel-portcullis), placed by the scene beside this one.",
+  "nodes": [
+    {
+      "id": "knot-outer-ring",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 60, "y": 1, "z": 45 },
+        "halfExtents": { "x": 40, "y": 3, "z": 45 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    {
+      "id": "ossuary-galleries",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 63, "y": 0, "z": 126 },
+        "halfExtents": { "x": 55, "y": 4, "z": 36 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    }
+  ],
+  "wires": []
+}
