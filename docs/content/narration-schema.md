@@ -8,7 +8,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `id` | id | required | `narration-<slug>`. |
-| `kind` | `"title"` \| `"arrival"` \| `"first-night"` \| `"barge"` \| `"ending"` \| `"epilogue"` | required | What the sequences are, which sets the rules they follow. |
+| `kind` | `"title"` \| `"arrival"` \| `"first-night"` \| `"barge"` \| `"ending"` \| `"epilogue"` \| `"class-beat"` | required | What the sequences are, which sets the rules they follow. |
 | `notes` | string | required | Author-facing: what this file covers and where it is shown. |
 | `sequences` | list of object (at least 1) | required |  |
 | `sequences[].id` | id | required | Unique in the file. An epilogue slide uses its objective id. |
@@ -16,6 +16,19 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `sequences[].notes` | string | — | Author-facing: when it is shown. |
 | `sequences[].endings` | list of `"vespers-rung"` \| `"last-warden"` \| `"hirelings-silence"` \| `"long-vespers"` (at least 1) | — | Ending cards and epilogue slides: the headline endings it can appear in. |
 | `sequences[].facts` | list of string | — | Epilogue slides: the world facts that choose it (besides `ending.headline`); empty when only the ending does. |
-| `sequences[].pages` | list of object (at least 1) | required | The pages, in the order they are shown. |
+| `sequences[].pages` | list of object (at least 1) | required | The pages, in the order they are shown. For a class beat these are the generic text every class without its own variant sees. |
 | `sequences[].pages[].text` | string | required | The page as the player reads it. |
 | `sequences[].pages[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |
+| `sequences[].variants` | object | — | Class beats only: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`. |
+| `sequences[].variants.knight` | list of object (at least 1) | — |  |
+| `sequences[].variants.knight[].text` | string | required | The page as the player reads it. |
+| `sequences[].variants.knight[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |
+| `sequences[].variants.archer` | list of object (at least 1) | — |  |
+| `sequences[].variants.archer[].text` | string | required | The page as the player reads it. |
+| `sequences[].variants.archer[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |
+| `sequences[].variants.sorcerer` | list of object (at least 1) | — |  |
+| `sequences[].variants.sorcerer[].text` | string | required | The page as the player reads it. |
+| `sequences[].variants.sorcerer[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |
+| `sequences[].variants.thief` | list of object (at least 1) | — |  |
+| `sequences[].variants.thief[].text` | string | required | The page as the player reads it. |
+| `sequences[].variants.thief[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |

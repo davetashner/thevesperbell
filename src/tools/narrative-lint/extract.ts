@@ -32,6 +32,8 @@ export interface GateSpan {
 export interface VariantsSpan {
   readonly keys: readonly string[];
   readonly line: number;
+  /** A class beat: the sequence also has generic `pages`, which stand in for a class with no variant. */
+  readonly fallback?: boolean;
 }
 
 export interface Extracted {
@@ -124,7 +126,11 @@ export function extract(path: string, raw: string): Extracted {
       if (field !== undefined && typeof value === 'string') {
         refs.push({ field, value, line: lineOf(JSON.stringify(value)) });
       } else if (key === 'variants' && isRecord(value)) {
-        variants.push({ keys: Object.keys(value), line });
+        variants.push({
+          keys: Object.keys(value),
+          line,
+          ...(prop(node, 'pages') !== undefined ? { fallback: true } : {}),
+        });
         strings(value, 'player');
       } else if (key === 'options' || key === 'entries') {
         walk(value, key === 'options' ? 'option' : 'entry');
