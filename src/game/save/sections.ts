@@ -2,7 +2,7 @@
 // loading and the save-schema gate (pnpm save:check, tests/save-fixtures) all build their registry
 // here, so a system that adds a section registers it in exactly one place and the gate fingerprints
 // it automatically. Sections: the built-in world section, then inventory (mw-e17.8), creatures
-// (mw-e12.14), world facts and level deltas (mw-e27.4), then merchants (mw-e20.4) and the game clock's schedule (mw-e27.12).
+// (mw-e12.14), world facts and level deltas (mw-e27.4), then merchants (mw-e20.4), the game clock's schedule (mw-e27.12) and the contest runner (mw-opf6).
 
 import {
   CapabilitiesComponent,
@@ -20,6 +20,7 @@ import {
   SpellHotbarComponent,
   StatsComponent,
 } from '@sim/index';
+import { contestsSaveSection } from './contests';
 import { creaturesSaveSection } from './creatures';
 import { gameClockSaveSection } from './game-clock';
 import { SaveRegistry } from './format';
@@ -83,5 +84,6 @@ export function createGameSaveRegistry(options: GameSaveOptions = {}): SaveRegis
     .register(worldFactsSaveSection({ ...(warn && { warn }) }))
     .register(levelDeltasSaveSection({ ...(warn && { warn }) }))
     .register(merchantsSaveSection(options))
-    .register(gameClockSaveSection());
+    .register(gameClockSaveSection())
+    .register(contestsSaveSection());
 }

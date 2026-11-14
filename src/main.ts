@@ -96,6 +96,8 @@ import {
 } from '@game/conversation/index';
 import type { DialogueDef } from '@content/types/dialogue';
 import { startShopUi } from '@game/shop/shop-window';
+import { ContestController } from '@game/contest/controller';
+import { contestsIn, installContests } from '@game/contest/install';
 import {
   ContainerWatch,
   hasContainers,
@@ -917,6 +919,17 @@ function startRenderer(
     let wheelShape: ((frame: ActionFrame) => ActionFrame) | undefined;
     let spellBar: { frame(): void } | undefined;
     const afterStep: (() => void)[] = [];
+    // Contests (mw-opf6): the runner over the logic host, installed before any save loads so a carry
+    // or a load finds it. It advances the rivals and time limits once a step; the screens and play
+    // input start with the shop UI.
+    const contests = installContests(world, {
+      contests: contestsIn(content),
+      host: gameLogic.host,
+      player: () => player?.entity,
+    });
+    afterStep.push(() => {
+      contests.update();
+    });
     // The input latency and controller cost probe (mw-e02.8): dev server and perf builds only, on a
     // page with ?latency. In any other build `__LATENCY_PROBE__` is false and all of it is dropped.
     const latency =
@@ -2318,6 +2331,29 @@ function startRenderer(
         });
         afterStep.push(() => {
           shop.afterStep();
+        });
+        // The contest screens (mw-opf6): the entry window, the play panel and the play keys (F plays,
+        // H cheats at dice, N walks away). #app[data-contest] is the e2e's readout.
+        const contestUi = new ContestController({
+          ui,
+          world,
+          player: player.entity,
+          runner: contests.runner,
+          contests: contestsIn(content),
+          host: gameLogic.host,
+          toast: (text) => {
+            shop.toast(text);
+          },
+          positionOf: soundPositions(world, [readPhysicsObjectTransform, readDummyTransform]),
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          contestUi.afterStep();
+        });
+        globalThis.window.addEventListener('keydown', (event) => {
+          if (contestUi.keydown(event)) event.preventDefault();
         });
       }
       // Class selection (mw-e19.5): the chosen class's capabilities, kit and stats go onto the player
