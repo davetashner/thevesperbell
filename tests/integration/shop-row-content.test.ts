@@ -21,6 +21,11 @@ const itemIds = new Set(items.map((item) => item.id));
  */
 const NOT_FOR_SALE = new Set([
   'gold',
+  // Contraband Pages quest items and the novel (mw-m97i): given and taken by dialogue, not sold.
+  'crate-impounded-books',
+  'writ-vane-chair',
+  'writ-forged-lantern',
+  'romance-hearts-against-the-tide',
   'rusted-gallery-key',
   'testbed-closet-key',
   'valley-chest-key',

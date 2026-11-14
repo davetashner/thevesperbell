@@ -379,13 +379,6 @@
                 "kind": "not",
                 "condition": {
                   "kind": "fact",
-                  "fact": "writ.held"
-                }
-              },
-              {
-                "kind": "not",
-                "condition": {
-                  "kind": "fact",
                   "fact": "cray.writ.accepted"
                 }
               },
@@ -394,6 +387,22 @@
                 "condition": {
                   "kind": "fact",
                   "fact": "cray.writ.rejected"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "hasItem",
+                  "item": "writ-vane-chair",
+                  "count": 1
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "hasItem",
+                  "item": "writ-forged-lantern",
+                  "count": 1
                 }
               }
             ]
@@ -408,8 +417,9 @@
             "kind": "all",
             "of": [
               {
-                "kind": "fact",
-                "fact": "books.recovered"
+                "kind": "hasItem",
+                "item": "crate-impounded-books",
+                "count": 1
               },
               {
                 "kind": "not",
@@ -437,8 +447,9 @@
             "kind": "all",
             "of": [
               {
-                "kind": "fact",
-                "fact": "books.recovered"
+                "kind": "hasItem",
+                "item": "crate-impounded-books",
+                "count": 1
               },
               {
                 "kind": "not",
@@ -1094,9 +1105,9 @@
       "kind": "effect",
       "effects": [
         {
-          "kind": "setFact",
-          "fact": "writ.held",
-          "value": true
+          "kind": "giveItem",
+          "item": "writ-forged-lantern",
+          "count": 1
         },
         {
           "kind": "setFact",
@@ -1126,6 +1137,11 @@
       "id": "deliver-fx",
       "kind": "effect",
       "effects": [
+        {
+          "kind": "takeItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "mirela.order.delivered",
@@ -1163,6 +1179,11 @@
       "id": "keep-fx",
       "kind": "effect",
       "effects": [
+        {
+          "kind": "takeItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "mirela.order.kept",

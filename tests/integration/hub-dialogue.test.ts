@@ -179,7 +179,12 @@ describe('Mirela Thorne', () => {
 
   it('AC-4: Mirela never sells, lends or gives Nine Sleeps; the secret needs trust and the ysolde story follows', () => {
     const json = JSON.stringify(content.get('dialogue', M));
-    expect(json).not.toMatch(/giveItem|takeItem/);
+    // The only items she hands over or takes are the Contraband Pages quest items (mw-m97i).
+    const moved = [...json.matchAll(/"kind":"(?:giveItem|takeItem)","item":"([^"]+)"/g)].map(
+      (m) => m[1],
+    );
+    for (const item of moved)
+      expect(['writ-forged-lantern', 'crate-impounded-books']).toContain(item);
     expect(json).not.toMatch(/"item"\s*:\s*"book-nine-sleeps"/);
 
     const locked = session({ playerClass: 'knight' });

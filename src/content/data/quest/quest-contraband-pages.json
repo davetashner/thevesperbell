@@ -3,7 +3,7 @@
   "id": "quest-contraband-pages",
   "title": "Contraband Pages",
   "summary": "Inspector Cray has impounded a crate of books: Mirela's order from over the sea, with a rare Illusion text among it, and, if you were careless, your own restricted spellbooks. Cray is incorruptible and reads everything she confiscates. There are a great many ways to get books out of a customs house, and she has seen most of them.",
-  "notes": "Side quest of Wendmouth (bible 3.6, 5.13, 6.1 quest 8; mw-e39.22), optional to the main quest and sorcerer-flavoured (a searched sorcerer's own books are in the crate, books.impounded) but open to every class. The crate's books are stand-in facts (books.impounded, books.recovered, writ.held) until the book items exist (follow-up bead). Routes: the failed bribe (cray-customs, recorded and never works: an optional objective and a hint, not a resolution), the romance novel (cray.books-traded), a writ from Vane (writ.source vane) or Mirela's forged Lantern seal (writ.source forged, which Cray catches if the player already tried a bribe), the strongroom over the roof (event books-lifted, emitted by the customs level), an inspector's coat or Mirror Self (event inspector-guise-passed; inspector-guise-blown moves the quest to 'watched' and sets cray.disposition to wary) and bay-nine evidence (cray.books-released). Every resolution sets books.recovered, books.method and cray.disposition (grateful or fond for the two lawful gifts, neutral for writs, wary for theft and impersonation). Cray's help in The Crate for Mr. S— stays gated by cray.seizure.agreed (evidence) and the evidence route also sets it, so the bay-nine evidence route opens her lawful seizure. Delivering the book to Mirela or keeping it happens afterwards in mirela-stacks (mirela.order.delivered or kept) and is an optional objective.",
+  "notes": "Side quest of Wendmouth (bible 3.6, 5.13, 6.1 quest 8; mw-e39.22), optional to the main quest and sorcerer-flavoured (a searched sorcerer's own books are in the crate, books.impounded) but open to every class. The crate, the writs and the romance novel are items (mw-m97i): crate-impounded-books is given by every resolution, writ-vane-chair and writ-forged-lantern are bought or forged and handed to Cray, romance-hearts-against-the-tide is handed to Cray. books.impounded, books.recovered, books.method and writ.source remain as decision records. Routes: the failed bribe (cray-customs, recorded and never works: an optional objective and a hint, not a resolution), the romance novel (cray.books-traded), a writ from Vane (writ.source vane) or Mirela's forged Lantern seal (writ.source forged, which Cray catches if the player already tried a bribe), the strongroom over the roof (event books-lifted, emitted by the customs level), an inspector's coat or Mirror Self (event inspector-guise-passed; inspector-guise-blown moves the quest to 'watched' and sets cray.disposition to wary) and bay-nine evidence (cray.books-released). Every resolution sets books.recovered, books.method and cray.disposition (grateful or fond for the two lawful gifts, neutral for writs, wary for theft and impersonation). Cray's help in The Crate for Mr. S— stays gated by cray.seizure.agreed (evidence) and the evidence route also sets it, so the bay-nine evidence route opens her lawful seizure. Delivering the book to Mirela or keeping it happens afterwards in mirela-stacks (mirela.order.delivered or kept) and is an optional objective.",
   "givers": ["npc-cray", "npc-mirela"],
   "startWhen": {
     "kind": "any",
@@ -65,16 +65,38 @@
                 "state": "complete"
               },
               {
-                "kind": "objectiveState",
-                "quest": "quest-contraband-pages",
-                "objective": "bring-a-romance",
-                "state": "complete"
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-contraband-pages",
+                    "objective": "find-a-romance",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-contraband-pages",
+                    "objective": "bring-a-romance",
+                    "state": "complete"
+                  }
+                ]
               },
               {
-                "kind": "objectiveState",
-                "quest": "quest-contraband-pages",
-                "objective": "get-a-writ",
-                "state": "complete"
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-contraband-pages",
+                    "objective": "buy-vanes-writ",
+                    "state": "complete"
+                  },
+                  {
+                    "kind": "objectiveState",
+                    "quest": "quest-contraband-pages",
+                    "objective": "forge-a-writ",
+                    "state": "complete"
+                  }
+                ]
               },
               {
                 "kind": "objectiveState",
@@ -168,6 +190,17 @@
       "optional": true
     },
     {
+      "id": "find-a-romance",
+      "kind": "haveItem",
+      "text": "Find Cray something to read: a romance from Mirela's back table.",
+      "params": {
+        "item": "romance-hearts-against-the-tide",
+        "count": 1,
+        "latch": true
+      },
+      "optional": true
+    },
+    {
       "id": "bring-a-romance",
       "kind": "fact",
       "text": "Bring Cray something to read for her evidence room.",
@@ -177,11 +210,24 @@
       "optional": true
     },
     {
-      "id": "get-a-writ",
-      "kind": "fact",
-      "text": "Get hold of a writ: from Harrow Vane as council chair, or from Mirela's steady hand.",
+      "id": "buy-vanes-writ",
+      "kind": "haveItem",
+      "text": "Buy a writ from Harrow Vane as council chair.",
       "params": {
-        "fact": "writ.held"
+        "item": "writ-vane-chair",
+        "count": 1,
+        "latch": true
+      },
+      "optional": true
+    },
+    {
+      "id": "forge-a-writ",
+      "kind": "haveItem",
+      "text": "Ask Mirela for a writ with a steady hand behind it.",
+      "params": {
+        "item": "writ-forged-lantern",
+        "count": 1,
+        "latch": true
       },
       "optional": true
     },
@@ -260,6 +306,11 @@
       },
       "effects": [
         {
+          "kind": "giveItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
+        {
           "kind": "setFact",
           "fact": "books.recovered",
           "value": true
@@ -303,6 +354,11 @@
         "fact": "cray.books-traded"
       },
       "effects": [
+        {
+          "kind": "giveItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "books.recovered",
@@ -354,6 +410,11 @@
       },
       "effects": [
         {
+          "kind": "giveItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
+        {
           "kind": "setFact",
           "fact": "books.recovered",
           "value": true
@@ -399,6 +460,11 @@
       },
       "effects": [
         {
+          "kind": "giveItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
+        {
           "kind": "setFact",
           "fact": "books.recovered",
           "value": true
@@ -434,6 +500,11 @@
         "state": "complete"
       },
       "effects": [
+        {
+          "kind": "giveItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "books.recovered",
@@ -480,6 +551,11 @@
         "state": "complete"
       },
       "effects": [
+        {
+          "kind": "giveItem",
+          "item": "crate-impounded-books",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "books.recovered",

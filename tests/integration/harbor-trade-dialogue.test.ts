@@ -226,14 +226,17 @@ describe('Inspector Prudence Cray', () => {
     expect(open(CRAY, { playerClass: 'knight' }).ids()).not.toContain('ask-writ');
   });
 
-  it('a romance novel (stand-in fact) raises disposition once', () => {
+  it('a romance novel in the pack raises disposition once', () => {
     const none = open(CRAY, { playerClass: 'knight' });
     expect(none.ids()).not.toContain('offer-romance');
-    const s = open(CRAY, { playerClass: 'knight', facts: { 'cray.romance-brought': true } });
+    const s = open(CRAY, {
+      playerClass: 'knight',
+      items: { 'romance-hearts-against-the-tide': 1 },
+    });
     s.pick('offer-romance');
     expect(s.host.disposition('npc-cray')).toBe(10);
     expect(s.host.facts.get('cray.romance-accepted')).toBe(true);
-    expect(s.host.facts.get('cray.romance-brought')).toBe(false);
+    expect(s.host.itemCount('romance-hearts-against-the-tide')).toBe(0);
     expect(s.events()).toContain('cray.romance-received');
     expect(s.ids()).not.toContain('offer-romance');
   });

@@ -112,6 +112,10 @@
     "placeholder": true
   },
   {
+    "id": "icon-item-crate-impounded-books-01",
+    "placeholder": true
+  },
+  {
     "id": "icon-item-dented-iron-cap-01",
     "placeholder": true
   },
@@ -336,6 +340,10 @@
     "placeholder": true
   },
   {
+    "id": "icon-item-romance-hearts-against-the-tide-01",
+    "placeholder": true
+  },
+  {
     "id": "icon-item-rope-arrow-01",
     "placeholder": true
   },
@@ -437,6 +445,14 @@
   },
   {
     "id": "icon-item-wool-cloak-01",
+    "placeholder": true
+  },
+  {
+    "id": "icon-item-writ-forged-lantern-01",
+    "placeholder": true
+  },
+  {
+    "id": "icon-item-writ-vane-chair-01",
     "placeholder": true
   },
   {
