@@ -1,0 +1,486 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "sentinel-watch",
+  "notes": "The Hollow Sentinels of Mooring's Watch (bible 3.5, 6.1 quest 3 The Watch Still Stands; mw-e39.11), speaking as one voice: the armour stands in the tower hall still keep Sergeant Mooring's order, hold the tower. They are courteous and unmovable. The quest's six ways are the options: the watchword (any class, once the keeper's last leaf is read: evidence.keepers-last-leaf), the knight's formal relief, the archer's shot at the bell cord, the sorcerer dispelling the binding, the thief's unseen walk (they stay and keep their post) and smashing them (anyone, slow). Each sets sentinels.method; every way but the thief's also sets sentinels.relieved. The Sentinels are not placed yet (encounters are mw-e25.7), the creature stands in the debug conversation room; the bell cord shot, the dispel and the sneak are narrated here and become real with the placed Sentinels, spell.dispel and stealth.",
+  "speakers": [
+    {
+      "id": "sentinel",
+      "npc": "npc-hollow-sentinel"
+    }
+  ],
+  "entries": [
+    {
+      "id": "stood-down",
+      "when": {
+        "kind": "fact",
+        "fact": "sentinels.relieved"
+      },
+      "node": "after"
+    },
+    {
+      "id": "slipped",
+      "when": {
+        "kind": "factCmp",
+        "fact": "sentinels.method",
+        "op": "eq",
+        "value": "sneak"
+      },
+      "node": "slipped-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "challenge-again"
+    },
+    {
+      "id": "first",
+      "node": "challenge-1"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "challenge-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "HALT. This tower is held. By order of Sergeant Aldric Mooring, no one passes the hall without the word.",
+      "next": "challenge-2"
+    },
+    {
+      "id": "challenge-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "The word.",
+      "next": "hub"
+    },
+    {
+      "id": "challenge-again",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "The word, traveller. The tower is held.",
+      "next": "hub"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "say-word",
+          "text": "Vespers-and-home.",
+          "when": {
+            "kind": "fact",
+            "fact": "evidence.keepers-last-leaf"
+          },
+          "next": "word-1"
+        },
+        {
+          "id": "no-word",
+          "text": "I don't have the word.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "evidence.keepers-last-leaf"
+            }
+          },
+          "next": "no-word-1"
+        },
+        {
+          "id": "ask-who",
+          "text": "Who is it you're holding the tower for?",
+          "once": true,
+          "next": "who-1"
+        },
+        {
+          "id": "ask-order",
+          "text": "How long ago was the order given?",
+          "once": true,
+          "next": "order-1"
+        },
+        {
+          "id": "relieve-knight",
+          "text": "I am a knight. By the old words of the watch, I relieve you.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "relief-1"
+        },
+        {
+          "id": "shoot-cord",
+          "text": "(Loose an arrow at the bell cord hanging through the roof.)",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "cord-1"
+        },
+        {
+          "id": "dispel",
+          "text": "(Unpick the order that binds you, thread by thread.)",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "dispel-1"
+        },
+        {
+          "id": "sneak",
+          "text": "(Wait for the change of the quarter-hour and slip past unseen.)",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "sneak-1"
+        },
+        {
+          "id": "smash",
+          "text": "Then I'll take the tower from you.",
+          "next": "smash-1"
+        },
+        {
+          "id": "leave",
+          "text": "I'll come back.",
+          "next": "leave-1"
+        }
+      ]
+    },
+    {
+      "id": "no-word-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Then you do not pass. The keeper wrote everything down, traveller. His desk is in the quarters above, and he was never one to leave a thing unsaid.",
+      "next": "hub"
+    },
+    {
+      "id": "who-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "For the garrison. They marched out at dawn, under orders, and left the Sergeant, and the Sergeant left us the order. Someone will come back for us. Someone always comes back for the post.",
+      "next": "who-2"
+    },
+    {
+      "id": "who-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "It is a long watch. We are not complaining. Sergeant Mooring wrote our names on the stands so we would be remembered. I am Ellis. I think. The paint has gone.",
+      "next": "hub"
+    },
+    {
+      "id": "order-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Forty winters, by the count the tower keeps. The singing from the east began the second winter. We do not listen to it. We hold the tower.",
+      "next": "hub"
+    },
+    {
+      "id": "word-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "...The word is right. The word is the Sergeant's own.",
+      "next": "word-2"
+    },
+    {
+      "id": "word-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Then you are a friend of the watch, and the watch is a very long one. Are you the relief?",
+      "next": "word-3"
+    },
+    {
+      "id": "word-3",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "word-relief",
+          "text": "The relief has come. Stand down. Go home.",
+          "next": "word-fx"
+        },
+        {
+          "id": "word-more",
+          "text": "Not yet. I only wanted to pass.",
+          "next": "word-pass"
+        }
+      ]
+    },
+    {
+      "id": "word-pass",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Then pass, friend of the watch, and keep your voice down on the stairs. The men are tired.",
+      "next": "hub"
+    },
+    {
+      "id": "word-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "sentinels.method",
+          "value": "watchword"
+        },
+        {
+          "kind": "setFact",
+          "fact": "sentinels.relieved",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "sentinels-relieved",
+          "data": {
+            "method": "watchword"
+          }
+        }
+      ],
+      "next": "relieved-1"
+    },
+    {
+      "id": "relief-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "...Those are the old words. They are the Sergeant's words, the ones he said we would hear when an officer came. Name your rank, knight.",
+      "next": "relief-2"
+    },
+    {
+      "id": "relief-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Then you have the right. We are relieved. Stand easy, all. Stand easy.",
+      "next": "relief-fx"
+    },
+    {
+      "id": "relief-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "sentinels.method",
+          "value": "knight"
+        },
+        {
+          "kind": "setFact",
+          "fact": "sentinels.relieved",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "sentinels-relieved",
+          "data": {
+            "method": "knight"
+          }
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hollow-sentinel",
+          "delta": 10
+        }
+      ],
+      "next": "relieved-1"
+    },
+    {
+      "id": "cord-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The arrow takes the frayed cord a hand below the roof beam. Far above, in a bell nobody has rung for forty years, something stirs and speaks one flat note.",
+      "next": "cord-1-b"
+    },
+    {
+      "id": "cord-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "It is not the Vesper Bell. It is a soldier's bell, and every armour stand in the hall has turned its head toward it.",
+      "next": "cord-2"
+    },
+    {
+      "id": "cord-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "That is the bell. The bell that ends the watch. Who rang it? ...It does not matter. It is rung. We are relieved.",
+      "next": "cord-fx"
+    },
+    {
+      "id": "cord-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "sentinels.method",
+          "value": "bell-cord"
+        },
+        {
+          "kind": "setFact",
+          "fact": "sentinels.relieved",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "sentinels-relieved",
+          "data": {
+            "method": "bell-cord"
+          }
+        }
+      ],
+      "next": "relieved-1"
+    },
+    {
+      "id": "dispel-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The order is not a spell, exactly. It is a sentence that was said so firmly it grew a shape. You find the end of it, and pull, and the whole long line comes loose with a noise like a held breath being let go.",
+      "next": "dispel-2"
+    },
+    {
+      "id": "dispel-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Hold the... Hold the... what was it we were holding? The tower. Yes. The tower. For... For whom? Oh. Oh, we are tired.",
+      "next": "dispel-fx"
+    },
+    {
+      "id": "dispel-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "sentinels.method",
+          "value": "dispel"
+        },
+        {
+          "kind": "setFact",
+          "fact": "sentinels.relieved",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "sentinels-relieved",
+          "data": {
+            "method": "dispel"
+          }
+        }
+      ],
+      "next": "relieved-1"
+    },
+    {
+      "id": "sneak-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The stands do not look away. They look at the door, and the stair, and the place a stranger would stand. You are not standing in any of those places.",
+      "next": "sneak-1-b"
+    },
+    {
+      "id": "sneak-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "By the time the quarter-hour changes you have taken what is worth taking from the keeper's room, and the Sentinels have noticed nothing but a draught.",
+      "next": "sneak-fx"
+    },
+    {
+      "id": "sneak-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "sentinels.method",
+          "value": "sneak"
+        },
+        {
+          "kind": "emit",
+          "event": "sentinels-slipped"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "slipped-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "The tower is held. By order of Sergeant Aldric Mooring. There has been a draught. There is always a draught.",
+      "next": "hub"
+    },
+    {
+      "id": "smash-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Then the order is plain. None passes who does not know the word. The watch will hold.",
+      "next": "smash-2"
+    },
+    {
+      "id": "smash-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "It takes a long time. The Sentinels are slow and honourable and do not run, and they are very hard to knock down. When each one falls it says, quite quietly, that it is sorry about the post.",
+      "next": "smash-2-b"
+    },
+    {
+      "id": "smash-2-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "At the last you stand in a hall of broken armour, and nothing is left to hold the tower but you.",
+      "next": "smash-fx"
+    },
+    {
+      "id": "smash-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "sentinels.method",
+          "value": "smash"
+        },
+        {
+          "kind": "setFact",
+          "fact": "sentinels.relieved",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "sentinels-relieved",
+          "data": {
+            "method": "smash"
+          }
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "relieved-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "The post is relieved. Every stand, every man. We stood this watch for the Sergeant, and the Sergeant stood it for the garrison, and none of them came back.",
+      "next": "relieved-2"
+    },
+    {
+      "id": "relieved-2",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "Thank you. Take the tower. Take the keys, traveller; they hang above the keeper's desk where the Sergeant left them. Tell the bell, if you pass it, that the watch is ended.",
+      "next": "relieved-end"
+    },
+    {
+      "id": "relieved-end",
+      "kind": "end"
+    },
+    {
+      "id": "after",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "...Stand easy. The post is relieved. We are only armour, now, resting.",
+      "next": "after-end"
+    },
+    {
+      "id": "after-end",
+      "kind": "end"
+    },
+    {
+      "id": "leave-1",
+      "kind": "line",
+      "speaker": "sentinel",
+      "text": "The tower is held. We will be here.",
+      "end": true
+    }
+  ]
+}

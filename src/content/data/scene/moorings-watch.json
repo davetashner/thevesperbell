@@ -1255,12 +1255,26 @@
     {
       "id": "keepers-log",
       "at": [96.0, 3.5, 56.5],
-      "tags": ["keepers-log"],
+      "tags": ["keepers-log", "readable", "book-keepers-log"],
       "interact": {
         "affordances": [
           {
             "verb": "read",
             "label": "Read the keeper's log"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "read-keepers-last-leaf",
+      "at": [94.5, 3.5, 56.5],
+      "tags": ["readable", "note-keepers-last-leaf"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the leaf wedged behind the desk"
           }
         ],
         "radius": 1.5

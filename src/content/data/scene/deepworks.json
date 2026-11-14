@@ -1458,7 +1458,16 @@
     {
       "id": "ledger",
       "at": [90, -12, 304],
-      "tags": ["lore", "ledger"]
+      "tags": ["lore", "ledger", "readable", "book-deepworks-ledger"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read Vane's ledger"
+          }
+        ],
+        "radius": 1.5
+      }
     },
     {
       "id": "horn-ring",

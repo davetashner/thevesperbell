@@ -1,0 +1,15 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-keepers-last-leaf",
+  "title": "The leaf behind the desk",
+  "author": "Sergeant Aldric Mooring",
+  "notes": "Bible 6.1 quest 3 (The Watch Still Stands; mw-e39.11): the page the damp took from book-keepers-log, found wedged behind the keeper's desk. Gives the watchword, which is the 'any class' solution, and says what ends the watch (the bell, relief by a knight, or the order being unmade). Does not contradict book-keepers-log: Day 40 gave the stands the order; this is Day 41 and the last day.",
+  "locations": ["place-mooring-watch"],
+  "evidence": ["evidence.keepers-last-leaf"],
+  "emits": ["keepers-leaf-read"],
+  "pages": [
+    {
+      "text": "Day 41 alone. If anyone reads this, the men on the stairs will let you pass if you say the word. The word is Vespers-and-home. I chose it so they would remember what they are waiting for.\n\nThe order is: hold the tower. It does not say until when. A relieving officer can end it, or a bell from the tower, or someone who unmakes it. I have not the heart to unmake it myself.\n\nIf you are a knight, say it properly. They will know the old words."
+    }
+  ]
+}

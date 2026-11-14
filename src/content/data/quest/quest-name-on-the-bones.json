@@ -1,0 +1,395 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-name-on-the-bones",
+  "title": "The Name on the Bones",
+  "summary": "Clatter cannot remember his own name. A psalter, a pear tree and a letter might help him.",
+  "notes": "Side quest of the town and the Knot (bible 6.1 quest 5; mw-e39.11), any class, the emotional one. Started by meeting Clatter (clatter.met), finding the psalter (evidence.clatter-psalter), the Bible (hollis.bible-lent) or the pear (bones.pear-bloomed). Three pieces, any order, each handed to Clatter in clatter-garden, which moves clatter.memories up one: the psalter (a readable among the Forgotten in the Ossuary), the pear tree (Juniper's graft, bones.pear-bloomed) and his sister's letter (Hollis lends the Bible, or a thief takes it). A sorcerer's memory-reading skips a piece when it succeeds; when it fails it costs a memory and permanently lowers clatter.memories.max from 3 to 2 (bible 6.1), and the quest then moves to lost-one and is completed by any two pieces. When clatter.memories reaches the max the quest sets clatter.restored and tansy.kin.known (Tansy is family: the epilogue slide vr-clatter-name). The choice is then Clatter's: join you (clatter.fate joined, which enables the abbot's Persuade resolution; the bead's clatter.choice is this existing fact) or rest (clatter.fate rested), with the knight's rites (clatter.rites) or the psalter laid on the priory altar; the three resolutions. The placed pear tree and its bloom are E29; the altar is narrated.",
+  "givers": ["npc-clatter"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "clatter.met"
+      },
+      {
+        "kind": "fact",
+        "fact": "evidence.clatter-psalter"
+      },
+      {
+        "kind": "fact",
+        "fact": "hollis.bible-lent"
+      },
+      {
+        "kind": "fact",
+        "fact": "bones.pear-bloomed"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "gather",
+      "text": "Clatter half remembers three things: a psalter among the Forgotten, a pear tree in the priory garden and a letter from his sister. Bring them to him in any order.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories.max",
+                    "op": "eq",
+                    "value": 3
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories",
+                    "op": "gte",
+                    "value": 3
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories.max",
+                    "op": "eq",
+                    "value": 2
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories",
+                    "op": "gte",
+                    "value": 2
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "remembered",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "clatter.restored",
+              "value": true
+            },
+            {
+              "kind": "setFact",
+              "fact": "tansy.kin.known",
+              "value": true
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories.max",
+            "op": "eq",
+            "value": 2
+          },
+          "stage": "lost-one"
+        }
+      ]
+    },
+    {
+      "id": "lost-one",
+      "text": "A memory has gone for good, and it will not come back. Two of the three pieces will have to be enough.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories.max",
+                    "op": "eq",
+                    "value": 3
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories",
+                    "op": "gte",
+                    "value": 3
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories.max",
+                    "op": "eq",
+                    "value": 2
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "clatter.memories",
+                    "op": "gte",
+                    "value": 2
+                  }
+                ]
+              }
+            ]
+          },
+          "stage": "remembered",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "clatter.restored",
+              "value": true
+            },
+            {
+              "kind": "setFact",
+              "fact": "tansy.kin.known",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "remembered",
+      "text": "Brother Anselm Hobb has his name. He asks whether it is time to rest, or whether there is something yet for hands like his to do."
+    }
+  ],
+  "initialStage": "gather",
+  "objectives": [
+    {
+      "id": "meet-clatter",
+      "kind": "fact",
+      "text": "Meet Clatter in his mushroom garden among the Forgotten.",
+      "params": {
+        "fact": "clatter.met"
+      },
+      "optional": true
+    },
+    {
+      "id": "enter-the-ossuary",
+      "kind": "enterArea",
+      "text": "Visit the Ossuary, where the Forgotten lie.",
+      "params": {
+        "area": "ossuary-galleries"
+      },
+      "optional": true
+    },
+    {
+      "id": "find-the-psalter",
+      "kind": "fact",
+      "text": "Find Clatter's burnt psalter among the Forgotten.",
+      "params": {
+        "fact": "evidence.clatter-psalter"
+      },
+      "optional": true
+    },
+    {
+      "id": "show-the-psalter",
+      "kind": "fact",
+      "text": "Show Clatter the psalter.",
+      "params": {
+        "fact": "bones.psalter-given"
+      }
+    },
+    {
+      "id": "ask-hollis",
+      "kind": "talkTo",
+      "text": "Ask Hollis Pell about the family Bible.",
+      "params": {
+        "npc": "npc-hollis"
+      },
+      "optional": true
+    },
+    {
+      "id": "get-the-letter",
+      "kind": "fact",
+      "text": "Take Anselm's letter from the Pell family Bible.",
+      "params": {
+        "fact": "hollis.bible-lent"
+      },
+      "optional": true
+    },
+    {
+      "id": "read-the-letter",
+      "kind": "fact",
+      "text": "Read Clatter his sister's letter.",
+      "params": {
+        "fact": "bones.letter-given"
+      }
+    },
+    {
+      "id": "bloom-the-pear",
+      "kind": "fact",
+      "text": "Have Juniper graft the dead pear tree so it blooms once.",
+      "params": {
+        "fact": "bones.pear-bloomed"
+      },
+      "optional": true
+    },
+    {
+      "id": "tell-the-pear",
+      "kind": "fact",
+      "text": "Tell Clatter the pear tree has bloomed.",
+      "params": {
+        "fact": "bones.pear-given"
+      }
+    },
+    {
+      "id": "read-his-memories",
+      "kind": "fact",
+      "text": "Optional (sorcerer): read his memories. A risk: it can cost him one for good.",
+      "params": {
+        "fact": "clatter.read-success"
+      },
+      "optional": true
+    },
+    {
+      "id": "he-joins",
+      "kind": "fact",
+      "text": "Take Clatter to the Cradle.",
+      "params": {
+        "fact": "clatter.fate",
+        "value": "joined"
+      },
+      "optional": true,
+      "activeWhen": {
+        "kind": "fact",
+        "fact": "clatter.restored"
+      }
+    },
+    {
+      "id": "he-rests",
+      "kind": "fact",
+      "text": "Let Clatter rest.",
+      "params": {
+        "fact": "clatter.fate",
+        "value": "rested"
+      },
+      "optional": true,
+      "activeWhen": {
+        "kind": "fact",
+        "fact": "clatter.restored"
+      }
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "joins-you",
+      "approach": "diplomacy",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "clatter.fate",
+            "op": "eq",
+            "value": "joined"
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "bones-resolved",
+          "data": {
+            "outcome": "joins-you"
+          }
+        }
+      ],
+      "journal": "Brother Anselm Hobb walks beside you now, and trips over things less often than he used to. He wants to see Corvin. He has a great deal to say, and a very long walk to say it in."
+    },
+    {
+      "id": "rest-with-rites",
+      "approach": "other",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "clatter.fate",
+                "op": "eq",
+                "value": "rested"
+              },
+              {
+                "kind": "fact",
+                "fact": "clatter.rites"
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "bones-resolved",
+          "data": {
+            "outcome": "rest-with-rites"
+          }
+        }
+      ],
+      "journal": "A knight said the Vesperine rites in a voice like a gate, and Clatter lay down among his mushrooms and was, at last, no longer sorry. The pears are for Amabel."
+    },
+    {
+      "id": "rest-at-altar",
+      "approach": "other",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "clatter.fate",
+                "op": "eq",
+                "value": "rested"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "clatter.rites"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "bones-resolved",
+          "data": {
+            "outcome": "rest-at-altar"
+          }
+        }
+      ],
+      "journal": "His psalter lies on the priory altar, and the pear tree bloomed once for him. Brother Anselm Hobb rests, and Tansy Pell has a great-great-great-aunt, and the gate is oiled."
+    }
+  ]
+}

@@ -1,0 +1,357 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-watch-still-stands",
+  "title": "The Watch Still Stands",
+  "summary": "The Hollow Sentinels still hold Mooring's Watch on a forty-year-old order and let no one pass without the watchword.",
+  "notes": "Side quest of the wilds (bible 6.1 quest 3; mw-e39.11), class-flavoured. Started by Dot's rumour 2 (watch.told) or by reading the keeper's last leaf (evidence.keepers-last-leaf, a readable on the moorings-watch tower, which is also the watchword). The Sentinels' voice is sentinel-watch (npc-hollow-sentinel); each way to settle them sets sentinels.method there and each is one resolution: the watchword (any class), the knight's formal relief (class-gated here and in the dialogue), the archer's shot at the bell cord, the sorcerer's dispelling, the thief's unseen walk (the Sentinels stay at their post: no safe base) and smashing them (anyone, slow). Every way but the thief's sets sentinels.relieved and the rewards: moorings.safe-base, watch.key-held (Sergeant Mooring's watch-key) and watch.mirror-held (the signal mirror, for the priory light puzzle); the thief takes the key and the mirror without the safe base. Rewards are facts until the items exist (follow-up bead), as are the placed Sentinels, the bell cord shot, the dispel spell, the sneak and the old-words technique (mw-e04) behind the knight's relief. The closing line in the keeper's log needs a text that reads differently after the quest (follow-up bead).",
+  "givers": [],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "watch.told"
+      },
+      {
+        "kind": "fact",
+        "fact": "evidence.keepers-last-leaf"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "approach",
+      "text": "Old Mooring's armour still keeps the tower at Mooring's Watch, and it lets no one pass without the word. The keeper's log is in the quarters above; he wrote everything down.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "sentinels.relieved"
+          },
+          "stage": "relieved"
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "evidence.keepers-last-leaf"
+          },
+          "stage": "word-known"
+        }
+      ]
+    },
+    {
+      "id": "word-known",
+      "text": "The keeper's last leaf gives the word: Vespers-and-home. It also says what ends the watch: a relieving officer, a bell from the tower, or someone who unmakes the order.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "sentinels.relieved"
+          },
+          "stage": "relieved"
+        }
+      ]
+    },
+    {
+      "id": "relieved",
+      "text": "The watch is ended. The tower is yours."
+    }
+  ],
+  "initialStage": "approach",
+  "objectives": [
+    {
+      "id": "hear-the-rumour",
+      "kind": "fact",
+      "text": "Hear that Old Mooring never left his tower.",
+      "params": {
+        "fact": "watch.told"
+      },
+      "optional": true
+    },
+    {
+      "id": "read-the-leaf",
+      "kind": "fact",
+      "text": "Find the keeper's last leaf behind his desk.",
+      "params": {
+        "fact": "evidence.keepers-last-leaf"
+      },
+      "optional": true
+    },
+    {
+      "id": "meet-the-sentinels",
+      "kind": "talkTo",
+      "text": "Speak to the Hollow Sentinels in the tower hall.",
+      "params": {
+        "npc": "npc-hollow-sentinel"
+      }
+    },
+    {
+      "id": "relieve-the-watch",
+      "kind": "fact",
+      "text": "End the watch: relieve the Sentinels, ring the bell, unbind them or break them.",
+      "params": {
+        "fact": "sentinels.relieved"
+      },
+      "optional": true
+    },
+    {
+      "id": "slip-past",
+      "kind": "event",
+      "text": "Slip past the Sentinels unseen.",
+      "params": {
+        "event": "sentinels-slipped"
+      },
+      "optional": true,
+      "hidden": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "watchword",
+      "approach": "diplomacy",
+      "when": {
+        "kind": "factCmp",
+        "fact": "sentinels.method",
+        "op": "eq",
+        "value": "watchword"
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "watch.key-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "watch.mirror-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "moorings.safe-base",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "watch-resolved",
+          "data": {
+            "method": "watchword"
+          }
+        }
+      ],
+      "journal": "You said the word, and the stands said theirs: relieved, and gone quiet. The tower is a safe place now, Sergeant Mooring's keys hang on the keeper's desk, and the signal mirror is yours to carry to the priory."
+    },
+    {
+      "id": "formal-relief",
+      "approach": "diplomacy",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "sentinels.method",
+            "op": "eq",
+            "value": "knight"
+          },
+          {
+            "kind": "playerClass",
+            "class": "knight"
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "watch.key-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "watch.mirror-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "moorings.safe-base",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "watch-resolved",
+          "data": {
+            "method": "knight"
+          }
+        }
+      ],
+      "journal": "You said the old words of the watch, and the Sentinels stood easy at last, every one. The keys and the mirror are yours, and the tower is a place you can sleep."
+    },
+    {
+      "id": "bell-cord",
+      "approach": "other",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "sentinels.method",
+            "op": "eq",
+            "value": "bell-cord"
+          },
+          {
+            "kind": "playerClass",
+            "class": "archer"
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "watch.key-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "watch.mirror-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "moorings.safe-base",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "watch-resolved",
+          "data": {
+            "method": "bell-cord"
+          }
+        }
+      ],
+      "journal": "One arrow, one frayed cord, and the soldier's bell said the watch was ended. The Sentinels were relieved by their own tower. The keys and the mirror are yours."
+    },
+    {
+      "id": "dispel",
+      "approach": "magic",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "sentinels.method",
+            "op": "eq",
+            "value": "dispel"
+          },
+          {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "watch.key-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "watch.mirror-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "moorings.safe-base",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "watch-resolved",
+          "data": {
+            "method": "dispel"
+          }
+        }
+      ],
+      "journal": "You pulled the end of the order and it came apart like old knitting. The Sentinels are armour on stands again, resting. The tower, the keys and the mirror are yours."
+    },
+    {
+      "id": "unseen",
+      "approach": "stealth",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "sentinels.method",
+            "op": "eq",
+            "value": "sneak"
+          },
+          {
+            "kind": "playerClass",
+            "class": "thief"
+          }
+        ]
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "watch.key-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "watch.mirror-held",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "watch-resolved",
+          "data": {
+            "method": "sneak"
+          }
+        }
+      ],
+      "journal": "The Sentinels still hold the tower and never saw you. You have the keys, and the signal mirror; you have no friend in the garrison, and the tower is a place you will leave the same way you came."
+    },
+    {
+      "id": "smashed",
+      "approach": "combat",
+      "when": {
+        "kind": "factCmp",
+        "fact": "sentinels.method",
+        "op": "eq",
+        "value": "smash"
+      },
+      "priority": 0,
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "watch.key-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "watch.mirror-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "moorings.safe-base",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "watch-resolved",
+          "data": {
+            "method": "smash"
+          }
+        }
+      ],
+      "journal": "It took a long time and none of it was clever. The tower is yours, and so is the quiet, and the keys, and the mirror. Somewhere in the broken armour, a very small voice is still sorry about the post."
+    }
+  ]
+}

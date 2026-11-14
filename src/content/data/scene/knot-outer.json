@@ -1417,6 +1417,20 @@
       "id": "bone-niche-8",
       "at": [109, 0, 153],
       "tags": ["bone-niche"]
+    },
+    {
+      "id": "read-clatter-psalter",
+      "at": [56, 0, 106],
+      "tags": ["readable", "note-clatter-psalter"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the burnt psalter"
+          }
+        ],
+        "radius": 1.5
+      }
     }
   ],
   "signals": [
