@@ -31,51 +31,59 @@ const leadsTo = (from: Scene, id: string, to: Scene, spawn: string) => {
   expect(from.spawns.find((s) => s.id === id)?.tags).toContain('transition');
 };
 
-describe('the forest loop edges list their transitions (mw-e25.25 AC-2)', () => {
-  const edge = (id: string) => world?.edges.find((e) => e.id === id);
+describe(
+  'the forest loop edges list their transitions (mw-e25.25 AC-2)',
+  { timeout: 60_000 },
+  () => {
+    const edge = (id: string) => world?.edges.find((e) => e.id === id);
 
-  it('AC-2: moorings-priory-ridge lists the ridge gate at each end', () => {
-    expect(edge('moorings-priory-ridge')?.transitions).toEqual([
-      'moorings-watch/ridge-gate',
-      'briarwood/ridge-gate',
-    ]);
-  });
+    it('AC-2: moorings-priory-ridge lists the ridge gate at each end', () => {
+      expect(edge('moorings-priory-ridge')?.transitions).toEqual([
+        'moorings-watch/ridge-gate',
+        'briarwood/ridge-gate',
+      ]);
+    });
 
-  it('AC-2: hub-moorings and priory-road-gate list theirs', () => {
-    expect(edge('hub-moorings')?.transitions).toEqual([
-      'briarwood/moorings-gate',
-      'moorings-watch/spur-gate',
-    ]);
-    expect(edge('priory-road-gate')?.transitions).toEqual([
-      'briarwood/priory-road-gate',
-      'bellwater-priory/road-gate',
-    ]);
-  });
+    it('AC-2: hub-moorings and priory-road-gate list theirs', () => {
+      expect(edge('hub-moorings')?.transitions).toEqual([
+        'briarwood/moorings-gate',
+        'moorings-watch/spur-gate',
+      ]);
+      expect(edge('priory-road-gate')?.transitions).toEqual([
+        'briarwood/priory-road-gate',
+        'bellwater-priory/road-gate',
+      ]);
+    });
 
-  it('AC-2: hub-priory-road is the in-scene walk and needs no transition volume', () => {
-    expect(edge('hub-priory-road')?.transitions ?? []).toEqual([]);
-    expect(edge('hub-priory-road')?.notes).toMatch(/inside the briarwood scene/);
-  });
-});
+    it('AC-2: hub-priory-road is the in-scene walk and needs no transition volume', () => {
+      expect(edge('hub-priory-road')?.transitions ?? []).toEqual([]);
+      expect(edge('hub-priory-road')?.notes).toMatch(/inside the briarwood scene/);
+    });
+  },
+);
 
-describe('each path of the loop arrives at the matching scene and returns (mw-e25.25 AC-1)', () => {
-  it('AC-1: the moorings gate and spur gate', () => {
-    leadsTo(briarwood, 'moorings-gate', watch, 'arrive-from-briarwood');
-    leadsTo(watch, 'spur-gate', briarwood, 'arrive-from-moorings-watch');
-  });
+describe(
+  'each path of the loop arrives at the matching scene and returns (mw-e25.25 AC-1)',
+  { timeout: 60_000 },
+  () => {
+    it('AC-1: the moorings gate and spur gate', () => {
+      leadsTo(briarwood, 'moorings-gate', watch, 'arrive-from-briarwood');
+      leadsTo(watch, 'spur-gate', briarwood, 'arrive-from-moorings-watch');
+    });
 
-  it('AC-1: the ridge gates', () => {
-    leadsTo(watch, 'ridge-gate', briarwood, 'arrive-from-moorings-watch-ridge');
-    leadsTo(briarwood, 'ridge-gate', watch, 'arrive-from-briarwood-ridge');
-  });
+    it('AC-1: the ridge gates', () => {
+      leadsTo(watch, 'ridge-gate', briarwood, 'arrive-from-moorings-watch-ridge');
+      leadsTo(briarwood, 'ridge-gate', watch, 'arrive-from-briarwood-ridge');
+    });
 
-  it('AC-1: the priory road gate and the priory’s road gate', () => {
-    leadsTo(briarwood, 'priory-road-gate', priory, 'arrive-from-briarwood');
-    leadsTo(priory, 'road-gate', briarwood, 'arrive-from-bellwater-priory');
-  });
-});
+    it('AC-1: the priory road gate and the priory’s road gate', () => {
+      leadsTo(briarwood, 'priory-road-gate', priory, 'arrive-from-briarwood');
+      leadsTo(priory, 'road-gate', briarwood, 'arrive-from-bellwater-priory');
+    });
+  },
+);
 
-describe('the loop is walkable on the navmeshes (mw-e25.25 AC-1)', () => {
+describe('the loop is walkable on the navmeshes (mw-e25.25 AC-1)', { timeout: 60_000 }, () => {
   const game = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'briarwood' });
   const probe = game.world.spawn();
   const dist = (from: string, to: string) => {

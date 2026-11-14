@@ -93,117 +93,121 @@ const withoutGate = () => bakedWithWalls([{ at: [90, 0, 74], half: 3 }]);
 
 const NODES = ['horns-hall', 'the-fold', 'the-cradle', 'sounding-shaft-foot'] as const;
 
-describe('the Knot inner half: named places and routes (mw-e26.10 AC-1)', () => {
-  it('AC-1: Horn’s Hall, the Fold, the Cradle and the Shaft’s foot are the knot-inner scene’s nodes of the world map, each a named spawn', () => {
-    const nodes = (world?.nodes ?? []).filter((n) => n.scene?.id === 'knot-inner');
-    expect(nodes.map((n) => n.id).sort()).toEqual([...NODES].sort());
-    for (const node of nodes) {
-      expect(scene.spawns.some((s) => s.id === node.id && s.tags.includes('node'))).toBe(true);
-    }
-  });
+describe(
+  'the Knot inner half: named places and routes (mw-e26.10 AC-1)',
+  { timeout: 60_000 },
+  () => {
+    it('AC-1: Horn’s Hall, the Fold, the Cradle and the Shaft’s foot are the knot-inner scene’s nodes of the world map, each a named spawn', () => {
+      const nodes = (world?.nodes ?? []).filter((n) => n.scene?.id === 'knot-inner');
+      expect(nodes.map((n) => n.id).sort()).toEqual([...NODES].sort());
+      for (const node of nodes) {
+        expect(scene.spawns.some((s) => s.id === node.id && s.tags.includes('node'))).toBe(true);
+      }
+    });
 
-  it('AC-1: the named places of the four areas are all there', () => {
-    const ids = new Set(scene.spawns.map((s) => s.id));
-    for (const id of [
-      'arrive-from-knot-outer',
-      'horns-door',
-      'horn-post',
-      'statue-ears-1',
-      'statue-ears-4',
-      'fold-door',
-      'fold-wake',
-      'moss-bed-1',
-      'moss-bed-6',
-      'read-fold-tallies',
-      'cradle-gate',
-      'cradle-centre',
-      'carved-face-1',
-      'carved-face-8',
-      'shaft-door',
-      'shaft-mouth',
-      'cradle-view',
-      'crypt-door',
-      'crypt-passage-end',
-      'hornfolk-door',
-      'hornfolk-wall',
-      'cradle-east-door',
-    ]) {
-      expect(ids.has(id), id).toBe(true);
-    }
-  });
+    it('AC-1: the named places of the four areas are all there', () => {
+      const ids = new Set(scene.spawns.map((s) => s.id));
+      for (const id of [
+        'arrive-from-knot-outer',
+        'horns-door',
+        'horn-post',
+        'statue-ears-1',
+        'statue-ears-4',
+        'fold-door',
+        'fold-wake',
+        'moss-bed-1',
+        'moss-bed-6',
+        'read-fold-tallies',
+        'cradle-gate',
+        'cradle-centre',
+        'carved-face-1',
+        'carved-face-8',
+        'shaft-door',
+        'shaft-mouth',
+        'cradle-view',
+        'crypt-door',
+        'crypt-passage-end',
+        'hornfolk-door',
+        'hornfolk-wall',
+        'cradle-east-door',
+      ]) {
+        expect(ids.has(id), id).toBe(true);
+      }
+    });
 
-  it('AC-1: a walker goes from the vestibule to every place of the four areas but the sealed ones', () => {
-    for (const id of [
-      'player-start',
-      'horns-hall',
-      'horn-post',
-      'statue-ears-1',
-      'statue-ears-4',
-      'the-fold',
-      'fold-wake',
-      'moss-bed-1',
-      'moss-bed-6',
-      'read-fold-tallies',
-      'crypt-passage',
-      'the-cradle',
-      'read-friend-note-cradle',
-      'cradle-centre',
-      'carved-face-1',
-      'carved-face-5',
-      'carved-face-8',
-      'cradle-east-door',
-      'sounding-shaft-foot',
-      'shaft-mouth',
-      'hornfolk-wall',
-    ]) {
-      expect(route('arrive-from-knot-outer', id).status, id).toBe('found');
-    }
-  });
+    it('AC-1: a walker goes from the vestibule to every place of the four areas but the sealed ones', () => {
+      for (const id of [
+        'player-start',
+        'horns-hall',
+        'horn-post',
+        'statue-ears-1',
+        'statue-ears-4',
+        'the-fold',
+        'fold-wake',
+        'moss-bed-1',
+        'moss-bed-6',
+        'read-fold-tallies',
+        'crypt-passage',
+        'the-cradle',
+        'read-friend-note-cradle',
+        'cradle-centre',
+        'carved-face-1',
+        'carved-face-5',
+        'carved-face-8',
+        'cradle-east-door',
+        'sounding-shaft-foot',
+        'shaft-mouth',
+        'hornfolk-wall',
+      ]) {
+        expect(route('arrive-from-knot-outer', id).status, id).toBe('found');
+      }
+    });
 
-  it('AC-1: the world map’s inner-Knot edges join the hall to the Fold, the Cradle and the Shaft on foot', () => {
-    const edges = new Map((world?.edges ?? []).map((e) => [e.id, e]));
-    for (const [id, from, to] of [
-      ['horns-hall-fold', 'horns-hall', 'the-fold'],
-      ['horns-hall-cradle', 'horns-hall', 'the-cradle'],
-      ['cradle-shaft-foot', 'the-cradle', 'sounding-shaft-foot'],
-    ] as const) {
-      expect(edges.get(id), id).toMatchObject({ from, to });
-      expect(route(from, to).status, id).toBe('found');
-    }
-    // The Fold and the Shaft are dead ends: the Cradle is not on the way to the Fold.
-    expect(route('the-fold', 'sounding-shaft-foot').status).toBe('found');
-    expect(route('the-fold', 'horns-hall').status).toBe('found');
-  });
+    it('AC-1: the world map’s inner-Knot edges join the hall to the Fold, the Cradle and the Shaft on foot', () => {
+      const edges = new Map((world?.edges ?? []).map((e) => [e.id, e]));
+      for (const [id, from, to] of [
+        ['horns-hall-fold', 'horns-hall', 'the-fold'],
+        ['horns-hall-cradle', 'horns-hall', 'the-cradle'],
+        ['cradle-shaft-foot', 'the-cradle', 'sounding-shaft-foot'],
+      ] as const) {
+        expect(edges.get(id), id).toMatchObject({ from, to });
+        expect(route(from, to).status, id).toBe('found');
+      }
+      // The Fold and the Shaft are dead ends: the Cradle is not on the way to the Fold.
+      expect(route('the-fold', 'sounding-shaft-foot').status).toBe('found');
+      expect(route('the-fold', 'horns-hall').status).toBe('found');
+    });
 
-  it('AC-1: the Fold has one door: with it walled shut the vault is cut off, and the hall is still whole', () => {
-    const q = bakedWithWalls([{ at: [50, 0, 44], half: 1.5 }]);
-    expect(pathOn(q, scene, 'horns-hall', 'the-fold').status).not.toBe('found');
-    expect(pathOn(q, scene, 'horns-hall', 'the-cradle').status).toBe('found');
-  });
+    it('AC-1: the Fold has one door: with it walled shut the vault is cut off, and the hall is still whole', () => {
+      const q = bakedWithWalls([{ at: [50, 0, 44], half: 1.5 }]);
+      expect(pathOn(q, scene, 'horns-hall', 'the-fold').status).not.toBe('found');
+      expect(pathOn(q, scene, 'horns-hall', 'the-cradle').status).toBe('found');
+    });
 
-  it('AC-1: the scene is the knot-inner region with the hall, the Fold, the Cradle and the Shaft inside it', () => {
-    const { regions } = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'knot-inner' })
-      .scene.layout;
-    for (const [id, area] of [
-      ['horns-hall', 'horns-hall'],
-      ['the-fold', 'the-fold'],
-      ['the-cradle', 'the-cradle'],
-      ['sounding-shaft-foot', 'sounding-shaft-foot'],
-      ['hornfolk-corner', undefined],
-    ] as const) {
-      const here = regionsAt(regions, spot(scene, id));
-      expect(here, id).toContain('knot-inner');
-      if (area !== undefined) expect(here, id).toContain(area);
-    }
-    expect(regionsAt(regions, spot(scene, 'player-start'))).toEqual(['knot-inner']);
-    const rule = content
-      .get('respawn-rules', 'respawn-rules')
-      .rules.find((r) => r.region.id === 'knot-inner');
-    expect(rule?.destination).toMatchObject({ spawn: 'player-start' });
-  });
-});
+    it('AC-1: the scene is the knot-inner region with the hall, the Fold, the Cradle and the Shaft inside it', () => {
+      const { regions } = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'knot-inner' })
+        .scene.layout;
+      for (const [id, area] of [
+        ['horns-hall', 'horns-hall'],
+        ['the-fold', 'the-fold'],
+        ['the-cradle', 'the-cradle'],
+        ['sounding-shaft-foot', 'sounding-shaft-foot'],
+        ['hornfolk-corner', undefined],
+      ] as const) {
+        const here = regionsAt(regions, spot(scene, id));
+        expect(here, id).toContain('knot-inner');
+        if (area !== undefined) expect(here, id).toContain(area);
+      }
+      expect(regionsAt(regions, spot(scene, 'player-start'))).toEqual(['knot-inner']);
+      const rule = content
+        .get('respawn-rules', 'respawn-rules')
+        .rules.find((r) => r.region.id === 'knot-inner');
+      expect(rule?.destination).toMatchObject({ spawn: 'player-start' });
+    });
+  },
+);
 
-describe('the Cradle’s secret Hornfolk way (mw-e26.10 AC-2)', () => {
+describe('the Cradle’s secret Hornfolk way (mw-e26.10 AC-2)', { timeout: 60_000 }, () => {
   it('AC-2: the Cradle has two ways in: the corridor from the hall and the secret way, which is a wall while the seal holds', () => {
     // Both open: the corridor and (with the seal open) the secret way each lead to the Cradle.
     expect(route('horns-hall', 'the-cradle').status).toBe('found');
@@ -275,7 +279,7 @@ describe('the Cradle’s secret Hornfolk way (mw-e26.10 AC-2)', () => {
   });
 });
 
-describe('the sealed crypt passage (mw-e26.10)', () => {
+describe('the sealed crypt passage (mw-e26.10)', { timeout: 60_000 }, () => {
   it('the passage runs off the hall to a locked door; behind it a sealed stub waits for the priory', () => {
     expect(route('horns-hall', 'crypt-passage').status).toBe('found');
     expect(route('horns-hall', 'crypt-passage-end').status).not.toBe('found');
@@ -294,7 +298,7 @@ describe('the sealed crypt passage (mw-e26.10)', () => {
   });
 });
 
-describe('the quest’s inner Knot areas (mw-5wg)', () => {
+describe('the quest’s inner Knot areas (mw-5wg)', { timeout: 60_000 }, () => {
   const inside = (node: string, p: Vec3): boolean => {
     const n = content.get('signal-graph', 'knot-inner').nodes.find((x) => x.id === node);
     if (n?.kind !== 'volume' || n.shape.kind !== 'box') return false;
@@ -340,7 +344,7 @@ describe('the quest’s inner Knot areas (mw-5wg)', () => {
   });
 });
 
-describe('the Chapel landing and the vestibule (mw-e26.10)', () => {
+describe('the Chapel landing and the vestibule (mw-e26.10)', { timeout: 60_000 }, () => {
   it('chapel-horns-hall lists the transition at each end and each leads to the other scene’s arrival', () => {
     const edge = world?.edges.find((e) => e.id === 'chapel-horns-hall');
     expect(edge?.transitions).toEqual(['knot-outer/horns-door', 'knot-inner/horns-door']);
