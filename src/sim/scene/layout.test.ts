@@ -395,6 +395,34 @@ describe('scene layout (mw-e00.21)', () => {
     expect(always?.presence).toBeUndefined();
   });
 
+  it('mw-e24.13: lays out the hours window of a spawn, with or without phases', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        {
+          id: 'clerk',
+          at: [0, 0, 0],
+          yaw: 0,
+          tags: [],
+          creature: { id: 'npc-ottilie' },
+          presence: { hours: [8, 18] },
+        },
+        {
+          id: 'both',
+          at: [1, 0, 0],
+          yaw: 0,
+          tags: [],
+          creature: { id: 'npc-ottilie' },
+          presence: { phases: ['day'], hours: [22, 4] },
+        },
+      ],
+    };
+    const [clerk, both] = layoutScene(scene, testKit).spawns;
+    expect(clerk?.presence).toEqual({ hours: [8, 18] });
+    expect(both?.presence).toEqual({ phases: ['day'], hours: [22, 4] });
+    expect(Object.isFrozen(both?.presence?.hours)).toBe(true);
+  });
+
   it('mw-e01.5: lays out what a creature carries as plain item ids, in order', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,

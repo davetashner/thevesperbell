@@ -255,7 +255,17 @@
         {
           "id": "ask-trinkets",
           "text": "They say goblins left brass trinkets where people vanished.",
-          "next": "trinkets-1"
+          "next": "trinkets-1",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 3,
+                "source": "npc-dot"
+              }
+            }
+          ]
         },
         {
           "id": "beams-knight",
@@ -463,6 +473,11 @@
             }
           ],
           "next": "mooring-1"
+        },
+        {
+          "id": "valley-news",
+          "text": "Anything about the valley itself?",
+          "next": "valley-1"
         },
         {
           "id": "harbour-news",
@@ -1225,6 +1240,129 @@
       "speaker": "dot",
       "text": "It'll stand there till the wall falls over. Take the right word if you go, or a very good excuse.",
       "next": "rumour-choice"
+    },
+    {
+      "id": "valley-1",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "valley-well",
+          "text": "Anything odd about the Glen Well?",
+          "once": true,
+          "next": "valley-well-1"
+        },
+        {
+          "id": "valley-bell",
+          "text": "What do they say about the priory bell?",
+          "once": true,
+          "next": "valley-bell-1"
+        },
+        {
+          "id": "valley-shelf",
+          "text": "Do people talk about Mirela's shop?",
+          "once": true,
+          "next": "valley-shelf-1"
+        },
+        {
+          "id": "valley-pond",
+          "text": "Anything about the millpond?",
+          "once": true,
+          "next": "valley-pond-1"
+        },
+        {
+          "id": "valley-back",
+          "text": "That'll do for now.",
+          "next": "rumour-choice"
+        }
+      ]
+    },
+    {
+      "id": "valley-well-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "People say the Glen Well echoes wrong. Drop a stone and you hear it land twice. I'd not lean over it, love.",
+      "next": "valley-well-fx"
+    },
+    {
+      "id": "valley-well-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 4,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "valley-1"
+    },
+    {
+      "id": "valley-bell-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "There's a bell up at the priory, cracked clean through, used to ring every sunset. My gran said the night it didn't ring, the monks all went for a walk.",
+      "next": "valley-bell-fx"
+    },
+    {
+      "id": "valley-bell-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 5,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "valley-1"
+    },
+    {
+      "id": "valley-shelf-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Mirela's got a shelf you can only see if she likes you. I've never been liked that much. Ask me why I mind.",
+      "next": "valley-shelf-fx"
+    },
+    {
+      "id": "valley-shelf-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 7,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "valley-1"
+    },
+    {
+      "id": "valley-pond-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Something at the millpond sings on still nights. Not a bird. I stopped my regulars walking home that way, and I told them it was the damp.",
+      "next": "valley-pond-fx"
+    },
+    {
+      "id": "valley-pond-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 9,
+            "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "valley-1"
     }
   ]
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-19-old-fire-tricks",
+  "notes": "Idris Quillon, the unlicensed teacher (bible 5.17). Dot tells it after the hearth is lit, in dot-sleeping-ox.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "npc-quillon",
+  "text": "If you want to learn the old fire tricks, don't ask the college. Walk down to the water after dark, past the Watch. Somebody under the bridge keeps a lantern lit and takes coin. I never said so.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "You found the man under the bridge. I never said a thing. Keep that lantern lit."
+  }
+}

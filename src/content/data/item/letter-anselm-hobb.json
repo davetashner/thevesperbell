@@ -1,0 +1,11 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "letter-anselm-hobb",
+  "category": "quest",
+  "name": "Brother Anselm's letter",
+  "description": "A single page in a gardener's careful hand, folded small and kept in the back of the Pell family Bible. Signed Anselm.",
+  "notes": "mw-3n0f: the letter for The Name on the Bones (quest-name-on-the-bones) as a real item. Given by Hollis's dialogue (lent, or the thief's lift from the Bible; hollis.bible-lent and bones.letter-stolen still record which) and taken by Clatter when read to him (bones.letter-given). Quest item, nominal value, never sold.",
+  "icon": "icon-item-letter-anselm-hobb-01",
+  "value": 1,
+  "stackable": false
+}

@@ -26,6 +26,7 @@ const NOT_FOR_SALE = new Set([
   'writ-vane-chair',
   'writ-forged-lantern',
   'romance-hearts-against-the-tide',
+  'letter-anselm-hobb', // mw-3n0f: Anselm's letter, given by Hollis and taken by Clatter
   'rusted-gallery-key',
   'testbed-closet-key',
   'valley-chest-key',

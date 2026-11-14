@@ -159,6 +159,11 @@
               "kind": "setFact",
               "fact": "hollis.bible-lent",
               "value": true
+            },
+            {
+              "kind": "giveItem",
+              "item": "letter-anselm-hobb",
+              "count": 1
             }
           ],
           "next": "bible-1"
@@ -198,6 +203,11 @@
               "kind": "disposition",
               "npc": "npc-hollis",
               "delta": -3
+            },
+            {
+              "kind": "giveItem",
+              "item": "letter-anselm-hobb",
+              "count": 1
             }
           ],
           "next": "steal-1"
@@ -367,6 +377,11 @@
               "kind": "setFact",
               "fact": "hollis.bible-lent",
               "value": true
+            },
+            {
+              "kind": "giveItem",
+              "item": "letter-anselm-hobb",
+              "count": 1
             }
           ],
           "next": "bible-glad-1"
@@ -406,6 +421,11 @@
               "kind": "disposition",
               "npc": "npc-hollis",
               "delta": -3
+            },
+            {
+              "kind": "giveItem",
+              "item": "letter-anselm-hobb",
+              "count": 1
             }
           ],
           "next": "steal-2"

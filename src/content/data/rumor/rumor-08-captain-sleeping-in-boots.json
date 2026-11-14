@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-08-captain-sleeping-in-boots",
+  "notes": "The Captain's Boots: Hale sleepwalks. Dot tells it for coin in dot-sleeping-ox.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "quest-captains-boots",
+  "text": "The captain looks like he's been sleeping in his boots.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "The boots, love. I only said look at them. You looked. Now you know and so do I."
+  }
+}
