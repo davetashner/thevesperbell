@@ -253,6 +253,240 @@
           "next": "rumours-1"
         },
         {
+          "id": "ask-followup",
+          "text": "I went and looked into one of your rumours.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-01-wolves-walk-through.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-01-wolves-walk-through.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-02-mooring-never-left.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-02-mooring-never-left.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-03-goblins-took-them.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-03-goblins-took-them.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-04-well-echoes-wrong.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-04-well-echoes-wrong.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-05-bell-cracked-clean.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-05-bell-cracked-clean.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-06-vane-buying-drinks.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-06-vane-buying-drinks.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-07-mirelas-shelf.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-07-mirelas-shelf.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-08-captain-sleeping-in-boots.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-08-captain-sleeping-in-boots.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-09-millpond-sings.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-09-millpond-sings.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-10-big-one-soft-room.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-10-big-one-soft-room.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-11-bones-say-sorry.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-11-bones-say-sorry.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-12-horn-covers-its-ears.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-12-horn-covers-its-ears.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-19-old-fire-tricks.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-19-old-fire-tricks.followed"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "entity:rumours/rumor-20-courts-short-list.investigated"
+                  },
+                  {
+                    "kind": "not",
+                    "condition": {
+                      "kind": "fact",
+                      "fact": "entity:rumours/rumor-20-courts-short-list.followed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "next": "followup-choice"
+        },
+        {
           "id": "ask-trinkets",
           "text": "They say goblins left brass trinkets where people vanished.",
           "next": "trinkets-1",
@@ -1363,6 +1597,577 @@
         }
       ],
       "next": "valley-1"
+    },
+    {
+      "id": "followup-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "fu-wolves-walk-through",
+          "text": "The wolves in the Briarwood.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-01-wolves-walk-through.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-01-wolves-walk-through.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-wolves-walk-through"
+        },
+        {
+          "id": "fu-mooring-never-left",
+          "text": "Old Mooring's tower.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-02-mooring-never-left.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-02-mooring-never-left.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-mooring-never-left"
+        },
+        {
+          "id": "fu-goblins-took-them",
+          "text": "The brass trinkets.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-03-goblins-took-them.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-03-goblins-took-them.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-goblins-took-them"
+        },
+        {
+          "id": "fu-well-echoes-wrong",
+          "text": "The Glen Well.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-04-well-echoes-wrong.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-04-well-echoes-wrong.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-well-echoes-wrong"
+        },
+        {
+          "id": "fu-bell-cracked-clean",
+          "text": "The priory bell.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-05-bell-cracked-clean.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-05-bell-cracked-clean.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-bell-cracked-clean"
+        },
+        {
+          "id": "fu-vane-buying-drinks",
+          "text": "Vane buying drinks.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-06-vane-buying-drinks.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-06-vane-buying-drinks.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-vane-buying-drinks"
+        },
+        {
+          "id": "fu-mirelas-shelf",
+          "text": "Mirela's shelf.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-07-mirelas-shelf.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-07-mirelas-shelf.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-mirelas-shelf"
+        },
+        {
+          "id": "fu-captain-sleeping-in-boots",
+          "text": "The captain's boots.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-08-captain-sleeping-in-boots.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-08-captain-sleeping-in-boots.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-captain-sleeping-in-boots"
+        },
+        {
+          "id": "fu-millpond-sings",
+          "text": "The millpond.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-09-millpond-sings.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-09-millpond-sings.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-millpond-sings"
+        },
+        {
+          "id": "fu-big-one-soft-room",
+          "text": "The soft room.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-10-big-one-soft-room.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-10-big-one-soft-room.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-big-one-soft-room"
+        },
+        {
+          "id": "fu-bones-say-sorry",
+          "text": "The talking bones.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-11-bones-say-sorry.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-11-bones-say-sorry.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-bones-say-sorry"
+        },
+        {
+          "id": "fu-horn-covers-its-ears",
+          "text": "The stone horn.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-12-horn-covers-its-ears.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-12-horn-covers-its-ears.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-horn-covers-its-ears"
+        },
+        {
+          "id": "fu-old-fire-tricks",
+          "text": "The old fire tricks.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-19-old-fire-tricks.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-19-old-fire-tricks.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-old-fire-tricks"
+        },
+        {
+          "id": "fu-courts-short-list",
+          "text": "The Court's short list.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "entity:rumours/rumor-20-courts-short-list.investigated"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "entity:rumours/rumor-20-courts-short-list.followed"
+                }
+              }
+            ]
+          },
+          "next": "follow-courts-short-list"
+        },
+        {
+          "id": "fu-back",
+          "text": "That's all of them.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "follow-wolves-walk-through",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Told you. Wolves and sleepwalkers, side by side. Juniper will say the same, and she was not pleased about it.",
+      "next": "follow-wolves-walk-through-fx"
+    },
+    {
+      "id": "follow-wolves-walk-through-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-01-wolves-walk-through.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-mooring-never-left",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Armour, as I said. You saw it stand. I like being nearly right.",
+      "next": "follow-mooring-never-left-fx"
+    },
+    {
+      "id": "follow-mooring-never-left-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-02-mooring-never-left.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-goblins-took-them",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "So it was never the goblins. I did wonder, love. I kept it behind the bar, mind.",
+      "next": "follow-goblins-took-them-fx"
+    },
+    {
+      "id": "follow-goblins-took-them-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-03-goblins-took-them.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-well-echoes-wrong",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Landed twice, did it? The well never lies, love. It just takes its time.",
+      "next": "follow-well-echoes-wrong-fx"
+    },
+    {
+      "id": "follow-well-echoes-wrong-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-04-well-echoes-wrong.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-bell-cracked-clean",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Cracked clean through. Gran would be unbearable about it. She was always right about bells.",
+      "next": "follow-bell-cracked-clean-fx"
+    },
+    {
+      "id": "follow-bell-cracked-clean-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-05-bell-cracked-clean.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-vane-buying-drinks",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "The ledger, then. Horn-coins. I said the money smelled of somewhere else.",
+      "next": "follow-vane-buying-drinks-fx"
+    },
+    {
+      "id": "follow-vane-buying-drinks-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-06-vane-buying-drinks.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-mirelas-shelf",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "She showed you the shelf? Well. She doesn't like anyone. You must be very bookish.",
+      "next": "follow-mirelas-shelf-fx"
+    },
+    {
+      "id": "follow-mirelas-shelf-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-07-mirelas-shelf.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-captain-sleeping-in-boots",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "The boots, love. I only said look at them. You looked. Now you know and so do I.",
+      "next": "follow-captain-sleeping-in-boots-fx"
+    },
+    {
+      "id": "follow-captain-sleeping-in-boots-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-08-captain-sleeping-in-boots.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-millpond-sings",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "You went to the millpond at night? Love. Sit down. Have something warm.",
+      "next": "follow-millpond-sings-fx"
+    },
+    {
+      "id": "follow-millpond-sings-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-09-millpond-sings.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-big-one-soft-room",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Beds, and bread. All of it. The town will never believe me if I say so, so I shan't.",
+      "next": "follow-big-one-soft-room-fx"
+    },
+    {
+      "id": "follow-big-one-soft-room-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-10-big-one-soft-room.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-bones-say-sorry",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Sorry a lot. Of course he does. Poor soul. Does he know his name yet?",
+      "next": "follow-bones-say-sorry-fx"
+    },
+    {
+      "id": "follow-bones-say-sorry-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-11-bones-say-sorry.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-horn-covers-its-ears",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Ears covered, the statue. You see it too. I always thought that was no accident.",
+      "next": "follow-horn-covers-its-ears-fx"
+    },
+    {
+      "id": "follow-horn-covers-its-ears-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-12-horn-covers-its-ears.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-old-fire-tricks",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "You found the man under the bridge. I never said a thing. Keep that lantern lit.",
+      "next": "follow-old-fire-tricks-fx"
+    },
+    {
+      "id": "follow-old-fire-tricks-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-19-old-fire-tricks.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
+    },
+    {
+      "id": "follow-courts-short-list",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "So you met him. Did you buy a book first? Good. He is insufferable to the unlettered.",
+      "next": "follow-courts-short-list-fx"
+    },
+    {
+      "id": "follow-courts-short-list-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "entity:rumours/rumor-20-courts-short-list.followed",
+          "value": true
+        }
+      ],
+      "next": "followup-choice"
     }
   ]
 }

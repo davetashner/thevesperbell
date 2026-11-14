@@ -427,6 +427,14 @@
                 "rumor": 18,
                 "source": "npc-mags"
               }
+            },
+            {
+              "kind": "emit",
+              "event": "rumor.corrected",
+              "data": {
+                "rumor": 18,
+                "debunker": "npc-mags"
+              }
             }
           ],
           "next": "river-serpent-1"
