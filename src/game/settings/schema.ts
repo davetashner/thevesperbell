@@ -378,6 +378,11 @@ export const SETTINGS_SCHEMA = {
         help: 'Shows the damage you deal over your target and the damage you take.',
         default: true,
       }),
+      questTracker: toggle({
+        label: 'Quest tracker',
+        help: 'Pins the quest you are following, with what is left to do, to the corner of the screen.',
+        default: true,
+      }),
       lastKnownMarker: toggle({
         label: 'Last-known-position marker',
         help: 'Shows a faint ghost where a creature that lost sight of you believes you are.',

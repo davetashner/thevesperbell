@@ -850,6 +850,15 @@ ${tokens}
 .vb-journal-objectives { margin: 0; padding: 0; list-style: none; }
 .vb-journal-objectives li { overflow-wrap: anywhere; }
 .vb-journal-check { font-family: monospace; }
+.vb-journal-new { font-size: ${size(0.75)}; color: var(--ui-color-accent); font-weight: 400; }
+.vb-tab[data-unread='true']::after { content: ' \\2022'; color: var(--ui-color-accent); }
+.vb-journal-hud { position: absolute; top: var(--ui-space-3); left: var(--ui-space-3); display: flex; flex-direction: column; align-items: flex-start; gap: var(--ui-space-2); max-width: max(min(20em, 40%), min(14em, calc(100% - 2 * var(--ui-space-3)))); pointer-events: none; }
+.vb-journal-hud h2, .vb-journal-hud p, .vb-journal-hud ul { margin: 0; }
+.vb-quest-tracker, .vb-journal-toast, .vb-journal-unread { padding: var(--ui-space-1) var(--ui-space-3); background: var(--ui-color-panel); color: var(--ui-color-text); text-shadow: none; border-left: 4px solid var(--ui-color-accent); border-radius: var(--ui-radius); overflow-wrap: anywhere; }
+.vb-quest-tracker[hidden], .vb-journal-unread[hidden] { display: none; }
+.vb-quest-tracker h2 { font-size: ${size(1)}; }
+.vb-quest-tracker ul { padding-left: 1.25em; font-size: ${size(0.875)}; }
+.vb-journal-unread { font-size: ${size(0.875)}; }
 .vb-journal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .vb-screen[data-screen="epilogue"] { background: ${DIALOGUE_HIGH_CONTRAST_PLATE}; }
 .vb-panel.vb-epilogue { width: min(36em, 100%); text-align: center; background: transparent; }

@@ -201,6 +201,10 @@ export interface JournalControllerOptions {
   readonly canOpen: () => boolean;
   /** Keyboard codes bound to the Journal action (the sampler's bindings: J). */
   readonly keys: () => readonly string[];
+  /** Entry ids not yet viewed, by tab (the notices; mw-e23.6.1). */
+  readonly unread?: () => Readonly<Partial<Record<JournalTabId, readonly string[]>>>;
+  /** A tab was viewed in the window. */
+  readonly onViewed?: (tab: JournalTabId) => void;
   /** Publishes `open` or `closed` for the e2e. */
   readonly publish?: (state: 'open' | 'closed') => void;
 }
@@ -224,11 +228,13 @@ export class JournalController {
    * opens it above the screen on top (the pause menu's Journal option).
    */
   open(tab?: JournalTabId, over = false): boolean {
-    const { ui, model, canOpen, publish } = this.#options;
+    const { ui, model, canOpen, publish, unread, onViewed } = this.#options;
     if (this.#window !== undefined || (!over && ui.top !== undefined) || !canOpen()) return false;
     this.#window = openJournalWindow(ui, {
       model: model(),
       ...(tab !== undefined && { tab }),
+      ...(unread !== undefined && { unread: unread() }),
+      ...(onViewed !== undefined && { onViewed }),
       onClose: () => {
         this.#window = undefined;
         publish?.('closed');

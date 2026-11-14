@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The journal now lists the rumours you have heard, flags new entries with a toast and an unread mark on its tab, and a Quest tracker (Settings, Gameplay) pins the quest you are following to the corner of the screen.
 - Rumours about the Briarwood, the Standing Horn, Mooring's Watch, the Glen Well, the Lamplit Stacks, the Weeping Adit and the Breakwater now resolve when you walk into those places, and the sea-serpent and Old Mooring rumours are put right by seeing the breakwater or the watch for yourself (mw-nh24). The Millweir stays a lead.
 - A journal screen (J, or Journal in the pause menu) lists your active, completed and failed quests with their objectives, your heard rumours and your notes, and opens with your class's first entry in place of the generic arrival text (mw-e23.6, mw-1myt).
 - Arrival volumes for the rumour target places that had none (mw-heoa): `briarwood` (the trail from the town gate) and `standing-horn` in the Briarwood, `mooring-watch` over the whole watch, `glen-well` and `lamplit-stacks` in Market Green, `weeping-adit` at the Deepworks adit arrival and `breakwater` on the Wendmouth breakwater. They are observed player volumes named for their area ids, ready for the rumour book's visit triggers. The Millweir has no scene yet, so no volume.
