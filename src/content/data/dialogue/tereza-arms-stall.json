@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "tereza-arms-stall",
-  "notes": "mw-e39.20: Tereza Maelo (bible 5.13), retired duellist at the Tidemarket arms stall. A knight's first meeting leads straight to the duel challenge (AC-4); combat is an emit hook (tereza.duel-start) and the combat system writes tereza.duel.fought and tereza.duel.victor (the dialogue clears fought when a duel is accepted and when its result is recorded), after which the entries duel-won and duel-lost set tereza.duel.result to won or lost. A win opens the under-the-counter stock, a loss offers a rematch, and declining relieves her. Sorcerer trades a story for a foreign spellbook (a charm check, fails gracefully). Tern access via the debt of honour needs disposition 10 or a duel win. Shop stock is E20/E21.",
+  "notes": "mw-e39.20: Tereza Maelo (bible 5.13), retired duellist at the Tidemarket arms stall. A knight's first meeting leads straight to the duel challenge (AC-4); combat is an emit hook (tereza.duel-start) and the combat system writes tereza.duel.fought and tereza.duel.victor (the dialogue clears fought when a duel is accepted and when its result is recorded), after which the entries duel-won and duel-lost set tereza.duel.result to won or lost. A win opens the under-the-counter stock, a loss offers a rematch, and declining relieves her. Sorcerer trades a story for a foreign spellbook (a charm check, fails gracefully). Tern access via the debt of honour needs disposition 10 or a duel win. Shop stock is E20/E21. mw-e39.22: the tidefair-regard entry rewards an honest Tidefair winner (tidefair.regarded) with the under-counter stock and a discount.",
   "speakers": [
     {
       "id": "tereza",
@@ -46,6 +46,26 @@
         ]
       },
       "node": "duel-lost-1"
+    },
+    {
+      "id": "tidefair-regard",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tidefair.regarded"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tereza.tidefair-rewarded"
+            }
+          }
+        ]
+      },
+      "node": "regard-1"
     },
     {
       "id": "return",
@@ -704,6 +724,44 @@
         {
           "kind": "emit",
           "event": "tereza.tern-introduced"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "regard-1",
+      "kind": "line",
+      "speaker": "tereza",
+      "text": "They tell me you won something on the Stone Wharf, and did it properly. That is rarer than steel. I keep a drawer for such people. Come, look: the blades that are not on the cloth, at a price the customs house has not been told.",
+      "next": "regard-fx"
+    },
+    {
+      "id": "regard-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tereza.tidefair-rewarded",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.under-counter",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "tereza.tidefair-discount",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-tereza",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "tereza.tidefair-reward"
         }
       ],
       "next": "hub"

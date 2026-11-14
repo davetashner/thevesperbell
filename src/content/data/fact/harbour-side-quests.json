@@ -1,0 +1,297 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "harbour-side-quests",
+  "name": "The Tidefair and Contraband Pages facts",
+  "notes": "mw-e39.22: facts written and read by quest-tidefair and quest-contraband-pages and by the harbour dialogues they added options to. cray.seizure.agreed, cray.books-released, cray.romance-accepted and the other Cray stand-ins are registered by harbor-trade-dialogue and reused as they are. The events that are not built yet (gull shoot, regatta, pocket race; mw-e40.7 to mw-e40.9) write their tidefair.results.* facts when they exist.",
+  "facts": [
+    {
+      "key": "tidefair.joined",
+      "type": "bool",
+      "default": false,
+      "description": "The player has signed up for the Tidefair (bible 6.1 quest 7). Set by oona-arm-wrestling; starts quest-tidefair.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tidefair.highlight",
+      "type": "enum",
+      "values": ["none", "arm-wrestling", "gull-shoot", "regatta", "pocket-race"],
+      "default": "none",
+      "description": "The event that suits the player's class and is highlighted when the Tidefair is joined (knight arm-wrestling, archer gull-shoot, sorcerer regatta, thief pocket-race). Written by quest-tidefair; every event stays enterable.",
+      "owner": "quest"
+    },
+    {
+      "key": "tidefair.results.arm-wrestling",
+      "type": "enum",
+      "values": ["none", "won", "lost", "cheated", "thrown"],
+      "default": "none",
+      "description": "How the player's arm wrestling at the Tidefair ended (bible 6.1 quest 7): won, lost, cheated (caught and voided) or thrown (a match thrown for Nell's book). Written by the event's contest outcome effects (drowned-gull-arm-wrestling).",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.results.gull-shoot",
+      "type": "enum",
+      "values": ["none", "won", "lost", "cheated", "thrown"],
+      "default": "none",
+      "description": "How the player's gull shoot at the Tidefair ended (bible 6.1 quest 7): won, lost, cheated (caught and voided) or thrown (a match thrown for Nell's book). Written by the event's contest outcome effects (the event's own contest bead, mw-e40.7 to mw-e40.9).",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.results.regatta",
+      "type": "enum",
+      "values": ["none", "won", "lost", "cheated", "thrown"],
+      "default": "none",
+      "description": "How the player's regatta at the Tidefair ended (bible 6.1 quest 7): won, lost, cheated (caught and voided) or thrown (a match thrown for Nell's book). Written by the event's contest outcome effects (the event's own contest bead, mw-e40.7 to mw-e40.9) and by quest-tidefair when a regatta win is voided.",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.results.pocket-race",
+      "type": "enum",
+      "values": ["none", "won", "lost", "cheated", "thrown"],
+      "default": "none",
+      "description": "How the player's pocket race at the Tidefair ended (bible 6.1 quest 7): won, lost, cheated (caught and voided) or thrown (a match thrown for Nell's book). Written by the event's contest outcome effects (the event's own contest bead, mw-e40.7 to mw-e40.9).",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.cheated",
+      "type": "bool",
+      "default": false,
+      "description": "The player was caught cheating at a Tidefair event and the result voided. Written by the contests' disqualified effects and by quest-tidefair (voided regatta win); read by its resolutions.",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.concluded",
+      "type": "bool",
+      "default": false,
+      "description": "The player has called the Tidefair day to a close with Big Oona, so quest-tidefair can total the results. Set by oona-arm-wrestling.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tidefair.regatta.magic-used",
+      "type": "bool",
+      "default": false,
+      "description": "The player cast a spell during the Regatta (bible 6.1 quest 7). Written by the Regatta contest (mw-e40.9).",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.regatta.cray-present",
+      "type": "bool",
+      "default": false,
+      "description": "Inspector Cray is walking the quay while the Regatta runs, so a spell cast now is seen (bible 6.1 quest 7). Written by the Wendmouth scene (mw-e40.9).",
+      "owner": "scene"
+    },
+    {
+      "key": "tidefair.regatta.fine-due",
+      "type": "bool",
+      "default": false,
+      "description": "A regatta win was voided for magic: Cray fines the player ten crowns. Written by quest-tidefair; cleared by cray-customs.",
+      "owner": "quest"
+    },
+    {
+      "key": "tidefair.regatta.fine-paid",
+      "type": "bool",
+      "default": false,
+      "description": "The player paid Cray's regatta fine. Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tidefair.regatta.fine-owed",
+      "type": "bool",
+      "default": false,
+      "description": "The player could not pay Cray's regatta fine and it was entered in her ledger as a debt. Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tidefair.pocket.cray-lifted",
+      "type": "bool",
+      "default": false,
+      "description": "The player lifted Cray's ribbon in the Pocket Race without being caught. Written by the Pocket Race contest (mw-e40.8); read by cray-customs.",
+      "owner": "contest"
+    },
+    {
+      "key": "tidefair.pocket.cray-caught",
+      "type": "bool",
+      "default": false,
+      "description": "Cray caught the player lifting her ribbon in the Pocket Race. Written by the Pocket Race contest (mw-e40.8); read by cray-customs.",
+      "owner": "contest"
+    },
+    {
+      "key": "cray.lifted-told",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has had her say about her ribbon (lifted or caught). Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tidefair.regarded",
+      "type": "bool",
+      "default": false,
+      "description": "The player won something at the Tidefair honestly, so Wendmouth rates them (Tereza's rewards). Written by quest-tidefair.",
+      "owner": "quest"
+    },
+    {
+      "key": "tidefair.consolation",
+      "type": "bool",
+      "default": false,
+      "description": "The player lost every Tidefair event gracefully and the Drowned Gull warmed to them anyway (bible 6.1 quest 7). Written by quest-tidefair.",
+      "owner": "quest"
+    },
+    {
+      "key": "tidefair.outcome",
+      "type": "enum",
+      "values": ["none", "champion", "honest", "crooked", "bookie", "consolation"],
+      "default": "none",
+      "description": "How the Tidefair ended for the player. Written by quest-tidefair.",
+      "owner": "quest"
+    },
+    {
+      "key": "oona.drink-bought",
+      "type": "bool",
+      "default": false,
+      "description": "Big Oona has bought the player the loser's drink. Set by oona-arm-wrestling.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.book-open",
+      "type": "bool",
+      "default": false,
+      "description": "Nell has told the player about her betting book on the Tidefair and that she pays for a fall. Set by nell-drowned-gull; starts quest-tidefair.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "nell.strongroom-tip",
+      "type": "bool",
+      "default": false,
+      "description": "Nell has told the player about the customs roof hatch above the strongroom. Set by nell-drowned-gull.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.tidefair-rewarded",
+      "type": "bool",
+      "default": false,
+      "description": "Tereza has rewarded a Tidefair winner (under-counter stock and a discount). Set by tereza-arms-stall.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "tereza.tidefair-discount",
+      "type": "bool",
+      "default": false,
+      "description": "Tereza gives the player a Tidefair winner's discount. Set by tereza-arms-stall; the Tidemarket stock (E20/E21) reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "books.impounded",
+      "type": "bool",
+      "default": false,
+      "description": "Cray holds the crate of books addressed to Mirela and, for a searched sorcerer, the player's own restricted spellbooks (bible 6.1 quest 8). Set by cray-customs; starts quest-contraband-pages. Stand-in until the crate's book items exist.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "books.recovered",
+      "type": "bool",
+      "default": false,
+      "description": "The player has got the impounded books out of the customs house, by any route (bible 6.1 quest 8). Written by quest-contraband-pages; read by mirela-stacks.",
+      "owner": "quest"
+    },
+    {
+      "key": "books.method",
+      "type": "enum",
+      "values": ["none", "evidence", "romance", "vane-writ", "forged-writ", "strongroom", "guise"],
+      "default": "none",
+      "description": "How the impounded books were recovered. Written by quest-contraband-pages.",
+      "owner": "quest"
+    },
+    {
+      "key": "mirela.order.told",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela has told the player her book order is stuck at Wendmouth customs (bible 6.1 quest 8). Set by mirela-stacks; starts quest-contraband-pages.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mirela.order.delivered",
+      "type": "bool",
+      "default": false,
+      "description": "The player handed Mirela her Illusion text from the impounded crate. Set by mirela-stacks.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mirela.order.kept",
+      "type": "bool",
+      "default": false,
+      "description": "The player kept Mirela's Illusion text for themselves and she knows (bible 6.1 quest 8). Set by mirela-stacks.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "mirela.illusion-stocked",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela's order was delivered, so a rare Illusion text joins the Lamplit Stacks' stock. Set by mirela-stacks; the bookshop stock (E21) reads it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.disposition",
+      "type": "enum",
+      "values": ["hostile", "wary", "neutral", "grateful", "fond"],
+      "default": "neutral",
+      "description": "Where Inspector Cray stands with the player after Contraband Pages: wary (the books walked out of her strongroom or a forged seal failed), neutral, grateful (bay-nine evidence: she released the books in gratitude, and her lawful seizure of bay nine is open) or fond (the romance novel). Written by quest-contraband-pages and cray-customs; gates her help in The Crate for Mr. S— together with cray.seizure.agreed.",
+      "owner": "quest"
+    },
+    {
+      "key": "cray.thanked",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has thanked a player she is grateful to. Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.books-traded",
+      "type": "bool",
+      "default": false,
+      "description": "Cray released the impounded books after accepting a romance novel. Set by cray-customs; read by quest-contraband-pages.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.writ.accepted",
+      "type": "bool",
+      "default": false,
+      "description": "Cray accepted a writ for the impounded books. Set by cray-customs; read by quest-contraband-pages.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.writ.rejected",
+      "type": "bool",
+      "default": false,
+      "description": "Cray saw through a forged writ. Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "cray.books-stolen",
+      "type": "bool",
+      "default": false,
+      "description": "The books were lifted from Cray's strongroom (thief route) or taken by a player in an inspector's coat. Written by quest-contraband-pages; read by cray-customs.",
+      "owner": "quest"
+    },
+    {
+      "key": "cray.theft-noted",
+      "type": "bool",
+      "default": false,
+      "description": "Cray has remarked on the missing books. Set by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "writ.held",
+      "type": "bool",
+      "default": false,
+      "description": "The player holds a writ for the impounded books (Vane's, or a forged Lantern seal). Stand-in until the writ item exists: set by vane-bounty and mirela-stacks, cleared by cray-customs.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "writ.source",
+      "type": "enum",
+      "values": ["none", "vane", "forged"],
+      "default": "none",
+      "description": "Where the player's writ came from: Vane as council chair, at a price, or a forged Lantern seal from Mirela. Set by vane-bounty and mirela-stacks.",
+      "owner": "dialogue"
+    }
+  ]
+}
