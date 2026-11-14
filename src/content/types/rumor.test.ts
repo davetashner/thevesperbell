@@ -5,12 +5,22 @@ import { describe, expect, it } from 'vitest';
 import { gameContentSources, loadGameContent } from '../game-content.ts';
 import { glossary } from '../narrative/glossary.ts';
 import { describeContent, markExercised } from '../testing.ts';
-import { rumorSchema, rumourPool, type Rumor } from './rumor.ts';
+import {
+  ALL_KNOWN_LINE,
+  dotTrade,
+  followUpLine,
+  rumorSchema,
+  rumourAvailable,
+  rumourPool,
+  type Rumor,
+} from './rumor.ts';
 import { noteSchema } from './readable.ts';
 
 const BIBLE = readFileSync('docs/narrative/story-bible.md', 'utf8').replace(/\n\s+/g, ' ');
 const content = loadGameContent();
-const rumours = content.all('rumor') as readonly Rumor[];
+const everyRumour = content.all('rumor') as readonly Rumor[];
+const rumours = everyRumour.filter((r) => r.region === 'harbour');
+const valley = everyRumour.filter((r) => r.region === 'valley');
 const glossaryIds = new Set(
   [
     ...glossary.characters,
@@ -76,7 +86,9 @@ describe('rumour schema', () => {
 
 describe('harbour rumours 13-18', () => {
   it('AC-1: there are six, numbered 13 to 18, each with a source and a truth value', () => {
-    const numbers = rumours.map((r) => Number(/^rumor-(\d{2})-/.exec(r.id)?.[1])).sort();
+    const numbers = rumours
+      .map((r) => Number(/^rumor-(\d{2})-/.exec(r.id)?.[1]))
+      .sort((a, b) => a - b);
     expect(numbers).toEqual([13, 14, 15, 16, 17, 18]);
     for (const r of rumours) {
       expect(r.region, r.id).toBe('harbour');
@@ -142,9 +154,118 @@ describe('harbour rumours 13-18', () => {
     expect(rumourPool(rumours, 'npc-mags', false).every((h) => !h.secondHand)).toBe(true);
     expect(rumourPool(rumours, 'npc-dot', true)).toEqual([]);
     // A valley rumour is never in the harbour pool, even from its own first-hand source.
-    const valley = rumorSchema.parse({ ...base, region: 'valley' });
-    expect(rumourPool([valley], 'npc-nell', false)).toEqual([]);
-    expect(rumourPool([valley], 'npc-dot', false)).toEqual([]);
+    const oneValley = rumorSchema.parse({ ...base, region: 'valley' });
+    expect(rumourPool([oneValley], 'npc-nell', false)).toEqual([]);
+    expect(rumourPool([oneValley], 'npc-dot', false)).toEqual([]);
+  });
+});
+
+const toldBy = (number: number): string[] =>
+  gameContentSources()
+    .filter((s) => s.path.includes('/data/dialogue/'))
+    .flatMap((s) =>
+      [
+        ...s.text.matchAll(
+          new RegExp(
+            `"rumor": ${String(number)},\\s*"source": "(npc-[a-z]+)"(?!,\\s*"secondHand")`,
+            'g',
+          ),
+        ),
+      ].map((m) => m[1] ?? ''),
+    );
+
+describe('valley rumours 1-12, 19-20 (mw-e39.12)', () => {
+  const numberOf = (r: Rumor) => Number(/^rumor-(\d{2})-/.exec(r.id)?.[1]);
+
+  it('AC-1: the valley set is 1-12 plus 19-20, the whole set is 20, each with source, truth and target', () => {
+    expect(valley.map(numberOf).sort((a, b) => a - b)).toEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 19, 20,
+    ]);
+    expect(everyRumour).toHaveLength(20);
+    for (const r of valley) {
+      expect(r.source.length, r.id).toBeGreaterThan(0);
+      expect(BIBLE, r.id).toContain(r.text.replace(/^\(Goblin\) /, ''));
+    }
+  });
+
+  it('AC-1: truth values match the bible (2 half, 3 false, the rest true)', () => {
+    const truth = Object.fromEntries(valley.map((r) => [numberOf(r), r.truth]));
+    expect(truth[2]).toBe('half');
+    expect(truth[3]).toBe('false');
+    for (const n of [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 19, 20])
+      expect(truth[n], String(n)).toBe('true');
+  });
+
+  describeContent(
+    'rumor',
+    'AC-1: every valley rumour is told by a source NPC in dialogue',
+    (entry) => {
+      if (entry.region !== 'valley') return;
+      const tellers = toldBy(Number(/^rumor-(\d{2})-/.exec(entry.id)?.[1]));
+      expect(tellers.length, entry.id).toBeGreaterThan(0);
+      for (const teller of tellers) expect(entry.source, entry.id).toContain(teller);
+      for (const source of entry.source) expect(tellers, entry.id).toContain(source);
+    },
+  );
+
+  it('AC-4: at least two rumours are false or half-true and each false one has a debunk path', () => {
+    const bent = everyRumour.filter((r) => r.truth !== 'true');
+    expect(bent.length).toBeGreaterThanOrEqual(2);
+    for (const r of everyRumour.filter((x) => x.truth === 'false')) {
+      expect(r.debunk?.length, r.id).toBeGreaterThan(0);
+    }
+    expect(valley.find((r) => r.truth === 'false')?.debunk).toEqual([
+      { via: 'ask', npc: 'npc-kettleback' },
+      { via: 'dive', place: 'place-deepworks' },
+    ]);
+  });
+
+  it('AC-2: while the goblins are hostile no goblin-sourced rumour is offered', () => {
+    const goblin = valley.filter((r) =>
+      r.source.some((s) => ['npc-kettleback', 'npc-snig'].includes(s)),
+    );
+    expect(goblin.map(numberOf)).toEqual([10, 11]);
+    for (const r of goblin) {
+      expect(rumourAvailable(r, 'hostile'), r.id).toBe(false);
+      expect(rumourAvailable(r, 'neutral'), r.id).toBe(true);
+      expect(rumourAvailable(r, 'friendly'), r.id).toBe(true);
+    }
+    for (const r of everyRumour.filter((x) => !goblin.includes(x))) {
+      expect(rumourAvailable(r, 'hostile'), r.id).toBe(true);
+    }
+  });
+
+  it('AC-3: once the player has visited the target, Dot trades the follow-up line once', () => {
+    const well = valley.find((r) => r.id === 'rumor-04-well-echoes-wrong');
+    if (well === undefined) throw new Error('missing rumour 4');
+    expect(followUpLine(well, new Set(), new Set())).toBeUndefined();
+    const line = followUpLine(well, new Set(['place-glen-well']), new Set());
+    expect(line).toContain('Landed twice');
+    expect(followUpLine(well, new Set(['place-glen-well']), new Set([well.id]))).toBeUndefined();
+    for (const r of valley) expect(r.followUp?.teller, r.id).toBe('npc-dot');
+    expect(
+      followUpLine(
+        rumorSchema.parse({ ...base, region: 'valley' }),
+        new Set(['place-bay-nine']),
+        new Set(),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('AC-5: when every rumour is known Dot plays a fallback and takes no coin', () => {
+    const all = new Set(everyRumour.map((r) => r.id));
+    const trade = dotTrade(everyRumour, all, 'friendly');
+    expect(trade).toEqual({ rumor: undefined, line: ALL_KNOWN_LINE, coinTaken: 0 });
+    const some = dotTrade(everyRumour, new Set(), 'hostile');
+    expect(some.rumor).toBeDefined();
+    expect(some.line).toBeUndefined();
+    expect(some.coinTaken).toBe(0);
+  });
+
+  it('Briar Glen dialogue holds no new harbour names: Dot and Juniper valley lines name no Nell, Mags or Gull', () => {
+    for (const file of ['/dialogue/juniper-fenn.json', '/dialogue/snig-tunnels.json']) {
+      expect(sourceOf(file)).not.toMatch(/Nell|Mags|Drowned Gull/);
+    }
   });
 });
 

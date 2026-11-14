@@ -80,7 +80,7 @@ describe('mw-18w: harbour texts are placed in Wendmouth', () => {
 });
 
 describe('mw-18w: the harbour rumours are told in dialogue', () => {
-  const rumours = content.all('rumor') as readonly Rumor[];
+  const rumours = (content.all('rumor') as readonly Rumor[]).filter((r) => r.region === 'harbour');
   const number = (r: Rumor) => Number(/^rumor-(\d+)-/.exec(r.id)?.[1]);
 
   it('AC-2: every first-hand source emits rumor.told for each rumour it tells', () => {

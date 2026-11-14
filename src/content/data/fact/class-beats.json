@@ -1,0 +1,22 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "class-beats",
+  "name": "Class beat facts",
+  "notes": "Set once when a class beat's text has been shown in the game (mw-aw1y), so a save and load does not show it again. Keyed by the beat id of narration-class-beats.json. Only beats with a built trigger have a fact; the rest are bound by beads (docs/narrative/class-beat-audit.md).",
+  "facts": [
+    {
+      "key": "class-beat.getting-in.shown",
+      "type": "bool",
+      "default": false,
+      "description": "The class's own way into the Deepworks text has been shown (shown when the player takes that class's way in).",
+      "owner": "game"
+    },
+    {
+      "key": "class-beat.wendmouth.shown",
+      "type": "bool",
+      "default": false,
+      "description": "The class's Wendmouth text has been shown (shown on first reaching Wendmouth, wendmouth.visited).",
+      "owner": "game"
+    }
+  ]
+}

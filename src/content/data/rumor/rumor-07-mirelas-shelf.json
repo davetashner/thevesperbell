@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-07-mirelas-shelf",
+  "notes": "The restricted red shelf and Nine Sleeps. Dot tells it in dot-sleeping-ox (Mirela would not).",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "place-lamplit-stacks",
+  "text": "Mirela's got a shelf you can only see if she likes you.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "She showed you the shelf? Well. She doesn't like anyone. You must be very bookish."
+  }
+}
