@@ -6,6 +6,7 @@ export * from './behaviour';
 export * from './combat';
 export * from './conversing';
 export * from './components';
+export * from './errand';
 export * from './inputs';
 export * from './introspect';
 export * from './memory';

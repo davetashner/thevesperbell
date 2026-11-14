@@ -97,6 +97,7 @@ import {
   type SceneMechanisms,
   type Consumables,
   type WorldItems,
+  sceneExits,
 } from '@sim/index';
 
 import { actionFrameCommand } from './action-frame-command';
@@ -422,7 +423,9 @@ export function createGameWorld<TInput>(
   startCreatureDrops(world, content, items, scene.id, scene.layout.spawns);
   const aiWatch = watchCreatureAi(world, sceneCreatures.ai, navigation);
   // Spawns that keep to some phases of the day come and go with the clock (mw-ju8.14).
-  watchPresence(world, creatures.spawn, scene.layout.spawns);
+  watchPresence(world, creatures.spawn, scene.layout.spawns, undefined, {
+    exits: sceneExits(scene.layout),
+  });
   // Puzzles (mw-e15.3) in scenes that have some, last: they read what everything else did this tick.
   const puzzles = startPuzzles(world, content, scene.id, {
     player,

@@ -16,7 +16,7 @@ export interface AiPorts {
   /** The attack table the `attack` primitive starts attacks from; absent = attacks always fail. */
   readonly attacks: AttackLookup | undefined;
   /** The hour of the day, 0–24, for routine windows (mw-e11.9); absent = windows are not read. */
-  readonly hourOfDay: ((world: World<never>) => number) | undefined;
+  readonly hourOfDay: ((world: World<never>) => number | undefined) | undefined;
   /** How target memory decays and predicts (mw-e11.8). */
   readonly memory: MemoryTuning;
   /** How many creatures may attack one target at once (mw-e11.13). */

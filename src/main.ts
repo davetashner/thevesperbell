@@ -435,6 +435,7 @@ import {
   EquipmentRules,
   InventoryRules,
   createSurfaceMap,
+  sceneExits,
 } from '@sim/index';
 import { installLatencyProbe } from '@tools/perf/latency-probe';
 import type { AnimDemo, ArrowDemo, SpellVfxDemo, VfxDemo } from '@tools/dev-kit';
@@ -2612,6 +2613,8 @@ function startRenderer(
       // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
       watchPresence(world, creatures.spawn, loaded.layout.spawns, undefined, {
         inView: (point) => ndcInView(projectToNdc(camera, point)),
+        // People walk to a door, marker or way out to leave and come in by one (mw-8551).
+        exits: sceneExits(loaded.layout),
       });
       // Talking to NPCs (mw-e22.9): a creature whose content names a `dialogue` gets Talk on the
       // Interact verb; talking pauses its routine, faces the player, runs the dialogue against the

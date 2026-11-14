@@ -9,9 +9,12 @@ import { InteractableComponent, INTERACTION_COMPONENTS } from '../interaction/sy
 import type { SceneSpawnPlacement } from '../scene/layout';
 import { SceneSpawnComponent } from '../scene/loader';
 import { CreatureComponent } from './components';
-import { beginConversing } from '../ai/conversing';
+import { beginConversing, endConversing } from '../ai/conversing';
 import { PlacementComponent } from '../stimulus/placement';
-import { hourNow, syncPresence } from './presence';
+import { errandOf } from '../ai/errand';
+import { compileBehaviours } from '../ai/behaviour';
+import { installAi } from '../ai/runtime';
+import { hourNow, sceneExits, syncPresence } from './presence';
 import { MINUTE_FACT } from '../rest/day-clock';
 import {
   presentIn,
@@ -290,5 +293,129 @@ describe('presence by hour of the day (mw-e24.13)', () => {
     expect(syncPresence(w, options, spawns, 'day', 19, { inView: () => true }).left).toEqual([
       'clerk',
     ]);
+  });
+});
+
+describe('people walk to doors (mw-8551)', () => {
+  const SHIFT = { hours: [8, 18] } as const;
+  const clerk = (over: Partial<SceneSpawnPlacement> = {}) =>
+    spawn({ id: 'clerk', creature: 'hound', presence: SHIFT, position: at, ...over });
+  const WEST = { x: -20, y: 0, z: 2 };
+  const EAST = { x: 30, y: 0, z: 2 };
+
+  it('AC-3: exits are the doors, then authored exit markers, then the middles of the ways out', () => {
+    const exits = sceneExits({
+      spawns: [
+        spawn({ id: 'marker' }),
+        spawn({ id: 'exit-back', position: { x: 5, y: 0, z: 5 } }),
+        spawn({
+          id: 'front-door',
+          position: { x: 1, y: 0, z: 1 },
+          door: { profile: 'wood' },
+        }),
+        spawn({
+          id: 'exit-door',
+          door: { profile: 'x' },
+        }),
+      ],
+      transitions: [
+        {
+          id: 'to-green',
+          min: { x: 10, y: 1, z: 0 },
+          max: { x: 14, y: 3, z: 6 },
+          scene: 'g',
+          spawn: 's',
+          follow: false,
+        },
+      ],
+    });
+    expect(exits).toEqual([{ x: 1, y: 0, z: 1 }, at, { x: 5, y: 0, z: 5 }, { x: 12, y: 1, z: 3 }]);
+  });
+
+  it('AC-3: a leaver sets off for the nearest exit and stays in the world, even on screen', () => {
+    const w = world();
+    const spawns = [clerk()];
+    syncPresence(w, options, spawns, 'day', 12);
+    const [who] = living(w);
+    const hold = { exits: [EAST, WEST, { x: -19, y: 0, z: 2 }], inView: () => true };
+    expect(syncPresence(w, options, spawns, 'dusk', 18, hold)).toEqual({
+      arrived: [],
+      left: ['clerk'],
+      errors: [],
+    });
+    expect(living(w)).toEqual([who]);
+    expect(errandOf(w, who as never)).toEqual({ goal: { x: -19, y: 0, z: 2 }, leave: true });
+    // It is not sent again while it walks.
+    expect(syncPresence(w, options, spawns, 'dusk', 18.5, hold).left).toEqual([]);
+  });
+
+  it('AC-3: a leaver in a conversation is not sent, and one whose window reopens turns back', () => {
+    const w = world();
+    const spawns = [clerk()];
+    syncPresence(w, options, spawns, 'day', 12);
+    const [who] = living(w);
+    const hold = { exits: [WEST] };
+    beginConversing(w, who as never, w.spawn());
+    expect(syncPresence(w, options, spawns, 'dusk', 18, hold).left).toEqual([]);
+    expect(errandOf(w, who as never)).toBeUndefined();
+    endConversing(w, who as never);
+    syncPresence(w, options, spawns, 'dusk', 18, hold);
+    expect(errandOf(w, who as never)?.leave).toBe(true);
+    syncPresence(w, options, spawns, 'day', 9, hold);
+    expect(errandOf(w, who as never)).toBeUndefined();
+    expect(living(w)).toEqual([who]);
+  });
+
+  it('AC-3: when no exit can be reached, the leaver goes in place, held while on screen', () => {
+    const w = world();
+    installAi(w, {
+      behaviours: compileBehaviours([]),
+      navigation: { travel: () => 'failure', distance: () => Infinity },
+    });
+    const spawns = [clerk()];
+    syncPresence(w, options, spawns, 'day', 12);
+    expect(
+      syncPresence(w, options, spawns, 'dusk', 18, { exits: [WEST], inView: () => true }).left,
+    ).toEqual([]);
+    expect(living(w)).toHaveLength(1);
+    expect(syncPresence(w, options, spawns, 'dusk', 18, { exits: [WEST] }).left).toEqual(['clerk']);
+    expect(living(w)).toHaveLength(0);
+  });
+
+  it('AC-3: the AI port decides which exit is nearest by the way there', () => {
+    const w = world();
+    installAi(w, {
+      behaviours: compileBehaviours([]),
+      navigation: { travel: () => 'running', distance: (_w, _e, goal) => (goal.x > 0 ? 1 : 99) },
+    });
+    const spawns = [clerk()];
+    syncPresence(w, options, spawns, 'day', 12);
+    const [who] = living(w);
+    syncPresence(w, options, spawns, 'dusk', 18, { exits: [WEST, EAST] });
+    expect(errandOf(w, who as never)?.goal).toEqual(EAST);
+  });
+
+  it('AC-3: an arrival is made at the nearest exit, walks to its spot, and waits while the exit is on screen', () => {
+    const w = world();
+    const spawns = [clerk()];
+    let seen = true;
+    const hold = { exits: [EAST, WEST], inView: () => seen };
+    expect(syncPresence(w, options, spawns, 'day', 9, hold).arrived).toEqual([]);
+    expect(living(w)).toHaveLength(0);
+    seen = false;
+    expect(syncPresence(w, options, spawns, 'day', 9, hold).arrived).toEqual(['clerk']);
+    const [who] = living(w);
+    expect(w.get(who as never, PlacementComponent)).toMatchObject({ x: -20, z: 2 });
+    expect(errandOf(w, who as never)).toEqual({ goal: at, leave: false });
+    expect(w.get(who as never, CreatureComponent)?.origin.at).toEqual(at);
+  });
+
+  it('AC-3: an arrival whose creature cannot be made reports it and makes no errand', () => {
+    const w = world();
+    const change = syncPresence(w, options, [clerk({ creature: 'wyvern' })], 'day', 9, {
+      exits: [WEST],
+    });
+    expect(change.errors).toHaveLength(1);
+    expect(change.arrived).toEqual([]);
   });
 });

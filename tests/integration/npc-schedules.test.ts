@@ -253,6 +253,9 @@ describe('Briar Glen schedules, loaded (mw-e24.13)', () => {
     expect(endConversing(t.world, keeper as never)).toBe(true);
     t.world.facts.set(MINUTE_FACT, hm(20, 6));
     t.game.world.step();
+    // He sets off for the way out (mw-8551, tests/integration/npc-walk.test.ts) and is gone there.
+    expect(oswin()).toBe(keeper);
+    for (let i = 0; i < 60 * 90 && oswin() !== undefined; i++) t.game.world.step();
     expect(oswin()).toBeUndefined();
   });
 
