@@ -35,5 +35,7 @@ describe('epilogue.preview (mw-e39.40)', () => {
       'last-warden',
       'long-vespers',
     ]);
+    // Only the first argument completes: there is nothing to offer after the ending.
+    expect(registry.complete('epilogue.preview last-warden ').options).toEqual([]);
   });
 });
