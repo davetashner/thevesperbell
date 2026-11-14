@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "wendmouth-harbour",
   "name": "Wendmouth Harbour",
-  "description": "Bead mw-e40.1: Wendmouth, the optional harbour town (bible 3.6), as one grey-box scene about 200 x 160 m (x -100..100, z 0..160; north is the sea). Reach it with ?scene=wendmouth-harbour: nothing built links to it yet, so the river legs stay planned (the towpath gate in the south wall is a locked planned stub, mw-e40.26; the Patient Ann's berth is where the barge will arrive). The Stone Wharf is the open flagstone quay along the pool (player-start; the Tidefair ground, two treadwheel crane piers, block yards, crates, and at its east end the Silver Quay behind a sealed iron gate: seen, not entered). A Great Stair, 24 m wide, steps down to the barge berth landing and the Patient Ann's deck (Mags). South of the wharf stand the columned Customs House (6 m walls, portico, hall, Cray's office, a locked strongroom, a flat roof), the covered Tidemarket (open arcade, stalls, Tereza's arms stall, the book cart), and the vaulted Bonded Warehouse (two doors, nine bays along the south wall, bay nine sealed behind a locked iron door, a roof with two skylights and a rough climb on its north face). The fish market stands on the east side over the Undertow: black-market vaults 4 m below, reached only by the harbour-wall stair door and the Gull's cellar door (two locked doors, a long tunnel under the breakwater). West of the Customs House the three net lofts (timber shells, roofs at 4 m joined by plank bridges and stairs to the Customs House roof at 6 m; the way up is a rough-stone climb). The breakwater is a block wall running north from the quay to the Drowned Gull (bar, arm-wrestling table, dice table, cellar stair to the Undertow). The pool (standing water, ladders out) holds the Gilded Tern at anchor off the wharf: a gangway behind a locked gate, deck, masts, rigging climb, cabin and the locked passenger berth. Building shells are solid masses with open doorways or gaps; interiors and class routes are the later E40 beads, so routes are marked with named spawns and locks only. The eight dialogue NPCs stand at their places; Quell is gone once quell.left is set. Harbour pool and sea are standing water: the river does not flow in the sim.",
+  "description": "Bead mw-e40.1: Wendmouth, the optional harbour town (bible 3.6), as one grey-box scene about 200 x 160 m (x -100..100, z 0..160; north is the sea). Reach it by the riverbank: the towpath gate in the south wall is an open doorway with the towpath-gate transition up the river to under-the-bridge (arrive-from-under-the-bridge stands inside the wall; mw-e40.26, a stopgap until Briar Glen Quay, the Millweir and Kestrel Lock are built), or with ?scene=wendmouth-harbour; the barge leg stays planned (mw-e25.15) and the Patient Ann's berth is where the barge will arrive. The Stone Wharf is the open flagstone quay along the pool (player-start; the Tidefair ground, two treadwheel crane piers, block yards, crates, and at its east end the Silver Quay behind a sealed iron gate: seen, not entered). A Great Stair, 24 m wide, steps down to the barge berth landing and the Patient Ann's deck (Mags). South of the wharf stand the columned Customs House (6 m walls, portico, hall, Cray's office, a locked strongroom, a flat roof), the covered Tidemarket (open arcade, stalls, Tereza's arms stall, the book cart), and the vaulted Bonded Warehouse (two doors, nine bays along the south wall, bay nine sealed behind a locked iron door, a roof with two skylights and a rough climb on its north face). The fish market stands on the east side over the Undertow: black-market vaults 4 m below, reached only by the harbour-wall stair door and the Gull's cellar door (two locked doors, a long tunnel under the breakwater). West of the Customs House the three net lofts (timber shells, roofs at 4 m joined by plank bridges and stairs to the Customs House roof at 6 m; the way up is a rough-stone climb). The breakwater is a block wall running north from the quay to the Drowned Gull (bar, arm-wrestling table, dice table, cellar stair to the Undertow). The pool (standing water, ladders out) holds the Gilded Tern at anchor off the wharf: a gangway behind a locked gate, deck, masts, rigging climb, cabin and the locked passenger berth. Building shells are solid masses with open doorways or gaps; interiors and class routes are the later E40 beads, so routes are marked with named spawns and locks only. The eight dialogue NPCs stand at their places; Quell is gone once quell.left is set. Harbour pool and sea are standing water: the river does not flow in the sim.",
   "grid": 1,
   "camera": {
     "position": [-100, 75, -30],
@@ -1551,29 +1551,26 @@
       "tags": ["arrival", "barge"]
     },
     {
-      "id": "door-exit-towpath",
-      "at": [-85.0, 0.0, 0.0],
-      "tags": [],
-      "door": {
-        "profile": "wooden-door",
-        "lock": "road-not-open"
-      }
-    },
-    {
       "id": "exit-towpath",
       "at": [-85.0, 0.0, 3.0],
       "yaw": 180,
-      "tags": ["exit-stub", "planned:mw-e40.26"]
+      "tags": ["node", "exit", "towpath"]
+    },
+    {
+      "id": "arrive-from-under-the-bridge",
+      "at": [-85.0, 0.0, 4.5],
+      "yaw": 0,
+      "tags": ["arrival"]
     },
     {
       "id": "sign-exit-towpath",
       "at": [-83.5, 1.25, 2.5],
-      "tags": ["sign", "exit-stub"],
+      "tags": ["sign", "exit"],
       "interact": {
         "affordances": [
           {
             "verb": "read",
-            "label": "Read the signpost: the towpath to Kestrel Lock"
+            "label": "Read the signpost: the towpath upriver, to Briar Glen"
           }
         ],
         "radius": 1
@@ -2117,7 +2114,7 @@
     },
     {
       "id": "npc-mags",
-      "at": [-9.5, -1.75, 106.0],
+      "at": [-9.5, -2.0, 106.0],
       "yaw": 90,
       "tags": ["npc", "barge"],
       "creature": "npc-mags",
@@ -2320,5 +2317,13 @@
       "graph": "wendmouth-areas"
     }
   ],
-  "transitions": []
+  "transitions": [
+    {
+      "id": "towpath-gate",
+      "min": [-86.5, -1, -0.5],
+      "max": [-83.5, 3, 1.5],
+      "scene": "under-the-bridge",
+      "spawn": "arrive-from-wendmouth-harbour"
+    }
+  ]
 }

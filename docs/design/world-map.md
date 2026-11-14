@@ -166,6 +166,7 @@ flowchart LR
   millweir -.-|shortcut archer/sorcerer| millweir_far_bank
   millweir --- kestrel_lock
   kestrel_lock --- stone_wharf
+  under_the_bridge --- stone_wharf
   briar_glen_quay ---|barge| kestrel_lock
   kestrel_lock ---|barge| stone_wharf
   kestrel_lock -.-|shortcut| lockkeepers_cottage
@@ -381,6 +382,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | planned: mw-e25.12 |
 | `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | planned: mw-e25.24 |
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | planned: mw-e40.26 |
+| `riverbank-wharf-link` | `under-the-bridge` | `stone-wharf` | path |  |  | `under-the-bridge/towpath-down`, `wendmouth-harbour/towpath-gate` |
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
@@ -440,7 +442,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
-| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path) |
+| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-wharf-link) |
 | `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
 | `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings); its other trails are walked inside the scene |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
@@ -471,7 +473,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `deepworks` | `vane-sealed-gallery` | none (a marker spawn two levels down; mw-e26.4 builds its content and the seal) |
 | `deepworks` | `breach` | none (a marker spawn and the breach-threshold stub; mw-e26.9 builds the Outer Ring and the transition) |
 | `deepworks` | `lower-deepworks` | none (a marker spawn; the Weeping Adit arrives beyond the channel, mw-e25.13) |
-| `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; debug entry ?scene=wendmouth-harbour until the river legs exist, mw-e40.26) |
+| `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; the towpath gate in the south wall is the `wendmouth-harbour/towpath-gate` transition, the stopgap riverbank-wharf-link from under-the-bridge, mw-e40.26; the barge berth is where the barge will arrive, mw-e25.15) |
 | `wendmouth-harbour` | `tidemarket` | none (a marker spawn; walked inside the scene) |
 | `wendmouth-harbour` | `customs-house` | none (a marker spawn; walked inside the scene) |
 | `wendmouth-harbour` | `bonded-warehouse` | none (a marker spawn; walked inside the scene) |

@@ -156,7 +156,6 @@ describe('Wendmouth named places (mw-e40.1 AC-1)', () => {
       .filter((d) => d.door?.lock !== undefined)
       .map((d) => [d.id, d.door?.lock?.id]);
     expect(locked).toEqual([
-      ['door-exit-towpath', 'road-not-open'],
       ['door-strongroom', 'strongroom-locked'],
       ['door-bay-nine', 'bay-nine-seal'],
       ['door-silver-quay-gate', 'silver-quay-sealed'],
@@ -192,18 +191,18 @@ describe('Wendmouth is optional (mw-e40.1 AC-2)', () => {
     expect(world.mainQuest.filter((id) => wendmouth.has(id))).toEqual([]);
   });
 
-  it('AC-2: no edge of the main quest runs to a Wendmouth node: the river legs stay planned and no scene links here yet', () => {
+  it('AC-2: the barge and Kestrel Lock legs stay planned; the only scene link is the riverbank stopgap, and the main quest never uses it (mw-e40.26)', () => {
     const towpath = world?.edges.find((e) => e.id === 'towpath-lock-wharf');
     const barge = world?.edges.find((e) => e.id === 'barge-lock-wharf');
-    expect(towpath?.transitions).toEqual([]);
-    expect(barge?.transitions).toEqual([]);
-    expect(scene.transitions).toEqual([]);
-    for (const other of content.all('scene')) {
-      expect(
-        other.transitions.filter((t) => t.scene.id === 'wendmouth-harbour'),
-        other.id,
-      ).toEqual([]);
-    }
+    expect(towpath?.transitions ?? []).toEqual([]);
+    expect(barge?.transitions ?? []).toEqual([]);
+    expect(scene.transitions.map((t) => t.scene.id)).toEqual(['under-the-bridge']);
+    const linking = content
+      .all('scene')
+      .flatMap((other) =>
+        other.transitions.filter((t) => t.scene.id === 'wendmouth-harbour').map(() => other.id),
+      );
+    expect(linking).toEqual(['under-the-bridge']);
   });
 });
 
@@ -266,9 +265,8 @@ describe('the harbour on foot (mw-e40.1 AC-3)', () => {
     const ys = pointsOf(result).map((p) => p.y);
     expect(Math.min(...ys)).toBeLessThan(-1.5);
     expect(Math.max(...ys)).toBeGreaterThan(-0.5);
-    // Mags's spawn sits 0.25 m (one grid step) above the landing (top y -2): a spawn exactly on the floor's
-    // top face has the Interact sight ray end inside the floor collider, so Talk was never offered.
-    expect(spawnOf('npc-mags').at[1]).toBeCloseTo(-1.75, 1);
+    // Mags's feet are on the landing (top y -2); the Interact sight ray ends a little above them (mw-j6el).
+    expect(spawnOf('npc-mags').at[1]).toBeCloseTo(-2, 1);
   });
 
   it('AC-3: the sealed places stay shut as found: bay nine, the strongroom, the Silver Quay, the Tern’s berth, and the whole Undertow', () => {

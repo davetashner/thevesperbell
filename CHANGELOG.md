@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- You can now walk to Wendmouth: a doorway in the east wall of the riverbank under the Miners' Bridge opens onto a short walled towpath, and its end leads downriver to the Stone Wharf, where the towpath gate in the harbour's south wall is now an open doorway back up the river (mw-e40.26). It is a stopgap until Briar Glen Quay, the Millweir and Kestrel Lock exist; the barge to the Patient Ann's berth is still to come, and the main quest never needs either.
 - Reaching the boarded forecourt in front of the Deepworks' gate wall now completes "Follow Tansy Pell up the street" in the main quest (mw-sba).
 - You can enter the Drowned Gull's contests and play them: ask Big Oona for a match (or use the dice table) and a window shows the entry fee, Nell's 2:1 odds on you and her offer to pay you to throw the match; then press F to push at the arm-wrestling table (four presses gain a push, first to five beats Oona) or to roll against the house at dice, H slips in a loaded die, N or walking away forfeits, and casting at the table counts as cheating that Nell and Oona catch only if they see you. A match in progress saves and loads with the game (mw-opf6).
 - Wendmouth Harbour: the optional harbour town is now a level you can walk (debug entry ?scene=wendmouth-harbour until the barge and towpath scenes exist). A 200 by 160 metre grey-box with the Stone Wharf (Great Stair down to the barge berth, crane piers, block yards, the sealed Silver Quay gate), the columned Customs House with Cray's office and a locked strongroom, the covered Tidemarket, the Bonded Warehouse with bay nine sealed and skylights, the fish market over the Undertow vaults (two locked doors in), three net lofts with a climbable roof route to the Customs House roof, the breakwater to the Drowned Gull, and the pool with the Gilded Tern at anchor behind a locked gangway. Mags, Nell, Oona, Reed, Cray, Tereza, Quell and Hesketh stand at their places and can be talked to, and arriving writes wendmouth.visited (mw-e40.1, mw-e39.32).
@@ -526,6 +527,7 @@ check enforces this).
 
 ### Fixed
 
+- People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).
 - Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).
 - An arrow stuck in a wall can now be taken back when you stand right up against that wall: the wall no longer hides it from reach, so "Take arrow" no longer shows with nothing to take, or fails to show at all (mw-fh5, mw-5h9).
 - A chandelier, anvil or other heavy thing dropped on a creature or a training dummy now hurts it, and so does standing in fire: until now only the knight took crush and fire damage from the world, and whoever cut the rope gets the blame (mw-aps).
