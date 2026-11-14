@@ -147,13 +147,16 @@ function referencesIn(): LogicRefChecker {
 
 const sentinels = (g: Game, ...picks: string[]): string[] => talk(g, 'sentinel-watch', picks);
 const tellClatter = (g: Game, ...picks: string[]): string[] => talk(g, 'clatter-garden', picks);
+/** Hollis lends the Bible (or a thief lifts it): the letter is a real item and the fact records it. */
+const LETTER = 'letter-anselm-hobb';
+function lend(g: Game): void {
+  g.host.giveItem(LETTER, 1);
+  set(g, { 'hollis.bible-lent': true });
+}
 /** Gives Clatter the three pieces (psalter, pear, letter) through the real dialogue. */
 function giveAllThree(g: Game): void {
-  set(g, {
-    'evidence.clatter-psalter': true,
-    'hollis.bible-lent': true,
-    'bones.pear-bloomed': true,
-  });
+  lend(g);
+  set(g, { 'evidence.clatter-psalter': true, 'bones.pear-bloomed': true });
   tellClatter(g, 'give-psalter', 'give-pear', 'give-letter');
 }
 
@@ -445,7 +448,7 @@ describe('The Name on the Bones', () => {
   it('three pieces in any order each lift his memories by one, and the third gives him his name', () => {
     const g = boot();
     tellClatter(g);
-    set(g, { 'hollis.bible-lent': true });
+    lend(g);
     tellClatter(g, 'give-letter');
     expect(fact(g, 'clatter.memories')).toBe(1);
     set(g, { 'bones.pear-bloomed': true });
@@ -477,7 +480,56 @@ describe('The Name on the Bones', () => {
     expect(fact(thief, 'hollis.bible-lent')).toBe(true);
     expect(fact(thief, 'bones.letter-stolen')).toBe(true);
     expect(thief.host.disposition('npc-hollis')).toBe(-3);
+    expect(thief.host.itemCount(LETTER)).toBe(1);
     expect(offered(boot(), 'hollis-pell')).not.toContain('steal-bible-grief');
+  });
+
+  it('AC-6: the letter is a real item, given by Hollis (lent or lifted) and taken by Clatter, not a stand-in fact', () => {
+    expect(content.get('item', LETTER).category).toBe('quest');
+    const g = boot();
+    talk(g, 'hollis-pell', ['ask-bible']);
+    expect(g.host.itemCount(LETTER)).toBe(1);
+    expect(fact(g, 'hollis.bible-lent')).toBe(true);
+    // The fact alone is not the letter: without the item Clatter has nothing to read.
+    const bare = boot();
+    set(bare, { 'hollis.bible-lent': true });
+    expect(offered(bare, 'clatter-garden')).not.toContain('give-letter');
+    expect(offered(g, 'clatter-garden')).toContain('give-letter');
+    tellClatter(g, 'give-letter');
+    expect(g.host.itemCount(LETTER)).toBe(0);
+    expect(fact(g, 'bones.letter-given')).toBe(true);
+  });
+
+  it('AC-7: Clatter, the bloom and the altar offering are placed; the bloom and offering follow the facts', () => {
+    const outer = content.get('scene', 'knot-outer');
+    const npc = outer.spawns.find((s) => s.id === 'npc-clatter');
+    expect(npc?.creature?.id).toBe('npc-clatter');
+    const garden = outer.spawns.find((s) => s.id === 'clatter-garden')?.at ?? [0, 0, 0];
+    const at = npc?.at ?? [0, 0, 0];
+    expect(Math.hypot(at[0] - garden[0], at[2] - garden[2])).toBeLessThan(4);
+    const nav = content.get('navmesh', 'knot-outer');
+    const [ox, oz] = nav.origin;
+    const cell = nav.settings.cellSize;
+    expect(
+      nav.polys.some(
+        (p) =>
+          at[0] >= ox + p[0] * cell &&
+          at[0] < ox + p[2] * cell &&
+          at[2] >= oz + p[1] * cell &&
+          at[2] < oz + p[3] * cell,
+      ),
+    ).toBe(true);
+    const priory = content.get('scene', 'bellwater-priory').spawns;
+    const tree = priory.find((s) => s.id === 'dead-pear-tree')?.at;
+    const bloom = priory.find((s) => s.id === 'pear-tree-bloom');
+    expect(bloom?.at).toEqual(tree);
+    expect(bloom?.spawnIf).toEqual({ fact: 'bones.pear-bloomed' });
+    const psalter = priory.find((s) => s.id === 'choir-altar-psalter');
+    expect(psalter?.spawnIf).toEqual({ fact: 'bones.psalter-given' });
+    const altar = priory.find((s) => s.id === 'choir-altar')?.at ?? [0, 0, 0];
+    expect(
+      Math.hypot((psalter?.at[0] ?? 0) - altar[0], (psalter?.at[2] ?? 0) - altar[2]),
+    ).toBeLessThan(2);
   });
 
   it("AC-5: after he is restored the join or rest choice is Clatter's, written as clatter.fate and read by the Cradle", () => {
@@ -518,7 +570,8 @@ describe('The Name on the Bones', () => {
     tellClatter(g, 'read-sorcerer');
     expect(fact(g, 'clatter.read-success')).toBe(true);
     expect(fact(g, 'clatter.memories')).toBe(1);
-    set(g, { 'evidence.clatter-psalter': true, 'hollis.bible-lent': true });
+    lend(g);
+    set(g, { 'evidence.clatter-psalter': true });
     tellClatter(g, 'give-psalter', 'give-letter');
     expect(fact(g, 'clatter.memories')).toBe(3);
     tick(g);
@@ -527,7 +580,7 @@ describe('The Name on the Bones', () => {
 
   it('AC-4: a failed memory-reading costs one memory and lowers the maximum by exactly one, and the quest stays completable', () => {
     const g = boot({ playerClass: 'sorcerer', checks: fails });
-    set(g, { 'hollis.bible-lent': true });
+    lend(g);
     tellClatter(g, 'give-letter');
     expect(fact(g, 'clatter.memories')).toBe(1);
     expect(fact(g, 'clatter.memories.max')).toBe(3);

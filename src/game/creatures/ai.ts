@@ -41,6 +41,7 @@ import {
   createSurfaceMap,
   DEFAULT_FOOTSTEP_SURFACES,
   entitySource,
+  hourNow,
   installAi,
   installAwareness,
   installFootstepNoise,
@@ -283,7 +284,8 @@ export function installCreatureAi<TInput>(
   const navigation = world.isRegistered(StatusLedgerComponent)
     ? statusScaledNavigation(options.navigation, statusLookup(content.all('status')))
     : options.navigation;
-  installAi(world, { behaviours, navigation, attacks });
+  // Routines switch by the game's hour (mw-8551); a world with no clock reads no windows.
+  installAi(world, { behaviours, navigation, attacks, hourOfDay: hourNow });
   return { perception, behaviours };
 }
 

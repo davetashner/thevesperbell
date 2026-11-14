@@ -138,6 +138,11 @@ test('AC-3: selecting Sorcerer and entering the testbed gives the sorcerer kit i
   expect(highlighted.confirmFocused).toBe(true);
   await page.keyboard.press('Enter');
 
+  // The class arrival narration (mw-aw1y) opens after the class is applied; Esc skips it.
+  await expect(page.locator('[data-screen="class-beat"]')).toBeVisible({ timeout: 10_000 });
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-screen]')).toHaveCount(0);
+
   // In the testbed: the screen is gone, the sim runs, and the player is a sorcerer with its kit.
   const entered = await selectState(page);
   expect(entered.open).toBe(false);

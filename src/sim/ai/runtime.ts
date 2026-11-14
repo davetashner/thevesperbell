@@ -57,6 +57,7 @@ import {
 } from './behaviour';
 import { DEFAULT_ATTACK_TOKENS, isStaggered } from './combat';
 import { isConversing } from './conversing';
+import { onErrand, stepErrands } from './errand';
 import { AlertStateChanged, BrainComponent, type Blackboard, type Brain } from './components';
 import { leashAllows, leashBroken } from './leash';
 import { DEFAULT_MEMORY_TUNING, type MemoryTuning } from './memory';
@@ -79,7 +80,7 @@ export interface AiOptions {
    * The hour of the day, 0–24, that routine windows are read against (the world clock, mw-e27.12);
    * without it windows are not read and every creature walks the first route of its routine.
    */
-  readonly hourOfDay?: (world: World<never>) => number;
+  readonly hourOfDay?: (world: World<never>) => number | undefined;
   /** How target memory decays and predicts (mw-e11.8); defaults to `DEFAULT_MEMORY_TUNING`. */
   readonly memory?: MemoryTuning;
   /**
@@ -285,6 +286,7 @@ function aiSystem<TInput>(runtime: AiRuntime): System<TInput> {
         hz,
         ports: runtime.ports,
       };
+      stepErrands(world, runtime.ports.navigation, hz);
       const brains = world.query(BrainComponent);
       /** Points the view at an agent; returns its behaviour, or undefined to skip it. */
       const focus = (entity: EntityId, brain: Brain): CompiledBehaviour | undefined => {
@@ -297,6 +299,8 @@ function aiSystem<TInput>(runtime: AiRuntime): System<TInput> {
         if (isFrozenSolid(world, entity)) return undefined;
         // Talking to the player, it keeps still until the conversation ends (mw-e22.9).
         if (isConversing(world, entity)) return undefined;
+        // Walking an errand (a scheduled person coming or going), its brain waits (mw-8551).
+        if (onErrand(world, entity)) return undefined;
         view.entity = entity;
         view.brain = brain;
         view.creature = getIf(world, entity, CreatureComponent);
@@ -380,6 +384,11 @@ export function installAi<TInput>(world: World<TInput>, options: AiOptions): voi
 /** The compiled behaviour `id` of `world`'s AI, or undefined (also when AI is not installed). */
 export function aiBehaviour(world: World<never>, id: string): CompiledBehaviour | undefined {
   return runtimes.get(world)?.behaviours.get(id);
+}
+
+/** How `world`'s AI travels, or undefined when AI is not installed. */
+export function aiNavigation(world: World<never>): AiNavigation | undefined {
+  return runtimes.get(world)?.ports.navigation;
 }
 
 /** The ports of `world`'s AI (AI must be installed). */

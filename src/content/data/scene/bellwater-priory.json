@@ -729,6 +729,12 @@
       "tags": ["landmark", "pear-tree"]
     },
     {
+      "id": "pear-tree-bloom",
+      "at": [20, 0, 72],
+      "tags": ["pear-tree", "bloom", "vfx-stub:pear-bloom"],
+      "spawnIf": { "fact": "bones.pear-bloomed" }
+    },
+    {
       "id": "priory-choir",
       "at": [60, 0, 100],
       "tags": ["node"]
@@ -737,6 +743,12 @@
       "id": "choir-altar",
       "at": [60, 0, 112],
       "tags": ["altar", "puzzle-stub:watchers"]
+    },
+    {
+      "id": "choir-altar-psalter",
+      "at": [60, 0, 111],
+      "tags": ["altar", "psalter-offering"],
+      "spawnIf": { "fact": "bones.psalter-given" }
     },
     {
       "id": "monk-statue-a",

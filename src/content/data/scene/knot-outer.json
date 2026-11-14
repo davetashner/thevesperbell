@@ -1254,6 +1254,16 @@
       "tags": ["encounter-stub", "npc-stub", "clatter"]
     },
     {
+      "id": "npc-clatter",
+      "at": [24, 0, 126],
+      "yaw": 0,
+      "tags": ["npc", "clatter", "gardener"],
+      "creature": "npc-clatter",
+      "leash": {
+        "radius": 3
+      }
+    },
+    {
       "id": "mushroom-bed-a",
       "at": [16, 0, 116],
       "tags": ["mushroom-garden"]

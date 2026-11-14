@@ -743,18 +743,22 @@ describe("Snig's lines (AC-5)", () => {
 });
 
 describe('placement', () => {
-  it('they are unplaced in the real world (E26) but can be talked to in the debug conversation room', () => {
+  it('Kettleback and Snig are unplaced in the real world (E26), Clatter is placed in knot-outer (mw-3n0f), and all can be talked to in the debug conversation room', () => {
     const shipped = loadGameContent();
     for (const scene of shipped.all('scene'))
       for (const spawn of scene.spawns)
-        expect(['npc-clatter', 'npc-kettleback', 'npc-snig']).not.toContain(spawn.creature?.id);
+        expect(['npc-kettleback', 'npc-snig']).not.toContain(spawn.creature?.id);
+    const garden = shipped
+      .get('scene', 'knot-outer')
+      .spawns.filter((s) => s.creature?.id === 'npc-clatter');
+    expect(garden.map((s) => s.id)).toEqual(['npc-clatter']);
     const dev = loadDevContent();
     const room = dev.get('scene', 'conversation-room');
     const placed = room.spawns.map((s) => s.creature?.id);
     expect(placed).toEqual(expect.arrayContaining(['npc-clatter', 'npc-kettleback', 'npc-snig']));
     for (const id of ['npc-clatter', 'npc-kettleback', 'npc-snig'])
       expect(dev.get('creature', id).dialogue?.id).toBeDefined();
-    for (const id of THREE) {
+    for (const id of THREE.filter((d) => d !== 'clatter-garden')) {
       const file = content.get('dialogue', id) as unknown as { notes?: string };
       expect(file.notes ?? '', id).toMatch(/unplaced|Not placed yet/);
     }
