@@ -85,12 +85,18 @@ export const SWORD_PLACEMENT: PropPlacement = {
  */
 export const KNIGHT_WRIST: readonly [number, number, number] = [0.18, 0, -0.07];
 
+/** The lowest the knight's fist reaches at rest, with room to spare above the boot (y 0.1). */
+export const KNIGHT_FIST_FLOOR = 0.6;
+
 /**
  * How much of the body mesh's right hand follows the sword bone: the fist (below y 0.90 and within
  * 0.14 m of the grip's axis) wholly, blending out to the forearm by y 0.98, so the hand and the sword
- * turn together at the wrist.
+ * turn together at the wrist. Nothing below KNIGHT_FIST_FLOOR: the fist hangs no lower than y 0.75,
+ * and the outer edge of the right boot (x 0.37, y 0 to 0.1) lies in the same column, so without the
+ * floor the boot followed the wrist and stretched up to the hand.
  */
 export function knightHandShare(x: number, y: number, z: number): number {
+  if (y < KNIGHT_FIST_FLOOR) return 0;
   if (Math.hypot(x - 0.45, z + 0.07) > 0.14 || x < 0.34) return 0;
   return Math.min(1, Math.max(0, (0.98 - y) / 0.08));
 }
