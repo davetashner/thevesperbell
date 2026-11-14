@@ -1,0 +1,33 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "moorings-watch-areas",
+  "name": "Mooring's Watch arrival volume",
+  "notes": "The observed player volume `mooring-watch` covers the whole watch (the spur trail, the lookout camp, the courtyard and the tower floors), so entering the scene by the spur gate or the ridge gate counts as a visit (mw-heoa, place-mooring-watch; also the debunk dive of rumor-02). No quest binds it.",
+  "nodes": [
+    {
+      "id": "mooring-watch",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 90,
+          "y": 5,
+          "z": 50
+        },
+        "halfExtents": {
+          "x": 90,
+          "y": 10,
+          "z": 50
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    }
+  ],
+  "wires": []
+}

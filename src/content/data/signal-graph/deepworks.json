@@ -2,7 +2,7 @@
   "$schema": "../signal-graph.schema.json",
   "id": "deepworks",
   "name": "Deepworks winch, pulley and inner bar",
-  "notes": "The wiring of the Deepworks blockout (scene deepworks, mw-e26.2). The winch lever inside the winch house and the shootable winch pulley over the cage bay both call the cage down: a latch keeps it down and opens the cage lift's gate (cage-gate, onto the shaft to the silver level) and the cage bay's gate (cage-bay-gate, the winch-cage way in from the forecourt). The inner-bar lever, which a sorcerer can pull from range through the slit, raises the inner-bar portcullis. Binding names are the scene's spawn ids. The player-filtered volume mine-gate is the main quest area mine-gate (follow-tansy, mw-sba): the boarded forecourt in front of the gate wall, around the mine-gate marker spawn, reached by the mine road from Market Green. The quest reads it, so it is not wired.",
+  "notes": "The wiring of the Deepworks blockout (scene deepworks, mw-e26.2). The winch lever inside the winch house and the shootable winch pulley over the cage bay both call the cage down: a latch keeps it down and opens the cage lift's gate (cage-gate, onto the shaft to the silver level) and the cage bay's gate (cage-bay-gate, the winch-cage way in from the forecourt). The inner-bar lever, which a sorcerer can pull from range through the slit, raises the inner-bar portcullis. Binding names are the scene's spawn ids. The player-filtered volume mine-gate is the main quest area mine-gate (follow-tansy, mw-sba): the boarded forecourt in front of the gate wall, around the mine-gate marker spawn, reached by the mine road from Market Green. The quest reads it, so it is not wired. The player-filtered volume weeping-adit is the arrival of the Weeping Adit across the flooded gallery, around adit-arrival (mw-heoa; the rumour book's visit trigger of place-weeping-adit).",
   "nodes": [
     {
       "id": "mine-gate",
@@ -12,6 +12,17 @@
         "kind": "box",
         "center": { "x": 100, "y": 1, "z": 66 },
         "halfExtents": { "x": 14, "y": 1.5, "z": 10 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    {
+      "id": "weeping-adit",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 188, "y": -11, "z": 278 },
+        "halfExtents": { "x": 6, "y": 3, "z": 6 }
       },
       "filter": [{ "test": "tag", "tag": "player" }]
     },
