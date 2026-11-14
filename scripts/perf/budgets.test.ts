@@ -62,6 +62,7 @@ describe('perf budgets (mw-e32.1)', () => {
       ['reference', 'bellwater-priory', 'high', 0],
       ['reference', 'deepworks', 'high', 0],
       ['reference', 'knot-outer', 'high', 0],
+      ['reference', 'knot-inner', 'high', 0],
       ['reference', 'wendmouth-harbour', 'high', 0],
     ]);
     expect(budgets.find((b) => b.id === 'frame-p95-high')).toMatchObject({

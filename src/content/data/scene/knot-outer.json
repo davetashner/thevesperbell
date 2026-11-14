@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "knot-outer",
   "name": "The Knot: Outer Ring, Ossuary and Chapel",
-  "description": "Bead mw-e26.9: the outer half of the labyrinth under Briar Glen as one connected greybox (about 125 x 260 m, one level plus the Dark Crossing pit). Through the Deepworks breach (breach-door, back to deepworks arrive-from-knot-outer; arrive-from-deepworks) a short landing opens onto the Outer Ring (knot-outer-ring): a looping corridor round a central Scales room (scales-room) with rune-band markers and loom-spider nests; the Scales gate (scales-gate, an open doorway until mw-e26.15 closes it) and a crawl vent (ring-vent) both lead north to the Ossuary Galleries (ossuary-galleries): an entry hall with bone niches, the sunk Dark Crossing room (dark-crossing, four metres of stair down and up), Clatter’s mushroom garden (clatter-garden) along the west side and an east gallery, so the hall and the far hall are joined three ways. The hall beyond the pit leads to the Chapel of Echoes (chapel-of-echoes, a 9 m nave with colonnades and the four chime markers) through a doorway (chapel-door) or the bone chute (bone-chute) from the garden. The chapel’s north doorway holds the portcullis (chapel-portcullis) on its counterweight rope (counterweight-rope; graph chapel-portcullis): cut, shoot or burn the rope and it drops for good; the north vent (chapel-vent-north) goes round it to the landing and the Horn’s Hall stub (horns-hall-stub, mw-e26.10). The four friend-below notes of the Knot are readable spawns.",
+  "description": "Bead mw-e26.9: the outer half of the labyrinth under Briar Glen as one connected greybox (about 125 x 260 m, one level plus the Dark Crossing pit). Through the Deepworks breach (breach-door, back to deepworks arrive-from-knot-outer; arrive-from-deepworks) a short landing opens onto the Outer Ring (knot-outer-ring): a looping corridor round a central Scales room (scales-room) with rune-band markers and loom-spider nests; the Scales gate (scales-gate, an open doorway until mw-e26.15 closes it) and a crawl vent (ring-vent) both lead north to the Ossuary Galleries (ossuary-galleries): an entry hall with bone niches, the sunk Dark Crossing room (dark-crossing, four metres of stair down and up), Clatter’s mushroom garden (clatter-garden) along the west side and an east gallery, so the hall and the far hall are joined three ways. The hall beyond the pit leads to the Chapel of Echoes (chapel-of-echoes, a 9 m nave with colonnades and the four chime markers) through a doorway (chapel-door) or the bone chute (bone-chute) from the garden. The chapel’s north doorway holds the portcullis (chapel-portcullis) on its counterweight rope (counterweight-rope; graph chapel-portcullis): cut, shoot or burn the rope and it drops for good; the north vent (chapel-vent-north) goes round it to the landing, where the horns-door (to arrive-from-knot-outer in knot-inner, mw-e26.10) leads to Horn’s Hall; the landing marker is horns-hall-stub. The four friend-below notes of the Knot are readable spawns.",
   "grid": 1,
   "camera": {
     "position": [60, 60, -40],
@@ -1351,7 +1351,18 @@
     {
       "id": "horns-hall-stub",
       "at": [60, 0, 254],
-      "tags": ["transition-stub", "planned:mw-e26.10"]
+      "tags": ["landing"]
+    },
+    {
+      "id": "arrive-from-knot-inner",
+      "at": [60, 0, 254],
+      "yaw": 180,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "horns-door",
+      "at": [60, 0, 257],
+      "tags": ["transition"]
     },
     {
       "id": "read-friend-note-warden",
@@ -1467,6 +1478,13 @@
       "min": [56, -1, 0.25],
       "max": [64, 3, 1.75],
       "scene": "deepworks",
+      "spawn": "arrive-from-knot-outer"
+    },
+    {
+      "id": "horns-door",
+      "min": [56, -1, 256.25],
+      "max": [64, 3, 257.75],
+      "scene": "knot-inner",
       "spawn": "arrive-from-knot-outer"
     }
   ]
