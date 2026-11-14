@@ -125,7 +125,10 @@ async function openTitle(page: Page): Promise<FrontState> {
   return frontState(page);
 }
 
-/** Waits until the knight is in play: class applied, no screen open, the sim stepping. */
+/**
+ * Waits until the knight is in play: class applied, the class arrival narration (mw-aw1y) read and
+ * skipped with Esc, no screen open, the sim stepping.
+ */
 async function inPlay(page: Page): Promise<FrontState> {
   await expect
     .poll(
@@ -135,7 +138,13 @@ async function inPlay(page: Page): Promise<FrontState> {
       },
       { timeout: 15_000 },
     )
-    .toEqual({ playerClass: 'knight', screens: [] });
+    .toEqual({ playerClass: 'knight', screens: ['class-beat'] });
+  const reading = JSON.parse(
+    (await page.locator('#app').getAttribute('data-class-beat')) ?? '{}',
+  ) as { open: boolean; beat: string };
+  expect(reading).toMatchObject({ open: true, beat: 'opening' });
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await frontState(page)).screens, { timeout: 15_000 }).toEqual([]);
   return frontState(page);
 }
 
