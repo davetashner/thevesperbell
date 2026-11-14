@@ -107,7 +107,33 @@
           "id": "ask-wolves",
           "text": "The wolves have stopped howling.",
           "once": true,
-          "next": "wolves-1"
+          "next": "wolves-1",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 1,
+                "source": "npc-juniper"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ask-horn",
+          "text": "They say the stone horn in the woods covers its ears.",
+          "once": true,
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 12,
+                "source": "npc-juniper"
+              }
+            }
+          ],
+          "next": "horn-1"
         },
         {
           "id": "ask-path",
@@ -278,6 +304,13 @@
       "kind": "line",
       "speaker": "juniper",
       "text": "Wolves don't go quiet. Not unless something bigger is listening. Three weeks ago they stopped. I don't know a Briarwood without howling. It's like being in a house with the clocks stopped.",
+      "next": "hub"
+    },
+    {
+      "id": "horn-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Stone doesn't mind what it hears. But it does look like it minds. Hands to its ears, facing the maze. I've sat under it. I didn't stay.",
       "next": "hub"
     },
     {

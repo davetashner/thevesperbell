@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-05-bell-cracked-clean",
+  "notes": "The Vesper Bell, cracked and without its tongue. Dot repeats what her gran told her, in dot-sleeping-ox.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "term-vesper-bell",
+  "text": "There's a bell up at the priory, cracked clean through. Used to ring every sunset. My gran said the night it didn't ring, the monks all went for a walk.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Cracked clean through. Gran would be unbearable about it. She was always right about bells."
+  }
+}

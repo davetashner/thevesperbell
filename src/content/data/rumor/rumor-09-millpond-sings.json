@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-09-millpond-sings",
+  "notes": "A sleepwalker's lost lantern and the Hushlings in the drowned lane at the millweir (true, and dangerous). Dot tells it in dot-sleeping-ox.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "place-millweir",
+  "text": "Something at the millpond sings on still nights. Not a bird.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "You went to the millpond at night? Love. Sit down. Have something warm."
+  }
+}

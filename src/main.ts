@@ -2588,7 +2588,9 @@ function startRenderer(
       });
       for (const line of sceneCreatureErrors(sceneCreatures)) console.error(line);
       // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
-      watchPresence(world, creatures.spawn, loaded.layout.spawns);
+      watchPresence(world, creatures.spawn, loaded.layout.spawns, undefined, {
+        inView: (point) => ndcInView(projectToNdc(camera, point)),
+      });
       // Talking to NPCs (mw-e22.9): a creature whose content names a `dialogue` gets Talk on the
       // Interact verb; talking pauses its routine, faces the player, runs the dialogue against the
       // game's logic host and ends in a walk away or danger. Only where content has talkable

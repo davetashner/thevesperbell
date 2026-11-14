@@ -1,0 +1,24 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-03-goblins-took-them",
+  "notes": "Planted by Vane, so false. Dot half-tells it at ask-trinkets in dot-sleeping-ox; Kettleback debunks it. Framed in Brass.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "false",
+  "target": "quest-framed-in-brass",
+  "text": "The goblins took them. They left their little brass trinkets at every door.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "So it was never the goblins. I did wonder, love. I kept it behind the bar, mind."
+  },
+  "debunk": [
+    {
+      "via": "ask",
+      "npc": "npc-kettleback"
+    },
+    {
+      "via": "dive",
+      "place": "place-deepworks"
+    }
+  ]
+}

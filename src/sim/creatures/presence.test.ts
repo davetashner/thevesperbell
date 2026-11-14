@@ -9,7 +9,10 @@ import { InteractableComponent, INTERACTION_COMPONENTS } from '../interaction/sy
 import type { SceneSpawnPlacement } from '../scene/layout';
 import { SceneSpawnComponent } from '../scene/loader';
 import { CreatureComponent } from './components';
-import { syncPresence } from './presence';
+import { beginConversing } from '../ai/conversing';
+import { PlacementComponent } from '../stimulus/placement';
+import { hourNow, syncPresence } from './presence';
+import { MINUTE_FACT } from '../rest/day-clock';
 import {
   presentIn,
   registerCreatureComponents,
@@ -177,5 +180,115 @@ describe('presence by phase (mw-ju8.14)', () => {
     expect(
       syncPresence(w, options, [spawn({ id: 'lessons', interact, presence: NIGHT })], 'day'),
     ).toEqual({ arrived: [], left: [], errors: [] });
+  });
+});
+
+describe('presence by hour of the day (mw-e24.13)', () => {
+  const SHIFT = { hours: [8, 18] } as const;
+  const NIGHT_HOURS = { phases: ['night'], hours: [22, 4] } as const;
+
+  it('AC-1: a scheduled spawn is there inside its window, [from, to), and wraps past midnight', () => {
+    expect(presentIn(spawn({ presence: SHIFT }), undefined, 8)).toBe(true);
+    expect(presentIn(spawn({ presence: SHIFT }), 'day', 17.99)).toBe(true);
+    expect(presentIn(spawn({ presence: SHIFT }), 'day', 18)).toBe(false);
+    expect(presentIn(spawn({ presence: SHIFT }), 'day', 7.5)).toBe(false);
+    expect(presentIn(spawn({ presence: SHIFT }), 'day', 32)).toBe(true);
+    expect(presentIn(spawn({ presence: SHIFT }), 'day', -10)).toBe(true);
+    const late = spawn({ presence: { hours: [22, 4] } });
+    expect(presentIn(late, 'night', 23)).toBe(true);
+    expect(presentIn(late, 'night', 3)).toBe(true);
+    expect(presentIn(late, 'night', 12)).toBe(false);
+  });
+
+  it('with both phases and hours both must hold; what the caller does not know is not checked', () => {
+    const both = spawn({ presence: NIGHT_HOURS });
+    expect(presentIn(both, 'night', 23)).toBe(true);
+    expect(presentIn(both, 'day', 23)).toBe(false);
+    expect(presentIn(both, 'night', 12)).toBe(false);
+    expect(presentIn(both, 'night')).toBe(true);
+    expect(presentIn(both, undefined, 23)).toBe(true);
+    expect(presentIn(spawn({ presence: SHIFT }), 'day')).toBe(true);
+    expect(presentIn(spawn({ presence: NIGHT }), 'night', 3)).toBe(true);
+  });
+
+  it('AC-2: a scene loads with the people who are scheduled to be there at the hour it loads', () => {
+    const spawns = [
+      spawn({ id: 'always', creature: 'hound' }),
+      spawn({ id: 'clerk', creature: 'hound', presence: SHIFT }),
+    ];
+    const noon = world();
+    expect(spawnSceneCreatures(noon, options, spawns, 'day', 12).entities).toHaveLength(2);
+    const dark = world();
+    expect(spawnSceneCreatures(dark, options, spawns, 'night', 23).entities).toHaveLength(1);
+    const noClock = world();
+    expect(spawnSceneCreatures(noClock, options, spawns).entities).toHaveLength(2);
+  });
+
+  it('AC-2: the clock minute is the hour of the day, and no clock is no hour', () => {
+    const w = world();
+    expect(hourNow(w)).toBeUndefined();
+    w.facts.declare(MINUTE_FACT, { type: 'int', default: 360 });
+    expect(hourNow(w)).toBe(6);
+    w.facts.set(MINUTE_FACT, 1290);
+    expect(hourNow(w)).toBe(21.5);
+  });
+
+  it('AC-1: the person arrives when their window opens and leaves when it closes', () => {
+    const w = world();
+    const spawns = [spawn({ id: 'clerk', creature: 'hound', presence: SHIFT })];
+    expect(syncPresence(w, options, spawns, 'day', 7)).toEqual({
+      arrived: [],
+      left: [],
+      errors: [],
+    });
+    expect(syncPresence(w, options, spawns, 'day', 8).arrived).toEqual(['clerk']);
+    expect(syncPresence(w, options, spawns, 'day', 12).arrived).toEqual([]);
+    expect(living(w)).toHaveLength(1);
+    expect(syncPresence(w, options, spawns, 'dusk', 18).left).toEqual(['clerk']);
+    expect(living(w)).toHaveLength(0);
+  });
+
+  it('AC-3: a person in a conversation when their window ends stays until it ends', () => {
+    const w = world();
+    const spawns = [spawn({ id: 'clerk', creature: 'hound', presence: SHIFT })];
+    syncPresence(w, options, spawns, 'day', 12);
+    const [clerk] = living(w);
+    beginConversing(w, clerk as never, w.spawn());
+    expect(syncPresence(w, options, spawns, 'dusk', 18)).toEqual({
+      arrived: [],
+      left: [],
+      errors: [],
+    });
+    expect(living(w)).toHaveLength(1);
+    w.destroy(clerk as never);
+    expect(living(w)).toHaveLength(0);
+  });
+
+  it('AC-3: nobody arrives or leaves on the player’s screen; they do once it is out of view', () => {
+    const w = world();
+    const spawns = [spawn({ id: 'clerk', creature: 'hound', presence: SHIFT })];
+    let seen = true;
+    const hold = { inView: () => seen };
+    expect(syncPresence(w, options, spawns, 'day', 9, hold).arrived).toEqual([]);
+    expect(living(w)).toHaveLength(0);
+    seen = false;
+    expect(syncPresence(w, options, spawns, 'day', 9, hold).arrived).toEqual(['clerk']);
+    seen = true;
+    expect(syncPresence(w, options, spawns, 'dusk', 19, hold).left).toEqual([]);
+    expect(living(w)).toHaveLength(1);
+    seen = false;
+    expect(syncPresence(w, options, spawns, 'dusk', 19, hold).left).toEqual(['clerk']);
+    expect(living(w)).toHaveLength(0);
+  });
+
+  it('a person with no placement is not held by the view', () => {
+    const w = world();
+    const spawns = [spawn({ id: 'clerk', creature: 'hound', presence: SHIFT })];
+    syncPresence(w, options, spawns, 'day', 9);
+    const [clerk] = living(w);
+    w.remove(clerk as never, PlacementComponent);
+    expect(syncPresence(w, options, spawns, 'day', 19, { inView: () => true }).left).toEqual([
+      'clerk',
+    ]);
   });
 });
