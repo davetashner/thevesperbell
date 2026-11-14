@@ -70,6 +70,15 @@ export const rumorSchema = z
       .describe(
         'How a valley teller repeats it; hearing it this way never marks the target visited.',
       ),
+    followUp: z
+      .strictObject({
+        teller: npcId.describe('Who trades the line back (Dot).'),
+        text: z.string().min(1).max(RUMOR_MAX_LENGTH),
+      })
+      .optional()
+      .describe(
+        'The line Dot trades back once, when the player has visited the target (confirms a true rumour, debunks a false one).',
+      ),
     debunk: z
       .array(debunkSchema)
       .min(1)
@@ -94,6 +103,54 @@ export const rumorSchema = z
   .describe('A rumour (story bible 6.2): source, truth value and target (mw-e39.23).');
 
 export type Rumor = z.output<typeof rumorSchema>;
+
+/** Goblin standing values (`goblins.standing`); the bible's "wary" ships as `neutral`. */
+export type GoblinStanding = 'hostile' | 'neutral' | 'friendly';
+
+const GOBLIN_TELLERS = ['npc-kettleback', 'npc-snig'];
+
+/** A rumour only the goblins tell (a goblin first-hand source or the `goblins` crowd tag). */
+export function isGoblinRumour(rumor: Rumor): boolean {
+  return (
+    rumor.source.some((s) => GOBLIN_TELLERS.includes(s)) ||
+    (rumor.sourceTags ?? []).includes('goblins')
+  );
+}
+
+/** Whether a rumour may be offered at all: no goblin-sourced rumour while the goblins are hostile. */
+export function rumourAvailable(rumor: Rumor, goblins: GoblinStanding): boolean {
+  return !(isGoblinRumour(rumor) && goblins === 'hostile');
+}
+
+/**
+ * The line Dot trades back for a rumour once the player has visited its target: offered once only
+ * (`delivered` holds the ids already traded back).
+ */
+export function followUpLine(
+  rumor: Rumor,
+  visited: ReadonlySet<string>,
+  delivered: ReadonlySet<string>,
+): string | undefined {
+  if (rumor.followUp === undefined) return undefined;
+  if (!visited.has(rumor.target) || delivered.has(rumor.id)) return undefined;
+  return rumor.followUp.text;
+}
+
+/** What Dot says when she has no rumour left to trade; nothing is charged. */
+export const ALL_KNOWN_LINE =
+  "Love, you've heard everything I have and half of what I made up. Keep your coin.";
+
+/** The next rumour Dot can trade, or the fallback line and no cost when `known` holds them all. */
+export function dotTrade(
+  rumors: readonly Rumor[],
+  known: ReadonlySet<string>,
+  goblins: GoblinStanding,
+): { rumor: Rumor | undefined; line: string | undefined; coinTaken: 0 } {
+  const next = rumors.find(
+    (r) => !known.has(r.id) && rumourAvailable(r, goblins) && !isGoblinRumour(r),
+  );
+  return { rumor: next, line: next === undefined ? ALL_KNOWN_LINE : undefined, coinTaken: 0 };
+}
 
 /** A rumour as a teller offers it. */
 export interface HeardRumor {

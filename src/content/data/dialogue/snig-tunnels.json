@@ -525,6 +525,29 @@
       "kind": "line",
       "speaker": "snig",
       "text": "And the Big One sleeps down below. The Big One doesn't eat people. He gives them beds. We bring the bread. And the bones in the flower room say sorry a lot. I like them.",
+      "next": "goblins-fx"
+    },
+    {
+      "id": "goblins-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 10,
+            "source": "npc-snig"
+          }
+        },
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 11,
+            "source": "npc-snig"
+          }
+        }
+      ],
       "next": "hub"
     },
     {

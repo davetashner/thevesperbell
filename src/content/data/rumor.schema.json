@@ -82,6 +82,27 @@
       ],
       "additionalProperties": false
     },
+    "followUp": {
+      "description": "The line Dot trades back once, when the player has visited the target (confirms a true rumour, debunks a false one).",
+      "type": "object",
+      "properties": {
+        "teller": {
+          "type": "string",
+          "pattern": "^npc-[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Who trades the line back (Dot)."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "teller",
+        "text"
+      ],
+      "additionalProperties": false
+    },
     "debunk": {
       "description": "Required when false: the ways the player can learn it is false.",
       "minItems": 1,
