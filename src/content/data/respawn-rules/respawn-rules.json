@@ -59,6 +59,14 @@
       "priority": 0,
       "destination": { "scene": "deepworks", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "wendmouth-harbour-reload",
+      "notes": "Death in Wendmouth (mw-e40.1): the region is the whole harbour scene; the death screen offers Load last save, and with no save the harbour restarts on the Stone Wharf. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
+      "region": "wendmouth-harbour",
+      "priority": 0,
+      "destination": { "scene": "wendmouth-harbour", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }

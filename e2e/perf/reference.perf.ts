@@ -360,3 +360,40 @@ test.describe('load budgets', () => {
     });
   });
 });
+
+// Wendmouth Harbour (mw-e40.1 AC-4: 200 × 160 m, viewed from the Stone Wharf along the quay) at the High
+// preset, the same sampling as the priory. Reference machine only.
+test.describe('wendmouth-harbour at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-4: the Stone Wharf view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'wendmouth-harbour',
+      spawn: 'wharf-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('wendmouth-harbour high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'wendmouth-harbour',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});

@@ -1,0 +1,2315 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "wendmouth-harbour",
+  "name": "Wendmouth Harbour",
+  "description": "Bead mw-e40.1: Wendmouth, the optional harbour town (bible 3.6), as one grey-box scene about 200 x 160 m (x -100..100, z 0..160; north is the sea). Reach it with ?scene=wendmouth-harbour: nothing built links to it yet, so the river legs stay planned (the towpath gate in the south wall is a locked planned stub, mw-e40.26; the Patient Ann's berth is where the barge will arrive). The Stone Wharf is the open flagstone quay along the pool (player-start; the Tidefair ground, two treadwheel crane piers, block yards, crates, and at its east end the Silver Quay behind a sealed iron gate: seen, not entered). A Great Stair, 24 m wide, steps down to the barge berth landing and the Patient Ann's deck (Mags). South of the wharf stand the columned Customs House (6 m walls, portico, hall, Cray's office, a locked strongroom, a flat roof), the covered Tidemarket (open arcade, stalls, Tereza's arms stall, the book cart), and the vaulted Bonded Warehouse (two doors, nine bays along the south wall, bay nine sealed behind a locked iron door, a roof with two skylights and a rough climb on its north face). The fish market stands on the east side over the Undertow: black-market vaults 4 m below, reached only by the harbour-wall stair door and the Gull's cellar door (two locked doors, a long tunnel under the breakwater). West of the Customs House the three net lofts (timber shells, roofs at 4 m joined by plank bridges and stairs to the Customs House roof at 6 m; the way up is a rough-stone climb). The breakwater is a block wall running north from the quay to the Drowned Gull (bar, arm-wrestling table, dice table, cellar stair to the Undertow). The pool (standing water, ladders out) holds the Gilded Tern at anchor off the wharf: a gangway behind a locked gate, deck, masts, rigging climb, cabin and the locked passenger berth. Building shells are solid masses with open doorways or gaps; interiors and class routes are the later E40 beads, so routes are marked with named spawns and locks only. The eight dialogue NPCs stand at their places; Quell is gone once quell.left is set. Harbour pool and sea are standing water: the river does not flow in the sim.",
+  "grid": 1,
+  "camera": {
+    "position": [-100, 75, -30],
+    "target": [0, 0, 85]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0.0, 0.0, 49.0],
+      "scale": [100.0, 1, 49.0]
+    },
+    {
+      "piece": "floor",
+      "at": [-56.0, 0.0, 99.0],
+      "scale": [44.0, 1, 1.0]
+    },
+    {
+      "piece": "floor",
+      "at": [56.0, 0.0, 99.0],
+      "scale": [44.0, 1, 1.0]
+    },
+    {
+      "piece": "floor",
+      "at": [-70.0, 0.0, 130.0],
+      "scale": [30.0, 1, 30.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-93.0, 0.0, 0.0],
+      "scale": [7.0, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-85.0, 0.0, 0.0]
+    },
+    {
+      "piece": "wall",
+      "at": [8.0, 0.0, 0.0],
+      "scale": [92.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-100.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [50.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [50.0, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [15.0, -6.0, 130.0],
+      "scale": [55.0, 1, 30.0]
+    },
+    {
+      "piece": "floor",
+      "at": [91.0, -6.0, 130.0],
+      "scale": [9.0, 1, 30.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-26.0, -6.0, 100.0],
+      "scale": [14.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [41.0, -6.0, 100.0],
+      "scale": [29.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [91.0, -6.0, 100.0],
+      "scale": [9.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-40.0, -6.0, 130.0],
+      "yaw": 90,
+      "scale": [30.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [70.0, -6.0, 130.0],
+      "yaw": 90,
+      "scale": [30.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [82.0, -6.0, 130.0],
+      "yaw": 90,
+      "scale": [30.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, -6.0, 160.0],
+      "scale": [70.0, 2.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100.0, -6.0, 130.0],
+      "yaw": 90,
+      "scale": [30.0, 2.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-100.0, 0.0, 130.0],
+      "yaw": 90,
+      "scale": [30.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-70.0, 0.0, 160.0],
+      "scale": [30.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [0.0, -1.0, 99.0],
+      "yaw": 180,
+      "scale": [12.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [0.0, -2.0, 101.0],
+      "yaw": 180,
+      "scale": [12.0, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0.0, -2.0, 107.0],
+      "scale": [12.0, 1, 5.0]
+    },
+    {
+      "piece": "floor",
+      "at": [-14.0, -2.0, 109.0],
+      "scale": [2.0, 1, 7.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-16.0, -2.0, 109.0],
+      "yaw": 90,
+      "scale": [7.0, 0.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-12.0, -2.0, 104.5],
+      "yaw": 90,
+      "scale": [2.5, 0.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-12.0, -2.0, 113.5],
+      "yaw": 90,
+      "scale": [2.5, 0.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-14.0, -2.0, 116.0],
+      "scale": [2.05, 0.3, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [-30.0, -6.0, 100.25],
+      "scale": [0.5, 6, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [50.0, -6.0, 100.25],
+      "scale": [0.5, 6, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [-39.75, -6.0, 130.0],
+      "yaw": 90,
+      "scale": [0.5, 6, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [69.75, -6.0, 114.0],
+      "yaw": 90,
+      "scale": [0.5, 6, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [22.0, 0.0, 94.0],
+      "scale": [2.0, 1.5, 2.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "pillar",
+      "at": [22.0, 1.5, 94.0],
+      "scale": [1, 3.0, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [46.0, 0.0, 94.0],
+      "scale": [2.0, 1.5, 2.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "pillar",
+      "at": [46.0, 1.5, 94.0],
+      "scale": [1, 3.0, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [50.0, 0.0, 79.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [56.0, 0.0, 79.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [62.0, 0.0, 79.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [68.0, 0.0, 79.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [50.0, 0.0, 85.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [56.0, 0.0, 85.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [62.0, 0.0, 85.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [68.0, 0.0, 85.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [50.0, 0.0, 91.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [56.0, 0.0, 91.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [62.0, 0.0, 91.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [68.0, 0.0, 91.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "crate",
+      "at": [6.0, 0.0, 90.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [8.0, 0.0, 90.5],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [7.0, 0.0, 91.5],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [36.0, 0.0, 78.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [38.0, 0.0, 78.5],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [-30.0, 0.0, 92.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [-28.5, 0.0, 92.5],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [-8.0, 0.0, 80.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [14.0, 0.0, 82.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "wall",
+      "at": [82.0, 0.0, 81.5],
+      "yaw": 90,
+      "scale": [5.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [82.0, 0.0, 88.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [82.0, 0.0, 94.5],
+      "yaw": 90,
+      "scale": [5.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [91.0, 0.0, 76.0],
+      "scale": [9.0, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [94.0, 0.0, 94.0],
+      "scale": [4.0, 1.2, 4.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [-23.0, 0.0, 36.0],
+      "scale": [17.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-33.0, 0.0, 70.0],
+      "scale": [7.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-23.0, 3.0, 70.0],
+      "scale": [3.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-13.0, 0.0, 70.0],
+      "scale": [7.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-40.0, 0.0, 53.0],
+      "yaw": 90,
+      "scale": [17.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-6.0, 0.0, 53.0],
+      "yaw": 90,
+      "scale": [17.0, 2, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-38.0, 0.0, 72.0],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-32.0, 0.0, 72.0],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-26.0, 0.0, 72.0],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-20.0, 0.0, 72.0],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-14.0, 0.0, 72.0],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-8.0, 0.0, 72.0],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-23.0, 6.0, 72.0],
+      "scale": [17.0, 1, 2.0]
+    },
+    {
+      "piece": "floor",
+      "at": [-23.0, 6.0, 53.0],
+      "scale": [17.0, 1, 17.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-16.0, 0.0, 39.0],
+      "yaw": 90,
+      "scale": [3.0, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-16.0, 0.0, 43.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [-16.0, 0.0, 47.0],
+      "yaw": 90,
+      "scale": [3.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-11.0, 0.0, 50.0],
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-34.0, 0.0, 50.0],
+      "scale": [6.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-28.0, 0.0, 39.0],
+      "yaw": 90,
+      "scale": [3.0, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-28.0, 0.0, 43.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [-28.0, 0.0, 47.0],
+      "yaw": 90,
+      "scale": [3.0, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [-23.0, 0.0, 57.5],
+      "scale": [1.5, 0.5, 1.5],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [-11.0, 0.0, 46.5],
+      "scale": [3.0, 1.5, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-34.0, 0.0, 37.5],
+      "scale": [4.0, 1.5, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [14.0, 0.0, 38.0],
+      "scale": [16.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-2.0, 0.0, 44.5],
+      "yaw": 90,
+      "scale": [6.5, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-2.0, 3.0, 54.0],
+      "yaw": 90,
+      "scale": [3.0, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-2.0, 0.0, 63.5],
+      "yaw": 90,
+      "scale": [6.5, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 0.0, 44.5],
+      "yaw": 90,
+      "scale": [6.5, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 3.0, 54.0],
+      "yaw": 90,
+      "scale": [3.0, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 0.0, 63.5],
+      "yaw": 90,
+      "scale": [6.5, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-2.0, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [4.5, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [10.75, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [17.25, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [23.5, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [30.0, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [30.0, 0.0, 70.0],
+      "scale": [1, 1.3333, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [14.0, 4.0, 54.0],
+      "scale": [16.0, 1, 16.0]
+    },
+    {
+      "piece": "platform",
+      "at": [7.5, 0.0, 46.75],
+      "scale": [1.5, 1, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [15.5, 0.0, 46.75],
+      "scale": [1.5, 1, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [7.5, 0.0, 62.75],
+      "scale": [1.5, 1, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [15.5, 0.0, 62.75],
+      "scale": [1.5, 1, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [25.5, 0.0, 46.75],
+      "scale": [1.5, 1, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [24.5, 0.0, 59.0],
+      "scale": [2.5, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [3.5, 0.0, 45.0],
+      "scale": [1.5, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [50.0, 0.0, 36.0],
+      "scale": [16.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [39.0, 0.0, 70.0],
+      "scale": [5.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [47.0, 3.0, 70.0],
+      "scale": [3.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [54.5, 0.0, 70.0],
+      "scale": [4.5, 2, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [60.0, 0.0, 70.0]
+    },
+    {
+      "piece": "wall",
+      "at": [60.0, 3.0, 70.0]
+    },
+    {
+      "piece": "wall",
+      "at": [63.5, 0.0, 70.0],
+      "scale": [2.5, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [34.0, 0.0, 53.0],
+      "yaw": 90,
+      "scale": [17.0, 2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [66.0, 0.0, 53.0],
+      "yaw": 90,
+      "scale": [17.0, 2, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [41.5, 6.0, 53.0],
+      "scale": [7.5, 1, 17.0]
+    },
+    {
+      "piece": "floor",
+      "at": [50.0, 6.0, 44.0],
+      "scale": [1.0, 1, 8.0]
+    },
+    {
+      "piece": "floor",
+      "at": [50.0, 6.0, 62.0],
+      "scale": [1.0, 1, 8.0]
+    },
+    {
+      "piece": "floor",
+      "at": [56.0, 6.0, 53.0],
+      "scale": [5.0, 1, 17.0]
+    },
+    {
+      "piece": "floor",
+      "at": [62.0, 6.0, 38.0],
+      "scale": [1.0, 1, 2.0]
+    },
+    {
+      "piece": "floor",
+      "at": [62.0, 6.0, 56.0],
+      "scale": [1.0, 1, 14.0]
+    },
+    {
+      "piece": "floor",
+      "at": [64.5, 6.0, 53.0],
+      "scale": [1.5, 1, 17.0]
+    },
+    {
+      "piece": "wall",
+      "at": [37.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [43.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [46.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [49.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [52.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [55.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58.0, 0.0, 41.0],
+      "yaw": 90,
+      "scale": [5.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [59.5, 0.0, 46.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [62.0, 0.0, 46.0]
+    },
+    {
+      "piece": "wall",
+      "at": [64.5, 0.0, 46.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [40.0, 0.0, 70.25],
+      "scale": [0.5, 6, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [46.0, 0.0, 65.0],
+      "scale": [2.0, 1.0, 1.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "crate",
+      "at": [62.0, 0.0, 40.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [80.0, 0.0, 31.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [86.0, 0.0, 31.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [92.0, 0.0, 31.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [80.0, 0.0, 45.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [86.0, 0.0, 45.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [92.0, 0.0, 45.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [82.0, 0.0, 59.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [90.0, 0.0, 59.0],
+      "scale": [2.0, 1, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [85.0, -4.0, 35.0],
+      "scale": [13.0, 1, 15.0]
+    },
+    {
+      "piece": "wall",
+      "at": [85.0, -4.0, 20.0],
+      "scale": [13.0, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [87.0, -4.0, 50.0],
+      "scale": [11.0, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [72.0, -4.0, 35.0],
+      "yaw": 90,
+      "scale": [15.0, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [98.0, -4.0, 35.0],
+      "yaw": 90,
+      "scale": [15.0, 1.3, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [80.0, -4.0, 27.0],
+      "scale": [2.0, 1.0, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [88.0, -4.0, 27.0],
+      "scale": [2.0, 1.0, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [93.0, -4.0, 36.0],
+      "scale": [1.0, 1.0, 2.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [80.0, -4.0, 41.0],
+      "scale": [2.0, 1.0, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [88.0, -4.0, 43.0],
+      "scale": [2.0, 1.0, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [74.0, -4.0, 91.5],
+      "scale": [2.0, 1, 41.5]
+    },
+    {
+      "piece": "wall",
+      "at": [72.0, -4.0, 91.5],
+      "yaw": 90,
+      "scale": [41.5, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, -4.0, 76.5],
+      "yaw": 90,
+      "scale": [26.5, 1.3, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [76.0, -4.0, 104.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, -1.0, 104.0],
+      "yaw": 90,
+      "scale": [1, 0.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, -4.0, 119.0],
+      "yaw": 90,
+      "scale": [14.0, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [72.5, -4.0, 133.0],
+      "scale": [0.5, 1.3, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [74.0, -4.0, 133.0]
+    },
+    {
+      "piece": "wall",
+      "at": [74.0, -1.0, 133.0],
+      "scale": [1, 0.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [75.5, -4.0, 133.0],
+      "scale": [0.5, 1.3, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [78.0, -4.0, 104.0],
+      "scale": [2.0, 1, 2.0]
+    },
+    {
+      "piece": "wall",
+      "at": [78.0, -4.0, 102.0],
+      "scale": [2.0, 1.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80.0, -4.0, 108.0],
+      "yaw": 90,
+      "scale": [6.0, 1.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [78.0, -4.0, 110.0],
+      "yaw": 90,
+      "scale": [4.0, 1.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, -4.0, 106.0],
+      "scale": [1.0, 1.4, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [79.0, -1.0, 113.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [79.0, -2.0, 111.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [79.0, -3.0, 109.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [79.0, -4.0, 107.0]
+    },
+    {
+      "piece": "floor",
+      "at": [74.0, -4.0, 135.5],
+      "scale": [2.0, 1, 2.5]
+    },
+    {
+      "piece": "wall",
+      "at": [72.0, -4.0, 135.5],
+      "yaw": 90,
+      "scale": [2.5, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, -4.0, 135.5],
+      "yaw": 90,
+      "scale": [2.5, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [73.0, -4.0, 142.0],
+      "yaw": 90,
+      "scale": [4.0, 1.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [75.0, -4.0, 142.0],
+      "yaw": 90,
+      "scale": [4.0, 1.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [72.5, -4.0, 138.0],
+      "scale": [0.5, 1.3, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [75.5, -4.0, 138.0],
+      "scale": [0.5, 1.3, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [74.0, -1.0, 145.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [74.0, -2.0, 143.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [74.0, -3.0, 141.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [74.0, -4.0, 139.0]
+    },
+    {
+      "piece": "floor",
+      "at": [74.0, 0.0, 114.0],
+      "scale": [4.0, 1, 14.0]
+    },
+    {
+      "piece": "floor",
+      "at": [81.0, 0.0, 114.0],
+      "scale": [1.0, 1, 14.0]
+    },
+    {
+      "piece": "floor",
+      "at": [79.0, 0.0, 103.0],
+      "scale": [1.0, 1, 3.0]
+    },
+    {
+      "piece": "floor",
+      "at": [79.0, 0.0, 121.0],
+      "scale": [1.0, 1, 7.0]
+    },
+    {
+      "piece": "floor",
+      "at": [67.5, 0.0, 143.0],
+      "scale": [5.5, 1, 15.0]
+    },
+    {
+      "piece": "floor",
+      "at": [82.5, 0.0, 143.0],
+      "scale": [7.5, 1, 15.0]
+    },
+    {
+      "piece": "floor",
+      "at": [74.0, 0.0, 133.0],
+      "scale": [1.0, 1, 5.0]
+    },
+    {
+      "piece": "floor",
+      "at": [74.0, 0.0, 152.0],
+      "scale": [1.0, 1, 6.0]
+    },
+    {
+      "piece": "wall",
+      "at": [69.0, 0.0, 128.0],
+      "scale": [7.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [86.0, 0.0, 128.0],
+      "scale": [4.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, 0.0, 158.0],
+      "scale": [14.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62.0, 0.0, 143.0],
+      "yaw": 90,
+      "scale": [15.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0.0, 143.0],
+      "yaw": 90,
+      "scale": [15.0, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [79.0, 0.0, 153.0],
+      "scale": [5.0, 1.0, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [66.5, 0.0, 147.0],
+      "scale": [1.5, 1.0, 1.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [84.5, 0.0, 145.0],
+      "scale": [1.5, 1.0, 1.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "wall",
+      "at": [-93.0, 0.0, 44.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-89.0, 0.0, 44.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-89.0, 3.0, 44.0],
+      "scale": [1, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-85.0, 0.0, 44.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-89.0, 0.0, 56.0],
+      "scale": [7.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-96.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-82.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-89.0, 4.0, 50.0],
+      "scale": [7.0, 1, 6.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-75.0, 0.0, 44.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-71.0, 0.0, 44.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-71.0, 3.0, 44.0],
+      "scale": [1, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-67.0, 0.0, 44.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-71.0, 0.0, 56.0],
+      "scale": [7.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-78.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-64.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-71.0, 4.0, 50.0],
+      "scale": [7.0, 1, 6.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-57.0, 0.0, 44.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-53.0, 0.0, 44.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-53.0, 3.0, 44.0],
+      "scale": [1, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-49.0, 0.0, 44.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-53.0, 0.0, 56.0],
+      "scale": [7.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-60.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-46.0, 0.0, 50.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-53.0, 4.0, 50.0],
+      "scale": [7.0, 1, 6.0]
+    },
+    {
+      "piece": "floor",
+      "at": [-80.0, 4.0, 50.0],
+      "scale": [2.0, 1, 1.0]
+    },
+    {
+      "piece": "floor",
+      "at": [-62.0, 4.0, 50.0],
+      "scale": [2.0, 1, 1.0]
+    },
+    {
+      "piece": "platform",
+      "at": [-92.0, 0.0, 43.75],
+      "scale": [0.5, 4, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    },
+    {
+      "piece": "stairs",
+      "at": [-45.0, 4.0, 50.0],
+      "yaw": 90
+    },
+    {
+      "piece": "stairs",
+      "at": [-43.0, 5.0, 50.0],
+      "yaw": 90
+    },
+    {
+      "piece": "floor",
+      "at": [-41.0, 6.0, 50.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-87.0, 0.0, 110.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-83.0, 0.0, 110.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-83.0, 3.0, 110.0],
+      "scale": [1, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-79.0, 0.0, 110.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-83.0, 0.0, 122.0],
+      "scale": [7.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-90.0, 0.0, 116.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-76.0, 0.0, 116.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-63.0, 0.0, 110.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [-59.0, 0.0, 110.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-59.0, 3.0, 110.0],
+      "scale": [1, 0.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-55.0, 0.0, 110.0],
+      "scale": [3.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-59.0, 0.0, 122.0],
+      "scale": [7.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-66.0, 0.0, 116.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-52.0, 0.0, 116.0],
+      "yaw": 90,
+      "scale": [6.0, 1.3333, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [-68.0, 0.0, 21.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-62.0, 0.0, 23.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-56.0, 0.0, 21.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-74.0, 0.0, 25.0],
+      "scale": [2.0, 1.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "stairs",
+      "at": [35.0, 0.0, 101.0]
+    },
+    {
+      "piece": "stairs",
+      "at": [35.0, 1.0, 103.0]
+    },
+    {
+      "piece": "floor",
+      "at": [35.0, 2.0, 105.0]
+    },
+    {
+      "piece": "platform",
+      "at": [35.0, -6.0, 126.0],
+      "scale": [5, 8, 20],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [31.0, 2.0, 126.0],
+      "yaw": 90,
+      "scale": [20.0, 0.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [39.0, 2.0, 126.0],
+      "yaw": 90,
+      "scale": [20.0, 0.4, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [35.0, 2.0, 146.0],
+      "scale": [4.0, 0.4, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [35.0, 2.0, 112.0],
+      "scale": [1, 4.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [35.0, 2.0, 124.0],
+      "scale": [1, 4.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [35.0, 2.0, 136.0],
+      "scale": [1, 4.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [32.5, 2.0, 138.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [35.0, 2.0, 138.0]
+    },
+    {
+      "piece": "wall",
+      "at": [37.5, 2.0, 138.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [35.0, 2.0, 146.0],
+      "scale": [4.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [31.0, 2.0, 142.0],
+      "yaw": 90,
+      "scale": [4.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [39.0, 2.0, 142.0],
+      "yaw": 90,
+      "scale": [4.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [33.5, 2.0, 142.0],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [37.0, 2.0, 142.0]
+    },
+    {
+      "piece": "wall",
+      "at": [38.5, 2.0, 142.0],
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [36.5, 2.0, 124.5],
+      "scale": [0.5, 10, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [36.75, 11.75, 124.5],
+      "scale": [1.25, 0.25, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [32.0, 0.0, 99.0],
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [38.0, 0.0, 99.0],
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 0.0, 99.5],
+      "yaw": 90,
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40.0, 0.0, 99.5],
+      "yaw": 90,
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [35.0, 0.0, 99.0]
+    },
+    {
+      "piece": "platform",
+      "at": [-79.0, 0.0, 12.5],
+      "scale": [1.0, 1.2, 0.5],
+      "purpose": "blocking"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0.0, 0.0, 90.0],
+      "yaw": 0,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "wharf-view",
+      "at": [-34.0, 0.0, 78.0],
+      "yaw": 90,
+      "tags": ["view"]
+    },
+    {
+      "id": "towpath-arrival",
+      "at": [-85.0, 0.0, 6.0],
+      "yaw": 0,
+      "tags": ["arrival", "towpath"]
+    },
+    {
+      "id": "barge-berth",
+      "at": [-9.0, -2.0, 108.0],
+      "yaw": 0,
+      "tags": ["arrival", "barge"]
+    },
+    {
+      "id": "door-exit-towpath",
+      "at": [-85.0, 0.0, 0.0],
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "road-not-open"
+      }
+    },
+    {
+      "id": "exit-towpath",
+      "at": [-85.0, 0.0, 3.0],
+      "yaw": 180,
+      "tags": ["exit-stub", "planned:mw-e40.26"]
+    },
+    {
+      "id": "sign-exit-towpath",
+      "at": [-83.5, 1.25, 2.5],
+      "tags": ["sign", "exit-stub"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the towpath to Kestrel Lock"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "stone-wharf",
+      "at": [0.0, 0.0, 86.0],
+      "tags": ["node", "region"]
+    },
+    {
+      "id": "tidemarket",
+      "at": [14.0, 0.0, 54.0],
+      "tags": ["node", "market"]
+    },
+    {
+      "id": "customs-house",
+      "at": [-23.0, 0.0, 56.0],
+      "tags": ["node"]
+    },
+    {
+      "id": "bonded-warehouse",
+      "at": [50.0, 0.0, 56.0],
+      "tags": ["node"]
+    },
+    {
+      "id": "drowned-gull",
+      "at": [78.0, 0.0, 148.0],
+      "tags": ["node", "tavern"]
+    },
+    {
+      "id": "undertow",
+      "at": [86.0, -4.0, 36.0],
+      "tags": ["node", "black-market"]
+    },
+    {
+      "id": "net-lofts",
+      "at": [-71.0, 4.0, 50.0],
+      "tags": ["node", "roof"]
+    },
+    {
+      "id": "gilded-tern",
+      "at": [35.0, 2.0, 118.0],
+      "tags": ["node", "ship"]
+    },
+    {
+      "id": "breakwater",
+      "at": [76.0, 0.0, 115.0],
+      "tags": ["node"]
+    },
+    {
+      "id": "customs-entry",
+      "at": [-23.0, 0.0, 68.0],
+      "yaw": 180,
+      "tags": ["entry"]
+    },
+    {
+      "id": "tidemarket-entry",
+      "at": [14.0, 0.0, 68.0],
+      "yaw": 180,
+      "tags": ["entry"]
+    },
+    {
+      "id": "warehouse-entry",
+      "at": [47.0, 0.0, 68.0],
+      "yaw": 180,
+      "tags": ["entry"]
+    },
+    {
+      "id": "warehouse-dockhand-door",
+      "at": [60.0, 0.0, 68.0],
+      "yaw": 180,
+      "tags": ["entry", "door-stub"]
+    },
+    {
+      "id": "gull-entry",
+      "at": [79.0, 0.0, 126.0],
+      "yaw": 0,
+      "tags": ["entry"]
+    },
+    {
+      "id": "net-loft-entry-a",
+      "at": [-89.0, 0.0, 42.0],
+      "yaw": 0,
+      "tags": ["entry"]
+    },
+    {
+      "id": "net-loft-entry-b",
+      "at": [-71.0, 0.0, 42.0],
+      "yaw": 0,
+      "tags": ["entry"]
+    },
+    {
+      "id": "net-loft-entry-c",
+      "at": [-53.0, 0.0, 42.0],
+      "yaw": 0,
+      "tags": ["entry"]
+    },
+    {
+      "id": "tern-gangway",
+      "at": [35.0, 0.0, 98.0],
+      "yaw": 0,
+      "tags": ["entry", "ship"]
+    },
+    {
+      "id": "breakwater-door-landing",
+      "at": [78.0, -4.0, 104.0],
+      "yaw": 270,
+      "tags": ["entry", "undertow-entry"]
+    },
+    {
+      "id": "gull-cellar-landing",
+      "at": [74.0, -4.0, 135.5],
+      "yaw": 180,
+      "tags": ["entry", "undertow-entry"]
+    },
+    {
+      "id": "customs-office-door",
+      "at": [-17.5, 0.0, 43.0],
+      "yaw": 270,
+      "tags": ["entry"]
+    },
+    {
+      "id": "door-customs-office",
+      "at": [-16.0, 0.0, 43.0],
+      "yaw": 90,
+      "tags": [],
+      "door": {
+        "profile": "wooden-door"
+      }
+    },
+    {
+      "id": "door-strongroom",
+      "at": [-28.0, 0.0, 43.0],
+      "yaw": 90,
+      "tags": [],
+      "door": {
+        "profile": "iron-door",
+        "lock": "strongroom-locked"
+      }
+    },
+    {
+      "id": "door-warehouse-dockhand",
+      "at": [60.0, 0.0, 70.0],
+      "tags": [],
+      "door": {
+        "profile": "wooden-door"
+      }
+    },
+    {
+      "id": "door-bay-nine",
+      "at": [62.0, 0.0, 46.0],
+      "tags": [],
+      "door": {
+        "profile": "iron-door",
+        "lock": "bay-nine-seal"
+      }
+    },
+    {
+      "id": "door-silver-quay-gate",
+      "at": [82.0, 0.0, 88.0],
+      "yaw": 90,
+      "tags": [],
+      "door": {
+        "profile": "iron-door",
+        "lock": "silver-quay-sealed"
+      }
+    },
+    {
+      "id": "door-tern-gangway",
+      "at": [35.0, 0.0, 99.0],
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "tern-gangway"
+      }
+    },
+    {
+      "id": "door-tern-cabin",
+      "at": [35.0, 2.0, 138.0],
+      "tags": [],
+      "door": {
+        "profile": "wooden-door"
+      }
+    },
+    {
+      "id": "door-tern-berth",
+      "at": [37.0, 2.0, 142.0],
+      "tags": [],
+      "door": {
+        "profile": "iron-door",
+        "lock": "tern-berth"
+      }
+    },
+    {
+      "id": "door-breakwater-undertow",
+      "at": [76.0, -4.0, 104.0],
+      "yaw": 90,
+      "tags": [],
+      "door": {
+        "profile": "iron-door",
+        "lock": "breakwater-door"
+      }
+    },
+    {
+      "id": "door-gull-trapdoor",
+      "at": [74.0, -4.0, 133.0],
+      "tags": [],
+      "door": {
+        "profile": "wooden-door",
+        "lock": "undertow-trapdoor"
+      }
+    },
+    {
+      "id": "tidefair-flagstones",
+      "at": [10.0, 0.0, 88.0],
+      "tags": ["marker", "contest-ground"]
+    },
+    {
+      "id": "crane-a",
+      "at": [22.0, 0.0, 94.0],
+      "tags": ["crane-stub", "puzzle-stub:wharf-cranes"]
+    },
+    {
+      "id": "crane-b",
+      "at": [46.0, 0.0, 94.0],
+      "tags": ["crane-stub", "puzzle-stub:wharf-cranes"]
+    },
+    {
+      "id": "cargo-net-a",
+      "at": [23.0, 2.0, 91.0],
+      "tags": ["cargo-net-stub", "archer-route"]
+    },
+    {
+      "id": "cargo-net-b",
+      "at": [47.0, 2.0, 91.0],
+      "tags": ["cargo-net-stub", "archer-route"]
+    },
+    {
+      "id": "block-yard-east",
+      "at": [56.0, 0.0, 86.0],
+      "tags": ["yard"]
+    },
+    {
+      "id": "block-yard-west",
+      "at": [-64.0, 0.0, 28.0],
+      "tags": ["yard"]
+    },
+    {
+      "id": "silver-quay",
+      "at": [92.0, 0.0, 88.0],
+      "tags": ["landmark", "seen-not-entered"]
+    },
+    {
+      "id": "imperial-guard-a",
+      "at": [85.0, 0.0, 86.0],
+      "tags": ["guard-stub", "imperial"]
+    },
+    {
+      "id": "imperial-guard-b",
+      "at": [85.0, 0.0, 90.0],
+      "tags": ["guard-stub", "imperial"]
+    },
+    {
+      "id": "patient-ann",
+      "at": [-14.0, -2.0, 109.0],
+      "tags": ["landmark", "barge"]
+    },
+    {
+      "id": "lighter-dock",
+      "at": [28.0, 0.0, 97.0],
+      "tags": ["lighter-stub", "gilded-tern-route"]
+    },
+    {
+      "id": "pool-ladder-a",
+      "at": [-30.0, -6.0, 101.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "pool-ladder-b",
+      "at": [50.0, -6.0, 101.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "pool-ladder-c",
+      "at": [-39.0, -6.0, 130.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "pool-ladder-d",
+      "at": [69.0, -6.0, 114.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "pool-ice-walk",
+      "at": [30.0, -2.5, 118.0],
+      "tags": ["marker", "sorcerer-route", "gilded-tern-route"]
+    },
+    {
+      "id": "customs-scale",
+      "at": [-23.0, 0.5, 57.5],
+      "tags": ["prop", "customs"]
+    },
+    {
+      "id": "customs-office",
+      "at": [-11.0, 0.0, 43.0],
+      "tags": ["marker", "customs"]
+    },
+    {
+      "id": "cray-shelf",
+      "at": [-11.0, 0.0, 47.5],
+      "tags": ["lore", "customs"]
+    },
+    {
+      "id": "strongroom",
+      "at": [-34.0, 0.0, 43.0],
+      "tags": ["marker", "strongroom", "sealed"]
+    },
+    {
+      "id": "strongroom-grille",
+      "at": [-28.0, 1.5, 40.0],
+      "yaw": 90,
+      "tags": ["marker", "strongroom", "sorcerer-route"]
+    },
+    {
+      "id": "confiscated-books",
+      "at": [-34.0, 0.0, 38.5],
+      "tags": ["lore", "strongroom"]
+    },
+    {
+      "id": "customs-roof-hatch",
+      "at": [-34.0, 6.0, 43.0],
+      "tags": ["marker", "roof", "thief-route"]
+    },
+    {
+      "id": "arms-stall",
+      "at": [24.5, 0.0, 59.0],
+      "tags": ["stall", "shop"]
+    },
+    {
+      "id": "book-cart",
+      "at": [4.0, 0.0, 47.0],
+      "tags": ["stall", "shop"]
+    },
+    {
+      "id": "spice-stall",
+      "at": [7.0, 0.0, 47.0],
+      "tags": ["stall"]
+    },
+    {
+      "id": "silk-stall",
+      "at": [15.0, 0.0, 47.0],
+      "tags": ["stall"]
+    },
+    {
+      "id": "manifest-desk",
+      "at": [46.0, 0.0, 64.0],
+      "yaw": 180,
+      "tags": ["desk", "bay-nine"]
+    },
+    {
+      "id": "night-watchman-post",
+      "at": [42.0, 0.0, 60.0],
+      "tags": ["guard-stub", "bay-nine"]
+    },
+    {
+      "id": "bay-nine",
+      "at": [62.0, 0.0, 42.0],
+      "tags": ["marker", "bay-nine", "sealed"]
+    },
+    {
+      "id": "bay-nine-crate",
+      "at": [62.0, 0.5, 40.0],
+      "tags": ["prop", "bay-nine", "heist-crate"]
+    },
+    {
+      "id": "skylight-hall",
+      "at": [50.0, 6.0, 53.0],
+      "tags": ["marker", "skylight", "thief-route"]
+    },
+    {
+      "id": "skylight-bay-nine",
+      "at": [62.0, 6.0, 41.0],
+      "tags": ["marker", "skylight", "thief-route"]
+    },
+    {
+      "id": "hoist-beam-a",
+      "at": [54.0, 5.5, 62.0],
+      "tags": ["marker", "hoist", "bay-nine"]
+    },
+    {
+      "id": "hoist-beam-b",
+      "at": [62.0, 5.5, 50.0],
+      "tags": ["marker", "hoist", "bay-nine"]
+    },
+    {
+      "id": "hoist-strap",
+      "at": [62.0, 5.0, 44.0],
+      "tags": ["marker", "hoist", "archer-route"]
+    },
+    {
+      "id": "warehouse-climb-foot",
+      "at": [40.0, 0.0, 71.5],
+      "yaw": 180,
+      "tags": ["climb-route"]
+    },
+    {
+      "id": "undertow-wet-bootprints-a",
+      "at": [74.0, -4.0, 62.0],
+      "tags": ["marker", "tracking-trail"]
+    },
+    {
+      "id": "undertow-wet-bootprints-b",
+      "at": [74.0, -4.0, 118.0],
+      "tags": ["marker", "tracking-trail"]
+    },
+    {
+      "id": "stamp-forger",
+      "at": [88.0, -4.0, 30.0],
+      "tags": ["stall", "undertow"]
+    },
+    {
+      "id": "tool-seller",
+      "at": [80.0, -4.0, 27.0],
+      "tags": ["stall", "undertow"]
+    },
+    {
+      "id": "book-smuggler",
+      "at": [94.0, -4.0, 38.0],
+      "tags": ["stall", "undertow"]
+    },
+    {
+      "id": "fish-market",
+      "at": [84.0, 0.0, 40.0],
+      "tags": ["marker", "market"]
+    },
+    {
+      "id": "gull-bar",
+      "at": [79.0, 0.0, 151.0],
+      "yaw": 180,
+      "tags": ["bar", "tavern"]
+    },
+    {
+      "id": "arm-wrestling-table",
+      "at": [66.5, 0.0, 147.0],
+      "tags": ["contest", "tavern"]
+    },
+    {
+      "id": "dice-table",
+      "at": [84.5, 0.0, 145.0],
+      "tags": ["contest", "tavern"]
+    },
+    {
+      "id": "breakwater-cellar-hatch",
+      "at": [74.0, 0.0, 146.5],
+      "tags": ["marker", "undertow-entry"]
+    },
+    {
+      "id": "sunken-figurehead",
+      "at": [60.0, -6.0, 118.0],
+      "tags": ["marker", "landmark", "sea-serpent"]
+    },
+    {
+      "id": "sea-door",
+      "at": [82.0, 0.0, 120.0],
+      "yaw": 90,
+      "tags": ["door-stub", "puzzle-stub:sea-door"]
+    },
+    {
+      "id": "tide-gauge",
+      "at": [76.0, 0.0, 104.0],
+      "tags": ["marker", "tides"]
+    },
+    {
+      "id": "net-loft-roof-a",
+      "at": [-89.0, 4.0, 50.0],
+      "tags": ["roof"]
+    },
+    {
+      "id": "net-loft-roof-c",
+      "at": [-53.0, 4.0, 50.0],
+      "tags": ["roof"]
+    },
+    {
+      "id": "net-loft-climb-foot",
+      "at": [-92.0, 0.0, 41.5],
+      "yaw": 0,
+      "tags": ["climb-route"]
+    },
+    {
+      "id": "net-loft-roof-view",
+      "at": [-89.0, 4.0, 53.0],
+      "yaw": 90,
+      "tags": ["roof", "view"]
+    },
+    {
+      "id": "roof-route-customs",
+      "at": [-41.0, 6.0, 50.0],
+      "tags": ["marker", "roof", "thief-route"]
+    },
+    {
+      "id": "tern-berth",
+      "at": [37.0, 2.0, 144.0],
+      "tags": ["marker", "ship", "sealed"]
+    },
+    {
+      "id": "tern-rigging-foot",
+      "at": [36.5, 2.0, 123.5],
+      "yaw": 180,
+      "tags": ["climb-route", "ship"]
+    },
+    {
+      "id": "tern-crows-nest",
+      "at": [37.0, 12.0, 124.5],
+      "tags": ["marker", "ship", "thief-route"]
+    },
+    {
+      "id": "tern-hold-hatch",
+      "at": [35.0, 2.0, 130.0],
+      "tags": ["marker", "ship"]
+    },
+    {
+      "id": "tern-cargo-hoist",
+      "at": [35.0, 2.0, 108.0],
+      "tags": ["marker", "ship", "archer-route"]
+    },
+    {
+      "id": "toll-board",
+      "at": [-79.0, 1.25, 12.5],
+      "yaw": 180,
+      "tags": ["sign", "toll"]
+    },
+    {
+      "id": "npc-mags",
+      "at": [-9.5, -1.75, 106.0],
+      "yaw": 90,
+      "tags": ["npc", "barge"],
+      "creature": "npc-mags",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-reed",
+      "at": [-82.0, 0.0, 10.0],
+      "yaw": 90,
+      "tags": ["npc", "toll"],
+      "creature": "npc-reed",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-nell",
+      "at": [79.0, 0.0, 155.5],
+      "yaw": 180,
+      "tags": ["npc", "tavern"],
+      "creature": "npc-nell",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-oona",
+      "at": [64.0, 0.0, 147.0],
+      "yaw": 90,
+      "tags": ["npc", "tavern"],
+      "creature": "npc-oona",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-cray",
+      "at": [-12.0, 0.0, 40.0],
+      "yaw": 270,
+      "tags": ["npc", "customs"],
+      "creature": "npc-cray",
+      "leash": {
+        "radius": 2
+      }
+    },
+    {
+      "id": "npc-tereza",
+      "at": [24.5, 0.0, 56.5],
+      "yaw": 0,
+      "tags": ["npc", "shop"],
+      "creature": "npc-tereza",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "npc-quell",
+      "at": [46.0, 0.0, 62.5],
+      "yaw": 0,
+      "tags": ["npc", "agent"],
+      "creature": "npc-quell",
+      "leash": {
+        "radius": 1.5
+      },
+      "despawnIf": {
+        "fact": "quell.left"
+      }
+    },
+    {
+      "id": "npc-hesketh",
+      "at": [35.0, 0.0, 96.0],
+      "yaw": 0,
+      "tags": ["npc", "ship"],
+      "creature": "npc-hesketh",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "harbour-pool-a",
+      "at": [-23.75, -6.0, 130.0],
+      "tags": ["pool", "standing-water"],
+      "liquid": {
+        "size": [32.5, 3.5, 60],
+        "liquid": "water",
+        "depth": 3.5
+      }
+    },
+    {
+      "id": "harbour-pool-b",
+      "at": [8.75, -6.0, 130.0],
+      "tags": ["pool", "standing-water"],
+      "liquid": {
+        "size": [32.5, 3.5, 60],
+        "liquid": "water",
+        "depth": 3.5
+      }
+    },
+    {
+      "id": "harbour-pool-c",
+      "at": [47.5, -6.0, 130.0],
+      "tags": ["pool", "standing-water"],
+      "liquid": {
+        "size": [45, 3.5, 60],
+        "liquid": "water",
+        "depth": 3.5
+      }
+    },
+    {
+      "id": "open-sea",
+      "at": [91.0, -6.0, 130.0],
+      "tags": ["pool", "standing-water", "sea"],
+      "liquid": {
+        "size": [18, 3.5, 60],
+        "liquid": "water",
+        "depth": 3.5
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.32,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [0.3, -1, 0.4],
+        "level": 0.3,
+        "reach": 90
+      }
+    ],
+    "timeOfDay": {
+      "keyframes": [
+        {
+          "minute": 0,
+          "ambient": 0.12,
+          "directional": 0.08,
+          "sky": "#0B0F1E"
+        },
+        {
+          "minute": 300,
+          "ambient": 0.14,
+          "directional": 0.08,
+          "sky": "#17203A"
+        },
+        {
+          "minute": 390,
+          "ambient": 0.32,
+          "directional": 0.22,
+          "sky": "#8A8FA8"
+        },
+        {
+          "minute": 480,
+          "ambient": 0.6,
+          "directional": 0.6,
+          "sky": "#A9C7DC"
+        },
+        {
+          "minute": 1020,
+          "ambient": 0.6,
+          "directional": 0.6,
+          "sky": "#A9C7DC"
+        },
+        {
+          "minute": 1110,
+          "ambient": 0.34,
+          "directional": 0.28,
+          "sky": "#D08A60"
+        },
+        {
+          "minute": 1260,
+          "ambient": 0.16,
+          "directional": 0.1,
+          "sky": "#10142A"
+        }
+      ]
+    }
+  },
+  "environment": {
+    "sky": "#A9C7DC",
+    "fog": {
+      "color": "#C5D3DC",
+      "near": 80,
+      "far": 260
+    }
+  },
+  "regions": [
+    {
+      "id": "wendmouth-harbour",
+      "min": [-100, -8, 0],
+      "max": [100, 40, 160],
+      "tags": ["region", "harbour"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "wendmouth-arrival"
+    },
+    {
+      "graph": "wendmouth-areas"
+    }
+  ],
+  "transitions": []
+}

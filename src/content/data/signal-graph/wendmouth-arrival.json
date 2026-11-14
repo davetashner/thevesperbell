@@ -1,0 +1,105 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "wendmouth-arrival",
+  "name": "Wendmouth arrival",
+  "notes": "The first time the player steps into Wendmouth (scene wendmouth-harbour, mw-e39.32) the latch writes wendmouth.visited = true and keeps it, so leaving never undoes it. That fact gates Dot's hearsay about Mags and Nell (dot-sleeping-ox). Three volumes cover the ways in: the towpath arrival just inside the south gate, the barge berth landing, and the Stone Wharf start (a debug load straight into the scene). When the river legs are built (mw-e40.26) the barge and towpath arrivals land inside the first two.",
+  "nodes": [
+    {
+      "id": "towpath-end",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": -85,
+          "y": 1,
+          "z": 8
+        },
+        "halfExtents": {
+          "x": 5,
+          "y": 2,
+          "z": 6
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "barge-end",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": -4,
+          "y": -1,
+          "z": 107
+        },
+        "halfExtents": {
+          "x": 10,
+          "y": 2,
+          "z": 6
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "wharf-start",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 0,
+          "y": 1,
+          "z": 90
+        },
+        "halfExtents": {
+          "x": 6,
+          "y": 2,
+          "z": 6
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "arrived",
+      "kind": "latch"
+    },
+    {
+      "id": "visited-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "wendmouth.visited"
+    }
+  ],
+  "wires": [
+    {
+      "from": "towpath-end.enter",
+      "to": "arrived.set"
+    },
+    {
+      "from": "barge-end.enter",
+      "to": "arrived.set"
+    },
+    {
+      "from": "wharf-start.enter",
+      "to": "arrived.set"
+    },
+    {
+      "from": "arrived",
+      "to": "visited-fact"
+    }
+  ]
+}

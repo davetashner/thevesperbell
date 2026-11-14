@@ -160,6 +160,7 @@ describe('fact checks', () => {
       'chapel-of-echoes.portcullis-dropped',
       'kestrel-lock.gate-open',
       'slice.complete',
+      'wendmouth.visited',
     ]);
   });
 
