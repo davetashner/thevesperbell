@@ -500,6 +500,134 @@ describe('contests in progress (mw-opf6)', () => {
     expect(t.toasts).toEqual(['You lost the contest, placing 9. (gold:short)', 'odd']);
   });
 
+  it('a controller over a contest already running will not open another entry window', () => {
+    const first = setup();
+    first.installed.runner.enter(ARM, 0);
+    const again = new ContestController({
+      ui: first.ui,
+      world: first.world,
+      player: first.player,
+      runner: first.installed.runner,
+      contests: defs,
+      host: first.host,
+      publish: () => undefined,
+    });
+    expect(again.start(DICE)).toBe(false);
+    expect(again.isOpen).toBe(false);
+    again.dispose();
+  });
+
+  it('an interaction with something that is not a scene spawn does nothing', () => {
+    const t = setup();
+    const bare = t.world.spawn();
+    t.world.events.emit(interacted, { actor: t.player, target: bare, verb: 'use', affordance: 0 });
+    t.world.events.flush();
+    t.controller.afterStep();
+    expect(t.controller.isOpen).toBe(false);
+  });
+
+  it('the offer sums only positive gold payouts; a contest without a target has no "first to"', () => {
+    const t = setup();
+    const finish = { ...def(ARM).finish, firstTo: undefined };
+    const book = def(ARM).betting;
+    if (book === undefined) throw new Error('no book');
+    const odd = {
+      ...def(ARM),
+      finish,
+      betting: {
+        ...book,
+        throwMatch: {
+          grudge: [],
+          payout: [
+            { kind: 'disposition', npc: 'npc-nell', delta: 3 },
+            { kind: 'gold' },
+            { kind: 'gold', delta: -4 },
+            { kind: 'gold', delta: 6 },
+          ],
+        },
+      },
+    } as unknown as ContestEntry;
+    const c = new ContestController({
+      ui: t.ui,
+      world: t.world,
+      player: t.player,
+      runner: t.installed.runner,
+      contests: [odd],
+      host: t.host,
+      publish: () => undefined,
+    });
+    expect(c.start(ARM)).toBe(true);
+    expect(el('[data-choice=throw]').textContent).toContain('offers 6 crowns');
+    expect(el('[data-testid=contest-window]').textContent).not.toContain('First to');
+    c.dispose();
+  });
+
+  describe('with a runner that refuses', () => {
+    type Runner = ReturnType<typeof setup>['installed']['runner'];
+    /** The real runner with some answers replaced. */
+    const fake = (real: Runner, over: Record<string, unknown>): Runner =>
+      new Proxy(real, {
+        get: (target, key) => {
+          if (key in over) return over[key as string];
+          const value: unknown = Reflect.get(target, key);
+          return typeof value === 'function' ? (value as () => unknown).bind(target) : value;
+        },
+      });
+    const control = (t: ReturnType<typeof setup>, over: Record<string, unknown>) =>
+      new ContestController({
+        ui: t.ui,
+        world: t.world,
+        player: t.player,
+        runner: fake(t.installed.runner, over),
+        contests: defs,
+        host: t.host,
+        toast: (text) => t.toasts.push(text),
+        publish: () => undefined,
+      });
+
+    it('an unknown refusal reason is shown as it is when opening the window', () => {
+      const t = setup();
+      const c = control(t, { canEnter: () => ({ ok: false, reason: 'strange' }) });
+      expect(c.start(ARM)).toBe(false);
+      expect(t.toasts).toEqual(['strange']);
+      c.dispose();
+    });
+
+    it('an unknown refusal reason is shown as it is when entering', () => {
+      const t = setup();
+      const c = control(t, { enter: () => ({ ok: false, reason: 'odd-reason' }) });
+      c.start(ARM);
+      t.click('[data-action=enter]');
+      expect(el('[data-testid=contest-status]').textContent).toBe('odd-reason');
+      c.dispose();
+    });
+
+    it('a bet the book will not take is reported but the contest goes on; unknown standings show their id', () => {
+      const t = setup();
+      let entered = false;
+      const c = control(t, {
+        enter: () => {
+          entered = true;
+          return { ok: true };
+        },
+        bet: () => ({ ok: false, reason: 'closed' }),
+        isActive: () => entered,
+        standings: () => [
+          { id: 'player', score: 1 },
+          { id: 'ghost', score: 2 },
+        ],
+      });
+      c.start(ARM);
+      t.click('[data-choice=throw]');
+      t.click('[data-action=enter]');
+      expect(t.toasts).toEqual(['The bet was not taken (closed).']);
+      expect(c.playing).toBe(ARM);
+      const rows = [...document.querySelectorAll('[data-testid=contest-rows]')];
+      expect(rows.map((r) => r.textContent).join('|')).toContain('ghost');
+      c.dispose();
+    });
+  });
+
   it('names and games come from content', () => {
     expect(npcName('npc-big-oona')).toBe('Big oona');
     expect(gameOf(def(ARM))).toBe('armwrestle');

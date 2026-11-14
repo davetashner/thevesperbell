@@ -127,6 +127,7 @@ export class ContestController {
   #playing:
     | {
         readonly id: string;
+        readonly def: ContestEntry;
         presses: number;
         message: string;
         anchor: Vec3 | undefined;
@@ -158,8 +159,10 @@ export class ContestController {
       }),
     );
     // A contest carried across a transition or loaded from a save carries on.
-    for (const id of this.#defs.keys()) {
-      if (runner.isActive(id)) this.#playing = { id, presses: 0, message: '', anchor: undefined };
+    for (const [id, def] of this.#defs) {
+      if (runner.isActive(id)) {
+        this.#playing = { id, def, presses: 0, message: '', anchor: undefined };
+      }
     }
     this.#publish();
   }
@@ -237,8 +240,7 @@ export class ContestController {
   keydown(event: ContestKey): boolean {
     const playing = this.#playing;
     if (playing === undefined || this.#options.ui.top !== undefined) return false;
-    const def = this.#defs.get(playing.id);
-    if (def === undefined) return false;
+    const { def } = playing;
     if (event.code === LEAVE_KEY) {
       if (event.repeat !== true) this.#options.runner.forfeit(playing.id);
       return true;
@@ -297,6 +299,7 @@ export class ContestController {
     if (!placed.ok) this.#options.toast?.(`The bet was not taken (${placed.reason}).`);
     this.#playing = {
       id: def.id,
+      def,
       presses: 0,
       message: choice.kind === 'throw' ? 'The deal is struck. Do not make it look easy.' : '',
       anchor: positionOf?.(player),
@@ -351,9 +354,13 @@ export class ContestController {
     if (metres > WALK_AWAY_METRES) runner.forfeit(playing.id);
   }
 
-  #model(playing: { id: string; presses: number; message: string }): ContestHudModel | undefined {
-    const def = this.#defs.get(playing.id);
-    if (def === undefined) return undefined;
+  #model(playing: {
+    id: string;
+    def: ContestEntry;
+    presses: number;
+    message: string;
+  }): ContestHudModel {
+    const { def } = playing;
     const names = new Map(def.participants.map((p) => [p.id, p.name]));
     const game = gameOf(def);
     const keyName = (code: string): string => code.slice(3);
@@ -384,11 +391,11 @@ export class ContestController {
     if (this.#playing !== undefined && !this.#options.runner.isActive(this.#playing.id))
       this.#playing = undefined;
     const playing = this.#playing;
-    const model = playing === undefined ? undefined : this.#model(playing);
-    if (model === undefined) {
+    if (playing === undefined) {
       this.#hud.hide();
       this.#shown = '';
     } else {
+      const model = this.#model(playing);
       const json = JSON.stringify(model);
       if (json !== this.#shown) {
         this.#shown = json;

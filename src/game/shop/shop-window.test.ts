@@ -1024,3 +1024,12 @@ describe('the Bridgeward College: lessons on the Services tab (mw-ju8.13, mw-ju8
     );
   });
 });
+
+describe('the shop UI toast (mw-opf6)', () => {
+  it('shows a message on the toast layer for other screens', () => {
+    document.body.innerHTML = '';
+    const t = setup();
+    t.shop.toast('A word from the contest.');
+    expect(document.querySelector('.vb-toast')?.textContent).toBe('A word from the contest.');
+  });
+});
