@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "juniper-fenn",
-  "notes": "Juniper Fenn (bible 5.6), fletcher and herbalist, laconic, sunburnt, knows the Briarwood. Fears fire; the silence of the wolves frightens her more than howling. Secret: her sleep-draughts make the song easier to follow, and she has just worked it out (option ask-draughts). Class reactions per bible: archer peer, knight 'you'll clank', sorcerer trades herbs for Nature scraps, thief gets poisons only after a favour (the thief option checks disposition >= 10, which the draught talk can raise). Merchant greeting and farewell lines vary by class; the counter itself is the shop.",
+  "notes": "Juniper Fenn (bible 5.6), fletcher and herbalist, laconic, sunburnt, knows the Briarwood. Fears fire; the silence of the wolves frightens her more than howling. Secret: her sleep-draughts make the song easier to follow, and she has just worked it out (option ask-draughts). Class reactions per bible: archer peer, knight 'you'll clank', sorcerer trades herbs for Nature scraps, thief gets poisons only after a favour (the thief option checks disposition >= 10, which the draught talk can raise). Merchant greeting and farewell lines vary by class; the counter itself is the shop. mw-e39.10 (The Captain's Boots): ask-hale (she has seen the dust on her step, boots.noticed), bring-bellwort (two bellwort roots from her own counter become wakeful tea, juniper.tea-ready, handed to Hale in hale-watch) and ask-sleep-draught (the wrong draught: she warns if she has already confessed, then sells it, juniper.draught-sold).",
   "speakers": [
     {
       "id": "juniper",
@@ -160,6 +160,80 @@
           },
           "once": true,
           "next": "poison-check"
+        },
+        {
+          "id": "ask-hale",
+          "text": "Captain Hale's boots are dusty every morning.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "boots.noticed"
+            }
+          },
+          "once": true,
+          "next": "hale-1"
+        },
+        {
+          "id": "bring-bellwort",
+          "text": "I have the two bellwort roots for the wakeful tea.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "boots.noticed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "juniper.tea-ready"
+                }
+              },
+              {
+                "kind": "hasItem",
+                "item": "bellwort-root",
+                "count": 2
+              }
+            ]
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "deliverItem",
+              "item": "bellwort-root",
+              "npc": "npc-juniper",
+              "count": 2
+            }
+          ],
+          "next": "brew-1"
+        },
+        {
+          "id": "ask-sleep-draught",
+          "text": "Have you a sleep draught? For the captain.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "boots.noticed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "juniper.draught-sold"
+                }
+              },
+              {
+                "kind": "gold",
+                "op": "gte",
+                "value": 8
+              }
+            ]
+          },
+          "next": "sd-gate"
         },
         {
           "id": "leave",
@@ -370,6 +444,159 @@
       "speaker": "juniper",
       "text": "Walk careful. Light a lamp.",
       "end": true
+    },
+    {
+      "id": "hale-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "I know. Prints on my step before dawn: big boots, mine dust to the ankle. Walks past my door with his eyes shut, like a man late for church. I thought I was seeing things. I haven't been sleeping.",
+      "next": "hale-2"
+    },
+    {
+      "id": "hale-2",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "He won't take a draught, if he's any sense. What he wants is a wakeful tea. Keeps you up, not out. Two roots of bellwort from the counter here, bring them back, and I'll brew it. If he'll drink it.",
+      "next": "hale-3"
+    },
+    {
+      "id": "hale-3",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "And if you've a mind to sell him sleep instead, I'm not telling you what to do. I'm telling you what I'd do.",
+      "next": "hale-fx"
+    },
+    {
+      "id": "hale-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "boots.noticed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "juniper.boots-told"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "brew-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Good roots. Not the sulky ones from the south bank. Give me a minute and a kettle, and don't watch it, it goes shy.",
+      "next": "brew-2"
+    },
+    {
+      "id": "brew-2",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "There. Don't let it go cold; it turns the colour of a bad tooth. It wants carrying to the Watch House. I'd carry it myself, but he looks at me as if I might ask him about wolves.",
+      "next": "brew-fx"
+    },
+    {
+      "id": "brew-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "juniper.tea-ready",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-juniper",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "juniper.tea-brewed"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "sd-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "juniper.draught-confessed"
+          },
+          "next": "sd-warn-1"
+        }
+      ],
+      "else": "sd-sell-1"
+    },
+    {
+      "id": "sd-warn-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "I told you what they do. They sleep deeper, and deeper they hear it clearer. And you want one for a man who already walks. ...I'll sell it. It's your conscience. I won't carry mine again.",
+      "next": "sd-choice"
+    },
+    {
+      "id": "sd-sell-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Sleep draught. Eight crowns. Blue bottle, two spoons, never three. It'll give the captain a night's rest such as he hasn't had in years.",
+      "next": "sd-choice"
+    },
+    {
+      "id": "sd-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "sd-buy",
+          "text": "Eight crowns. Done.",
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -8
+            },
+            {
+              "kind": "setFact",
+              "fact": "juniper.draught-sold",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "juniper.draught-sold-event"
+            }
+          ],
+          "next": "sd-bought",
+          "onFail": "sd-short"
+        },
+        {
+          "id": "sd-back",
+          "text": "On second thought, no.",
+          "next": "sd-back-1"
+        }
+      ]
+    },
+    {
+      "id": "sd-bought",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Two spoons. Never three. And if he sleeps too well, that is a thing I will have to live with.",
+      "next": "hub"
+    },
+    {
+      "id": "sd-short",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Eight crowns, the purse says seven and a sigh. Come back when it's heavier.",
+      "next": "hub"
+    },
+    {
+      "id": "sd-back-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Good. I'm glad. Don't tell me I'm sensible.",
+      "next": "hub"
     }
   ]
 }
