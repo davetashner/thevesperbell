@@ -1,0 +1,803 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-tidefair",
+  "title": "The Tidefair",
+  "summary": "Every market day the Stone Wharf holds the Tidefair: arm-wrestling at the Drowned Gull, the Gull Shoot, the Regatta and the Pocket Race. Any class may enter any event, and each class is best at one. Win honestly, cheat, throw a match for Nell's book, or lose gracefully; the Gull warms to you either way.",
+  "notes": "Side quest of Wendmouth (bible 3.6, 6.1 quest 7; mw-e39.22), optional to the main quest: it reads and writes only harbour facts. Each event writes tidefair.results.<event> (won, lost, cheated, thrown) from its contest outcome effects: the arm-wrestling contest does so now (drowned-gull-arm-wrestling); the gull shoot, regatta and pocket race are mw-e40.7 to mw-e40.9 and write the same facts when built, so their objectives are fact objectives that stay open until then. The class event is highlighted (tidefair.highlight) but every event stays enterable. A regatta win with magic while Cray walks the quay is voided in the stage transition (tidefair.cheated, a fine branch in cray-customs). The quest resolves once the player calls the day (Oona) or has a result in all four events: a class champion, an honest winner, a crooked winner, a bookie's friend, or a graceful loser (consolation, dispositions never lower). Placeholder numbers (the fine, the purse) are for the owner to tune.",
+  "givers": ["npc-oona", "npc-nell"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "tidefair.joined"
+      },
+      {
+        "kind": "fact",
+        "fact": "nell.gull-shoot-sponsored"
+      },
+      {
+        "kind": "fact",
+        "fact": "nell.book-open"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "entry",
+      "text": "The Tidefair runs on market day on the Stone Wharf: four events, any of them open to you, and a prize for each. Big Oona takes entries at the Drowned Gull and Nell keeps the book.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "stage": "events",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "tidefair.highlight",
+              "value": "arm-wrestling"
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "stage": "events",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "tidefair.highlight",
+              "value": "gull-shoot"
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "stage": "events",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "tidefair.highlight",
+              "value": "regatta"
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "stage": "events",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "tidefair.highlight",
+              "value": "pocket-race"
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "any",
+              "of": [
+                {
+                  "kind": "playerClass",
+                  "class": "knight"
+                },
+                {
+                  "kind": "playerClass",
+                  "class": "archer"
+                },
+                {
+                  "kind": "playerClass",
+                  "class": "sorcerer"
+                },
+                {
+                  "kind": "playerClass",
+                  "class": "thief"
+                }
+              ]
+            }
+          },
+          "stage": "events"
+        }
+      ]
+    },
+    {
+      "id": "events",
+      "text": "Four events: arm-wrestling at the Drowned Gull, the Gull Shoot on the boom, the Regatta in the pool and the Pocket Race in the crowd. Your own class has an event it was made for, but nobody checks your hands at the door.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.regatta",
+                "op": "eq",
+                "value": "won"
+              },
+              {
+                "kind": "fact",
+                "fact": "tidefair.regatta.magic-used"
+              },
+              {
+                "kind": "fact",
+                "fact": "tidefair.regatta.cray-present"
+              }
+            ]
+          },
+          "stage": "fined",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "tidefair.results.regatta",
+              "value": "cheated"
+            },
+            {
+              "kind": "setFact",
+              "fact": "tidefair.cheated",
+              "value": true
+            },
+            {
+              "kind": "setFact",
+              "fact": "tidefair.regatta.fine-due",
+              "value": true
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-oona",
+              "delta": -1
+            },
+            {
+              "kind": "emit",
+              "event": "regatta-win-voided"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fined",
+      "text": "The Regatta win is void: you used magic in front of Inspector Cray, and rule four is the one rule she enforces. She will want ten crowns, or an entry in her ledger.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.regatta.fine-paid"
+              },
+              {
+                "kind": "fact",
+                "fact": "tidefair.regatta.fine-owed"
+              }
+            ]
+          },
+          "stage": "after-the-fine"
+        }
+      ]
+    },
+    {
+      "id": "after-the-fine",
+      "text": "The fine is settled, or at least written down. The other events are still open to you, and the harbour is watching a little more closely."
+    }
+  ],
+  "initialStage": "entry",
+  "objectives": [
+    {
+      "id": "see-the-flagstones",
+      "kind": "enterArea",
+      "text": "Walk out to the Tidefair ground on the Stone Wharf flagstones.",
+      "params": {
+        "area": "tidefair-ground"
+      },
+      "optional": true
+    },
+    {
+      "id": "sign-up",
+      "kind": "fact",
+      "text": "Sign up for the Tidefair with Big Oona.",
+      "params": {
+        "fact": "tidefair.joined"
+      },
+      "optional": true
+    },
+    {
+      "id": "nells-book",
+      "kind": "fact",
+      "text": "Ask Nell about her book on the day: she pays for a fall.",
+      "params": {
+        "fact": "nell.book-open"
+      },
+      "optional": true
+    },
+    {
+      "id": "win-the-table",
+      "kind": "fact",
+      "text": "Beat Big Oona at the Drowned Gull table, or survive the brawl that follows.",
+      "params": {
+        "fact": "tidefair.results.arm-wrestling",
+        "value": "won"
+      },
+      "optional": true
+    },
+    {
+      "id": "win-the-gull-shoot",
+      "kind": "fact",
+      "text": "Win the Gull Shoot: the wooden gulls on the boom, then the live one with the ribbon.",
+      "params": {
+        "fact": "tidefair.results.gull-shoot",
+        "value": "won"
+      },
+      "optional": true
+    },
+    {
+      "id": "win-the-regatta",
+      "kind": "fact",
+      "text": "Win the Regatta. Rule four says no magic; mind who is walking the quay.",
+      "params": {
+        "fact": "tidefair.results.regatta",
+        "value": "won"
+      },
+      "optional": true
+    },
+    {
+      "id": "win-the-pocket-race",
+      "kind": "fact",
+      "text": "Win the Pocket Race: five ribbons from five marks, and one of them is the Inspector.",
+      "params": {
+        "fact": "tidefair.results.pocket-race",
+        "value": "won"
+      },
+      "optional": true
+    },
+    {
+      "id": "lift-crays-ribbon",
+      "kind": "fact",
+      "text": "Lift Inspector Cray's ribbon without her feeling it.",
+      "params": {
+        "fact": "tidefair.pocket.cray-lifted"
+      },
+      "optional": true
+    },
+    {
+      "id": "settle-the-fine",
+      "kind": "talkTo",
+      "text": "Settle the regatta fine with Inspector Cray.",
+      "params": {
+        "npc": "npc-cray"
+      },
+      "optional": true,
+      "stage": "fined"
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "crooked-winner",
+      "approach": "trickery",
+      "priority": 80,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.concluded"
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.arm-wrestling",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.gull-shoot",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.regatta",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.pocket-race",
+                    "op": "neq",
+                    "value": "none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "fact",
+            "fact": "tidefair.cheated"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.outcome",
+          "value": "crooked"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oona",
+          "delta": -2
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-nell",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-resolved",
+          "data": {
+            "outcome": "crooked"
+          }
+        }
+      ],
+      "journal": "You cheated at the Tidefair and somebody noticed. Oona has stopped smiling at you, and Nell has started."
+    },
+    {
+      "id": "bookies-friend",
+      "approach": "trickery",
+      "priority": 70,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.concluded"
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.arm-wrestling",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.gull-shoot",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.regatta",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.pocket-race",
+                    "op": "neq",
+                    "value": "none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.arm-wrestling",
+                "op": "eq",
+                "value": "thrown"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.gull-shoot",
+                "op": "eq",
+                "value": "thrown"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.regatta",
+                "op": "eq",
+                "value": "thrown"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.pocket-race",
+                "op": "eq",
+                "value": "thrown"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.outcome",
+          "value": "bookie"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-nell",
+          "delta": 3
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oona",
+          "delta": -1
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-resolved",
+          "data": {
+            "outcome": "bookie"
+          }
+        }
+      ],
+      "journal": "You fell over on purpose and Nell's book paid. She calls you a natural. Oona calls you something else, quietly."
+    },
+    {
+      "id": "class-champion",
+      "approach": "other",
+      "priority": 60,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.concluded"
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.arm-wrestling",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.gull-shoot",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.regatta",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.pocket-race",
+                    "op": "neq",
+                    "value": "none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tidefair.cheated"
+            }
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "playerClass",
+                    "class": "knight"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.arm-wrestling",
+                    "op": "eq",
+                    "value": "won"
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "playerClass",
+                    "class": "archer"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.gull-shoot",
+                    "op": "eq",
+                    "value": "won"
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "playerClass",
+                    "class": "sorcerer"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.regatta",
+                    "op": "eq",
+                    "value": "won"
+                  }
+                ]
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "playerClass",
+                    "class": "thief"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.pocket-race",
+                    "op": "eq",
+                    "value": "won"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.outcome",
+          "value": "champion"
+        },
+        {
+          "kind": "setFact",
+          "fact": "tidefair.regarded",
+          "value": true
+        },
+        {
+          "kind": "gold",
+          "delta": 25
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oona",
+          "delta": 3
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-nell",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-resolved",
+          "data": {
+            "outcome": "champion"
+          }
+        }
+      ],
+      "journal": "You won the event you were made for, cleanly, in front of the whole Stone Wharf. People who have never met you are buying you drinks."
+    },
+    {
+      "id": "honest-sport",
+      "approach": "diplomacy",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.concluded"
+              },
+              {
+                "kind": "all",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.arm-wrestling",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.gull-shoot",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.regatta",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.pocket-race",
+                    "op": "neq",
+                    "value": "none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tidefair.cheated"
+            }
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.arm-wrestling",
+                "op": "eq",
+                "value": "won"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.gull-shoot",
+                "op": "eq",
+                "value": "won"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.regatta",
+                "op": "eq",
+                "value": "won"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.pocket-race",
+                "op": "eq",
+                "value": "won"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.outcome",
+          "value": "honest"
+        },
+        {
+          "kind": "setFact",
+          "fact": "tidefair.regarded",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oona",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-resolved",
+          "data": {
+            "outcome": "honest"
+          }
+        }
+      ],
+      "journal": "You won an event you had no business winning and did it by the rules, which here counts for something. Wendmouth has noticed."
+    },
+    {
+      "id": "graceful-loser",
+      "approach": "diplomacy",
+      "priority": 10,
+      "when": {
+        "kind": "any",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tidefair.concluded"
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.arm-wrestling",
+                "op": "neq",
+                "value": "none"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.gull-shoot",
+                "op": "neq",
+                "value": "none"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.regatta",
+                "op": "neq",
+                "value": "none"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.pocket-race",
+                "op": "neq",
+                "value": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.outcome",
+          "value": "consolation"
+        },
+        {
+          "kind": "setFact",
+          "fact": "tidefair.consolation",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oona",
+          "delta": 2
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-nell",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-resolved",
+          "data": {
+            "outcome": "consolation"
+          }
+        }
+      ],
+      "journal": "You lost, and lost well. Oona bought the drink, Nell wrote you down as a good sport, and the Drowned Gull warmed to you anyway.",
+      "note": "Consolation outcome (AC-5): nothing here lowers a disposition."
+    }
+  ]
+}

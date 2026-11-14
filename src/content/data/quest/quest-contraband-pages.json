@@ -1,0 +1,514 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-contraband-pages",
+  "title": "Contraband Pages",
+  "summary": "Inspector Cray has impounded a crate of books: Mirela's order from over the sea, with a rare Illusion text among it, and, if you were careless, your own restricted spellbooks. Cray is incorruptible and reads everything she confiscates. There are a great many ways to get books out of a customs house, and she has seen most of them.",
+  "notes": "Side quest of Wendmouth (bible 3.6, 5.13, 6.1 quest 8; mw-e39.22), optional to the main quest and sorcerer-flavoured (a searched sorcerer's own books are in the crate, books.impounded) but open to every class. The crate's books are stand-in facts (books.impounded, books.recovered, writ.held) until the book items exist (follow-up bead). Routes: the failed bribe (cray-customs, recorded and never works: an optional objective and a hint, not a resolution), the romance novel (cray.books-traded), a writ from Vane (writ.source vane) or Mirela's forged Lantern seal (writ.source forged, which Cray catches if the player already tried a bribe), the strongroom over the roof (event books-lifted, emitted by the customs level), an inspector's coat or Mirror Self (event inspector-guise-passed; inspector-guise-blown moves the quest to 'watched' and sets cray.disposition to wary) and bay-nine evidence (cray.books-released). Every resolution sets books.recovered, books.method and cray.disposition (grateful or fond for the two lawful gifts, neutral for writs, wary for theft and impersonation). Cray's help in The Crate for Mr. S— stays gated by cray.seizure.agreed (evidence) and the evidence route also sets it, so the bay-nine evidence route opens her lawful seizure. Delivering the book to Mirela or keeping it happens afterwards in mirela-stacks (mirela.order.delivered or kept) and is an optional objective.",
+  "givers": ["npc-cray", "npc-mirela"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "books.impounded"
+      },
+      {
+        "kind": "fact",
+        "fact": "mirela.order.told"
+      },
+      {
+        "kind": "fact",
+        "fact": "cray.writ.offered"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "lead",
+      "text": "A crate of books addressed to Mirela Thorne, and a few restricted ones besides, is sitting in the customs house under Inspector Cray's eye. Ask her about it. Or do not.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-contraband-pages",
+            "objective": "guise-blown",
+            "state": "complete"
+          },
+          "stage": "watched",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "cray.disposition",
+              "value": "wary"
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-cray",
+              "delta": -3
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-contraband-pages",
+                "objective": "visit-the-customs",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-contraband-pages",
+                "objective": "try-a-bribe",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-contraband-pages",
+                "objective": "bring-a-romance",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-contraband-pages",
+                "objective": "get-a-writ",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-contraband-pages",
+                "objective": "give-her-evidence",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-contraband-pages",
+                "objective": "reach-the-strongroom",
+                "state": "complete"
+              },
+              {
+                "kind": "fact",
+                "fact": "cray.writ.offered"
+              },
+              {
+                "kind": "fact",
+                "fact": "cray.bay-nine.suspicion"
+              },
+              {
+                "kind": "fact",
+                "fact": "nell.strongroom-tip"
+              }
+            ]
+          },
+          "stage": "route"
+        }
+      ]
+    },
+    {
+      "id": "route",
+      "text": "Cray will not be bought, but she is a reader, she follows procedure, and she has weaknesses, mostly romances. A writ would do it. So would evidence about bay nine. So would a quiet night on the customs roof.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-contraband-pages",
+            "objective": "guise-blown",
+            "state": "complete"
+          },
+          "stage": "watched",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "cray.disposition",
+              "value": "wary"
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-cray",
+              "delta": -3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "watched",
+      "text": "Cray has seen through you. She is courteous about it. She is also writing it down, and the next route will be harder."
+    }
+  ],
+  "initialStage": "lead",
+  "objectives": [
+    {
+      "id": "visit-the-customs",
+      "kind": "enterArea",
+      "text": "Visit the customs house and find out what Inspector Cray holds.",
+      "params": {
+        "area": "customs-house"
+      },
+      "optional": true
+    },
+    {
+      "id": "ask-after-the-crate",
+      "kind": "fact",
+      "text": "Ask Inspector Cray about the impounded crate.",
+      "params": {
+        "fact": "books.impounded"
+      },
+      "optional": true
+    },
+    {
+      "id": "try-a-bribe",
+      "kind": "fact",
+      "text": "Try bribing the Inspector. It will go exactly as well as you expect.",
+      "params": {
+        "fact": "cray.bribe.attempted"
+      },
+      "optional": true
+    },
+    {
+      "id": "bring-a-romance",
+      "kind": "fact",
+      "text": "Bring Cray something to read for her evidence room.",
+      "params": {
+        "fact": "cray.romance-accepted"
+      },
+      "optional": true
+    },
+    {
+      "id": "get-a-writ",
+      "kind": "fact",
+      "text": "Get hold of a writ: from Harrow Vane as council chair, or from Mirela's steady hand.",
+      "params": {
+        "fact": "writ.held"
+      },
+      "optional": true
+    },
+    {
+      "id": "present-the-writ",
+      "kind": "fact",
+      "text": "Put the writ in front of Inspector Cray.",
+      "params": {
+        "fact": "cray.writ.accepted"
+      },
+      "optional": true
+    },
+    {
+      "id": "give-her-evidence",
+      "kind": "fact",
+      "text": "Give Cray evidence about bay nine and let her be grateful.",
+      "params": {
+        "fact": "cray.evidence-given"
+      },
+      "optional": true
+    },
+    {
+      "id": "reach-the-strongroom",
+      "kind": "enterArea",
+      "text": "Get up and in to the customs strongroom.",
+      "params": {
+        "area": "customs-strongroom"
+      },
+      "optional": true
+    },
+    {
+      "id": "lift-the-books",
+      "kind": "event",
+      "text": "Lift the books out of the strongroom and away over the roof.",
+      "params": {
+        "event": "books-lifted"
+      },
+      "optional": true
+    },
+    {
+      "id": "wear-the-coat",
+      "kind": "event",
+      "text": "Walk out with the books as an inspector: a borrowed coat or a Mirror Self.",
+      "params": {
+        "event": "inspector-guise-passed"
+      },
+      "optional": true
+    },
+    {
+      "id": "guise-blown",
+      "kind": "event",
+      "text": "Cray knows every inspector by name; she has seen through you.",
+      "params": {
+        "event": "inspector-guise-blown"
+      },
+      "optional": true
+    },
+    {
+      "id": "deliver-to-mirela",
+      "kind": "fact",
+      "text": "Take Mirela her Illusion text, or keep it and let her know.",
+      "params": {
+        "fact": "mirela.order.delivered"
+      },
+      "optional": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "evidence-gratitude",
+      "approach": "diplomacy",
+      "priority": 60,
+      "when": {
+        "kind": "fact",
+        "fact": "cray.books-released"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.recovered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.method",
+          "value": "evidence"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "grateful"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.seizure.agreed",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "books-recovered",
+          "data": {
+            "method": "evidence"
+          }
+        }
+      ],
+      "journal": "You gave Cray what she needed about bay nine, and she released the books in gratitude, off the record, before she could remember her duties. Mirela's crate is yours to carry, and Cray will help you open bay nine."
+    },
+    {
+      "id": "romance-trade",
+      "approach": "diplomacy",
+      "priority": 55,
+      "when": {
+        "kind": "fact",
+        "fact": "cray.books-traded"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.recovered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.method",
+          "value": "romance"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "fond"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "books-recovered",
+          "data": {
+            "method": "romance"
+          }
+        }
+      ],
+      "journal": "A romance novel for the evidence room, and a crate that was never seen leaving. Cray has not mentioned the exchange. She has, however, started humming."
+    },
+    {
+      "id": "vane-writ",
+      "approach": "diplomacy",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "cray.writ.accepted"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "writ.source",
+            "op": "eq",
+            "value": "vane"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.recovered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.method",
+          "value": "vane-writ"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "neutral"
+        },
+        {
+          "kind": "emit",
+          "event": "books-recovered",
+          "data": {
+            "method": "vane-writ"
+          }
+        }
+      ],
+      "journal": "Harrow Vane signed the writ for a donation to the bridge fund, and Cray accepted it with the look of a woman filing the signature away for later. The books are out, lawfully, and a little tarnished."
+    },
+    {
+      "id": "forged-writ",
+      "approach": "trickery",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "cray.writ.accepted"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "writ.source",
+            "op": "eq",
+            "value": "forged"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.recovered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.method",
+          "value": "forged-writ"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "neutral"
+        },
+        {
+          "kind": "emit",
+          "event": "books-recovered",
+          "data": {
+            "method": "forged-writ"
+          }
+        }
+      ],
+      "journal": "Mirela's sealing wax, pressed firmly, crown to the left of the lamp. Cray accepted the writ without a flicker. You will never know whether she knew."
+    },
+    {
+      "id": "strongroom-theft",
+      "approach": "stealth",
+      "priority": 45,
+      "when": {
+        "kind": "objectiveState",
+        "quest": "quest-contraband-pages",
+        "objective": "lift-the-books",
+        "state": "complete"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.recovered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.method",
+          "value": "strongroom"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "wary"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.books-stolen",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": -2
+        },
+        {
+          "kind": "emit",
+          "event": "books-recovered",
+          "data": {
+            "method": "strongroom"
+          }
+        }
+      ],
+      "journal": "Over the roof, through the hatch, out with the books, and the lock never knew. Cray will find the strongroom lighter and the locks undisturbed. She will be thinking about it for a long time."
+    },
+    {
+      "id": "inspector-guise",
+      "approach": "trickery",
+      "priority": 45,
+      "when": {
+        "kind": "objectiveState",
+        "quest": "quest-contraband-pages",
+        "objective": "wear-the-coat",
+        "state": "complete"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.recovered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.method",
+          "value": "guise"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "neutral"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.books-stolen",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "books-recovered",
+          "data": {
+            "method": "guise"
+          }
+        }
+      ],
+      "journal": "You walked into the customs house in an inspector's coat and walked out with eleven books and a clerk holding the door. Nobody on the quay has the slightest idea that Wendmouth has two inspectors."
+    }
+  ]
+}

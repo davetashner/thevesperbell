@@ -2306,6 +2306,9 @@
     },
     {
       "graph": "wendmouth-areas"
+    },
+    {
+      "graph": "wendmouth-harbour-areas"
     }
   ],
   "transitions": [

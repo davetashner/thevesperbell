@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "cray-customs",
-  "notes": "mw-e39.20: Inspector Prudence Cray (bible 5.13), Lantern Court customs. Incorruptible: every bribe option sets cray.bribe.attempted, lowers disposition by 6 and is recorded; no branch lets a bribe succeed (AC-2). Never confiscates plot-critical or forbidden-plot items: the confiscate hook is an emit whose payload excludes both (AC-5). Sorcerer is searched on sight; romance novels (stand-in fact cray.romance-brought) raise disposition; evidence about bay nine (stand-in facts evidence.*) opens the legal seizure route; cold disposition still accepts evidence.",
+  "notes": "mw-e39.20: Inspector Prudence Cray (bible 5.13), Lantern Court customs. Incorruptible: every bribe option sets cray.bribe.attempted, lowers disposition by 6 and is recorded; no branch lets a bribe succeed (AC-2). Never confiscates plot-critical or forbidden-plot items: the confiscate hook is an emit whose payload excludes both (AC-5). Sorcerer is searched on sight; romance novels (stand-in fact cray.romance-brought) raise disposition; evidence about bay nine (stand-in facts evidence.*) opens the legal seizure route; cold disposition still accepts evidence. mw-e39.22 (The Tidefair, Contraband Pages): ask-crate names the impounded crate (books.impounded, also set by the sorcerer search); ask-swap releases the books after the romance novel (cray.books-traded); present-writ checks a writ (Vane's passes, Mirela's forged seal passes unless the player already tried a bribe); ask-regatta explains rule four; entries thanks, regatta-fine, pocket-ribbon and theft-noticed react to the quests' facts. Still incorruptible: no bribe works.",
   "speakers": [
     {
       "id": "cray",
@@ -18,6 +18,115 @@
         "value": -10
       },
       "node": "cold-1"
+    },
+    {
+      "id": "regatta-fine",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tidefair.regatta.fine-due"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tidefair.regatta.fine-paid"
+            }
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tidefair.regatta.fine-owed"
+            }
+          }
+        ]
+      },
+      "node": "fine-1"
+    },
+    {
+      "id": "pocket-ribbon",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.pocket.cray-lifted"
+              },
+              {
+                "kind": "fact",
+                "fact": "tidefair.pocket.cray-caught"
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "cray.lifted-told"
+            }
+          }
+        ]
+      },
+      "node": "ribbon-route"
+    },
+    {
+      "id": "theft-noticed",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "cray.books-stolen"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "cray.theft-noted"
+            }
+          }
+        ]
+      },
+      "node": "theft-1"
+    },
+    {
+      "id": "thanks",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "cray.disposition",
+                "op": "eq",
+                "value": "grateful"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "cray.disposition",
+                "op": "eq",
+                "value": "fond"
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "cray.thanked"
+            }
+          }
+        ]
+      },
+      "node": "thanks-1"
     },
     {
       "id": "return",
@@ -164,6 +273,11 @@
             "exclude": "plot-critical,forbidden-plot",
             "route": "strongroom"
           }
+        },
+        {
+          "kind": "setFact",
+          "fact": "books.impounded",
+          "value": true
         }
       ],
       "next": "search-done"
@@ -387,6 +501,76 @@
           },
           "once": true,
           "next": "thief-1"
+        },
+        {
+          "id": "ask-crate",
+          "text": "Is a crate of books being held here? Addressed to a bookseller in Briar Glen.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "books.impounded"
+            }
+          },
+          "once": true,
+          "next": "crate-1"
+        },
+        {
+          "id": "ask-swap",
+          "text": "About that crate. In the spirit of the evidence room.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "cray.romance-accepted"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.books-released"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.books-traded"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "swap-1"
+        },
+        {
+          "id": "present-writ",
+          "text": "I have a writ for the impounded books.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "writ.held"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.writ.accepted"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "writ-check"
+        },
+        {
+          "id": "ask-regatta",
+          "text": "Is magic really forbidden at the Regatta?",
+          "once": true,
+          "next": "regatta-1"
         },
         {
           "id": "leave",
@@ -789,6 +973,407 @@
       "speaker": "cray",
       "text": "Do.",
       "end": true
+    },
+    {
+      "id": "crate-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Crate seven. Consigned to M. Thorne, bookseller, Briar Glen: eleven volumes, one of them Restricted. Illusion. No writ, therefore held. You may visit it. I have visited it a good deal, in the interests of diligence.",
+      "next": "crate-2"
+    },
+    {
+      "id": "crate-2",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A writ will release it. So will other lawful considerations. I am not permitted to enumerate the unlawful ones, though I observe that people in Wendmouth appear to know them without my help.",
+      "next": "crate-fx"
+    },
+    {
+      "id": "crate-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "books.impounded",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "books.impound-told"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "swap-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Reading material is not currency. I wish that understood. However. A person who brings the Court such... thoughtful reading has shown good character, and there is a crate that I have never seen leave. Nor, I think, will you.",
+      "next": "swap-fx"
+    },
+    {
+      "id": "swap-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.books-traded",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "cray.books-traded",
+          "data": {
+            "scope": "impounded-crate"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "writ-check",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "writ.source",
+                "op": "eq",
+                "value": "forged"
+              },
+              {
+                "kind": "fact",
+                "fact": "cray.bribe.attempted"
+              }
+            ]
+          },
+          "next": "writ-rejected-1"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "writ.source",
+            "op": "eq",
+            "value": "forged"
+          },
+          "next": "writ-forged-1"
+        }
+      ],
+      "else": "writ-vane-1"
+    },
+    {
+      "id": "writ-vane-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Signed, H. Vane, chair of the Council of Briar Glen. Valid on its face. I observe that Mr. Vane signs for coin, and that he is the consignor of bay nine. I accept it. I shall be thinking, quietly, about what else he signs.",
+      "next": "writ-vane-fx"
+    },
+    {
+      "id": "writ-vane-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.writ.accepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "writ.held",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "cray.writ-accepted",
+          "data": {
+            "source": "vane"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "writ-forged-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A Lantern seal. The wax is the correct red and the crown stands on the correct side of the lamp. Quite excellent. I shall make a note of the correct side, for future reference. Release is authorised.",
+      "next": "writ-forged-fx"
+    },
+    {
+      "id": "writ-forged-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.writ.accepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "writ.held",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "cray.writ-accepted",
+          "data": {
+            "source": "forged"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "writ-rejected-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "You offered me a purse, and now you offer me a writ that happens to be exactly what I would have asked for. I compared it with the register. The crown is on the wrong side of the lamp. That is a forgery, and I am writing it down.",
+      "next": "writ-rejected-fx"
+    },
+    {
+      "id": "writ-rejected-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.writ.rejected",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "writ.held",
+          "value": false
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.disposition",
+          "value": "wary"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": -4
+        },
+        {
+          "kind": "emit",
+          "event": "cray.writ-rejected"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "regatta-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Rule four. The stewards are volunteers and are drunk, so the rule is unenforced. I enforce it when I am walking past, which I do at the start, the turn and the finish. I say this in no sense as advice.",
+      "next": "hub"
+    },
+    {
+      "id": "fine-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Halt. You used magic in the Regatta, in front of a Lantern Court officer, and a rule that nobody enforces has just been enforced. Your win is void. The fine is ten crowns.",
+      "next": "fine-choice"
+    },
+    {
+      "id": "fine-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pay-fine",
+          "text": "Here: ten crowns.",
+          "when": {
+            "kind": "gold",
+            "op": "gte",
+            "value": 10
+          },
+          "next": "fine-paid-fx"
+        },
+        {
+          "id": "owe-fine",
+          "text": "I haven't got ten crowns.",
+          "next": "fine-owed-fx"
+        }
+      ]
+    },
+    {
+      "id": "fine-paid-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "gold",
+          "delta": -10
+        },
+        {
+          "kind": "setFact",
+          "fact": "tidefair.regatta.fine-paid",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "regatta-fine-settled",
+          "data": {
+            "how": "paid"
+          }
+        }
+      ],
+      "next": "fine-paid-1"
+    },
+    {
+      "id": "fine-paid-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Receipt attached. Ten crowns, paid in full, without argument. It was, if I may say so, a very handsome Gust. I did not say that.",
+      "next": "hub"
+    },
+    {
+      "id": "fine-owed-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.regatta.fine-owed",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": -1
+        },
+        {
+          "kind": "emit",
+          "event": "regatta-fine-settled",
+          "data": {
+            "how": "owed"
+          }
+        }
+      ],
+      "next": "fine-owed-1"
+    },
+    {
+      "id": "fine-owed-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Then it is a debt, entered in the ledger with your name spelled as spoken. I shall collect it. I always do.",
+      "next": "hub"
+    },
+    {
+      "id": "ribbon-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "tidefair.pocket.cray-caught"
+          },
+          "next": "ribbon-caught-1"
+        }
+      ],
+      "else": "ribbon-lifted-1"
+    },
+    {
+      "id": "ribbon-lifted-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "My ribbon is gone. I did not feel it go. Nobody has ever once relieved me of anything in this harbour, and now it has happened before two hundred people. Keep it. I shall write a very long report on my own pockets.",
+      "next": "ribbon-lifted-fx"
+    },
+    {
+      "id": "ribbon-lifted-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.lifted-told",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "ribbon-caught-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "My hand was on your wrist before it left my coat. I have been waiting for this all season. Let it be known that Lantern Court pockets are not a game, and also that you were rather good.",
+      "next": "ribbon-caught-fx"
+    },
+    {
+      "id": "ribbon-caught-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.lifted-told",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": -2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "theft-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "Someone has been in my strongroom. The lock is undisturbed. The grille is undisturbed. The books are not. I do not ask how you are involved, as I assume you will say you are not. I do ask that you note I have noticed.",
+      "next": "theft-fx"
+    },
+    {
+      "id": "theft-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.theft-noted",
+          "value": true
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "thanks-1",
+      "kind": "line",
+      "speaker": "cray",
+      "text": "A moment. For the record: the matter of the crate was settled to the Court's satisfaction, or near enough that I have chosen not to look closely. You have been, on balance, useful. I do not say so often. I shall not say it twice.",
+      "next": "thanks-fx"
+    },
+    {
+      "id": "thanks-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "cray.thanked",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-cray",
+          "delta": 1
+        }
+      ],
+      "next": "hub"
     }
   ]
 }
