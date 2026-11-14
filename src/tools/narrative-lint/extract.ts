@@ -55,8 +55,9 @@ const REF_KEYS: Readonly<Record<string, RefField>> = {
 
 /** A file the lint reads: dialogue, quest, rumour, narration, book, note, inscription, description, fact or NPC. */
 export const isNarrativeSource = (path: string): boolean =>
-  /(^|\/)(dialogue|quest|rumor|narration|book|note|inscription|description|fact)\/[^/]+\.json$/.test(path) ||
-  /(^|\/)creature\/npc-[^/]+\.json$/.test(path);
+  /(^|\/)(dialogue|quest|rumor|narration|book|note|inscription|description|fact)\/[^/]+\.json$/.test(
+    path,
+  ) || /(^|\/)creature\/npc-[^/]+\.json$/.test(path);
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
