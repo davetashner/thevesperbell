@@ -1095,6 +1095,14 @@
       "notes": "Towpath on to Wendmouth (always open; bible 3.6)."
     },
     {
+      "id": "riverbank-wharf-link",
+      "from": "under-the-bridge",
+      "to": "stone-wharf",
+      "kind": "path",
+      "transitions": ["under-the-bridge/towpath-down", "wendmouth-harbour/towpath-gate"],
+      "notes": "Stopgap (mw-e40.26): the towpath downriver from the riverbank runs straight to the Stone Wharf until Briar Glen Quay, the Millweir and Kestrel Lock are built; then it is replaced by under-the-bridge-quay, quay-millweir, millweir-kestrel-lock and towpath-lock-wharf. Wendmouth is optional: the main quest never uses it."
+    },
+    {
       "id": "barge-quay-lock",
       "from": "briar-glen-quay",
       "to": "kestrel-lock",

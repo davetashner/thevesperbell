@@ -127,6 +127,8 @@ describe('the walkable world (mw-e01.11)', () => {
       'deepworks',
       'marsh-store',
       'sleeping-ox',
+      'under-the-bridge',
+      'wendmouth-harbour',
     ];
     const forward = reach(START, out);
     const back = reach(START, into);
