@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "hollis-pell",
-  "notes": "Hollis Pell the baker (bible 5.5), widower, frightened that he slept through it. Voice: short, broken sentences that stop mid-thought, flour and ovens. AC-3 branches: with tansy.saved the entry `reunion` (then `reunion-again`) plays and he is warm and shaky; without it the class greetings lead to the grief branch. Class gifts per bible 5.5: knight bread for the road, archer told where Tansy played, sorcerer her library card, thief the spare key. The library card and spare key have no item yet (fact stand-ins hollis.library-card-given, hollis.spare-key-given plus an emit); mw-e39.6 filed a follow-up bead. The bible option sets hollis.bible-lent for the side quest The Name on the Bones. Merchant greeting and farewell lines vary by class.",
+  "notes": "Hollis Pell the baker (bible 5.5), widower, frightened that he slept through it. Voice: short, broken sentences that stop mid-thought, flour and ovens. AC-3 branches: with tansy.saved the entry `reunion` (then `reunion-again`) plays and he is warm and shaky; without it the class greetings lead to the grief branch. Class gifts per bible 5.5: knight bread for the road, archer told where Tansy played, sorcerer her library card, thief the spare key. The library card and spare key have no item yet (fact stand-ins hollis.library-card-given, hollis.spare-key-given plus an emit); mw-e39.6 filed a follow-up bead. The bible option sets hollis.bible-lent for the side quest The Name on the Bones. Merchant greeting and farewell lines vary by class. mw-e39.11: a thief can take Anselm's letter (steal-bible, bones.letter-stolen) instead of asking.",
   "speakers": [
     {
       "id": "hollis",
@@ -162,6 +162,45 @@
             }
           ],
           "next": "bible-1"
+        },
+        {
+          "id": "steal-bible-grief",
+          "text": "(While he's at the oven, slip upstairs and take the letter from the Bible.)",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "thief"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hollis.bible-lent"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hollis.bible-lent",
+              "value": true
+            },
+            {
+              "kind": "setFact",
+              "fact": "bones.letter-stolen",
+              "value": true
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-hollis",
+              "delta": -3
+            }
+          ],
+          "next": "steal-1"
         },
         {
           "id": "gift-knight",
@@ -333,6 +372,45 @@
           "next": "bible-glad-1"
         },
         {
+          "id": "steal-bible-reunion",
+          "text": "(While he's at the oven, slip upstairs and take the letter from the Bible.)",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "playerClass",
+                "class": "thief"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hollis.bible-lent"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hollis.bible-lent",
+              "value": true
+            },
+            {
+              "kind": "setFact",
+              "fact": "bones.letter-stolen",
+              "value": true
+            },
+            {
+              "kind": "disposition",
+              "npc": "npc-hollis",
+              "delta": -3
+            }
+          ],
+          "next": "steal-2"
+        },
+        {
           "id": "vane-purse",
           "text": "What about Vane's money?",
           "when": {
@@ -461,6 +539,34 @@
       "speaker": "hollis",
       "text": "Thank you. Thank you for listening. Mind the cold.",
       "end": true
+    },
+    {
+      "id": "steal-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The third stair complains. The Bible is on the chest at the foot of the bed, and in the back, behind the births and deaths, is one letter in a gardener's careful hand, signed Anselm.",
+      "next": "steal-1-b"
+    },
+    {
+      "id": "steal-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Downstairs Hollis does not turn from the oven. He says, to the bread, that he thought he heard a stair.",
+      "next": "grief-hub"
+    },
+    {
+      "id": "steal-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "The third stair complains. The Bible is on the chest at the foot of the bed, and in the back, behind the births and deaths, is one letter in a gardener's careful hand, signed Anselm.",
+      "next": "steal-2-b"
+    },
+    {
+      "id": "steal-2-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Downstairs Hollis does not turn from the oven. He says, to the bread, that he thought he heard a stair.",
+      "next": "reunion-hub"
     }
   ]
 }
