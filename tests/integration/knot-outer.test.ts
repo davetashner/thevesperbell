@@ -105,137 +105,143 @@ const PAIRS = [
   },
 ] as const;
 
-describe('the Knot outer half: named places and routes (mw-e26.9 AC-1)', () => {
-  it('AC-1: Outer Ring, Ossuary and Chapel are the knot-outer scene’s nodes of the world map, each a named spawn', () => {
-    const nodes = (world?.nodes ?? []).filter((n) => n.scene?.id === 'knot-outer');
-    expect(nodes.map((n) => n.id).sort()).toEqual([...NODES].sort());
-    for (const node of nodes) {
-      expect(node.scene?.id).toBe('knot-outer');
-      expect(scene.spawns.some((s) => s.id === node.id && s.tags.includes('node'))).toBe(true);
-    }
-  });
+describe(
+  'the Knot outer half: named places and routes (mw-e26.9 AC-1)',
+  { timeout: 60_000 },
+  () => {
+    it('AC-1: Outer Ring, Ossuary and Chapel are the knot-outer scene’s nodes of the world map, each a named spawn', () => {
+      const nodes = (world?.nodes ?? []).filter((n) => n.scene?.id === 'knot-outer');
+      expect(nodes.map((n) => n.id).sort()).toEqual([...NODES].sort());
+      for (const node of nodes) {
+        expect(node.scene?.id).toBe('knot-outer');
+        expect(scene.spawns.some((s) => s.id === node.id && s.tags.includes('node'))).toBe(true);
+      }
+    });
 
-  it('AC-1: the named places of the three areas are all there', () => {
-    const ids = new Set(scene.spawns.map((s) => s.id));
-    for (const id of [
-      'arrive-from-deepworks',
-      'breach-door',
-      'scales-room',
-      'scales-gate',
-      'ring-vent',
-      'spider-nest-a',
-      'rune-band-south',
-      'dark-crossing',
-      'clatter-garden',
-      'mushroom-bed-a',
-      'bone-niche-1',
-      'chapel-door',
-      'bone-chute',
-      'chime-1',
-      'chime-4',
-      'chapel-portcullis',
-      'counterweight-rope',
-      'chapel-vent-north',
-      'horns-hall-stub',
-      'ossuary-view',
-    ]) {
-      expect(ids.has(id), id).toBe(true);
-    }
-  });
+    it('AC-1: the named places of the three areas are all there', () => {
+      const ids = new Set(scene.spawns.map((s) => s.id));
+      for (const id of [
+        'arrive-from-deepworks',
+        'breach-door',
+        'scales-room',
+        'scales-gate',
+        'ring-vent',
+        'spider-nest-a',
+        'rune-band-south',
+        'dark-crossing',
+        'clatter-garden',
+        'mushroom-bed-a',
+        'bone-niche-1',
+        'chapel-door',
+        'bone-chute',
+        'chime-1',
+        'chime-4',
+        'chapel-portcullis',
+        'counterweight-rope',
+        'chapel-vent-north',
+        'horns-hall-stub',
+        'ossuary-view',
+      ]) {
+        expect(ids.has(id), id).toBe(true);
+      }
+    });
 
-  it('AC-1: the markers of each way between an adjacent pair stand in the scene, two of them for each', () => {
-    for (const pair of PAIRS) {
-      const tagged = scene.spawns.filter((s) => s.tags.includes(`route:${pair.edge}`));
-      expect(tagged.map((s) => s.id).sort(), pair.edge).toEqual([...pair.ways].sort());
-    }
-    const edges = new Map((world?.edges ?? []).map((e) => [e.id, e]));
-    for (const pair of PAIRS) {
-      expect(edges.get(pair.edge)).toMatchObject({ from: pair.from, to: pair.to });
-    }
-  });
-
-  it(
-    'AC-1: with any one way shut, a walker still goes from each area to the next',
-    { timeout: 240_000 },
-    () => {
+    it('AC-1: the markers of each way between an adjacent pair stand in the scene, two of them for each', () => {
       for (const pair of PAIRS) {
-        expect(route(pair.from, pair.to).status, `${pair.edge} open`).toBe('found');
-        for (const shut of pair.ways) {
-          const q = bakedWithout([shut]);
-          expect(pathOn(q, scene, pair.from, pair.to).status, `${pair.edge} without ${shut}`).toBe(
+        const tagged = scene.spawns.filter((s) => s.tags.includes(`route:${pair.edge}`));
+        expect(tagged.map((s) => s.id).sort(), pair.edge).toEqual([...pair.ways].sort());
+      }
+      const edges = new Map((world?.edges ?? []).map((e) => [e.id, e]));
+      for (const pair of PAIRS) {
+        expect(edges.get(pair.edge)).toMatchObject({ from: pair.from, to: pair.to });
+      }
+    });
+
+    it(
+      'AC-1: with any one way shut, a walker still goes from each area to the next',
+      { timeout: 240_000 },
+      () => {
+        for (const pair of PAIRS) {
+          expect(route(pair.from, pair.to).status, `${pair.edge} open`).toBe('found');
+          for (const shut of pair.ways) {
+            const q = bakedWithout([shut]);
+            expect(
+              pathOn(q, scene, pair.from, pair.to).status,
+              `${pair.edge} without ${shut}`,
+            ).toBe('found');
+          }
+          // And both shut: the areas are truly separate, so each way is really a way.
+          const none = bakedWithout([...pair.ways]);
+          expect(pathOn(none, scene, pair.from, pair.to).status, `${pair.edge} both shut`).not.toBe(
             'found',
           );
         }
-        // And both shut: the areas are truly separate, so each way is really a way.
-        const none = bakedWithout([...pair.ways]);
-        expect(pathOn(none, scene, pair.from, pair.to).status, `${pair.edge} both shut`).not.toBe(
+      },
+    );
+
+    it(
+      'AC-1: the Chapel’s way on has two routes too: the portcullis doorway and the north vent',
+      { timeout: 120_000 },
+      () => {
+        expect(route('chapel-of-echoes', 'horns-hall-stub', 'chapel-portcullis').status).toBe(
           'found',
         );
+        // The portcullis down (closed), the vent still goes round.
+        expect(route('chapel-of-echoes', 'horns-hall-stub').status).toBe('found');
+        const ventShut = bakedWithout(['chapel-vent-north']);
+        expect(
+          pathOn(ventShut, scene, 'chapel-of-echoes', 'horns-hall-stub', 'chapel-portcullis')
+            .status,
+        ).toBe('found');
+        expect(pathOn(ventShut, scene, 'chapel-of-echoes', 'horns-hall-stub').status).not.toBe(
+          'found',
+        );
+      },
+    );
+
+    it('AC-1: the Ossuary has a loop: the hall reaches the far hall through the Dark Crossing, the garden or the east gallery', () => {
+      for (const id of [
+        'dark-crossing',
+        'clatter-garden',
+        'mushroom-bed-c',
+        'east-gallery',
+        'chapel-door',
+      ]) {
+        expect(route('ossuary-galleries', id).status, id).toBe('found');
       }
-    },
-  );
+      const down = route('ossuary-galleries', 'dark-crossing');
+      if (down.status === 'off-mesh') throw new Error('off-mesh');
+      expect(Math.min(...down.points.map((p) => p.y))).toBeCloseTo(-3, 1);
+    });
 
-  it(
-    'AC-1: the Chapel’s way on has two routes too: the portcullis doorway and the north vent',
-    { timeout: 120_000 },
-    () => {
-      expect(route('chapel-of-echoes', 'horns-hall-stub', 'chapel-portcullis').status).toBe(
-        'found',
-      );
-      // The portcullis down (closed), the vent still goes round.
-      expect(route('chapel-of-echoes', 'horns-hall-stub').status).toBe('found');
-      const ventShut = bakedWithout(['chapel-vent-north']);
-      expect(
-        pathOn(ventShut, scene, 'chapel-of-echoes', 'horns-hall-stub', 'chapel-portcullis').status,
-      ).toBe('found');
-      expect(pathOn(ventShut, scene, 'chapel-of-echoes', 'horns-hall-stub').status).not.toBe(
-        'found',
-      );
-    },
-  );
+    it('AC-1: the scene is the knot-outer region with the ring, the Ossuary and the Chapel inside it', () => {
+      const { regions } = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'knot-outer' })
+        .scene.layout;
+      expect(regionsAt(regions, spot(scene, 'knot-outer-ring'))).toEqual([
+        'knot-outer',
+        'knot-outer-ring',
+      ]);
+      expect(regionsAt(regions, spot(scene, 'ossuary-galleries'))).toEqual([
+        'knot-outer',
+        'ossuary-galleries',
+      ]);
+      expect(regionsAt(regions, spot(scene, 'dark-crossing'))).toEqual([
+        'knot-outer',
+        'ossuary-galleries',
+      ]);
+      expect(regionsAt(regions, spot(scene, 'chapel-of-echoes'))).toEqual([
+        'knot-outer',
+        'chapel-of-echoes',
+      ]);
+      const rule = content
+        .get('respawn-rules', 'respawn-rules')
+        .rules.find((r) => r.region.id === 'knot-outer');
+      expect(rule?.destination).toMatchObject({ spawn: 'player-start' });
+    });
+  },
+);
 
-  it('AC-1: the Ossuary has a loop: the hall reaches the far hall through the Dark Crossing, the garden or the east gallery', () => {
-    for (const id of [
-      'dark-crossing',
-      'clatter-garden',
-      'mushroom-bed-c',
-      'east-gallery',
-      'chapel-door',
-    ]) {
-      expect(route('ossuary-galleries', id).status, id).toBe('found');
-    }
-    const down = route('ossuary-galleries', 'dark-crossing');
-    if (down.status === 'off-mesh') throw new Error('off-mesh');
-    expect(Math.min(...down.points.map((p) => p.y))).toBeCloseTo(-3, 1);
-  });
-
-  it('AC-1: the scene is the knot-outer region with the ring, the Ossuary and the Chapel inside it', () => {
-    const { regions } = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'knot-outer' })
-      .scene.layout;
-    expect(regionsAt(regions, spot(scene, 'knot-outer-ring'))).toEqual([
-      'knot-outer',
-      'knot-outer-ring',
-    ]);
-    expect(regionsAt(regions, spot(scene, 'ossuary-galleries'))).toEqual([
-      'knot-outer',
-      'ossuary-galleries',
-    ]);
-    expect(regionsAt(regions, spot(scene, 'dark-crossing'))).toEqual([
-      'knot-outer',
-      'ossuary-galleries',
-    ]);
-    expect(regionsAt(regions, spot(scene, 'chapel-of-echoes'))).toEqual([
-      'knot-outer',
-      'chapel-of-echoes',
-    ]);
-    const rule = content
-      .get('respawn-rules', 'respawn-rules')
-      .rules.find((r) => r.region.id === 'knot-outer');
-    expect(rule?.destination).toMatchObject({ spawn: 'player-start' });
-  });
-});
-
-describe('the Knot outer half on foot (mw-e26.9)', () => {
+describe('the Knot outer half on foot (mw-e26.9)', { timeout: 60_000 }, () => {
   it('a walker goes from the breach landing to every place of the three areas and the Horn’s Hall stub', () => {
     for (const id of [
       'player-start',
@@ -267,7 +273,7 @@ describe('the Knot outer half on foot (mw-e26.9)', () => {
   });
 });
 
-describe('the quest’s Knot areas (mw-e26.9)', () => {
+describe('the quest’s Knot areas (mw-e26.9)', { timeout: 60_000 }, () => {
   it('the main quest’s enterArea knot-outer-ring and ossuary-galleries are player volumes of the knot-outer graph', () => {
     const quest = readFileSync(
       'src/content/data/quest/quest-labyrinth-beneath-briar-glen.json',
@@ -301,7 +307,7 @@ describe('the quest’s Knot areas (mw-e26.9)', () => {
   });
 });
 
-describe('the breach and the Deepworks (mw-e26.9)', () => {
+describe('the breach and the Deepworks (mw-e26.9)', { timeout: 60_000 }, () => {
   it('breach-outer-ring lists the transition at each end and each leads to the other scene’s arrival', () => {
     const edge = world?.edges.find((e) => e.id === 'breach-outer-ring');
     expect(edge?.transitions).toEqual(['deepworks/breach-door', 'knot-outer/breach-door']);
@@ -335,7 +341,7 @@ describe('the breach and the Deepworks (mw-e26.9)', () => {
   });
 });
 
-describe('the Chapel portcullis counterweight (mw-e26.9 AC-2)', () => {
+describe('the Chapel portcullis counterweight (mw-e26.9 AC-2)', { timeout: 60_000 }, () => {
   const chapel = (options: { magic?: boolean } = {}) => {
     const game = createGameWorld<never>(RAPIER, {
       seed: 1,

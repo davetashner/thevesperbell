@@ -362,7 +362,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `hub-millpond` | `briarwood-hub` | `millpond` | path |  |  | planned: mw-e25.5 |
 | `hub-priory-road` | `briarwood-hub` | `priory-road` | path |  |  | planned: mw-e25.25 |
 | `hub-moorings` | `briarwood-hub` | `moorings-courtyard` | path |  |  | `briarwood/moorings-gate`, `moorings-watch/spur-gate` |
-| `moorings-priory-ridge` | `moorings-courtyard` | `priory-road` | path |  |  | planned: mw-e25.25 |
+| `moorings-priory-ridge` | `moorings-courtyard` | `priory-road` | path |  |  | `moorings-watch/ridge-gate`, `briarwood/ridge-gate` |
 | `hub-far-bank` | `briarwood-hub` | `millweir-far-bank` | path |  |  | planned: mw-e25.1 |
 | `courtyard-tower` | `moorings-courtyard` | `moorings-tower` | door |  |  | planned: mw-e25.6 |
 | `courtyard-supply-tunnel` | `moorings-courtyard` | `supply-tunnel` | door |  |  | planned: mw-e25.6 |
@@ -446,7 +446,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
 | `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-wharf-link) |
 | `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
-| `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings); its other trails are walked inside the scene |
+| `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings), `briarwood/ridge-gate` (moorings-priory-ridge); its other trails are walked inside the scene |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `standing-horn` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `wolf-den` | none (a marker spawn; its trails are walked inside the scene) |
@@ -454,7 +454,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briarwood` | `millpond` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `priory-road` | `briarwood/priory-road-gate` (priory-road-gate) |
 | `briarwood` | `millweir-far-bank` | none (a marker spawn; its trails are walked inside the scene) |
-| `moorings-watch` | `moorings-courtyard` | `moorings-watch/spur-gate` (hub-moorings) |
+| `moorings-watch` | `moorings-courtyard` | `moorings-watch/spur-gate` (hub-moorings), `moorings-watch/ridge-gate` (moorings-priory-ridge) |
 | `moorings-watch` | `moorings-tower` | none (a marker spawn inside the tower; the door is walked in and the stair climbed inside the scene) |
 | `moorings-watch` | `supply-tunnel` | none (a locked door stub over a sealed vestibule; mw-e25.9 replaces it with a transition) |
 | `bellwater-priory` | `priory-gate` | `bellwater-priory/road-gate` (priory-road-gate) |
@@ -555,6 +555,6 @@ Shortcut facts: `pnpm world:validate` warns (AC-2) for each shortcut fact no pla
 - **How does the town reach the Briarwood?** The bible says the forest is "above the town" without a gate or lane. The map has a `lane-briarwood-edge` path: the lane's woodside path (mw-e25.22), a few steps from the gate to Market Green (mw-e24.2); whether the town should also open onto the forest from the green is open.
 - **Where is the quay relative to the bridge?** Idris's riverbank (under the bridge) is built; the map puts the quay downriver of it and the Weeping Adit mouth upriver. If the adit sits much further up the valley it may need its own approach path.
 - **Which side is the Millweir far bank?** §3.1 says the sluice walk reaches "the Briarwood's far bank"; the map joins it to the forest hub by a path.
-- **Which way does the ridge path leave Mooring's Watch?** The map has `moorings-priory-ridge` from the courtyard to the priory road (mw-e25.25), but the bible never says where the path starts. The watch greybox (mw-e25.6) leaves the courtyard's east wall solid and makes the valley beyond it a plain of crags to look at from the roof; when the ridge path is built it needs an exit, most simply a gate at the north end of that wall.
+- **Which way does the ridge path leave Mooring's Watch?** The map has `moorings-priory-ridge` from the courtyard to the priory road (mw-e25.25), but the bible never says where the path starts. The watch greybox (mw-e25.6) leaves the courtyard's east wall solid and makes the valley beyond it a plain of crags to look at from the roof; built (mw-e25.25) as a gap in the watch's north wall at x 25 to 31 (`ridge-gate`), well clear of the crags, arriving at a second gap in the Briarwood's east wall (`ridge-gate`) with the path running west to the priory road. Confirm or move it: the courtyard's east wall is still solid.
 - **Does the Fold have a second exit?** Only Horn's Hall reaches it, so it is a dead end by design.
 - Guard names, shift times and what the Bridge Watch does with armed strangers remain open in the bible; the map treats the post as always passable.

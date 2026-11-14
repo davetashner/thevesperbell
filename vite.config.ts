@@ -115,6 +115,9 @@ export default defineConfig({
     server: { deps: { inline: [/@dimforge\/rapier3d-deterministic/] } },
     include: ['src/**/*.test.ts', 'tests/**/*.test.ts', 'scripts/**/*.test.ts'],
     environment: 'node',
+    // CI runners are shared and loaded; content-heavy integration tests (navmesh re-bakes, full content
+    // loads) routinely pass 5 s there while running in about a second locally. A hang still fails.
+    testTimeout: process.env['CI'] ? 30_000 : 5_000,
     // The content reporter records which content entries passing tests exercised (mw-e00.18).
     reporters: ['default', new ContentCoverageReporter()],
     coverage: {
