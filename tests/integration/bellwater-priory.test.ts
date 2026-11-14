@@ -232,11 +232,6 @@ describe('the priory legs of the forest loop (mw-e25.25)', () => {
     expect(scene.spawns.find((s) => s.id === 'arrive-from-briarwood')).toBeDefined();
   });
 
-  it('the ridge path from Mooring’s Watch stays planned: no transition yet (owner question)', () => {
-    const edge = world?.edges.find((e) => e.id === 'moorings-priory-ridge');
-    expect(edge?.transitions ?? []).toEqual([]);
-  });
-
   it('the Briarwood’s priory gate is reachable on its navmesh from the town gate and from the hub', () => {
     const game = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'briarwood' });
     const probe = game.world.spawn();

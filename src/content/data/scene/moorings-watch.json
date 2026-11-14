@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "moorings-watch",
   "name": "Mooring's Watch",
-  "description": "Bead mw-e25.6 (with the forest-loop leg of mw-e25.25): the abandoned barony watchtower, a 180 x 100 m greybox on its spur. From the west gap (spur-gate, back to the Briarwood's moorings-gate; arrive-from-briarwood) the spur trail runs east between drop-off walls to the goblin lookout camp below the curtain wall (goblin-lookout, a ladder post at lookout-post), then through the courtyard gate (courtyard-gate) into the courtyard (moorings-courtyard). The tower (moorings-tower; region tower, which doubles as the Hollow Sentinels' leash volume) takes four floors of 3 m: the armour stand hall (armour-stand-a to d), the keeper's quarters with the keepers-log desk, the bell cord shaft (bell-cord, hanging through the roof) and the roof (tower-roof) with the signal-mirror plinth. Stairs wind up inside (three flights); two climbs go up outside, ivy on the south face (everyone: walk into it) and broken masonry on the east face (rough: a jump at it, thief and archer only). The supply tunnel's cellar door (supply-tunnel-door, lock tunnel-collapsed) stands in the courtyard's north wall, shut over a sealed vestibule: the tunnel beyond is mw-e26 and the way through it is mw-e25.9. East of the courtyard a plain of crags stands in for the valley (view it from roof-view). Encounters (mw-e25.7) and the signal mirror puzzle (mw-e25.8) are not built.",
+  "description": "Bead mw-e25.6 (with the forest-loop leg of mw-e25.25): the abandoned barony watchtower, a 180 x 100 m greybox on its spur. From the west gap (spur-gate, back to the Briarwood's moorings-gate; arrive-from-briarwood) the spur trail runs east between drop-off walls to the goblin lookout camp below the curtain wall (goblin-lookout, a ladder post at lookout-post), then through the courtyard gate (courtyard-gate) into the courtyard (moorings-courtyard). The tower (moorings-tower; region tower, which doubles as the Hollow Sentinels' leash volume) takes four floors of 3 m: the armour stand hall (armour-stand-a to d), the keeper's quarters with the keepers-log desk, the bell cord shaft (bell-cord, hanging through the roof) and the roof (tower-roof) with the signal-mirror plinth. Stairs wind up inside (three flights); two climbs go up outside, ivy on the south face (everyone: walk into it) and broken masonry on the east face (rough: a jump at it, thief and archer only). The supply tunnel's cellar door (supply-tunnel-door, lock tunnel-collapsed) stands in the courtyard's north wall, shut over a sealed vestibule: the tunnel beyond is mw-e26 and the way through it is mw-e25.9. A second gap in the north wall (ridge-gate, arrive-from-briarwood-ridge) is the start of the ridge path to the Briarwood's priory road. East of the courtyard a plain of crags stands in for the valley (view it from roof-view). Encounters (mw-e25.7) and the signal mirror puzzle (mw-e25.8) are not built.",
   "grid": 1,
   "camera": {
     "position": [-10, 14, 20],
@@ -21,8 +21,13 @@
     },
     {
       "piece": "wall",
-      "at": [90.0, 0.0, 100.0],
-      "scale": [90.0, 1.0, 1.0]
+      "at": [12.5, 0.0, 100.0],
+      "scale": [12.5, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [105.5, 0.0, 100.0],
+      "scale": [74.5, 1.0, 1.0]
     },
     {
       "piece": "wall",
@@ -1187,8 +1192,19 @@
       "tags": ["arrival"]
     },
     {
+      "id": "arrive-from-briarwood-ridge",
+      "at": [28.0, 0.0, 96.0],
+      "yaw": 180,
+      "tags": ["arrival"]
+    },
+    {
       "id": "spur-gate",
       "at": [2.0, 0.0, 45.0],
+      "tags": ["transition"]
+    },
+    {
+      "id": "ridge-gate",
+      "at": [28.0, 0.0, 99.0],
       "tags": ["transition"]
     },
     {
@@ -1345,6 +1361,13 @@
       "max": [1.75, 3, 48],
       "scene": "briarwood",
       "spawn": "arrive-from-moorings-watch"
+    },
+    {
+      "id": "ridge-gate",
+      "min": [25, -1, 98.25],
+      "max": [31, 3, 99.75],
+      "scene": "briarwood",
+      "spawn": "arrive-from-moorings-watch-ridge"
     }
   ]
 }
