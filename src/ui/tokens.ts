@@ -804,6 +804,33 @@ ${tokens}
 .vb-container-status:empty { display: none; }
 .vb-container-hint { color: var(--ui-color-text-muted); font-size: ${size(0.875)}; }
 .vb-container-actions { flex-wrap: wrap; }
+.vb-panel.vb-contest { width: min(34em, 100%); }
+.vb-contest h1 { overflow-wrap: anywhere; margin: 0; }
+.vb-contest p { margin: 0; overflow-wrap: anywhere; }
+.vb-contest-bet { flex-wrap: wrap; align-items: center; }
+.vb-contest-stake { font-variant-numeric: tabular-nums; font-weight: 700; }
+.vb-contest-status:empty { display: none; }
+.vb-contest-hud {
+  position: absolute;
+  top: var(--ui-space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 28em;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  background: var(--ui-color-panel);
+  color: var(--ui-color-text);
+  border-left: 4px solid var(--ui-color-accent);
+  border-radius: var(--ui-radius);
+  pointer-events: none;
+}
+.vb-contest-hud[hidden] { display: none; }
+.vb-contest-hud-title { margin: 0; font-size: ${size(1)}; }
+.vb-contest-hud-rows { margin: 0; padding: 0; list-style: none; font-variant-numeric: tabular-nums; }
+.vb-contest-hud-row[data-you='true'] { font-weight: 700; }
+.vb-contest-hud-meter { width: 100%; }
+.vb-contest-hud-meter[hidden] { display: none; }
+.vb-contest-hud-hints, .vb-contest-hud-message { margin: 0; overflow-wrap: anywhere; }
+.vb-contest-hud-message:empty { display: none; }
 .vb-panel.vb-shop { width: min(40em, 100%); container-type: inline-size; }
 .vb-shop h1 { overflow-wrap: anywhere; margin: 0; }
 .vb-shop-header { display: flex; align-items: center; gap: var(--ui-space-3); }
