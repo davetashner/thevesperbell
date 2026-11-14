@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "clatter-garden",
-  "notes": "Clatter (Brother Anselm Hobb, bible 5.9) in his mushroom garden among the Forgotten (the Ossuary, E26: unplaced for now; reachable in the debug conversation room). Courteous, apologetic, tends pale mushrooms like a garden; the bones 'have opinions'. Memory stages follow the numeric fact clatter.memories (0 to 3 pieces of The Name on the Bones recovered, written by the quest): every stage has its own greeting and its own set of remembered fragments (ask-memory). If the song swells before he is restored the quest sets clatter.song-swelled and drops clatter.memories to 0: he notices something is missing (lost-1) and the dialogue clears the flag. While clatter.hostile (the Forgotten's fighting reflex has him, until the player hums the hymn or lowers a weapon) he only apologises (barks). Once clatter.restored he asks to rest or to join; either is right (bible 6.1). Class branches: sorcerer reads his memories (a gamble: success skips a piece, failure costs one, once only), thief returns a thing he does not know he lost, knight stands guard (and gives the rites if he asks for rest), archer keeps watch. Not placed yet: the Ossuary scenes belong to E26. mw-e39.11 (The Name on the Bones): meeting him sets clatter.met (starts the quest). Three pieces are handed to him here, each its own hub option: the psalter (evidence.clatter-psalter), the blooming pear tree (bones.pear-bloomed, Juniper) and the letter from the Pell Bible (hollis.bible-lent); each sets its bones.*-given fact and moves clatter.memories up one through `bump`. When memories reach clatter.memories.max (3, or 2 after a failed reading), the name moment plays, and the quest sets clatter.restored. A failed sorcerer reading drops clatter.memories.max to 2 for good (read-lost) as well as costing the memory he held; a successful one sets clatter.read-success. The knight's rites set clatter.rites.",
+  "notes": "Clatter (Brother Anselm Hobb, bible 5.9) in his mushroom garden among the Forgotten (the Ossuary, E26: placed in knot-outer, mw-3n0f; also reachable in the debug conversation room). Courteous, apologetic, tends pale mushrooms like a garden; the bones 'have opinions'. Memory stages follow the numeric fact clatter.memories (0 to 3 pieces of The Name on the Bones recovered, written by the quest): every stage has its own greeting and its own set of remembered fragments (ask-memory). If the song swells before he is restored the quest sets clatter.song-swelled and drops clatter.memories to 0: he notices something is missing (lost-1) and the dialogue clears the flag. While clatter.hostile (the Forgotten's fighting reflex has him, until the player hums the hymn or lowers a weapon) he only apologises (barks). Once clatter.restored he asks to rest or to join; either is right (bible 6.1). Class branches: sorcerer reads his memories (a gamble: success skips a piece, failure costs one, once only), thief returns a thing he does not know he lost, knight stands guard (and gives the rites if he asks for rest), archer keeps watch. Not placed yet: the Ossuary scenes belong to E26. mw-e39.11 (The Name on the Bones): meeting him sets clatter.met (starts the quest). Three pieces are handed to him here, each its own hub option: the psalter (evidence.clatter-psalter), the blooming pear tree (bones.pear-bloomed, Juniper) and the letter from the Pell Bible (hollis.bible-lent); each sets its bones.*-given fact and moves clatter.memories up one through `bump`. When memories reach clatter.memories.max (3, or 2 after a failed reading), the name moment plays, and the quest sets clatter.restored. A failed sorcerer reading drops clatter.memories.max to 2 for good (read-lost) as well as costing the memory he held; a successful one sets clatter.read-success. The knight's rites set clatter.rites.",
   "speakers": [
     {
       "id": "clatter",
@@ -373,8 +373,9 @@
             "kind": "all",
             "of": [
               {
-                "kind": "fact",
-                "fact": "hollis.bible-lent"
+                "kind": "hasItem",
+                "item": "letter-anselm-hobb",
+                "count": 1
               },
               {
                 "kind": "not",
@@ -1083,6 +1084,11 @@
       "id": "letter-fx",
       "kind": "effect",
       "effects": [
+        {
+          "kind": "takeItem",
+          "item": "letter-anselm-hobb",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "bones.letter-given",
