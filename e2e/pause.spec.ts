@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { focusRing, installVirtualPad, seriousAxeViolations } from './helpers/ui';
 
 // mw-e01.3: the pause menu in the vertical slice, against the production build (Chromium). Esc (or
-// P, or the pad's Menu) pauses: Resume, Settings, Save, Load and Quit to Title over the stopped
+// P, or the pad's Menu) pauses: Resume, Journal, Settings, Save, Load and Quit to Title over the stopped
 // game. Save opens the Save screen over it and Esc comes back; Quit to Title asks first when there
 // is progress since the last save, then reloads into the front door (the title over the slice), whose
 // Continue loads that save. #app[data-pause] is open or closed.
@@ -145,7 +145,14 @@ test('AC-1, AC-3: Esc pauses; after saving and playing on, Quit to Title asks fi
   expect(state.screens).toEqual(['pause']);
   expect(state.pause).toBe('open');
   expect(state.focus.text).toBe('Resume');
-  expect(Object.keys(state.buttons)).toEqual(['resume', 'settings', 'save', 'load', 'quit']);
+  expect(Object.keys(state.buttons)).toEqual([
+    'resume',
+    'journal',
+    'settings',
+    'save',
+    'load',
+    'quit',
+  ]);
   expect(state.buttons['save']?.disabled).toBe(false);
   expect(await seriousAxeViolations(page)).toEqual([]);
   const pausedAt = state.tick;
@@ -219,7 +226,7 @@ test('AC-4: the pad’s Menu pauses; the d-pad reaches every option with a visib
   await tapPad(page, 9); // Menu
   await expect(page.locator('#app')).toHaveAttribute('data-pause', 'open', { timeout: 15_000 });
   const visited: string[] = [(await pauseState(page)).focus.action];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     await tapPad(page, 13); // d-pad down
     const { focus } = await pauseState(page);
     expect(focus.ring).toBe(true);
@@ -228,11 +235,12 @@ test('AC-4: the pad’s Menu pauses; the d-pad reaches every option with a visib
     expect(ring?.contrast ?? 0).toBeGreaterThanOrEqual(3);
     visited.push(focus.action);
   }
-  expect(visited).toEqual(['resume', 'settings', 'save', 'load', 'quit']);
-  for (let i = 0; i < 4; i++) await tapPad(page, 12); // d-pad up, back to Resume
+  expect(visited).toEqual(['resume', 'journal', 'settings', 'save', 'load', 'quit']);
+  for (let i = 0; i < 5; i++) await tapPad(page, 12); // d-pad up, back to Resume
   expect((await pauseState(page)).focus.action).toBe('resume');
 
   // Settings opens the options over the menu; B goes back to the menu, B again resumes.
+  await tapPad(page, 13);
   await tapPad(page, 13);
   await tapPad(page, 0); // A on Settings
   expect((await pauseState(page)).screens).toEqual(['pause', 'options']);

@@ -840,6 +840,17 @@ ${tokens}
 .vb-reader-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .vb-reader-hint { font-size: ${size(0.875)}; }
 .vb-reader-actions { flex-wrap: wrap; }
+.vb-panel.vb-journal { width: min(40em, 100%); }
+.vb-journal h1, .vb-journal h2 { overflow-wrap: anywhere; margin: 0; }
+.vb-journal-panel { max-height: 55vh; overflow-y: auto; }
+.vb-journal-entry { line-height: 1.5; }
+.vb-journal-entry p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vb-journal-status, .vb-journal-empty, .vb-journal-hint { margin: 0; color: var(--ui-color-text-muted); }
+.vb-journal-hint { font-size: ${size(0.875)}; }
+.vb-journal-objectives { margin: 0; padding: 0; list-style: none; }
+.vb-journal-objectives li { overflow-wrap: anywhere; }
+.vb-journal-check { font-family: monospace; }
+.vb-journal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .vb-screen[data-screen="epilogue"] { background: ${DIALOGUE_HIGH_CONTRAST_PLATE}; }
 .vb-panel.vb-epilogue { width: min(36em, 100%); text-align: center; background: transparent; }
 .vb-epilogue h1 { overflow-wrap: anywhere; margin: 0; }

@@ -15,6 +15,7 @@ beforeEach(() => {
 
 function controller(overrides: { canPause?: () => boolean; unsaved?: () => boolean } = {}) {
   const calls = {
+    journal: vi.fn(),
     settings: vi.fn(),
     save: vi.fn(),
     load: vi.fn(),
@@ -27,6 +28,7 @@ function controller(overrides: { canPause?: () => boolean; unsaved?: () => boole
     saveBlocked: () => null,
     unsavedProgress: overrides.unsaved ?? (() => false),
     pauseKeys: () => ['Escape', 'KeyP'],
+    openJournal: calls.journal,
     openSettings: calls.settings,
     openSave: calls.save,
     openLoad: calls.load,
@@ -117,16 +119,17 @@ describe('PauseController', () => {
     expect(pause.isOpen).toBe(false);
   });
 
-  it('hands Settings, Save and Load to the game; Resume just closes', () => {
+  it('hands Journal, Settings, Save and Load to the game; Resume just closes', () => {
     const { pause, calls } = controller();
     pause.open();
     const buttons = pause.menu?.buttons;
+    buttons?.journal.click();
     buttons?.settings.click();
     buttons?.save.click();
     buttons?.load.click();
-    expect([calls.settings, calls.save, calls.load].map((f) => f.mock.calls.length)).toEqual([
-      1, 1, 1,
-    ]);
+    expect(
+      [calls.journal, calls.settings, calls.save, calls.load].map((f) => f.mock.calls.length),
+    ).toEqual([1, 1, 1, 1]);
     buttons?.resume.click();
     expect(pause.isOpen).toBe(false);
     pause.close(); // closed already: no-op
