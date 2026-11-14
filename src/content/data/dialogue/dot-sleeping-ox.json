@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "dot-sleeping-ox",
-  "notes": "Odette 'Dot' Farrow (bible 5.4), innkeeper of the Sleeping Ox and the main rumour source. Warm, sharp, calls everyone love, missing her barman Fitch more than she admits. Fears being useless in a crisis. Secrets: a quiet fencing business in the cellar (opens to thieves, dot.fence.open) and one 'goblin trinket' with a Vane Deepworks stamp (dot.trinket.confessed). Rumour trading is a HOOK only (bible 6.2): rumours are told through emit rumor.told events with the bible's number; the rumour set (e39-rumor-set) owns the content. Fence prices and shop rules are out of scope (emit dot.fence-trade). Class options: knight (the beams, her fear), archer (game), sorcerer (light the hearth, which can fail), thief (cellar). Drinks cost gold and raise disposition, which gates the trinket confidence.",
+  "notes": "Odette 'Dot' Farrow (bible 5.4), innkeeper of the Sleeping Ox and the main rumour source. Warm, sharp, calls everyone love, missing her barman Fitch more than she admits. Fears being useless in a crisis. Secrets: a quiet fencing business in the cellar (opens to thieves, dot.fence.open) and one 'goblin trinket' with a Vane Deepworks stamp (dot.trinket.confessed). Rumour trading is a HOOK only (bible 6.2): rumours are told through emit rumor.told events with the bible's number; the rumour set (e39-rumor-set) owns the content. Fence prices and shop rules are out of scope (emit dot.fence-trade). Class options: knight (the beams, her fear), archer (game), sorcerer (light the hearth, which can fail), thief (cellar). Drinks cost gold and raise disposition, which gates the trinket confidence. mw-e39.10 (The Captain's Boots): rumour 8 also sets boots.noticed; tell-dot is the town-telling choice (hale.secret.exposed): Hale loses authority and Vane gains it.",
   "speakers": [
     {
       "id": "dot",
@@ -320,6 +320,41 @@
           "next": "downriver-1"
         },
         {
+          "id": "tell-dot",
+          "text": "I know why the captain's boots are dusty.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.night-followed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "boots.method",
+                "op": "neq",
+                "value": "none"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.secret.kept"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.secret.exposed"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "tell-1"
+        },
+        {
           "id": "leave",
           "text": "That's all.",
           "next": "farewell"
@@ -480,6 +515,11 @@
             "rumor": 8,
             "source": "npc-dot"
           }
+        },
+        {
+          "kind": "setFact",
+          "fact": "boots.noticed",
+          "value": true
         }
       ],
       "next": "rumour-choice"
@@ -1079,6 +1119,76 @@
       "kind": "line",
       "speaker": "dot",
       "text": "Fitch is home, love, and I'm glad. But I've heard about the money. A rumour's just the truth wearing someone else's coat, and I know whose coat that money's wearing. First drink's on the house. The second's on you.",
+      "next": "hub"
+    },
+    {
+      "id": "tell-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Do you, love? Do you really. Go on, then. I'll not breathe a word. I'll only sit very still and listen, and by supper the whole green will know, but that won't be me.",
+      "next": "tell-choice"
+    },
+    {
+      "id": "tell-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tell-all",
+          "text": "He walks in his sleep. Up the mine road. He delivered a note he can't remember.",
+          "next": "tell-all-1"
+        },
+        {
+          "id": "tell-never",
+          "text": "On second thought, forget I said anything.",
+          "next": "tell-never-1"
+        }
+      ]
+    },
+    {
+      "id": "tell-all-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Brannoc? Walking? ...Oh, love. Oh, the poor old goat. Those boots. I said it was the boots.",
+      "next": "tell-all-2"
+    },
+    {
+      "id": "tell-all-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "I'll say nothing. (A long pause, the sound of a woman not saying a thing.) Well. I'll say nothing to a few people at a time. It does get about.",
+      "next": "tell-all-fx"
+    },
+    {
+      "id": "tell-all-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.secret.exposed",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": -6
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-dot",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "hale.town-told"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "tell-never-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Said what, love? I've not heard a thing. I never do. It's a gift.",
       "next": "hub"
     }
   ]

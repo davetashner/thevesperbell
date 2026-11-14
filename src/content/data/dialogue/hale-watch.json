@@ -1,11 +1,19 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "hale-watch",
-  "notes": "Captain Brannoc Hale (bible 5.2), the whole Watch of Briar Glen plus two teenagers with spears. Honest, tired, rumpled; clipped sentences, counts doors. Fears he is too old for this. SECRET: he sleepwalks and hides the mine dust on his boots. AC-3/bible: he must not know he delivered the 'friend below' note until The Captain's Boots reveals it, so every line about the note is behind hale.sleepwalking.revealed (the entry boots-acknowledged and the option ask-note); before that he only deflects about his boots. The quest owns hale.secret.kept / hale.secret.exposed (tell the town or keep it). Also: the missing-persons list, the jail (hale.jailed, set by the theft system; the loose stone is only hinted), Act III testimony (a persuasion check unless the secret was kept), and a reaction to each headline ending. Disposition: cold (<= -10) shuts him down; >= 10 he admits the dust on his boots.",
+  "notes": "Captain Brannoc Hale (bible 5.2), the whole Watch of Briar Glen plus two teenagers with spears. Honest, tired, rumpled; clipped sentences, counts doors. Fears he is too old for this. SECRET: he sleepwalks and hides the mine dust on his boots. AC-3/bible: he must not know he delivered the 'friend below' note until The Captain's Boots reveals it, so every line about the note is behind hale.sleepwalking.revealed (the entry boots-acknowledged and the option ask-note); before that he only deflects about his boots. The quest owns hale.secret.kept / hale.secret.exposed (tell the town or keep it). Also: the missing-persons list, the jail (hale.jailed, set by the theft system; the loose stone is only hinted), Act III testimony (a persuasion check unless the secret was kept), and a reaction to each headline ending. Disposition: cold (<= -10) shuts him down; >= 10 he admits the dust on his boots. mw-e39.10 (The Captain's Boots, bible 6.1 quest 2, and The Bookshop Burglar): the walked-in entry (he took the sleep draught and walked to the mine gate; Dot and the lads; hale.retrieved), the night-walk scene after midnight once boots.noticed (wake him, watch from the lane, or follow the whole route), the snig-in entry (burglar.outcome turned-in: Snig goes in the cell, bounty paid), and hub options to settle it: wakeful tea (Juniper brings it), the sleep draught (the wrong one), tying him down with his consent, a bell on his door, or walking his route with him, then keep-secret (hale.secret.kept; telling the town is Dot's option, hale.secret.exposed). boots.method records the choice; the quest owns hale.sleepwalking.revealed.",
   "speakers": [
     {
       "id": "hale",
       "npc": "npc-hale"
+    },
+    {
+      "id": "juniper",
+      "npc": "npc-juniper"
+    },
+    {
+      "id": "dot",
+      "npc": "npc-dot"
     }
   ],
   "entries": [
@@ -16,6 +24,73 @@
         "fact": "hale.jailed"
       },
       "node": "jail-1"
+    },
+    {
+      "id": "walked-in",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "hale.walked-in"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "hale.retrieved"
+            }
+          }
+        ]
+      },
+      "node": "walkin-1"
+    },
+    {
+      "id": "snig-in",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "turned-in"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "burglar.snig-jailed"
+            }
+          }
+        ]
+      },
+      "node": "snig-in-1"
+    },
+    {
+      "id": "night-walk",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "boots.noticed"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "hale.night-followed"
+            }
+          },
+          {
+            "kind": "timeOfDay",
+            "from": "23:00",
+            "to": "04:00"
+          }
+        ]
+      },
+      "node": "night-1"
     },
     {
       "id": "ending-long",
@@ -363,6 +438,178 @@
             "fact": "tansy.saved"
           },
           "next": "testify-1"
+        },
+        {
+          "id": "give-tea",
+          "text": "Juniper's wakeful tea. One cup before bed.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "juniper.tea-ready"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.night-followed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "hale.draught",
+                "op": "neq",
+                "value": "tea"
+              }
+            ]
+          },
+          "once": true,
+          "next": "tea-1"
+        },
+        {
+          "id": "give-draught",
+          "text": "A sleep draught, from Juniper. For proper rest.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "juniper.draught-sold"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.night-followed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.retrieved"
+                }
+              },
+              {
+                "kind": "factCmp",
+                "fact": "hale.draught",
+                "op": "neq",
+                "value": "sleep"
+              }
+            ]
+          },
+          "once": true,
+          "next": "draught-1"
+        },
+        {
+          "id": "tie-bed",
+          "text": "Let me tie you to your bed tonight. With your say-so.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.night-followed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.tied-consent"
+                }
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "hale.boots.confessed"
+                  },
+                  {
+                    "kind": "disposition",
+                    "npc": "npc-hale",
+                    "op": "gte",
+                    "value": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "once": true,
+          "next": "tie-1"
+        },
+        {
+          "id": "hang-bell",
+          "text": "Hang a bell on your door. If you walk, it rings.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.night-followed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.bell-hung"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "bell-1"
+        },
+        {
+          "id": "route-plan",
+          "text": "I know your road now. Next time I'll walk it behind you.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.route-followed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "boots.method",
+                "op": "neq",
+                "value": "route"
+              }
+            ]
+          },
+          "once": true,
+          "next": "route-1"
+        },
+        {
+          "id": "keep-secret",
+          "text": "What I saw at night stays between us.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.night-followed"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "boots.method",
+                "op": "neq",
+                "value": "none"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.secret.kept"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hale.secret.exposed"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "keep-1"
         },
         {
           "id": "leave",
@@ -900,6 +1147,578 @@
       "kind": "line",
       "speaker": "hale",
       "text": "The bounty's paid and the council's pleased. I haven't written the report. Don't ask me to. Vane's quite right that nobody wants to read it. Somebody ought to.",
+      "next": "hub"
+    },
+    {
+      "id": "walkin-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(The Watch House is empty at dawn but for a kettle boiling dry. One of the lads is on the step with his spear the wrong way up. \"The Captain's gone up the mine road in his shirt,\" he says. \"Eyes shut. Wouldn't answer. We tried.\")",
+      "next": "walkin-2"
+    },
+    {
+      "id": "walkin-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "(coming across the green at a run with a shawl over her nightgown) Juniper's draught, was it? The blue one, that sinks a man like a stone? I'll come as far as the gate and not an inch past it. Go on, love. Go and fetch him.",
+      "next": "walkin-3"
+    },
+    {
+      "id": "walkin-3",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You run the mine road before the sun is up. He is at the barred gate, eyes shut, boots black to the knee, one fist raised as if to knock.)",
+      "next": "walkin-3-b"
+    },
+    {
+      "id": "walkin-3-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Beyond the bars the dark smells of damp stone and, very faintly, of honey. You get a hand on his sleeve and talk him round like a horse, all the way down the hill.)",
+      "next": "walkin-4"
+    },
+    {
+      "id": "walkin-4",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "(He wakes on his own doorstep with Dot's shawl round his shoulders and the whole Watch staring.) I have been somewhere. I can taste it. Don't tell me where. I can see it in your face.",
+      "next": "walkin-5"
+    },
+    {
+      "id": "walkin-5",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Seven beds gone cold, Brannoc Hale, and you very nearly made it eight. I'll put the kettle on. Nobody is to say a word about the shawl.",
+      "next": "walkin-6"
+    },
+    {
+      "id": "walkin-6",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "The draught. I thought it a kindness. I'll not drink another. And don't look so grave; it's a fine thing to be fetched home. It's only that nobody has ever had to.",
+      "next": "walkin-fx"
+    },
+    {
+      "id": "walkin-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.retrieved",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "hale.draught",
+          "value": "none"
+        },
+        {
+          "kind": "setFact",
+          "fact": "hale.walked-in",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "hale-brought-home"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "snig-in-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You bring Snig up from the Glen Well by the scruff, which is mostly string, and set him on the Watch House bench. He looks at the keys, the kettle and the Captain in that order.)",
+      "next": "snig-in-2"
+    },
+    {
+      "id": "snig-in-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "This is the thief? A goblin the size of a loaf. Eleven picture books. I've a cell older than the Watch, and I can't say I enjoy putting a child in it. But there are people in this town who want somebody to be punished, and he is somebody.",
+      "next": "snig-in-3"
+    },
+    {
+      "id": "snig-in-3",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "He'll have bread and a blanket and the bucket. Nobody is to say Hale is a hard man. Here: the bounty the council posted for the books. It isn't much. Take it before I think better of it.",
+      "next": "snig-in-4"
+    },
+    {
+      "id": "snig-in-4",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(From the cell, a very small voice: \"The man with the keys has a LOT of doors.\")",
+      "next": "snig-in-fx"
+    },
+    {
+      "id": "snig-in-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.snig-jailed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "snig.jailed"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "night-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Past one in the morning. The Watch House door opens without anyone opening it. Captain Hale comes out in his nightshirt and his boots, eyes closed, lantern unlit. He turns up the lane toward the mine road and does not look at you.)",
+      "next": "night-2"
+    },
+    {
+      "id": "night-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "(asleep) Seven. Eight. Door's open, Fitch. Door's open. Somebody ought to shut it.",
+      "next": "night-3"
+    },
+    {
+      "id": "night-3",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(He walks like a man being gently pulled on a string.)",
+      "next": "night-choice"
+    },
+    {
+      "id": "night-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "night-route",
+          "text": "Follow close, the whole way, and note the road.",
+          "once": true,
+          "next": "night-route-1"
+        },
+        {
+          "id": "night-lane",
+          "text": "Watch from the lane and see where he goes.",
+          "once": true,
+          "next": "night-lane-1"
+        },
+        {
+          "id": "night-wake",
+          "text": "Take his arm and wake him.",
+          "once": true,
+          "next": "night-wake-1"
+        }
+      ]
+    },
+    {
+      "id": "night-route-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You keep a dozen paces back. He does not take the mine road at all, as you thought he would.)",
+      "next": "night-route-1-b"
+    },
+    {
+      "id": "night-route-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(At the last lantern he turns off across the Briarwood by a line of trampled ferns, a path nobody walks awake, and the roots do not trip him. Far ahead, between two leaning stones, the air goes cold.)",
+      "next": "night-route-2"
+    },
+    {
+      "id": "night-route-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(At the Bell Line stones he stops. He sways. His hand comes up as if to a knocker that is not there.)",
+      "next": "night-route-2-b"
+    },
+    {
+      "id": "night-route-2-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Then, as if someone had said no, he turns, and walks all the way home by the same ferns, and you walk behind him, and the map of it is in your head.)",
+      "next": "night-route-3"
+    },
+    {
+      "id": "night-route-3",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "(at his own door, still asleep) Not that way. Never that way. Whose door is that?",
+      "next": "night-route-fx"
+    },
+    {
+      "id": "night-route-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.night-followed",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "hale.route-followed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hale-night-followed"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "night-lane-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You keep to the shadow of the lantern posts. He goes up the lane, past the forge and the Ox, and up the mine road with his shirt tail flapping, a grey man in grey light.)",
+      "next": "night-lane-1-b"
+    },
+    {
+      "id": "night-lane-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(At the Bell Line stones he stops, sways, and turns back as if someone had said no.)",
+      "next": "night-lane-2"
+    },
+    {
+      "id": "night-lane-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(In the morning his boots will be dusty to the ankle, and he will not know why.)",
+      "next": "night-lane-fx"
+    },
+    {
+      "id": "night-lane-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.night-followed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hale-night-followed"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "night-wake-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You take his arm. He comes up out of sleep like a man out of cold water, and stands in the road in his nightshirt, looking at his boots.)",
+      "next": "night-wake-2"
+    },
+    {
+      "id": "night-wake-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "What am I... Why am I in the road? ...Oh. Oh, no. Not again. Not with someone watching.",
+      "next": "night-wake-3"
+    },
+    {
+      "id": "night-wake-3",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "I tie my laces to the bedpost. Did you know? I tie them tight, and in the morning they are still tied, and my boots are on the other side of the door. Don't tell. Please.",
+      "next": "night-wake-fx"
+    },
+    {
+      "id": "night-wake-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.night-followed",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "hale.boots.confessed",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hale-night-followed"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "tea-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Juniper has walked over with you, a flask in each hand and the face of a woman who would sooner be anywhere with a wolf in it.)",
+      "next": "tea-2"
+    },
+    {
+      "id": "tea-2",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Wakeful tea, Captain. Bellwort, mint, and something I won't name, because you'd ask for the recipe. One cup before bed. It keeps your head on the pillow and your feet in the bed.",
+      "next": "tea-3"
+    },
+    {
+      "id": "tea-3",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "(drinking) It tastes of boots. Which I suppose is fair.",
+      "next": "tea-4"
+    },
+    {
+      "id": "tea-4",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "It's meant to. Drink it.",
+      "next": "tea-5"
+    },
+    {
+      "id": "tea-5",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Juniper. You came to the Watch House. On your own feet, in daylight. And you haven't mentioned a wolf once.",
+      "next": "tea-6"
+    },
+    {
+      "id": "tea-6",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "I'm told I'm very sensible. I'd rather be useful.",
+      "next": "tea-fx"
+    },
+    {
+      "id": "tea-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.draught",
+          "value": "tea"
+        },
+        {
+          "kind": "setFact",
+          "fact": "boots.method",
+          "value": "tea"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 3
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-juniper",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hale.tea-given"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "draught-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(The little blue bottle. Half the town swears by it.)",
+      "next": "draught-2"
+    },
+    {
+      "id": "draught-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Sleep. Proper sleep. I'd almost forgotten it had a taste, like warm bread. Thank you, truly. I'll sleep like the dead tonight.",
+      "next": "draught-fx"
+    },
+    {
+      "id": "draught-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.draught",
+          "value": "sleep"
+        },
+        {
+          "kind": "setFact",
+          "fact": "boots.method",
+          "value": "sleep"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hale.draught-given"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "tie-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "With my say-so. Yes. Yes, all right. Not the laces. Me. You'll tie it loose enough to breathe and tight enough to argue with.",
+      "next": "tie-2"
+    },
+    {
+      "id": "tie-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "And you'll be there to untie it at dawn, or I'll have the lads do it, and they'll talk. The dignity of the Watch is a fragile thing.",
+      "next": "tie-fx"
+    },
+    {
+      "id": "tie-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.tied-consent",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "boots.method",
+          "value": "tied"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "hale.tied-to-bed"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "bell-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "A bell. Fitch had one over the Ox's cellar door; it rang at all the wrong moments. Aye. The Watch's hand-bell, from the shelf by the kettle. If it rings and I'm not up, the lads come.",
+      "next": "bell-2"
+    },
+    {
+      "id": "bell-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "If it rings and the lads are asleep, heaven help the town. Hang it. I'll sleep to the sound of it, or I won't.",
+      "next": "bell-fx"
+    },
+    {
+      "id": "bell-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.bell-hung",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "boots.method",
+          "value": "bell"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hale.bell-hung-event"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "route-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "You mean to walk it with me. Every step. In the ferns, in the dark, behind a man in his shirt.",
+      "next": "route-2"
+    },
+    {
+      "id": "route-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "Aye. All right. Mark the way, and keep a clear head; there is a place on it that I don't like. Better that someone knows where I go than nobody.",
+      "next": "route-fx"
+    },
+    {
+      "id": "route-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "boots.method",
+          "value": "route"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "hale.route-agreed"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "keep-1",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "That is more than I would ask of a stranger. If the council knew, Vane would have the Watch by Sunday and I'd have a chair by the fire.",
+      "next": "keep-2"
+    },
+    {
+      "id": "keep-2",
+      "kind": "line",
+      "speaker": "hale",
+      "text": "You've my thanks, and what's left of my knees. If it comes to the council, I'll stand with you, whatever it costs me.",
+      "next": "keep-fx"
+    },
+    {
+      "id": "keep-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.secret.kept",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hale",
+          "delta": 10
+        },
+        {
+          "kind": "emit",
+          "event": "hale.secret-kept"
+        }
+      ],
       "next": "hub"
     }
   ]
