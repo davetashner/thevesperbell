@@ -12,6 +12,7 @@ export * from './components/list';
 export * from './components/overlays';
 export * from './components/tabs';
 export * from './container-window';
+export * from './contest-window';
 export * from './death-fade';
 export * from './dialogue-box';
 export * from './death-screen';

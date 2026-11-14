@@ -2024,7 +2024,16 @@
     {
       "id": "dice-table",
       "at": [84.5, 0.0, 145.0],
-      "tags": ["contest", "tavern"]
+      "tags": ["contest", "tavern", "contest:drowned-gull-dice"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "use",
+            "label": "Play dice"
+          }
+        ],
+        "radius": 1.5
+      }
     },
     {
       "id": "breakwater-cellar-hatch",

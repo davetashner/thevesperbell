@@ -650,6 +650,8 @@ export interface ShopUi {
   readonly shops: Shops;
   /** Call after every sim step. */
   afterStep(): void;
+  /** A toast in the shop's corner (the contest screens share it). */
+  toast(text: string): void;
 }
 
 /** Builds the shops engine over content and readies the shop screen for the player. */
@@ -696,6 +698,9 @@ export function startShopUi(options: ShopUiOptions): ShopUi {
     shops,
     afterStep: () => {
       controller.afterStep();
+    },
+    toast: (text) => {
+      toasts.show(text, { durationMs: 6000 });
     },
   };
 }
