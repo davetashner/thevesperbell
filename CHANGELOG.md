@@ -14,6 +14,7 @@ check enforces this).
 ### Added
 
 - The knight now holds his sword the way a hand really holds one: the fist closed around the grip with the elbow bent and the hand low by his hip, the blade pointing forward and a little out and down, instead of hanging straight down or sticking out as an extension of his arm; the wrist bends with the fist, and attacks, blocks and dodges start from and return to this stance (mw-a6t).
+- The journal now lists the rumours you have heard, flags new entries with a toast and an unread mark on its tab, and a Quest tracker (Settings, Gameplay) pins the quest you are following to the corner of the screen.
 - Rumours about the Briarwood, the Standing Horn, Mooring's Watch, the Glen Well, the Lamplit Stacks, the Weeping Adit and the Breakwater now resolve when you walk into those places, and the sea-serpent and Old Mooring rumours are put right by seeing the breakwater or the watch for yourself (mw-nh24). The Millweir stays a lead.
 - A journal screen (J, or Journal in the pause menu) lists your active, completed and failed quests with their objectives, your heard rumours and your notes, and opens with your class's first entry in place of the generic arrival text (mw-e23.6, mw-1myt).
 - Arrival volumes for the rumour target places that had none (mw-heoa): `briarwood` (the trail from the town gate) and `standing-horn` in the Briarwood, `mooring-watch` over the whole watch, `glen-well` and `lamplit-stacks` in Market Green, `weeping-adit` at the Deepworks adit arrival and `breakwater` on the Wendmouth breakwater. They are observed player volumes named for their area ids, ready for the rumour book's visit triggers. The Millweir has no scene yet, so no volume.
@@ -550,6 +551,7 @@ check enforces this).
 
 ### Fixed
 
+- The new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
 - People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).
 - Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).
 - An arrow stuck in a wall can now be taken back when you stand right up against that wall: the wall no longer hides it from reach, so "Take arrow" no longer shows with nothing to take, or fails to show at all (mw-fh5, mw-5h9).

@@ -254,6 +254,8 @@ export function rumourReading(book: RumourBook): RumourReading {
 }
 
 export interface RumourUiOptions extends Omit<RumourBookOptions, 'onChange'> {
+  /** Called after the book changed and the readout was published (the journal's notices). */
+  readonly onChange?: () => void;
   /** Publishes a readout for the e2e: `rumours` (JSON of a `RumourReading`). */
   readonly publish?: (key: 'rumours', value: string) => void;
 }
@@ -267,9 +269,10 @@ export interface RumourUi {
 
 /** Starts the rumour book over `options`; it opens no UI, so a debug boot is never blocked. */
 export function startRumourUi(options: RumourUiOptions): RumourUi {
-  const { publish, ...rest } = options;
+  const { publish, onChange, ...rest } = options;
   const report = (): void => {
     publish?.('rumours', JSON.stringify(rumourReading(book)));
+    onChange?.();
   };
   const book: RumourBook = new RumourBook({ ...rest, onChange: report });
   report();

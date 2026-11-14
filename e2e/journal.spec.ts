@@ -33,6 +33,10 @@ test('mw-e23.6: the journal stays closed on a scene boot, J opens it, Esc closes
   await expect(app).toHaveAttribute('data-player', /"grounded":true/);
   await expect(app).toHaveAttribute('data-journal', 'closed');
   await expect(page.locator('[data-screen="journal"]')).toHaveCount(0);
+  // mw-e23.6.1: the notices are small HUD pieces, never a blocking screen: they exist, take no focus
+  // and no entry is unread on a fresh boot.
+  await expect(page.locator('[data-testid="journal-toasts"]')).toHaveCount(1);
+  await expect(page.locator('[data-testid="journal-unread"]')).toBeHidden();
   await takeControl(page);
 
   await page.keyboard.press('KeyJ');
