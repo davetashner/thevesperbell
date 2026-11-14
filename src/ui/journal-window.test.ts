@@ -9,6 +9,7 @@ import {
   openJournalWindow,
   type JournalModel,
 } from '@ui/journal-window';
+import { setTextScale, textScale } from '@ui/comfort';
 import { UiRoot } from '@ui/screens';
 import { find, rectFromData } from '@ui/testing/layout';
 
@@ -121,5 +122,63 @@ describe('journal window', () => {
     const w = openJournalWindow(ui, { model: MODEL });
     w.close();
     expect(ui.top).toBeUndefined();
+  });
+
+  it('AC-3: unread entries tag their tab and themselves until the tab is viewed, reported once', () => {
+    const onViewed = vi.fn();
+    openJournalWindow(ui, {
+      model: MODEL,
+      unread: { active: ['q1'], rumours: ['r1'] },
+      onViewed,
+    });
+    const tab = (id: string): HTMLElement => find(`[role="tab"][data-tab="${id}"]`);
+    // The opening tab counts as viewed at once; its entry keeps its tag for this visit.
+    expect(onViewed).toHaveBeenCalledExactlyOnceWith('active');
+    expect(tab('active').dataset['unread']).toBeUndefined();
+    expect(document.querySelector('[data-entry="q1"] .vb-journal-new')?.textContent).toBe(
+      `(${JOURNAL_TEXT.unread})`,
+    );
+    expect(tab('rumours').dataset['unread']).toBe('true');
+    expect(tab('rumours').textContent).toContain(JOURNAL_TEXT.unread);
+    expect(tab('done').dataset['unread']).toBeUndefined();
+    tab('rumours').click();
+    expect(onViewed).toHaveBeenLastCalledWith('rumours');
+    expect(tab('rumours').dataset['unread']).toBeUndefined();
+    expect(tab('rumours').textContent).toBe('Rumours');
+    tab('done').click();
+    tab('rumours').click();
+    expect(onViewed).toHaveBeenCalledTimes(2);
+  });
+
+  it('AC-3: with nothing unread nothing is tagged and viewing reports nothing', () => {
+    const onViewed = vi.fn();
+    openJournalWindow(ui, { model: MODEL, unread: { done: [] }, onViewed });
+    find('[role="tab"][data-tab="notes"]').click();
+    expect(onViewed).not.toHaveBeenCalled();
+    expect(document.querySelector('.vb-journal-new')).toBeNull();
+    expect(document.querySelector('[data-unread]')).toBeNull();
+  });
+
+  it('AC-4: at 150% text a 10-objective quest scrolls in its panel without clipping', () => {
+    const styled = new UiRoot(document.body, { focus: { rectOf: rectFromData } });
+    setTextScale(styled.element, 1.5);
+    expect(textScale(styled.element)).toBe(1.5);
+    const objectives = Array.from({ length: 10 }, (_, i) => ({
+      text: `Objective number ${String(i + 1)}, written as a long line of prose that wraps.`,
+      done: i < 3,
+      optional: i === 9,
+    }));
+    openJournalWindow(styled, {
+      model: { ...MODEL, active: [{ id: 'big', title: 'Big', paragraphs: ['Go.'], objectives }] },
+    });
+    const panelEl = find('[data-panel="active"]');
+    const style = getComputedStyle(panelEl);
+    // The panel is height-capped and scrolls; entries wrap instead of clipping.
+    expect(style.overflowY).toBe('auto');
+    expect(style.maxHeight).not.toBe('none');
+    expect(panelEl.querySelectorAll('li')).toHaveLength(10);
+    expect(getComputedStyle(find('.vb-journal-objectives li')).overflowWrap).toBe('anywhere');
+    expect(styled.element.style.getPropertyValue('--ui-text-scale')).toBe('1.5');
+    expect(document.querySelector('article')?.getAttribute('tabindex')).toBe('0');
   });
 });
