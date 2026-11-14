@@ -132,33 +132,40 @@ describe('interaction system (mw-e02.5)', () => {
     expect(focusOf(world, actor)?.target).not.toBeNull();
   });
 
-  describe.each([-2, 2, 0])('mw-j6el: an object placed at its feet on a floor whose top is y %d', (top) => {
-    const feetSpec: InteractableSpec = { affordances: [{ verb: 'talk' }], anchor: [0, 0, 0] };
-    const floorWorld = (extra: readonly ReturnType<typeof box>[] = []) => {
-      const sight = new FakeSightWorld([
-        box({ x: -20, y: top - 1, z: -20 }, { x: 20, y: top, z: 20 }),
-        ...extra,
-      ]);
-      const made = setup({ sight });
-      made.world.set(made.actor, CharacterController, initialCharacterState({ x: 0, y: top, z: 0 }));
-      const npc = made.world.spawn();
-      addInteractable(made.world, npc, feetSpec, { x: 0, y: top, z: -2 });
-      return { ...made, npc };
-    };
+  describe.each([-2, 2, 0])(
+    'mw-j6el: an object placed at its feet on a floor whose top is y %d',
+    (top) => {
+      const feetSpec: InteractableSpec = { affordances: [{ verb: 'talk' }], anchor: [0, 0, 0] };
+      const floorWorld = (extra: readonly ReturnType<typeof box>[] = []) => {
+        const sight = new FakeSightWorld([
+          box({ x: -20, y: top - 1, z: -20 }, { x: 20, y: top, z: 20 }),
+          ...extra,
+        ]);
+        const made = setup({ sight });
+        made.world.set(
+          made.actor,
+          CharacterController,
+          initialCharacterState({ x: 0, y: top, z: 0 }),
+        );
+        const npc = made.world.spawn();
+        addInteractable(made.world, npc, feetSpec, { x: 0, y: top, z: -2 });
+        return { ...made, npc };
+      };
 
-    it('is reachable: the sight ray ends above the floor it stands on, not inside it', () => {
-      const { world, actor, npc } = floorWorld();
-      world.step([IDLE]);
-      expect(focusOf(world, actor)?.target).toBe(npc);
-    });
+      it('is reachable: the sight ray ends above the floor it stands on, not inside it', () => {
+        const { world, actor, npc } = floorWorld();
+        world.step([IDLE]);
+        expect(focusOf(world, actor)?.target).toBe(npc);
+      });
 
-    it('is still hidden by a wall between it and the player', () => {
-      const wall = box({ x: -2, y: top, z: -1.2 }, { x: 2, y: top + 3, z: -1 });
-      const { world, actor } = floorWorld([wall]);
-      world.step([IDLE]);
-      expect(focusOf(world, actor)?.target).toBeNull();
-    });
-  });
+      it('is still hidden by a wall between it and the player', () => {
+        const wall = box({ x: -2, y: top, z: -1.2 }, { x: 2, y: top + 3, z: -1 });
+        const { world, actor } = floorWorld([wall]);
+        world.step([IDLE]);
+        expect(focusOf(world, actor)?.target).toBeNull();
+      });
+    },
+  );
 
   it("AC-2: the object's own colliders never block it", () => {
     const sight = new FakeSightWorld();
