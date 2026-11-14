@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Wendmouth's harbour texts now have places to be read (the customs house, bay nine, the Stone Wharf, Cray's desk and the Kestrel Lock toll board; the reader itself is still to come), Nell tells the rumour about her cellar, and Dot repeats the six harbour rumours second-hand until you have been to Wendmouth (mw-18w, mw-ily9).
 - Two Wendmouth side quests, "The Tidefair" (four contest events, a class-highlighted event for each of knight, archer, sorcerer and thief, win, cheat, throw the match or lose gracefully) and "Contraband Pages" (get Mirela's impounded books out of Inspector Cray's customs house by evidence, romance novel, Vane's writ, a forged seal, the strongroom or an inspector's coat), with new talk options for Oona, Nell, Cray, Mirela, Vane and Tereza (mw-e39.22).
 - You can now walk to Wendmouth: a doorway in the east wall of the riverbank under the Miners' Bridge opens onto a short walled towpath, and its end leads downriver to the Stone Wharf, where the towpath gate in the harbour's south wall is now an open doorway back up the river (mw-e40.26). It is a stopgap until Briar Glen Quay, the Millweir and Kestrel Lock exist; the barge to the Patient Ann's berth is still to come, and the main quest never needs either.
 - Reaching the boarded forecourt in front of the Deepworks' gate wall now completes "Follow Tansy Pell up the street" in the main quest (mw-sba).

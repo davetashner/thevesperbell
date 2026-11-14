@@ -103,12 +103,14 @@ describe('harbour rumours 13-18', () => {
       const number = Number(/^rumor-(\d{2})-/.exec(entry.id)?.[1]);
       const dialogues = gameContentSources().filter((s) => s.path.includes('/data/dialogue/'));
       const told = dialogues.filter((s) =>
-        new RegExp(`"rumor": ${String(number)},\\s*"source": "(npc-[a-z]+)"`).test(s.text),
+        new RegExp(
+          `"rumor": ${String(number)},\\s*"source": "(npc-[a-z]+)"(?!,\\s*"secondHand")`,
+        ).test(s.text),
       );
       for (const s of told) {
-        const teller = new RegExp(`"rumor": ${String(number)},\\s*"source": "(npc-[a-z]+)"`).exec(
-          s.text,
-        )?.[1];
+        const teller = new RegExp(
+          `"rumor": ${String(number)},\\s*"source": "(npc-[a-z]+)"(?!,\\s*"secondHand")`,
+        ).exec(s.text)?.[1];
         expect(entry.source, s.path).toContain(teller);
       }
     },

@@ -502,6 +502,21 @@
           "next": "gossip-cray-1"
         },
         {
+          "id": "gossip-cellar",
+          "text": "Is it true your cellar goes further than your cellar?",
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 15,
+                "source": "npc-nell"
+              }
+            }
+          ],
+          "next": "gossip-cellar-1"
+        },
+        {
           "id": "gossip-back",
           "text": "Enough gossip.",
           "next": "hub"
@@ -520,6 +535,13 @@
       "kind": "line",
       "speaker": "nell",
       "text": "Every one. She carries them home in a sack and brings back the empty sack. I'd be charmed, if she weren't trying to ruin me.",
+      "next": "gossip-choice"
+    },
+    {
+      "id": "gossip-cellar-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Further than anyone's cellar has a right to, darling. Down the steps, along the damp, and out where the tide doesn't ask. I'd say more, but I like you with your teeth in.",
       "next": "gossip-choice"
     },
     {
