@@ -1,0 +1,15 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-11-bones-say-sorry",
+  "notes": "Clatter in his mushroom garden. Goblin-sourced; told by Snig in snig-tunnels.",
+  "region": "valley",
+  "source": ["npc-snig"],
+  "sourceTags": ["goblins"],
+  "truth": "true",
+  "target": "npc-clatter",
+  "text": "The talking bones in the flower room says sorry a lot.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Sorry a lot. Of course he does. Poor soul. Does he know his name yet?"
+  }
+}

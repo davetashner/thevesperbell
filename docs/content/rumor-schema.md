@@ -18,6 +18,9 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `secondHand` | object | — | How a valley teller repeats it; hearing it this way never marks the target visited. |
 | `secondHand.teller` | string | required | Who repeats it second-hand (Dot, in the valley). |
 | `secondHand.text` | string | required |  |
+| `followUp` | object | — | The line Dot trades back once, when the player has visited the target (confirms a true rumour, debunks a false one). |
+| `followUp.teller` | string | required | Who trades the line back (Dot). |
+| `followUp.text` | string | required |  |
 | `debunk` | list of object (at least 1) | — | Required when false: the ways the player can learn it is false. |
 | `debunk[].via` | `"dive"` | required |  |
 | `debunk[].place` | string | required | Where the player goes to see for themselves. |

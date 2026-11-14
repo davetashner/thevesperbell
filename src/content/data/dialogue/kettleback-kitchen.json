@@ -696,6 +696,14 @@
           "kind": "setFact",
           "fact": "kettleback.sleepers-told",
           "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 10,
+            "source": "npc-kettleback"
+          }
         }
       ],
       "next": "hub"

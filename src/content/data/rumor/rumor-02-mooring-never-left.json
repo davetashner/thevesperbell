@@ -1,0 +1,20 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-02-mooring-never-left",
+  "notes": "The Hollow Sentinels: half-true, only his armour keeps watch. Dot tells it (and corrects it) in dot-sleeping-ox; The Watch Still Stands.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "half",
+  "target": "place-mooring-watch",
+  "text": "Old Mooring never left his tower. Some say he's still up there, keeping watch.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Armour, as I said. You saw it stand. I like being nearly right."
+  },
+  "debunk": [
+    {
+      "via": "dive",
+      "place": "place-mooring-watch"
+    }
+  ]
+}

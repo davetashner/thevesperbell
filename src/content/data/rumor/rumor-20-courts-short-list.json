@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-20-courts-short-list",
+  "notes": "Idris Quillon again, told by Mirela in mirela-stacks.",
+  "region": "valley",
+  "source": ["npc-mirela"],
+  "truth": "true",
+  "target": "npc-quillon",
+  "text": "The Court's list of teachers is very short, and the best one isn't on it. He's under the Miners' Bridge from dusk, if you can bear the damp. Buy a book first; he hates teaching people who can't read.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "So you met him. Did you buy a book first? Good. He is insufferable to the unlettered."
+  }
+}
