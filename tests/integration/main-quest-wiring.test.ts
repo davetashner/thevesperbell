@@ -184,10 +184,27 @@ describe('the main quest plays through the built levels (mw-e39.38)', () => {
     expect(g.world.facts.get(`quest.${MAIN}.seen.hear-the-friend-below`)).toBe(true);
   });
 
+  it('AC-5: standing in the mine-gate forecourt completes follow-tansy, once the first night is on', () => {
+    const g = play('deepworks', { x: 100, y: 0.9, z: 6 });
+    g.world.facts.set('briar-glen.arrived', true);
+    g.settle();
+    expect(g.runtime.stage(MAIN)).toBe('first-night');
+    expect(g.runtime.objectiveState(MAIN, 'follow-tansy')).toBe('active');
+    // The mine road is not the gate: walking it completes nothing.
+    g.stand({ x: 100, y: 0.9, z: 30 });
+    g.settle();
+    expect(g.runtime.objectiveState(MAIN, 'follow-tansy')).toBe('active');
+    g.stand({ x: 100, y: 0.9, z: 68 });
+    g.settle();
+    expect(g.runtime.objectiveState(MAIN, 'follow-tansy')).toBe('complete');
+    // Optional: the beat it belongs to still waits for the horned shape (not built yet).
+    expect(g.runtime.objectiveState(MAIN, 'see-the-horned-shape')).toBe('active');
+  });
+
   it('AC-4: objectives whose level is not built stay untouched by play', () => {
     const g = play('briar-glen-lane', { x: 0, y: 0.9, z: 5 });
     g.settle();
-    for (const id of ['follow-tansy', 'enter-the-knot', 'reach-the-cradle', 'ring-the-bell']) {
+    for (const id of ['enter-the-knot', 'reach-the-cradle', 'ring-the-bell']) {
       expect(g.runtime.objectiveState(MAIN, id), id).not.toBe('complete');
     }
   });

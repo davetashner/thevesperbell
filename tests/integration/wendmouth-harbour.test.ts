@@ -265,9 +265,8 @@ describe('the harbour on foot (mw-e40.1 AC-3)', () => {
     const ys = pointsOf(result).map((p) => p.y);
     expect(Math.min(...ys)).toBeLessThan(-1.5);
     expect(Math.max(...ys)).toBeGreaterThan(-0.5);
-    // Mags's spawn sits 0.25 m (one grid step) above the landing (top y -2): a spawn exactly on the floor's
-    // top face has the Interact sight ray end inside the floor collider, so Talk was never offered.
-    expect(spawnOf('npc-mags').at[1]).toBeCloseTo(-1.75, 1);
+    // Mags's feet are on the landing (top y -2); the Interact sight ray ends a little above them (mw-j6el).
+    expect(spawnOf('npc-mags').at[1]).toBeCloseTo(-2, 1);
   });
 
   it('AC-3: the sealed places stay shut as found: bay nine, the strongroom, the Silver Quay, the Tern’s berth, and the whole Undertow', () => {
