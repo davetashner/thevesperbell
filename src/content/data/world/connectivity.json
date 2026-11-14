@@ -897,7 +897,7 @@
       "to": "priory-road",
       "kind": "path",
       "bead": "mw-e25.25",
-      "notes": "Forest to priory road (loop edge)."
+      "notes": "Forest to priory road (loop edge). The priory road is the Briarwood's last stretch, so the walk from the hub to the priory-road spot runs inside the briarwood scene, and an edge inside one scene has no transition volume (mw-e25.25)."
     },
     {
       "id": "hub-moorings",
@@ -912,8 +912,8 @@
       "from": "moorings-courtyard",
       "to": "priory-road",
       "kind": "path",
-      "bead": "mw-e25.25",
-      "notes": "Ridge path from the watch to the priory road (loop edge)."
+      "transitions": ["moorings-watch/ridge-gate", "briarwood/ridge-gate"],
+      "notes": "Ridge path from the watch to the priory road (loop edge): a gap in the watch's north wall (ridge-gate) opens on a second gap in the Briarwood's east wall north of the moorings gate, from which the path runs west along the forest's north edge to the priory road; the Briarwood's ridge-gate leads back (mw-e25.25). Where the path really leaves the watch is an owner question (world-map open questions)."
     },
     {
       "id": "hub-far-bank",

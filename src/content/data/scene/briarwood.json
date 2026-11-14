@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "briarwood",
   "name": "The Briarwood",
-  "description": "Bead mw-e25.1 (with mw-e25.22): the Briarwood greybox, 300 x 250 m: a thick old forest of placeholder trunks (pillars) on a flat floor, with the trails of the world map (docs/design/world-map.md). From the town gate at the south end (town-gate, leading back to briar-glen-lane's woodside path, arrive-from-briar-glen-lane) the main trail runs north to the hub clearing (briarwood-hub); from it the trails branch to the Standing Horn clearing (west), the Sleepers' Path corridor (north-west) and on to the priory road, the millpond and drowned lane (north-east), the spur trail to Mooring's Watch (east, ending at moorings-spur, then a gap in the east wall: the moorings-gate transition into the watch, arrive-from-moorings-watch back), the far-bank trail (east) and, off the main trail, the woodcutter's hut (west) and the wolf den hollow (east); the priory road climbs north past the mine road junction and ends at a gap in the north wall: the priory-road-gate transition into Bellwater Priory (arrive-from-bellwater-priory back). Every bible location is a marker spawn named for its world-map node (the rest are planned content beads). Soft boundaries are solid hedges with a bramble gate each (profile bramble-barrier: ivy, so flammable and cuttable): burning or cutting a gate breaks it, which opens the way for walkers and for the navmesh, and the 8 m gates sit between solid, non-burning hedge so a fire stays inside its 12 m neighbourhood. The whole scene is the briarwood region (respawn rules and ambience read it).",
+  "description": "Bead mw-e25.1 (with mw-e25.22): the Briarwood greybox, 300 x 250 m: a thick old forest of placeholder trunks (pillars) on a flat floor, with the trails of the world map (docs/design/world-map.md). From the town gate at the south end (town-gate, leading back to briar-glen-lane's woodside path, arrive-from-briar-glen-lane) the main trail runs north to the hub clearing (briarwood-hub); from it the trails branch to the Standing Horn clearing (west), the Sleepers' Path corridor (north-west) and on to the priory road, the millpond and drowned lane (north-east), the spur trail to Mooring's Watch (east, ending at moorings-spur, then a gap in the east wall: the moorings-gate transition into the watch, arrive-from-moorings-watch back), a second gap in the east wall north of it (the ridge-gate transition, arrive-from-moorings-watch-ridge back: the ridge path from the watch comes in here and runs west along the north edge to the priory road), the far-bank trail (east) and, off the main trail, the woodcutter's hut (west) and the wolf den hollow (east); the priory road climbs north past the mine road junction and ends at a gap in the north wall: the priory-road-gate transition into Bellwater Priory (arrive-from-bellwater-priory back). Every bible location is a marker spawn named for its world-map node (the rest are planned content beads). Soft boundaries are solid hedges with a bramble gate each (profile bramble-barrier: ivy, so flammable and cuttable): burning or cutting a gate breaks it, which opens the way for walkers and for the navmesh, and the 8 m gates sit between solid, non-burning hedge so a fire stays inside its 12 m neighbourhood. The whole scene is the briarwood region (respawn rules and ambience read it).",
   "grid": 1,
   "camera": {
     "position": [-14, 18, -6],
@@ -22,9 +22,15 @@
     },
     {
       "piece": "wall",
-      "at": [150.0, 0.0, 239.0],
+      "at": [150.0, 0.0, 231.5],
       "yaw": 90,
-      "scale": [11.0, 1.0, 1.0]
+      "scale": [3.5, 1.0, 1.0]
+    },
+    {
+      "piece": "wall",
+      "at": [150.0, 0.0, 245.5],
+      "yaw": 90,
+      "scale": [4.5, 1.0, 1.0]
     },
     {
       "piece": "wall",
@@ -1508,6 +1514,12 @@
       "tags": ["arrival"]
     },
     {
+      "id": "arrive-from-moorings-watch-ridge",
+      "at": [143.0, 0.0, 238.0],
+      "yaw": 270,
+      "tags": ["arrival"]
+    },
+    {
       "id": "arrive-from-bellwater-priory",
       "at": [0.0, 0.0, 243.0],
       "yaw": 180,
@@ -1526,6 +1538,11 @@
     {
       "id": "moorings-gate",
       "at": [149.0, 0.0, 225.0],
+      "tags": ["transition"]
+    },
+    {
+      "id": "ridge-gate",
+      "at": [149.0, 0.0, 238.0],
       "tags": ["transition"]
     }
   ],
@@ -1570,6 +1587,13 @@
       "max": [149.75, 3, 228],
       "scene": "moorings-watch",
       "spawn": "arrive-from-briarwood"
+    },
+    {
+      "id": "ridge-gate",
+      "min": [148.25, -1, 235],
+      "max": [149.75, 3, 241],
+      "scene": "moorings-watch",
+      "spawn": "arrive-from-briarwood-ridge"
     },
     {
       "id": "priory-road-gate",

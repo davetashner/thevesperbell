@@ -147,12 +147,15 @@ describe('the walkable world (mw-e01.11)', () => {
     expect(oneWay.sort()).toEqual([...ONE_WAY].sort());
   });
 
-  it('every transition arrives at a marker spawn named arrive-from-<its scene>, 1.5 m or more from any way out', () => {
+  it('every transition arrives at a marker spawn named arrive-from-<its scene>[-<way>], 1.5 m or more from any way out', () => {
     for (const scene of scenes) {
       for (const t of scene.transitions) {
         const target = byId.get(t.scene.id);
         expect(target, `${scene.id}/${t.id} leads to a scene`).toBeDefined();
-        expect(t.spawn).toBe(`arrive-from-${scene.id}`);
+        // A second way between the same two scenes (the ridge path, mw-e25.25) names its arrival
+        // arrive-from-<scene>-<way>.
+        expect(t.spawn.startsWith(`arrive-from-${scene.id}`)).toBe(true);
+        expect(t.spawn).toMatch(/^arrive-from-[a-z0-9]+(-[a-z0-9]+)*$/);
         const arrival = target?.spawns.find((s) => s.id === t.spawn);
         expect(arrival, `${t.scene.id} places ${t.spawn}`).toBeDefined();
         expect(arrival?.prop).toBeUndefined();
