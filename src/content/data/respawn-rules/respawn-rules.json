@@ -69,6 +69,14 @@
       "mode": "reload"
     },
     {
+      "id": "knot-inner-reload",
+      "notes": "Death in the Knot's inner half (mw-e26.10): the region is the whole scene; the death screen offers Load last save, and with no save the player restarts at the vestibule south of Horn's Hall. Waking in the Fold is the PROPOSAL in docs/design/dungeon.md (Fold respawn logic); the fold-wake marker stands ready and mw-e26.16 replaces this with those fact-conditioned rules.",
+      "region": "knot-inner",
+      "priority": 0,
+      "destination": { "scene": "knot-inner", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
       "id": "wendmouth-harbour-reload",
       "notes": "Death in Wendmouth (mw-e40.1): the region is the whole harbour scene; the death screen offers Load last save, and with no save the harbour restarts on the Stone Wharf. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
       "region": "wendmouth-harbour",

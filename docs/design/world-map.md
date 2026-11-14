@@ -87,10 +87,10 @@ flowchart LR
     knot_outer_ring["The Outer Ring"]:::built
     ossuary_galleries["The Ossuary Galleries"]:::built
     chapel_of_echoes["The Chapel of Echoes"]:::built
-    horns_hall["Horn's Hall"]
-    the_fold["The Fold"]
-    sounding_shaft_foot["The Sounding Shaft's foot"]
-    the_cradle["The Cradle"]
+    horns_hall["Horn's Hall"]:::built
+    the_fold["The Fold"]:::built
+    sounding_shaft_foot["The Sounding Shaft's foot"]:::built
+    the_cradle["The Cradle"]:::built
   end
   subgraph river["The River Wend"]
     briar_glen_quay["Briar Glen Quay"]
@@ -187,6 +187,7 @@ flowchart LR
   chapel_of_echoes --- horns_hall
   horns_hall ---|door| the_fold
   horns_hall --- the_cradle
+  horns_hall -.->|secret| the_cradle
   the_cradle --- sounding_shaft_foot
   sounding_shaft_foot --- belfry
   ossuary_galleries ---|door| priory_crypt
@@ -303,10 +304,10 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `knot-outer-ring` | The Outer Ring | knot | e26 | `knot-outer` | Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). Built (mw-e26.9): the breach landing and a looping ring corridor round the Scales room, with rune-band and spider-nest markers; the Scales gate and a crawl vent lead north to the Ossuary. |
 | `ossuary-galleries` | The Ossuary Galleries | knot | e26 | `knot-outer` | The Forgotten; Clatter (bible 3.5). Built (mw-e26.9): an entry hall with bone niches, the sunk Dark Crossing room, Clatter's mushroom garden and an east gallery. |
 | `chapel-of-echoes` | The Chapel of Echoes | knot | e26 | `knot-outer` | Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14). Built (mw-e26.9): a 9 m nave with colonnades, four chime markers and the counterweight-hung portcullis in the north doorway; the Chimes puzzle and the trap's story are mw-e26.14. |
-| `horns-hall` | Horn's Hall | knot | e26 | planned | The Warden's hall outside the Fold (bible 3.5, 4.2). |
-| `the-fold` | The Fold | knot | e26 | planned | Sealed sleepers' vault; wake-up point (bible 3.5). |
-| `sounding-shaft-foot` | The Sounding Shaft's foot | knot | e26 | planned | Foot of the shaft to the belfry (bible 3.5, mw-e26.18). |
-| `the-cradle` | The Cradle | knot | e26 | planned | Heart of the Knot (bible 3.5, 4.1 beat 12). |
+| `horns-hall` | Horn's Hall | knot | e26 | `knot-inner` | The Warden's hall outside the Fold (bible 3.5, 4.2). Built (mw-e26.10): an 80 x 60 m arena with pillars and four ear-covering Hornfolk statues, Horn's post at its centre (the encounter is mw-e26.16); doors west to the Fold and the sealed crypt passage, a corridor north to the Cradle and the secret Hornfolk door in the east wall. |
+| `the-fold` | The Fold | knot | e26 | `knot-inner` | Sealed sleepers' vault; wake-up point (bible 3.5). Built (mw-e26.10): a dead-end vault of six moss-bed markers and the chalk tallies behind one doorway (fold-door, left open until mw-e26.16 stages the reveal), with the fold-wake marker. |
+| `sounding-shaft-foot` | The Sounding Shaft's foot | knot | e26 | `knot-inner` | Foot of the shaft to the belfry (bible 3.5, mw-e26.18). Built (mw-e26.10): a 20 x 24 m room north of the Cradle with the shaft's mouth marker; the climb is mw-e26.18. |
+| `the-cradle` | The Cradle | knot | e26 | `knot-inner` | Heart of the Knot (bible 3.5, 4.1 beat 12). Built (mw-e26.10): a 48 m chamber ringed by sixteen pillars with eight carved faces turned inward, the abbot's stage at the centre (mw-e26.17), the last friend-below note, a door to the Shaft's foot and a secret east doorway. |
 | `briar-glen-quay` | Briar Glen Quay | river | e25 | planned | Barge landing and slipway (bible 3.5, mw-e25.11). |
 | `millweir` | The Millweir | river | e25 | planned | Weir below town with its sluice walk (bible 3.1, mw-e25.12). |
 | `weeping-adit-mouth` | The Weeping Adit (river mouth) | river | e25 | planned | Where the Wend springs from the hill, a flooded drainage tunnel (bible 3.1, mw-e25.13). |
@@ -400,9 +401,10 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `breach-outer-ring` | `breach` | `knot-outer-ring` | door |  |  | `deepworks/breach-door`, `knot-outer/breach-door` |
 | `outer-ring-ossuary` | `knot-outer-ring` | `ossuary-galleries` | path |  |  | planned: mw-e26.9 |
 | `ossuary-chapel` | `ossuary-galleries` | `chapel-of-echoes` | path |  |  | planned: mw-e26.9 |
-| `chapel-horns-hall` | `chapel-of-echoes` | `horns-hall` | path |  |  | planned: mw-e26.10 |
+| `chapel-horns-hall` | `chapel-of-echoes` | `horns-hall` | path |  |  | `knot-outer/horns-door`, `knot-inner/horns-door` |
 | `horns-hall-fold` | `horns-hall` | `the-fold` | door |  |  | planned: mw-e26.16 |
 | `horns-hall-cradle` | `horns-hall` | `the-cradle` | path |  |  | planned: mw-e26.10 |
+| `horns-hall-cradle-secret` | `horns-hall` | `the-cradle` | secret | `{"fact":"world.hornfolk-seal.dispelled"}` | `spell.mage-hand` | planned: mw-e26.10 |
 | `cradle-shaft-foot` | `the-cradle` | `sounding-shaft-foot` | path |  |  | planned: mw-e26.10 |
 | `sounding-shaft` | `sounding-shaft-foot` | `belfry` | path |  |  | planned: mw-e26.18 |
 | `ossuary-crypt` | `ossuary-galleries` | `priory-crypt` | door | `{"fact":"world.priory-crypt.unsealed"}` |  | planned: mw-e26.20 |
@@ -476,6 +478,10 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `knot-outer` | `knot-outer-ring` | `knot-outer/breach-door` (breach-outer-ring) |
 | `knot-outer` | `ossuary-galleries` | none (a marker spawn in the entry hall; the Scales gate and the ring vent lead in from the ring, inside the scene) |
 | `knot-outer` | `chapel-of-echoes` | none (a marker spawn in the nave; the chapel door and the bone chute lead in from the Ossuary, inside the scene) |
+| `knot-inner` | `horns-hall` | `knot-inner/horns-door` (chapel-horns-hall) |
+| `knot-inner` | `the-fold` | none (a marker spawn in the vault; the hall's west doorway leads in, inside the scene) |
+| `knot-inner` | `the-cradle` | none (a marker spawn at the south entrance; the corridor from the hall and the secret east doorway lead in, inside the scene) |
+| `knot-inner` | `sounding-shaft-foot` | none (a marker spawn in the shaft room; the Cradle's north doorway leads in, inside the scene) |
 | `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; the towpath gate in the south wall is the `wendmouth-harbour/towpath-gate` transition, the stopgap riverbank-wharf-link from under-the-bridge, mw-e40.26; the barge berth is where the barge will arrive, mw-e25.15) |
 | `wendmouth-harbour` | `tidemarket` | none (a marker spawn; walked inside the scene) |
 | `wendmouth-harbour` | `customs-house` | none (a marker spawn; walked inside the scene) |
@@ -525,7 +531,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e26.7 | `choir-scriptorium` |
 | mw-e26.8 | `nave-belfry` |
 | mw-e26.9 | `outer-ring-ossuary`, `ossuary-chapel` |
-| mw-e26.10 | `chapel-horns-hall`, `horns-hall-cradle`, `cradle-shaft-foot` |
+| mw-e26.10 | `horns-hall-cradle`, `horns-hall-cradle-secret`, `cradle-shaft-foot` |
 | mw-e26.16 | `horns-hall-fold` |
 | mw-e26.18 | `sounding-shaft` |
 | mw-e26.20 | `nave-cistern`, `ossuary-crypt` |

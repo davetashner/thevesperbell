@@ -26,6 +26,13 @@
       "owner": "world"
     },
     {
+      "key": "world.hornfolk-seal.dispelled",
+      "type": "bool",
+      "default": false,
+      "description": "The Hornfolk seal on the stone door in the east wall of Horn's Hall is dispelled and the secret route to the Cradle is open (mw-e26.10 greybox; the fragments and the dispel are a follow-up bead).",
+      "owner": "world"
+    },
+    {
       "key": "world.supply-tunnel.cleared",
       "type": "bool",
       "default": false,

@@ -323,6 +323,43 @@ test.describe('knot-outer at high', () => {
   });
 });
 
+// The Knot's inner half (mw-e26.10 AC-3: about 100 × 175 m, viewed from the Cradle's south entrance) at the High
+// preset, the same sampling as the Deepworks. Reference machine only.
+test.describe('knot-inner at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the Cradle view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'knot-inner',
+      spawn: 'cradle-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('knot-inner high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'knot-inner',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
 // The wall-clock load budgets that used to be PR e2e assertions (mw-e41.8): same moments, measured
 // in the page, enforced here against the reference machine. Budgets: perf/perf-budgets.json.
 test.describe('load budgets', () => {

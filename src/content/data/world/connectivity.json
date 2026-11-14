@@ -468,28 +468,32 @@
       "name": "Horn's Hall",
       "area": "knot",
       "epic": "e26",
-      "notes": "The Warden's hall outside the Fold (bible 3.5, 4.2)."
+      "notes": "The Warden's hall outside the Fold (bible 3.5, 4.2). Built (mw-e26.10): an 80 x 60 m arena with pillars and four ear-covering Hornfolk statues, Horn's post at its centre (the encounter is mw-e26.16); doors west to the Fold and the sealed crypt passage, a corridor north to the Cradle and the secret Hornfolk door in the east wall.",
+      "scene": "knot-inner"
     },
     {
       "id": "the-fold",
       "name": "The Fold",
       "area": "knot",
       "epic": "e26",
-      "notes": "Sealed sleepers' vault; wake-up point (bible 3.5)."
+      "notes": "Sealed sleepers' vault; wake-up point (bible 3.5). Built (mw-e26.10): a dead-end vault of six moss-bed markers and the chalk tallies behind one doorway (fold-door, left open until mw-e26.16 stages the reveal), with the fold-wake marker.",
+      "scene": "knot-inner"
     },
     {
       "id": "sounding-shaft-foot",
       "name": "The Sounding Shaft's foot",
       "area": "knot",
       "epic": "e26",
-      "notes": "Foot of the shaft to the belfry (bible 3.5, mw-e26.18)."
+      "notes": "Foot of the shaft to the belfry (bible 3.5, mw-e26.18). Built (mw-e26.10): a 20 x 24 m room north of the Cradle with the shaft's mouth marker; the climb is mw-e26.18.",
+      "scene": "knot-inner"
     },
     {
       "id": "the-cradle",
       "name": "The Cradle",
       "area": "knot",
       "epic": "e26",
-      "notes": "Heart of the Knot (bible 3.5, 4.1 beat 12)."
+      "notes": "Heart of the Knot (bible 3.5, 4.1 beat 12). Built (mw-e26.10): a 48 m chamber ringed by sixteen pillars with eight carved faces turned inward, the abbot's stage at the centre (mw-e26.17), the last friend-below note, a door to the Shaft's foot and a secret east doorway.",
+      "scene": "knot-inner"
     },
     {
       "id": "briar-glen-quay",
@@ -1270,7 +1274,8 @@
       "to": "horns-hall",
       "kind": "path",
       "bead": "mw-e26.10",
-      "notes": "Chapel to Horn's Hall."
+      "notes": "Chapel to Horn's Hall. Built (mw-e26.10): the horns-door transitions at the landing beyond the Chapel and at the south end of the vestibule of Horn's Hall, both ways.",
+      "transitions": ["knot-outer/horns-door", "knot-inner/horns-door"]
     },
     {
       "id": "horns-hall-fold",
@@ -1278,7 +1283,7 @@
       "to": "the-fold",
       "kind": "door",
       "bead": "mw-e26.16",
-      "notes": "The Fold, past the Warden."
+      "notes": "The Fold, past the Warden. Greybox (mw-e26.10), walked inside knot-inner: an open doorway in the hall's west wall until mw-e26.16 stages it."
     },
     {
       "id": "horns-hall-cradle",
@@ -1286,7 +1291,18 @@
       "to": "the-cradle",
       "kind": "path",
       "bead": "mw-e26.10",
-      "notes": "Horn's Hall to the Cradle."
+      "notes": "Horn's Hall to the Cradle. Built (mw-e26.10), walked inside knot-inner: a corridor from the hall's north wall; the secret route is horns-hall-cradle-secret."
+    },
+    {
+      "id": "horns-hall-cradle-secret",
+      "from": "horns-hall",
+      "to": "the-cradle",
+      "kind": "secret",
+      "unlock": { "fact": "world.hornfolk-seal.dispelled" },
+      "routes": ["spell.mage-hand"],
+      "classesHint": ["sorcerer"],
+      "bead": "mw-e26.10",
+      "notes": "The secret sorcerer route (bible 4.2: fragments of Hornfolk inscription unlock the Cradle's secret route). Greybox (mw-e26.10), walked inside knot-inner: a stone door in the hall's east wall (hornfolk-door, lock hornfolk-seal) and a corridor round to the Cradle's east doorway. A wall until the seal is dispelled; the fragments and the dispel are a bead filed from mw-e26.10, and spell.mage-hand is the sorcerer capability standing in for the dispel until then."
     },
     {
       "id": "cradle-shaft-foot",
@@ -1294,7 +1310,7 @@
       "to": "sounding-shaft-foot",
       "kind": "path",
       "bead": "mw-e26.10",
-      "notes": "Cradle to the shaft's foot."
+      "notes": "Cradle to the shaft's foot. Built (mw-e26.10), walked inside knot-inner: a doorway in the Cradle's north wall."
     },
     {
       "id": "sounding-shaft",
@@ -1313,7 +1329,7 @@
         "fact": "world.priory-crypt.unsealed"
       },
       "bead": "mw-e26.20",
-      "notes": "The crypt is sealed from the Knot side; opens once the seal is broken (bible 4.1 beat 9)."
+      "notes": "The crypt is sealed from the Knot side; opens once the seal is broken (bible 4.1 beat 9). The Knot-side crypt passage is built (mw-e26.10) as a sealed stub off Horn's Hall in knot-inner (crypt-door, crypt-passage-end); mw-e26.20 decides whether this edge starts there."
     },
     {
       "id": "wharf-tidemarket",

@@ -1,6 +1,6 @@
-// mw-nro9: where the seven friend-below notes are placed and what reading one publishes. Six are
-// placed (the Sleeping Ox room, the Deepworks gate, and four in the Knot's outer half, mw-cqfn); the
-// last belongs to the Cradle, which is not built (bead filed from mw-nro9).
+// mw-nro9: where the seven friend-below notes are placed and what reading one publishes. All seven are
+// placed (the Sleeping Ox room, the Deepworks gate, four in the Knot's outer half, mw-cqfn, and the
+// last in the Cradle, mw-bj41).
 import { describe, expect, it } from 'vitest';
 import { loadGameContent } from './game-content.ts';
 
@@ -21,6 +21,7 @@ const PLACED: Record<string, { scene: string; spawn: string }> = {
   'note-friend-below-spiders': { scene: 'knot-outer', spawn: 'read-friend-note-spiders' },
   'note-friend-below-ossuary': { scene: 'knot-outer', spawn: 'read-friend-note-ossuary' },
   'note-friend-below-warden': { scene: 'knot-outer', spawn: 'read-friend-note-warden' },
+  'note-friend-below-cradle': { scene: 'knot-inner', spawn: 'read-friend-note-cradle' },
 };
 
 describe('the friend-below notes (mw-nro9)', () => {
@@ -29,7 +30,7 @@ describe('the friend-below notes (mw-nro9)', () => {
     for (const note of NOTES) expect(note.emits, note.id).toEqual(['friend-note-found']);
   });
 
-  it('AC-1: the six placed notes are readable spawns with a read affordance', () => {
+  it('AC-1: the seven placed notes are readable spawns with a read affordance', () => {
     for (const [text, { scene, spawn }] of Object.entries(PLACED)) {
       const found = content.get('scene', scene).spawns.filter((s) => s.tags.includes(text));
       expect(found.map((s) => s.id)).toEqual([spawn]);
@@ -93,5 +94,27 @@ describe('the friend-below notes (mw-nro9)', () => {
       expect(p[2], spawn).toBeGreaterThanOrEqual(z0);
       expect(p[2], spawn).toBeLessThan(z1);
     }
+  });
+
+  it('AC-1 (mw-bj41): the Cradle note stands on baked navmesh inside the Cradle, by its south entrance', () => {
+    const scene = content.get('scene', 'knot-inner');
+    const nav = content.get('navmesh', 'knot-inner');
+    const [ox, oz] = nav.origin;
+    const cell = nav.settings.cellSize;
+    const p = at(scene, 'read-friend-note-cradle');
+    const onMesh = nav.polys.some(
+      (q) =>
+        p[0] >= ox + q[0] * cell &&
+        p[0] < ox + q[2] * cell &&
+        p[2] >= oz + q[1] * cell &&
+        p[2] < oz + q[3] * cell,
+    );
+    expect(onMesh).toBe(true);
+    const cradle = scene.regions.find((r) => r.id === 'the-cradle');
+    expect(cradle).toBeDefined();
+    expect(p[0]).toBeGreaterThan(cradle?.min[0] ?? Infinity);
+    expect(p[0]).toBeLessThan(cradle?.max[0] ?? -Infinity);
+    expect(p[2]).toBeGreaterThan(cradle?.min[2] ?? Infinity);
+    expect(p[2]).toBeLessThan(cradle?.max[2] ?? -Infinity);
   });
 });

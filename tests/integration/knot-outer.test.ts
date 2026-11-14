@@ -107,7 +107,7 @@ const PAIRS = [
 
 describe('the Knot outer half: named places and routes (mw-e26.9 AC-1)', () => {
   it('AC-1: Outer Ring, Ossuary and Chapel are the knot-outer scene’s nodes of the world map, each a named spawn', () => {
-    const nodes = (world?.nodes ?? []).filter((n) => n.area === 'knot' && n.scene !== undefined);
+    const nodes = (world?.nodes ?? []).filter((n) => n.scene?.id === 'knot-outer');
     expect(nodes.map((n) => n.id).sort()).toEqual([...NODES].sort());
     for (const node of nodes) {
       expect(node.scene?.id).toBe('knot-outer');
