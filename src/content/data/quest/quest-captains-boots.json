@@ -1,0 +1,440 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-captains-boots",
+  "title": "The Captain's Boots",
+  "summary": "Captain Hale's boots are dusty every morning, with dust from the mine, and he swears he never leaves his bed. Somebody ought to find out where he goes at night.",
+  "notes": "Side quest of Briar Glen (bible 5.2, 6.1 quest 2; mw-e39.10), any class. Rumour 8 (Dot, or Juniper) or asking Hale about his boots starts it. The night scene is in hale-watch (after 23:00, boots.noticed): wake him, watch from the lane, or follow the whole route (hale.route-followed). Settling it is five ways, each a fact in boots.method written by hale-watch: wakeful tea (two bellwort roots bought at Fenn's and delivered to Juniper, then handed to Hale), the sleep draught (Juniper sells it; the wrong choice), tying him down with his consent, a bell on his door, or walking his route behind him (reveals the Briarwood shortcut, route.briarwood.revealed). The sleep draught is a story, not a failure (bible 6.1): when night falls with hale.draught sleep, the quest moves to walked-in (hale.walked-in), Hale walks to the mine gate, and the fetching scene in hale-watch brings him home (hale.retrieved) and the quest resolves as wrong-draught; the player can still try another way first. The choice is keep the secret (hale.secret.kept: Hale backs the Act III testimony without a check) or tell the town (Dot, hale.secret.exposed: Hale loses authority, Vane gains it, and the testimony is a harder persuasion). It needs a settled method first, so the way is chosen before the secret is. Every resolution sets hale.sleepwalking.revealed, which lets hale-watch play the note reveal. Hale as a body in the Deepworks (the walk itself) and the bell and the bed as placed things are unbuilt; the scenes narrate them (follow-up beads).",
+  "givers": ["npc-juniper", "npc-dot"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "boots.noticed"
+      },
+      {
+        "kind": "fact",
+        "fact": "hale.boots.asked"
+      },
+      {
+        "kind": "fact",
+        "fact": "hale.boots.confessed"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "noticed",
+      "text": "The captain's boots are dusty every morning and he will not say why. Follow him at night, after midnight, and see where he goes.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "hale.draught",
+                "op": "eq",
+                "value": "sleep"
+              },
+              {
+                "kind": "timeOfDay",
+                "from": "21:00",
+                "to": "05:00"
+              }
+            ]
+          },
+          "stage": "walked-in",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hale.walked-in",
+              "value": true
+            }
+          ]
+        },
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "hale.night-followed"
+          },
+          "stage": "followed"
+        }
+      ]
+    },
+    {
+      "id": "followed",
+      "text": "He walks in his sleep toward the mine and turns back at the Bell Line stones, confused. Settle it: a wakeful tea, a tied bed, a bell on the door, or his own route. Then decide who is to know.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "hale.draught",
+                "op": "eq",
+                "value": "sleep"
+              },
+              {
+                "kind": "timeOfDay",
+                "from": "21:00",
+                "to": "05:00"
+              }
+            ]
+          },
+          "stage": "walked-in",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "hale.walked-in",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "walked-in",
+      "text": "The sleep draught did what Juniper said sleep draughts do. The captain has walked up the mine road in the night. Fetch him home before the mine takes him.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "hale.retrieved"
+          },
+          "stage": "followed"
+        }
+      ]
+    }
+  ],
+  "initialStage": "noticed",
+  "objectives": [
+    {
+      "id": "hear-the-rumour",
+      "kind": "fact",
+      "text": "Hear that the captain looks as if he's been sleeping in his boots.",
+      "params": {
+        "fact": "boots.noticed"
+      },
+      "optional": true
+    },
+    {
+      "id": "ask-the-captain",
+      "kind": "fact",
+      "text": "Ask the captain about his boots.",
+      "params": {
+        "fact": "hale.boots.asked"
+      },
+      "optional": true
+    },
+    {
+      "id": "follow-hale",
+      "kind": "fact",
+      "text": "Watch the captain at night after midnight.",
+      "params": {
+        "fact": "hale.night-followed"
+      }
+    },
+    {
+      "id": "learn-the-route",
+      "kind": "fact",
+      "text": "Follow the sleepwalkers' route all the way.",
+      "params": {
+        "fact": "hale.route-followed"
+      },
+      "optional": true,
+      "hidden": true
+    },
+    {
+      "id": "buy-bellwort",
+      "kind": "haveItem",
+      "text": "Buy two bellwort roots from Fenn's counter.",
+      "params": {
+        "item": "bellwort-root",
+        "count": 2,
+        "latch": true
+      },
+      "optional": true,
+      "activeWhen": {
+        "kind": "objectiveState",
+        "quest": "quest-captains-boots",
+        "objective": "follow-hale",
+        "state": "complete"
+      }
+    },
+    {
+      "id": "bring-bellwort",
+      "kind": "deliverItem",
+      "text": "Bring the bellwort to Juniper for wakeful tea.",
+      "params": {
+        "item": "bellwort-root",
+        "npc": "npc-juniper",
+        "count": 2
+      },
+      "optional": true
+    },
+    {
+      "id": "give-the-tea",
+      "kind": "fact",
+      "text": "Give the captain the wakeful tea.",
+      "params": {
+        "fact": "hale.draught",
+        "value": "tea"
+      },
+      "optional": true
+    },
+    {
+      "id": "bring-hale-home",
+      "kind": "fact",
+      "text": "Fetch the captain home from the mine gate.",
+      "params": {
+        "fact": "hale.retrieved"
+      },
+      "stage": "walked-in"
+    },
+    {
+      "id": "keep-the-secret",
+      "kind": "fact",
+      "text": "Keep the captain's secret.",
+      "params": {
+        "fact": "hale.secret.kept"
+      },
+      "optional": true
+    },
+    {
+      "id": "tell-the-town",
+      "kind": "fact",
+      "text": "Tell the town.",
+      "params": {
+        "fact": "hale.secret.exposed"
+      },
+      "optional": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "wakeful-tea",
+      "approach": "other",
+      "priority": 60,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "boots.method",
+            "op": "eq",
+            "value": "tea"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.secret.kept"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.secret.exposed"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.sleepwalking.revealed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "boots-resolved",
+          "data": {
+            "method": "tea"
+          }
+        }
+      ],
+      "journal": "Juniper's wakeful tea keeps the captain's head on the pillow and his feet in the bed. His boots are clean in the morning, and he looks ten years younger and a little embarrassed about it."
+    },
+    {
+      "id": "tied-down",
+      "approach": "diplomacy",
+      "priority": 55,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "boots.method",
+            "op": "eq",
+            "value": "tied"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.secret.kept"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.secret.exposed"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.sleepwalking.revealed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "boots-resolved",
+          "data": {
+            "method": "tied"
+          }
+        }
+      ],
+      "journal": "With his say-so and a length of good rope you tie the captain to his bed, loose enough to breathe and tight enough to argue with. He goes nowhere in the night, and says nothing about it in the morning, which is a kind of thanks."
+    },
+    {
+      "id": "bell-on-door",
+      "approach": "other",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "boots.method",
+            "op": "eq",
+            "value": "bell"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.secret.kept"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.secret.exposed"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.sleepwalking.revealed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "boots-resolved",
+          "data": {
+            "method": "bell"
+          }
+        }
+      ],
+      "journal": "The Watch's own hand-bell hangs on the captain's door. If he walks, it rings, and the lads come. It rang twice in the first week, once for the captain and once for a cat."
+    },
+    {
+      "id": "follow-the-route",
+      "approach": "stealth",
+      "priority": 45,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "boots.method",
+            "op": "eq",
+            "value": "route"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.secret.kept"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.secret.exposed"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.sleepwalking.revealed",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "route.briarwood.revealed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "boots-resolved",
+          "data": {
+            "method": "route"
+          }
+        }
+      ],
+      "journal": "You walked the captain's road behind him, in the ferns, in the dark, and learned where it goes: a path through the Briarwood nobody walks awake, and the shortcut to the priory it hides. He still walks. Now somebody knows where."
+    },
+    {
+      "id": "wrong-draught",
+      "approach": "other",
+      "priority": 10,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "hale.retrieved"
+          },
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hale.secret.kept"
+              },
+              {
+                "kind": "fact",
+                "fact": "hale.secret.exposed"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hale.sleepwalking.revealed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "boots-resolved",
+          "data": {
+            "method": "sleep"
+          }
+        }
+      ],
+      "journal": "The sleep draught put the captain down so deep that he walked all the way to the mine gate and tried the bars. You brought him home before the sun was up, with the whole Watch watching. He will not drink another, and the town now knows his boots have been somewhere."
+    }
+  ]
+}

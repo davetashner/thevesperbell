@@ -1,11 +1,19 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "mirela-stacks",
-  "notes": "Mirela Thorne (bible 5.1), bookseller of the Lamplit Stacks. Dry, bookish, ink-stained; protective of a shop that is the town's secret heart. Voice: 'Don't touch the red shelf. It's not cursed. It's expensive.' Class reactions per bible: sorcerer a colleague with back-room access, knight teased about reading, archer maps and bestiaries, thief watched like Mortimer watches and offered a job. BANNED: modelled as the fact mirela.banned, not a disposition band (the band is her mood, the ban is Mortimer's rule): the banned entry plays while mirela.banned holds and not mirela.banned-days >= 1; it lifts when the player brings biscuits (mirela.biscuits-brought, a stand-in for the ginger-biscuits item) or a full in-game day has passed (mirela.banned-days >= 1, counted by the ban system), via the ban-lapsed entry. Secret: she owns Nine Sleeps and will never sell it, lend it or give it; no option transfers the book (AC-4). The restricted shelf opens with restricted-access (sorcerer trust, a persuasion, or disposition). Rumour and shop content are out of scope: emit hooks only. mw-e39.22 (Contraband Pages, bible 6.1 quest 8): ask-order tells of the crate stuck at Wendmouth customs (mirela.order.told); ask-forge hands a forged Lantern seal writ to a player who has heard Cray's writ speech; deliver-order and keep-order close the story after the books are recovered (mirela.order.delivered or kept; keeping it costs disposition: Mirela knows).",
+  "notes": "Mirela Thorne (bible 5.1), bookseller of the Lamplit Stacks. Dry, bookish, ink-stained; protective of a shop that is the town's secret heart. Voice: 'Don't touch the red shelf. It's not cursed. It's expensive.' Class reactions per bible: sorcerer a colleague with back-room access, knight teased about reading, archer maps and bestiaries, thief watched like Mortimer watches and offered a job. BANNED: modelled as the fact mirela.banned, not a disposition band (the band is her mood, the ban is Mortimer's rule): the banned entry plays while mirela.banned holds and not mirela.banned-days >= 1; it lifts when the player brings biscuits (mirela.biscuits-brought, a stand-in for the ginger-biscuits item) or a full in-game day has passed (mirela.banned-days >= 1, counted by the ban system), via the ban-lapsed entry. Secret: she owns Nine Sleeps and will never sell it, lend it or give it; no option transfers the book (AC-4). The restricted shelf opens with restricted-access (sorcerer trust, a persuasion, or disposition). Rumour and shop content are out of scope: emit hooks only. mw-e39.22 (Contraband Pages, bible 6.1 quest 8): ask-order tells of the crate stuck at Wendmouth customs (mirela.order.told); ask-forge hands a forged Lantern seal writ to a player who has heard Cray's writ speech; deliver-order and keep-order close the story after the books are recovered (mirela.order.delivered or kept; keeping it costs disposition: Mirela knows). mw-e39.10 (The Bookshop Burglar, bible 6.1 quest 1): ask-books tells of the missing picture books and Mortimer's bite and asks the player to sit up (burglar.told; a thief accepting her retrieval job starts it too); the stakeout entry plays after ten at night once told (Mortimer and Snig speak; a sorcerer can raise a light, burglar.outcome light); report-snig reacts to how it ended (deal agrees reading lessons, burglar.lessons-agreed).",
   "speakers": [
     {
       "id": "mirela",
       "npc": "npc-mirela"
+    },
+    {
+      "id": "mortimer",
+      "npc": "npc-mortimer"
+    },
+    {
+      "id": "snig",
+      "npc": "npc-snig"
     }
   ],
   "entries": [
@@ -168,6 +176,31 @@
         ]
       },
       "node": "dreamer-1"
+    },
+    {
+      "id": "stakeout-night",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "burglar.told"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "burglar.staked-out"
+            }
+          },
+          {
+            "kind": "timeOfDay",
+            "from": "22:00",
+            "to": "04:00"
+          }
+        ]
+      },
+      "node": "stake-1"
     },
     {
       "id": "return",
@@ -469,6 +502,47 @@
           },
           "once": true,
           "next": "keep-1"
+        },
+        {
+          "id": "ask-books",
+          "text": "Your shelves look thin.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "burglar.told"
+            }
+          },
+          "once": true,
+          "next": "books-1"
+        },
+        {
+          "id": "report-snig",
+          "text": "About the missing books. I know how it ended.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "burglar.told"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "burglar.outcome",
+                "op": "neq",
+                "value": "open"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "burglar.reported"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "report-gate"
         },
         {
           "id": "leave",
@@ -889,6 +963,11 @@
             {
               "kind": "emit",
               "event": "mirela.thief-job-offered"
+            },
+            {
+              "kind": "setFact",
+              "fact": "burglar.told",
+              "value": true
             }
           ],
           "next": "job-accepted"
@@ -1197,6 +1276,460 @@
         {
           "kind": "emit",
           "event": "mirela.order-kept"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "stake-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Past ten. The Stacks is dark but for the lamp in the window and the two eyes of Mortimer, shining between the S's.)",
+      "next": "stake-1-b"
+    },
+    {
+      "id": "stake-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Mirela has put you in the reading nook with a blanket and a poker, and herself behind the till with a ledger she is not reading.)",
+      "next": "stake-2"
+    },
+    {
+      "id": "stake-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Don't speak. Don't sneeze. Don't look at the red shelf; it knows.",
+      "next": "stake-3"
+    },
+    {
+      "id": "stake-3",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(A sound like a page being turned in a temper.) Small. Green. Cellar. Beetroot. Mine.",
+      "next": "stake-4"
+    },
+    {
+      "id": "stake-4",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "He has said exactly that every night for a week. I've stopped asking him for details. He is not a good witness. He is a book.",
+      "next": "stake-5"
+    },
+    {
+      "id": "stake-5",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(An hour. Two. Then a scrabble in the transom over the back door, and a small green hand, then an arm, then a goblin with a great deal of string about him, coming in upside down and reading the spines with one finger.)",
+      "next": "stake-6"
+    },
+    {
+      "id": "stake-6",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "(a whisper) Snake book. The big one with the snake. Where is it. I only want to look at the snake. ...Oh. Oh no. That's the teeth. Hello, teeth.",
+      "next": "stake-7"
+    },
+    {
+      "id": "stake-7",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(Every cover in the shop rattles at once.) MINE.",
+      "next": "stake-choice"
+    },
+    {
+      "id": "stake-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "stake-light-sorcerer",
+          "text": "Raise a light, right here, right now.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "stake-light-1"
+        },
+        {
+          "id": "stake-follow",
+          "text": "Hold still. Let him take the book, then follow the ink.",
+          "once": true,
+          "next": "stake-follow-1"
+        },
+        {
+          "id": "stake-grab",
+          "text": "Grab him.",
+          "once": true,
+          "next": "stake-grab-1"
+        }
+      ]
+    },
+    {
+      "id": "stake-light-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You lift a hand. A pale light fills the Stacks from floor to rafters, and for the first time in his small green life Snig sees Mortimer properly lit, and for the first time in his long paper one Mortimer sees a goblin.)",
+      "next": "stake-light-2"
+    },
+    {
+      "id": "stake-light-2",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "He's got a MOUTH. On the INSIDE.",
+      "next": "stake-light-3"
+    },
+    {
+      "id": "stake-light-3",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "...Is that a hat? Why does it have string? Why is it looking at me like that?",
+      "next": "stake-light-4"
+    },
+    {
+      "id": "stake-light-4",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Neither of you will ever speak of this. Out. Both of you. One of you is being a great deal too loud for a book.",
+      "next": "stake-light-5"
+    },
+    {
+      "id": "stake-light-5",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Snig goes up the ladder and out of the transom the way a dropped coin goes down a drain. He does not take the snake book. From the dark of the green comes one last, distant wail: \"The scary one has a LIGHT.\")",
+      "next": "stake-light-fx"
+    },
+    {
+      "id": "stake-light-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.outcome",
+          "value": "light"
+        },
+        {
+          "kind": "setFact",
+          "fact": "burglar.staked-out",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "stacks-light-cast"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 3
+        }
+      ],
+      "next": "stake-light-after"
+    },
+    {
+      "id": "stake-light-after",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I do not know whether to thank you or send for a doctor. For Mortimer. Go home. Take a biscuit if you find one. I have not slept so well in a week, which is the oddest part.",
+      "end": true
+    },
+    {
+      "id": "stake-follow-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You sit like a stone. Snig climbs the shelf ladder, takes the snake book down in both arms as if it were a sleeping cat, dips a thumb in the ink pot by mistake, and goes up and out through the transom.)",
+      "next": "stake-follow-1-b"
+    },
+    {
+      "id": "stake-follow-1-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(Mortimer gets a mouthful of his sleeve and a sock.)",
+      "next": "stake-follow-2"
+    },
+    {
+      "id": "stake-follow-2",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(A rustle of deep satisfaction.) Mine. Sock.",
+      "next": "stake-after-1"
+    },
+    {
+      "id": "stake-grab-1",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "(You lunge. He is all string and no handle; he comes out of his jacket like a sprig out of a wet hedge, and Mortimer, who bites at everything that comes within reach, bites you. Snig flees with the book, trailing ink.)",
+      "next": "stake-grab-2"
+    },
+    {
+      "id": "stake-grab-2",
+      "kind": "line",
+      "speaker": "snig",
+      "text": "(from the dark, delighted) I borrowed it! I borrowed it for ever! Thank you!",
+      "next": "stake-after-1"
+    },
+    {
+      "id": "stake-after-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Ink. He has been in the ink pot. Look: the little footprints go out the back and across the green. In the morning you can follow them; he can't have gone far with a book that size.",
+      "next": "stake-after-2"
+    },
+    {
+      "id": "stake-after-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "If he is a thing that lives in the Glen Well, I shall want to know before I next wash.",
+      "next": "stake-fx"
+    },
+    {
+      "id": "stake-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.staked-out",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "stacks-staked-out"
+        }
+      ],
+      "end": true
+    },
+    {
+      "id": "books-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Thin is the word. Eleven books in nine nights, and not one of them worth a crown. A bestiary with plates. A book of knots. The big herbal, the one with the snakes. Whoever it is has no taste in money and a great deal of taste in woodcuts.",
+      "next": "books-2"
+    },
+    {
+      "id": "books-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer says he bit it. Small, green, and it tastes of the cellar. That is the whole of his evidence. He is not a good witness.",
+      "next": "books-3"
+    },
+    {
+      "id": "books-3",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(A rustle, like a page torn in anger.) Bum. Left. Bit. Bum.",
+      "next": "books-4"
+    },
+    {
+      "id": "books-4",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Yes, thank you, Mortimer, the left. I would sit up myself, but I fall asleep over a footnote by eleven. Would you? After ten. The reading nook, a blanket, a poker. And keep your hands off the red shelf.",
+      "next": "books-fx"
+    },
+    {
+      "id": "books-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.told",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.burglar-told"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "report-gate",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "deal"
+          },
+          "next": "report-deal-1"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "turned-in"
+          },
+          "next": "report-turned-1"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "sold-book"
+          },
+          "next": "report-sold-1"
+        }
+      ],
+      "else": "report-light-1"
+    },
+    {
+      "id": "report-deal-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "A goblin. Of course it is a goblin. He reads with his fingers, doesn't he? There are green thumbprints on every snake plate. I thought it was mould.",
+      "next": "report-deal-2"
+    },
+    {
+      "id": "report-deal-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Lessons. For a goblin, on my second step, in exchange for salvage, which Mother Kettleback will believe she invented. Very well. The books come back, he comes in by the door like a customer, and nobody climbs through my transom again.",
+      "next": "report-deal-3"
+    },
+    {
+      "id": "report-deal-3",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(A long, offended rustle.) Teeth. In. My. Shop.",
+      "next": "report-deal-4"
+    },
+    {
+      "id": "report-deal-4",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer, you will sit on the third step, you will be civil, and he will sit on the second. We are not animals. Well. One of us is a book.",
+      "next": "report-deal-fx"
+    },
+    {
+      "id": "report-deal-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.lessons-agreed",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "burglar.reported",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.lessons-agreed"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 4
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "report-turned-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Hale has him in the cell. For eleven picture books. I wanted him taught, not jailed, and I shall not pretend I would have said so if you had asked.",
+      "next": "report-turned-2"
+    },
+    {
+      "id": "report-turned-2",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(A small, satisfied rustle.)",
+      "next": "report-turned-3"
+    },
+    {
+      "id": "report-turned-3",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Mortimer, that is not a nice sound. Sit down.",
+      "next": "report-turned-fx"
+    },
+    {
+      "id": "report-turned-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.reported",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": -1
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "report-sold-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "You sold him a book. A goblin. And he has stopped coming? Well. I should call it theft, but the till is steady and the shelves are not emptier, so call it a draw.",
+      "next": "report-sold-2"
+    },
+    {
+      "id": "report-sold-2",
+      "kind": "line",
+      "speaker": "mortimer",
+      "text": "(Grudgingly.) Bored. Mortimer. Bored.",
+      "next": "report-sold-3"
+    },
+    {
+      "id": "report-sold-3",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I could almost call it professional courtesy. Almost. The red shelf is still not for you.",
+      "next": "report-sold-fx"
+    },
+    {
+      "id": "report-sold-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.reported",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 2
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "report-light-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I do not wish to discuss the light. Mortimer has not spoken since. A book and a goblin each decided the other was the monster, and the town thinks me very calm. Thank you.",
+      "next": "report-light-fx"
+    },
+    {
+      "id": "report-light-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "burglar.reported",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 2
         }
       ],
       "next": "hub"

@@ -1,0 +1,12 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-ink-prints-stacks",
+  "title": "Ink-smudged footprints",
+  "notes": "The Bookshop Burglar (bible 6.1 quest 1, mw-e39.10): the trail Snig leaves from the Stacks after the stakeout. Placed as a readable by the Stacks door on Market Green; reading it publishes the note-ink-prints-stacks event.",
+  "locations": ["place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "Small prints, three-toed, in blue-black ink: from the ink pot behind the till, up the shelf ladder, out under the transom and down the back step.\n\nOne of them is a thumb. It is pressed hard into the margin of a woodcut, a snake, as if to make sure the snake was real.\n\nThe trail turns toward Market Green."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-ink-prints-well",
+  "title": "Ink on the well coping",
+  "notes": "The Bookshop Burglar (mw-e39.10): the end of the trail, at the Glen Well. The goblin tunnels under it are not built yet, so the trail ends at the rim and Snig is found by his dialogue (follow-up bead). Reading it publishes the note-ink-prints-well event.",
+  "locations": ["place-glen-well"],
+  "pages": [
+    {
+      "text": "The prints end at the rim of the Glen Well: a smear on the coping, and one black thumbprint on the loose rung.\n\nBelow, a draught that smells of cellars and boiled cabbage. Somewhere very far down, someone is singing the alphabet in the wrong order."
+    }
+  ]
+}
