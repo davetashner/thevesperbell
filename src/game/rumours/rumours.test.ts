@@ -182,9 +182,9 @@ describe('visiting the target', () => {
 
   it('AC-3: a target with no trigger yet stays a lead', () => {
     const { told, book, enter } = setup();
-    told(1);
-    enter('briarwood');
-    expect(book.leads()).toEqual(['place-briarwood']);
+    told(9);
+    enter('millweir');
+    expect(book.leads()).toEqual(['place-millweir']);
   });
 
   it('AC-3: every trigger names an area, an NPC or a quest that exists', () => {
@@ -241,7 +241,7 @@ describe('debunking', () => {
   it('AC-4: a dive debunk place that is not a trigger leaves the rumour standing', () => {
     const { told, enter, flag } = setup();
     told(2);
-    enter('mooring-watch');
+    enter('millweir');
     expect(flag(id('02'), 'debunked')).not.toBe(true);
   });
 

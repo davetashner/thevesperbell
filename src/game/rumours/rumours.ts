@@ -49,15 +49,21 @@ export type VisitTrigger =
   { readonly area: string } | { readonly talk: string } | { readonly quest: string };
 
 /**
- * Visit triggers by glossary or quest id. Absent: no arrival volume exists yet (bead mw-8n3j adds
- * them for briarwood, mooring-watch, glen-well, lamplit-stacks, millweir, standing-horn,
- * weeping-adit and breakwater), so those rumours stay leads.
+ * Visit triggers by glossary or quest id. Absent: no arrival volume exists yet (the Millweir has no
+ * scene), so that rumour stays a lead.
  */
 export const VISIT_TRIGGERS: Readonly<Record<string, readonly VisitTrigger[]>> = {
   'term-vesper-bell': [{ area: 'belfry' }],
   'place-fold': [{ area: 'the-fold' }],
   'place-deepworks': [{ area: 'mine-gate' }],
   'place-bay-nine': [{ area: 'bonded-warehouse' }],
+  'place-briarwood': [{ area: 'briarwood' }],
+  'place-standing-horn': [{ area: 'standing-horn' }],
+  'place-mooring-watch': [{ area: 'mooring-watch' }],
+  'place-glen-well': [{ area: 'glen-well' }],
+  'place-lamplit-stacks': [{ area: 'lamplit-stacks' }],
+  'place-weeping-adit': [{ area: 'weeping-adit' }],
+  'place-breakwater': [{ area: 'breakwater' }],
   'place-undertow': [{ area: 'undertow' }],
   'npc-vane': [{ talk: 'npc-vane' }],
   'npc-clatter': [{ talk: 'npc-clatter' }],
