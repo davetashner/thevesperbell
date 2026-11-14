@@ -2,7 +2,7 @@
   "$schema": "../contest.schema.json",
   "id": "drowned-gull-arm-wrestling",
   "name": "Arm-wrestling at the Drowned Gull",
-  "notes": "mw-e40.5. Big Oona's table (bible 5.14, 6.1 quest 7). PLACEHOLDER TUNING for the owner to tune in playtest: fee, pace (Oona scores a point every 90 ticks), first to 5, odds 2:1, the bribe. The scene (mw-e40.6) reports `armwrestle.push` events: the player's own for a won push, Oona's through her pace. Casting at the table is the cheat: Nell and Oona both watch.",
+  "notes": "mw-e40.5. Big Oona's table (bible 5.14, 6.1 quest 7). PLACEHOLDER TUNING for the owner to tune in playtest: fee, pace (Oona scores a point every 90 ticks), first to 5, odds 2:1, the bribe. The scene (mw-e40.6) reports `armwrestle.push` events: the player's own for a won push, Oona's through her pace. Casting at the table is the cheat: Nell and Oona both watch. mw-e39.22: each outcome also writes tidefair.results.arm-wrestling (won, lost, cheated, thrown) for quest-tidefair; a caught cheat sets tidefair.cheated.",
   "entry": {
     "fee": 2
   },
@@ -11,7 +11,11 @@
       "id": "big-oona",
       "name": "Big Oona",
       "creature": "npc-oona",
-      "pace": { "everyTicks": 90, "points": 1, "spread": 0 }
+      "pace": {
+        "everyTicks": 90,
+        "points": 1,
+        "spread": 0
+      }
     }
   ],
   "scoring": [
@@ -22,20 +26,65 @@
       "note": "A push gained; the scene reports one for the player each time the grip moves their way."
     }
   ],
-  "finish": { "firstTo": 5 },
+  "finish": {
+    "firstTo": 5
+  },
   "win": {
     "placement": 1,
     "effects": [
-      { "kind": "gold", "delta": 10 },
-      { "kind": "disposition", "npc": "npc-oona", "delta": 2 },
-      { "kind": "disposition", "npc": "npc-nell", "delta": 1 }
+      {
+        "kind": "gold",
+        "delta": 10
+      },
+      {
+        "kind": "disposition",
+        "npc": "npc-oona",
+        "delta": 2
+      },
+      {
+        "kind": "disposition",
+        "npc": "npc-nell",
+        "delta": 1
+      },
+      {
+        "kind": "setFact",
+        "fact": "tidefair.results.arm-wrestling",
+        "value": "won"
+      }
     ]
   },
   "lose": {
-    "effects": [{ "kind": "disposition", "npc": "npc-oona", "delta": 1 }]
+    "effects": [
+      {
+        "kind": "disposition",
+        "npc": "npc-oona",
+        "delta": 1
+      },
+      {
+        "kind": "setFact",
+        "fact": "tidefair.results.arm-wrestling",
+        "value": "lost"
+      }
+    ]
   },
   "disqualified": {
-    "effects": [{ "kind": "disposition", "npc": "npc-oona", "delta": -2 }]
+    "effects": [
+      {
+        "kind": "disposition",
+        "npc": "npc-oona",
+        "delta": -2
+      },
+      {
+        "kind": "setFact",
+        "fact": "tidefair.results.arm-wrestling",
+        "value": "cheated"
+      },
+      {
+        "kind": "setFact",
+        "fact": "tidefair.cheated",
+        "value": true
+      }
+    ]
   },
   "cheats": [
     {
@@ -46,20 +95,55 @@
       "bonusPoints": 2,
       "detected": {
         "disqualify": true,
-        "effects": [{ "kind": "disposition", "npc": "npc-nell", "delta": -3 }]
+        "effects": [
+          {
+            "kind": "disposition",
+            "npc": "npc-nell",
+            "delta": -3
+          }
+        ]
       },
       "undetected": {
-        "effects": [{ "kind": "disposition", "npc": "npc-oona", "delta": -1 }]
+        "effects": [
+          {
+            "kind": "disposition",
+            "npc": "npc-oona",
+            "delta": -1
+          }
+        ]
       },
       "note": "Oona felt the table hum, even if nobody saw why."
     }
   ],
   "betting": {
     "book": "npc-nell",
-    "onPlayer": { "minStake": 1, "maxStake": 20, "odds": { "numerator": 2, "denominator": 1 } },
+    "onPlayer": {
+      "minStake": 1,
+      "maxStake": 20,
+      "odds": {
+        "numerator": 2,
+        "denominator": 1
+      }
+    },
     "throwMatch": {
-      "payout": [{ "kind": "gold", "delta": 15 }],
-      "grudge": [{ "kind": "disposition", "npc": "npc-nell", "delta": -4 }]
+      "payout": [
+        {
+          "kind": "gold",
+          "delta": 15
+        },
+        {
+          "kind": "setFact",
+          "fact": "tidefair.results.arm-wrestling",
+          "value": "thrown"
+        }
+      ],
+      "grudge": [
+        {
+          "kind": "disposition",
+          "npc": "npc-nell",
+          "delta": -4
+        }
+      ]
     }
   }
 }

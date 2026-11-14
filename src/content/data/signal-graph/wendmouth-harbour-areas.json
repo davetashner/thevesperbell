@@ -1,0 +1,81 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "wendmouth-harbour-areas",
+  "name": "Wendmouth side-quest areas",
+  "notes": "Player volumes that are quest areas of The Tidefair and Contraband Pages (mw-e39.22): the Tidefair ground on the Stone Wharf flagstones, the Customs House hall and its strongroom. The node ids are the area ids (enterArea objectives see-the-flagstones, visit-the-customs and reach-the-strongroom).",
+  "nodes": [
+    {
+      "id": "tidefair-ground",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 10,
+          "y": 1.5,
+          "z": 88
+        },
+        "halfExtents": {
+          "x": 22,
+          "y": 3,
+          "z": 9
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "customs-house",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": -23,
+          "y": 1.5,
+          "z": 56
+        },
+        "halfExtents": {
+          "x": 12,
+          "y": 3,
+          "z": 13
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "customs-strongroom",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": -34,
+          "y": 1.5,
+          "z": 41
+        },
+        "halfExtents": {
+          "x": 6,
+          "y": 3,
+          "z": 6
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    }
+  ],
+  "wires": []
+}

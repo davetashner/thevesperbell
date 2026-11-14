@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "mirela-stacks",
-  "notes": "Mirela Thorne (bible 5.1), bookseller of the Lamplit Stacks. Dry, bookish, ink-stained; protective of a shop that is the town's secret heart. Voice: 'Don't touch the red shelf. It's not cursed. It's expensive.' Class reactions per bible: sorcerer a colleague with back-room access, knight teased about reading, archer maps and bestiaries, thief watched like Mortimer watches and offered a job. BANNED: modelled as the fact mirela.banned, not a disposition band (the band is her mood, the ban is Mortimer's rule): the banned entry plays while mirela.banned holds and not mirela.banned-days >= 1; it lifts when the player brings biscuits (mirela.biscuits-brought, a stand-in for the ginger-biscuits item) or a full in-game day has passed (mirela.banned-days >= 1, counted by the ban system), via the ban-lapsed entry. Secret: she owns Nine Sleeps and will never sell it, lend it or give it; no option transfers the book (AC-4). The restricted shelf opens with restricted-access (sorcerer trust, a persuasion, or disposition). Rumour and shop content are out of scope: emit hooks only.",
+  "notes": "Mirela Thorne (bible 5.1), bookseller of the Lamplit Stacks. Dry, bookish, ink-stained; protective of a shop that is the town's secret heart. Voice: 'Don't touch the red shelf. It's not cursed. It's expensive.' Class reactions per bible: sorcerer a colleague with back-room access, knight teased about reading, archer maps and bestiaries, thief watched like Mortimer watches and offered a job. BANNED: modelled as the fact mirela.banned, not a disposition band (the band is her mood, the ban is Mortimer's rule): the banned entry plays while mirela.banned holds and not mirela.banned-days >= 1; it lifts when the player brings biscuits (mirela.biscuits-brought, a stand-in for the ginger-biscuits item) or a full in-game day has passed (mirela.banned-days >= 1, counted by the ban system), via the ban-lapsed entry. Secret: she owns Nine Sleeps and will never sell it, lend it or give it; no option transfers the book (AC-4). The restricted shelf opens with restricted-access (sorcerer trust, a persuasion, or disposition). Rumour and shop content are out of scope: emit hooks only. mw-e39.22 (Contraband Pages, bible 6.1 quest 8): ask-order tells of the crate stuck at Wendmouth customs (mirela.order.told); ask-forge hands a forged Lantern seal writ to a player who has heard Cray's writ speech; deliver-order and keep-order close the story after the books are recovered (mirela.order.delivered or kept; keeping it costs disposition: Mirela knows).",
   "speakers": [
     {
       "id": "mirela",
@@ -347,6 +347,117 @@
           },
           "once": true,
           "next": "job-1"
+        },
+        {
+          "id": "ask-order",
+          "text": "Are you expecting a delivery?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "mirela.order.told"
+            }
+          },
+          "once": true,
+          "next": "order-1"
+        },
+        {
+          "id": "ask-forge",
+          "text": "Cray says a writ can be forged. By someone with a steady hand.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "cray.writ.offered"
+              },
+              {
+                "kind": "fact",
+                "fact": "mirela.order.told"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "writ.held"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.writ.accepted"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.writ.rejected"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "forge-1"
+        },
+        {
+          "id": "deliver-order",
+          "text": "I brought your crate from Wendmouth.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "books.recovered"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "mirela.order.delivered"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "mirela.order.kept"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "deliver-1"
+        },
+        {
+          "id": "keep-order",
+          "text": "I would like to keep the Illusion text. If I may.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "books.recovered"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "mirela.order.delivered"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "mirela.order.kept"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "keep-1"
         },
         {
           "id": "leave",
@@ -939,6 +1050,134 @@
       "kind": "line",
       "speaker": "mirela",
       "text": "You've the look the Nine Sleeps leaves on a reader. Dreamers listen to something past the shelves. I'll still serve you. I'll count the stock afterwards.",
+      "next": "hub"
+    },
+    {
+      "id": "order-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Seven weeks late, from over the sea: eleven volumes, one of them an Illusion text, The Glasswright's Primer, in a Saltmarch binding. The carter says it reached Wendmouth and stopped. That means the customs house. That means Inspector Cray.",
+      "next": "order-2"
+    },
+    {
+      "id": "order-2",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I do not sell Illusion; the Court's list is clear. I keep it, on a shelf, for the right reader, and Mortimer knows the difference. If you are going to Wendmouth, and you look as if you might, I would pay well for it. Do not tell me how.",
+      "next": "order-fx"
+    },
+    {
+      "id": "order-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.order.told",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.order-told"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "forge-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "I do not forge Lantern seals. It is a serious offence. I did once, long ago, study sealing wax, for reasons unrelated. Press it firmly. The crown goes to the left of the lamp. If anyone asks, you found it on the road.",
+      "next": "forge-fx"
+    },
+    {
+      "id": "forge-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "writ.held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "writ.source",
+          "value": "forged"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "writ-forged"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "deliver-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Eleven volumes, one damp at the corner, nobody's stamp on any of them. And the Primer. Oh, you wonderful, dreadful creature. Here is what I promised. The Primer goes on the back shelf, for the right reader, and you may be the first.",
+      "next": "deliver-fx"
+    },
+    {
+      "id": "deliver-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.order.delivered",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "mirela.illusion-stocked",
+          "value": true
+        },
+        {
+          "kind": "gold",
+          "delta": 80
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": 4
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.order-delivered"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "keep-1",
+      "kind": "line",
+      "speaker": "mirela",
+      "text": "Keep it. Ah. I see. You went to Wendmouth for me, and you came back for yourself. Mortimer will remember that, and so shall I. Take the Primer, and do read the foreword, which is about trust. The rest of the crate stays here.",
+      "next": "keep-fx"
+    },
+    {
+      "id": "keep-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "mirela.order.kept",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-mirela",
+          "delta": -3
+        },
+        {
+          "kind": "emit",
+          "event": "mirela.order-kept"
+        }
+      ],
       "next": "hub"
     }
   ]

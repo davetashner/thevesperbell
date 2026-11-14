@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "vane-bounty",
-  "notes": "Harrow Vane (story bible 5.3), the mine owner: charming, generous in public, frightened of being the Vane who lost the warrant. He is hedged, not a villain: he pays the families of the missing and says so. Voice: long, reasonable sentences that never quite say the thing. OUTCOME TABLE (mw-e39.6 AC-2). The confrontation is the option `confront` (shown locked until the player holds proof). Facts: L = vane.ledger.obtained (his ledger of horn-coin sales), T = duggan.testimony (Duggan Marl will testify). Outcome options and the vane.fate they set: confront-expose = exposed, confront-confess = confessed, confront-bribe = bribed-player, confront-flee = fled. L=no,T=no: none (he denies; `confront` stays locked). L=yes,T=no: confesses (it is his own book), bribes. L=no,T=yes: bribes, flees (he hears Duggan has talked and has a coach waiting). L=yes,T=yes: exposed, confesses, bribes, flees. Exposing him needs both the ledger and the witness because neither alone would hold before the Captain and the council. Once vane.fate is set he only speaks the aftermath entry for it. The quest runtime (mw-e39.4) owns what else changes (bounty paid to the Pells, bell repair funded, Vane House shut).",
+  "notes": "Harrow Vane (story bible 5.3), the mine owner: charming, generous in public, frightened of being the Vane who lost the warrant. He is hedged, not a villain: he pays the families of the missing and says so. Voice: long, reasonable sentences that never quite say the thing. OUTCOME TABLE (mw-e39.6 AC-2). The confrontation is the option `confront` (shown locked until the player holds proof). Facts: L = vane.ledger.obtained (his ledger of horn-coin sales), T = duggan.testimony (Duggan Marl will testify). Outcome options and the vane.fate they set: confront-expose = exposed, confront-confess = confessed, confront-bribe = bribed-player, confront-flee = fled. L=no,T=no: none (he denies; `confront` stays locked). L=yes,T=no: confesses (it is his own book), bribes. L=no,T=yes: bribes, flees (he hears Duggan has talked and has a coach waiting). L=yes,T=yes: exposed, confesses, bribes, flees. Exposing him needs both the ledger and the witness because neither alone would hold before the Captain and the council. Once vane.fate is set he only speaks the aftermath entry for it. The quest runtime (mw-e39.4) owns what else changes (bounty paid to the Pells, bell repair funded, Vane House shut). mw-e39.22 (Contraband Pages): ask-writ sells a council chair's writ for a hundred crowns (writ.source vane) while his fate is unexposed.",
   "speakers": [
     {
       "id": "vane",
@@ -270,6 +270,41 @@
           },
           "showWhenLocked": true,
           "next": "confront-open"
+        },
+        {
+          "id": "ask-writ",
+          "text": "Inspector Cray says a council chair can sign a writ for the customs house.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "cray.writ.offered"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "writ.held"
+                }
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "cray.writ.accepted"
+                }
+              },
+              {
+                "kind": "factCmp",
+                "fact": "vane.fate",
+                "op": "eq",
+                "value": "unexposed"
+              }
+            ]
+          },
+          "once": true,
+          "next": "writ-1"
         },
         {
           "id": "leave",
@@ -547,6 +582,71 @@
       "speaker": "narrator",
       "text": "Vane House is barred. A maid at the gate says the master took the mountain road before dawn, and left every lamp lit behind him.",
       "end": true
+    },
+    {
+      "id": "writ-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "A writ. Yes, as chair I sign a great many things; it is most of the job. It is the Court's paper, not the Council's, but a chair's hand carries weight. A hundred crowns, receipted as a gift to the bridge fund. I am helpful.",
+      "next": "writ-choice"
+    },
+    {
+      "id": "writ-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "writ-pay",
+          "text": "A hundred crowns. Done.",
+          "when": {
+            "kind": "gold",
+            "op": "gte",
+            "value": 100
+          },
+          "next": "writ-signed-fx"
+        },
+        {
+          "id": "writ-decline",
+          "text": "That is a great deal for a signature.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "writ-signed-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "gold",
+          "delta": -100
+        },
+        {
+          "kind": "setFact",
+          "fact": "writ.held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "writ.source",
+          "value": "vane"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-vane",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "writ-signed"
+        }
+      ],
+      "next": "writ-signed-1"
+    },
+    {
+      "id": "writ-signed-1",
+      "kind": "line",
+      "speaker": "vane",
+      "text": "There. Signed, sealed, and entirely proper. You will remember, I hope, that it was I who was helpful to you. Do give my regards to the Inspector. She does not like me, which I regard as a great compliment.",
+      "next": "hub"
     }
   ]
 }

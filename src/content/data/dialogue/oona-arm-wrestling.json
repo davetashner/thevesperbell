@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "oona-arm-wrestling",
-  "notes": "Big Oona (bible 5.14), dockhand and arm-wrestling champion of the Drowned Gull. Voice: loud, cheerful, bossy, teasing; 'love'. Tidefair barks (bible 6.1 quest 7). Class greetings only. The match itself is a hook: ask-wrestle emits armwrestle.requested, consumed by the Drowned Gull gameplay bead (mw-e40.6); the match, stakes and brawl are out of scope.",
+  "notes": "Big Oona (bible 5.14), dockhand and arm-wrestling champion of the Drowned Gull. Voice: loud, cheerful, bossy, teasing; 'love'. Tidefair barks (bible 6.1 quest 7). Class greetings only. The match itself is a hook: ask-wrestle emits armwrestle.requested, consumed by the Drowned Gull gameplay bead (mw-e40.6); the match, stakes and brawl are out of scope. mw-e39.22 (The Tidefair, bible 6.1 quest 7): ask-enter signs the player up with a class-flavoured pointer to their event (all four stay open) and starts quest-tidefair; close-day calls the day so the quest can total the results; the lost-drink entry is the graceful-loser drink (never a penalty).",
   "speakers": [
     {
       "id": "oona",
@@ -9,6 +9,51 @@
     }
   ],
   "entries": [
+    {
+      "id": "lost-drink",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.arm-wrestling",
+                "op": "eq",
+                "value": "lost"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.gull-shoot",
+                "op": "eq",
+                "value": "lost"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.regatta",
+                "op": "eq",
+                "value": "lost"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "tidefair.results.pocket-race",
+                "op": "eq",
+                "value": "lost"
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "oona.drink-bought"
+            }
+          }
+        ]
+      },
+      "node": "drink-1"
+    },
     {
       "id": "return",
       "when": {
@@ -134,6 +179,70 @@
           "next": "nell-1"
         },
         {
+          "id": "ask-enter",
+          "text": "How do I enter the Tidefair?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tidefair.joined"
+            }
+          },
+          "once": true,
+          "next": "enter-route"
+        },
+        {
+          "id": "close-day",
+          "text": "I think I'm done for the Tidefair.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tidefair.joined"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "tidefair.concluded"
+                }
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.arm-wrestling",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.gull-shoot",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.regatta",
+                    "op": "neq",
+                    "value": "none"
+                  },
+                  {
+                    "kind": "factCmp",
+                    "fact": "tidefair.results.pocket-race",
+                    "op": "neq",
+                    "value": "none"
+                  }
+                ]
+              }
+            ]
+          },
+          "once": true,
+          "next": "close-1"
+        },
+        {
           "id": "leave",
           "text": "That's all.",
           "next": "farewell"
@@ -173,6 +282,143 @@
       "kind": "line",
       "speaker": "oona",
       "text": "Nell? She pays on time and hides in the cellar when Cray's about. That's all I know and all I'll say. Loud mouth, soft heart, and three hundred ways to lose a bet.",
+      "next": "hub"
+    },
+    {
+      "id": "enter-route",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "next": "enter-knight"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "next": "enter-archer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "next": "enter-sorcerer"
+        },
+        {
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "next": "enter-thief"
+        }
+      ],
+      "else": "enter-any"
+    },
+    {
+      "id": "enter-knight",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Table's yours, love. Arm-wrestling, that's your event, you've got the grip. The rest are open too: the Gull Shoot, the Regatta, the Pocket Race. Two crowns at the table and no whining. Go and tell Nell; she keeps the book.",
+      "next": "enter-fx"
+    },
+    {
+      "id": "enter-archer",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "The Gull Shoot's yours, soft hands: wooden gulls on a swinging boom and then a live one with the ribbon. Nell sponsors archers, ask her. Take the table too. The Regatta, the Pocket Race: every event's open. Pick your poison.",
+      "next": "enter-fx"
+    },
+    {
+      "id": "enter-sorcerer",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "The Regatta, I'd say. It says no magic. It also says no drowning, and people manage both. Cray walks the quay at the start, the turn and the finish, so mind the turn. The table, the Gull Shoot, the Pocket Race: all open.",
+      "next": "enter-fx"
+    },
+    {
+      "id": "enter-thief",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "The Pocket Race, love: five marks, five ribbons, and one mark is a Lantern Court inspector who thinks nobody would dare. I've two crowns on you. The table, the Gull Shoot and the Regatta are open too, mind.",
+      "next": "enter-fx"
+    },
+    {
+      "id": "enter-any",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Four events, love: the table, the Gull Shoot, the Regatta and the Pocket Race. Anyone can enter any of them and everyone's better at one. Tell Nell, she keeps the book. Lose well and I'll buy the drink.",
+      "next": "enter-fx"
+    },
+    {
+      "id": "enter-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.joined",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-joined"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "close-1",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Done? Then it's done. I'll shout the tally from the table and anyone who disagrees can take it up with me and my elbow. Oi! That's the Tidefair, you lot! Drink up!",
+      "next": "close-fx"
+    },
+    {
+      "id": "close-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "tidefair.concluded",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "tidefair-concluded"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "drink-1",
+      "kind": "line",
+      "speaker": "oona",
+      "text": "Oh, love, up you get. You lost like a gentleman, which is rarer than winning. Here: Nell's second-best, on me. The Gull warms to people who fall well, and you fall beautifully.",
+      "next": "drink-fx"
+    },
+    {
+      "id": "drink-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "oona.drink-bought",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-oona",
+          "delta": 1
+        },
+        {
+          "kind": "emit",
+          "event": "oona.drink-bought"
+        }
+      ],
       "next": "hub"
     }
   ]

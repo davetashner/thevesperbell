@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-impound-ledger",
+  "title": "Customs house impound ledger, page 41",
+  "author": "P. Cray",
+  "notes": "mw-e39.22: Cray's ledger entry for the crate of books (bible 6.1 quest 8), a clue for every Contraband Pages route. Placement on Cray's desk is a follow-up scene bead.",
+  "locations": ["place-customs-house"],
+  "pages": [
+    {
+      "text": "Crate seven. Consigned: M. Thorne, the Lamplit Stacks, Briar Glen. Eleven volumes, bound in the Saltmarch manner. One Restricted (Illusion: The Glasswright's Primer). Ten licensed. No writ. HELD.\n\nAlso held this month, pending writ: sundry restricted spellbooks, taken from travellers who did not declare them.\n\nNote: I have read the Primer, naturally, to judge it. It is competent. It is also, I regret, rather good.\n\nNote: the writ may be requested by post. Alternatively, evidence of a crime in this harbour is always received, and I am known to be grateful."
+    }
+  ]
+}

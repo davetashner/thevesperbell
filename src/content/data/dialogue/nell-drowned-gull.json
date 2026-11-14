@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "nell-drowned-gull",
-  "notes": "Nell Gannet (bible 5.13), keeper of the Drowned Gull and queen of the Low Tide Company. Voice: gold-toothed, delighted, 'darling'; everything's for sale. THIEF COMMISSION DROP (bible 4.3, the thief commission): a thief holding the horn-coin (commission.coin-held, stand-in until the item exists) meets her first at the entry 'commission' and chooses deliver, keep or a fake; each sets commission.outcome and emits commission.dropped for the world consequences (follow-up bead). SECRETS: bay nine (only to a thief or at disposition >= 10, nell.bay-nine-told), the relic-skimming and her go-between role (disposition >= 8, nell.skimming-confessed), the Undertow (opened for a thief by her class deal, or at disposition >= 6). Class deals: knight (warning), archer (Gull Shoot sponsor), sorcerer (restricted books past customs), thief (Undertow access). Stock and prices are out of scope (E20, E21); jobs and quests are hooks.",
+  "notes": "Nell Gannet (bible 5.13), keeper of the Drowned Gull and queen of the Low Tide Company. Voice: gold-toothed, delighted, 'darling'; everything's for sale. THIEF COMMISSION DROP (bible 4.3, the thief commission): a thief holding the horn-coin (commission.coin-held, stand-in until the item exists) meets her first at the entry 'commission' and chooses deliver, keep or a fake; each sets commission.outcome and emits commission.dropped for the world consequences (follow-up bead). SECRETS: bay nine (only to a thief or at disposition >= 10, nell.bay-nine-told), the relic-skimming and her go-between role (disposition >= 8, nell.skimming-confessed), the Undertow (opened for a thief by her class deal, or at disposition >= 6). Class deals: knight (warning), archer (Gull Shoot sponsor), sorcerer (restricted books past customs), thief (Undertow access). Stock and prices are out of scope (E20, E21); jobs and quests are hooks. mw-e39.22: ask-book (her betting book on the Tidefair; starts the Tidefair quest) and ask-strongroom (the roof hatch, for Contraband Pages).",
   "speakers": [
     {
       "id": "nell",
@@ -389,6 +389,50 @@
           "next": "deal-thief-1"
         },
         {
+          "id": "ask-book",
+          "text": "I hear you keep a book on the Tidefair.",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "nell.book-open"
+            }
+          },
+          "once": true,
+          "next": "book-1"
+        },
+        {
+          "id": "ask-strongroom",
+          "text": "What do you know about Cray's strongroom?",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "books.impounded"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "cray.writ.offered"
+                  }
+                ]
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "nell.strongroom-tip"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "strongroom-1"
+        },
+        {
           "id": "leave",
           "text": "That's all.",
           "next": "farewell"
@@ -677,6 +721,52 @@
       "kind": "line",
       "speaker": "nell",
       "text": "The way down. Kin, you're in. Second step, loose board, and a knock I'll teach you. Don't tell the Inspector. Don't tell the Gull. Don't tell the tide.",
+      "next": "hub"
+    },
+    {
+      "id": "book-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "The Book! Odds on every event, darling, and on every loser. Back yourself, or, if you mean to fall over, fall over with me: I pay for a graceful tumble at the table, the boom, wherever. Don't tell Oona. I'll deny it. Beautifully.",
+      "next": "book-fx"
+    },
+    {
+      "id": "book-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "nell.book-open",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "nell.book-opened"
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "strongroom-1",
+      "kind": "line",
+      "speaker": "nell",
+      "text": "Cray's strongroom? Iron door, a grille no one fits through, and a roof hatch she's reported to the Court as a skylight so she'll never be asked to fix it. A friend of mine would want the net lofts and a head for heights. Only a friend.",
+      "next": "strongroom-fx"
+    },
+    {
+      "id": "strongroom-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "nell.strongroom-tip",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "nell.strongroom-tip"
+        }
+      ],
       "next": "hub"
     }
   ]
