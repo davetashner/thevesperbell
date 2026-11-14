@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 // mw-e39.38: the main quest (quest-labyrinth-beneath-briar-glen) progresses when the player plays
 // the levels that are built today. Real game content: the briar-glen-lane and bellwater-priory
 // scenes with their signal graphs, the game's fact registry and quest runtime. The player is
@@ -5,6 +6,7 @@
 // hand. Everything whose level is not built yet stays inactive (see the deferred test).
 import { loadGameContent, materialPresets } from '@content/index';
 import { installFactRegistry } from '@game/facts';
+import { startReaderUi } from '@game/reader/reader';
 import { installGameLogic, questsOf } from '@game/logic/index';
 import { startMechanisms } from '@game/mechanisms/index';
 import {
@@ -16,6 +18,7 @@ import {
   INTERACTION_COMPONENTS,
   InMemoryColliderSink,
   InventoryRules,
+  interacted,
   loadScene,
   registerSceneComponents,
   registerWorldProperties,
@@ -26,6 +29,7 @@ import {
   type KitLookup,
 } from '@sim/index';
 import { placeEntity } from '@sim/stimulus/placement';
+import { UiRoot } from '@ui/index';
 import { describe, expect, it } from 'vitest';
 
 const MAIN = 'quest-labyrinth-beneath-briar-glen';
@@ -70,7 +74,19 @@ function play(scene: string, at: { x: number; y: number; z: number }) {
     for (let i = 0; i < steps; i++) world.step();
   };
   stand(at);
-  return { world, logic, runtime, stand, settle };
+  /** The player reads the scene's spawn `id`, as the interaction does, and the reader opens it. */
+  const read = (id: string): void => {
+    document.body.innerHTML = '';
+    const target = loaded.spawns.find((s) => s.spawn.id === id)?.entity;
+    if (target === undefined) throw new Error(`no spawn ${id}`);
+    const ui = new UiRoot(document.body, { unstyled: true });
+    const reader = startReaderUi({ ui, world: world, content, player });
+    world.events.emit(interacted, { actor: player, target, verb: 'read', affordance: 0 });
+    settle(1);
+    reader.afterStep();
+    settle(2);
+  };
+  return { world, logic, runtime, stand, settle, read };
 }
 
 describe('the main quest plays through the built levels (mw-e39.38)', () => {
@@ -207,5 +223,33 @@ describe('the main quest plays through the built levels (mw-e39.38)', () => {
     for (const id of ['enter-the-knot', 'reach-the-cradle', 'ring-the-bell']) {
       expect(g.runtime.objectiveState(MAIN, id), id).not.toBe('complete');
     }
+  });
+
+  it('mw-nro9 AC-1: reading the Deepworks gate note completes find-the-friend-note once the investigation is on', () => {
+    const g = play('deepworks', { x: 104, y: 0.9, z: 64 });
+    g.world.facts.set('briar-glen.arrived', true);
+    g.settle();
+    g.world.facts.set('time.day', 2);
+    g.settle();
+    g.runtime.completeObjective(MAIN, 'hear-the-bounty');
+    g.settle();
+    expect(g.runtime.stage(MAIN)).toBe('investigation');
+    expect(g.runtime.objectiveState(MAIN, 'friend-below-note')).toBe('active');
+    g.read('read-friend-note-gate');
+    expect(g.runtime.objectiveState(MAIN, 'friend-below-note')).toBe('complete');
+  });
+
+  it('mw-nro9 AC-1: a note read before the stage is remembered and completes the objective when it starts', () => {
+    const g = play('deepworks', { x: 104, y: 0.9, z: 64 });
+    g.world.facts.set('briar-glen.arrived', true);
+    g.settle();
+    g.read('read-friend-note-gate');
+    expect(g.runtime.objectiveState(MAIN, 'friend-below-note')).not.toBe('complete');
+    g.world.facts.set('time.day', 2);
+    g.settle();
+    g.runtime.completeObjective(MAIN, 'hear-the-bounty');
+    g.settle();
+    expect(g.runtime.stage(MAIN)).toBe('investigation');
+    expect(g.runtime.objectiveState(MAIN, 'friend-below-note')).toBe('complete');
   });
 });

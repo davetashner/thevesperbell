@@ -285,6 +285,20 @@
       "tags": ["bed", "furniture", "rented-room"]
     },
     {
+      "id": "read-friend-note-door",
+      "at": [6.25, 0, -1],
+      "tags": ["readable", "note-friend-below-door"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the folded note on the floor"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
       "id": "washstand",
       "at": [6, 0.5, 0.25],
       "tags": ["furniture", "rented-room"]

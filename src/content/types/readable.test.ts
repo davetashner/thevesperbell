@@ -47,6 +47,21 @@ describe('readable schema', () => {
     ).toEqual(['id: a note id starts with "note-"']);
   });
 
+  it('mw-nro9 AC-3: emits is an optional list of distinct kebab-case events other than the text id', () => {
+    expect(problems(bookTextSchema, book({ emits: ['friend-note-found'] }))).toEqual([]);
+    expect(bookTextSchema.parse(book()).emits).toBeUndefined();
+    expect(problems(bookTextSchema, book({ emits: [] }))).toHaveLength(1);
+    expect(problems(bookTextSchema, book({ emits: ['Friend Note'] }))).toEqual([
+      'emits.0: must be a kebab-case event id, e.g. "friend-note-found"',
+    ]);
+    expect(problems(bookTextSchema, book({ emits: ['a-b', 'a-b'] }))).toEqual([
+      'emits: lists an event twice',
+    ]);
+    expect(problems(bookTextSchema, book({ emits: ['book-test'] }))).toEqual([
+      'emits: the reader already publishes the text id as an event',
+    ]);
+  });
+
   it('a book needs an author; a note or inscription does not', () => {
     const anonymous: Record<string, unknown> = book();
     delete anonymous['author'];

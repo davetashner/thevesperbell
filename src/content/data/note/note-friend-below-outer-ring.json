@@ -5,6 +5,7 @@
   "author": "A friend below",
   "notes": "Bible 4.1 beat 7: the first rule of the Knot (followed runes lead somewhere, ignored runes lead in circles), genuinely helpful. Re-read: he wrote the arrow in a hand not his own, and 'the way to the middle' is where he wants the player.",
   "locations": ["place-knot"],
+  "emits": ["friend-note-found"],
   "pages": [
     {
       "text": "Mind the runes on the walls. Follow one and it will lead you somewhere; ignore one and the corridor will happily lead you back to where you were. I have made arrows in chalk where I could reach.\n\nDo not be frightened of the dead you meet here. They are only habit. They sweep, they pray, they carry. Walk quietly and they will let you by.\n\nI am so glad you came.\n\n— A friend below."

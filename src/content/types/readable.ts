@@ -76,6 +76,9 @@ export function bookPageText(
   return lookup(String(match[1]))?.pages[Number(match[2]) - 1]?.text;
 }
 
+/** A logic event id: kebab-case, as quest `event` objectives name them. */
+const EVENT_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+
 /** A glossary place id: where the text can be found. */
 const placeId = z
   .string()
@@ -130,6 +133,15 @@ function readableSchema(kind: ReadableKind) {
         .describe(
           'Evidence tags (mw-e39.23): the `evidence.*` facts that holding this text proves. Quest and dialogue conditions read the fact; the text names it so the two stay together.',
         ),
+      emits: z
+        .array(
+          z.string().regex(EVENT_ID, 'must be a kebab-case event id, e.g. "friend-note-found"'),
+        )
+        .min(1)
+        .optional()
+        .describe(
+          'Logic events (kebab-case ids) the reader publishes the first time the text is read, besides `readable.read` and the event named by the text id. A quest objective of kind `event` binds one of these.',
+        ),
       damaged: z
         .boolean()
         .default(false)
@@ -144,6 +156,14 @@ function readableSchema(kind: ReadableKind) {
         issue(['author'], 'a book has an author');
       if (readable.evidence?.some((key) => !key.startsWith('evidence.')) === true) {
         issue(['evidence'], 'evidence tags are `evidence.*` facts');
+      }
+      if (readable.emits !== undefined) {
+        if (new Set(readable.emits).size !== readable.emits.length) {
+          issue(['emits'], 'lists an event twice');
+        }
+        if (readable.emits.some((event) => event === readable.id)) {
+          issue(['emits'], 'the reader already publishes the text id as an event');
+        }
       }
       if (new Set(readable.locations).size !== readable.locations.length) {
         issue(['locations'], 'lists a location twice');

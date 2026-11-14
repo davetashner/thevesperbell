@@ -67,6 +67,15 @@
         "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
       }
     },
+    "emits": {
+      "description": "Logic events (kebab-case ids) the reader publishes the first time the text is read, besides `readable.read` and the event named by the text id. A quest objective of kind `event` binds one of these.",
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+      }
+    },
     "damaged": {
       "default": false,
       "description": "True exactly when the text carries `[illegible]` or `[missing]` markers.",
