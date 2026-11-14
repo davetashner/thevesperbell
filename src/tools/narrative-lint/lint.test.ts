@@ -301,6 +301,7 @@ describe('narrative lint: scope and extraction', () => {
   it('only narrative files are read', () => {
     expect(isNarrativeSource('src/content/data/dialogue/a.json')).toBe(true);
     expect(isNarrativeSource('src/content/data/fact/a.json')).toBe(true);
+    expect(isNarrativeSource('src/content/data/narration/narration-a.json')).toBe(true);
     expect(isNarrativeSource('src/content/data/creature/npc-hale.json')).toBe(true);
     expect(isNarrativeSource('src/content/data/creature/forgotten-miner.json')).toBe(false);
     expect(isNarrativeSource('src/content/data/scene/a.json')).toBe(false);

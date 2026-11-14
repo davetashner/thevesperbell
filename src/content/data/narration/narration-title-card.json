@@ -1,0 +1,21 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-title-card",
+  "kind": "title",
+  "notes": "The title and intro card shown when a new game starts, before the arrival (bible 1, 2.2). Bible 2.4: dread quiet and specific, never despair.",
+  "sequences": [
+    {
+      "id": "title-card",
+      "title": "The Vesper Bell",
+      "notes": "Two cards over the title; the second ends on the player's goal, the road into town (AC-5: what am I trying to do next).",
+      "pages": [
+        {
+          "text": "For as long as anyone in the valley can say, a bell was rung at dusk in the hills above Briar Glen. Sixty-one years ago it stopped. The children still skip to a rhyme about an ox that stays awake beneath the hill. Nobody remembers who for."
+        },
+        {
+          "text": "Three weeks ago the sleepers began to walk. Six have gone out of their beds at night and into the dark, and a bounty is about to go up on the Market Green. You are on the mountain road, and it is nearly dusk."
+        }
+      ]
+    }
+  ]
+}

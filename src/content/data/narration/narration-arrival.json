@@ -1,0 +1,63 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-arrival",
+  "kind": "arrival",
+  "notes": "Arrival at dusk, the bounty board in two states, and the last room at the Sleeping Ox (bible 4.1 beats 1 to 2). Class-specific arrival text is mw-e39.17 and is not here. The board's text is shown when the player reads the notice board on Market Green.",
+  "sequences": [
+    {
+      "id": "road",
+      "title": "Dusk on the mountain road",
+      "notes": "Shown as the player crosses the Miners' Bridge and the main quest starts (briar-glen.arrived).",
+      "pages": [
+        {
+          "text": "The mountain road comes down out of the pines at the hour when the light goes gold. Below you lies Briar Glen: chimney smoke, a river the colour of tea, and the mine's headframe standing over the roofs like a held breath."
+        },
+        {
+          "text": "A small crowd has gathered on the Market Green beyond the Miners' Bridge. Someone is nailing a notice to the board, and nobody is looking at the hammer. They are looking at the hill."
+        }
+      ]
+    },
+    {
+      "id": "bounty-board",
+      "title": "The notice board",
+      "notes": "Read at the board on the evening of arrival: the first version of the bounty.",
+      "pages": [
+        {
+          "text": "WANTED\nthe BEAST of the DEEPWORKS\nFive hundred crowns on proof of its death.\nApply at Vane House.\n(signed) H. Vane, Deepworks"
+        },
+        {
+          "text": "Beneath it, older notices curl in the damp: a lost dog, a lantern for sale, and six names in a careful hand, with a line below. Anyone who has seen anything, tell the Watch."
+        }
+      ]
+    },
+    {
+      "id": "bounty-board-raised",
+      "title": "The notice board",
+      "notes": "The same board after Vane's speech on the morning after the first night: five hundred raised to eight hundred.",
+      "pages": [
+        {
+          "text": "WANTED\nthe BEAST of the DEEPWORKS\nEight hundred crowns on proof of its death.\nThe child Tansy Pell has been taken. Apply at Vane House.\n(signed) H. Vane, Deepworks"
+        }
+      ]
+    },
+    {
+      "id": "the-last-room",
+      "title": "The last room",
+      "notes": "Hands off to the first night when the player goes after Tansy; the player can also stay in bed (the day-two timer ends the beat).",
+      "pages": [
+        {
+          "text": "The Sleeping Ox has one room left, under the eaves, over the kitchen. Dot Farrow hands you the key and a candle and does not ask your business. She has asked everyone else's already."
+        },
+        {
+          "text": "The town goes to bed early now, and carefully, as if quiet were a shutter that could be latched. A little after midnight even the dogs have stopped."
+        },
+        {
+          "text": "You wake and cannot say why. The street is silent. Then, under the window, something that is not the wind: someone humming, slow and sweet and a little flat."
+        },
+        {
+          "text": "It is a girl of twelve, barefoot, in a nightgown, her eyes open and seeing nothing. Dot pointed her out at supper: the baker's daughter, Tansy, who reads what she is not supposed to. She is walking up the street, toward the mine."
+        }
+      ]
+    }
+  ]
+}

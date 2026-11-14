@@ -93,6 +93,7 @@ import { checkUnlocks, unlockSchema } from './types/unlock.ts';
 import { vfxCueSheetSchema } from './types/vfx-cue-sheet.ts';
 import { vfxEffectSchema } from './types/vfx-effect.ts';
 import { worldSchema } from './types/world.ts';
+import { narrationSchema } from './types/narration.ts';
 import { rumorSchema } from './types/rumor.ts';
 import { bookTextSchema, inscriptionSchema, noteSchema } from './types/readable.ts';
 
@@ -138,6 +139,7 @@ export const contentTypes = {
   prefab: prefabSchema,
   puzzle: puzzleSchema,
   quest: questSchema,
+  narration: narrationSchema,
   persuasion: persuasionSchema,
   contest: contestSchema,
   'reach-class': reachClassSchema,

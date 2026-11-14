@@ -1,0 +1,40 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-barge",
+  "kind": "barge",
+  "notes": "The Patient Ann between Briar Glen Quay and Wendmouth (bible 3.6, 11.3: one day downriver, two up, towed). Mags is met at the quay, where she offers the ride; a ride on her barge is itself the introduction.",
+  "sequences": [
+    {
+      "id": "downriver-to-wendmouth",
+      "title": "Downriver",
+      "notes": "Played on the ride to Wendmouth; one day.",
+      "pages": [
+        {
+          "text": "Mags Oakum casts off from Briar Glen Quay as the mist lifts. The Patient Ann sits low with dressed glenstone to the gunwales. Mags has hauled stone down this river for thirty years and steers by the sound of the water."
+        },
+        {
+          "text": "The Wend widens and slows: the white water at the Millweir, the long green pools above Kestrel Lock, a towpath horse asleep on its feet. Nobody talks. Mags hums something, stops to listen to herself, and starts again louder."
+        },
+        {
+          "text": "By evening the river smells of salt. Wendmouth rises out of the dusk like a city that lost its way: columns, cranes and a hundred lamps, all of it built from the stone you came down with."
+        }
+      ]
+    },
+    {
+      "id": "upriver-to-briar-glen",
+      "title": "Upriver",
+      "notes": "Played on the ride back to Briar Glen Quay; two days, towed.",
+      "pages": [
+        {
+          "text": "Going home takes twice as long. The Patient Ann is hitched to a patient horse on the towpath, and the river that carried you down leans against you all the way back."
+        },
+        {
+          "text": "Two days of rope, reeds and slow bends. You sleep on the cargo, which is colder than it looks, and wake to the horse's bell."
+        },
+        {
+          "text": "On the second evening the headframe comes up over the trees, and the smoke of Briar Glen. You find you are listening for the humming."
+        }
+      ]
+    }
+  ]
+}

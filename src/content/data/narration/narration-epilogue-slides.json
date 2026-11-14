@@ -1,0 +1,316 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-epilogue-slides",
+  "kind": "epilogue",
+  "notes": "The epilogue slides (bible 4.4). Each sequence id is an objective of quest-briar-glen-epilogue; the objective's activeWhen chooses it and the order of the objectives is the order of the slideshow. Each slide is at most 60 words. A slide names only characters its own facts have introduced (Hale, Clatter and Mother Kettleback appear only behind the fact that brings them in).",
+  "sequences": [
+    {
+      "id": "vr-bell-goblins",
+      "notes": "Vespers Rung, goblins friendly: the goblins ring the bell.",
+      "endings": ["vespers-rung"],
+      "facts": ["goblins.standing"],
+      "pages": [
+        {
+          "text": "At dusk the goblins ring the bell, and Briar Glen turns out to listen. Mother Kettleback's clan has opinions about timing and about tolls, and has been told that neither is negotiable. The note carries to the farthest farm, and the farthest farm is, for once, not afraid of it."
+        }
+      ]
+    },
+    {
+      "id": "vr-bell-hale",
+      "notes": "Vespers Rung, goblins not friendly, the player gave Hale testimony: Hale rings the bell.",
+      "endings": ["vespers-rung"],
+      "facts": ["goblins.standing", "hale.testimony.given"],
+      "pages": [
+        {
+          "text": "At dusk Captain Hale climbs the belfry stair, which takes him some time, and rings the bell. Seven beds were cold. Now every one is warm. That night he sleeps eleven hours, and wakes ashamed of it, and has never felt better."
+        }
+      ]
+    },
+    {
+      "id": "vr-bell-tansy",
+      "notes": "Vespers Rung, no goblin or Hale to ring it: Tansy insists. The neutral bell slide.",
+      "endings": ["vespers-rung"],
+      "facts": ["goblins.standing", "hale.testimony.given"],
+      "pages": [
+        {
+          "text": "Nobody asked Tansy Pell to learn the bell. She insisted. Now at dusk a twelve-year-old stands on a crate at the rope while the whole town pretends not to worry, and she rings it flat. The Nightjar sleeps anyway. So, for the first time in weeks, does her father."
+        }
+      ]
+    },
+    {
+      "id": "vr-bread-at-the-gate",
+      "notes": "Vespers Rung, always: the town brings bread to the mine gate.",
+      "endings": ["vespers-rung"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "Brother Horn stays below. He is the warden, and the watch has no end. But each morning now someone leaves bread at the mine gate, and each evening the basket is empty and the gatepost has one more chalk stroke: one more day kept."
+        }
+      ]
+    },
+    {
+      "id": "vr-song-sealed",
+      "notes": "Vespers Rung, breach sealed.",
+      "endings": ["vespers-rung"],
+      "facts": ["knot.breach-sealed"],
+      "pages": [
+        {
+          "text": "The breach is sealed, and the song never reaches the town again. Dogs sleep through the night. So do children. In the Deepworks the stone is, at last, only stone."
+        }
+      ]
+    },
+    {
+      "id": "vr-new-verse",
+      "notes": "Vespers Rung, the player spoke for Horn publicly: the rhyme gets a new last verse.",
+      "endings": ["vespers-rung"],
+      "facts": ["horn.spoken-for"],
+      "pages": [
+        {
+          "text": "You spoke for Horn in front of the whole town, and the skipping rhyme has a new last verse. Nobody can say who made it up. It goes: The ox beneath the hill is Horn, he keeps the dark so we sleep till morn."
+        }
+      ]
+    },
+    {
+      "id": "vr-clatter-name",
+      "notes": "Vespers Rung, Clatter restored: the Pells visit him.",
+      "endings": ["vespers-rung"],
+      "facts": ["clatter.restored"],
+      "pages": [
+        {
+          "text": "Brother Anselm Hobb, who is still mostly a skeleton, tends his pale mushrooms in the Ossuary and answers to his name every time. Tansy Pell carries a loaf down to him on Sundays, with a lantern and Horn's leave. Family does that."
+        }
+      ]
+    },
+    {
+      "id": "lw-sleepers-home",
+      "notes": "The Last Warden, always: the sleepers come home and the bounty is paid.",
+      "endings": ["last-warden"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "The sleepers come home, hungry and confused, and seven doors open on seven kitchens. There is more weeping on the Green than there has been in a generation, and some of it is joyful. The bounty is paid. Nobody likes to ask what it paid for. The Knot has no warden."
+        }
+      ]
+    },
+    {
+      "id": "hs-silver-from-below",
+      "notes": "The Hireling's Silence, always: the mine prospers.",
+      "endings": ["hirelings-silence"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "The Deepworks takes on a second shift. Silver comes up from below the Bell Line, and Hornfolk gold goes down the river in crates, and the town is grateful: bread is cheaper, the school has a new roof, the Ox has a new sign. The bell is rung every dusk, mostly."
+        }
+      ]
+    },
+    {
+      "id": "tansy-saved",
+      "notes": "Tansy was stopped before she reached the Cradle (tansy.saved).",
+      "endings": ["vespers-rung", "last-warden", "hirelings-silence"],
+      "facts": ["tansy.saved"],
+      "pages": [
+        {
+          "text": "Tansy Pell goes back to school, and the schoolhouse, which stood empty, fills up again desk by desk. She has a great deal to tell and is allowed to tell only some of it. She has read everything in the Stacks she was not supposed to, and now she has a story to hold up against it."
+        }
+      ]
+    },
+    {
+      "id": "tansy-shaken",
+      "notes": "The abbot held Tansy hostage in the final scene (tansy.saved is false); she is safe now, and shaken.",
+      "endings": ["vespers-rung", "last-warden", "hirelings-silence"],
+      "facts": ["tansy.saved"],
+      "pages": [
+        {
+          "text": "Tansy Pell walks to school the long way, away from the hill. She sleeps with the window shut and a candle lit, and in her exercise book, under what I did in the holidays, she has written one word: listened. Her father leaves the candle where it is."
+        }
+      ]
+    },
+    {
+      "id": "abbot-at-rest",
+      "notes": "The abbot was laid to rest (abbot.fate at-rest).",
+      "endings": ["vespers-rung", "last-warden", "hirelings-silence"],
+      "facts": ["abbot.fate"],
+      "pages": [
+        {
+          "text": "In the priory crypt a lantern burns that nobody lit. Some evenings a pear lies on the belfry sill. The mice do not eat them. The Watch has stopped asking, and the town has started leaving the crypt door unlocked."
+        }
+      ]
+    },
+    {
+      "id": "abbot-defeated",
+      "notes": "The abbot was defeated (abbot.fate defeated).",
+      "endings": ["vespers-rung", "last-warden", "hirelings-silence"],
+      "facts": ["abbot.fate"],
+      "pages": [
+        {
+          "text": "Nobody speaks of the Sleepless Abbot at the Ox. It is bad luck, and also nobody has seen the lantern-fog since. At the lychgate the monks' graves get fresh flowers. No one admits to bringing them."
+        }
+      ]
+    },
+    {
+      "id": "vane-exposed",
+      "notes": "Vane exposed (vane.fate exposed).",
+      "endings": ["vespers-rung", "last-warden"],
+      "facts": ["vane.fate"],
+      "pages": [
+        {
+          "text": "Harrow Vane's ledger lies open on the council table, and nobody can find a way to read it that helps him. The Deepworks stands idle through the winter. In spring the town will vote on what to do with it, and on whether Vane House needs a new tenant."
+        }
+      ]
+    },
+    {
+      "id": "vane-confessed",
+      "notes": "Vane confessed (vane.fate confessed): the redemption bible 5.3 allows.",
+      "endings": ["vespers-rung", "last-warden"],
+      "facts": ["vane.fate"],
+      "pages": [
+        {
+          "text": "Harrow Vane pays the bounty to the Pells, the whole of it, and pays for the bell's new rope besides. On the first night it rings he stands at the back of the Green with his hat in his hands, trying not to be noticed, and not managing it."
+        }
+      ]
+    },
+    {
+      "id": "vane-fled",
+      "notes": "Vane fled (vane.fate fled).",
+      "endings": ["vespers-rung", "last-warden"],
+      "facts": ["vane.fate"],
+      "pages": [
+        {
+          "text": "Harrow Vane left on the mountain road before his ledger was read, with two trunks and no hat. Vane House stands shuttered on its rise, and the council argues about who owns the Deepworks. Nobody has yet dared dig."
+        }
+      ]
+    },
+    {
+      "id": "vane-quiet",
+      "notes": "Neutral: Vane neither exposed nor bought (vane.fate unexposed), the bounty settled.",
+      "endings": ["vespers-rung", "last-warden"],
+      "facts": ["vane.fate"],
+      "pages": [
+        {
+          "text": "The Deepworks stays shut. The mine office keeps its books closed, and nobody on the council cares to ask for them. The bounty is paid, without a word about why it was posted. Nobody asks. That is not the same as nobody knowing."
+        }
+      ]
+    },
+    {
+      "id": "hs-vane-ledger",
+      "notes": "The Hireling's Silence, always: the ledger buried, the bounty claimed.",
+      "endings": ["hirelings-silence"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "The ledger stays where you buried it. Vane shakes your hand on the Green in front of the whole town, and the purse is heavier than the bounty and has no one's name on it. You do not count it until you are out of sight."
+        }
+      ]
+    },
+    {
+      "id": "lw-goblins-watch",
+      "notes": "The Last Warden, goblins friendly: the clan keeps the watch.",
+      "endings": ["last-warden"],
+      "facts": ["goblins.standing"],
+      "pages": [
+        {
+          "text": "Mother Kettleback's clan takes up the watch in its own way: loudly, for a fee, and with a great deal of salvage. Nothing walks the Knot's corridors now without being sold something. It is not what Horn would have done. It works, mostly."
+        }
+      ]
+    },
+    {
+      "id": "lw-clatter-hums",
+      "notes": "The Last Warden, goblins not friendly and Clatter restored.",
+      "endings": ["last-warden"],
+      "facts": ["goblins.standing", "clatter.restored"],
+      "pages": [
+        {
+          "text": "Clatter walks the Knot's halls at night, humming the hymn flat, and the Forgotten fall quiet as he passes. He does not know he is keeping watch. He thinks he is looking for pears."
+        }
+      ]
+    },
+    {
+      "id": "lw-lantern-and-footprints",
+      "notes": "The Last Warden, nobody keeps the watch: a hook, not doom (bible 4.4). The neutral watch slide, and the last slide.",
+      "endings": ["last-warden"],
+      "facts": ["goblins.standing", "clatter.restored"],
+      "pages": [
+        {
+          "text": "At the mine gate a lantern burns that nobody lit. In the dust beside it, a child's bare footprints go in. They are not sleepwalking: the steps are quick, and one of them skips."
+        }
+      ]
+    },
+    {
+      "id": "hs-someone-sits-up",
+      "notes": "The Hireling's Silence, always: the last slide.",
+      "endings": ["hirelings-silence"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "On still nights, in one house or another, someone sits up in bed. Eyes open. Listening. Then lies down again, and by morning no one remembers. You were well paid."
+        }
+      ]
+    },
+    {
+      "id": "lv-valley-sleeps",
+      "notes": "The Long Vespers, always.",
+      "endings": ["long-vespers"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "The song goes on. Briar Glen sleeps, and so do the farms along the Wend, and the stone barges drift on the river with no one at the tiller. The valley is very quiet. At the Sleeping Ox one lamp still burns in the window. Nobody lit it."
+        }
+      ]
+    },
+    {
+      "id": "lv-took-the-hand",
+      "notes": "The Long Vespers: the player joined the abbot (abbot.fate joined).",
+      "endings": ["long-vespers"],
+      "facts": ["abbot.fate"],
+      "pages": [
+        {
+          "text": "You took the abbot's hand, and he was so pleased. Together you sang the hymn the way he always wanted it sung, with no end, and the song climbed the Sounding Shaft and out over the hill and down into every bed in the valley."
+        }
+      ]
+    },
+    {
+      "id": "lv-bell-silent",
+      "notes": "The Long Vespers: the abbot was not joined, so the bell failed (bell.rung failed).",
+      "endings": ["long-vespers"],
+      "facts": ["abbot.fate"],
+      "pages": [
+        {
+          "text": "The bell would not ring. You tried with everything the shaft would allow, and the note that came was sour and small and the song swallowed it. The Hushlings came up the shaft after that. You do not remember much more."
+        }
+      ]
+    },
+    {
+      "id": "lv-wake-in-the-cradle",
+      "notes": "The Long Vespers, always: the last slide (bible 4.4), on a doorway, not a grave.",
+      "endings": ["long-vespers"],
+      "facts": [],
+      "pages": [
+        {
+          "text": "You wake in the Cradle. The abbot is gone. A goblin is poking you with a stick. “Oi. You're the only one up. Everyone's snoring. Fix it.” Behind it a door stands open on the dark, and somewhere beyond, a very long way up, a bell is waiting."
+        }
+      ]
+    },
+    {
+      "id": "harbor-name-stone-home",
+      "notes": "Harbour: the crate was intercepted (crate.intercepted). Adds a slide; never changes the headline ending.",
+      "endings": ["vespers-rung", "last-warden", "hirelings-silence", "long-vespers"],
+      "facts": ["crate.intercepted"],
+      "pages": [
+        {
+          "text": "The name-stone from Vane's crate goes home to the Knot, carried the last mile by someone who will not say who. It is set into a wall in the dark where a stone has been missing for a very long time, and the carving lines up with the carving around it perfectly."
+        }
+      ]
+    },
+    {
+      "id": "harbor-tern-ox",
+      "notes": "Harbour: the Gilded Tern sailed with the crate (tern.sailed, not crate.intercepted). Post-MVP hook.",
+      "endings": ["vespers-rung", "last-warden", "hirelings-silence", "long-vespers"],
+      "facts": ["crate.intercepted", "tern.sailed"],
+      "pages": [
+        {
+          "text": "In a far city a man prises open a crate and finds, stamped on every coin, a tiny ox asleep. He counts them twice: forty. He keeps one, being the sort of man who would. That night, for the first time in years, he dreams."
+        }
+      ]
+    }
+  ]
+}
