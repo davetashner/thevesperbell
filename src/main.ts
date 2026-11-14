@@ -98,8 +98,10 @@ import type { DialogueDef } from '@content/types/dialogue';
 import { startShopUi } from '@game/shop/shop-window';
 import { ContestController } from '@game/contest/controller';
 import { contestsIn, installContests } from '@game/contest/install';
+import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
+import { rumoursOf, startRumourUi } from '@game/rumours/rumours';
 import {
   ContainerWatch,
   hasContainers,
@@ -434,6 +436,7 @@ import {
   EquipmentRules,
   InventoryRules,
   createSurfaceMap,
+  sceneExits,
 } from '@sim/index';
 import { installLatencyProbe } from '@tools/perf/latency-probe';
 import type { AnimDemo, ArrowDemo, SpellVfxDemo, VfxDemo } from '@tools/dev-kit';
@@ -1385,6 +1388,9 @@ function startRenderer(
     let sliceCard: SliceCompleteController | undefined;
     // The epilogue slideshow (mw-e39.40): plays when the epilogue quest starts; the console previews it.
     let epilogueUi: EpilogueUi | undefined;
+    // The class arrival and class beats (mw-aw1y): the narration window after a class is picked at the
+    // front door, and a class's own text when a trigger fires. #app[data-class-beat] is the e2e's readout.
+    let classBeatUi: ClassBeatUi | undefined;
     let captureAfterRender: ((capture: Promise<CapturedThumbnail>) => void) | undefined;
     // A save's thumbnail (mw-e30.11): the next drawn frame, or the placeholder when no frame comes
     // (a hidden tab). Manual saves and autosaves both take one.
@@ -2374,6 +2380,22 @@ function startRenderer(
         afterStep.push(() => {
           reader.afterStep();
         });
+        // Rumours (mw-e22.11): a teller's `rumor.told` records the rumour, its target becomes a lead,
+        // visiting the target resolves it. No UI opens; #app[data-rumours] (JSON: heard, leads,
+        // investigated, debunked) is the e2e's readout.
+        const rumourHero = player.entity;
+        const rumours = startRumourUi({
+          world,
+          rumours: rumoursOf(content),
+          quests: gameLogic.quests,
+          player: () => rumourHero,
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          rumours.afterStep();
+        });
         // The epilogue slideshow (mw-e39.40): the ending card and the slides of the epilogue quest,
         // once the main quest resolves. #app[data-epilogue] (JSON: open, slide, preview, ended) is the
         // e2e's readout.
@@ -2390,6 +2412,21 @@ function startRenderer(
           epilogueUi = epilogue;
           afterStep.push(() => {
             epilogue.afterStep();
+          });
+          const classBeats = startClassBeatUi({
+            ui,
+            world,
+            quests: gameLogic.quests,
+            content,
+            // A debug boot into a named scene (?scene=) fires no beats (it sets arrival facts at once).
+            triggers: !new URLSearchParams(location.search).has('scene'),
+            publish: (key, value) => {
+              root.dataset[key] = value;
+            },
+          });
+          classBeatUi = classBeats;
+          afterStep.push(() => {
+            classBeats.afterStep();
           });
         }
       }
@@ -2430,7 +2467,10 @@ function startRenderer(
             onBack: back,
             cards: classCards(content, playable),
             onConfirm: (id) => {
-              if (isPlayerClass(id) && playable.has(id)) choose(id);
+              if (isPlayerClass(id) && playable.has(id)) {
+                choose(id);
+                classBeatUi?.controller.startNewGame();
+              }
             },
           });
         };
@@ -2590,6 +2630,8 @@ function startRenderer(
       // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
       watchPresence(world, creatures.spawn, loaded.layout.spawns, undefined, {
         inView: (point) => ndcInView(projectToNdc(camera, point)),
+        // People walk to a door, marker or way out to leave and come in by one (mw-8551).
+        exits: sceneExits(loaded.layout),
       });
       // Talking to NPCs (mw-e22.9): a creature whose content names a `dialogue` gets Talk on the
       // Interact verb; talking pauses its routine, faces the player, runs the dialogue against the

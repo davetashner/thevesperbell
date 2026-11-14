@@ -7,10 +7,13 @@
 
 import type { EntityId } from '../core/component';
 import { isConversing } from '../ai/conversing';
+import { endErrand, errandOf, sendOnErrand } from '../ai/errand';
+import { straightDistance } from '../ai/navigation';
+import { aiNavigation } from '../ai/runtime';
 import type { World } from '../core/world';
 import { addInteractable, InteractableComponent } from '../interaction/system';
 import { SceneSpawnComponent } from '../scene/loader';
-import type { SceneSpawnPlacement } from '../scene/layout';
+import type { SceneLayout, SceneSpawnPlacement } from '../scene/layout';
 import { MINUTE_FACT } from '../rest/day-clock';
 import { PlacementComponent } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
@@ -27,9 +30,9 @@ import {
 
 /** What `syncPresence` changed, as spawn point ids, and any spawn that failed. */
 export interface PresenceChange {
-  /** Spawns whose creature or interaction came back. */
+  /** Spawns whose creature or interaction came back (an arrival on foot counts when it is made). */
   readonly arrived: readonly string[];
-  /** Spawns whose creature or interaction went away. */
+  /** Spawns whose creature or interaction went away (a person who sets off to walk out counts). */
   readonly left: readonly string[];
   readonly errors: readonly { readonly point: string; readonly error: SpawnError }[];
 }
@@ -44,6 +47,48 @@ export function hourNow(world: World<never>): number | undefined {
 export interface PresenceHold {
   /** Whether a point is on the player's screen: nobody pops in or out there (mw-e24.13 AC-3). */
   readonly inView?: (at: Vec3) => boolean;
+  /**
+   * Where people may come and go on foot (`sceneExits`). A leaver walks to the nearest one it can
+   * reach and is gone there; an arrival is made at the nearest and walks to its spot. Without any
+   * (or where none can be reached) people arrive and leave in place, held while their spot is in
+   * view.
+   */
+  readonly exits?: readonly Vec3[];
+}
+
+/** Name prefix of a scene spawn that marks a place people come and go (no creature, no door). */
+export const EXIT_MARKER_PREFIX = 'exit-';
+
+/**
+ * The places people come and go on foot in `layout` (mw-8551), in a fixed order: doors, authored
+ * exit markers (spawns whose id starts with `exit-`), then ways into other scenes (the floor at the
+ * middle of the box).
+ */
+export function sceneExits(layout: Pick<SceneLayout, 'spawns' | 'transitions'>): Vec3[] {
+  const doors = layout.spawns.filter((s) => s.door !== undefined).map((s) => s.position);
+  const markers = layout.spawns
+    .filter((s) => s.door === undefined && s.id.startsWith(EXIT_MARKER_PREFIX))
+    .map((s) => s.position);
+  const transitions = layout.transitions.map((t) => ({
+    x: (t.min.x + t.max.x) / 2,
+    y: t.min.y,
+    z: (t.min.z + t.max.z) / 2,
+  }));
+  return [...doors, ...markers, ...transitions];
+}
+
+/** The nearest of `exits` by `measure` (ties: the earlier), or undefined when none can be reached. */
+function nearest(exits: readonly Vec3[], measure: (exit: Vec3) => number): Vec3 | undefined {
+  let best: Vec3 | undefined;
+  let bestDistance = Infinity;
+  for (const exit of exits) {
+    const d = measure(exit);
+    if (d < bestDistance) {
+      best = exit;
+      bestDistance = d;
+    }
+  }
+  return best;
 }
 
 /**
@@ -64,6 +109,7 @@ export function syncPresence(
 ): PresenceChange {
   const arrived = new Set<string>();
   const left = new Set<string>();
+  const exits = hold.exits ?? [];
   const errors: { point: string; error: SpawnError }[] = [];
   for (const spawn of spawns) {
     if (spawn.presence === undefined) continue;
@@ -73,16 +119,39 @@ export function syncPresence(
         (entity) => world.get(entity, CreatureComponent)?.origin.point === spawn.id,
       );
       if (present && here.length === 0) {
-        if (hold.inView?.(spawn.position) === true) continue;
-        const result = spawnCreature(world, options, originOfSpawn(spawn, spawn.creature));
-        if (result.ok) arrived.add(spawn.id);
-        else errors.push({ point: spawn.id, error: result.error });
-      } else if (!present && here.length > 0) {
-        const leaving = here.filter(
-          (entity) => !isConversing(world, entity) && !heldInView(world, entity, hold),
+        const door = nearest(exits, (exit) => flat(exit, spawn.position));
+        // Through a door when there is one, held while that door is on screen; else in place,
+        // held while the spot is.
+        if (hold.inView?.(door ?? spawn.position) === true) continue;
+        const origin = originOfSpawn(spawn, spawn.creature);
+        const result = spawnCreature(
+          world,
+          options,
+          door === undefined ? origin : { ...origin, from: door },
         );
-        for (const entity of leaving) despawnCreature(world, entity);
-        if (leaving.length > 0) left.add(spawn.id);
+        if (!result.ok) errors.push({ point: spawn.id, error: result.error });
+        else {
+          if (door !== undefined) sendOnErrand(world, result.entity, spawn.position, false);
+          arrived.add(spawn.id);
+        }
+      } else if (!present && here.length > 0) {
+        for (const entity of here) {
+          if (isConversing(world, entity) || errandOf(world, entity)?.leave === true) continue;
+          const navigation = aiNavigation(world);
+          const measure = navigation?.distance ?? straightDistance;
+          const exit = nearest(exits, (point) => measure(world, entity, point));
+          if (exit !== undefined) {
+            sendOnErrand(world, entity, exit, true);
+            left.add(spawn.id);
+          } else if (!heldInView(world, entity, hold)) {
+            despawnCreature(world, entity);
+            left.add(spawn.id);
+          }
+        }
+      } else if (present) {
+        // Back in its window before it reached the door: it turns round and takes up its place.
+        for (const entity of here)
+          if (errandOf(world, entity)?.leave === true) endErrand(world, entity);
       }
     }
     if (spawn.interact !== undefined && world.isRegistered(InteractableComponent)) {
@@ -106,4 +175,9 @@ export function syncPresence(
 function heldInView(world: World<never>, entity: EntityId, hold: PresenceHold): boolean {
   const here = world.get(entity, PlacementComponent);
   return here !== undefined && hold.inView?.(here) === true;
+}
+
+/** Horizontal metres between two points. */
+function flat(a: Vec3, b: Vec3): number {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.z - b.z) ** 2);
 }

@@ -138,3 +138,17 @@ describe('epilogue slideshow window (mw-e39.40)', () => {
     expect(ui.top).toBeUndefined();
   });
 });
+
+describe('epilogue slideshow window as narration (mw-aw1y)', () => {
+  it('AC-1: takes its own screen id, label and counter unit; the defaults are unchanged', () => {
+    openEpilogueSlideshow(ui, {
+      slides: SLIDES,
+      screenId: 'class-beat',
+      label: 'Narration',
+      unit: 'Page',
+    });
+    expect(ui.top?.id).toBe('class-beat');
+    expect(find('[data-testid="epilogue-counter"]').textContent).toBe('Page 1 of 3');
+    expect(slideLabel(1, 3)).toBe('Slide 2 of 3');
+  });
+});
