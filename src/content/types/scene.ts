@@ -695,13 +695,27 @@ export const sceneSpawnSchema = z.strictObject({
       phases: z
         .array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/))
         .min(1)
+        .optional()
         .describe(
           'Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for.',
         ),
+      hours: z
+        .tuple([z.number().min(0).max(24), z.number().min(0).max(24)])
+        .optional()
+        .describe(
+          'From and to, hours of the day, [from, to) (wraps past midnight when from > to): the spawn is there only inside this window of the world clock (mw-e24.13). A schedule is a creature’s spawns, each with its own window, across the scenes it moves between.',
+        ),
+    })
+    .refine(({ phases, hours }) => phases !== undefined || hours !== undefined, {
+      message: 'presence needs phases, hours or both',
+    })
+    .refine(({ hours }) => hours === undefined || hours[0] !== hours[1], {
+      message: 'the window is empty: from equals to',
+      path: ['hours'],
     })
     .optional()
     .describe(
-      'The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene.',
+      'The spawn is only there during these phases of the day and/or hours of the clock (mw-ju8.14, mw-e27.12, mw-e24.13); with both, both must hold. Its creature is not spawned and its `interact` is switched off at any other time, and both come and go as the clock crosses a boundary while the player is in the scene.',
     ),
   spawnIf: conditionSchema
     .optional()

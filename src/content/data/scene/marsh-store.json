@@ -237,15 +237,8 @@
       "id": "shop-counter",
       "at": [-2, 0, 0.75],
       "tags": ["counter", "shop", "merchant:marsh-general-store", "dev-crowns:400"],
-      "interact": {
-        "affordances": [
-          {
-            "verb": "talk",
-            "label": "Trade"
-          }
-        ],
-        "radius": 1.5
-      }
+      "interact": { "affordances": [{ "verb": "talk", "label": "Trade" }], "radius": 1.5 },
+      "presence": { "hours": [6, 21] }
     },
     {
       "id": "shelf-loaf",
@@ -265,11 +258,10 @@
       "id": "npc-ottilie",
       "at": [-2, 0, 3],
       "yaw": 180,
-      "tags": ["shopkeeper"],
+      "tags": ["shopkeeper", "schedule:ottilie"],
       "creature": "npc-ottilie",
-      "leash": {
-        "radius": 3
-      }
+      "leash": { "radius": 3 },
+      "presence": { "hours": [6, 21] }
     },
     {
       "id": "hearth-ground",
@@ -376,6 +368,15 @@
       "id": "arrive-from-briar-glen-lane",
       "at": [0, 0, -2.5],
       "tags": ["arrival"]
+    },
+    {
+      "id": "npc-ottilie-upstairs",
+      "at": [-3.0, 3.5, 2.0],
+      "tags": ["schedule:ottilie", "activity:home", "upstairs"],
+      "yaw": 90,
+      "creature": "npc-ottilie",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [21, 6] }
     }
   ],
   "light": {

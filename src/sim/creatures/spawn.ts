@@ -28,7 +28,7 @@
 // tick; between steps at once.
 
 import type { CreatureTable, RuntimeCreature, RuntimeShield } from '@content/index';
-import type { PatrolRoutine } from '../ai/routes';
+import { inWindow, type PatrolRoutine } from '../ai/routes';
 import { aiBehaviour, giveBrain } from '../ai/runtime';
 import { giveAttacker, AttackerComponent } from '../combat/attacks/components';
 import {
@@ -300,9 +300,22 @@ export function spawnCreature(
   return { ok: true, entity };
 }
 
-/** Whether the spawn's creature belongs in the scene in `phase` (always, when it sets no presence). */
-export function presentIn(spawn: SceneSpawnPlacement, phase: string): boolean {
-  return spawn.presence === undefined || spawn.presence.phases.includes(phase);
+/**
+ * Whether the spawn's creature belongs in the scene in `phase` at `hour` of the day, 0 to 24 (always,
+ * when it sets no presence). A window the spawn does not set, or a clock reading the caller does not
+ * have (undefined), is not checked; when it sets both, both must hold (mw-e24.13).
+ */
+export function presentIn(
+  spawn: SceneSpawnPlacement,
+  phase: string | undefined,
+  hour?: number,
+): boolean {
+  const { presence } = spawn;
+  if (presence === undefined) return true;
+  if (phase !== undefined && presence.phases !== undefined && !presence.phases.includes(phase)) {
+    return false;
+  }
+  return hour === undefined || inWindow(presence.hours, ((hour % 24) + 24) % 24);
 }
 
 /** Whether `entity` is a living creature. */
@@ -369,21 +382,23 @@ export interface SceneCreatures {
 
 /**
  * Spawns the creature of every scene spawn that names one, facing the spawn's yaw, with its faction
- * override, patrol route, routine and leash. With `phase` (the clock's `time.phase`), a spawn whose
- * `presence` leaves that phase out is skipped (mw-ju8.14). A failed spawn is reported, not thrown; the rest still spawn.
+ * override, patrol route, routine and leash. With `phase` (the clock's `time.phase`) and `hour` (of
+ * the day, 0 to 24), a spawn whose `presence` leaves that phase or hour out is skipped (mw-ju8.14,
+ * mw-e24.13). A failed spawn is reported, not thrown; the rest still spawn.
  */
 export function spawnSceneCreatures(
   world: World<never>,
   options: CreatureSpawnOptions,
   spawns: readonly SceneSpawnPlacement[],
   phase?: string,
+  hour?: number,
 ): SceneCreatures {
   const entities: EntityId[] = [];
   const errors: { point: string; error: SpawnError }[] = [];
   for (const spawn of spawns) {
     if (spawn.creature === undefined) continue;
     // A creature that keeps to some phases of the day is not there in the others (mw-ju8.14).
-    if (phase !== undefined && !presentIn(spawn, phase)) continue;
+    if (!presentIn(spawn, phase, hour)) continue;
     const result = spawnCreature(world, options, originOfSpawn(spawn, spawn.creature));
     if (result.ok) entities.push(result.entity);
     else errors.push({ point: spawn.id, error: result.error });

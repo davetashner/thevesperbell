@@ -1,6 +1,7 @@
 {
   "$schema": "../merchant.schema.json",
   "id": "fenn-fletchery-simples",
+  "hours": { "open": 6, "close": 19 },
   "notes": "Fenn's Fletchery & Simples, Briar Glen (story bible §3.5 and §5.6; mw-ju8.5): Juniper Fenn (npc-juniper), sunburnt and laconic, who knows the Briarwood better than anyone. Bows (shortbow, hunting bow, yew longbow), every arrow type, staves (walking, ash, yew), the potion line (healing, mana, stamina, tonic), potion ingredients, empty glass jars and the three spell scrolls. Scrolls are stock-only items today; reading them is mw-ju8.17. Gruff and shrewd, so markup 1.25 (band 1.1-1.5) and buy rate 0.4 (band 0.3-0.6); ammunition and consumables are her specialties (bonus at the default 1.2), and she buys ingredients and odds and ends (misc), books and scrolls, and bows and staves, not armour. 300 gold, refilling 60 a day; arrows, potions, ingredients and jars restock, bows, staves, the greater potions and scrolls do not. Prices follow the catalogue values (mw-ju8.3, mw-ju8.4) and will move with the balance pass.",
   "npcId": "npc-juniper",
   "displayName": "Juniper Fenn",
