@@ -57,6 +57,7 @@ import {
   type CreatureSpawnOptions,
   type EntityId,
   type RapierPhysics,
+  hourNow,
   PHASE_FACT,
   type SceneCreatures,
   type SceneSpawnPlacement,
@@ -142,6 +143,7 @@ export function startCreatures<TInput>(
     creatures.spawn,
     spawns,
     typeof phase === 'string' ? phase : undefined,
+    hourNow(w),
   );
   return { ...scene, ai: installed };
 }

@@ -76,6 +76,7 @@ import {
   HIT_VOLUME_COMPONENTS,
   installDebugCommands,
   DAY_CLOCK_FACTS,
+  MINUTE_FACT,
   PHASE_FACT,
   installSlainFacts,
   LEDGE_HANG_CAPABILITY,
@@ -251,6 +252,7 @@ export function createGameWorld<TInput>(
     environment,
     content = loadGameContent(),
     phase,
+    minute,
     magic: withMagic = false,
   }: {
     seed: number;
@@ -265,6 +267,11 @@ export function createGameWorld<TInput>(
      * phases of the day are there or not by it. Without it the world has no clock and they all are.
      */
     phase?: string;
+    /**
+     * The minute of the day the clock reads (`time.minute`, 0-1439; mw-e24.13): scheduled spawns
+     * (`presence.hours`) are there or not by it. Declares the clock's facts like `phase` does.
+     */
+    minute?: number;
     /**
      * Spells and fire as src/main.ts installs them (mw-e06.15): the spell pipeline before the
      * stimulus system, the element field and fire rules after it, the player with a mana pool.
@@ -397,9 +404,10 @@ export function createGameWorld<TInput>(
     : undefined;
   // Creatures (mw-e12.4) with senses and AI (mw-e11.21, mw-e11.23): perception sees the player by
   // the light field over the sim's Rapier world; AI walks the scene's navmesh.
-  if (phase !== undefined) {
+  if (phase !== undefined || minute !== undefined) {
     for (const [key, spec] of Object.entries(DAY_CLOCK_FACTS)) world.facts.declare(key, spec);
-    world.facts.set(PHASE_FACT, phase);
+    if (phase !== undefined) world.facts.set(PHASE_FACT, phase);
+    if (minute !== undefined) world.facts.set(MINUTE_FACT, minute);
   }
   const sceneCreatures = startCreatures(world, creatures, combat, scene.layout.spawns, {
     content,

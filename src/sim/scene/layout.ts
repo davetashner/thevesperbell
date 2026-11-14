@@ -409,7 +409,12 @@ export interface SceneSpawnSpec {
   /** Opts the creature in to returning after a kill (mw-ju8.29). */
   readonly repopulate?: { readonly afterDays: number } | undefined;
   /** The clock phases the spawn's creature and interaction are there for (mw-ju8.14); absent = always. */
-  readonly presence?: { readonly phases: readonly string[] } | undefined;
+  readonly presence?:
+    | {
+        readonly phases?: readonly string[] | undefined;
+        readonly hours?: readonly [number, number] | undefined;
+      }
+    | undefined;
   /** The spawn exists only while this holds (mw-e27.8). */
   readonly spawnIf?: Condition | undefined;
   /** The spawn is absent while this holds (mw-e27.8). */
@@ -614,7 +619,10 @@ export interface SceneSpawnPlacement {
   /** Returns after a kill once `afterDays` world days have passed (mw-ju8.29). */
   readonly repopulate?: { readonly afterDays: number };
   /** The clock phases that spawn's creature and interaction are there for (mw-ju8.14); absent = always. */
-  readonly presence?: { readonly phases: readonly string[] };
+  readonly presence?: {
+    readonly phases?: readonly string[];
+    readonly hours?: readonly [number, number];
+  };
   /** Which world conditions decide whether the spawn exists (mw-e27.8); absent = always there. */
   readonly gate?: SpawnGate;
   /** What that creature carries and drops where it dies (mw-e01.5), in order. */
@@ -1130,7 +1138,14 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           repopulate: Object.freeze({ afterDays: spawn.repopulate.afterDays }),
         }),
         ...(spawn.presence !== undefined && {
-          presence: Object.freeze({ phases: Object.freeze([...spawn.presence.phases]) }),
+          presence: Object.freeze({
+            ...(spawn.presence.phases !== undefined && {
+              phases: Object.freeze([...spawn.presence.phases]),
+            }),
+            ...(spawn.presence.hours !== undefined && {
+              hours: Object.freeze([...spawn.presence.hours] as [number, number]),
+            }),
+          }),
         }),
         ...gateOf(spawn),
         ...(spawn.carries !== undefined && {
