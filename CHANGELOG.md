@@ -11,6 +11,7 @@ check enforces this).
 
 ## [Unreleased]
 
+- Fixed: the new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
 ### Added
 
 - Rumours about the Briarwood, the Standing Horn, Mooring's Watch, the Glen Well, the Lamplit Stacks, the Weeping Adit and the Breakwater now resolve when you walk into those places, and the sea-serpent and Old Mooring rumours are put right by seeing the breakwater or the watch for yourself (mw-nh24). The Millweir stays a lead.

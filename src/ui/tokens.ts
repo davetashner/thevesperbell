@@ -852,7 +852,8 @@ ${tokens}
 .vb-journal-check { font-family: monospace; }
 .vb-journal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .vb-screen[data-screen="epilogue"] { background: ${DIALOGUE_HIGH_CONTRAST_PLATE}; }
-.vb-panel.vb-epilogue { width: min(36em, 100%); text-align: center; background: transparent; }
+.vb-screen[data-screen="class-beat"] { background: rgb(0 0 0 / 0.72); }
+.vb-panel.vb-epilogue { width: min(36em, 100%); text-align: center; }
 .vb-epilogue h1 { overflow-wrap: anywhere; margin: 0; }
 .vb-epilogue h1[hidden], .vb-epilogue-counter[hidden] { display: none; }
 .vb-epilogue-counter, .vb-epilogue-hint { margin: 0; color: var(--ui-color-text-muted); }
