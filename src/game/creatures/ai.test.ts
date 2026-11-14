@@ -3,7 +3,9 @@ import { loadGameContent } from '@content/index';
 import {
   ClimbRopeComponent,
   entitySource,
+  aiPorts,
   FakeSightWorld,
+  MINUTE_FACT,
   giveBrain,
   NavRouteComponent,
   placeEntity,
@@ -50,6 +52,16 @@ describe('creature AI glue (mw-e11.21, mw-e11.23)', () => {
     expect(ai.perception.unitsPerTick).toBeGreaterThan(0);
     world.step();
     expect(ai.perception.lastUnits).toBe(0);
+  });
+
+  it('mw-8551: the AI reads the hour of the day from the game clock, none without one', () => {
+    const { world } = aiWorld();
+    const port = aiPorts(world).hourOfDay;
+    expect(port?.(world)).toBeUndefined();
+    world.facts.declare(MINUTE_FACT, { type: 'int', default: 13 * 60 + 30 });
+    expect(port?.(world)).toBe(13.5);
+    world.facts.set(MINUTE_FACT, 22 * 60);
+    expect(port?.(world)).toBe(22);
   });
 
   it('awareness resolves only the player’s source to a target', () => {

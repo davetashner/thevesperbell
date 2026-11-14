@@ -102,6 +102,7 @@ import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beat
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
 import { buildJournal, JournalController, journalSources } from '@game/journal/journal';
+import { rumoursOf, startRumourUi } from '@game/rumours/rumours';
 import {
   ContainerWatch,
   hasContainers,
@@ -436,6 +437,7 @@ import {
   EquipmentRules,
   InventoryRules,
   createSurfaceMap,
+  sceneExits,
 } from '@sim/index';
 import { installLatencyProbe } from '@tools/perf/latency-probe';
 import type { AnimDemo, ArrowDemo, SpellVfxDemo, VfxDemo } from '@tools/dev-kit';
@@ -2383,6 +2385,22 @@ function startRenderer(
         afterStep.push(() => {
           reader.afterStep();
         });
+        // Rumours (mw-e22.11): a teller's `rumor.told` records the rumour, its target becomes a lead,
+        // visiting the target resolves it. No UI opens; #app[data-rumours] (JSON: heard, leads,
+        // investigated, debunked) is the e2e's readout.
+        const rumourHero = player.entity;
+        const rumours = startRumourUi({
+          world,
+          rumours: rumoursOf(content),
+          quests: gameLogic.quests,
+          player: () => rumourHero,
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          rumours.afterStep();
+        });
         // The epilogue slideshow (mw-e39.40): the ending card and the slides of the epilogue quest,
         // once the main quest resolves. #app[data-epilogue] (JSON: open, slide, preview, ended) is the
         // e2e's readout.
@@ -2617,6 +2635,8 @@ function startRenderer(
       // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
       watchPresence(world, creatures.spawn, loaded.layout.spawns, undefined, {
         inView: (point) => ndcInView(projectToNdc(camera, point)),
+        // People walk to a door, marker or way out to leave and come in by one (mw-8551).
+        exits: sceneExits(loaded.layout),
       });
       // Talking to NPCs (mw-e22.9): a creature whose content names a `dialogue` gets Talk on the
       // Interact verb; talking pauses its routine, faces the player, runs the dialogue against the

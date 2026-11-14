@@ -1,0 +1,57 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "briar-glen-green-areas",
+  "name": "Market Green arrival volumes",
+  "notes": "Observed player volumes of Market Green (mw-heoa): `glen-well` around the Glen Well (place-glen-well) and `lamplit-stacks` before the Lamplit Stacks' front door (place-lamplit-stacks), the visit triggers of the rumour book. No quest binds them.",
+  "nodes": [
+    {
+      "id": "glen-well",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 14,
+          "y": 1.5,
+          "z": 45.5
+        },
+        "halfExtents": {
+          "x": 4,
+          "y": 3,
+          "z": 4
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "lamplit-stacks",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": -40,
+          "y": 1.5,
+          "z": 70
+        },
+        "halfExtents": {
+          "x": 5,
+          "y": 3,
+          "z": 6
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    }
+  ],
+  "wires": []
+}

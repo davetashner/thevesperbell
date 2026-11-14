@@ -1335,6 +1335,7 @@
       }
     }
   ],
+  "signals": [{ "graph": "moorings-watch-areas" }],
   "light": {
     "ambient": 0.4,
     "directional": [
