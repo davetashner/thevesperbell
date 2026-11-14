@@ -39,6 +39,7 @@ import {
 } from './system';
 
 const DEG = Math.PI / 180;
+const ORIGIN = { x: 0, y: 0, z: 0 };
 const UP = actionButton(false, false, false);
 
 /** A frame with Interact in the given state. */
@@ -131,6 +132,41 @@ describe('interaction system (mw-e02.5)', () => {
     expect(focusOf(world, actor)?.target).not.toBeNull();
   });
 
+  describe.each([-2, 2, 0])(
+    'mw-j6el: an object placed at its feet on a floor whose top is y %d',
+    (top) => {
+      const feetSpec: InteractableSpec = { affordances: [{ verb: 'talk' }], anchor: [0, 0, 0] };
+      const floorWorld = (extra: readonly ReturnType<typeof box>[] = []) => {
+        const sight = new FakeSightWorld([
+          box({ x: -20, y: top - 1, z: -20 }, { x: 20, y: top, z: 20 }),
+          ...extra,
+        ]);
+        const made = setup({ sight });
+        made.world.set(
+          made.actor,
+          CharacterController,
+          initialCharacterState({ x: 0, y: top, z: 0 }),
+        );
+        const npc = made.world.spawn();
+        addInteractable(made.world, npc, feetSpec, { x: 0, y: top, z: -2 });
+        return { ...made, npc };
+      };
+
+      it('is reachable: the sight ray ends above the floor it stands on, not inside it', () => {
+        const { world, actor, npc } = floorWorld();
+        world.step([IDLE]);
+        expect(focusOf(world, actor)?.target).toBe(npc);
+      });
+
+      it('is still hidden by a wall between it and the player', () => {
+        const wall = box({ x: -2, y: top, z: -1.2 }, { x: 2, y: top + 3, z: -1 });
+        const { world, actor } = floorWorld([wall]);
+        world.step([IDLE]);
+        expect(focusOf(world, actor)?.target).toBeNull();
+      });
+    },
+  );
+
   it("AC-2: the object's own colliders never block it", () => {
     const sight = new FakeSightWorld();
     const crate = sight.add(box({ x: -0.3, y: 0.7, z: -2.3 }, { x: 0.3, y: 1.3, z: -1.7 }));
@@ -189,6 +225,16 @@ describe('interaction system (mw-e02.5)', () => {
         z: 0,
       },
     );
+    world.step([IDLE]);
+    expect(focusOf(world, actor)?.target).toBe(here);
+  });
+
+  it('mw-j6el: reaches an object whose lifted reach point is the reach point itself', () => {
+    const sight = new FakeSightWorld([box({ x: -1, y: 0, z: -1 }, { x: 1, y: 0.5, z: 1 })]);
+    const { world, actor } = setup({ sight });
+    const here = world.spawn();
+    // The reach point is 1 m up, so a focus point 0.9 m up has its ray end exactly there.
+    addInteractable(world, here, { affordances: [{ verb: 'use' }], anchor: [0, 0.9, 0] }, ORIGIN);
     world.step([IDLE]);
     expect(focusOf(world, actor)?.target).toBe(here);
   });

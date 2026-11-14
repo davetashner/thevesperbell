@@ -525,6 +525,7 @@ check enforces this).
 
 ### Fixed
 
+- People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).
 - Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).
 - An arrow stuck in a wall can now be taken back when you stand right up against that wall: the wall no longer hides it from reach, so "Take arrow" no longer shows with nothing to take, or fails to show at all (mw-fh5, mw-5h9).
 - A chandelier, anvil or other heavy thing dropped on a creature or a training dummy now hurts it, and so does standing in fire: until now only the knight took crush and fire damage from the world, and whoever cut the rope gets the blame (mw-aps).
