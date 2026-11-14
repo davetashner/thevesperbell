@@ -27,6 +27,7 @@ import {
   type JournalWindow,
   type UiRoot,
 } from '@ui/index';
+import { beatShownFact } from '../class-beats/class-beats';
 
 /** The main quest, whose arrival stage the class's first journal entry stands in for. */
 export const MAIN_QUEST = 'quest-labyrinth-beneath-briar-glen';
@@ -37,7 +38,7 @@ export const PLAYER_CLASS_FACT = 'player.class';
 /** `player.class` before a class is chosen. */
 const NO_CLASS = 'none';
 /** The fact that records a class beat has been shown. */
-export const classBeatShownFact = (beat: string): string => `class-beat.${beat}.shown`;
+export const classBeatShownFact = beatShownFact;
 
 /** One heard rumour as the journal lists it (the rumour book's `RumourEntry` satisfies this). */
 export interface JournalRumour {
