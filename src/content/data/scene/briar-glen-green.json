@@ -692,11 +692,10 @@
       "id": "npc-vane",
       "at": [3.0, 0.0, 57.5],
       "yaw": 180,
-      "tags": ["npc", "council"],
+      "tags": ["npc", "council", "schedule:vane"],
       "creature": "npc-vane",
-      "leash": {
-        "radius": 2
-      }
+      "leash": { "radius": 2 },
+      "presence": { "hours": [6, 18] }
     },
     {
       "id": "market-green",
@@ -882,11 +881,10 @@
       "id": "npc-mirela",
       "at": [-42.5, 0.0, 72.5],
       "yaw": 90,
-      "tags": ["npc", "shopkeeper"],
+      "tags": ["npc", "shopkeeper", "schedule:mirela"],
       "creature": "npc-mirela",
-      "leash": {
-        "radius": 1.5
-      }
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [6, 22] }
     },
     {
       "id": "stacks-lean",
@@ -929,11 +927,10 @@
       "id": "npc-hale",
       "at": [2.5, 0.0, 92.5],
       "yaw": 180,
-      "tags": ["npc", "watch"],
+      "tags": ["npc", "watch", "schedule:hale"],
       "creature": "npc-hale",
-      "leash": {
-        "radius": 2
-      }
+      "leash": { "radius": 2 },
+      "presence": { "hours": [6, 23] }
     },
     {
       "id": "door-schoolhouse",
@@ -1045,6 +1042,204 @@
       "at": [-85.5, 0.0, 20.0],
       "yaw": 90,
       "tags": ["arrival"]
+    },
+    {
+      "id": "npc-juniper-evening",
+      "at": [11.5, 0.0, 46.5],
+      "tags": ["schedule:juniper", "activity:stroll"],
+      "yaw": 90,
+      "creature": "npc-juniper",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [19, 22] }
+    },
+    {
+      "id": "npc-vane-home",
+      "at": [50.0, 4.0, 107.5],
+      "tags": ["schedule:vane", "activity:home", "council"],
+      "yaw": 180,
+      "creature": "npc-vane",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 6] }
+    },
+    {
+      "id": "npc-mirela-late",
+      "at": [-41.0, 0.0, 72.5],
+      "tags": ["schedule:mirela", "activity:read-late", "npc", "shopkeeper"],
+      "yaw": 180,
+      "creature": "npc-mirela",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [22, 2] }
+    },
+    {
+      "id": "npc-hale-night",
+      "at": [-1.0, 0.0, 92.5],
+      "tags": ["schedule:hale", "activity:night-watch", "npc", "watch"],
+      "yaw": 180,
+      "creature": "npc-hale",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [23, 4] }
+    },
+    {
+      "id": "townsfolk-1-market",
+      "at": [-6.0, 0.0, 52.0],
+      "tags": ["townsfolk", "schedule:townsfolk-1", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-2-market",
+      "at": [-4.0, 0.0, 55.0],
+      "tags": ["townsfolk", "schedule:townsfolk-2", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-3-market",
+      "at": [-5.0, 0.0, 48.0],
+      "tags": ["townsfolk", "schedule:townsfolk-3", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-miner",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-4-market",
+      "at": [4.0, 0.0, 53.0],
+      "tags": ["townsfolk", "schedule:townsfolk-4", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-neighbour",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-5-morning",
+      "at": [4.5, 0.0, 54.5],
+      "tags": ["townsfolk", "schedule:townsfolk-5", "activity:work"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [7, 11] }
+    },
+    {
+      "id": "townsfolk-5-market",
+      "at": [6.0, 0.0, 50.0],
+      "tags": ["townsfolk", "schedule:townsfolk-5", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-6-morning",
+      "at": [8.5, 0.0, 50.5],
+      "tags": ["townsfolk", "schedule:townsfolk-6", "activity:work"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [7, 11] }
+    },
+    {
+      "id": "townsfolk-6-market",
+      "at": [7.0, 0.0, 55.0],
+      "tags": ["townsfolk", "schedule:townsfolk-6", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-6-evening",
+      "at": [7.0, 0.0, 49.0],
+      "tags": ["townsfolk", "schedule:townsfolk-6", "activity:stroll"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 21] }
+    },
+    {
+      "id": "townsfolk-7-morning",
+      "at": [-9.5, 0.0, 54.5],
+      "tags": ["townsfolk", "schedule:townsfolk-7", "activity:work"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-miner",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [7, 11] }
+    },
+    {
+      "id": "townsfolk-7-market",
+      "at": [-8.0, 0.0, 50.0],
+      "tags": ["townsfolk", "schedule:townsfolk-7", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-miner",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-7-evening",
+      "at": [-8.0, 0.0, 56.0],
+      "tags": ["townsfolk", "schedule:townsfolk-7", "activity:stroll"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-miner",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 21] }
+    },
+    {
+      "id": "townsfolk-8-morning",
+      "at": [10.5, 0.0, 47.5],
+      "tags": ["townsfolk", "schedule:townsfolk-8", "activity:work"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-neighbour",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [7, 11] }
+    },
+    {
+      "id": "townsfolk-8-market",
+      "at": [9.0, 0.0, 52.0],
+      "tags": ["townsfolk", "schedule:townsfolk-8", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-neighbour",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-9-morning",
+      "at": [-3.5, 0.0, 51.0],
+      "tags": ["townsfolk", "schedule:townsfolk-9", "activity:work"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [7, 11] }
+    },
+    {
+      "id": "townsfolk-9-market",
+      "at": [-2.0, 0.0, 55.5],
+      "tags": ["townsfolk", "schedule:townsfolk-9", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
+    },
+    {
+      "id": "townsfolk-10-morning",
+      "at": [3.5, 0.0, 51.0],
+      "tags": ["townsfolk", "schedule:townsfolk-10", "activity:work"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [7, 11] }
+    },
+    {
+      "id": "townsfolk-10-market",
+      "at": [2.0, 0.0, 46.5],
+      "tags": ["townsfolk", "schedule:townsfolk-10", "activity:market"],
+      "yaw": 0,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [11, 15] }
     }
   ],
   "light": {

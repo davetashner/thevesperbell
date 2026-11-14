@@ -302,6 +302,60 @@
       "id": "washstand",
       "at": [6, 0.5, 0.25],
       "tags": ["furniture", "rented-room"]
+    },
+    {
+      "id": "npc-oswin-evening",
+      "at": [4.0, 0.0, 0.5],
+      "tags": ["schedule:oswin", "activity:drink"],
+      "yaw": 90,
+      "creature": "npc-oswin",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [20, 23] }
+    },
+    {
+      "id": "townsfolk-1-evening",
+      "at": [0.5, 0.0, 1.5],
+      "tags": ["townsfolk", "schedule:townsfolk-1", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-2-evening",
+      "at": [0, 0.0, -1.0],
+      "tags": ["townsfolk", "schedule:townsfolk-2", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-3-evening",
+      "at": [1.25, 0.0, 2.5],
+      "tags": ["townsfolk", "schedule:townsfolk-3", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-miner",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-4-evening",
+      "at": [-0.75, 0.0, -2.75],
+      "tags": ["townsfolk", "schedule:townsfolk-4", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-neighbour",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-5-evening",
+      "at": [4.0, 0.0, 2.0],
+      "tags": ["townsfolk", "schedule:townsfolk-5", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
     }
   ],
   "light": {

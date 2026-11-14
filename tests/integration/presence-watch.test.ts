@@ -59,7 +59,7 @@ describe('watchPresence (mw-ju8.14)', () => {
   });
 
   it('a scene with nothing phase-bound is not watched', () => {
-    const { game, sim } = bank('marsh-store', 'day');
+    const { game, sim } = bank('hiding-room', 'day');
     const stop = watchPresence(sim, game.creatures.spawn, game.scene.layout.spawns);
     expect(typeof stop).toBe('function');
     stop();

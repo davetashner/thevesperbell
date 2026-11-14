@@ -5,10 +5,15 @@
 // there. Stateless: it finds the creature by the spawn point it came from (`origin.point`) and the
 // counter by its scene spawn component, so a creature a save restored is treated like a fresh one.
 
+import type { EntityId } from '../core/component';
+import { isConversing } from '../ai/conversing';
 import type { World } from '../core/world';
 import { addInteractable, InteractableComponent } from '../interaction/system';
 import { SceneSpawnComponent } from '../scene/loader';
 import type { SceneSpawnPlacement } from '../scene/layout';
+import { MINUTE_FACT } from '../rest/day-clock';
+import { PlacementComponent } from '../stimulus/placement';
+import type { Vec3 } from '../stimulus/shapes';
 import { CreatureComponent } from './components';
 import {
   creaturesInstalled,
@@ -29,34 +34,55 @@ export interface PresenceChange {
   readonly errors: readonly { readonly point: string; readonly error: SpawnError }[];
 }
 
+/** The hour of the day, 0 to 24, from the world clock's minute fact; undefined without a clock. */
+export function hourNow(world: World<never>): number | undefined {
+  const minute = world.facts.get(MINUTE_FACT);
+  return typeof minute === 'number' ? minute / 60 : undefined;
+}
+
+/** What waits a change out (see `syncPresence`). */
+export interface PresenceHold {
+  /** Whether a point is on the player's screen: nobody pops in or out there (mw-e24.13 AC-3). */
+  readonly inView?: (at: Vec3) => boolean;
+}
+
 /**
- * Makes every presence-gated spawn of `spawns` match `phase`: spawns the creatures that should be
- * there and are not, removes those that should not be, and switches the spawn's interaction on or
- * off. Spawns without a `presence` are left alone.
+ * Makes every presence-gated spawn of `spawns` match `phase` and `hour`: spawns the creatures that
+ * should be there and are not, removes those that should not be, and switches the spawn's
+ * interaction on or off. Spawns without a `presence` are left alone. A creature in a conversation
+ * stays until it ends, and a creature does not arrive or leave while its spot is `inView`
+ * (`hold`): the next sync, a game minute on, tries again, so nobody teleports in front of the
+ * player (mw-e24.13 AC-3). Interactions switch at once: a shut counter is not a creature.
  */
 export function syncPresence(
   world: World<never>,
   options: CreatureSpawnOptions,
   spawns: readonly SceneSpawnPlacement[],
   phase: string,
+  hour?: number,
+  hold: PresenceHold = {},
 ): PresenceChange {
   const arrived = new Set<string>();
   const left = new Set<string>();
   const errors: { point: string; error: SpawnError }[] = [];
   for (const spawn of spawns) {
     if (spawn.presence === undefined) continue;
-    const present = presentIn(spawn, phase);
+    const present = presentIn(spawn, phase, hour);
     if (spawn.creature !== undefined && creaturesInstalled(world)) {
       const here = [...world.query(CreatureComponent).ids()].filter(
         (entity) => world.get(entity, CreatureComponent)?.origin.point === spawn.id,
       );
       if (present && here.length === 0) {
+        if (hold.inView?.(spawn.position) === true) continue;
         const result = spawnCreature(world, options, originOfSpawn(spawn, spawn.creature));
         if (result.ok) arrived.add(spawn.id);
         else errors.push({ point: spawn.id, error: result.error });
       } else if (!present && here.length > 0) {
-        for (const entity of here) despawnCreature(world, entity);
-        left.add(spawn.id);
+        const leaving = here.filter(
+          (entity) => !isConversing(world, entity) && !heldInView(world, entity, hold),
+        );
+        for (const entity of leaving) despawnCreature(world, entity);
+        if (leaving.length > 0) left.add(spawn.id);
       }
     }
     if (spawn.interact !== undefined && world.isRegistered(InteractableComponent)) {
@@ -74,4 +100,10 @@ export function syncPresence(
     }
   }
   return { arrived: [...arrived], left: [...left], errors };
+}
+
+/** Whether `entity` stands on the player's screen. */
+function heldInView(world: World<never>, entity: EntityId, hold: PresenceHold): boolean {
+  const here = world.get(entity, PlacementComponent);
+  return here !== undefined && hold.inView?.(here) === true;
 }
