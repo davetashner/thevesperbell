@@ -546,45 +546,80 @@ describe('main quest: epilogue slides', () => {
     return g;
   };
 
+  /** The slides of `ending` the ending facts pick, leaving out the shared Tansy, abbot and Vane slides. */
+  const own = (g: Game, ...except: string[]) =>
+    activeSlides(g).filter(
+      (id) => !/^(tansy|abbot|vane)-/.test(id) && !except.includes(id) && !id.startsWith('harbor-'),
+    );
+
   it('Vespers Rung: the bell is rung by the goblins, else Hale, else Tansy; sealing and speaking add slides', () => {
     const base = { 'horn.fate': 'alive', 'vane.fate': 'exposed' };
-    expect(activeSlides(finish(base))).toEqual(['vr-bell-tansy', 'vr-bread-at-the-gate']);
-    expect(activeSlides(finish({ ...base, 'hale.testimony.given': true }))).toEqual([
+    expect(own(finish(base))).toEqual(['vr-bell-tansy', 'vr-bread-at-the-gate']);
+    expect(own(finish({ ...base, 'hale.testimony.given': true }))).toEqual([
       'vr-bell-hale',
       'vr-bread-at-the-gate',
     ]);
     expect(
-      activeSlides(
+      own(
         finish({
           ...base,
           'goblins.standing': 'friendly',
           'hale.testimony.given': true,
           'knot.breach-sealed': true,
           'horn.spoken-for': true,
+          'clatter.restored': true,
         }),
       ),
-    ).toEqual(['vr-bell-goblins', 'vr-bread-at-the-gate', 'vr-new-verse', 'vr-song-sealed']);
+    ).toEqual([
+      'vr-bell-goblins',
+      'vr-bread-at-the-gate',
+      'vr-clatter-name',
+      'vr-new-verse',
+      'vr-song-sealed',
+    ]);
   });
 
   it('The Last Warden: goblins keep watch, else Clatter hums, else a lantern and footprints', () => {
     const base = { 'horn.fate': 'dead', 'vane.fate': 'confessed' };
-    expect(activeSlides(finish({ ...base, 'goblins.standing': 'friendly' }))).toEqual([
+    expect(own(finish({ ...base, 'goblins.standing': 'friendly' }))).toEqual([
       'lw-goblins-watch',
       'lw-sleepers-home',
     ]);
-    expect(activeSlides(finish({ ...base, 'clatter.restored': true }))).toEqual([
+    expect(own(finish({ ...base, 'clatter.restored': true }))).toEqual([
       'lw-clatter-hums',
       'lw-sleepers-home',
     ]);
-    expect(activeSlides(finish(base))).toEqual(['lw-lantern-and-footprints', 'lw-sleepers-home']);
+    expect(own(finish(base))).toEqual(['lw-lantern-and-footprints', 'lw-sleepers-home']);
+  });
+
+  it('Tansy, the abbot and Vane each add one slide to the endings that share them', () => {
+    const base = { 'horn.fate': 'alive', 'tansy.saved': true };
+    const shared = (facts: Record<string, boolean | string>) =>
+      activeSlides(finish({ ...base, ...facts })).filter((id) => /^(tansy|abbot|vane)-/.test(id));
+    expect(shared({ 'vane.fate': 'exposed', 'abbot.fate': 'at-rest' })).toEqual([
+      'abbot-at-rest',
+      'tansy-saved',
+      'vane-exposed',
+    ]);
+    expect(
+      shared({ 'vane.fate': 'confessed', 'abbot.fate': 'defeated', 'tansy.saved': false }),
+    ).toEqual(['abbot-defeated', 'tansy-shaken', 'vane-confessed']);
+    expect(shared({ 'vane.fate': 'fled' })).toEqual(['tansy-saved', 'vane-fled']);
+    expect(shared({ 'vane.fate': 'unexposed', 'bounty.outcome': 'paid' })).toEqual([
+      'tansy-saved',
+      'vane-quiet',
+    ]);
   });
 
   it("The Hireling's Silence and The Long Vespers have their own slides", () => {
-    expect(activeSlides(finish({ 'horn.fate': 'dead', 'vane.fate': 'bribed-player' }))).toEqual([
-      'hs-silver-from-below',
-      'hs-someone-sits-up',
+    expect(
+      own(finish({ 'horn.fate': 'dead', 'vane.fate': 'bribed-player' }), 'hs-vane-ledger'),
+    ).toEqual(['hs-silver-from-below', 'hs-someone-sits-up']);
+    expect(activeSlides(finish({ 'abbot.fate': 'joined' }))).toEqual([
+      'lv-took-the-hand',
+      'lv-valley-sleeps',
+      'lv-wake-in-the-cradle',
     ]);
-    expect(activeSlides(finish({ 'abbot.fate': 'joined' }))).toEqual(['lv-wake-in-the-cradle']);
   });
 
   it('harbour facts only add slides: the crate intercepted, or the Tern sailed with it', () => {

@@ -3,7 +3,7 @@
   "id": "quest-briar-glen-epilogue",
   "title": "What Became of Briar Glen",
   "summary": "The valley's story, told in the slides the ending leaves behind.",
-  "notes": "The epilogue-slide variants of the four headline endings (bible 4.4), as data. Started when the main quest resolves. Each slide is an objective whose `activeWhen` is its selection rule, so while this quest is active the set of active objectives IS the slide list (read it with QuestRuntime.activeObjectives); the slideshow completes each slide by emitting epilogue-slide-<id>, and sets epilogue.finished to close the quest. Slide text here is a description for the writers; the slide prose is mw-e39.16. Harbour slides (name-stone home, the Tern's crate) are added by facts alone and never change the headline ending.",
+  "notes": "The epilogue-slide variants of the four headline endings (bible 4.4), as data. Started when the main quest resolves. Each slide is an objective whose `activeWhen` is its selection rule, so while this quest is active the set of active objectives IS the slide list (read it with QuestRuntime.activeObjectives); the slideshow completes each slide by emitting epilogue-slide-<id>, and sets epilogue.finished to close the quest. The slide prose is in src/content/data/narration/narration-epilogue-slides.json (mw-e39.16), keyed by objective id; the `text` here is a one-line description. Objectives are listed in slideshow order. Every ending gets at least three slides, whichever of the ending facts are set; shared slides (Tansy, the abbot, Vane) sit before each ending's last slide. Harbour slides (name-stone home, the Tern's crate) are added by facts alone and never change the headline ending.",
   "startWhen": {
     "kind": "questState",
     "quest": "quest-labyrinth-beneath-briar-glen",
@@ -163,6 +163,29 @@
       }
     },
     {
+      "id": "vr-clatter-name",
+      "kind": "event",
+      "text": "Clatter has his name back, and the Pells visit.",
+      "params": {
+        "event": "epilogue-slide-vr-clatter-name"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "vespers-rung"
+          },
+          {
+            "kind": "fact",
+            "fact": "clatter.restored"
+          }
+        ]
+      }
+    },
+    {
       "id": "lw-sleepers-home",
       "kind": "event",
       "text": "The sleepers come home and the bounty is paid.",
@@ -174,6 +197,345 @@
         "fact": "ending.headline",
         "op": "eq",
         "value": "last-warden"
+      }
+    },
+    {
+      "id": "hs-silver-from-below",
+      "kind": "event",
+      "text": "The mine prospers on silver from below the Line.",
+      "params": {
+        "event": "epilogue-slide-hs-silver-from-below"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "hirelings-silence"
+      }
+    },
+    {
+      "id": "tansy-saved",
+      "kind": "event",
+      "text": "Tansy goes back to school.",
+      "params": {
+        "event": "epilogue-slide-tansy-saved"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "hirelings-silence"
+              }
+            ]
+          },
+          {
+            "kind": "fact",
+            "fact": "tansy.saved"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tansy-shaken",
+      "kind": "event",
+      "text": "Tansy sleeps with a candle lit.",
+      "params": {
+        "event": "epilogue-slide-tansy-shaken"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "hirelings-silence"
+              }
+            ]
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tansy.saved"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "abbot-at-rest",
+      "kind": "event",
+      "text": "A pear on the belfry sill.",
+      "params": {
+        "event": "epilogue-slide-abbot-at-rest"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "hirelings-silence"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "abbot.fate",
+            "op": "eq",
+            "value": "at-rest"
+          }
+        ]
+      }
+    },
+    {
+      "id": "abbot-defeated",
+      "kind": "event",
+      "text": "Fresh flowers on the monks' graves.",
+      "params": {
+        "event": "epilogue-slide-abbot-defeated"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "hirelings-silence"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "abbot.fate",
+            "op": "eq",
+            "value": "defeated"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vane-exposed",
+      "kind": "event",
+      "text": "Vane's ledger on the council table.",
+      "params": {
+        "event": "epilogue-slide-vane-exposed"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "vane.fate",
+            "op": "eq",
+            "value": "exposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vane-confessed",
+      "kind": "event",
+      "text": "Vane pays the Pells and stands at the back.",
+      "params": {
+        "event": "epilogue-slide-vane-confessed"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "vane.fate",
+            "op": "eq",
+            "value": "confessed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vane-fled",
+      "kind": "event",
+      "text": "Vane House stands shuttered.",
+      "params": {
+        "event": "epilogue-slide-vane-fled"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "vane.fate",
+            "op": "eq",
+            "value": "fled"
+          }
+        ]
+      }
+    },
+    {
+      "id": "vane-quiet",
+      "kind": "event",
+      "text": "The Deepworks stays shut and nobody asks.",
+      "params": {
+        "event": "epilogue-slide-vane-quiet"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "vespers-rung"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "ending.headline",
+                "op": "eq",
+                "value": "last-warden"
+              }
+            ]
+          },
+          {
+            "kind": "factCmp",
+            "fact": "vane.fate",
+            "op": "eq",
+            "value": "unexposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hs-vane-ledger",
+      "kind": "event",
+      "text": "The ledger stays buried and the purse is heavy.",
+      "params": {
+        "event": "epilogue-slide-hs-vane-ledger"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "hirelings-silence"
       }
     },
     {
@@ -269,20 +631,6 @@
       }
     },
     {
-      "id": "hs-silver-from-below",
-      "kind": "event",
-      "text": "The mine prospers on silver from below the Line.",
-      "params": {
-        "event": "epilogue-slide-hs-silver-from-below"
-      },
-      "activeWhen": {
-        "kind": "factCmp",
-        "fact": "ending.headline",
-        "op": "eq",
-        "value": "hirelings-silence"
-      }
-    },
-    {
       "id": "hs-someone-sits-up",
       "kind": "event",
       "text": "On still nights, someone always sits up in bed.",
@@ -294,6 +642,73 @@
         "fact": "ending.headline",
         "op": "eq",
         "value": "hirelings-silence"
+      }
+    },
+    {
+      "id": "lv-valley-sleeps",
+      "kind": "event",
+      "text": "The valley sleeps.",
+      "params": {
+        "event": "epilogue-slide-lv-valley-sleeps"
+      },
+      "activeWhen": {
+        "kind": "factCmp",
+        "fact": "ending.headline",
+        "op": "eq",
+        "value": "long-vespers"
+      }
+    },
+    {
+      "id": "lv-took-the-hand",
+      "kind": "event",
+      "text": "You took the abbot's hand.",
+      "params": {
+        "event": "epilogue-slide-lv-took-the-hand"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "long-vespers"
+          },
+          {
+            "kind": "factCmp",
+            "fact": "abbot.fate",
+            "op": "eq",
+            "value": "joined"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lv-bell-silent",
+      "kind": "event",
+      "text": "The bell would not ring.",
+      "params": {
+        "event": "epilogue-slide-lv-bell-silent"
+      },
+      "activeWhen": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "ending.headline",
+            "op": "eq",
+            "value": "long-vespers"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "factCmp",
+              "fact": "abbot.fate",
+              "op": "eq",
+              "value": "joined"
+            }
+          }
+        ]
       }
     },
     {

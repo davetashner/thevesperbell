@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "`narration-<slug>`."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "title",
+        "arrival",
+        "first-night",
+        "barge",
+        "ending",
+        "epilogue"
+      ],
+      "description": "What the sequences are, which sets the rules they follow."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Author-facing: what this file covers and where it is shown."
+    },
+    "sequences": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Unique in the file. An epilogue slide uses its objective id."
+          },
+          "title": {
+            "description": "Heading of the card, if it has one.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "notes": {
+            "description": "Author-facing: when it is shown.",
+            "type": "string",
+            "minLength": 1
+          },
+          "endings": {
+            "description": "Ending cards and epilogue slides: the headline endings it can appear in.",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "vespers-rung",
+                "last-warden",
+                "hirelings-silence",
+                "long-vespers"
+              ]
+            }
+          },
+          "facts": {
+            "description": "Epilogue slides: the world facts that choose it (besides `ending.headline`); empty when only the ending does.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)+$"
+            }
+          },
+          "pages": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The page as the player reads it."
+                },
+                "beat": {
+                  "description": "A named story beat this page lands (the first night ends on `horned-shadow`).",
+                  "type": "string",
+                  "pattern": "^[a-z]+(?:-[a-z]+)*$"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false
+            },
+            "description": "The pages, in the order they are shown."
+          }
+        },
+        "required": [
+          "id",
+          "pages"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "notes",
+    "sequences"
+  ],
+  "additionalProperties": false,
+  "description": "Narration: cards and slides shown to the player (story bible 4.1, 4.4; mw-e39.16)."
+}
