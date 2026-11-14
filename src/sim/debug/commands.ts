@@ -7,6 +7,8 @@
 
 import type { ControllerTuning, Frozen } from '@content/index';
 import type { EntityId } from '../core/component';
+import type { LevelDeltas } from '../deltas/persistence';
+import type { FactSnapshot } from '../facts/store';
 import { isWorldPropertyKey, validateProperty, type WorldPropertyKey } from '../properties/spec';
 import type { Vec3 } from '../stimulus/shapes';
 
@@ -84,6 +86,31 @@ export interface BlastCommand {
   readonly intensity: number;
 }
 
+/** The elements `stim` can deliver: the ones that move a temperature, wetness or charge. */
+export const DEBUG_STIM_ELEMENTS = ['heat', 'cold', 'water', 'charge'] as const;
+
+export type DebugStimElement = (typeof DEBUG_STIM_ELEMENTS)[number];
+
+/** Largest `stim` radius, metres. */
+export const MAX_STIM_RADIUS = 10;
+/** Largest `stim` intensity, in the element's unit. */
+export const MAX_STIM_INTENSITY = 10_000;
+
+/**
+ * Delivers a stimulus of `element` at `at` (mw-e03.29: `stim heat 500 2` to see the temperature
+ * field respond): a sphere of `radius` metres, `intensity` at its centre, falling off linearly, with
+ * no source. It goes through the one stimulus API, so it heats the element field and reaches every
+ * entity in the sphere exactly as a torch or a spell would.
+ */
+export interface StimCommand {
+  readonly kind: typeof DEBUG_COMMAND;
+  readonly op: 'stim';
+  readonly element: DebugStimElement;
+  readonly at: Vec3;
+  readonly radius: number;
+  readonly intensity: number;
+}
+
 /** Removes every spawned creature (mw-e12.4: the console's `despawn all`). */
 export interface DespawnCommand {
   readonly kind: typeof DEBUG_COMMAND;
@@ -147,7 +174,22 @@ export type TimeCommand =
       readonly minutes: number;
     };
 
+/**
+ * Puts the world's facts and the stored deltas of its levels back to a snapshot (mw-e27.6: the
+ * console's `state.restore`). Facts are replaced wholesale (no `factChanged` fires, as for a load);
+ * deltas replace those of every level that is not loaded (the loaded level's entities are live and
+ * keep their state; its deltas are read again when it is next entered). Plain JSON, so a replay
+ * carries the whole snapshot.
+ */
+export interface RestoreStateCommand {
+  readonly kind: typeof DEBUG_COMMAND;
+  readonly op: 'restore';
+  readonly facts: FactSnapshot;
+  readonly levels: readonly LevelDeltas[];
+}
+
 export type DebugCommand =
+  | RestoreStateCommand
   | TimeCommand
   | ActCommand
   | SpawnCommand
@@ -156,6 +198,7 @@ export type DebugCommand =
   | TeleportCommand
   | KillCommand
   | BlastCommand
+  | StimCommand
   | DespawnCommand
   | PropertyCommand;
 
@@ -251,6 +294,39 @@ export function blastCommand(at: Vec3, radius: number, intensity: number): Blast
   };
 }
 
+/**
+ * A stimulus. @throws RangeError for an element `stim` does not deliver, a non-finite position, a
+ * radius outside (0, MAX_STIM_RADIUS] or an intensity outside (0, MAX_STIM_INTENSITY].
+ */
+export function stimCommand(
+  element: string,
+  at: Vec3,
+  radius: number,
+  intensity: number,
+): StimCommand {
+  if (!(DEBUG_STIM_ELEMENTS as readonly string[]).includes(element)) {
+    throw new RangeError(`stim element must be one of ${DEBUG_STIM_ELEMENTS.join(', ')}`);
+  }
+  if (!(radius > 0 && radius <= MAX_STIM_RADIUS)) {
+    throw new RangeError(
+      `stim radius must be above 0 and at most ${String(MAX_STIM_RADIUS)}, got ${String(radius)}`,
+    );
+  }
+  if (!(intensity > 0 && intensity <= MAX_STIM_INTENSITY)) {
+    throw new RangeError(
+      `stim intensity must be above 0 and at most ${String(MAX_STIM_INTENSITY)}, got ${String(intensity)}`,
+    );
+  }
+  return {
+    kind: DEBUG_COMMAND,
+    op: 'stim',
+    element: element as DebugStimElement,
+    at: position('stim position', at),
+    radius,
+    intensity,
+  };
+}
+
 /** A clock set. @throws RangeError for a day below 1 or a minute outside 0-1439. */
 export function timeSetCommand(day: number, minute: number): TimeCommand {
   if (!Number.isInteger(day) || day < 1)
@@ -273,6 +349,14 @@ export function timeAdvanceCommand(minutes: number): TimeCommand {
 export function actCommand(target: EntityId, move: string): ActCommand {
   if (move === '') throw new RangeError('act needs a move id');
   return { kind: DEBUG_COMMAND, op: 'act', target: entity(target), move };
+}
+
+/** A state restore; `facts` and `levels` come from `FactStore.snapshot` and `LevelDeltaStore.capture`. */
+export function restoreStateCommand(
+  facts: FactSnapshot,
+  levels: readonly LevelDeltas[],
+): RestoreStateCommand {
+  return { kind: DEBUG_COMMAND, op: 'restore', facts: { ...facts }, levels: [...levels] };
 }
 
 /** A despawn of every creature. */

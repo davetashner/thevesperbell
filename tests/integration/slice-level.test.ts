@@ -109,7 +109,7 @@ describe('the slice grey-box level (mw-e01.4)', () => {
   });
 
   it('AC-1: lays out the spaces of the layout of record', () => {
-    // Floors: spawn room 10 × 10, corridor 2 × 20, side alcove 3 × 4, arena 12 × 12, vestibule 2 × 3.
+    // Floors: spawn room 10 × 10, corridor 2 × 20, side alcove 3 × 4, arena 12 × 12, vestibule 2 × 3, mountain-road passage 2 × 6 (mw-e24.21).
     const floors = partsOf('floor').map(({ min, max }) => [min.x, min.z, max.x, max.z]);
     expect(floors).toEqual([
       [-5, -5, 5, 5],
@@ -117,6 +117,7 @@ describe('the slice grey-box level (mw-e01.4)', () => {
       [1, 13, 4, 17],
       [-6, 25, 6, 37],
       [-1, 37, 1, 40],
+      [-1, 40, 1, 46],
     ]);
     // Two pillars break lines of attack in the arena.
     expect(partsOf('pillar').map((p) => [p.center.x, p.center.z])).toEqual([

@@ -48,10 +48,11 @@ import type { BodyId, CollisionHit, CollisionWorld } from '../../character/colli
 import type { EntityId } from '../../core/component';
 import type { System, World } from '../../core/world';
 import { PhysicsColliderComponent, PhysicsObjectComponent } from '../../physics/objects';
-import { readProperty } from '../../properties/components';
+import { readProperty, WorldProperties } from '../../properties/components';
 import { WORLD_PROPERTY_SPECS, type SurfaceHardness } from '../../properties/spec';
 import type { GeomShape } from '../../geom';
 import type { Vec3 } from '../../stimulus/shapes';
+import { PlacementComponent } from '../../stimulus/placement';
 import { applyStimulus, StimulusQueueComponent } from '../../stimulus/stimulus';
 import { rotateToWorld } from '../attacks/frame';
 import { scaleDamage, type DamageModel } from '../damage/model';
@@ -74,6 +75,7 @@ import {
   penetrates,
   ricochet,
   speedOf,
+  intactChanceOf,
   type ArrowRules,
 } from './ballistics';
 import {
@@ -83,7 +85,13 @@ import {
   type ArrowFlight,
   type ArrowRestState,
 } from './components';
-import { ArrowExpired, ArrowFired, arrowImpact, type ArrowImpactOutcome } from './events';
+import {
+  ArrowExpired,
+  ArrowFired,
+  arrowImpact,
+  ArrowRested,
+  type ArrowImpactOutcome,
+} from './events';
 
 /** Arrow definitions by id (`arrowLookup`); the system looks every arrow's numbers up here. */
 export type ArrowLookup = ReadonlyMap<string, ArrowEntry>;
@@ -130,7 +138,16 @@ export interface ArrowSystemOptions {
   readonly surfaceOf?: SurfaceRule;
   /** Overrides of DEFAULT_ARROW_RULES. */
   readonly rules?: Partial<ArrowRules>;
+  /**
+   * The roll in [0, 1) that decides whether an arrow coming to rest is intact (it is when the roll is
+   * below the surface's chance). Defaults to a draw from the world's `arrows` RNG stream, a sub-stream
+   * named for the arrow's entity, so it never shifts any other draw. Tests inject fixed rolls.
+   */
+  readonly roll?: (world: World<never>, arrow: EntityId) => number;
 }
+
+/** The world RNG stream arrow rolls are drawn from (a sub-stream per arrow entity). */
+export const ARROW_RNG_STREAM = 'arrows';
 
 /** How to loose an arrow. */
 export interface FireArrowSpec {
@@ -292,6 +309,36 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
   const rules: ArrowRules = { ...DEFAULT_ARROW_RULES, ...options.rules };
   const invulnerable = options.invulnerable ?? noInvulnerability;
   const surfaceOf = options.surfaceOf ?? physicsSurfaceOf;
+  const roll =
+    options.roll ??
+    ((world: World<never>, arrow: EntityId): number =>
+      world
+        .random(ARROW_RNG_STREAM)
+        .stream(`rest:${String(arrow)}`)
+        .float());
+
+  /**
+   * Whether an arrow coming to rest in `other` is whole: not when its kind is not retrievable, when it
+   * burns itself or what it lands in burns (a fire arrow, a burning crate), else by the surface's
+   * odds (hardness and conductivity; ballistics.ts intactChanceOf).
+   */
+  function landsIntact(
+    world: World<never>,
+    arrow: Flying,
+    other: EntityId | null,
+    hardness: SurfaceHardness,
+  ): boolean {
+    const { def, entity } = arrow;
+    if (!def.retrievable) return false;
+    // A world with no properties has nothing that burns; an arrow in flight carries none of its own yet.
+    const props = world.isRegistered(WorldProperties.burning);
+    if (def.properties?.burning === true || (props && readProperty(world, entity, 'burning'))) {
+      return false;
+    }
+    if (other !== null && readProperty(world, other, 'burning')) return false;
+    const conductive = other !== null && readProperty(world, other, 'conductive');
+    return roll(world, entity) < intactChanceOf(rules, hardness, conductive);
+  }
 
   /** Deals the arrow's packet to `target`, scaled by its speed; the damage model's result. */
   function strike(
@@ -326,8 +373,19 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
     });
   }
 
-  function rest(world: World<never>, arrow: Flying, state: ArrowRestState, contact: Contact): void {
+  function rest(
+    world: World<never>,
+    arrow: Flying,
+    state: ArrowRestState,
+    contact: Contact,
+    intact: boolean,
+  ): void {
     world.remove(arrow.entity, ArrowComponent);
+    const host =
+      contact.other === null || !world.isRegistered(PlacementComponent)
+        ? undefined
+        : world.get(contact.other, PlacementComponent);
+    const { point } = contact;
     world.add(
       arrow.entity,
       ArrowRestComponent,
@@ -335,12 +393,25 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
         arrow: arrow.flight.arrow,
         shooter: arrow.flight.shooter,
         state,
-        position: frozen(contact.point),
+        position: frozen(point),
         direction: frozen(arrowDirection({ velocity: arrow.velocity })),
         in: contact.other,
         tick: world.tick,
+        intact,
+        ...(host !== undefined && {
+          local: frozen({ x: point.x - host.x, y: point.y - host.y, z: point.z - host.z }),
+        }),
       }),
     );
+    world.events.emit(ArrowRested, {
+      tick: world.tick,
+      entity: arrow.entity,
+      arrow: arrow.flight.arrow,
+      state,
+      intact,
+      in: contact.other,
+      position: frozen(point),
+    });
   }
 
   /** Resolves `arrow` striking `contact` (see the file header). */
@@ -373,6 +444,12 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
       after = ricochet(velocity, contact.normal, rules.ricochetSpeedFactor);
       outcome = speedOf(after) < rules.minRicochetSpeed ? 'drop' : 'ricochet';
     }
+    // Whether this impact brings the arrow to rest, and if so whether it is whole (mw-e05.7).
+    const rests =
+      outcome === 'stick' ||
+      (outcome === 'drop' &&
+        (flight.spent || (!hitCreature && contact.normal.y >= GROUND_NORMAL_Y)));
+    const intact = rests ? landsIntact(world, arrow, other, hardness) : undefined;
     // Blunt heads hurt without penetrating; a sticking head that fails to penetrate glances off.
     if (
       hitCreature &&
@@ -394,6 +471,7 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
       material,
       hardness,
       outcome,
+      ...(intact !== undefined && { intact }),
       speed,
       energy: 0.5 * mass * speed * speed,
       impulse,
@@ -450,14 +528,14 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
         world.destroy(arrow.entity);
         return;
       case 'stick':
-        rest(world, arrow, 'stuck', contact);
+        rest(world, arrow, 'stuck', contact, intact === true);
         return;
       case 'ricochet':
         flyOn(false);
         return;
       case 'drop':
-        if (flight.spent || (!hitCreature && contact.normal.y >= GROUND_NORMAL_Y)) {
-          rest(world, arrow, 'dropped', contact);
+        if (rests) {
+          rest(world, arrow, 'dropped', contact, intact === true);
         } else {
           flyOn(true);
         }

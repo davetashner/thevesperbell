@@ -19,6 +19,10 @@ on:
         description: Run the perf budget suite (mw-e32.1) with its wall-clock load budgets (mw-e41.8).
         type: boolean
         default: true
+      matrix:
+        description: Run the long interaction matrix property run with a fresh seed each night (mw-e03.26).
+        type: boolean
+        default: true
       ref:
         description: Git ref to test; empty means the calling workflow's own ref.
         type: string
@@ -28,6 +32,24 @@ permissions:
   contents: read
 
 jobs:
+  # Many more generated worlds than the per-PR job, from a seed that changes daily (the seed is
+  # printed, and a failure prints the shrunk world and replays from it with ELEMENT_MATRIX_SEED).
+  element-matrix:
+    if: inputs.matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: ./.github/actions/setup
+      - name: 8000 worlds x 300 ticks, daily seed
+        run: |
+          export ELEMENT_MATRIX_SEED=$(date -u +%Y%m%d)
+          export ELEMENT_MATRIX_WORLDS=8000
+          echo "seed $ELEMENT_MATRIX_SEED"
+          pnpm exec vitest run tests/integration/element-matrix-run.test.ts
+
   bench:
     if: inputs.bench
     runs-on: ubuntu-latest
@@ -57,9 +79,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-firefox-webkit
       - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps firefox webkit
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install --with-deps firefox webkit && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps firefox webkit
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install-deps firefox webkit && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       # Firefox only runs an AudioContext with a sound server; the runner has no sound card, so give
       # it PulseAudio with a null sink (mw-e28.1 AC-6).
       - run: |
@@ -103,9 +129,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       # Writes test-results/perf-report.json and the job summary (e2e/perf/reporter.ts).
       - run: pnpm perf
       - uses: actions/upload-artifact@v7

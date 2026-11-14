@@ -11,6 +11,7 @@
   },
   "neutral": "#E6EDF5",
   "arrow": "#F3E7C4",
+  "arrowTypes": { "fire": "#FF9A3C", "water": "#8FD0F0", "rope": "#D2B27A" },
   "glow": ["#FFE9B0", "#FFC46B", "#FFFFFF"],
-  "alpha": { "swing": 0.7, "arrow": 0.22 }
+  "alpha": { "swing": 0.7, "arrow": 0.3, "arrowFocused": 0.7 }
 }

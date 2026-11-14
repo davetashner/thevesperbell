@@ -9,6 +9,7 @@ import { dirname, join } from 'node:path';
 import type { Percentiles } from '../../src/tools/perf/percentiles.ts';
 import {
   evaluateAll,
+  measures,
   formatValue,
   type BudgetResult,
   type Measurement,
@@ -19,6 +20,8 @@ import {
 /** Frame-time statistics of one scene in one run. */
 export interface FrameRun {
   readonly scene: string;
+  /** The quality preset the scene was run at; absent means High. */
+  readonly preset?: 'low' | 'high';
   /** Frame interval percentiles, ms. */
   readonly frame: Percentiles;
   /** Main-thread work per frame, ms. */
@@ -70,13 +73,7 @@ export function buildReport(
 ): PerfRunReport {
   const measurements = attachments.flatMap((a) => a.measurements);
   const results = evaluateAll(
-    budgets.filter(
-      (b) =>
-        b.mode === meta.mode &&
-        measurements.some(
-          (m) => m.metric === b.metric && (b.scene === undefined || m.scene === b.scene),
-        ),
-    ),
+    budgets.filter((b) => b.mode === meta.mode && measurements.some((m) => measures(b, m))),
     measurements,
   );
   return {
@@ -115,7 +112,7 @@ export function formatSummary(report: PerfRunReport): string {
       '|---|---|---|---|---|---|',
       ...report.frames.map(
         (f) =>
-          `| ${f.scene} | ${f.viewport} | ${f.renderer} | ${String(f.frame.count)} | ${ms(f.frame.p50)} / ${ms(f.frame.p95)} / ${ms(f.frame.p99)} / ${ms(f.frame.max)} | ${ms(f.work.p50)} / ${ms(f.work.p95)} |`,
+          `| ${f.scene}${f.preset === undefined ? '' : ` (${f.preset})`} | ${f.viewport} | ${f.renderer} | ${String(f.frame.count)} | ${ms(f.frame.p50)} / ${ms(f.frame.p95)} / ${ms(f.frame.p99)} / ${ms(f.frame.max)} | ${ms(f.work.p50)} / ${ms(f.work.p95)} |`,
       ),
     );
   }

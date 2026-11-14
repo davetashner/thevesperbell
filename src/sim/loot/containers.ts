@@ -28,13 +28,24 @@
 //   any input. Every take that moved something fires `container.taken` with what moved (the pickup
 //   toasts read it); every command fires `container.action` with whether it worked and, if not, why.
 //
+// - Bodies (mw-e03.23): a container with a `loot.stash` (src/sim/loot/stash.ts) takes bodies up to a
+//   capacity in kg. The Stash affordance is offered, ahead of Search, to an actor carrying a bulky
+//   thing (a body); one over the room left is greyed "Too heavy". Stashing destroys the body
+//   entity and records it in the stash, so it saves with the container.
+// - Breaking (mw-e03.23): a container that breaks (`breakableBroken`) or burns away spills everything
+//   it holds that tick as world pickups on a ring around it (gold as `gold`), and its stashed
+//   bodies as bodies on the floor. Occupants of a hiding spot are ejected by the hiding rules.
+//
 // Trap (mw-e10) and ownership (e18 stolen items) hooks are later beads. The sim never imports
 // content: the game passes loot tables, items and locks in.
 
+import { breakableBroken } from '../breakables/events';
+import { CarryBulkyComponent, holdOf } from '../carry/state';
 import type { EntityId } from '../core/component';
 import { defineComponent } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
+import { fireBurntOut } from '../elements/fire';
 import { entityFactKey } from '../facts/store';
 import {
   addAffordanceGate,
@@ -54,10 +65,32 @@ import {
   type ItemInstance,
 } from '../inventory/inventory';
 import { LockComponent, type Lock, type LockSpec } from '../mechanisms/components';
+import type { WorldItemSpec } from '../items/world-items';
 import { lockRefused, lockUnlocked } from '../mechanisms/events';
+import {
+  flagsOnPut,
+  ownerOf,
+  recordTheft,
+  stolenFlags,
+  tagOwner,
+  theftTag,
+  type OwnerTag,
+  type PermissionCheck,
+} from '../ownership/ownership';
 import { lockAffordances } from '../mechanisms/system';
-import { placeEntity } from '../stimulus/placement';
+import { cos, sin } from '../math';
+import { readProperty } from '../properties/components';
+import { placeEntity, placementOf } from '../stimulus/placement';
 import type { Vec3 } from '../stimulus/shapes';
+import {
+  containerSpilled,
+  containerStashed,
+  containerStashRefused,
+  spawnStashedBody,
+  StashComponent,
+  stashRoom,
+  type StashRefusal,
+} from './stash';
 import { LOOT_RNG_STREAM, type LootStack, type LootTables } from './tables';
 
 /** A container (`loot.container`; a snapshot and save key, never renamed). */
@@ -74,6 +107,25 @@ export const ContainerComponent = defineComponent<Container>('loot.container');
 
 /** The prompt of an unlocked container: Interact opens it and takes everything. */
 export const SEARCH_AFFORDANCE: AffordanceSpec = Object.freeze({ verb: 'search', label: 'Search' });
+
+/** The prompt of a container with room for bodies, for an actor carrying one. */
+export const STASH_AFFORDANCE: AffordanceSpec = Object.freeze({
+  verb: 'stash',
+  label: 'Stash body',
+});
+
+/** Why Stash is greyed: nothing bulky in the hands, or more than the room left. */
+export const NO_BODY_REASON = 'Carry a body';
+export const TOO_HEAVY_REASON = 'Too heavy';
+
+/** Radius of the ring a spilled container drops its contents on, and how high above it, metres. */
+export const SPILL_RADIUS = 0.5;
+export const SPILL_HEIGHT = 0.3;
+
+/** What a container needs to spill pickups: `WorldItems` does this. */
+export interface ItemSpawner {
+  spawn(world: World<never>, spec: WorldItemSpec): EntityId;
+}
 
 /** Why an opened container's Search is greyed. */
 export const EMPTY_REASON = 'Empty';
@@ -95,6 +147,10 @@ export interface ContainerSpec {
   readonly lock?: LockSpec;
   /** Starts locked; defaults to whether it has a lock. */
   readonly locked?: boolean;
+  /** Room for bodies, kg (mw-e03.23); without it the container takes none. */
+  readonly stashKg?: number;
+  /** Whom it belongs to (mw-e27.9): taking from it without permission is a theft. */
+  readonly owner?: OwnerTag;
 }
 
 /** A container was opened. */
@@ -183,7 +239,13 @@ export function refreshContainerAffordances(world: World<never>, entity: EntityI
   if (!world.isRegistered(ContainerComponent) || !world.isRegistered(InteractableComponent)) return;
   if (!world.has(entity, ContainerComponent) || !world.has(entity, InteractableComponent)) return;
   const lock = lockOf(world, entity);
-  const affordances = lock?.locked === true ? lockAffordances(lock) : [SEARCH_AFFORDANCE];
+  const stash = world.isRegistered(StashComponent) && world.has(entity, StashComponent);
+  const affordances =
+    lock?.locked === true
+      ? lockAffordances(lock)
+      : stash
+        ? [STASH_AFFORDANCE, SEARCH_AFFORDANCE]
+        : [SEARCH_AFFORDANCE];
   world.set(entity, InteractableComponent, interactableOf({ affordances }));
 }
 
@@ -203,21 +265,29 @@ export class Containers {
   readonly inventory: InventoryRules;
   readonly loot: LootTables;
   readonly #classOf: (world: World<never>, actor: EntityId) => string | undefined;
+  readonly #items: ItemSpawner | undefined;
+  readonly #permits: PermissionCheck | undefined;
 
   /**
    * `classOf`: the opener's class, which class-conditioned loot entries read (mw-e19); none: those
-   * entries never drop.
+   * entries never drop. `items`: what spills a broken container's contents as pickups; none: they
+   * are lost with it.
    */
   constructor(
     inventory: InventoryRules,
     loot: LootTables,
     options: {
       readonly classOf?: (world: World<never>, actor: EntityId) => string | undefined;
+      readonly items?: ItemSpawner;
+      /** Whether an actor may take from an owner's containers without theft; default: only the owner. */
+      readonly permits?: PermissionCheck;
     } = {},
   ) {
     this.inventory = inventory;
     this.loot = loot;
     this.#classOf = options.classOf ?? (() => undefined);
+    this.#items = options.items;
+    this.#permits = options.permits;
   }
 
   /**
@@ -243,6 +313,10 @@ export class Containers {
         lock: id,
         locked: spec.locked ?? true,
       });
+    }
+    if (spec.owner !== undefined) tagOwner(world, entity, spec.owner);
+    if (spec.stashKg !== undefined) {
+      world.add(entity, StashComponent, { capacityKg: spec.stashKg, bodies: [] });
     }
     if (world.isRegistered(InteractableComponent)) {
       addInteractable(
@@ -291,6 +365,100 @@ export class Containers {
   }
 
   /**
+   * Why container `entity` would refuse `body` (a carried, bulky thing) from `actor`, or undefined.
+   * Reads only: the prompt's gate asks it too.
+   */
+  stashRefusal(world: World<never>, entity: EntityId, body: EntityId): StashRefusal | undefined {
+    const stash = world.get(entity, StashComponent);
+    if (stash === undefined) return 'no-stash';
+    if (lockOf(world, entity)?.locked === true) return 'locked';
+    if (!world.has(body, CarryBulkyComponent)) return 'not-a-body';
+    return readProperty(world, body, 'weight') > stashRoom(stash) ? 'too-heavy' : undefined;
+  }
+
+  /**
+   * `actor` puts the body `body` into container `entity`: the body is destroyed and recorded in the
+   * stash (it saves with the container). Refused, changing nothing, with `container.stashRefused`,
+   * when `stashRefusal` says so.
+   * @throws RangeError when `entity` is not a container.
+   */
+  stash(
+    world: World<never>,
+    entity: EntityId,
+    actor: EntityId,
+    body: EntityId,
+  ): { readonly ok: true } | { readonly ok: false; readonly reason: StashRefusal } {
+    this.#container(world, entity);
+    const reason = this.stashRefusal(world, entity, body);
+    if (reason !== undefined) {
+      world.events.emit(containerStashRefused, { tick: world.tick, entity, actor, reason });
+      return { ok: false, reason };
+    }
+    const stash = known(world.get(entity, StashComponent)); // stashRefusal found it
+    const record = {
+      kind: known(world.get(body, CarryBulkyComponent)).kind,
+      weight: readProperty(world, body, 'weight'),
+    };
+    world.set(entity, StashComponent, { ...stash, bodies: [...stash.bodies, record] });
+    world.destroy(body);
+    world.events.emit(containerStashed, { tick: world.tick, entity, actor, body: record });
+    return { ok: true };
+  }
+
+  /**
+   * Spills everything `entity` holds around it: its stacks and gold as world pickups, its stashed
+   * bodies as bodies, all on a ring above its place (what a break or a burn-out does). Needs an item
+   * spawner (without one the items are lost with the container) and a placement.
+   */
+  spill(world: World<never>, entity: EntityId): void {
+    const at = placementOf(world, entity);
+    const pack = inventoryOf(world, entity);
+    const stash = world.get(entity, StashComponent);
+    if (at === undefined || pack === undefined) return;
+    const stacks: LootStack[] = pack.items.map(({ defId, count }) => ({ item: defId, count }));
+    if (pack.gold > 0) stacks.push({ item: 'gold', count: pack.gold });
+    const bodies = stash?.bodies ?? [];
+    const total = stacks.length + bodies.length;
+    if (total === 0) return;
+    const spawned: EntityId[] = [];
+    const where = (i: number) => {
+      const angle = (2 * Math.PI * i) / total;
+      return {
+        x: at.x + SPILL_RADIUS * cos(angle),
+        y: at.y + SPILL_HEIGHT,
+        z: at.z + SPILL_RADIUS * sin(angle),
+      };
+    };
+    const items = this.#items;
+    const owner = ownerOf(world, entity);
+    if (items !== undefined) {
+      stacks.forEach(({ item, count }, i) => {
+        // What spills from an owned container is still its owner's (mw-e27.9).
+        spawned.push(
+          items.spawn(world, {
+            defId: item,
+            count,
+            position: where(i),
+            ...(owner !== undefined && { owner }),
+          }),
+        );
+      });
+    }
+    bodies.forEach((body, i) => {
+      spawned.push(spawnStashedBody(world, body, where(stacks.length + i)));
+    });
+    // Emptied, so nothing is spilled twice (a break and a burn-out in one tick).
+    world.set(entity, InventoryComponent, { ...pack, gold: 0, items: [] });
+    if (stash !== undefined) world.set(entity, StashComponent, { ...stash, bodies: [] });
+    world.events.emit(containerSpilled, {
+      tick: world.tick,
+      entity,
+      spawned,
+      bodies: bodies.length,
+    });
+  }
+
+  /**
    * `actor` opens `entity` and takes everything it can: every stack (in order) and the gold. A stack
    * the actor's inventory refuses stays inside. Refused only while locked.
    * @throws RangeError when `entity` is not a container or `actor` has no inventory.
@@ -300,7 +468,7 @@ export class Containers {
     if (!open.ok) return open;
     const moved: LootStack[] = [...this.#moveGold(world, entity, actor)];
     for (const { instanceId, defId, count } of open.items) {
-      if (this.#transfer(world, entity, actor, instanceId, count) === undefined) {
+      if (this.#transfer(world, actor, entity, actor, instanceId, count) === undefined) {
         moved.push({ item: defId, count });
       }
     }
@@ -343,7 +511,7 @@ export class Containers {
   ): MoveResult {
     const open = this.open(world, entity, actor);
     if (!open.ok) return open;
-    const result = this.#move(world, entity, actor, instanceId, count);
+    const result = this.#move(world, actor, entity, actor, instanceId, count);
     if (result.ok) this.#takenBy(world, entity, actor, result.moved);
     return result;
   }
@@ -366,12 +534,13 @@ export class Containers {
     if (instance !== undefined && this.inventory.def(instance.defId).flags.questItem) {
       return { ok: false, reason: 'quest-item' };
     }
-    return this.#move(world, actor, entity, instanceId, count);
+    return this.#move(world, actor, actor, entity, instanceId, count);
   }
 
   /** Moves units of `from`'s stack `instanceId` to `to`, checking the stack and count first. */
   #move(
     world: World<never>,
+    actor: EntityId,
     from: EntityId,
     to: EntityId,
     instanceId: number,
@@ -384,7 +553,7 @@ export class Containers {
       throw new RangeError(`count must be a positive integer, got ${String(units)}`);
     }
     if (units > instance.count) return { ok: false, reason: 'not-enough' };
-    const refused = this.#transfer(world, from, to, instanceId, units);
+    const refused = this.#transfer(world, actor, from, to, instanceId, units);
     if (refused !== undefined) return { ok: false, reason: refused };
     return { ok: true, moved: [{ item: instance.defId, count: units }] };
   }
@@ -395,6 +564,7 @@ export class Containers {
    */
   #transfer(
     world: World<never>,
+    actor: EntityId,
     from: EntityId,
     to: EntityId,
     instanceId: number,
@@ -402,9 +572,16 @@ export class Containers {
   ): AddRefusal | undefined {
     const instance = this.#pack(world, from).items.find((i) => i.instanceId === instanceId);
     const { defId, flags } = known(instance); // callers found it
-    const added = this.inventory.add(world, to, defId, count, flags);
+    const move = { item: defId, count, flags };
+    // Leaving an owned container without permission is a theft; going into its owner's container
+    // returns stolen goods (mw-e27.9). The theft is recorded once the units have really moved.
+    const tag = theftTag(world, actor, from, move, this.#permits);
+    const carried =
+      tag !== undefined ? stolenFlags(flags, tag) : flagsOnPut(world, actor, to, move);
+    const added = this.inventory.add(world, to, defId, count, carried);
     if (!added.ok) return added.reason;
     this.inventory.remove(world, from, { instanceId, count, force: true });
+    if (tag !== undefined) recordTheft(world, actor, tag, move);
     return undefined;
   }
 
@@ -576,9 +753,30 @@ export function containerActionsSystem<TInput>(
   };
 }
 
-/** The gate that greys an opened, empty container's Search with EMPTY_REASON. */
-const emptyGate: AffordanceGate = (world, _actor, target, affordance) =>
-  affordance.verb === 'search' && containerEmpty(world, target) ? EMPTY_REASON : undefined;
+/** The body `actor` carries, if it is a bulky thing. */
+function carriedBody(world: World<never>, actor: EntityId): EntityId | undefined {
+  const hold = holdOf(world, actor);
+  return hold !== undefined && world.has(hold.target, CarryBulkyComponent)
+    ? hold.target
+    : undefined;
+}
+
+/**
+ * The gate that greys an opened, empty container's Search with EMPTY_REASON, and a container's Stash
+ * unless the actor carries a body that fits.
+ */
+const containerGate =
+  (containers: Containers): AffordanceGate =>
+  (world, actor, target, affordance) => {
+    if (affordance.verb === 'stash') {
+      const body = carriedBody(world, actor);
+      if (body === undefined) return NO_BODY_REASON;
+      return containers.stashRefusal(world, target, body) === 'too-heavy'
+        ? TOO_HEAVY_REASON
+        : undefined;
+    }
+    return affordance.verb === 'search' && containerEmpty(world, target) ? EMPTY_REASON : undefined;
+  };
 
 /**
  * Sets up containers in `world`: registers `loot.container` (and the inventory component if it is
@@ -593,20 +791,37 @@ export function installContainers<TInput>(
   containers: Containers,
 ): () => void {
   const sim: World<never> = world;
-  world.register(ContainerComponent);
+  world.register(ContainerComponent, StashComponent);
   if (!world.isRegistered(InventoryComponent)) world.register(InventoryComponent);
+  // A stashed body comes back bulky (carrying installs the marker too, whichever comes first).
+  if (!world.isRegistered(CarryBulkyComponent)) world.register(CarryBulkyComponent);
   let active = true;
   world.addSystem(containerActionsSystem(containers, () => active));
   const offs = [
-    addAffordanceGate(world, emptyGate),
+    addAffordanceGate(world, containerGate(containers)),
     world.events.on(interacted, ({ actor, target, verb }) => {
-      if (verb !== 'search' || !sim.has(target, ContainerComponent)) return;
+      if (!sim.has(target, ContainerComponent)) return;
+      if (verb === 'stash') {
+        const body = carriedBody(sim, actor);
+        if (body !== undefined) containers.stash(sim, target, actor, body);
+        return;
+      }
+      if (verb !== 'search') return;
       if (inventoryOf(sim, actor) === undefined) return;
       if (!containers.open(sim, target, actor).ok) return;
       world.events.emit(containerSearched, { tick: world.tick, entity: target, actor });
     }),
     world.events.on(lockUnlocked, ({ entity }) => {
       refreshContainerAffordances(sim, entity);
+    }),
+    // A container that breaks or burns away spills what it holds the same tick (mw-e03.23).
+    world.events.on(breakableBroken, ({ entity }) => {
+      if (active && sim.has(entity, ContainerComponent)) containers.spill(sim, entity);
+    }),
+    world.events.on(fireBurntOut, ({ entity, becomes }) => {
+      if (active && becomes === null && sim.has(entity, ContainerComponent)) {
+        containers.spill(sim, entity);
+      }
     }),
   ];
   return () => {
@@ -627,8 +842,11 @@ export interface ContainerSpawnEntity {
           readonly contents: readonly LootStack[];
           readonly lock?: string;
           readonly locked?: boolean;
+          readonly stashKg?: number;
         }
       | undefined;
+    /** Whom it belongs to (mw-e27.9). */
+    readonly owner?: string | undefined;
   };
 }
 
@@ -661,6 +879,10 @@ export function addSceneContainers(
       ...(own.loot !== undefined && { loot: own.loot }),
       ...(lock !== undefined && { lock }),
       ...(own.locked !== undefined && { locked: own.locked }),
+      ...(own.stashKg !== undefined && { stashKg: own.stashKg }),
+      ...(spawn.owner !== undefined && {
+        owner: { owner: spawn.owner, level, place: spawn.id },
+      }),
     });
     made.push(entity);
   }

@@ -1,0 +1,84 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "sound-clue",
+  "name": "Sound clue",
+  "description": "A hidden chime source that plays three chimes in order, one second apart (by default), when its button is pressed: the listening half of a bell-tower puzzle. Put the source behind a wall and the button where the player can reach it; the chimes come from the source, so they are muffled and panned by the audio engine, and with sound captions on each shows as text with its direction, for example [High chime, left].",
+  "tags": ["sound", "sequence"],
+  "parameters": {
+    "first": {
+      "type": "enum",
+      "description": "The first chime.",
+      "values": ["chime-low", "chime-mid", "chime-high"],
+      "default": "chime-low"
+    },
+    "second": {
+      "type": "enum",
+      "description": "The second chime.",
+      "values": ["chime-low", "chime-mid", "chime-high"],
+      "default": "chime-high"
+    },
+    "third": {
+      "type": "enum",
+      "description": "The third chime.",
+      "values": ["chime-low", "chime-mid", "chime-high"],
+      "default": "chime-mid"
+    },
+    "spacing": {
+      "type": "number",
+      "description": "Seconds between one chime and the next.",
+      "unit": "s",
+      "min": 0.2,
+      "max": 10,
+      "default": 1
+    }
+  },
+  "spawns": [
+    {
+      "local": "source",
+      "at": [0, 1.5, 2]
+    },
+    {
+      "local": "listen",
+      "at": [0, 0, 0],
+      "switch": {
+        "kind": "button"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "press",
+        "kind": "button",
+        "entity": "listen"
+      },
+      {
+        "id": "chimes",
+        "kind": "clue",
+        "cues": ["$first", "$second", "$third"],
+        "spacing": "$spacing",
+        "entity": "source"
+      }
+    ],
+    "wires": [
+      {
+        "from": "press",
+        "to": "chimes"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "listen",
+      "description": "The button; pressing it while the chimes play does nothing.",
+      "spawn": "listen"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "playing",
+      "description": "On from the press until the last chime has sounded.",
+      "node": "chimes"
+    }
+  ]
+}

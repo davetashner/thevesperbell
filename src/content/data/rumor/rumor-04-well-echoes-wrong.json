@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-04-well-echoes-wrong",
+  "notes": "The cistern route to the priory, through the Glen Well. Dot tells it in dot-sleeping-ox.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "place-glen-well",
+  "text": "The Glen Well echoes wrong. Drop a stone and you hear it land twice.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Landed twice, did it? The well never lies, love. It just takes its time."
+  }
+}

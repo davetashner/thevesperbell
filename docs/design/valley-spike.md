@@ -80,6 +80,25 @@ geometry, and the valleys are within about 10 to 40 percent of the perf-baseline
 fill cost is the same. The backdrop adds one draw call and one 1344 x 752 texture (about 4 MB
 resident uncompressed; KTX2 would be about 1 MB).
 
+### Reference machine (mw-ju8.2)
+
+`pnpm perf:ref` on the M1 Pro (Chrome 156, headed, uncapped, 1,800 frames after a 3 s warm-up), p50 / p95 / p99 in ms,
+production build (no backdrop card):
+
+| Scene | High (2560 x 1440) | Low (1920 x 1080, `?quality=low`) |
+|---|---|---|
+| valley-01 | 2.4 / 3.2 / 3.9 | 1.6 / 2.8 / 3.2 |
+| valley-02 | 2.4 / 3.4 / 3.9 | 1.6 / 2.9 / 3.2 |
+| valley-03 | 2.5 / 3.2 / 3.8 | 1.8 / 2.8 / 3.2 |
+
+Low changes only the buffer size (and the magic materials' heat haze, which the valleys do not use); it is
+not measured on the integrated-GPU class the contract names. The dev build with the backdrop card and its skirt
+gives the same numbers within 0.1 ms.
+
+The backdrop's bottom edge used to leave a band of flat sky colour between the painted ground and the floor
+whenever the camera looked down past the floor's far edge; a skirt hung from the card's bottom edge now
+stretches the image's last row downwards (`src/render/environment/index.ts`).
+
 ## Recommendation
 
 Use **kit pieces plus backdrop cards** for the walkable valley, not a heightfield, for the first

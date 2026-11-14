@@ -91,6 +91,16 @@ describe('class selection screen', () => {
     expect(ui.top?.id).toBe(CLASS_SELECT_SCREEN);
   });
 
+  it('mw-e31.11 AC-3: with an onBack, Back (Esc or B) closes class selection and calls it', () => {
+    const onBack = vi.fn();
+    const onConfirm = vi.fn();
+    openClassSelect(ui, { cards: CARDS, onConfirm, onBack });
+    ui.intent('back', 'gamepad');
+    expect(onBack).toHaveBeenCalledOnce();
+    expect(ui.top).toBeUndefined();
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
   it('opens with no cards without a focus target', () => {
     const select = openClassSelect(ui, { cards: [], onConfirm: vi.fn() });
     expect(select.confirm.disabled).toBe(true);

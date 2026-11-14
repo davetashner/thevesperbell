@@ -36,6 +36,7 @@ import { fromUnits, scaleUnits, toUnits } from '../combat/damage/types';
 import { noiseEmitted } from '../noise/events';
 import { addPhysicsObject, PhysicsObjectComponent, physicsImpact } from '../physics/objects';
 import { addProperties, assignProperty, hasProperty, readProperty } from '../properties/components';
+import { FROZEN_FRAGILITY } from '../properties/derived';
 import type { MaterialPresets } from '../properties/materials';
 import { BREAK_TYPES, type BreakType } from '../properties/spec';
 import { ScenePieceComponent } from '../scene/loader';
@@ -60,7 +61,7 @@ export const DEFAULT_DEBRIS_BUDGET = 24;
 /** Default seconds a piece of debris lasts. */
 export const DEFAULT_DEBRIS_LIFETIME = 4;
 /** Default divisor of a frozen thing's `fragile` threshold. */
-export const DEFAULT_FROZEN_FRAGILITY = 4;
+export const DEFAULT_FROZEN_FRAGILITY = FROZEN_FRAGILITY;
 /** Heaviest piece of debris, kg (a stone chunk weighs no more, so it cannot crush anyone). */
 export const MAX_DEBRIS_WEIGHT = 4;
 /** Lightest piece of debris, kg. */

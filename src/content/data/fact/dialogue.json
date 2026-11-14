@@ -1,0 +1,15 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "dialogue",
+  "name": "Dialogue facts",
+  "notes": "mw-e22.5: how often each node and option of a dialogue has been visited with each NPC, so a returning player is greeted as one and a once option stays gone. Saves carry them in the world facts section.",
+  "facts": [
+    {
+      "key": "entity:*.visits",
+      "type": "int",
+      "default": 0,
+      "description": "Visits of one node or option of a dialogue with one NPC. The key is entity:<dialogue id>/<n>-<npc id>-<node or option id>.visits, where n is the number of hyphen-separated parts of the NPC id, which keeps the NPC and the node apart (dialogueVisitKey in src/sim/dialogue/runtime.ts). Read by dialogue.visitedCount, entries and once options.",
+      "owner": "dialogue"
+    }
+  ]
+}

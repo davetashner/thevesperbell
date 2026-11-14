@@ -45,12 +45,14 @@ import { defineComponent, type EntityId } from '../core/component';
 import type { System, World } from '../core/world';
 import { CreatureNavComponent, CreatureSensesComponent } from '../creatures/components';
 import type { LightField } from '../light/field';
+import { isMovementNoise } from '../noise/footsteps';
 import { NoiseListenerComponent, noiseHeard, type NoiseHeard } from '../noise/system';
 import {
   DEFAULT_SIGHT_SAMPLES,
   type LineOfSight,
   type OcclusionVolume,
 } from '../sight/line-of-sight';
+import { concealmentOf } from '../hiding/state';
 import { bodyLightSamples, VisibilityProfileComponent } from '../stealth/self-visibility';
 import {
   DEFAULT_VISIBILITY_TUNING,
@@ -147,6 +149,12 @@ export interface PerceptionOptions {
   readonly anomalies?: (world: World<never>) => readonly AnomalySighting[];
   /** Occlusion volumes in the level right now (smoke, foliage); none by default. */
   readonly volumes?: (world: World<never>) => readonly OcclusionVolume[];
+  /**
+   * Whether `agent` pays attention to the footsteps and landings of `target` at all (default: it
+   * does). The game says no for creatures that are friends of the player (shopkeepers, the Watch),
+   * so running past them never makes them suspicious (mw-e09.5); other noises still reach them.
+   */
+  readonly noticesMovement?: (agent: EntityId, target: EntityId) => boolean;
   /** Controller tuning for targets without their own (`movementProfileOf`'s fallback). */
   readonly controller?: Frozen<ControllerTuning>;
   readonly trace?: PerceptionTrace;
@@ -186,6 +194,8 @@ interface TargetBody extends SenseTarget {
   readonly height: number;
   readonly stance: 'standing' | 'crouched';
   readonly profile: VisibilityProfile | undefined;
+  /** How well it hides in a wardrobe or haystack, 0..1 (mw-e03.23); 1 takes it out of every sight query. */
+  readonly concealment: number;
 }
 
 type Hearing = NonNullable<Frozen<SenseProfile>['hearing']>;
@@ -216,9 +226,22 @@ export function perceptionSystem<TInput>(
   let installed = true;
   let lastUnits = 0;
 
+  const defaultTargets = (): readonly EntityId[] => {
+    return w.isRegistered(CharacterController) ? w.query(CharacterController).ids() : EMPTY;
+  };
+
+  const isTarget = (source: EntityId | null): source is EntityId =>
+    source !== null && (options.targets?.(w) ?? defaultTargets()).includes(source);
+
   const unsubscribe = w.events.on(noiseHeard, (heard) => {
     const senses = w.get(heard.listener, CreatureSensesComponent);
     if (senses?.hearing === undefined) return;
+    // Creatures notice the footfalls of their targets (the player), never each other's, and only if
+    // they pay attention to them: a patrol is not suspicious of its colleagues' steps (mw-e09.5).
+    if (isMovementNoise(heard.noise.kind)) {
+      const { source } = heard.noise;
+      if (!isTarget(source) || options.noticesMovement?.(heard.listener, source) === false) return;
+    }
     // An agent hears only once perception has given it a listener, which comes with its bookkeeping.
     w.get(heard.listener, PerceptionAgentComponent)?.heard.push(heard);
   });
@@ -234,10 +257,6 @@ export function perceptionSystem<TInput>(
     else if (current.thresholdDb !== wanted.thresholdDb || current.range !== wanted.range) {
       w.set(agent, NoiseListenerComponent, wanted);
     }
-  };
-
-  const defaultTargets = (): readonly EntityId[] => {
-    return w.isRegistered(CharacterController) ? w.query(CharacterController).ids() : EMPTY;
   };
 
   return {
@@ -320,6 +339,7 @@ export function perceptionSystem<TInput>(
           profile: w.isRegistered(VisibilityProfileComponent)
             ? w.get(entity, VisibilityProfileComponent)
             : undefined,
+          concealment: concealmentOf(w, entity),
         };
       };
       const lightOn = (body: TargetBody): number[] => {
@@ -350,11 +370,14 @@ export function perceptionSystem<TInput>(
         const cone = coneHit(sight, eye, facing, body.centre);
         if (cone === undefined) return undefined;
         units += DEFAULT_SIGHT_SAMPLES.length;
-        const inSight = lineOfSight.visibleFraction(
-          eye,
-          { feet: body.feet, height: body.height },
-          sightOptions(),
-        );
+        // What is in a spot's way hides it by the spot's concealment (partial: a shadowed alcove).
+        const inSight =
+          lineOfSight.visibleFraction(
+            eye,
+            { feet: body.feet, height: body.height },
+            sightOptions(),
+          ) *
+          (1 - body.concealment);
         // The light behind the target, along the sight line (an eye inside the target looks nowhere).
         const reach = cone.distance === 0 ? 0 : tuning.sight.backgroundDistance / cone.distance;
         const behind = {
@@ -434,7 +457,8 @@ export function perceptionSystem<TInput>(
           for (const target of targetIds()) {
             if (target === agent) continue;
             const body = bodyOf(target);
-            if (body === undefined) continue;
+            // Hidden out of sight queries altogether: only a search (mw-e11) finds it (mw-e03.23).
+            if (body === undefined || body.concealment >= 1) continue;
             const seen = seeTarget(agent, sight, eye, facing, body);
             if (seen !== undefined) percepts.push(seen);
           }

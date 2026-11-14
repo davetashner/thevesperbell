@@ -49,7 +49,8 @@ import {
 type RawEvent =
   | { readonly type: 'down'; readonly code: InputCode }
   | { readonly type: 'up'; readonly code: InputCode }
-  | { readonly type: 'releaseAll' };
+  | { readonly type: 'releaseAll' }
+  | { readonly type: 'releaseToggles' };
 
 interface Edges {
   pressed: boolean;
@@ -65,12 +66,28 @@ function byCode(keys: Bindings, pad: Bindings): ReadonlyMap<InputCode, readonly 
   return map;
 }
 
+/**
+ * Whether a press of `code` toggles `action` instead of holding it. The pad's own crouch and sprint
+ * already latch (the stance toggle and `sprintToggle` below), so their pad codes pass through; any
+ * other code on a toggled action flips it.
+ */
+function flips(action: BindableAction, code: InputCode): boolean {
+  return !(isPadCode(code) && (action === 'sprint' || action === 'crouch'));
+}
+
 export interface ActionSamplerOptions {
   /** Keyboard + mouse bindings; defaults to DEFAULT_BINDINGS. */
   readonly bindings?: Bindings;
   /** Gamepad bindings; defaults to DEFAULT_PAD_BINDINGS. */
   readonly padBindings?: Bindings;
   readonly gamepad?: GamepadSettings;
+  /** Actions that start in toggle mode (the hold-or-toggle setting, mw-e31.3); none by default. */
+  readonly toggled?: Iterable<BindableAction>;
+  /**
+   * Whether a toggled action may latch right now. Aim and draw only toggle while the bow is out, so
+   * a swing of the sword is never stuck on. A latch whose action stops qualifying lets go.
+   */
+  readonly toggleApplies?: (action: BindableAction) => boolean;
 }
 
 export class ActionSampler {
@@ -97,12 +114,51 @@ export class ActionSampler {
   #crouchLatched = false;
   #padMoving = false;
   #lastDevice: InputDevice = 'keyboardMouse';
+  /** Actions in toggle mode: a press flips them and the release does nothing (mw-e31.3). */
+  #toggled: ReadonlySet<BindableAction>;
+  readonly #toggleApplies: (action: BindableAction) => boolean;
+  /** Toggled actions currently latched on. */
+  readonly #latched = new Set<BindableAction>();
+  /** `action:code` pairs held across a mode change: ignored until that code comes up. */
+  readonly #stale = new Set<string>();
 
   constructor(options: ActionSamplerOptions = {}) {
     this.#bindings = options.bindings ?? DEFAULT_BINDINGS;
     this.#padBindings = options.padBindings ?? DEFAULT_PAD_BINDINGS;
     this.#padSettings = options.gamepad ?? DEFAULT_GAMEPAD_SETTINGS;
     this.#byCode = byCode(this.#bindings, this.#padBindings);
+    this.#toggled = new Set(options.toggled);
+    this.#toggleApplies = options.toggleApplies ?? (() => true);
+  }
+
+  /** The actions in toggle mode. */
+  get toggled(): ReadonlySet<BindableAction> {
+    return this.#toggled;
+  }
+
+  /**
+   * Sets which actions toggle (the hold-or-toggle setting, mw-e31.3). An action whose mode changed
+   * resets to released: its latch lets go, and a key still down from the old mode is ignored until
+   * it comes up, so nothing is stuck on either way.
+   */
+  setToggled(actions: Iterable<BindableAction>): void {
+    const next = new Set(actions);
+    for (const action of BINDABLE_ACTIONS) {
+      if (next.has(action) === this.#toggled.has(action)) continue;
+      this.#latched.delete(action);
+      for (const code of this.#held) {
+        if ((this.#byCode.get(code) ?? []).includes(action)) this.#stale.add(`${action}:${code}`);
+      }
+    }
+    this.#toggled = next;
+  }
+
+  /**
+   * Lets every toggle go: a menu opened, the player died or respawned. Held keys are untouched. Held
+   * actions report a release on the next frame.
+   */
+  releaseToggles(): void {
+    this.#queue.push({ type: 'releaseToggles' });
   }
 
   /** Keyboard + mouse bindings. */
@@ -184,7 +240,8 @@ export class ActionSampler {
   /**
    * Keyboard + mouse focus is gone (pointer lock lost, window blur): every key and mouse button goes
    * up and pending look is discarded, so nothing stays stuck. Held actions report a release on the
-   * next frame. Pad buttons follow the pad's own snapshot (the adapter idles it without focus).
+   * next frame, and so do toggled ones. Pad buttons follow the pad's own snapshot (the adapter idles
+   * it without focus).
    */
   releaseAll(): void {
     this.#queue.push({ type: 'releaseAll' });
@@ -225,12 +282,15 @@ export class ActionSampler {
       held.delete(action);
       edgesOf(action).released = true;
     };
+    // Whether `code` holds `action` (rather than toggling it, or being stale from a mode change).
+    const holds = (action: BindableAction, code: InputCode): boolean =>
+      !(this.#toggled.has(action) && flips(action, code)) && !this.#stale.has(`${action}:${code}`);
     for (const code of this.#held) {
-      for (const action of this.#byCode.get(code) ?? []) bump(action, 1);
+      for (const action of this.#byCode.get(code) ?? []) if (holds(action, code)) bump(action, 1);
     }
     // After a bindings change an action can be held with no key down any more, or the reverse.
     for (const action of BINDABLE_ACTIONS) {
-      const down = (count.get(action) ?? 0) > 0;
+      const down = this.#latched.has(action) || (count.get(action) ?? 0) > 0;
       if (held.has(action) !== down) {
         if (down) press(action);
         else release(action);
@@ -241,14 +301,30 @@ export class ActionSampler {
       if (this.#held.has(code)) return;
       this.#held.add(code);
       for (const action of this.#byCode.get(code) ?? []) {
-        if (bump(action, 1) === 1) press(action);
+        if (this.#toggled.has(action) && flips(action, code)) {
+          // A toggle: the press flips the latch, if the action may latch right now.
+          if (this.#latched.delete(action)) {
+            if ((count.get(action) ?? 0) === 0) release(action);
+          } else if (this.#toggleApplies(action)) {
+            this.#latched.add(action);
+            if (!held.has(action)) press(action);
+          }
+        } else if (!this.#stale.has(`${action}:${code}`) && bump(action, 1) === 1) {
+          if (!held.has(action)) press(action);
+        }
       }
     };
     const goUp = (code: InputCode): void => {
       if (!this.#held.delete(code)) return;
       for (const action of this.#byCode.get(code) ?? []) {
-        if (bump(action, -1) === 0) release(action);
+        if (this.#stale.delete(`${action}:${code}`)) continue;
+        if (this.#toggled.has(action) && flips(action, code)) continue;
+        if (bump(action, -1) === 0 && !this.#latched.has(action)) release(action);
       }
+    };
+    const unlatch = (action: BindableAction): void => {
+      this.#latched.delete(action);
+      if ((count.get(action) ?? 0) === 0) release(action);
     };
     let keyboardUsed = this.#lookX !== 0 || this.#lookY !== 0;
     for (const event of this.#queue) {
@@ -256,9 +332,16 @@ export class ActionSampler {
         keyboardUsed = true;
         goDown(event.code);
       } else if (event.type === 'up') goUp(event.code);
-      else for (const code of [...this.#held]) if (!isPadCode(code)) goUp(code);
+      else {
+        if (event.type === 'releaseAll') {
+          for (const code of [...this.#held]) if (!isPadCode(code)) goUp(code);
+        }
+        for (const action of [...this.#latched]) unlatch(action);
+      }
     }
     this.#queue = [];
+    // A latch whose action no longer qualifies (the bow was put away) lets go.
+    for (const action of [...this.#latched]) if (!this.#toggleApplies(action)) unlatch(action);
 
     // The pad: its buttons are codes held while down, like keys.
     const settings = this.#padSettings;

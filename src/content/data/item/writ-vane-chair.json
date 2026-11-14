@@ -1,0 +1,11 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "writ-vane-chair",
+  "category": "quest",
+  "name": "Vane's writ",
+  "description": "A Court release writ over the signature of H. Vane, chair of the Council of Briar Glen. A donation of one hundred crowns to the bridge fund is receipted on the back.",
+  "notes": "mw-m97i: bought from Vane for 100 crowns (vane-bounty writ-signed-fx); presented to Cray, who takes it (cray-customs). Quest item: noSell, noDrop. Value 100 is what it cost; owner to confirm.",
+  "icon": "icon-item-writ-vane-chair-01",
+  "value": 100,
+  "stackable": false
+}

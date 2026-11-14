@@ -1,0 +1,113 @@
+{
+  "$schema": "../../../data/fact.schema.json",
+  "id": "quest-fixtures",
+  "name": "Quest format fixture facts",
+  "notes": "Facts the fixture quests (mw-e23.1) read and write. Never shipped; the real quest facts are written under E39.",
+  "facts": [
+    {
+      "key": "fixture-boots.noticed",
+      "type": "bool",
+      "default": false,
+      "description": "Juniper has told the player the Captain's boots are dusty every morning. Starts The Captain's Boots (format fixture).",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.night-followed",
+      "type": "bool",
+      "default": false,
+      "description": "The player followed the Captain at night as far as the Bell Line stones.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.route-learned",
+      "type": "bool",
+      "default": false,
+      "description": "The player learned the sleepwalkers' route to the Briarwood shortcut.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.tea-given",
+      "type": "bool",
+      "default": false,
+      "description": "The Captain drank Juniper's wakeful tea.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.draught-given",
+      "type": "bool",
+      "default": false,
+      "description": "The Captain drank the sleep draught by mistake and walked all the way in.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.consented-tie",
+      "type": "bool",
+      "default": false,
+      "description": "The Captain agreed to be tied to his bed at night.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.bell-hung",
+      "type": "bool",
+      "default": false,
+      "description": "A bell hangs on the Captain's door.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-boots.shortcut-known",
+      "type": "bool",
+      "default": false,
+      "description": "The Briarwood shortcut to the priory is known.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-below.captain-home",
+      "type": "bool",
+      "default": false,
+      "description": "The Captain is home from the mine, safe.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-below.watch-sent",
+      "type": "bool",
+      "default": false,
+      "description": "The Watch has been sent into the mine after the Captain.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-bones.psalter",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter's psalter has been found among the Forgotten.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-bones.psalter-burnt",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter's psalter was burnt.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-bones.pear-bloomed",
+      "type": "bool",
+      "default": false,
+      "description": "The dead pear tree in the priory garden has bloomed once.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-bones.letter",
+      "type": "bool",
+      "default": false,
+      "description": "The Pell family letter from Clatter's sister is in the player's hands.",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-bones.letter-stolen",
+      "type": "bool",
+      "default": false,
+      "description": "The letter was taken without Hollis knowing.",
+      "owner": "quest"
+    }
+  ]
+}

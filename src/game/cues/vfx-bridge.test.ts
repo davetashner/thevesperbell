@@ -11,6 +11,7 @@ import {
   fireExtinguished,
   fireIgnited,
   GuardBroken,
+  WallRecoil,
   HitParried,
   registerWorldProperties,
   World,
@@ -26,6 +27,20 @@ import { upTo, VfxCueBridge, type VfxCueBridgeOptions, type VfxSpawner } from '.
 const content = loadGameContent();
 const combat = content.get('vfx-cue-sheet', 'combat');
 const worldSheet = content.get('vfx-cue-sheet', 'world');
+// The burning loop is the element-state bridge's now (mw-e03.28); the bridge's own loop lifecycle
+// (attach, stopOn, destroy) is still exercised with a fire rule written here.
+const fireSheet = vfxCueSheetSchema.parse({
+  id: 'fire-loop-test',
+  notes: 'A looping flame stopped by its stop events, for the loop lifecycle tests.',
+  rules: [
+    {
+      event: 'fireIgnited',
+      layer: 'fire',
+      effect: 'vfx-fire-burn-loop',
+      stopOn: ['fireExtinguished', 'fireBurntOut'],
+    },
+  ],
+} satisfies VfxCueSheetDefInput);
 const DT = 1 / 60;
 
 afterEach(() => {
@@ -71,7 +86,7 @@ function game() {
     has: (effect) => vfx.has(effect),
   };
   const bridge = new VfxCueBridge({
-    sheets: [combat, worldSheet],
+    sheets: [combat, worldSheet, fireSheet],
     vfx: spawner,
     now: () => world.tick * 1000,
     locate,
@@ -244,6 +259,28 @@ describe('VFX cue sheets on the game’s events (mw-e29.3)', () => {
     expect(effects).toContain('vfx-impact-ichor');
   });
 
+  it('mw-e04.15: a wall recoil throws sparks at the contact, facing back along the wall normal', () => {
+    const { world, spawned, spawn } = game();
+    const knight = spawn('flesh');
+    const point = { x: 2, y: 1.2, z: -4.5 };
+    world.events.emit(WallRecoil, {
+      tick: 1,
+      entity: knight,
+      move: 'sword-light-1',
+      activeTick: 1,
+      point,
+      normal: { x: 0, y: 0, z: 1 },
+      ticks: 30,
+    });
+    world.events.flush();
+    expect(spawned).toHaveLength(1);
+    expect(spawned[0]?.effect).toBe('vfx-arrow-deflect-sparks');
+    expect(spawned[0]?.options).toMatchObject({ position: point, worldRotation: true });
+    // The sparks' up axis turns to the wall's normal (+z): a quarter turn about x from +y.
+    expect(spawned[0]?.options.rotation?.x).toBeCloseTo(Math.SQRT1_2, 6);
+    expect(spawned[0]?.options.rotation?.w).toBeCloseTo(Math.SQRT1_2, 6);
+  });
+
   it('AC-2: a looping effect attached to an entity stops emitting when it is destroyed, and its particles finish within their lifetime', ({
     task,
   }) => {
@@ -273,6 +310,24 @@ describe('VFX cue sheets on the game’s events (mw-e29.3)', () => {
     expect(vfx.stats()).toMatchObject({ particles: 0, effects: 0, dormant: 0 });
     expect(lifeMax).toBeGreaterThan(0);
     expect(bridge.loops()).toBe(0);
+  });
+
+  it('mw-e29.12: a burning thing going out exhales a short smoke puff where it stood, once, and it finishes', ({
+    task,
+  }) => {
+    markExercised(task, 'vfx-cue-sheet', 'world');
+    markExercised(task, 'vfx-effect', 'vfx-extinguish-puff');
+    const { world, vfx, spawned, spawn, run } = game();
+    const torch = spawn('dry-wood', { x: 2, y: 1.5, z: -1 });
+    world.events.emit(fireExtinguished, { entity: torch, cause: 'water' });
+    world.events.flush();
+    expect(spawned).toEqual([
+      { effect: 'vfx-extinguish-puff', options: { position: { x: 2, y: 1.5, z: -1 } } },
+    ]);
+    run(0.2);
+    expect(vfx.stats().particles).toBeGreaterThan(0);
+    run(2);
+    expect(vfx.stats()).toMatchObject({ particles: 0, effects: 0 });
   });
 
   it('a fire loop stops when its entity is extinguished (stopOn), and only that entity’s', () => {

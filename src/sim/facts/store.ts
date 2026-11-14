@@ -24,6 +24,38 @@ import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import { encodeCanonical, xxHash32 } from '../snapshot';
 
+/**
+ * How long a fact's value lasts (mw-e27.7), declared with the fact:
+ * - `permanent` (default): saved and kept forever.
+ * - `reset-on-rest`: back to its default when the player rests (`applyResets('rest')`).
+ * - `reset-after`: back to its default `resetAfter` sim ticks after it was last written, whether or
+ *   not the world was loaded meanwhile (reads see it at once; a save and a rest apply it).
+ * - `transient`: never saved; a loaded game starts it at its default.
+ * - `decays-to`: saved, but a loaded game finds a value in `decaysTo.from` as `decaysTo.to` (what a
+ *   burning thing would have become by the time the game loads).
+ */
+export const FACT_PERSISTENCE_KINDS = [
+  'permanent',
+  'reset-on-rest',
+  'reset-after',
+  'transient',
+  'decays-to',
+] as const;
+
+export type FactPersistenceKind = (typeof FACT_PERSISTENCE_KINDS)[number];
+
+/** The persistence part of a fact declaration (see FACT_PERSISTENCE_KINDS). */
+export interface FactPersistenceSpec {
+  readonly persistence?: FactPersistenceKind;
+  /** Ticks after the last write; only with `reset-after`, where it is required. */
+  readonly resetAfter?: number;
+  /** Only with `decays-to`, where it is required. */
+  readonly decaysTo?: { readonly from: readonly FactValue[]; readonly to: FactValue };
+}
+
+/** The key holding when a `reset-after` fact was last written (a tick fact, declared with it). */
+export const factWrittenKey = (key: string): string => `${key}.written-at`;
+
 /** Every fact value type. */
 export const FACT_TYPES = ['bool', 'int', 'enum', 'id', 'tick'] as const;
 
@@ -48,7 +80,7 @@ export type FactSpec = (
     }
   | { readonly type: 'id'; readonly default?: string }
   | { readonly type: 'tick'; readonly default?: number }
-) & { readonly renamedFrom?: readonly string[] };
+) & { readonly renamedFrom?: readonly string[] } & FactPersistenceSpec;
 
 /** Why `FactStore.restoreProblem` would refuse a fact: not declared (under a strict policy) or invalid. */
 export type FactRestoreProblem = 'undeclared' | 'invalid';
@@ -230,6 +262,8 @@ interface JournalEntry {
   readonly key: string;
   readonly old: FactValue | undefined;
   readonly source: EntityId | null;
+  /** A bookkeeping write (a written-at stamp): undone with the batch, never announced. */
+  readonly silent?: true;
 }
 
 /** The world's fact store; reach it as `world.facts`. */
@@ -279,8 +313,9 @@ export class FactStore {
         `default ${describe(spec.default)} is not of type ${spec.type}`,
       );
     }
-    const { renamedFrom: former = [], ...typed } = spec;
+    const { renamedFrom: former = [], persistence, resetAfter, decaysTo, ...typed } = spec;
     this.checkRenames(key, template, former);
+    this.checkPersistence(key, spec);
     for (const [held, current] of this.values) {
       const governed = template
         ? factTemplateOf(held) === key && !this.specs.has(held)
@@ -290,7 +325,21 @@ export class FactStore {
     const copy =
       typed.type === 'enum' ? { ...typed, values: Object.freeze([...typed.values]) } : typed;
     const renames = former.length > 0 ? { renamedFrom: Object.freeze([...former]) } : {};
-    this.specs.set(key, Object.freeze({ ...copy, ...renames }));
+    const policy = {
+      ...(persistence !== undefined && persistence !== 'permanent' && { persistence }),
+      ...(resetAfter !== undefined && { resetAfter }),
+      ...(decaysTo !== undefined && {
+        decaysTo: Object.freeze({ from: Object.freeze([...decaysTo.from]), to: decaysTo.to }),
+      }),
+    };
+    if (persistence === 'reset-after') {
+      // Its timer is a fact of its own, so it rides snapshots, hashes and saves like any other.
+      this.declare(factWrittenKey(key), {
+        type: 'tick',
+        ...(former.length > 0 && { renamedFrom: former.map(factWrittenKey) }),
+      });
+    }
+    this.specs.set(key, Object.freeze({ ...copy, ...renames, ...policy }));
     for (const old of former) this.formerKeys.set(old, key);
     return this;
   }
@@ -352,12 +401,55 @@ export class FactStore {
 
   /** True once `key` has been set (a declared default alone does not count). */
   has(key: string): boolean {
-    return this.values.has(key);
+    return this.values.has(key) && !this.expired(key);
   }
 
   /** The value of `key`: the stored value, else its declared default, else undefined. */
   get(key: string): FactValue | undefined {
-    return this.values.get(key) ?? this.spec(key)?.default;
+    return (this.expired(key) ? undefined : this.values.get(key)) ?? this.spec(key)?.default;
+  }
+
+  /** The persistence policy of `key` (`permanent` unless declared otherwise). */
+  persistenceOf(key: string): FactPersistenceKind {
+    return this.spec(key)?.persistence ?? 'permanent';
+  }
+
+  /** Whether `key` is a `reset-after` fact whose time is up (its reads already show the default). */
+  expired(key: string): boolean {
+    const spec = this.spec(key);
+    if (spec?.persistence !== 'reset-after' || !this.values.has(key)) return false;
+    const stamp = this.values.get(factWrittenKey(key));
+    return typeof stamp === 'number' && this.hooks.tick() - stamp >= Number(spec.resetAfter);
+  }
+
+  /**
+   * Puts facts back to their defaults by policy and returns their keys (code-unit order): the
+   * `reset-after` ones whose time is up, and, for `rest`, every `reset-on-rest` one. Each reset is an
+   * ordinary write of the default (one `factChanged`), so quests and signals see it.
+   */
+  applyResets(trigger: 'rest' | 'time'): string[] {
+    const due: string[] = [];
+    for (const key of this.sortedKeys()) {
+      const persistence = this.spec(key)?.persistence;
+      if (
+        (persistence === 'reset-on-rest' && trigger === 'rest') ||
+        (persistence === 'reset-after' && this.expired(key))
+      ) {
+        due.push(key);
+      }
+    }
+    if (due.length > 0 && this.journal !== null) {
+      throw new Error('facts cannot be reset inside a transaction');
+    }
+    for (const key of due) {
+      const old = known(this.values.get(key));
+      this.values.delete(key);
+      this.values.delete(factWrittenKey(key));
+      this.order = null;
+      const value = known(this.spec(key)?.default); // reset policies require a default
+      if (value !== old) this.announce(key, old, value, null);
+    }
+    return due;
   }
 
   /**
@@ -372,7 +464,7 @@ export class FactStore {
     checkKey(key);
     const spec = this.spec(key);
     if (spec === undefined && !this.admitUndeclared(key)) return false;
-    const current = this.values.get(key);
+    const current = this.expired(key) ? undefined : this.values.get(key);
     const type = this.typeOf(key);
     const valid =
       type === undefined
@@ -451,6 +543,18 @@ export class FactStore {
     return snapshot;
   }
 
+  /**
+   * What a save keeps: every set fact except the `transient` ones (and the timer of a transient
+   * fact, which has none), in code-unit key order.
+   */
+  persistentSnapshot(): FactSnapshot {
+    const snapshot: Record<string, FactValue> = {};
+    for (const key of this.sortedKeys()) {
+      if (this.spec(key)?.persistence !== 'transient') snapshot[key] = known(this.values.get(key));
+    }
+    return snapshot;
+  }
+
   /** A stable content hash of the set facts (8 hex digits); independent of insertion order. */
   hash(): string {
     return xxHash32(encodeCanonical(this.snapshot())).toString(16).padStart(8, '0');
@@ -476,6 +580,42 @@ export class FactStore {
       this.values = values;
       this.order = null;
     };
+  }
+
+  /** Rejects a persistence policy that is incomplete or contradicts itself (see FactPersistenceSpec). */
+  private checkPersistence(key: string, spec: FactSpec): void {
+    const { persistence = 'permanent', resetAfter, decaysTo } = spec;
+    const fail = (message: string): never => {
+      throw new FactDeclarationError(key, message);
+    };
+    if (!(FACT_PERSISTENCE_KINDS as readonly string[]).includes(persistence)) {
+      fail(`unknown persistence "${persistence}"`);
+    }
+    if (resetAfter !== undefined && persistence !== 'reset-after') {
+      fail(`resetAfter needs persistence "reset-after", not "${persistence}"`);
+    }
+    if (decaysTo !== undefined && persistence !== 'decays-to') {
+      fail(`decaysTo needs persistence "decays-to", not "${persistence}"`);
+    }
+    if (
+      persistence === 'reset-after' &&
+      !(Number.isSafeInteger(resetAfter) && Number(resetAfter) > 0)
+    ) {
+      fail('reset-after needs resetAfter, a positive whole number of ticks');
+    }
+    if (persistence === 'decays-to') {
+      if (decaysTo === undefined || decaysTo.from.length === 0) {
+        fail('decays-to needs decaysTo with at least one value in "from"');
+      } else if (![...decaysTo.from, decaysTo.to].every((value) => accepts(spec, value))) {
+        fail(`decaysTo values must be of type ${spec.type}`);
+      }
+    }
+    if (
+      (persistence === 'reset-on-rest' || persistence === 'reset-after') &&
+      spec.default === undefined
+    ) {
+      fail(`${persistence} needs a default to return to`);
+    }
   }
 
   /** Rejects a `renamedFrom` list that is malformed or overlaps another declaration. */
@@ -523,16 +663,33 @@ export class FactStore {
   ): void {
     if (old === undefined) this.order = null;
     this.values.set(key, value);
-    if (this.journal === null) {
-      this.hooks.emit({ key, old, new: value, source, tick: this.hooks.tick() });
-    } else {
-      this.journal.push({ key, old, source });
-    }
+    if (this.journal === null) this.announce(key, old, value, source);
+    else this.journal.push({ key, old, source });
+    if (this.spec(key)?.persistence === 'reset-after') this.stampWritten(key);
+  }
+
+  private announce(
+    key: string,
+    old: FactValue | undefined,
+    value: FactValue,
+    source: EntityId | null,
+  ): void {
+    this.hooks.emit({ key, old, new: value, source, tick: this.hooks.tick() });
+  }
+
+  /** Records now as the time a `reset-after` fact was written (silently; a batch undoes it). */
+  private stampWritten(key: string): void {
+    const stampKey = factWrittenKey(key);
+    const old = this.values.get(stampKey);
+    if (old === undefined) this.order = null;
+    this.values.set(stampKey, this.hooks.tick());
+    this.journal?.push({ key: stampKey, old, source: null, silent: true });
   }
 
   private commit(journal: readonly JournalEntry[]): void {
     const touched = new Map<string, { old: FactValue | undefined; source: EntityId | null }>();
-    for (const { key, old, source } of journal) {
+    for (const { key, old, source, silent } of journal) {
+      if (silent === true) continue;
       const first = touched.get(key);
       touched.set(key, { old: first === undefined ? old : first.old, source });
     }

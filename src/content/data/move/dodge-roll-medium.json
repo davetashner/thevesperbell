@@ -1,0 +1,34 @@
+{
+  "$schema": "../move.schema.json",
+  "id": "dodge-roll-medium",
+  "notes": "Dodge roll in a Medium armor load (mw-e04.16, ADR-0003): 40 ticks, 20 stamina, i-frames ticks 2-12 (11 ticks), 3.0 m travel. Frames split as 2 startup, 11 active, 27 recovery; recovery cancels into the roll attack from tick 32.",
+  "verb": "dodge",
+  "frames": {
+    "startup": 2,
+    "active": 11,
+    "recovery": 27
+  },
+  "staminaCost": 20,
+  "cancelWindows": [
+    {
+      "into": "attack",
+      "from": 32,
+      "to": 39,
+      "move": "roll-attack"
+    }
+  ],
+  "flags": {
+    "iframes": {
+      "from": 2,
+      "to": 12
+    }
+  },
+  "motion": {
+    "distance": 3.0,
+    "direction": "input"
+  },
+  "presentation": {
+    "anim": "anim-knight-dodge-roll",
+    "audioCue": "sfx-knight-dodge-roll-armor"
+  }
+}

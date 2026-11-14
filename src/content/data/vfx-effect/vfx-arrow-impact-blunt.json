@@ -1,0 +1,49 @@
+{
+  "id": "vfx-arrow-impact-blunt",
+  "notes": "Blunt arrow (mw-e29.11): a heavier puff of dust and grit than a sharp arrow's, because the head hits rather than bites (environment palette #8A7F70, style bible §8: alpha-blended). Replaces the generic arrow puff for the blunt arrow's surface impacts.",
+  "priority": 35,
+  "duration": 0.7,
+  "emitters": [
+    {
+      "id": "puff",
+      "texture": "vfx-base-smoke-noise-01",
+      "blend": "alpha",
+      "bursts": [{ "at": 0, "count": 12 }],
+      "lifetime": { "min": 0.5, "max": 0.9 },
+      "speed": { "min": 0.6, "max": 1.8 },
+      "coneDeg": 65,
+      "spawnRadius": 0.06,
+      "gravity": 0.5,
+      "drag": 3,
+      "size": [
+        { "t": 0, "v": 0.18 },
+        { "t": 1, "v": 0.55 }
+      ],
+      "color": "#8A7F70",
+      "alpha": [
+        { "t": 0, "v": 0.7 },
+        { "t": 1, "v": 0 }
+      ]
+    },
+    {
+      "id": "grit",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "alpha",
+      "bursts": [{ "at": 0, "count": 10 }],
+      "lifetime": { "min": 0.3, "max": 0.6 },
+      "speed": { "min": 1.5, "max": 3.5 },
+      "coneDeg": 70,
+      "gravity": 9,
+      "drag": 1,
+      "size": [
+        { "t": 0, "v": 0.035 },
+        { "t": 1, "v": 0.02 }
+      ],
+      "color": "#6E6458",
+      "alpha": [
+        { "t": 0, "v": 0.9 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

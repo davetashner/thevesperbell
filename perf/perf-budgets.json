@@ -94,6 +94,186 @@
       "note": "On the reference GPU a frame takes milliseconds, so every task of 200 ms or more in the sampling window counts, frame renders included. Same run as frame-p95-high."
     },
     {
+      "id": "valley-01-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-01",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-01",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-01",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-01-frame-p50-low",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-01",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-frame-p95-low",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-01",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-01-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-01",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-02-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-02",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-02",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-02",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-02-frame-p50-low",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-02",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-frame-p95-low",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-02",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-02-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-02",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-03-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-03",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-03",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "valley-03",
+      "preset": "high",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "valley-03-frame-p50-low",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-03",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-frame-p95-low",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-03",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. 60 fps is a 16.7 ms frame interval. 1,800 frames after a 3 s warm-up, uncapped, a 1920×1080 drawing buffer at DPR 1 with ?quality=low (1080p, the contract's Low resolution; measured on the M1 Pro, which is faster than the integrated-GPU class Low targets). Production build: no backdrop card."
+    },
+    {
+      "id": "valley-03-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "scene": "valley-03",
+      "preset": "low",
+      "note": "mw-ju8.2 AC-1. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
       "id": "load-to-playable-slice",
       "metric": "loadToPlayableMs",
       "mode": "reference",
@@ -164,6 +344,284 @@
       "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
       "scene": "valley-02",
       "note": "Reference mode, warm: teleport into valley-01's north gate; #app[data-transit].ms of the arriving page is the wall-clock time from the crossing to the first sim step in valley-02 (mw-e01.11 AC-4: grey-box scene to scene ≤ 3 s)."
+    },
+    {
+      "id": "input-to-motion-high",
+      "metric": "inputToMotionP95Ms",
+      "mode": "reference",
+      "max": 100,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "scene": "testbed",
+      "preset": "high",
+      "note": "mw-e02.8 AC-1. Contract §5 writes \"responsive\" as input-to-motion latency ≤ 100 ms (target ≤ 50 ms). p95 of 50 synthetic move key presses in the greybox testbed at High, display paced to 60 fps, vsync on: keydown event to the end of the first frame callback that draws the player moved."
+    },
+    {
+      "id": "input-to-motion-low-30fps",
+      "metric": "inputToMotionP95Ms",
+      "mode": "reference",
+      "max": 133,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: 30 fps floor in worst-case combat",
+      "scene": "testbed",
+      "preset": "low",
+      "note": "mw-e02.8 AC-4. The same at the Low preset with the display paced to 30 fps, the Low worst case: two 33 ms frame intervals of slack, ≤ 133 ms."
+    },
+    {
+      "id": "controller-tick-p95",
+      "metric": "controllerTickP95Ms",
+      "mode": "reference",
+      "max": 0.3,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "scene": "testbed",
+      "note": "mw-e02.8 AC-2. Wall time of one character controller system run (one sim tick), p95 over 60 s of scripted traversal: a small slice of the 16.7 ms frame the 60 fps baseline leaves."
+    },
+    {
+      "id": "camera-frame-p95",
+      "metric": "cameraFrameP95Ms",
+      "mode": "reference",
+      "max": 0.2,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "scene": "testbed",
+      "note": "mw-e02.8 AC-2. Wall time of one orbit camera placement (collision boom, framing, clip probe and its readout), p95 per drawn frame over the same traversal."
+    },
+    {
+      "id": "briarwood-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briarwood",
+      "preset": "high",
+      "note": "mw-e25.1 AC-4. The 300 × 250 m Briarwood greybox with placeholder trunks and bramble gates. 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "briarwood-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briarwood",
+      "preset": "high",
+      "note": "mw-e25.1 AC-4. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "briarwood-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briarwood",
+      "preset": "high",
+      "note": "mw-e25.1 AC-4. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "briar-glen-green-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "note": "mw-e24.2 AC-4. The 180 × 140 m Briar Glen grey-box town viewed from Market Green (the scene's player-start). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "briar-glen-green-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "note": "mw-e24.2 AC-4. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "briar-glen-green-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "note": "mw-e24.2 AC-4. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "moorings-watch-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "moorings-watch",
+      "preset": "high",
+      "note": "mw-e25.6 AC-3. The 180 × 100 m Mooring's Watch greybox (spur, camp, courtyard, four-floor tower, crag plain) viewed from the tower roof over the valley (?spawn=roof-view, 9 m up, facing east). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "moorings-watch-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "moorings-watch",
+      "preset": "high",
+      "note": "mw-e25.6 AC-3. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "moorings-watch-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "moorings-watch",
+      "preset": "high",
+      "note": "mw-e25.6 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "bellwater-priory-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "bellwater-priory",
+      "preset": "high",
+      "note": "mw-e26.5 AC-3. The 120 × 130 m Bellwater Priory greybox (road, gate wall, roofless nave and colonnade, choir, scriptorium, garden, crypt pit) viewed from the belfry deck, 9 m up, facing west over the nave (?spawn=belfry-view). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "bellwater-priory-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "bellwater-priory",
+      "preset": "high",
+      "note": "mw-e26.5 AC-3. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "bellwater-priory-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "bellwater-priory",
+      "preset": "high",
+      "note": "mw-e26.5 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "deepworks-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "deepworks",
+      "preset": "high",
+      "note": "mw-e26.2 AC-3. The Deepworks greybox (about 220 × 335 m over three levels: mine road, forecourt and gate wall, winch house, pillared old galleries, the 120 × 60 m cutting hall, silver galleries, Vane's gallery, breach and flooded lower gallery) viewed from the south end of the cutting hall, facing north over the pillars and rails (?spawn=cutting-hall-view). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "deepworks-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "deepworks",
+      "preset": "high",
+      "note": "mw-e26.2 AC-3. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "deepworks-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "deepworks",
+      "preset": "high",
+      "note": "mw-e26.2 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "knot-outer-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-outer",
+      "preset": "high",
+      "note": "mw-e26.9 AC-3. The Knot's outer half greybox (about 125 × 260 m: Outer Ring, Ossuary Galleries with the sunk Dark Crossing room and Clatter's garden, Chapel of Echoes) viewed from the south end of the Ossuary entry hall, facing north down the hall and over the pit (?spawn=ossuary-view). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "knot-outer-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-outer",
+      "preset": "high",
+      "note": "mw-e26.9 AC-3. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "knot-outer-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-outer",
+      "preset": "high",
+      "note": "mw-e26.9 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "knot-inner-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-inner",
+      "preset": "high",
+      "note": "mw-e26.10 AC-3. The Knot's inner half greybox (about 100 × 175 m: Horn's Hall, the Fold, the Cradle with its sixteen-pillar ring, the Sounding Shaft's foot) viewed from the Cradle's south entrance, facing north across the chamber (?spawn=cradle-view). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "knot-inner-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-inner",
+      "preset": "high",
+      "note": "mw-e26.10 AC-3. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "knot-inner-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-inner",
+      "preset": "high",
+      "note": "mw-e26.10 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
+      "id": "wendmouth-harbour-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "wendmouth-harbour",
+      "preset": "high",
+      "note": "mw-e40.1 AC-4. The 200 × 160 m Wendmouth harbour greybox (Stone Wharf, Customs House, Tidemarket, Bonded Warehouse, net lofts, breakwater and Gull, the pool with the Gilded Tern) viewed from the west end of the Stone Wharf looking east along the quay (?spawn=wharf-view). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "wendmouth-harbour-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "wendmouth-harbour",
+      "preset": "high",
+      "note": "mw-e40.1 AC-4. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "wendmouth-harbour-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "wendmouth-harbour",
+      "preset": "high",
+      "note": "mw-e40.1 AC-4. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
     }
   ]
 }

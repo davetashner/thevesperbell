@@ -1,0 +1,55 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "beam-source",
+  "name": "Beam source",
+  "description": "A light emitter casting a beam along the instance's facing (north at yaw 0), half a metre up so it meets the mirror and lens stands. Turn the instance to aim it.",
+  "tags": ["light"],
+  "parameters": {
+    "kind": {
+      "type": "enum",
+      "description": "What shines: a sunlight shaft, a crystal or a spell.",
+      "values": ["sunlight", "crystal", "spell"],
+      "default": "crystal"
+    },
+    "intensity": {
+      "type": "number",
+      "description": "Strength of the beam; 1 is a sunbeam.",
+      "min": 0.1,
+      "max": 10,
+      "default": 1
+    },
+    "range": {
+      "type": "number",
+      "description": "Longest a beam segment runs.",
+      "unit": "m",
+      "min": 1,
+      "max": 60,
+      "default": 12
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Shines from the start.",
+      "default": true
+    }
+  },
+  "spawns": [
+    {
+      "local": "emitter",
+      "at": [0, 0.5, 0],
+      "beamEmitter": {
+        "kind": "$kind",
+        "direction": [0, 0, 1],
+        "intensity": "$intensity",
+        "range": "$range",
+        "active": "$active"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "beam",
+      "description": "The emitter entity; mirrors and receivers react to its beam.",
+      "spawn": "emitter"
+    }
+  ]
+}

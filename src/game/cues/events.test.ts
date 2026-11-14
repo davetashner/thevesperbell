@@ -73,6 +73,15 @@ const SAMPLES: Record<CueEventName, unknown> = {
     to: 'alerted',
     cause: 'event:saw-target',
   },
+  WallRecoil: {
+    tick: 1,
+    entity: 1,
+    move: 'sword-light-1',
+    activeTick: 1,
+    point: { x: 2, y: 1.2, z: -4.5 },
+    normal: { x: 0, y: 0, z: 1 },
+    ticks: 30,
+  },
   GuardBroken: { tick: 1, entity: 1, instigator: 4, source: null, staggerTicks: 60 },
   HitParried: { tick: 1, entity: 1, attacker: 4, source: null, parriedTicks: 90 },
   DodgedHit: hitbox,
@@ -130,6 +139,16 @@ const SAMPLES: Record<CueEventName, unknown> = {
     entity: null,
     key: 'sfx-bell-chime',
     value: true,
+    tick: 1,
+  },
+  soundClueCued: {
+    graph: 7,
+    graphId: 'bells',
+    node: 'chimes',
+    entity: 4,
+    cue: 'chime-high',
+    index: 1,
+    count: 3,
     tick: 1,
   },
   volumeEntered: { graph: 7, graphId: 'gate', node: 'plate', entity: 4, tick: 1 },
@@ -499,6 +518,13 @@ describe('cue event bindings', () => {
     ).toBeUndefined();
   });
 
+  it('mw-e15.5: read a sound clue cue, anchored at its source with the cue id as a fact', () => {
+    expect(read('soundClueCued', SAMPLES.soundClueCued)).toEqual({
+      anchors: { entity: { entity: 4 } },
+      facts: { graph: 'bells', node: 'chimes', cue: 'chime-high' },
+    });
+  });
+
   it('AC-1: read a physics impact: both sides’ impact class and material, energy, impulse and speed', () => {
     expect(read('physicsImpact', SAMPLES.physicsImpact)).toEqual({
       anchors: {
@@ -561,6 +587,17 @@ describe('cue event bindings', () => {
         directions: {},
       },
     );
+  });
+
+  it('mw-e04.15: reads a wall recoil at its contact point, facing out of the wall', () => {
+    const read1 = read('WallRecoil', SAMPLES.WallRecoil);
+    expect(read1).toEqual({
+      anchors: { at: { position: { x: 2, y: 1.2, z: -4.5 } }, entity: { entity: 1 } },
+      facts: { move: 'sword-light-1' },
+      directions: { hitNormal: { x: 0, y: 0, z: 1 } },
+    });
+    const inside = { ...(SAMPLES.WallRecoil as object), normal: { x: 0, y: 0, z: 0 } };
+    expect(read('WallRecoil', inside).directions).toEqual({});
   });
 
   it('mw-e28.4: read guard breaks, dodged swings and move phases (with the move’s own sound)', () => {

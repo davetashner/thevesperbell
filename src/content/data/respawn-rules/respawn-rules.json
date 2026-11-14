@@ -19,6 +19,70 @@
       "priority": 0,
       "destination": { "scene": "testbed", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "brazier-hall-reload",
+      "notes": "Demo scene of the puzzle runtime: the puzzle save and load e2e (mw-e15.3) dies here.",
+      "region": "brazier-hall",
+      "priority": 0,
+      "destination": { "scene": "brazier-hall", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "briarwood-reload",
+      "notes": "Death in the Briarwood (mw-e25.1): the region is the whole scene; the death screen offers Load last save, and with no save the forest restarts at the town gate. Waking at the Sleeping Ox is e24-sleeping-ox.",
+      "region": "briarwood",
+      "priority": 0,
+      "destination": { "scene": "briarwood", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "moorings-watch-reload",
+      "notes": "Death at Mooring's Watch (mw-e25.6): the region is the whole scene; the death screen offers Load last save, and with no save the watch restarts at the head of the spur trail.",
+      "region": "moorings-watch",
+      "priority": 0,
+      "destination": { "scene": "moorings-watch", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "bellwater-priory-reload",
+      "notes": "Death at Bellwater Priory (mw-e26.5): the region is the whole scene; the death screen offers Load last save, and with no save the priory restarts at the head of the priory road. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
+      "region": "bellwater-priory",
+      "priority": 0,
+      "destination": { "scene": "bellwater-priory", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "deepworks-reload",
+      "notes": "Death in the Deepworks (mw-e26.2): the region is the whole scene; the death screen offers Load last save, and with no save the mine restarts at the head of the mine road. Waking in the goblin camp, carried by Kettleback for a fee, is the PROPOSAL in docs/design/dungeon.md (Fold respawn logic, the `deepworks` rule); a later bead replaces this with that fact-conditioned rule.",
+      "region": "deepworks",
+      "priority": 0,
+      "destination": { "scene": "deepworks", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "knot-outer-reload",
+      "notes": "Death in the Knot's outer half (mw-e26.9): the region is the whole scene; the death screen offers Load last save, and with no save the player restarts at the breach landing. Waking in the Fold, laid out by the Forgotten or carried by Kettleback is the PROPOSAL in docs/design/dungeon.md (Fold respawn logic, the `knot-*` rules); mw-e26.16 replaces this with those fact-conditioned rules.",
+      "region": "knot-outer",
+      "priority": 0,
+      "destination": { "scene": "knot-outer", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "knot-inner-reload",
+      "notes": "Death in the Knot's inner half (mw-e26.10): the region is the whole scene; the death screen offers Load last save, and with no save the player restarts at the vestibule south of Horn's Hall. Waking in the Fold is the PROPOSAL in docs/design/dungeon.md (Fold respawn logic); the fold-wake marker stands ready and mw-e26.16 replaces this with those fact-conditioned rules.",
+      "region": "knot-inner",
+      "priority": 0,
+      "destination": { "scene": "knot-inner", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
+      "id": "wendmouth-harbour-reload",
+      "notes": "Death in Wendmouth (mw-e40.1): the region is the whole harbour scene; the death screen offers Load last save, and with no save the harbour restarts on the Stone Wharf. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
+      "region": "wendmouth-harbour",
+      "priority": 0,
+      "destination": { "scene": "wendmouth-harbour", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }

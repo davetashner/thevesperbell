@@ -1,0 +1,6 @@
+{
+  "$schema": "../disposition-rule.schema.json",
+  "id": "fed",
+  "notes": "The player fed this creature something it accepts.",
+  "delta": 15
+}

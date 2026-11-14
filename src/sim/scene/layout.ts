@@ -10,6 +10,7 @@
 import type { KitPurpose, KitShape, RouteKind, SceneYaw } from '@content/index';
 import type { PatrolRoute, PatrolRoutine, PatrolWaypoint } from '../ai/routes';
 import type { RampRise } from '../character/greybox';
+import type { Condition } from '../facts/conditions';
 import type { CreatureLeash } from '../creatures/components';
 import type { InteractableSpec } from '../interaction/affordance';
 import type { LightEnvironment } from '../light/field';
@@ -131,6 +132,21 @@ export interface ScenePlateSpec {
   readonly hidden?: boolean | undefined;
 }
 
+/** Push rules of a movable prop (mw-e15.4; `push.config`). */
+export interface ScenePushSpec {
+  readonly axis?: readonly [number, number] | undefined;
+  readonly grid?: number | undefined;
+  readonly rotateStep?: number | undefined;
+}
+
+/** A volume of liquid (mw-e15.4; `liquid.volume`): size in metres, what it holds and its drain. */
+export interface SceneLiquidSpec {
+  readonly size: Triple;
+  readonly liquid: { readonly id: string };
+  readonly depth: number;
+  readonly drain?: { readonly rate: number; readonly open: boolean } | undefined;
+}
+
 /** A beam emitter spawn (mw-e03.17). */
 export interface SceneBeamEmitterSpec {
   readonly kind: BeamKind;
@@ -181,14 +197,60 @@ export interface SceneImpactSwitchSpec {
   readonly loudness?: number | null | undefined;
 }
 
-/** A cuttable rope spawn (mw-e05.13): it hangs straight down from the spawn point. */
+/** Shares of each kind of hit a support ignores, 0 … 1 (mw-e03.13). */
+export interface SceneResistancesSpec {
+  readonly blunt?: number | undefined;
+  readonly slash?: number | undefined;
+  readonly pierce?: number | undefined;
+  readonly force?: number | undefined;
+}
+
+/** What makes a rope a support with hit points and a rating (mw-e03.13). */
+export interface SceneSupportSpec {
+  readonly rating?: number | undefined;
+  readonly resistances?: SceneResistancesSpec | undefined;
+  readonly span?: string | undefined;
+}
+
+/**
+ * A rope spawn (mw-e05.13): a cord from the spawn point straight down `length` metres, or to `to`
+ * (grid cells). With `support` it has hit points and a load rating (mw-e03.13).
+ */
 export interface SceneRopeSpec {
-  readonly length: number;
+  readonly length?: number | undefined;
+  readonly to?: Triple | undefined;
   readonly radius?: number | undefined;
+  readonly support?: SceneSupportSpec | undefined;
+}
+
+/** A rope as laid out, metres: where it ends and how long it is. */
+export interface SceneRope {
+  readonly length: number;
+  /** Its other anchor; absent: it hangs straight down from the spawn point. */
+  readonly to?: Vec3;
+  readonly radius?: number;
+  readonly support?: {
+    readonly rating?: number;
+    readonly resistances: Readonly<Partial<Record<'blunt' | 'slash' | 'pierce' | 'force', number>>>;
+    readonly span?: string;
+  };
+}
+
+/** A rope bridge prefab spawn (mw-e03.13): ropes and planks hung level from the spawn to `to`. */
+export interface SceneBridgeSpec {
+  readonly to: Triple;
+  readonly planks: number;
+  readonly plank: { readonly id: string };
+  readonly rating: number;
+  readonly resistances?: SceneResistancesSpec | undefined;
+  /** Distance between its two ropes, metres. */
+  readonly width: number;
 }
 
 /** A container spawn as written in data (mw-e18.3): its loot table, contents and lock. */
 export interface SceneContainerSpec {
+  /** Room for bodies, kg (mw-e03.23). */
+  readonly stash?: { readonly capacityKg: number } | undefined;
   readonly loot?: { readonly id: string } | undefined;
   readonly contents?:
     readonly { readonly item: { readonly id: string }; readonly count: number }[] | undefined;
@@ -202,7 +264,32 @@ export interface SceneContainer {
   readonly contents: readonly { readonly item: string; readonly count: number }[];
   readonly lock?: string;
   readonly locked?: boolean;
+  /** Room for bodies, kg (mw-e03.23). */
+  readonly stashKg?: number;
 }
+
+/**
+ * A hiding spot spawn as written in data (mw-e03.23). The spawn's `yaw` is which way its opening
+ * faces; offsets are in metres in the spot's frame (x right of the opening, y up, z out of it).
+ */
+export interface SceneHidingSpec {
+  readonly capacity?: number | undefined;
+  readonly concealment?: number | undefined;
+  readonly peek?: boolean | undefined;
+  readonly enterDb?: number | undefined;
+  readonly exitDb?: number | undefined;
+  /** Greybox box drawn for it, metres, and its colour (glue; the sim never reads them). */
+  readonly size?: Triple | undefined;
+  readonly look?: 'wood' | 'hay' | undefined;
+  readonly inside?: Triple | undefined;
+  readonly eye?: Triple | undefined;
+  readonly exits?: readonly Triple[] | undefined;
+}
+
+/** A hiding spot as laid out: the same data, only what the file set. */
+export type SceneHiding = {
+  readonly [K in keyof SceneHidingSpec]?: Exclude<SceneHidingSpec[K], undefined>;
+};
 
 /** A signal graph placed in a scene (mw-e03.18): its id and binding renames. */
 export interface SceneSignalSpec {
@@ -253,6 +340,24 @@ export interface SceneRegionSpec {
   readonly tags: readonly string[];
 }
 
+/** A box tagged with an acoustic surface, as authored (mw-e09.4). */
+export interface SceneSurfaceSpec {
+  readonly id: string;
+  readonly min: Triple;
+  readonly max: Triple;
+  readonly surface: string;
+  readonly priority: number;
+}
+
+/** A surface region as laid out: its corners in metres (read by `surfaceAt`, src/sim/surfaces). */
+export interface SceneSurface {
+  readonly id: string;
+  readonly min: Vec3;
+  readonly max: Vec3;
+  readonly surface: string;
+  readonly priority: number;
+}
+
 /** A tagged box as laid out: its corners in metres (water: wading and swimming, mw-e02.14). */
 export interface SceneRegion {
   readonly id: string;
@@ -289,6 +394,8 @@ export interface SceneSpawnSpec {
   readonly targetable?: { readonly id: string } | undefined;
   /** An item lying here as a world item (mw-e17.7). */
   readonly item?: { readonly id: { readonly id: string }; readonly count: number } | undefined;
+  /** Whom the item or container here belongs to (mw-e27.9). */
+  readonly owner?: string | undefined;
   /** A creature to spawn here (mw-e12.4). */
   readonly creature?: { readonly id: string } | undefined;
   /** The faction the creature joins instead of its definition's. */
@@ -302,7 +409,20 @@ export interface SceneSpawnSpec {
   /** Opts the creature in to returning after a kill (mw-ju8.29). */
   readonly repopulate?: { readonly afterDays: number } | undefined;
   /** The clock phases the spawn's creature and interaction are there for (mw-ju8.14); absent = always. */
-  readonly presence?: { readonly phases: readonly string[] } | undefined;
+  readonly presence?:
+    | {
+        readonly phases?: readonly string[] | undefined;
+        readonly hours?: readonly [number, number] | undefined;
+      }
+    | undefined;
+  /** The spawn exists only while this holds (mw-e27.8). */
+  readonly spawnIf?: Condition | undefined;
+  /** The spawn is absent while this holds (mw-e27.8). */
+  readonly despawnIf?: Condition | undefined;
+  /** One variant of a group: the first whose `when` holds is the active one (mw-e27.8). */
+  readonly variant?: { readonly group: string; readonly when?: Condition | undefined } | undefined;
+  /** Changes may happen while the spawn is on screen (mw-e27.8); default: wait until it is not. */
+  readonly swapInView?: boolean | undefined;
   /** What the creature carries and drops where it dies (mw-e01.5). */
   readonly carries?:
     readonly { readonly item: { readonly id: string }; readonly count: number }[] | undefined;
@@ -320,6 +440,10 @@ export interface SceneSpawnSpec {
   readonly switch?: SceneSwitchSpec | undefined;
   /** Makes the spawned entity a pressure plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec | undefined;
+  /** Gives a movable prop push rules (mw-e15.4). */
+  readonly push?: ScenePushSpec | undefined;
+  /** Makes the spawned entity a volume of liquid (mw-e15.4). */
+  readonly liquid?: SceneLiquidSpec | undefined;
   /** Makes the spawned entity a light source (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec | undefined;
   /** Makes the spawned entity an impact switch (mw-e03.20). */
@@ -332,8 +456,14 @@ export interface SceneSpawnSpec {
   readonly lightReceiver?: SceneLightReceiverSpec | undefined;
   /** Makes the spawned entity a lootable container (mw-e18.3). */
   readonly container?: SceneContainerSpec | undefined;
-  /** Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). */
+  /** Makes the spawned entity a hiding spot (mw-e03.23). */
+  readonly hiding?: SceneHidingSpec | undefined;
+  /** Makes a movable prop a shoulder-carry of this kind (mw-e03.23). */
+  readonly bulky?: string | undefined;
+  /** Makes the spawned entity a rope from its position (mw-e05.13, mw-e03.13). */
   readonly rope?: SceneRopeSpec | undefined;
+  /** Makes the spawn one end of a rope bridge: its ropes and planks (mw-e03.13). */
+  readonly bridge?: SceneBridgeSpec | undefined;
   /** Spawn id of the rope this spawned prop hangs from (mw-e05.13). */
   readonly suspendedFrom?: string | undefined;
 }
@@ -406,6 +536,8 @@ export interface SceneSpec {
   readonly transitions?: readonly SceneTransitionSpec[] | undefined;
   /** Tagged boxes: rivers and pools (mw-ju8.1). */
   readonly regions?: readonly SceneRegionSpec[] | undefined;
+  /** Boxes tagged with a footstep surface (mw-e09.4). */
+  readonly surfaces?: readonly SceneSurfaceSpec[] | undefined;
 }
 
 /** Finds a kit piece by id (undefined when there is none). */
@@ -449,6 +581,15 @@ export interface ScenePiecePlacement {
   readonly breakable?: SceneBreakable;
 }
 
+/** The world conditions that decide whether a spawn exists (mw-e27.8; see ./variants.ts). */
+export interface SpawnGate {
+  readonly spawnIf?: Condition;
+  readonly despawnIf?: Condition;
+  readonly variant?: { readonly group: string; readonly when?: Condition };
+  /** Changes may happen on screen; default: they wait until the spawn is out of view. */
+  readonly swapInView?: boolean;
+}
+
 /** One spawn in world space. */
 export interface SceneSpawnPlacement {
   readonly id: string;
@@ -463,6 +604,8 @@ export interface SceneSpawnPlacement {
   readonly targetable?: string | undefined;
   /** The item lying here (see src/sim/items), when there is one. */
   readonly item?: { readonly id: string; readonly count: number };
+  /** Whom the item or container here belongs to, a faction or NPC id (mw-e27.9). */
+  readonly owner?: string;
   /** The creature spawned here (see src/sim/creatures), when there is one. */
   readonly creature?: string;
   /** The faction that creature joins instead of its definition's. */
@@ -476,7 +619,12 @@ export interface SceneSpawnPlacement {
   /** Returns after a kill once `afterDays` world days have passed (mw-ju8.29). */
   readonly repopulate?: { readonly afterDays: number };
   /** The clock phases that spawn's creature and interaction are there for (mw-ju8.14); absent = always. */
-  readonly presence?: { readonly phases: readonly string[] };
+  readonly presence?: {
+    readonly phases?: readonly string[];
+    readonly hours?: readonly [number, number];
+  };
+  /** Which world conditions decide whether the spawn exists (mw-e27.8); absent = always there. */
+  readonly gate?: SpawnGate;
   /** What that creature carries and drops where it dies (mw-e01.5), in order. */
   readonly carries?: readonly { readonly item: string; readonly count: number }[];
   /** Its world properties, when the spawn sets any (mw-e03.37). */
@@ -491,6 +639,15 @@ export interface SceneSpawnPlacement {
   readonly switch?: SceneSwitchSpec;
   /** Its pressure plate data, when it is a plate (mw-e03.19). */
   readonly plate?: ScenePlateSpec;
+  /** Its push rules, when it has any (mw-e15.4). */
+  readonly push?: ScenePushSpec;
+  /** Its liquid volume, when it is one (mw-e15.4); size in metres, the liquid by id. */
+  readonly liquid?: {
+    readonly size: Vec3;
+    readonly liquid: string;
+    readonly depth: number;
+    readonly drain?: { readonly rate: number; readonly open: boolean };
+  };
   /** Its light source data, when it is one (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec;
   /** Its impact switch data, when it is one (mw-e03.20). */
@@ -501,8 +658,12 @@ export interface SceneSpawnPlacement {
   readonly lightReceiver?: SceneLightReceiverSpec;
   /** Its container data, when it is a container (mw-e18.3). */
   readonly container?: SceneContainer;
-  /** Its rope data, when it is a cuttable rope (mw-e05.13). */
-  readonly rope?: SceneRopeSpec;
+  /** Its hiding spot data, when it is one (mw-e03.23). */
+  readonly hiding?: SceneHiding;
+  /** What kind of shoulder-carry it is, when it is one (mw-e03.23). */
+  readonly bulky?: string;
+  /** Its rope data, when it is a rope (mw-e05.13, mw-e03.13). */
+  readonly rope?: SceneRope;
   /** The rope spawn it hangs from, when it hangs (mw-e05.13). */
   readonly suspendedFrom?: string;
 }
@@ -520,6 +681,8 @@ export interface SceneLayout {
   readonly transitions: readonly SceneTransition[];
   /** Its tagged boxes (water), in scene order, in metres. */
   readonly regions: readonly SceneRegion[];
+  /** Its footstep surface boxes, in scene order, in metres (mw-e09.4). */
+  readonly surfaces: readonly SceneSurface[];
 }
 
 /** Thrown when a scene names a kit piece the lookup does not have. */
@@ -569,6 +732,92 @@ function maxOf(a: Vec3, b: Vec3): Vec3 {
 
 function gridToWorld(at: Triple, grid: number): Vec3 {
   return vec(at[0] * grid, at[1] * grid, at[2] * grid);
+}
+
+/** The shares a spec sets, without the absent ones. */
+function definedShares(
+  spec: SceneResistancesSpec | undefined,
+): Partial<Record<'blunt' | 'slash' | 'pierce' | 'force', number>> {
+  const shares: Partial<Record<'blunt' | 'slash' | 'pierce' | 'force', number>> = {};
+  for (const kind of ['blunt', 'slash', 'pierce', 'force'] as const) {
+    const share = spec?.[kind];
+    if (share !== undefined) shares[kind] = share;
+  }
+  return shares;
+}
+
+const known = <T>(value: T | undefined): T => value as T;
+
+/** A rope spawn as laid out (see `SceneRope`). */
+function ropeOf(spawn: SceneSpawnSpec, grid: number): SceneRope {
+  const rope = known(spawn.rope);
+  const from = gridToWorld(spawn.at, grid);
+  const to = rope.to === undefined ? undefined : gridToWorld(rope.to, grid);
+  const length =
+    to === undefined
+      ? known(rope.length)
+      : Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2 + (to.z - from.z) ** 2);
+  const { support } = rope;
+  return Object.freeze({
+    length,
+    ...(to !== undefined && { to }),
+    ...(rope.radius !== undefined && { radius: rope.radius }),
+    ...(support !== undefined && {
+      support: Object.freeze({
+        ...(support.rating !== undefined && { rating: support.rating }),
+        resistances: Object.freeze(definedShares(support.resistances)),
+        ...(support.span !== undefined && { span: support.span }),
+      }),
+    }),
+  });
+}
+
+/**
+ * How far a bridge's ropes run below the planks' undersides, metres: past a rope's collider (0.05 m
+ * either way), so a plank let go is never inside it.
+ */
+const BRIDGE_ROPE_DROP = 0.06;
+
+/** Rope bridges are prefabs: the spawn stays, joined by two support ropes and the planks they hold. */
+function expandBridge(spawn: SceneSpawnSpec, grid: number): readonly SceneSpawnSpec[] {
+  const { bridge } = spawn;
+  if (bridge === undefined) return [spawn];
+  const [x0, y0, z0] = spawn.at;
+  const [x1, , z1] = bridge.to;
+  const alongX = Math.abs(x1 - x0) > Math.abs(z1 - z0);
+  const run = alongX ? x1 - x0 : z1 - z0;
+  const span = spawn.id;
+  const ropeIds = [`${span}-rope-1`, `${span}-rope-2`] as const;
+  const out: SceneSpawnSpec[] = [spawn];
+  ropeIds.forEach((id, i) => {
+    // Each rope sits half the width (metres, here in cells) either side of the centre line.
+    const side = ((i === 0 ? -1 : 1) * bridge.width) / (2 * grid);
+    const offset = (cells: number) => cells + side;
+    const y = y0 - BRIDGE_ROPE_DROP / grid;
+    out.push({
+      id,
+      at: alongX ? [x0, y, offset(z0)] : [offset(x0), y, z0],
+      yaw: 0,
+      tags: ['rope', 'bridge'],
+      properties: { material: { id: 'rope' } },
+      rope: {
+        to: alongX ? [x1, y, offset(z0)] : [offset(x0), y, z1],
+        support: { rating: bridge.rating, resistances: bridge.resistances, span },
+      },
+    });
+  });
+  for (let i = 0; i < bridge.planks; i++) {
+    const along = (run * (i + 0.5)) / bridge.planks;
+    out.push({
+      id: `${span}-plank-${String(i + 1)}`,
+      at: alongX ? [x0 + along, y0, z0] : [x0, y0, z0 + along],
+      yaw: alongX ? 90 : 0,
+      prop: bridge.plank,
+      tags: ['bridge-plank'],
+      suspendedFrom: ropeIds[0],
+    });
+  }
+  return out;
 }
 
 function layoutPart(
@@ -662,6 +911,27 @@ function plateOf(spec: ScenePlateSpec): ScenePlateSpec {
   });
 }
 
+/** A prop's push rules without absent fields. */
+function pushOf(spec: ScenePushSpec): ScenePushSpec {
+  return Object.freeze({
+    ...(spec.axis !== undefined && { axis: Object.freeze([spec.axis[0], spec.axis[1]] as const) }),
+    ...(spec.grid !== undefined && { grid: spec.grid }),
+    ...(spec.rotateStep !== undefined && { rotateStep: spec.rotateStep }),
+  });
+}
+
+/** A liquid volume's data: its size (metres already) and its liquid by id. */
+function liquidOf(spec: SceneLiquidSpec): NonNullable<SceneSpawnPlacement['liquid']> {
+  return Object.freeze({
+    size: Object.freeze({ x: spec.size[0], y: spec.size[1], z: spec.size[2] }),
+    liquid: spec.liquid.id,
+    depth: spec.depth,
+    ...(spec.drain !== undefined && {
+      drain: Object.freeze({ rate: spec.drain.rate, open: spec.drain.open }),
+    }),
+  });
+}
+
 /** An impact switch's data without absent fields. */
 function impactSwitchOf(spec: SceneImpactSwitchSpec): SceneImpactSwitchSpec {
   return Object.freeze({
@@ -685,7 +955,14 @@ function containerOf(spec: SceneContainerSpec): SceneContainer {
     ),
     ...(spec.lock !== undefined && { lock: spec.lock.id }),
     ...(spec.locked !== undefined && { locked: spec.locked }),
+    ...(spec.stash !== undefined && { stashKg: spec.stash.capacityKg }),
   });
+}
+
+/** A hiding spot's data-file form: only what the file set. */
+function hidingOf(spec: SceneHidingSpec): SceneHiding {
+  const set = Object.entries(spec).filter(([, value]) => value !== undefined);
+  return Object.freeze(Object.fromEntries(set));
 }
 
 /**
@@ -746,6 +1023,24 @@ function sceneRoutes(scene: SceneSpec): Map<string, PatrolRoute> {
     );
   }
   return routes;
+}
+
+/** The conditions that gate a spawn, when it has any (mw-e27.8), as a spread for the placement. */
+function gateOf(spawn: SceneSpawnSpec): { readonly gate: SpawnGate } | undefined {
+  const { spawnIf, despawnIf, variant, swapInView } = spawn;
+  if (spawnIf === undefined && despawnIf === undefined && variant === undefined) return undefined;
+  const gate: SpawnGate = Object.freeze({
+    ...(spawnIf !== undefined && { spawnIf }),
+    ...(despawnIf !== undefined && { despawnIf }),
+    ...(variant !== undefined && {
+      variant: Object.freeze({
+        group: variant.group,
+        ...(variant.when !== undefined && { when: variant.when }),
+      }),
+    }),
+    ...(swapInView === true && { swapInView }),
+  });
+  return { gate };
 }
 
 /** A spawn's routine with its routes resolved (mw-e11.9). */
@@ -809,67 +1104,79 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
     );
   });
   const routes = sceneRoutes(scene);
-  const spawns = scene.spawns.map((spawn) =>
-    Object.freeze({
-      id: spawn.id,
-      position: gridToWorld(spawn.at, scene.grid),
-      yaw: spawn.yaw,
-      rotation: ROTATIONS[spawn.yaw],
-      prop: spawn.prop?.id,
-      tags: Object.freeze([...spawn.tags]),
-      interact: spawn.interact,
-      targetable: spawn.targetable?.id,
-      ...(spawn.item !== undefined && {
-        item: Object.freeze({ id: spawn.item.id.id, count: spawn.item.count }),
-      }),
-      ...(spawn.creature !== undefined && { creature: spawn.creature.id }),
-      ...(spawn.faction !== undefined && { faction: spawn.faction.id }),
-      ...(spawn.patrol !== undefined && {
-        patrol: Object.freeze(spawn.patrol.map((at) => gridToWorld(at, scene.grid))),
-      }),
-      ...(spawn.routine !== undefined && {
-        routine: routineOf(scene, routes, spawn, spawn.routine),
-      }),
-      ...(spawn.leash !== undefined && {
-        leash: Object.freeze({
-          radius: spawn.leash.radius,
-          post: gridToWorld(spawn.leash.post ?? spawn.at, scene.grid),
+  const spawns = scene.spawns
+    .flatMap((spawn) => expandBridge(spawn, scene.grid))
+    .map((spawn) =>
+      Object.freeze({
+        id: spawn.id,
+        position: gridToWorld(spawn.at, scene.grid),
+        yaw: spawn.yaw,
+        rotation: ROTATIONS[spawn.yaw],
+        prop: spawn.prop?.id,
+        tags: Object.freeze([...spawn.tags]),
+        interact: spawn.interact,
+        targetable: spawn.targetable?.id,
+        ...(spawn.item !== undefined && {
+          item: Object.freeze({ id: spawn.item.id.id, count: spawn.item.count }),
         }),
-      }),
-      ...(spawn.repopulate !== undefined && {
-        repopulate: Object.freeze({ afterDays: spawn.repopulate.afterDays }),
-      }),
-      ...(spawn.presence !== undefined && {
-        presence: Object.freeze({ phases: Object.freeze([...spawn.presence.phases]) }),
-      }),
-      ...(spawn.carries !== undefined && {
-        carries: Object.freeze(
-          spawn.carries.map(({ item, count }) => Object.freeze({ item: item.id, count })),
-        ),
-      }),
-      ...(spawn.properties !== undefined && { properties: spawn.properties }),
-      ...(spawn.recovery !== undefined && { recovery: gridToWorld(spawn.recovery, scene.grid) }),
-      ...(spawn.breakable !== undefined && { breakable: breakableOf(spawn.breakable) }),
-      ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
-      ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
-      ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
-      ...(spawn.lightSource !== undefined && {
-        lightSource: Object.freeze({ ...spawn.lightSource }),
-      }),
-      ...(spawn.impactSwitch !== undefined && { impactSwitch: impactSwitchOf(spawn.impactSwitch) }),
-      ...(spawn.beamEmitter !== undefined && { beamEmitter: definedOf(spawn.beamEmitter) }),
-      ...(spawn.optic !== undefined && { optic: definedOf(spawn.optic) }),
-      ...(spawn.lightReceiver !== undefined && { lightReceiver: definedOf(spawn.lightReceiver) }),
-      ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
-      ...(spawn.rope !== undefined && {
-        rope: Object.freeze({
-          length: spawn.rope.length,
-          ...(spawn.rope.radius !== undefined && { radius: spawn.rope.radius }),
+        ...(spawn.owner !== undefined && { owner: spawn.owner }),
+        ...(spawn.creature !== undefined && { creature: spawn.creature.id }),
+        ...(spawn.faction !== undefined && { faction: spawn.faction.id }),
+        ...(spawn.patrol !== undefined && {
+          patrol: Object.freeze(spawn.patrol.map((at) => gridToWorld(at, scene.grid))),
         }),
+        ...(spawn.routine !== undefined && {
+          routine: routineOf(scene, routes, spawn, spawn.routine),
+        }),
+        ...(spawn.leash !== undefined && {
+          leash: Object.freeze({
+            radius: spawn.leash.radius,
+            post: gridToWorld(spawn.leash.post ?? spawn.at, scene.grid),
+          }),
+        }),
+        ...(spawn.repopulate !== undefined && {
+          repopulate: Object.freeze({ afterDays: spawn.repopulate.afterDays }),
+        }),
+        ...(spawn.presence !== undefined && {
+          presence: Object.freeze({
+            ...(spawn.presence.phases !== undefined && {
+              phases: Object.freeze([...spawn.presence.phases]),
+            }),
+            ...(spawn.presence.hours !== undefined && {
+              hours: Object.freeze([...spawn.presence.hours] as [number, number]),
+            }),
+          }),
+        }),
+        ...gateOf(spawn),
+        ...(spawn.carries !== undefined && {
+          carries: Object.freeze(
+            spawn.carries.map(({ item, count }) => Object.freeze({ item: item.id, count })),
+          ),
+        }),
+        ...(spawn.properties !== undefined && { properties: spawn.properties }),
+        ...(spawn.recovery !== undefined && { recovery: gridToWorld(spawn.recovery, scene.grid) }),
+        ...(spawn.breakable !== undefined && { breakable: breakableOf(spawn.breakable) }),
+        ...(spawn.door !== undefined && { door: doorOf(spawn.door) }),
+        ...(spawn.switch !== undefined && { switch: switchOf(spawn.switch) }),
+        ...(spawn.plate !== undefined && { plate: plateOf(spawn.plate) }),
+        ...(spawn.push !== undefined && { push: pushOf(spawn.push) }),
+        ...(spawn.liquid !== undefined && { liquid: liquidOf(spawn.liquid) }),
+        ...(spawn.lightSource !== undefined && {
+          lightSource: Object.freeze({ ...spawn.lightSource }),
+        }),
+        ...(spawn.impactSwitch !== undefined && {
+          impactSwitch: impactSwitchOf(spawn.impactSwitch),
+        }),
+        ...(spawn.beamEmitter !== undefined && { beamEmitter: definedOf(spawn.beamEmitter) }),
+        ...(spawn.optic !== undefined && { optic: definedOf(spawn.optic) }),
+        ...(spawn.lightReceiver !== undefined && { lightReceiver: definedOf(spawn.lightReceiver) }),
+        ...(spawn.container !== undefined && { container: containerOf(spawn.container) }),
+        ...(spawn.hiding !== undefined && { hiding: hidingOf(spawn.hiding) }),
+        ...(spawn.bulky !== undefined && { bulky: spawn.bulky }),
+        ...(spawn.rope !== undefined && { rope: ropeOf(spawn, scene.grid) }),
+        ...(spawn.suspendedFrom !== undefined && { suspendedFrom: spawn.suspendedFrom }),
       }),
-      ...(spawn.suspendedFrom !== undefined && { suspendedFrom: spawn.suspendedFrom }),
-    }),
-  );
+    );
   return Object.freeze({
     id: scene.id,
     pieces: Object.freeze(pieces),
@@ -892,6 +1199,17 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           min: gridToWorld(r.min, scene.grid),
           max: gridToWorld(r.max, scene.grid),
           tags: Object.freeze([...r.tags]),
+        }),
+      ),
+    ),
+    surfaces: Object.freeze(
+      (scene.surfaces ?? []).map((r) =>
+        Object.freeze({
+          id: r.id,
+          min: gridToWorld(r.min, scene.grid),
+          max: gridToWorld(r.max, scene.grid),
+          surface: r.surface,
+          priority: r.priority,
         }),
       ),
     ),

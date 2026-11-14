@@ -174,6 +174,18 @@ export function describeCollisionWorldContract(label: string, makeWorld: MakeCon
       });
     });
 
+    describe('isStatic (mw-e04.15)', () => {
+      it('is true for level geometry and false for a collider that moves', () => {
+        const platform: GreyboxShape = { ...box(v(0, 0, 0), v(2, 0.2, 2)), velocity: v(1.5, 0, 0) };
+        const { world, bodies } = makeWorld([FLOOR, platform]);
+        const [floor = 0, moving = 0] = bodies;
+        const asked = world as Required<CollisionWorld>;
+        expect(asked.isStatic(floor)).toBe(true);
+        expect(asked.isStatic(moving)).toBe(false);
+        expect(asked.isStatic(9999)).toBe(false);
+      });
+    });
+
     describe('bodyVelocity', () => {
       it('is zero for static colliders and the set velocity for moving ones', () => {
         const platform: GreyboxShape = { ...box(v(0, 0, 0), v(2, 0.2, 2)), velocity: v(1.5, 0, 0) };

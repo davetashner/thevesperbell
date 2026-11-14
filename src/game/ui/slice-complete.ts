@@ -70,6 +70,11 @@ export class SliceCompleteController {
         this.#returnWanted = true;
         this.#leave();
       },
+      // Walking on into the valley (mw-e24.21): the card closes and, the fact being already true,
+      // never opens again; a pending save line keeps updating in the (now closed) card harmlessly.
+      onContinue: () => {
+        this.#card?.screen.close();
+      },
     });
     this.#options.publish?.('shown');
   }

@@ -1,0 +1,787 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "knot-inner",
+  "name": "The Knot: Horn's Hall, the Fold, the Cradle and the Shaft's foot",
+  "description": "Bead mw-e26.10: the inner half of the labyrinth as one connected greybox (about 100 x 175 m, one level). Through the Chapel landing (knot-outer horns-door, back to knot-outer arrive-from-knot-inner; arrive-from-knot-outer) a vestibule opens into Horn's Hall (horns-hall): an 80 x 60 m arena, 9 m tall, with pillars, four Hornfolk statues with their hands over their ears and Horn's post (horn-post; the Warden encounter is mw-e26.16). In the hall's west wall a doorway (fold-door) leads to the Fold (the-fold): a dead-end vault with six moss-bed markers and the chalk tallies, the one door of the respawn design. A second west doorway runs to the sealed crypt passage (crypt-passage, crypt-door locked with the priory's crypt-sealed lock, crypt-passage-end beyond it) that will rise to Bellwater Priory (mw-e26.20). North, a corridor (cradle-gate) leads to the Cradle (the-cradle): a 48 m chamber ringed by sixteen pillars with eight carved faces turned inward, the abbot's stage at the centre (cradle-centre, mw-e26.17), the last friend-below note and a doorway in the north wall to the Sounding Shaft's foot (sounding-shaft-foot; shaft-mouth, the climb is mw-e26.18). A secret way (route:horns-hall-cradle-secret) leaves the hall's east wall through a stone door sealed with a Hornfolk seal (hornfolk-door, lock hornfolk-seal, the runes of hornfolk-wall beside it) and runs round to the Cradle's east doorway (cradle-east-door): a wall until the seal is dispelled.",
+  "grid": 1,
+  "camera": {
+    "position": [90, 70, -40],
+    "target": [90, 0, 90]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [90, 0, 7],
+      "scale": [8, 1, 7]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0, 0],
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [82, 0, 7.0],
+      "yaw": 90,
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [98, 0, 7.0],
+      "yaw": 90,
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [90, 0, 44],
+      "scale": [40, 1, 30]
+    },
+    {
+      "piece": "wall",
+      "at": [66.0, 0, 14],
+      "scale": [16.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [114.0, 0, 14],
+      "scale": [16.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [50, 0, 17.5],
+      "yaw": 90,
+      "scale": [3.5, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [50, 0, 33.0],
+      "yaw": 90,
+      "scale": [10.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [50, 0, 59.5],
+      "yaw": 90,
+      "scale": [14.5, 3.0, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [50, 0, 22],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [50, 3, 22],
+      "yaw": 90,
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [50, 0, 44],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [50, 3, 44],
+      "yaw": 90,
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [130, 0, 35.5],
+      "yaw": 90,
+      "scale": [21.5, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [130, 0, 66.5],
+      "yaw": 90,
+      "scale": [7.5, 3.0, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [130, 0, 58],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [130, 3, 58],
+      "yaw": 90,
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [69.0, 0, 74],
+      "scale": [19.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [111.0, 0, 74],
+      "scale": [19.0, 3.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [66, 0, 26]
+    },
+    {
+      "piece": "pillar",
+      "at": [66, 0, 38]
+    },
+    {
+      "piece": "pillar",
+      "at": [66, 0, 50]
+    },
+    {
+      "piece": "pillar",
+      "at": [66, 0, 62]
+    },
+    {
+      "piece": "pillar",
+      "at": [114, 0, 26]
+    },
+    {
+      "piece": "pillar",
+      "at": [114, 0, 38]
+    },
+    {
+      "piece": "pillar",
+      "at": [114, 0, 50]
+    },
+    {
+      "piece": "pillar",
+      "at": [114, 0, 62]
+    },
+    {
+      "piece": "floor",
+      "at": [35, 0, 45],
+      "scale": [15, 1, 11]
+    },
+    {
+      "piece": "wall",
+      "at": [20, 0, 45.0],
+      "yaw": 90,
+      "scale": [11.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [35.0, 0, 34],
+      "scale": [15.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [35.0, 0, 56],
+      "scale": [15.0, 1.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 22],
+      "scale": [8, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [42.0, 0, 20],
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [42.0, 0, 24],
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [34, 0, 20.5],
+      "yaw": 90,
+      "scale": [0.5, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [34, 0, 23.5],
+      "yaw": 90,
+      "scale": [0.5, 1.5, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [34, 0, 22],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [34, 3, 22],
+      "yaw": 90,
+      "scale": [1, 0.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [31, 0, 22],
+      "scale": [3, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [31.0, 0, 20],
+      "scale": [3.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [31.0, 0, 24],
+      "scale": [3.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28, 0, 22.0],
+      "yaw": 90,
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [90, 0, 87],
+      "scale": [4, 1, 13]
+    },
+    {
+      "piece": "wall",
+      "at": [86, 0, 87.0],
+      "yaw": 90,
+      "scale": [13.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [94, 0, 87.0],
+      "yaw": 90,
+      "scale": [13.0, 1.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [90, 0, 124],
+      "scale": [24, 1, 24]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, 0, 100],
+      "scale": [10.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [104.0, 0, 100],
+      "scale": [10.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.5, 0, 148],
+      "scale": [11.5, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [102.5, 0, 148],
+      "scale": [11.5, 3.0, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [90, 0, 148]
+    },
+    {
+      "piece": "wall",
+      "at": [90, 3, 148],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [66, 0, 124.0],
+      "yaw": 90,
+      "scale": [24.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [114, 0, 111.5],
+      "yaw": 90,
+      "scale": [11.5, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [114, 0, 136.5],
+      "yaw": 90,
+      "scale": [11.5, 3.0, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [114, 0, 124],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [114, 3, 124],
+      "yaw": 90,
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [90.0, 0, 138.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [95.25, 0, 137.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [100.0, 0, 134.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [103.0, 0, 129.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [104.0, 0, 124.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [103.0, 0, 118.75]
+    },
+    {
+      "piece": "pillar",
+      "at": [100.0, 0, 114.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [95.25, 0, 111.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [90.0, 0, 110.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [84.75, 0, 111.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [80.0, 0, 114.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [77.0, 0, 118.75]
+    },
+    {
+      "piece": "pillar",
+      "at": [76.0, 0, 124.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [77.0, 0, 129.25]
+    },
+    {
+      "piece": "pillar",
+      "at": [80.0, 0, 134.0]
+    },
+    {
+      "piece": "pillar",
+      "at": [84.75, 0, 137.0]
+    },
+    {
+      "piece": "floor",
+      "at": [90, 0, 160],
+      "scale": [10, 1, 12]
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 160.0],
+      "yaw": 90,
+      "scale": [12.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100, 0, 160.0],
+      "yaw": 90,
+      "scale": [12.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [90.0, 0, 172],
+      "scale": [10.0, 3.0, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [135, 0, 58],
+      "scale": [5, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [136.0, 0, 56],
+      "scale": [6.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [134.0, 0, 60],
+      "scale": [4.0, 1.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [140, 0, 90],
+      "scale": [2, 1, 34]
+    },
+    {
+      "piece": "wall",
+      "at": [142, 0, 91.0],
+      "yaw": 90,
+      "scale": [35.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [138, 0, 91.0],
+      "yaw": 90,
+      "scale": [31.0, 1.5, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [128, 0, 124],
+      "scale": [14, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [128.0, 0, 126],
+      "scale": [14.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [126.0, 0, 122],
+      "scale": [12.0, 1.5, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [90, 0, 10],
+      "yaw": 0,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "arrive-from-knot-outer",
+      "at": [90, 0, 6],
+      "yaw": 0,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "horns-door",
+      "at": [90, 0, 1],
+      "tags": ["transition"]
+    },
+    {
+      "id": "horns-hall",
+      "at": [90, 0, 34],
+      "tags": ["node", "hall"]
+    },
+    {
+      "id": "the-fold",
+      "at": [35, 0, 45],
+      "tags": ["node", "fold"]
+    },
+    {
+      "id": "the-cradle",
+      "at": [90, 0, 106],
+      "tags": ["node", "cradle"]
+    },
+    {
+      "id": "sounding-shaft-foot",
+      "at": [90, 0, 164],
+      "tags": ["node", "shaft"]
+    },
+    {
+      "id": "horn-post",
+      "at": [90, 0, 50],
+      "tags": ["encounter-stub", "horn"]
+    },
+    {
+      "id": "statue-ears-1",
+      "at": [56, 0, 20],
+      "tags": ["lore", "hornfolk-statue"]
+    },
+    {
+      "id": "statue-ears-2",
+      "at": [124, 0, 20],
+      "tags": ["lore", "hornfolk-statue"]
+    },
+    {
+      "id": "statue-ears-3",
+      "at": [56, 0, 68],
+      "tags": ["lore", "hornfolk-statue"]
+    },
+    {
+      "id": "statue-ears-4",
+      "at": [124, 0, 68],
+      "tags": ["lore", "hornfolk-statue"]
+    },
+    {
+      "id": "cradle-gate",
+      "at": [90, 0, 74],
+      "tags": ["route", "route:horns-hall-cradle"]
+    },
+    {
+      "id": "fold-door",
+      "at": [50, 0, 44],
+      "yaw": 90,
+      "tags": ["door-stub", "route:horns-hall-fold"]
+    },
+    {
+      "id": "fold-wake",
+      "at": [35, 0, 42],
+      "yaw": 90,
+      "tags": ["wake-point"]
+    },
+    {
+      "id": "moss-bed-1",
+      "at": [26, 0, 38],
+      "tags": ["lore", "moss-bed"]
+    },
+    {
+      "id": "moss-bed-2",
+      "at": [26, 0, 45],
+      "tags": ["lore", "moss-bed"]
+    },
+    {
+      "id": "moss-bed-3",
+      "at": [26, 0, 52],
+      "tags": ["lore", "moss-bed"]
+    },
+    {
+      "id": "moss-bed-4",
+      "at": [32, 0, 38],
+      "tags": ["lore", "moss-bed"]
+    },
+    {
+      "id": "moss-bed-5",
+      "at": [32, 0, 52],
+      "tags": ["lore", "moss-bed"]
+    },
+    {
+      "id": "moss-bed-6",
+      "at": [44, 0, 38],
+      "tags": ["lore", "moss-bed"]
+    },
+    {
+      "id": "read-fold-tallies",
+      "at": [48, 0, 40],
+      "tags": ["readable", "inscription-fold-tallies"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the chalk tallies by the door"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "crypt-passage",
+      "at": [42, 0, 22],
+      "tags": ["lore", "crypt-passage"]
+    },
+    {
+      "id": "crypt-door",
+      "at": [34, 0, 22],
+      "yaw": 90,
+      "tags": ["door-stub", "sealed", "planned:mw-e26.20"],
+      "door": {
+        "profile": "iron-door",
+        "lock": "crypt-sealed"
+      }
+    },
+    {
+      "id": "crypt-passage-end",
+      "at": [31, 0, 22],
+      "tags": ["sealed", "route:ossuary-crypt", "planned:mw-e26.20"]
+    },
+    {
+      "id": "hornfolk-wall",
+      "at": [126, 0, 58],
+      "yaw": 90,
+      "tags": [
+        "lore",
+        "readable",
+        "inscription-knot-carved-faces",
+        "route:horns-hall-cradle-secret"
+      ],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the runes cut round the stone door"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "hornfolk-door",
+      "at": [130, 0, 58],
+      "yaw": 90,
+      "tags": ["door-stub", "secret", "route:horns-hall-cradle-secret"],
+      "door": {
+        "profile": "sliding-door",
+        "lock": "hornfolk-seal"
+      }
+    },
+    {
+      "id": "hornfolk-way",
+      "at": [135, 0, 58],
+      "tags": ["lore", "secret-route"]
+    },
+    {
+      "id": "hornfolk-corner",
+      "at": [140, 0, 58],
+      "tags": ["lore", "secret-route"]
+    },
+    {
+      "id": "cradle-east-door",
+      "at": [114, 0, 124],
+      "yaw": 270,
+      "tags": ["route", "route:horns-hall-cradle-secret"]
+    },
+    {
+      "id": "cradle-view",
+      "at": [90, 0, 102],
+      "yaw": 0,
+      "tags": ["perf-view"]
+    },
+    {
+      "id": "read-friend-note-cradle",
+      "at": [82, 0, 104],
+      "tags": ["readable", "note-friend-below-cradle"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the last note, set down square on the floor"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "cradle-centre",
+      "at": [90, 0, 124],
+      "tags": ["stage-stub", "abbot"]
+    },
+    {
+      "id": "carved-face-1",
+      "at": [98.0, 0, 143.5],
+      "yaw": 180,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-2",
+      "at": [109.5, 0, 132.0],
+      "yaw": 270,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-3",
+      "at": [109.5, 0, 116.0],
+      "yaw": 270,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-4",
+      "at": [98.0, 0, 104.5],
+      "yaw": 0,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-5",
+      "at": [82.0, 0, 104.5],
+      "yaw": 0,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-6",
+      "at": [70.5, 0, 116.0],
+      "yaw": 90,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-7",
+      "at": [70.5, 0, 132.0],
+      "yaw": 90,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "carved-face-8",
+      "at": [82.0, 0, 143.5],
+      "yaw": 180,
+      "tags": ["lore", "carved-face"]
+    },
+    {
+      "id": "shaft-mouth",
+      "at": [90, 0, 166],
+      "tags": ["sounding-shaft", "climb-stub"]
+    },
+    {
+      "id": "shaft-door",
+      "at": [90, 0, 148],
+      "tags": ["route", "route:cradle-shaft-foot"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "knot-inner"
+    }
+  ],
+  "light": {
+    "ambient": 0.25,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.4, -1, 0.3],
+        "level": 0.3,
+        "reach": 80
+      }
+    ]
+  },
+  "environment": {
+    "sky": "#14120F",
+    "fog": {
+      "color": "#201D19",
+      "near": 16,
+      "far": 95
+    }
+  },
+  "regions": [
+    {
+      "id": "knot-inner",
+      "min": [14, -2, -2],
+      "max": [146, 14, 176],
+      "tags": ["region", "knot"]
+    },
+    {
+      "id": "horns-hall",
+      "min": [50, -1, 14],
+      "max": [130, 10, 74],
+      "tags": ["region", "hall"]
+    },
+    {
+      "id": "the-fold",
+      "min": [20, -1, 34],
+      "max": [50, 6, 56],
+      "tags": ["region", "fold"]
+    },
+    {
+      "id": "the-cradle",
+      "min": [66, -1, 100],
+      "max": [114, 10, 148],
+      "tags": ["region", "cradle"]
+    },
+    {
+      "id": "sounding-shaft-foot",
+      "min": [80, -1, 148],
+      "max": [100, 10, 172],
+      "tags": ["region", "shaft"]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "horns-door",
+      "min": [86, -1, 0.25],
+      "max": [94, 3, 1.75],
+      "scene": "knot-outer",
+      "spawn": "arrive-from-knot-inner"
+    }
+  ]
+}

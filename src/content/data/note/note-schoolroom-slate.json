@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-schoolroom-slate",
+  "title": "The schoolroom slate",
+  "author": "Mina Coles",
+  "notes": "Dressing for the empty schoolhouse (3.5; Mina is one of the six missing). Not wiped; the last lesson names the ox.",
+  "locations": ["place-briar-glen"],
+  "pages": [
+    {
+      "text": "Tomorrow: the ox beneath the hill. Who can tell me why the bell used to ring at dusk?\n\n(Written beneath, in a child's hand: so we can sleep.)"
+    }
+  ]
+}

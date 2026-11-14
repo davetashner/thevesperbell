@@ -41,6 +41,7 @@ export interface GamepadInput {
 export function attachGamepadInput(sampler: ActionSampler, host: GamepadHost): GamepadInput {
   let index: number | undefined;
   let enabled = true;
+  let wasLive = true;
   const poll = (): void => {
     let pads: readonly (GamepadLike | null)[] = [];
     try {
@@ -60,7 +61,11 @@ export function attachGamepadInput(sampler: ActionSampler, host: GamepadHost): G
       index = pad.index;
       host.onConnect?.(pad);
     }
-    sampler.gamepad(enabled && host.hasFocus() ? readPad(pad, sampler.gamepadSettings) : IDLE_PAD);
+    // Losing focus (or the debug camera taking the pad) lets toggled actions go, as it does for keys.
+    const live = enabled && host.hasFocus();
+    if (wasLive && !live) sampler.releaseToggles();
+    wasLive = live;
+    sampler.gamepad(live ? readPad(pad, sampler.gamepadSettings) : IDLE_PAD);
   };
   const remove = sampler.addPoller(poll);
   return {

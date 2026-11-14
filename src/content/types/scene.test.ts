@@ -157,6 +157,105 @@ describe('scene containers (mw-e18.3)', () => {
   });
 });
 
+describe('scene hiding spots and bodies (mw-e03.23)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
+
+  it('fills a hiding spot’s defaults and takes its greybox, noise and exit points', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('wardrobe', { yaw: 90, hiding: {} }),
+        spawn('hay', {
+          hiding: {
+            capacity: 2,
+            concealment: 0.5,
+            peek: false,
+            enterDb: 40,
+            exitDb: 30,
+            size: [1, 1, 1],
+            look: 'hay',
+            inside: [0, 0, 0.1],
+            eye: [0, 1.2, 0.2],
+            exits: [[0, 0, 1]],
+          },
+        }),
+      ],
+    });
+    expect(scene.spawns[0]?.hiding).toEqual({
+      capacity: 1,
+      concealment: 1,
+      peek: true,
+      look: 'wood',
+    });
+    expect(scene.spawns[1]?.hiding?.exits).toEqual([[0, 0, 1]]);
+  });
+
+  it('rejects a hiding spot that is also a container, door, switch, plate, item or creature, or declares a prompt', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('mimic', {
+            hiding: {},
+            container: {},
+            door: { profile: 'wooden-door' },
+            interact: { affordances: [{ verb: 'hide' }] },
+          }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.container: spawn "mimic" cannot be both a hiding spot and a container',
+        'spawns.0.door: spawn "mimic" cannot be both a hiding spot and a door',
+        'spawns.0.interact: spawn "mimic" is a hiding spot: its affordances follow who is inside, so it declares none',
+      ]),
+    );
+  });
+
+  it('rejects a spot with no capacity, a concealment over 1, no exits or an exit far away', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('a', { hiding: { capacity: 0 } }),
+          spawn('b', { hiding: { concealment: 1.5 } }),
+          spawn('c', { hiding: { exits: [] } }),
+          spawn('d', { hiding: { exits: [[0, 0, 9]] } }),
+        ],
+      }),
+    ).toHaveLength(4);
+  });
+
+  it('takes room for bodies on a container and a bulky mark on a prop, but not on a spawn that is no prop', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('chest', { container: { stash: { capacityKg: 60 } } }),
+        spawn('body', { prop: 'limp-body', bulky: 'body' }),
+      ],
+    });
+    expect(scene.spawns[0]?.container?.stash).toEqual({ capacityKg: 60 });
+    expect(scene.spawns[1]?.bulky).toBe('body');
+    expect(problems({ ...room, spawns: [spawn('lump', { bulky: 'body' })] })).toEqual([
+      'spawns.0.bulky: spawn "lump" is carried but is not a movable prop',
+    ]);
+    expect(
+      problems({ ...room, spawns: [spawn('c', { container: { stash: { capacityKg: 0 } } })] }),
+    ).toHaveLength(1);
+  });
+
+  it('places the hiding room’s wardrobe, haystack and barrel, its body chest and its two bodies', () => {
+    const content = loadContent(contentTypes, gameContentSources(), contentChecks);
+    const spawns = content.get('scene', 'hiding-room').spawns;
+    const named = (id: string) => spawns.find((s) => s.id === id);
+    expect(named('hiding-wardrobe')?.hiding?.concealment).toBe(1);
+    expect(named('hiding-haystack')?.hiding?.look).toBe('hay');
+    expect(named('hiding-barrel')?.hiding?.peek).toBe(false);
+    expect(named('body-chest')?.container?.stash?.capacityKg).toBe(60);
+    expect(named('limp-body-a')?.bulky).toBe('body');
+  });
+});
+
 describe('scene pressure plates (mw-e03.19)', () => {
   const spawn = (id: string, extra: object) => ({ id, at: [0, 0, 0], ...extra });
 
@@ -185,6 +284,56 @@ describe('scene pressure plates (mw-e03.19)', () => {
       mode: 'momentary',
       hidden: false,
     });
+  });
+
+  it('mw-e15.4: push rules and liquid volumes fill their defaults and are checked', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('statue', { prop: 'crate', push: { rotateStep: 90 } }),
+        spawn('basin', {
+          liquid: { size: [2, 1, 2], liquid: 'water', depth: 0.5, drain: { rate: 0.1 } },
+        }),
+      ],
+    });
+    expect(scene.spawns[0]?.push).toEqual({ rotateStep: 90 });
+    expect(scene.spawns[1]?.liquid?.drain).toEqual({ rate: 0.1, open: false });
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('floating', { push: { grid: 1 } }),
+          spawn('empty', { prop: 'crate', push: {} }),
+          spawn('slanted', { prop: 'crate', push: { axis: [1, 1] } }),
+          spawn('brim', { liquid: { size: [2, 1, 2], liquid: 'water', depth: 2 } }),
+          spawn('odd', {
+            prop: 'crate',
+            door: { profile: 'portcullis' },
+            switch: { kind: 'lever' },
+            plate: { minWeight: 5 },
+            item: { id: 'healing-draught' },
+            creature: 'forgotten-miner',
+            liquid: { size: [2, 1, 2], liquid: 'water', depth: 0.5 },
+          }),
+        ],
+      }),
+    ).toEqual([
+      'spawns.0.push: spawn "floating" has push rules but is not a movable prop',
+      'spawns.1.push: spawn "empty" sets no rail, grid or rotation step',
+      'spawns.2.push: spawn "slanted" has an axis that is not a unit vector',
+      'spawns.3.liquid: spawn "brim" starts deeper than its brim',
+      'spawns.4.switch: spawn "odd" cannot be both a door and a switch',
+      'spawns.4.door: spawn "odd" cannot be both a liquid volume and a door',
+      'spawns.4.switch: spawn "odd" cannot be both a liquid volume and a switch',
+      'spawns.4.plate: spawn "odd" cannot be both a liquid volume and a plate',
+      'spawns.4.prop: spawn "odd" cannot be both a liquid volume and a prop',
+      'spawns.4.item: spawn "odd" cannot be both a liquid volume and an item',
+      'spawns.4.creature: spawn "odd" cannot be both a liquid volume and a creature',
+      'spawns.4.door: spawn "odd" cannot be both a plate and a door',
+      'spawns.4.switch: spawn "odd" cannot be both a plate and a switch',
+      'spawns.4.item: spawn "odd" cannot be both a plate and an item',
+      'spawns.4.creature: spawn "odd" cannot be both a plate and a creature',
+    ]);
   });
 
   it('rejects a ceiling below the floor, and a plate that is also a door, switch, item, creature or container', () => {
@@ -547,6 +696,23 @@ describe('scene creature leashes (mw-e01.17)', () => {
   });
 });
 
+describe('scene spawn owners (mw-e27.9)', () => {
+  it('an item or a container can have an owner; a bare marker cannot', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          { id: 'loaf', at: [0, 0, 0], item: { id: 'rusted-gallery-key' }, owner: 'npc-ottilie' },
+          { id: 'box', at: [1, 0, 0], container: {}, owner: 'npc-ottilie' },
+          { id: 'marker', at: [2, 0, 0], owner: 'npc-ottilie' },
+        ],
+      }),
+    ).toEqual([
+      'spawns.2.owner: spawn "marker" has an owner but is neither an item nor a container',
+    ]);
+  });
+});
+
 describe('scene creature carries (mw-e01.5)', () => {
   it('lists items a placed creature carries, a unit by default; needs a creature, an item and at least one entry', () => {
     const spawns = [
@@ -600,6 +766,7 @@ describe('scene schema (mw-e00.21)', () => {
       waypoints: [],
       routes: [],
       regions: [],
+      surfaces: [],
       transitions: [],
     });
   });
@@ -811,29 +978,50 @@ describeContent(
 );
 
 describe('scene content', () => {
-  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College and the skeleton pen', () => {
+  it('ships the default testbed scene, the kit gallery, the combat sandbox, the lighting room, the weak-wall room, the mechanism room, the slice, the perf baseline, the valley spike scenes, the Marsh store, the Briar Glen shop lane, the Sleeping Ox, the Bridgeward College, the chandelier room, the skeleton pen, the recoil corridor and the puzzle prefab gallery', () => {
     expect(
       loadContent(contentTypes, gameContentSources(), contentChecks)
         .all('scene')
         .map((s) => s.id),
     ).toEqual([
+      'bellwater-priory',
+      'brazier-hall',
+      'briar-glen-green',
       'briar-glen-lane',
+      'briarwood',
       'bridgeward-college',
+      'chandelier-room',
+      'chimes',
       'combat-sandbox',
+      'dark-crossing',
+      'deepworks',
+      'frozen-channel',
+      'hiding-room',
       'kit-gallery',
+      'knot-inner',
+      'knot-outer',
       'lighting-room',
       'marsh-store',
       'mechanism-room',
+      'moorings-watch',
       'perf-baseline',
+      'prefab-gallery',
+      'recoil-corridor',
+      'scales-room',
       'skeleton-pen',
       'sleeping-ox',
       'slice',
+      'sunbeam-hall',
       'testbed',
       'under-the-bridge',
       'valley-01',
       'valley-02',
       'valley-03',
+      'variant-room',
+      'vertical-hall',
+      'watchers',
       'weak-wall-room',
+      'wendmouth-harbour',
     ]);
   });
 
@@ -879,6 +1067,29 @@ describe('scene content', () => {
   it('mw-e03.11: rejects a breakable naming no profile or an unknown key', () => {
     expect(sceneBreakableSchema.safeParse({}).success).toBe(false);
     expect(sceneBreakableSchema.safeParse({ profile: 'old-wall', hp: 3 }).success).toBe(false);
+  });
+});
+
+describe('scene surface regions (mw-e09.4)', () => {
+  const rug = { id: 'rug', min: [0, 0, 0], max: [2, 1, 2], surface: 'carpet' };
+
+  it('accepts tagged surface boxes, defaulting the priority, and none at all', () => {
+    const scene = sceneSchema.parse({ ...room, surfaces: [rug, { ...rug, id: 'p', priority: 4 }] });
+    expect(scene.surfaces.map((r) => [r.surface, r.priority])).toEqual([
+      ['carpet', 0],
+      ['carpet', 4],
+    ]);
+    expect(sceneSchema.parse(room).surfaces).toEqual([]);
+  });
+
+  it('rejects an unknown surface, an empty box and a duplicate id', () => {
+    expect(problems({ ...room, surfaces: [{ ...rug, surface: 'marble' }] })).toHaveLength(1);
+    expect(problems({ ...room, surfaces: [{ ...rug, max: [0, 1, 2] }] })).toEqual([
+      'surfaces.0.max: max must be above min on every axis',
+    ]);
+    expect(problems({ ...room, surfaces: [rug, rug] })).toEqual([
+      'surfaces.1.id: surface region id "rug" is used twice in this scene',
+    ]);
   });
 });
 
@@ -969,5 +1180,121 @@ describe('scene ropes and hanging props (mw-e05.13)', () => {
         'spawns.2.suspendedFrom: spawn "ghost" hangs from "missing", which is not a rope spawn of this scene',
       ]),
     );
+  });
+});
+
+describe('scene supports and rope bridges (mw-e03.13)', () => {
+  const spawn = (id: string, extra: object) => ({ id, at: [0, 3, 0], ...extra });
+  const bridge = (extra: object = {}) => ({
+    to: [6, 3, 0],
+    planks: 12,
+    plank: 'plank',
+    rating: 150,
+    width: 1.2,
+    ...extra,
+  });
+
+  it('takes a rope with support: a rating, resistances and a span, over a second anchor', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [
+        spawn('left', {
+          rope: {
+            to: [4, 3, 0],
+            support: { rating: 150, resistances: { pierce: 0.3 }, span: 'bridge' },
+          },
+        }),
+        spawn('chain', { rope: { length: 2, support: {} } }),
+      ],
+    });
+    expect(scene.spawns[0]?.rope?.support).toEqual({
+      rating: 150,
+      resistances: { pierce: 0.3 },
+      span: 'bridge',
+    });
+    expect(scene.spawns[1]?.rope?.support).toEqual({ resistances: {} });
+  });
+
+  it('rejects a rope with both or neither of length and to, a far anchor without support, a bad share', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('both', { rope: { length: 2, to: [1, 3, 0] } }),
+          spawn('neither', { rope: {} }),
+          spawn('loose', { rope: { to: [3, 3, 0] } }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.rope: spawn "both" needs exactly one of length and to',
+        'spawns.1.rope: spawn "neither" needs exactly one of length and to',
+        'spawns.2.rope: spawn "loose" runs to another point but has no support: a cuttable rope hangs straight down',
+      ]),
+    );
+    expect(
+      problems({
+        ...room,
+        spawns: [spawn('hot', { rope: { length: 2, support: { resistances: { pierce: 1.5 } } } })],
+      }),
+    ).toEqual([expect.stringMatching(/^spawns\.0\.rope\.support\.resistances\.pierce: /)]);
+  });
+
+  it('takes a rope bridge spawn, level and along x or z', () => {
+    const scene = sceneSchema.parse({
+      ...room,
+      spawns: [spawn('span', { bridge: bridge({ resistances: { pierce: 0.3 } }) })],
+    });
+    expect(scene.spawns[0]?.bridge).toMatchObject({ planks: 12, rating: 150, width: 1.2 });
+    expect(scene.spawns[0]?.bridge?.resistances).toEqual({ pierce: 0.3 });
+  });
+
+  it('rejects a bridge that climbs, runs diagonally or nowhere, or is also something else', () => {
+    expect(
+      problems({
+        ...room,
+        spawns: [
+          spawn('up', { bridge: bridge({ to: [6, 4, 0] }) }),
+          spawn('diagonal', { bridge: bridge({ to: [6, 3, 6] }) }),
+          spawn('nowhere', { bridge: bridge({ to: [0, 3, 0] }) }),
+          spawn('both', { bridge: bridge(), rope: { length: 1 }, prop: 'barrel' }),
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'spawns.0.bridge: spawn "up" must run level: `to` is at another height',
+        'spawns.1.bridge: spawn "diagonal" must run along x or z, and be longer than nothing',
+        'spawns.2.bridge: spawn "nowhere" must run along x or z, and be longer than nothing',
+        'spawns.3.rope: spawn "both" cannot be both a rope bridge and a rope',
+        'spawns.3.prop: spawn "both" cannot be both a rope bridge and a prop',
+      ]),
+    );
+  });
+
+  it('ships the chandelier room: a chandelier and an anvil on supports, over a rated rope bridge', () => {
+    const scene = loadContent(contentTypes, gameContentSources(), contentChecks).get(
+      'scene',
+      'chandelier-room',
+    );
+    const byId = new Map(scene.spawns.map((s) => [s.id, s]));
+    expect(byId.get('chandelier')?.suspendedFrom).toBe('chandelier-rope');
+    expect(byId.get('anvil')?.suspendedFrom).toBe('anvil-rope');
+    expect(byId.get('chandelier-rope')?.rope?.support?.resistances.pierce).toBe(0.3);
+    expect(byId.get('rope-bridge')?.bridge).toMatchObject({ planks: 12, rating: 150 });
+  });
+
+  it('ships the vertical hall: a ladder, a rough face and a rope hook up to a 5 m rafter platform (mw-e10.9)', () => {
+    const scene = loadContent(contentTypes, gameContentSources(), contentChecks).get(
+      'scene',
+      'vertical-hall',
+    );
+    const grades = scene.placements.flatMap((p) =>
+      p.purpose === 'climbable' ? [p.properties?.climbable] : [],
+    );
+    expect(grades).toEqual(['ladder', 'rough']);
+    const hook = scene.spawns.find((s) => s.tags.includes('rope-anchor'));
+    expect(hook?.at).toEqual([3.75, 5, 2.25]);
+    expect(hook?.interact?.affordances.map((a) => a.verb)).toEqual(['climb', 'release']);
+    expect(scene.spawns.find((s) => s.item?.id.id === 'climbing-rope')).toBeDefined();
   });
 });

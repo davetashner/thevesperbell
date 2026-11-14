@@ -1,0 +1,18 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "climbing-rope",
+  "category": "tool",
+  "name": "Climbing rope",
+  "description": "Six metres of hemp with a grapple knot at one end. Tie it off up high and everyone after you has a way up.",
+  "notes": "A placeable rope (mw-e10.9): Interact at a level's rope anchor ties it (spends one), Interact on the tied rope unties it and gives it back. It hangs 6 m from the anchor and climbs like any rope (ladder-easy, quiet); creatures that climb get an off-mesh link up it while it hangs. Not equippable. Placeholder icon shared with the rope arrow until its own is made.",
+  "icon": "icon-item-rope-arrow-01",
+  "value": 15,
+  "stackable": true,
+  "maxStack": 5,
+  "worldProperties": {
+    "material": "rope"
+  },
+  "rope": {
+    "length": 6
+  }
+}

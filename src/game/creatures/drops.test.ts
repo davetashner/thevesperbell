@@ -6,6 +6,7 @@ import { loadGameContent } from '@content/game-content';
 import type { GameContent } from '@content/index';
 import { prepareWorldItems } from '@game/items/index';
 import {
+  ArrowRestComponent,
   box,
   CREATURE_COMPONENTS,
   CreatureComponent,
@@ -61,10 +62,13 @@ const SPAWNS: SceneSpawnPlacement[] = [
   },
 ];
 
-function dropsOnDeath(source: Pick<GameContent, 'all'>): (string | undefined)[] {
+function dropsOnDeath(
+  source: Pick<GameContent, 'all'>,
+  arrows: readonly string[] = [],
+): (string | undefined)[] {
   const physics = new RapierPhysics(RAPIER);
   const world = installStimuli(registerWorldProperties(new World<never>({ seed: 3, physics })));
-  world.register(...CREATURE_COMPONENTS);
+  world.register(...CREATURE_COMPONENTS, ArrowRestComponent);
   installPhysicsObjects(world);
   physics.add(box({ x: -10, y: -1, z: -10 }, { x: 10, y: 0, z: 10 }));
   const items = prepareWorldItems(content);
@@ -83,6 +87,19 @@ function dropsOnDeath(source: Pick<GameContent, 'all'>): (string | undefined)[] 
     tuning: {},
     needs: {},
   });
+  for (const arrow of arrows) {
+    const stuck = world.spawn();
+    world.add(stuck, ArrowRestComponent, {
+      arrow,
+      shooter: null,
+      state: 'stuck',
+      position: { x: 0, y: 1, z: 0 },
+      direction: { x: 0, y: 0, z: 1 },
+      in: skeleton,
+      tick: 0,
+      intact: true,
+    });
+  }
   world.step([]);
   world.events.emit(Died, {
     tick: world.tick,
@@ -92,6 +109,7 @@ function dropsOnDeath(source: Pick<GameContent, 'all'>): (string | undefined)[] 
     tags: [],
   });
   world.events.flush();
+  world.step([]);
   stop();
   return world
     .query(WorldItemComponent)
@@ -109,6 +127,12 @@ describe('creature drops in the game (mw-e01.5)', () => {
     expect(dropped[0]).toBe('rusted-gallery-key');
     expect(dropped).toContain('gold');
     expect(dropped.every((id) => id !== undefined)).toBe(true);
+  });
+
+  it('mw-e05.7 AC-4: the intact arrows stuck in it drop as the ammo items of their types', () => {
+    const dropped = dropsOnDeath(withoutLoot, ['standard', 'standard', 'rope', 'water']);
+    // The water arrow comes back as a standard arrow, so three standard arrows stack as one drop.
+    expect(dropped.sort()).toEqual(['rope-arrow', 'rusted-gallery-key', 'standard-arrow']);
   });
 
   it('rolls the creature’s content loot table after what it carries', () => {

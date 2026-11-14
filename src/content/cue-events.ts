@@ -121,6 +121,13 @@ export const CUE_EVENTS = {
     anchors: ['entity', 'instigator', 'source'],
     facts: { shield: 'string' },
   },
+  WallRecoil: {
+    /** `entity` is the fighter whose swing clanged off a wall, `at` the contact point (mw-e04.15). */
+    anchors: ['at', 'entity'],
+    /** Out of the wall, back towards the fighter. */
+    directions: ['hitNormal'],
+    facts: { move: 'string' },
+  },
   DodgedHit: {
     /** `target` is the dodger (the swing whiffed through its i-frames), `attacker` who swung. */
     anchors: ['target', 'attacker'],
@@ -223,6 +230,12 @@ export const CUE_EVENTS = {
     anchors: ['entity'],
     /** `key` is the fact key or, for an `audio-cue` receiver, the cue id. */
     facts: { graph: 'string', node: 'string', receiver: 'string', key: 'string', value: 'boolean' },
+  },
+  soundClueCued: {
+    /** `entity` is the sound's source (a clue node's bound spawn), so the cue plays from it. */
+    anchors: ['entity'],
+    /** `cue` is the clue cue id, e.g. "chime-high"; `graph` and `node` name the emitter. */
+    facts: { graph: 'string', node: 'string', cue: 'string' },
   },
   volumeEntered: { anchors: ['entity'], facts: { graph: 'string', node: 'string' } },
   volumeExited: { anchors: ['entity'], facts: { graph: 'string', node: 'string' } },

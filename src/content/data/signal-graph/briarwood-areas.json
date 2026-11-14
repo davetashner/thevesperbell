@@ -1,0 +1,57 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "briarwood-areas",
+  "name": "Briarwood arrival volumes",
+  "notes": "Observed player volumes of the Briarwood scene (mw-heoa). The node ids are area ids: `briarwood` is the main trail from the town gate to the hub clearing, the way into the forest from Briar Glen (a visit trigger of the rumour book, place-briarwood), and `standing-horn` is the Standing Horn clearing in the west (place-standing-horn). No quest binds them.",
+  "nodes": [
+    {
+      "id": "briarwood",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 0,
+          "y": 1.5,
+          "z": 55
+        },
+        "halfExtents": {
+          "x": 10,
+          "y": 3,
+          "z": 55
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "standing-horn",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": -82,
+          "y": 1.5,
+          "z": 124
+        },
+        "halfExtents": {
+          "x": 10,
+          "y": 3,
+          "z": 10
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    }
+  ],
+  "wires": []
+}

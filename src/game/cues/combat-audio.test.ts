@@ -11,6 +11,7 @@ import {
   DodgedHit,
   GuardBroken,
   HitParried,
+  WallRecoil,
   registerWorldProperties,
   World,
   type DamageResult,
@@ -164,6 +165,25 @@ describe('combat impact audio (mw-e28.4)', () => {
     const hitPriority = priorityOf('sfx-blade-impact-flesh') ?? 0;
     expect(played[0]?.options.priority).toBeGreaterThan(hitPriority);
     expect(played[1]?.options.priority).toBeGreaterThan(played[0]?.options.priority ?? 100);
+  });
+
+  it('mw-e28.19 AC-2: a swing that recoils off a wall clangs at the contact point', () => {
+    const { world, played, spawn } = setup();
+    const knight = spawn('flesh');
+    world.step();
+    const point = { x: 2, y: 1.2, z: -4.5 };
+    world.events.emit(WallRecoil, {
+      tick: 1,
+      entity: knight,
+      move: 'sword-light-1',
+      activeTick: 1,
+      point,
+      normal: { x: 0, y: 0, z: 1 },
+      ticks: 30,
+    });
+    world.step();
+    expect(played.map((p) => p.cue)).toEqual(['sfx-knight-wall-recoil-clang']);
+    expect(played[0]?.options.position).toEqual(point);
   });
 
   it('mw-e28.16: a parry rings at the top voice priority, once, instead of the deflected hit’s impact', () => {

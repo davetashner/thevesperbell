@@ -12,11 +12,17 @@ export type FactDeclaration = GameEntry<'fact'>['facts'][number];
 
 /**
  * The store spec of a registry declaration (`default: null` = no default: unset until written), with
- * the keys it was saved under before (`renamedFrom`, mw-e27.4) when it has any.
+ * the keys it was saved under before (`renamedFrom`, mw-e27.4) and its persistence policy (mw-e27.7).
  */
 export function factSpecFromDef(def: FactDeclaration): FactSpec {
   const typed = def.type === 'enum' ? { type: def.type, values: def.values } : { type: def.type };
-  const spec = def.renamedFrom === undefined ? typed : { ...typed, renamedFrom: def.renamedFrom };
+  const named = def.renamedFrom === undefined ? typed : { ...typed, renamedFrom: def.renamedFrom };
+  const spec = {
+    ...named,
+    ...(def.persistence !== 'permanent' && { persistence: def.persistence }),
+    ...(def.resetAfter !== undefined && { resetAfter: def.resetAfter }),
+    ...(def.decaysTo !== undefined && { decaysTo: def.decaysTo }),
+  };
   return (def.default === null ? spec : { ...spec, default: def.default }) as FactSpec;
 }
 

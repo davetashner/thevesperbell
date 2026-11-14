@@ -17,13 +17,16 @@ import { addMaterialProperties, type MaterialPresets } from '../properties/mater
 import { installStimuli, stimulusSystem } from '../stimulus/stimulus';
 import {
   canAttachClimb,
+  BASE_CLIMB_DIFFICULTY,
   CLIMB_GRADE_RULES,
+  CLIMB_REFUSAL_TEXT,
   CLIMB_ICE_CAPABILITY,
   CLIMB_ROUGH_CAPABILITY,
   CLIMB_SHEER_CAPABILITY,
   climbabilityOf,
   climbabilityOfCollider,
   climbDifficulty,
+  maxClimbDifficulty,
   ownerOfCollider,
   type Climbability,
 } from './surfaces';
@@ -189,5 +192,46 @@ describe('climbability after fire (mw-e03.22 AC-3)', () => {
     burnOut(w, beam);
     expect(readProperty(w, beam, 'material')).toBe('charred');
     expect(climbabilityOf(w, beam)).toBe('none');
+  });
+});
+
+describe('climb difficulty by capability (mw-e10.9)', () => {
+  const GRANTS = new Map([
+    [CLIMB_ROUGH_CAPABILITY, 3],
+    ['verb.climb.sheer', 3],
+    ['tool.grip-gloves', 2],
+  ]);
+
+  it('AC-1/AC-2: the best difficulty is the highest a held capability grants, 1 with none', () => {
+    expect(BASE_CLIMB_DIFFICULTY).toBe(1);
+    expect(maxClimbDifficulty(THIEF, GRANTS)).toBe(3);
+    expect(maxClimbDifficulty(KNIGHT, GRANTS)).toBe(1);
+    expect(maxClimbDifficulty(['verb.climb.ledge'], GRANTS)).toBe(1);
+    expect(maxClimbDifficulty(['tool.grip-gloves', 'verb.climb.ledge'], GRANTS)).toBe(2);
+    expect(maxClimbDifficulty([...THIEF, 'tool.grip-gloves'], GRANTS)).toBe(3);
+  });
+
+  it('a grade harder than the actor’s best is refused first, with the numbers and a prompt', () => {
+    const w = world();
+    const wall = surface(w, { climbable: 'rough' });
+    const ladder = surface(w, { climbable: 'ladder' });
+    expect(canAttachClimb(w, wall, THIEF, 3)).toEqual({ ok: true, climbability: 'rough' });
+    expect(canAttachClimb(w, wall, THIEF, 1)).toEqual({
+      ok: false,
+      reason: 'too-difficult',
+      difficulty: 2,
+      max: 1,
+    });
+    // Without a limit the capability alone decides (the old rule); a ladder is always difficulty 1.
+    expect(canAttachClimb(w, wall, KNIGHT)).toMatchObject({ reason: 'needs-capability' });
+    expect(canAttachClimb(w, ladder, KNIGHT, 1).ok).toBe(true);
+    // A sheer face needs its capability even from a climber who can attempt difficulty 3.
+    const sheer = surface(w, { climbable: 'sheer' });
+    expect(canAttachClimb(w, sheer, THIEF, 3)).toMatchObject({ reason: 'needs-capability' });
+    // A frozen surface is about grip, not difficulty.
+    const ice = surface(w, { climbable: 'rough', frozen: true });
+    expect(canAttachClimb(w, ice, THIEF, 1)).toMatchObject({ reason: 'slippery' });
+    expect(CLIMB_REFUSAL_TEXT['too-difficult']).toBe('Too hard for you to climb');
+    for (const text of Object.values(CLIMB_REFUSAL_TEXT)) expect(text).not.toBe('');
   });
 });

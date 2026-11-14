@@ -1,0 +1,13 @@
+{
+  "$schema": "../door.schema.json",
+  "id": "bramble-barrier",
+  "name": "Bramble barrier (grey-box prefab)",
+  "notes": "A 4 m leaf of thorny briar that closes a gap in a Briarwood hedge (mw-e25.1). Ivy material (the briars of the material notes): flammable, cuttable and soft, so fire or a blade breaks it and the way behind it opens, for walkers and for the navmesh. Never opened by hand: nobody pushes through thorns. It shuts out nothing but the way.",
+  "kind": "hinged",
+  "size": [4, 2.4, 0.5],
+  "seconds": 1,
+  "manual": false,
+  "material": "ivy",
+  "blocks": { "light": false, "gas": false, "sound": false },
+  "loudness": 30
+}

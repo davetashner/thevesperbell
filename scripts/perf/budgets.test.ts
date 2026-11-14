@@ -10,6 +10,7 @@ import {
   evaluateAll,
   formatValue,
   loadBudgets,
+  measures,
   quoteOf,
   validateBudgets,
   type PerfBudget,
@@ -46,8 +47,23 @@ describe('perf budgets (mw-e32.1)', () => {
       { mode: 'ci', scene: 'perf-baseline', max: 0 },
       { mode: 'ci', scene: 'testbed', max: 0 },
     ]);
-    expect(budgets.filter((b) => b.metric === 'longTasksOver200ms')).toMatchObject([
-      { mode: 'reference', scene: 'perf-baseline', max: 0 },
+    expect(
+      budgets
+        .filter((b) => b.metric === 'longTasksOver200ms')
+        .map((b) => [b.mode, b.scene, b.preset, b.max]),
+    ).toEqual([
+      ['reference', 'perf-baseline', 'high', 0],
+      ...['valley-01', 'valley-02', 'valley-03'].flatMap((scene) =>
+        ['high', 'low'].map((preset) => ['reference', scene, preset, 0]),
+      ),
+      ['reference', 'briarwood', 'high', 0],
+      ['reference', 'briar-glen-green', 'high', 0],
+      ['reference', 'moorings-watch', 'high', 0],
+      ['reference', 'bellwater-priory', 'high', 0],
+      ['reference', 'deepworks', 'high', 0],
+      ['reference', 'knot-outer', 'high', 0],
+      ['reference', 'knot-inner', 'high', 0],
+      ['reference', 'wendmouth-harbour', 'high', 0],
     ]);
     expect(budgets.find((b) => b.id === 'frame-p95-high')).toMatchObject({
       max: 16.7,
@@ -55,6 +71,36 @@ describe('perf budgets (mw-e32.1)', () => {
       scene: 'perf-baseline',
       preset: 'high',
     });
+  });
+
+  it('mw-e02.8: input-to-motion latency (100 ms High, 133 ms Low at 30 fps) and controller and camera cost budgets', () => {
+    const result = validateBudgets(committed, contract);
+    const budgets = result.ok ? result.budgets : [];
+    const pick = (id: string) => budgets.find((b) => b.id === id);
+    expect(pick('input-to-motion-high')).toMatchObject({
+      metric: 'inputToMotionP95Ms',
+      mode: 'reference',
+      max: 100,
+      scene: 'testbed',
+      preset: 'high',
+    });
+    expect(pick('input-to-motion-low-30fps')).toMatchObject({
+      metric: 'inputToMotionP95Ms',
+      max: 133,
+      preset: 'low',
+    });
+    expect(pick('controller-tick-p95')).toMatchObject({ metric: 'controllerTickP95Ms', max: 0.3 });
+    expect(pick('camera-frame-p95')).toMatchObject({ metric: 'cameraFrameP95Ms', max: 0.2 });
+    // A High latency does not pass the Low budget, nor the reverse.
+    const [high, low] = [pick('input-to-motion-high'), pick('input-to-motion-low-30fps')];
+    const at = (preset: 'low' | 'high') => ({
+      metric: 'inputToMotionP95Ms' as const,
+      value: 1,
+      scene: 'testbed',
+      preset,
+    });
+    expect(high && measures(high, at('low'))).toBe(false);
+    expect(low && measures(low, at('low'))).toBe(true);
   });
 
   it('AC-6: a budget lacking a source citing the baseline fails validation', () => {
@@ -192,6 +238,60 @@ describe('perf budgets (mw-e32.1)', () => {
       ['initial-transfer', 1_000, true],
       ['frame-p95-high', 12, true],
     ]);
+  });
+});
+
+describe('presets (mw-ju8.2 AC-1)', () => {
+  const low = budget({
+    id: 'valley-01-frame-p95-low',
+    metric: 'frameP95Ms',
+    mode: 'reference',
+    max: 16.7,
+    scene: 'valley-01',
+    preset: 'low',
+  });
+  const high = { ...low, id: 'valley-01-frame-p95-high', preset: 'high' } as const;
+
+  it('AC-1: a budget with a preset judges only the measurement at that preset (none means High)', () => {
+    const at = (preset?: 'low' | 'high') => ({
+      metric: 'frameP95Ms' as const,
+      value: preset === 'low' ? 5 : 3,
+      scene: 'valley-01',
+      ...(preset === undefined ? {} : { preset }),
+    });
+    expect(measures(low, at('low'))).toBe(true);
+    expect(measures(low, at('high'))).toBe(false);
+    expect(measures(low, at())).toBe(false);
+    expect(measures(high, at())).toBe(true);
+    expect(measures(high, at('high'))).toBe(true);
+    expect(measures({ ...low, scene: 'valley-02' }, at('low'))).toBe(false);
+    expect(measures(budget({ preset: undefined }), { ...at('low'), metric: 'frameP95Ms' })).toBe(
+      false,
+    );
+    const results = evaluateAll([low, high], [at('high'), at('low')]);
+    expect(results.map((r) => [r.id, r.value])).toEqual([
+      ['valley-01-frame-p95-low', 5],
+      ['valley-01-frame-p95-high', 3],
+    ]);
+    expect(results[0]?.message).toContain('valley-01 at low');
+  });
+
+  it('AC-1: the committed budgets hold a p50, p95 and long-task budget per valley scene and preset', () => {
+    const result = validateBudgets(committed, contract);
+    const ids = new Set((result.ok ? result.budgets : []).map((b) => b.id));
+    for (const scene of ['valley-01', 'valley-02', 'valley-03']) {
+      for (const preset of ['high', 'low']) {
+        for (const metric of ['frame-p50', 'frame-p95', 'long-tasks']) {
+          expect(
+            ids.has(
+              metric === 'long-tasks'
+                ? `${scene}-long-tasks-${preset}`
+                : `${scene}-${metric}-${preset}`,
+            ),
+          ).toBe(true);
+        }
+      }
+    }
   });
 });
 

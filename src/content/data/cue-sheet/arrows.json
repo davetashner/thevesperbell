@@ -81,7 +81,8 @@
       "cue": "{sound}",
       "pitchJitter": 0.04,
       "priority": 55,
-      "caption": "caption.noise-rattle"
+      "caption": "caption.noise-rattle",
+      "gameplayCritical": true
     },
     {
       "event": "arrowImpact",

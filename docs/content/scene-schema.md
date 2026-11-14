@@ -28,6 +28,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `placements[].properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `placements[].properties.burning` | boolean | — | On fire right now. |
 | `placements[].properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `placements[].properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `placements[].properties.frozen` | boolean | — | Frozen solid. |
 | `placements[].properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `placements[].properties.conductive` | boolean | — | Conducts electric charge. |
@@ -95,7 +96,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].tags` | list of string | `[]` | Free-form tags for systems and tools. |
 | `spawns[].interact` | object | — | Makes the spawned entity interactable: its affordances (mw-e02.5). |
 | `spawns[].interact.affordances` | list of object (at least 1) | required | In priority order: Interact uses the first one the actor can. |
-| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"hide"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
+| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"stash"` \| `"hide"` \| `"leave"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
 | `spawns[].interact.affordances[].label` | string | — | Prompt text; defaults to the verb (e.g. "Pull"). |
 | `spawns[].interact.affordances[].hold` | number 0–10 | — | Seconds Interact must be held; 0 or omitted fires on press. |
 | `spawns[].interact.affordances[].requires` | list of object | — | Every one must hold for the actor to use it (else shown greyed with the reason). |
@@ -109,6 +110,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].item` | object | — | Places an item here as a world item the player can take, drop and throw (mw-e17.7). |
 | `spawns[].item.id` | ref → item | required | The item lying here. |
 | `spawns[].item.count` | integer 1–9999 | `1` | Units in the one world item (a pile of arrows); default 1. |
+| `spawns[].owner` | id | — | Whom the item or container here belongs to, a faction or NPC id (mw-e27.9): taking from it without permission flags the goods stolen and records a theft fact (needs item or container). |
 | `spawns[].creature` | ref → creature | — | Creature to spawn here (mw-e12.4); faces the spawn’s yaw. |
 | `spawns[].faction` | ref → faction | — | Faction the spawned creature joins instead of its definition’s (needs creature). |
 | `spawns[].patrol` | list of list of any (at least 3) (at least 1) | — | Patrol route for the spawned creature: waypoints in grid cells, walked in order (needs creature; AI, e11, walks it). |
@@ -120,8 +122,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].leash.post` | list of any (at least 3) | — | The post, grid cells; absent = the spawn point. |
 | `spawns[].repopulate` | object | — | Opts the spawned creature in to returning after it is killed (mw-ju8.29): it is spawned fresh at its origin when the scene next loads, or at once when the player is out of sight and far away. Not for bosses or gatekeepers (needs creature). |
 | `spawns[].repopulate.afterDays` | integer 1–365 | required | World days after the kill before the creature returns; 1 = once the player has slept through a night. |
-| `spawns[].presence` | object | — | The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene. |
-| `spawns[].presence.phases` | list of id (at least 1) | required | Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for. |
+| `spawns[].presence` | object | — | The spawn is only there during these phases of the day and/or hours of the clock (mw-ju8.14, mw-e27.12, mw-e24.13); with both, both must hold. Its creature is not spawned and its `interact` is switched off at any other time, and both come and go as the clock crosses a boundary while the player is in the scene. |
+| `spawns[].presence.phases` | list of id (at least 1) | — | Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for. |
+| `spawns[].presence.hours` | list of any (at least 2) | — | From and to, hours of the day, [from, to) (wraps past midnight when from > to): the spawn is there only inside this window of the world clock (mw-e24.13). A schedule is a creature’s spawns, each with its own window, across the scenes it moves between. |
+| `spawns[].spawnIf` | `condition` | — | The spawn exists only while this world condition holds (mw-e27.8): checked when the scene loads and again when a fact it reads changes, so the world reacts to what the player did (e.g. { "fact": "miller.rescued" }). |
+| `spawns[].despawnIf` | `condition` | — | The spawn is removed while this world condition holds (mw-e27.8); the opposite of spawnIf. With both, it exists only when spawnIf holds and despawnIf does not. |
+| `spawns[].variant` | object | — | Makes the spawn one variant of a group (mw-e27.8): exactly one variant of the group is active, the first listed in the scene whose `when` holds (a variant without `when` always matches, so list it last as the fallback). A group with no fallback warns (variantWarnings) because nothing spawns when none matches. |
+| `spawns[].variant.group` | id | required | Variant group id: the spawns of the scene that share it. |
+| `spawns[].variant.when` | `condition` | — | This variant is chosen while the condition holds; absent = the default, chosen when no variant listed before it matches. |
+| `spawns[].swapInView` | boolean | — | Lets spawnIf, despawnIf and variant changes happen while the spawn is on the player’s screen (mw-e27.8). By default a change waits until the spawn is out of view, so nothing pops in or out in front of the player. |
 | `spawns[].carries` | list of object (at least 1) | — | What the spawned creature carries and drops where it dies, as world items (mw-e01.5), e.g. the slice skeleton’s key (needs creature). |
 | `spawns[].carries[].item` | ref → item | required | An item the creature carries. |
 | `spawns[].carries[].count` | integer 1–9999 | `1` | Units of it; default 1. |
@@ -133,6 +142,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `spawns[].properties.burning` | boolean | — | On fire right now. |
 | `spawns[].properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `spawns[].properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `spawns[].properties.frozen` | boolean | — | Frozen solid. |
 | `spawns[].properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `spawns[].properties.conductive` | boolean | — | Conducts electric charge. |
@@ -211,8 +221,28 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].plate.depth` | number > 0 | `1` | Footprint along z, metres. |
 | `spawns[].plate.hidden` | boolean | `false` | The trap variant: nothing to see or prompt; wire it to trap signals. |
 | `spawns[].rope` | object | — | Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13). |
-| `spawns[].rope.length` | number > 0 | required | How far it hangs straight down, metres. |
+| `spawns[].rope.length` | number > 0 | — | How far it hangs straight down, metres (or give `to`). |
+| `spawns[].rope.to` | list of any (at least 3) | — | Its other anchor, grid cells (or give `length`). |
 | `spawns[].rope.radius` | number > 0 | — | Half its thickness, metres (default 0.05). |
+| `spawns[].rope.support` | object | — | Gives it hit points and a load rating (mw-e03.13): see the support fields. |
+| `spawns[].rope.support.rating` | number > 0 | — | Heaviest load its span carries, kg: what hangs from it and rests on that. Over it, the weakest rope of the span snaps. Omit: never overloads. |
+| `spawns[].rope.support.resistances` | object | `{}` | Share of each kind of hit it ignores; a kind left out is 0. |
+| `spawns[].rope.support.resistances.blunt` | number 0–1 | — | Share of blunt damage ignored. |
+| `spawns[].rope.support.resistances.slash` | number 0–1 | — | Share of slash damage ignored. |
+| `spawns[].rope.support.resistances.pierce` | number 0–1 | — | Share of pierce damage ignored (1: a chain). |
+| `spawns[].rope.support.resistances.force` | number 0–1 | — | Share of a shove (force) ignored. |
+| `spawns[].rope.support.span` | id | — | Ropes of a scene with the same span share one load and fail together (a bridge’s two ropes); what hangs from one hangs from the span. |
+| `spawns[].bridge` | object | — | Makes the spawn one end of a rope bridge (mw-e03.13): two support ropes and their planks, hung level from the spawn to `to`. |
+| `spawns[].bridge.to` | list of any (at least 3) | required | The far end, grid cells: level with the spawn and along x or z, so a bridge runs straight. |
+| `spawns[].bridge.planks` | integer 1–64 | required | How many planks, evenly spaced from end to end. |
+| `spawns[].bridge.plank` | ref → testprop | required | The plank prop: its first size axis is the bridge’s width. |
+| `spawns[].bridge.rating` | number > 0 | required | Heaviest load the bridge carries, kg: planks, what rests on them, and who walks. |
+| `spawns[].bridge.resistances` | object | `{}` | Share of each kind of hit its two ropes ignore. |
+| `spawns[].bridge.resistances.blunt` | number 0–1 | — | Share of blunt damage ignored. |
+| `spawns[].bridge.resistances.slash` | number 0–1 | — | Share of slash damage ignored. |
+| `spawns[].bridge.resistances.pierce` | number 0–1 | — | Share of pierce damage ignored (1: a chain). |
+| `spawns[].bridge.resistances.force` | number 0–1 | — | Share of a shove (force) ignored. |
+| `spawns[].bridge.width` | number > 0 | required | Distance between the two ropes, metres: the plank prop’s width. |
 | `spawns[].suspendedFrom` | string | — | Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls. |
 | `spawns[].lightSource` | object | — | Makes the spawned entity a light source that can be put out and relit (mw-e03.16). |
 | `spawns[].lightSource.variant` | `"candle"` \| `"torch"` \| `"sconce"` \| `"brazier"` \| `"lantern"` \| `"fireplace"` | required | Prefab: its fuel, light, ignition point and how much wind it takes to blow it out. |
@@ -248,6 +278,17 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].lightReceiver.filter` | list of any (at least 3) | — | Only light of about this colour counts (default any). |
 | `spawns[].lightReceiver.mode` | `"momentary"` \| `"latching"` | `"momentary"` | momentary goes off with the light; latching until a signal resets it. |
 | `spawns[].lightReceiver.radius` | number > 0 | `0.3` | Radius of the sensor, metres. |
+| `spawns[].push` | object | — | Gives a movable prop push rules: a rail, a grid, a rotation step (mw-e15.4). |
+| `spawns[].push.axis` | list of any (at least 2) | — | Unit direction (x, z) the prop may only slide along (a rail); omit for free. |
+| `spawns[].push.grid` | number > 0 | — | Grid cell size, metres: the prop moves one cardinal axis at a time and settles on a cell centre. |
+| `spawns[].push.rotateStep` | number > 0 ≤ 180 | — | Degrees one rotate turns it by; omit for a prop that does not turn. |
+| `spawns[].liquid` | object | — | Makes the spawned entity a volume of liquid, with an optional drain (mw-e15.4). |
+| `spawns[].liquid.size` | list of any (at least 3) | required | Width (x), height to the brim (y) and depth (z) of the volume, metres. |
+| `spawns[].liquid.liquid` | ref → material | required | The liquid it holds: a material with `liquid` (water, oil). |
+| `spawns[].liquid.depth` | number > 0 | required | How deep the liquid stands at the start, metres (not above the brim). |
+| `spawns[].liquid.drain` | object | — | A drain, opened and closed by a signal or code (the valve of a basin). |
+| `spawns[].liquid.drain.rate` | number > 0 | required | Level fall while open, m/s. |
+| `spawns[].liquid.drain.open` | boolean | `false` | Starts open. |
 | `spawns[].container` | object | — | Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3). |
 | `spawns[].container.loot` | ref → loot-table | — | Loot table rolled into it the first time it is opened (once; saves keep the result). |
 | `spawns[].container.contents` | list of object | — | What it holds from the start, before any roll. |
@@ -255,6 +296,20 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].container.contents[].count` | integer 1–9999 | `1` | Units of it; default 1. |
 | `spawns[].container.lock` | ref → lock | — | The lock it carries: unlocked and picked like a door’s (mw-e03.18). |
 | `spawns[].container.locked` | boolean | — | Starts locked; defaults to true when it has a lock (needs one). |
+| `spawns[].container.stash` | object | — | Room for bodies (mw-e03.23): a carried body goes in if it fits. |
+| `spawns[].container.stash.capacityKg` | number > 0 ≤ 1000 | required | Most the bodies stashed in it may weigh together, kg. |
+| `spawns[].bulky` | id | — | Makes a movable prop a shoulder-carry (a body, a statue part; mw-e03.23): heavier than a hand-carry, and it fits in a container with room for bodies. The id says what it is. |
+| `spawns[].hiding` | object | — | Makes the spawned entity a hiding spot an actor can slip into (mw-e03.23). |
+| `spawns[].hiding.capacity` | integer 1–8 | `1` | Actors that fit at once; default 1. |
+| `spawns[].hiding.concealment` | number 0–1 | `1` | How well it hides whoever is inside, 0–1; 1 takes them out of every sight query. |
+| `spawns[].hiding.peek` | boolean | `true` | The occupant may look out through the opening. |
+| `spawns[].hiding.enterDb` | number 0–120 | — | Noise of getting in, dB at 1 m; 30. |
+| `spawns[].hiding.exitDb` | number 0–120 | — | Noise of getting out, dB at 1 m; 24. |
+| `spawns[].hiding.size` | list of any (at least 3) | — | Greybox box drawn for it, metres along x, y, z, standing on the spawn point. |
+| `spawns[].hiding.look` | `"wood"` \| `"hay"` | `"wood"` | Colour of that box. |
+| `spawns[].hiding.inside` | list of any (at least 3) | — | Where an occupant stands; the spot’s origin. |
+| `spawns[].hiding.eye` | list of any (at least 3) | — | Where the peek camera sits; 1.5 m above `inside`. |
+| `spawns[].hiding.exits` | list of list of any (at least 3) (at least 1) | — | Exit points in order of preference; one 0.9 m out of the opening. |
 | `waypoints` | list of object | `[]` | Named points patrol routes walk through (mw-e11.9). |
 | `waypoints[].id` | id | required | Name of the waypoint, unique in the scene, e.g. yard-gate. |
 | `waypoints[].at` | list of any (at least 3) | required | Position in grid cells (x, y, z), snapped to SCENE_SNAP_STEP. |
@@ -324,6 +379,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `regions[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
 | `regions[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
 | `regions[].tags` | list of string | `[]` | Free-form tags, e.g. water. |
+| `surfaces` | list of object | `[]` | Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4). |
+| `surfaces[].id` | id | required | Name of the surface region, unique in the scene, e.g. hall-carpet. |
+| `surfaces[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
+| `surfaces[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
+| `surfaces[].surface` | `"stone"` \| `"wood"` \| `"wood-hollow"` \| `"dirt"` \| `"grass"` \| `"gravel"` \| `"mud"` \| `"water-shallow"` \| `"snow-ice"` \| `"metal-grate"` \| `"straw"` \| `"carpet"` \| `"bone-litter"` \| `"leaves"` \| `"glass-shards"` | required | The footstep surface (audio bible §7.3) of everything inside, e.g. carpet. |
+| `surfaces[].priority` | integer | `0` | Where boxes overlap, the higher priority wins; the first listed wins a tie. |
 | `transitions` | list of object | — | Volumes that lead to another scene, and where the player arrives (mw-e01.11). |
 | `transitions[].id` | id | required | Name of the transition, unique in the scene, e.g. north-gate. |
 | `transitions[].min` | list of any (at least 3) | required | Lower corner of the volume, grid cells. |
@@ -334,3 +395,120 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `ambience` | list of object | — | Ambience zones placed over regions of the scene or all of it (mw-e28.13). |
 | `ambience[].zone` | ref → ambience | required | The ambience zone that plays here. |
 | `ambience[].region` | id | — | Id of one of the scene’s regions; leave out to cover the whole scene. |
+| `prefabs` | list of object | — | Puzzle prefab instances (mw-e15.4); expanded into spawns and signal graphs when the content loads, so a loaded scene never has this field. |
+| `prefabs[].id` | id | required | Instance id: prefixes its spawns and names its signal graph. |
+| `prefabs[].prefab` | ref → prefab | required | The prefab to place. |
+| `prefabs[].at` | list of any (at least 3) | required | Position in grid cells (x, y, z), snapped to SCENE_SNAP_STEP. |
+| `prefabs[].yaw` | `0` \| `90` \| `180` \| `270` | `0` | Rotation about +y in degrees: 0, 90, 180 or 270. |
+| `prefabs[].params` | map of string → number or boolean or string | `{}` | Parameter values; a parameter with no default must be given. |
+
+## `condition`
+
+A condition over world facts and live state: one of fact, count, entities, signal, sustained, all, any, not (docs/design/conditions.md).
+
+A `condition` is exactly one of these objects:
+
+### 1. Tests one fact, with at most one operator.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fact` | string | required | Fact key to test. Alone: the (bool) fact is true. With one operator: that comparison holds. |
+| `eq` | boolean or integer or string | — | The fact equals this value. |
+| `neq` | boolean or integer or string | — | The fact does not equal this value (unset counts as unequal). |
+| `gt` | integer | — | The (int or tick) fact is greater than this. |
+| `gte` | integer | — | The (int or tick) fact is at least this. |
+| `lt` | integer | — | The (int or tick) fact is less than this. |
+| `lte` | integer | — | The (int or tick) fact is at most this. |
+| `has` | boolean | — | true: the fact holds a value (set, or declared with a non-null default); false: none. |
+
+### 2. Counts true entity facts matching a pattern, compared with exactly one operator.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `count` | string | required | Entity facts to count: `entity:<level>/*.<fact>` (one level) or `entity:*/*.<fact>` (every level). Counts those holding true. |
+| `eq` | integer | — | The count equals this. |
+| `neq` | integer | — | The count does not equal this. |
+| `gt` | integer | — | The count is greater than this. |
+| `gte` | integer | — | The count is at least this. |
+| `lt` | integer | — | The count is less than this. |
+| `lte` | integer | — | The count is at most this. |
+
+### 3. Property predicates over live entities: how many of them pass, and where they are. Exactly one of match or an operator.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `entities` | object | required | Which entities to test. `{ "tag": … }`, `{ "entity": … }` or both; `{}` is every entity with a placement. |
+| `entities.tag` | id | — | Entities carrying this tag (an entity tag, or the tag of a scene spawn). |
+| `entities.entity` | id | — | The entity of the scene spawn with this id. |
+| `where` | list of object | — | Predicates (property, tag, element) an entity must all pass. |
+| `where[].test` | `"property"` | required |  |
+| `where[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"absorbency"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
+| `where[].op` | `"eq"` \| `"ne"` \| `"lt"` \| `"lte"` \| `"gt"` \| `"gte"` | required | Comparison; lt/lte/gt/gte need a number property. |
+| `where[].value` | number or boolean or string | required | Value to compare with. |
+| `where[].test` | `"tag"` | required |  |
+| `where[].tag` | id | required | Tag the entity must carry, e.g. "player". |
+| `where[].test` | `"facing"` | required |  |
+| `where[].facing` | `"north"` \| `"east"` \| `"south"` \| `"west"` | required | Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east. |
+| `where[].test` | `"element"` | required |  |
+| `where[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
+| `inside` | object | — | The entity must stand in this box, sphere or capsule, in world coordinates. |
+| `inside.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `inside.center` | object | required | Centre of the box, metres. |
+| `inside.center.x` | number | required | Metres. |
+| `inside.center.y` | number | required | Metres. |
+| `inside.center.z` | number | required | Metres. |
+| `inside.halfExtents` | object | required | Half the size per axis. |
+| `inside.halfExtents.x` | number ≥ 0 | required | Metres. |
+| `inside.halfExtents.y` | number ≥ 0 | required | Metres. |
+| `inside.halfExtents.z` | number ≥ 0 | required | Metres. |
+| `inside.kind` | `"sphere"` | required | Shape: a sphere. |
+| `inside.center` | object | required | Centre of the sphere, metres. |
+| `inside.radius` | number ≥ 0 | required | Metres. |
+| `inside.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `inside.from` | object | required | One end of the capsule’s segment, metres. |
+| `inside.from.x` | number | required | Metres. |
+| `inside.from.y` | number | required | Metres. |
+| `inside.from.z` | number | required | Metres. |
+| `inside.to` | object | required | The other end of the capsule’s segment, metres. |
+| `inside.to.x` | number | required | Metres. |
+| `inside.to.y` | number | required | Metres. |
+| `inside.to.z` | number | required | Metres. |
+| `match` | `"all"` \| `"any"` \| `"none"` | — | all: at least one entity is selected and every one passes; any: one passes; none: none passes. |
+| `eq` | integer | — | The number of entities that pass equals this. |
+| `neq` | integer | — | The number that pass does not equal this. |
+| `gt` | integer | — | The number that pass is greater than this. |
+| `gte` | integer | — | At least this many pass. |
+| `lt` | integer | — | Fewer than this many pass. |
+| `lte` | integer | — | At most this many pass. |
+
+### 4. True while a signal graph node output is on (mark the node `observed`).
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `signal` | string | required | Signal graph id and node id, e.g. "vault/gate-open". Holds while the output is on. |
+| `port` | id | — | Output port of the node; default: its first. |
+
+### 5. True once the condition has held, without a break, for that long.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `sustained` | `condition` | required | The condition that must keep holding. |
+| `seconds` | number > 0 ≤ 3600 | required | Seconds of sim time it must hold, without a break. |
+
+### 6. True when every condition in the list holds.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `all` | list of `condition` (at least 1) | required | Every condition holds. |
+
+### 7. True when at least one condition in the list holds.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `any` | list of `condition` (at least 1) | required | At least one holds. |
+
+### 8. True when the condition does not hold.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `not` | `condition` | required | The condition that must not hold. |

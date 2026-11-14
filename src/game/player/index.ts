@@ -9,3 +9,4 @@ export * from './controller-reload';
 export * from './death-beat';
 export * from './water-hud';
 export * from './water';
+export * from './climb-hint';

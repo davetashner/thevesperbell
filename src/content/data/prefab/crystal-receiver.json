@@ -1,0 +1,49 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "crystal-receiver",
+  "name": "Crystal receiver",
+  "description": "A crystal that charges when a spell of charge or a beam of light reaches it, and stays charged (latching) until a signal resets it. The usual far-away target of an arrow-and-spell puzzle.",
+  "tags": ["light", "magic"],
+  "parameters": {
+    "mode": {
+      "type": "enum",
+      "description": "latching stays charged until reset; momentary fades.",
+      "values": ["latching", "momentary"],
+      "default": "latching"
+    }
+  },
+  "spawns": [
+    {
+      "local": "crystal",
+      "at": [0, 1.5, 0],
+      "impactSwitch": {
+        "variant": "crystal",
+        "mode": "$mode"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "charged",
+        "kind": "lever",
+        "entity": "crystal"
+      }
+    ],
+    "wires": []
+  },
+  "inputs": [
+    {
+      "name": "charge",
+      "description": "A charge spell or light reaching it.",
+      "spawn": "crystal"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "charged",
+      "description": "On once the crystal has been charged.",
+      "node": "charged"
+    }
+  ]
+}

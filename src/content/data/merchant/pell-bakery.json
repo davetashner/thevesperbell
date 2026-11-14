@@ -1,6 +1,7 @@
 {
   "$schema": "../merchant.schema.json",
   "id": "pell-bakery",
+  "hours": { "open": 5, "close": 19 },
   "notes": "Pell's Bakery, Briar Glen (story bible §3.5 and §5.5; mw-ju8.5): Hollis Pell (npc-hollis), who bakes at four. Food only: bread, hot pies, cheese, sausage, apples and travelling rations. Friendly and generous, so the lowest markup that suits a baker, 1.15 (band 1.1-1.5), and the default buy rate 0.4 (band 0.3-0.6); food is his specialty (the consumable category, bonus at the default 1.2, so he will also take a potion off you). He buys consumables only. A small till of 120 gold refilling 30 a day: food is cheap, so he cannot pay for much else. Everything restocks daily, the bread fastest. Prices follow the catalogue values (mw-ju8.4) and will move with the balance pass.",
   "npcId": "npc-hollis",
   "displayName": "Hollis Pell",

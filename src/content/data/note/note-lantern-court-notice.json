@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-lantern-court-notice",
+  "title": "Notice of the Lantern Court — Port of Wendmouth",
+  "author": "P. Cray",
+  "notes": "Bible 7.2: posted at the Stone Wharf and the customs house; Cray's dry office humour (5.13).",
+  "locations": ["place-stone-wharf", "place-customs-house"],
+  "pages": [
+    {
+      "text": "All books of the Restricted Schools (Illusion, Conjuration, Gravity, Shadow) entering this port without writ shall be held. Books of the Forbidden Schools shall be burned. Enquiries to the Inspector, who is not to be approached before ten, or after four, or at lunch.\n\nBy order, P. Cray."
+    }
+  ]
+}

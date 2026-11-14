@@ -74,4 +74,20 @@ describe('difficulty in saves', () => {
     expect(target.seed).toBe(9);
     expect(target.difficulty.fallDamage).toBe(0);
   });
+
+  it('mw-e31.10: a v5 save, from before the search-duration multiplier, loads with it neutral', () => {
+    const registry = new SaveRegistry();
+    const bytes = registry.write(new World({ seed: 4 }), options);
+    const decoded = decodeSave(bytes);
+    if (!decoded.ok) throw decoded.error;
+    const record = decoded.envelope.sections[WORLD_SECTION_ID];
+    const data = { ...(record?.data as WorldSnapshot), difficulty: { damageTaken: 0.5 } };
+    const v5 = encodeSave({
+      ...decoded.envelope,
+      sections: { ...decoded.envelope.sections, [WORLD_SECTION_ID]: { version: 5, data } },
+    });
+    const loaded = new World({ seed: 1 });
+    expect(registry.read(loaded, v5)).toMatchObject({ ok: true });
+    expect(loaded.difficulty).toMatchObject({ damageTaken: 0.5, searchDuration: 1 });
+  });
 });

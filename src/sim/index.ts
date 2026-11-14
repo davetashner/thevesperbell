@@ -34,14 +34,17 @@ export {
   difficultyCommand,
   DifficultyConfigError,
   difficultyOverrides,
+  difficultyScaler,
   isDifficultyCommand,
   resolveDifficulty,
+  scaleDifficulty,
   type DifficultyChange,
   type DifficultyCommand,
   type DifficultyConfig,
   type DifficultyKey,
   type DifficultyOverrides,
   type DifficultyRange,
+  type DifficultyScaler,
 } from './difficulty';
 export {
   World,
@@ -54,27 +57,38 @@ export {
 } from './core/world';
 export * from './debug';
 export * from './deltas';
+export * from './disposition';
 export * from './economy';
+export * from './electricity';
 export * from './elements';
+export * from './liquids';
 export * from './factions';
 export * from './facts';
 export * from './field';
 export * from './geom';
+export * from './hiding';
 export * from './input';
 export * from './interaction';
 export * from './light';
+export * from './logic';
+export * from './dialogue';
 export * from './loot';
 export * from './magic';
 export * from './mechanisms';
 export * from './nav';
 export * as simMath from './math';
 export * from './noise';
+export * from './ownership';
+export * from './surfaces';
 export * from './perception';
 export * from './physics';
 export * from './player';
 export * from './inventory';
 export * from './items';
 export * from './progression';
+export * from './puzzle';
+export * from './contest';
+export * from './quest';
 export * from './properties';
 export * from './push';
 export * from './respawn';

@@ -1,0 +1,24 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "scales-room",
+  "name": "Scales room vault",
+  "notes": "The wiring of the scales room (scene scales-room, mw-e15.9): the puzzle runtime switches the vault latch on when the puzzle scales-room is solved, and the latch raises the portcullis. Nothing else opens it, so every way of loading the plates opens it. Binding names are the scene's spawn ids.",
+  "nodes": [
+    {
+      "id": "vault-latch",
+      "kind": "lever"
+    },
+    {
+      "id": "vault-gate",
+      "kind": "receiver",
+      "receiver": "door",
+      "entity": "vault-gate"
+    }
+  ],
+  "wires": [
+    {
+      "from": "vault-latch",
+      "to": "vault-gate"
+    }
+  ]
+}

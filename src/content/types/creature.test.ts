@@ -96,7 +96,8 @@ describe('creature schema', () => {
       senses: { sight, hearing: { thresholdDb: 30, range: 25 } },
       locomotion: walker,
       attacks: [],
-      properties: [],
+      properties: {},
+      aflame: false,
       regions: [],
       resistances: {},
       poiseRegen: { delayTicks: 120, percentPerSecond: 25 },
@@ -198,11 +199,12 @@ describe('creature schema', () => {
       senses: 'undead',
       locomotion: { base: 'forgotten', modes: { climb: null, walk: { speeds: { run: 2 } } } },
       attacks: ['overhead-chop', 'lunging-thrust'],
-      properties: ['brittle'],
+      properties: { fragile: 120 },
+      aflame: true,
       resistances: { blunt: 1.5, pierce: 0.5, poison: 0 },
       reactions: { knockdownImpulse: 1200, replace: { knockdown: 'knockback' } },
       faction: 'forgotten',
-      disposition: { towardPlayer: 'wary' },
+      disposition: { towardPlayer: 'wary', classAffinity: { thief: 30, knight: -15 } },
       fears: [{ kind: 'property', stimulus: 'burning', intensity: 30 }],
       personality: { diligence: 0.9, curiosity: 0.1 },
       needs: { sleep: { ratePerMinute: 2, threshold: 80 } },
@@ -218,6 +220,15 @@ describe('creature schema', () => {
       attacks: ['overhead-chop', 'lunging-thrust'],
     });
     expect(creatureSchema.parse(JSON.parse(text))).toEqual(full);
+  });
+
+  it('AC-5: classAffinity is optional, keyed by player class and held to -100..100', () => {
+    const parse = (classAffinity: unknown) =>
+      creatureSchema.safeParse({ ...minimal, disposition: { classAffinity } }).success;
+    expect(creatureSchema.parse(minimal).disposition.classAffinity).toBeUndefined();
+    expect(parse({ thief: 30 })).toBe(true);
+    expect(parse({ wizard: 5 })).toBe(false);
+    expect(parse({ thief: 101 })).toBe(false);
   });
 
   it('rejects out-of-range and repeated values with their JSON paths', () => {

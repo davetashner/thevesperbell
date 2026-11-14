@@ -41,6 +41,11 @@ export interface ClassSelectOptions {
   readonly cards: readonly ClassCardModel[];
   /** The player confirmed the highlighted class (the screen has closed). */
   readonly onConfirm: (id: string) => void;
+  /**
+   * Back (Esc, B) closes the screen and calls this, so the player returns to where they came from
+   * (the title menu). Without it Back does nothing: class selection is then the root screen.
+   */
+  readonly onBack?: (() => void) | undefined;
 }
 
 export interface ClassSelect {
@@ -190,7 +195,13 @@ export function openClassSelect(ui: UiRoot, options: ClassSelectOptions): ClassS
     label: CLASS_SELECT_TEXT.heading,
     content,
     pausesSim: true,
-    onBack: () => true,
+    onBack: () => {
+      if (options.onBack !== undefined) {
+        screen.close();
+        options.onBack();
+      }
+      return true;
+    },
   });
   return {
     screen,

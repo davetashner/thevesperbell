@@ -1,0 +1,92 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "horn-dialogue",
+  "name": "Horn dialogue facts",
+  "notes": "mw-e39.7: world-state facts read and written by Brother Horn's dialogue (horn-warden, bible 5.8, 4.2, 4.5). The Warden resolutions (horn.defeated, horn.spared, horn.tricked, horn.befriended, horn.trial-won, horn.helped, horn.rescues) are in warden.json and horn.fate in endings.json; the backlog's player.rescues.byHorn is horn.rescues. Writers other than the dialogue (the quest, respawn, items) are named in each description; the main quest data (mw-e39.4) does not exist yet.",
+  "facts": [
+    {
+      "key": "horn.hymn-hummed",
+      "type": "bool",
+      "default": false,
+      "description": "The player hummed the Vesper hymn within Horn's earshot (befriend trigger, bible 4.2). Expected writer: the main quest (mw-e39.4) when the hum gesture is performed near him. Read by horn-warden.",
+      "owner": "quest"
+    },
+    {
+      "key": "horn.ring-held",
+      "type": "bool",
+      "default": false,
+      "description": "The player carries Horn's mother's horn-ring from Vane's gallery (befriend trigger). Stand-in until the item exists: expected writer is the ring's pickup (mw-e39.4), cleared with the item. Read by horn-warden.",
+      "owner": "quest"
+    },
+    {
+      "key": "horn.name-stone-held",
+      "type": "bool",
+      "default": false,
+      "description": "The player carries the Hornfolk name-stone from Vane's crate in Wendmouth (befriend trigger, bible 6.3). Stand-in until the item exists; expected writer is the name-stone pickup (mw-e39.4). Read by horn-warden.",
+      "owner": "quest"
+    },
+    {
+      "key": "clatter.vouched",
+      "type": "bool",
+      "default": false,
+      "description": "Clatter has vouched for the player to Horn (befriend trigger; the player brought Anselm to the Warden). Expected writer: the main quest (mw-e39.4) / The Name on the Bones. snig.vouched is the Snig trigger. Read by horn-warden.",
+      "owner": "quest"
+    },
+    {
+      "key": "horn.weapon-lowered",
+      "type": "bool",
+      "default": false,
+      "description": "The player lowered their weapon and waited while Horn circled three times (befriend trigger, bible 4.2). Expected writer: the Warden encounter (mw-e39.4, E14 social creatures). Read by horn-warden.",
+      "owner": "quest"
+    },
+    {
+      "key": "horn.trial-offered",
+      "type": "bool",
+      "default": false,
+      "description": "The knight asked for the Trial of Horns; the duel is under way. Set by horn-warden together with the event horn.trial.begin; the quest (mw-e39.4) runs the duel and sets horn.trial-won.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "horn.fold-fled",
+      "type": "bool",
+      "default": false,
+      "description": "The player tricked Horn, he found them in the Fold, and they fled the confrontation. Set by horn-warden (the flee option) or by the quest when the player leaves the Fold unresolved; Horn then plays the angry-then-weary re-entry (bible 4.2). Cleared when they hear him out.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "horn.rescue-pending",
+      "type": "bool",
+      "default": false,
+      "description": "Horn has just dragged the defeated player to the Fold (bible 4.5) and has not remarked on it yet. Expected writer: the respawn system with horn.rescues; cleared by horn-warden after the remark.",
+      "owner": "quest"
+    },
+    {
+      "key": "horn.healed",
+      "type": "bool",
+      "default": false,
+      "description": "Horn has been healed (a healing draught from horn-warden, or rest among the sleepers). A spared Horn cannot hold the Act III shaft until this is set (bible 4.2). Set by horn-warden; the quest may also set it (Juniper's salve, a Nature spell).",
+      "owner": "dialogue"
+    },
+    {
+      "key": "horn.bread-brought",
+      "type": "bool",
+      "default": false,
+      "description": "The player brought bread for the sleepers (part of Help, bible 4.2). Set by horn-warden, which takes three bread loaves; with horn.healed and knot.breach-sealed it lets Horn give the Help thanks and set horn.helped.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "horn.crypt-open",
+      "type": "bool",
+      "default": false,
+      "description": "Horn opened the crypt shortcut to the priory (befriend reward, bible 4.2). Set by horn-warden with the event horn.crypt-opened; expected reader: the main quest, which should unseal world.priory-crypt.unsealed.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "horn.at-shaft",
+      "type": "bool",
+      "default": false,
+      "description": "Act III: Horn holds the foot of the Sounding Shaft against the Hushlings (bible beat 13). Expected writer: the main quest (mw-e39.4) when the climb begins and Horn lives; read by horn-warden for the shaft barks.",
+      "owner": "quest"
+    }
+  ]
+}

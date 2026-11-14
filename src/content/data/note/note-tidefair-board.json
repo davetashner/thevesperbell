@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-tidefair-board",
+  "title": "The Tidefair — Order of the Day",
+  "author": "Wendmouth Harbour Stewards",
+  "notes": "mw-e39.22: the board at the Stone Wharf (bible 3.6, 6.1 quest 7). Names the four events and the 'no magic' rule that nobody enforces until Cray walks by. Placement on the wharf is a follow-up scene bead.",
+  "locations": ["place-stone-wharf"],
+  "pages": [
+    {
+      "text": "THE TIDEFAIR. Market day, the Stone Wharf, from the second bell. Entry by coin, at the table or from Nell's book.\n\nAt the Drowned Gull: arm-wrestling against Big Oona. On the boom: the Gull Shoot. In the pool: the Regatta, rowing boats only. Among the crowd: the Pocket Race.\n\nRule four: No Magic In The Regatta. The stewards do not enforce this. The Inspector may. Prizes: coin, ribbons, and the favour of the Drowned Gull.\n\nBy order of the stewards, who are volunteers and have been drinking."
+    }
+  ]
+}

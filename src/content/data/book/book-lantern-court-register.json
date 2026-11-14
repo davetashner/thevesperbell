@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-lantern-court-register",
+  "title": "Register of the Licensed Schools",
+  "author": "The Lantern Court, Office of Seals",
+  "notes": "Extra shelf book: bible 3.3 as the Court prints it. Somnomancy forbidden since the Long Vespers; the Court's view of the priory.",
+  "locations": ["place-lamplit-stacks", "place-customs-house", "place-bridgeward-college"],
+  "pages": [
+    {
+      "text": "By the authority of the Lantern Court.\n\nLicensed: Fire, Frost, Storm, Light, Nature, Alteration, Arcane. Books of these Schools carry the pressed lantern seal and may be sold in any shop of good standing.\n\nRestricted: Illusion, Conjuration, Gravity, Shadow. Sale requires a writ of the Court.\n\nForbidden: Necromancy, Time, and Somnomancy. The last was added after the matter at Bellwater, when the Order of the Vesper Bell was dissolved, its priory sealed and its library committed to the fire. Any book of these Schools found in a shop shall be burned and the seller examined.\n\nA book without a seal is a rumour with a binding."
+    }
+  ]
+}

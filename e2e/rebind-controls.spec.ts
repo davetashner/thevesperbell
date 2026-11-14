@@ -67,7 +67,10 @@ async function tapAndMeasure(page: Page, code: string): Promise<number> {
       window.dispatchEvent(new KeyboardEvent(type, { code: c, bubbles: true }));
     }
   }, code);
-  await expect.poll(async () => (await player(page)).tick).toBeGreaterThanOrEqual(before.tick + 40);
+  // 40 ticks at about a frame a second, five ticks a frame, with slow answers (mw-8qo).
+  await expect
+    .poll(async () => (await player(page)).tick, { timeout: 30_000 })
+    .toBeGreaterThanOrEqual(before.tick + 40);
   const after = await player(page);
   return Math.hypot(after.position.x - before.position.x, after.position.z - before.position.z);
 }

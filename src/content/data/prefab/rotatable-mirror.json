@@ -1,0 +1,58 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "rotatable-mirror",
+  "name": "Rotatable mirror",
+  "description": "A mirror on a stand that bounces light beams and turns in steps with Interact. Its face points along the instance's facing at yaw 0 (south, towards a beam travelling north). Wire a beam source, one or more of these and a beam sensor for the classic light puzzle.",
+  "tags": ["light", "weight"],
+  "parameters": {
+    "stepAngle": {
+      "type": "number",
+      "description": "Degrees one turn rotates the mirror.",
+      "unit": "degrees",
+      "min": 5,
+      "max": 180,
+      "default": 45
+    }
+  },
+  "spawns": [
+    {
+      "local": "mirror",
+      "at": [0, 0, 0],
+      "prop": "mirror-stand",
+      "properties": {
+        "pushable": true,
+        "opaque": false
+      },
+      "optic": {
+        "kind": "mirror",
+        "normal": [0, 0, -1],
+        "radius": 0.5
+      },
+      "push": {
+        "rotateStep": "$stepAngle"
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "rotate",
+            "label": "Turn mirror"
+          }
+        ]
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "name": "turn",
+      "description": "Interact turns the mirror by one step; the beam re-aims at once.",
+      "spawn": "mirror"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "mirror",
+      "description": "The mirror entity: beams bounce off it; its rotation is its push.config angle.",
+      "spawn": "mirror"
+    }
+  ]
+}

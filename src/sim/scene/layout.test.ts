@@ -123,6 +123,92 @@ describe('scene layout (mw-e00.21)', () => {
     ]);
   });
 
+  it('mw-e03.13: a rope lays out in metres, to its other anchor, with its support data', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      grid: 2,
+      spawns: [
+        { id: 'plain', at: [0, 3, 0], yaw: 0, tags: [], rope: { length: 1.5, radius: 0.1 } },
+        {
+          id: 'span',
+          at: [1, 2, 0],
+          yaw: 0,
+          tags: [],
+          rope: {
+            to: [4, 2, 0],
+            support: { rating: 150, resistances: { pierce: 0.3, slash: undefined }, span: 'b' },
+          },
+        },
+        { id: 'bare', at: [0, 3, 1], yaw: 0, tags: [], rope: { length: 1, support: {} } },
+      ],
+    };
+    const [plain, span, bare] = layoutScene(scene, testKit).spawns;
+    expect(plain?.rope).toEqual({ length: 1.5, radius: 0.1 });
+    expect(span?.rope).toEqual({
+      length: 6,
+      to: { x: 8, y: 4, z: 0 },
+      support: { rating: 150, resistances: { pierce: 0.3 }, span: 'b' },
+    });
+    expect(bare?.rope).toEqual({ length: 1, support: { resistances: {} } });
+  });
+
+  it.each([
+    ['z', [0, 1, 0], [0, 1, 4], 0, (i: number) => ({ x: 0, y: 1, z: 0.5 + i })],
+    ['x', [0, 1, 0], [4, 1, 0], 90, (i: number) => ({ x: 0.5 + i, y: 1, z: 0 })],
+  ] as const)(
+    'mw-e03.13: a rope bridge along %s becomes a marker, two support ropes and its planks',
+    (_axis, at, to, yaw, plankAt) => {
+      const scene: SceneSpec = {
+        ...TEST_SCENE,
+        grid: 1,
+        spawns: [
+          {
+            id: 'bridge',
+            at,
+            yaw: 0,
+            tags: ['bridge'],
+            bridge: {
+              to,
+              planks: 4,
+              plank: { id: 'plank' },
+              rating: 150,
+              width: 1.2,
+              resistances: { pierce: 0.3 },
+            },
+          },
+        ],
+      };
+      const spawns = layoutScene(scene, testKit).spawns;
+      expect(spawns.map((s) => s.id)).toEqual([
+        'bridge',
+        'bridge-rope-1',
+        'bridge-rope-2',
+        'bridge-plank-1',
+        'bridge-plank-2',
+        'bridge-plank-3',
+        'bridge-plank-4',
+      ]);
+      const [, a, b, ...planks] = spawns;
+      expect(a?.rope).toMatchObject({
+        length: 4,
+        support: { rating: 150, resistances: { pierce: 0.3 }, span: 'bridge' },
+      });
+      expect(a?.tags).toEqual(['rope', 'bridge']);
+      const ends = [a, b].map((rope) => [rope?.position, rope?.rope?.to]);
+      const side = (p: { x: number; z: number } | undefined) => (yaw === 0 ? p?.x : p?.z);
+      expect(side(ends[0]?.[0])).toBeCloseTo(-0.6);
+      expect(side(ends[1]?.[0])).toBeCloseTo(0.6);
+      expect(side(ends[0]?.[1])).toBeCloseTo(-0.6);
+      // The ropes run just under the planks, clear of them.
+      expect(a?.position.y).toBeCloseTo(0.94);
+      expect(a?.rope?.to?.y).toBeCloseTo(0.94);
+      expect(planks[0]?.position.y).toBe(1);
+      expect(planks.map((p) => p.position)).toEqual([0, 1, 2, 3].map(plankAt));
+      expect(planks.every((p) => p.yaw === yaw && p.prop === 'plank')).toBe(true);
+      expect(planks.every((p) => p.suspendedFrom === 'bridge-rope-1')).toBe(true);
+    },
+  );
+
   it('lays out a creature spawn with its faction override and patrol route in metres (mw-e12.4)', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,
@@ -309,6 +395,34 @@ describe('scene layout (mw-e00.21)', () => {
     expect(always?.presence).toBeUndefined();
   });
 
+  it('mw-e24.13: lays out the hours window of a spawn, with or without phases', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        {
+          id: 'clerk',
+          at: [0, 0, 0],
+          yaw: 0,
+          tags: [],
+          creature: { id: 'npc-ottilie' },
+          presence: { hours: [8, 18] },
+        },
+        {
+          id: 'both',
+          at: [1, 0, 0],
+          yaw: 0,
+          tags: [],
+          creature: { id: 'npc-ottilie' },
+          presence: { phases: ['day'], hours: [22, 4] },
+        },
+      ],
+    };
+    const [clerk, both] = layoutScene(scene, testKit).spawns;
+    expect(clerk?.presence).toEqual({ hours: [8, 18] });
+    expect(both?.presence).toEqual({ phases: ['day'], hours: [22, 4] });
+    expect(Object.isFrozen(both?.presence?.hours)).toBe(true);
+  });
+
   it('mw-e01.5: lays out what a creature carries as plain item ids, in order', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,
@@ -392,6 +506,19 @@ describe('scene layout (mw-e00.21)', () => {
     expect(layoutScene(TEST_SCENE, testKit).spawns.every((s) => s.item === undefined)).toBe(true);
   });
 
+  it('lays out an owner as a plain id, and none when the spawn has none (mw-e27.9)', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        { id: 'chest', at: [1, 0, 1], yaw: 0, tags: [], container: {}, owner: 'mirela' },
+        { id: 'barrel', at: [2, 0, 1], yaw: 0, tags: [], container: {} },
+      ],
+    };
+    const [chest, barrel] = layoutScene(scene, testKit).spawns;
+    expect(chest?.owner).toBe('mirela');
+    expect(barrel).not.toHaveProperty('owner');
+  });
+
   it('lays out a container spawn with its loot table, contents and lock as plain ids (mw-e18.3)', () => {
     const scene: SceneSpec = {
       ...TEST_SCENE,
@@ -423,6 +550,46 @@ describe('scene layout (mw-e00.21)', () => {
     expect(layoutScene(TEST_SCENE, testKit).spawns.every((s) => s.container === undefined)).toBe(
       true,
     );
+  });
+
+  it('lays out hiding spots, room for bodies and bulky props as plain data (mw-e03.23)', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      spawns: [
+        {
+          id: 'wardrobe',
+          at: [1, 0, 1],
+          yaw: 90,
+          tags: [],
+          hiding: { capacity: 2, concealment: 0.5, peek: false, exits: [[0, 0, 1]] },
+        },
+        { id: 'hay', at: [2, 0, 1], yaw: 0, tags: [], hiding: { size: [1, 1, 1], look: 'hay' } },
+        {
+          id: 'chest',
+          at: [3, 0, 1],
+          yaw: 0,
+          tags: [],
+          container: { stash: { capacityKg: 60 } },
+        },
+        { id: 'body', at: [4, 0, 1], yaw: 0, tags: [], prop: { id: 'crate' }, bulky: 'body' },
+      ],
+    };
+    const [wardrobe, hay, chest, body] = layoutScene(scene, testKit).spawns;
+    expect(wardrobe?.hiding).toEqual({
+      capacity: 2,
+      concealment: 0.5,
+      peek: false,
+      exits: [[0, 0, 1]],
+    });
+    expect(Object.isFrozen(wardrobe?.hiding)).toBe(true);
+    expect(hay?.hiding).toEqual({ size: [1, 1, 1], look: 'hay' });
+    expect(chest?.container?.stashKg).toBe(60);
+    expect(body?.bulky).toBe('body');
+    expect(
+      layoutScene(TEST_SCENE, testKit).spawns.every(
+        (s) => s.hiding === undefined && s.bulky === undefined,
+      ),
+    ).toBe(true);
   });
 
   it('lays out placed signal graphs with their bindings and checkpoints (mw-e01.4)', () => {
@@ -463,6 +630,35 @@ describe('scene layout (mw-e00.21)', () => {
     ]);
     expect(Object.isFrozen(regions[0]?.tags)).toBe(true);
     expect(layoutScene(TEST_SCENE, testKit).regions).toEqual([]);
+  });
+
+  it('mw-e09.4: lays out surface regions as boxes in metres, in scene order', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      grid: 2,
+      surfaces: [
+        { id: 'rug', min: [0, 0, 0], max: [1, 1, 2], surface: 'carpet', priority: 3 },
+        { id: 'path', min: [-1, 0, 0], max: [0, 1, 1], surface: 'gravel', priority: 0 },
+      ],
+    };
+    const { surfaces } = layoutScene(scene, testKit);
+    expect(surfaces).toEqual([
+      {
+        id: 'rug',
+        min: { x: 0, y: 0, z: 0 },
+        max: { x: 2, y: 2, z: 4 },
+        surface: 'carpet',
+        priority: 3,
+      },
+      {
+        id: 'path',
+        min: { x: -2, y: 0, z: 0 },
+        max: { x: 0, y: 2, z: 2 },
+        surface: 'gravel',
+        priority: 0,
+      },
+    ]);
+    expect(layoutScene(TEST_SCENE, testKit).surfaces).toEqual([]);
   });
 
   it('is deterministic and frozen', () => {

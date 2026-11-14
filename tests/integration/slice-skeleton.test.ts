@@ -14,6 +14,7 @@ import {
   AlertStateChanged,
   BrainComponent,
   CreatureComponent,
+  DamageApplied,
   Died,
   hashWorld,
   HealthComponent,
@@ -315,6 +316,11 @@ describe('the Forgotten skeleton fight in the slice arena (mw-e01.5)', () => {
     markExercised(task, 'behaviour', 'forgotten');
     const t = slice();
     const skeleton = t.skeleton();
+    // Walking home down the corridor it passes the wall torch, which burns it like anyone (mw-aps).
+    let scorched = 0;
+    t.sim.events.on(DamageApplied, (r) => {
+      if (r.target === skeleton && r.packet.tags.includes('hazard')) scorched += r.total;
+    });
     t.teleport({ x: 1.5, y: 0, z: 29 });
     t.until(() => t.brain().state === 'combat', 10 * HZ);
     // Wounded before the chase.
@@ -351,11 +357,12 @@ describe('the Forgotten skeleton fight in the slice arena (mw-e01.5)', () => {
     expect(states.slice(leash).map(([, to]) => to)).toEqual(['searching', 'unaware']);
     expect(t.brain().state).toBe('unaware');
     expect(southmost).toBeGreaterThan(5); // it never entered the spawn room
-    // Home, at its post, still 40 below its maximum.
+    // Home, at its post, still 40 below its maximum (and whatever the torch took).
     t.until(() => flat(t.at(skeleton), POST) <= 0.5, 15 * HZ);
     t.step(IDLE, HZ);
     expect(t.brain().state).toBe('unaware');
     const health = t.health();
-    expect((health?.max ?? 0) - (health?.current ?? 0)).toBe(40);
+    expect((health?.max ?? 0) - (health?.current ?? 0)).toBe(40 + scorched);
+    expect(scorched).toBeLessThanOrEqual(8); // a torch's pulse or two, not a bonfire
   });
 });

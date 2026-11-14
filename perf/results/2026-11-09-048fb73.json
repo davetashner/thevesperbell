@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "mode": "reference",
+  "sha": "048fb73",
+  "date": "2026-11-09T20:47:15.204Z",
+  "browser": "chrome 156.0.8078.81",
+  "results": [
+    {
+      "id": "input-to-motion-high",
+      "metric": "inputToMotionP95Ms",
+      "unit": "ms",
+      "max": 100,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "value": 27.179999947547913,
+      "delta": -72.82000005245209,
+      "pass": true,
+      "message": "input-to-motion-high (inputToMotionP95Ms in testbed at high): 27.18 ms within budget ≤ 100.00 ms (−72.82 ms (−72.8%))"
+    },
+    {
+      "id": "input-to-motion-low-30fps",
+      "metric": "inputToMotionP95Ms",
+      "unit": "ms",
+      "max": 133,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: 30 fps floor in worst-case combat",
+      "value": 32.12999999523163,
+      "delta": -100.87000000476837,
+      "pass": true,
+      "message": "input-to-motion-low-30fps (inputToMotionP95Ms in testbed at low): 32.13 ms within budget ≤ 133.00 ms (−100.87 ms (−75.8%))"
+    },
+    {
+      "id": "controller-tick-p95",
+      "metric": "controllerTickP95Ms",
+      "unit": "ms",
+      "max": 0.3,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "value": 0.05500006675720215,
+      "delta": -0.24499993324279784,
+      "pass": true,
+      "message": "controller-tick-p95 (controllerTickP95Ms in testbed): 0.06 ms within budget ≤ 0.30 ms (−0.24 ms (−81.7%))"
+    },
+    {
+      "id": "camera-frame-p95",
+      "metric": "cameraFrameP95Ms",
+      "unit": "ms",
+      "max": 0.2,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine",
+      "value": 0.06499993801116943,
+      "delta": -0.13500006198883058,
+      "pass": true,
+      "message": "camera-frame-p95 (cameraFrameP95Ms in testbed): 0.06 ms within budget ≤ 0.20 ms (−0.14 ms (−67.5%))"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "inputToMotionP95Ms",
+      "value": 27.179999947547913,
+      "scene": "testbed",
+      "preset": "high"
+    },
+    {
+      "metric": "inputToMotionP95Ms",
+      "value": 32.12999999523163,
+      "scene": "testbed",
+      "preset": "low"
+    },
+    {
+      "metric": "controllerTickP95Ms",
+      "value": 0.05500006675720215,
+      "scene": "testbed"
+    },
+    {
+      "metric": "cameraFrameP95Ms",
+      "value": 0.06499993801116943,
+      "scene": "testbed"
+    }
+  ],
+  "frames": [],
+  "pass": true
+}

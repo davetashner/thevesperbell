@@ -84,7 +84,7 @@ export {
   type SnapshotName,
 } from './mix-snapshots.ts';
 export {
-  MIN_DB,
+  SLIDER_EXPONENT,
   MIXER_BUSES,
   MIXER_RAMP_S,
   bindMixer,

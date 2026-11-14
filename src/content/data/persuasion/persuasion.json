@@ -1,0 +1,78 @@
+{
+  "$schema": "../persuasion.schema.json",
+  "id": "persuasion",
+  "notes": "PLACEHOLDER TUNING (mw-e22.7), for the owner to tune in playtest. Score = base + disposition band + class modifiers + the node's own modifiers + NPC personality; it must meet the node's difficulty (typically 8 to 14). Margin labels: easy from +5, fair from 0 (a success), hard from -4, else impossible.",
+  "base": 4,
+  "bandModifiers": { "hostile": -6, "cold": -3, "neutral": 0, "friendly": 3, "devoted": 6 },
+  "labels": { "easyFrom": 5, "fairFrom": 0, "hardFrom": -4 },
+  "modifiers": [
+    {
+      "approaches": ["deceive"],
+      "when": { "kind": "playerClass", "class": "thief" },
+      "bonus": 3,
+      "label": "A practised liar"
+    },
+    {
+      "approaches": ["intimidate"],
+      "when": { "kind": "playerClass", "class": "knight" },
+      "bonus": 3,
+      "label": "A knight's bearing"
+    },
+    {
+      "approaches": ["charm", "persuade"],
+      "when": { "kind": "playerClass", "class": "sorcerer" },
+      "bonus": 2,
+      "label": "Something uncanny in your manner"
+    },
+    {
+      "approaches": ["persuade"],
+      "when": { "kind": "playerClass", "class": "archer" },
+      "bonus": 2,
+      "label": "A steady, honest eye"
+    }
+  ],
+  "personality": [
+    {
+      "approaches": ["intimidate"],
+      "trait": "bravery",
+      "atMost": 0.3,
+      "bonus": 3,
+      "label": "Easily cowed"
+    },
+    {
+      "approaches": ["intimidate"],
+      "trait": "bravery",
+      "atLeast": 0.7,
+      "bonus": -3,
+      "label": "Unflinching"
+    },
+    {
+      "approaches": ["charm", "persuade"],
+      "trait": "sociability",
+      "atLeast": 0.7,
+      "bonus": 2,
+      "label": "Glad of the company"
+    },
+    {
+      "approaches": ["deceive"],
+      "trait": "curiosity",
+      "atMost": 0.3,
+      "bonus": 2,
+      "label": "Incurious"
+    },
+    {
+      "approaches": ["deceive"],
+      "trait": "diligence",
+      "atLeast": 0.7,
+      "bonus": -2,
+      "label": "Checks everything twice"
+    },
+    {
+      "approaches": ["persuade", "deceive"],
+      "trait": "greed",
+      "atLeast": 0.7,
+      "bonus": 2,
+      "label": "Fond of a good deal"
+    }
+  ]
+}

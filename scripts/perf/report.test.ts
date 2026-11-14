@@ -65,6 +65,32 @@ describe('perf run report (mw-e32.1)', () => {
     );
   });
 
+  it('a Low frame run is labelled with its preset in the summary', () => {
+    const run = { ...frames(8), scene: 'valley-01', preset: 'low' } as const;
+    const report = buildReport(
+      [
+        {
+          id: 'valley-01-frame-p95-low',
+          metric: 'frameP95Ms',
+          mode: 'reference',
+          max: 16.7,
+          source,
+          scene: 'valley-01',
+          preset: 'low',
+        },
+      ],
+      [
+        {
+          measurements: [{ metric: 'frameP95Ms', value: 8, scene: 'valley-01', preset: 'low' }],
+          frames: run,
+        },
+      ],
+      meta('reference'),
+    );
+    expect(report.pass).toBe(true);
+    expect(formatSummary(report)).toContain('| valley-01 (low) | 1280×720 @2x |');
+  });
+
   it('a CI run judges only what it measured, and passes when every budget does', () => {
     const report = buildReport(
       budgets,

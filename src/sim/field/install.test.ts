@@ -144,4 +144,21 @@ describe('installElementField', () => {
     w.step();
     expect(elementFieldOf(w).total('charge')).toBeLessThan(1); // charge decays by default
   });
+
+  it('mw-e03.30: with a focus, far chunks step on every 4th tick only (and any tick without one)', () => {
+    const run = (focus?: () => { x: number; y: number; z: number } | undefined) => {
+      const w = installElementField(new World<never>({ seed: 1 }), { maxChunks: 1 });
+      w.addSystem(elementFieldSystem(undefined, focus));
+      elementFieldOf(w).add('moisture', { x: 120, y: 0, z: 0 }, 1);
+      const seen: number[] = [];
+      for (let i = 0; i < 8; i++) {
+        w.step();
+        seen.push(elementFieldOf(w).read('moisture', { x: 120, y: 0, z: 0 }));
+      }
+      return seen.filter((value, i) => value !== (seen[i - 1] ?? 1)).length;
+    };
+    expect(run()).toBe(8);
+    expect(run(() => undefined)).toBe(8);
+    expect(run(() => ({ x: 0, y: 0, z: 0 }))).toBe(2);
+  });
 });

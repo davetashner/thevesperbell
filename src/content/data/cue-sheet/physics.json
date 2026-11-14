@@ -27,7 +27,8 @@
       "volumeJitterDb": 1,
       "volumeBy": { "fact": "loudness", "min": 60, "max": 90, "floorDb": -12 },
       "priority": 60,
-      "caption": "caption.breaking"
+      "caption": "caption.breaking",
+      "gameplayCritical": true
     }
   ]
 }

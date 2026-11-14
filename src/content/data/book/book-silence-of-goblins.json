@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-silence-of-goblins",
+  "title": "On the Silence of Goblins",
+  "author": "Dr Ambrose Pettifer",
+  "notes": "Bible 7.2: Mirela's stock. A learned and half-wrong treatise: canon is that goblins cannot read and do not dream (11.3), they speak in gesture and smell, and Mother Kettleback is anything but silent.",
+  "locations": ["place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "The goblin does not dream. Deprived of sleep's theatre, it compensates by stealing props.\n\nNeither does it read. I have shown a goblin a page of my own best work, and it sniffed the page, licked the page, and offered me a spoon for it. I cannot say the trade was unfair.\n\nThe goblin is called silent because it speaks to the nose and the hands, in a language of shrugs and smells that no scholar has yet noted down. (I have been asked to stop trying. The goblins were very clear.)\n\nIt follows that the goblin cannot be charmed, bored, or put to sleep. It can be bribed. It must be bribed with shiny things."
+    }
+  ]
+}

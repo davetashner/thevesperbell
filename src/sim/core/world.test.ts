@@ -78,6 +78,20 @@ describe('World scheduler', () => {
     );
   });
 
+  it('mw-e03.23: an input filter may rewrite the inputs it keeps', () => {
+    const seen: string[][] = [];
+    const world = new World<string>({ seed: 1 })
+      .addInputFilter({ name: 'plain', keep: () => true })
+      .addInputFilter({
+        name: 'shout',
+        keep: (input) => input !== 'drop',
+        map: (input) => input.toUpperCase(),
+      })
+      .addSystem(system<string>('probe', ({ inputs }) => void seen.push([...inputs])));
+    world.step(['a', 'drop', 'b']);
+    expect(seen).toEqual([['A', 'B']]);
+  });
+
   it('defaults to 60 Hz', () => {
     expect(new World({ seed: 1 }).clock.hz).toBe(60);
   });
@@ -706,5 +720,67 @@ describe('World remove listeners (mw-e03.41)', () => {
     expect(w.isAlive(id)).toBe(false);
     const Unregistered = defineComponent<number>('Unregistered');
     expect(() => w.onRemove(Unregistered, () => undefined)).toThrow('is not registered');
+  });
+
+  it('structureVersion counts structural changes, so watchers can skip scans', () => {
+    const w = new World({ seed: 1 }).register(Position);
+    const start = w.structureVersion;
+    const e = w.spawn();
+    w.add(e, Position, { x: 1, y: 0 });
+    const added = w.structureVersion;
+    expect(added).toBeGreaterThan(start);
+    w.set(e, Position, { x: 2, y: 0 }); // a value write is not structural
+    expect(w.structureVersion).toBe(added);
+    w.remove(e, Position);
+    expect(w.structureVersion).toBeGreaterThan(added);
+  });
+});
+
+describe('World.restores (mw-e15.3)', () => {
+  it('counts restores, and is not part of the state', () => {
+    const world = new World<never>({ seed: 1 });
+    const before = world.snapshot();
+    expect(world.restores).toBe(0);
+    world.restore(before);
+    world.restore(before);
+    expect(world.restores).toBe(2);
+    expect(world.snapshot()).toEqual(before);
+  });
+});
+
+describe('unregisterIfEmpty (mw-e22.15)', () => {
+  const Tag = defineComponent<number>('Tag');
+  it('drops an unused type so the snapshot is as if it was never registered, and allows registering again', () => {
+    const w = new World<never>({ seed: 1 });
+    const bare = JSON.stringify(w.snapshot());
+    w.register(Tag);
+    w.query(Tag);
+    expect(w.unregisterIfEmpty(Tag)).toBe(true);
+    expect(JSON.stringify(w.snapshot())).toBe(bare);
+    expect(w.isRegistered(Tag)).toBe(false);
+    w.register(Tag);
+    const e = w.spawn();
+    w.add(e, Tag, 1);
+    expect(w.query(Tag).count).toBe(1);
+  });
+
+  it('refuses when the type is unknown, in use, or the world is mid-step', () => {
+    const w = new World<never>({ seed: 1 });
+    expect(w.unregisterIfEmpty(Tag)).toBe(false);
+    w.register(Tag);
+    const e = w.spawn();
+    w.add(e, Tag, 1);
+    expect(w.unregisterIfEmpty(Tag)).toBe(false);
+    w.remove(e, Tag);
+    let midStep: boolean | undefined;
+    w.addSystem({
+      name: 'probe',
+      run: () => {
+        midStep = w.unregisterIfEmpty(Tag);
+      },
+    });
+    w.step();
+    expect(midStep).toBe(false);
+    expect(w.isRegistered(Tag)).toBe(true);
   });
 });

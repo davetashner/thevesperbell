@@ -49,6 +49,7 @@ import { statusMoveScale, type StatusLookup } from '../magic/statuses';
 import { initialCharacterState, SKIN } from '../character/controller';
 import type { CollisionWorld } from '../character/collision-world';
 import { carryRestraint, refuseGrab } from '../carry/state';
+import { isHidden } from '../hiding/state';
 import { pushRestraint } from '../push/state';
 import { radians } from '../character/greybox';
 import {
@@ -58,7 +59,15 @@ import {
   characterTuning,
   spawnCharacter,
 } from '../character/system';
+import {
+  DEFAULT_FOOTSTEP_SURFACES,
+  footSurface,
+  groundUnder,
+  type SurfaceOffsets,
+} from '../character/footsteps';
+import { surfaceAt, type SurfaceMap } from '../surfaces/surfaces';
 import { CharacterLocomotion, giveLocomotion, locomotionSystem } from '../character/locomotion';
+import { CharacterEncumbrance, movementProfileOf } from '../character/profile';
 import { DEFAULT_ARROW_RULES } from '../combat/arrows/ballistics';
 import type { ArrowLookup } from '../combat/arrows/system';
 import { giveBow, type BowLoadout } from '../combat/bow/components';
@@ -71,6 +80,7 @@ import {
 } from '../combat/bow/system';
 import { DodgeComponent, giveDodge, type DodgeMoves } from '../combat/dodge/components';
 import { dodgeInputSystem, dodgeMotionSystem, type DodgeFacing } from '../combat/dodge/dodge';
+import { ArmorLoadComponent, armorLoadSystem, loadClassReader } from '../combat/load';
 import {
   DEFAULT_STAMINA_PROFILE,
   drainStamina,
@@ -115,10 +125,11 @@ import {
   type ButtonAction,
 } from '../input/action-frame';
 import { cos, pow, sin } from '../math';
-import { climbTraversal, DEFAULT_CLIMB_TUNING } from '../climb/climb';
+import { climbDrainPerSecond, climbTraversal, DEFAULT_CLIMB_TUNING } from '../climb/climb';
 import type { LedgeIndex } from '../climb/ledges';
 import { ledgeTraversal, type LedgeTraversalHook } from '../climb/mantle';
 import { ClimbRopeComponent } from '../climb/ropes';
+import { maxClimbDifficulty } from '../climb/surfaces';
 import {
   CharacterBreath,
   DEFAULT_WATER_TUNING,
@@ -129,7 +140,7 @@ import {
   WATER_MATERIAL,
   type WaterVolume,
 } from '../character/water';
-import type { LoadClass } from '../inventory/equipment';
+import type { EquipmentRules, LoadClass } from '../inventory/equipment';
 import { capabilitiesOf } from '../progression/capabilities';
 import type { TraversalHook } from '../character/traversal';
 import type { SceneSpawnPlacement } from '../scene/layout';
@@ -223,6 +234,13 @@ export interface LookSettings {
   readonly sensitivity: number;
   /** Looking up (mouse or stick) looks down. */
   readonly invertY: boolean;
+  /** Pushing right turns left. */
+  readonly invertX?: boolean;
+  /**
+   * Eases the pitch back to `recentre.pitch` radians while the player moves without look input
+   * (auto-centre, mw-e31.6): after `delay` seconds, at `rate` radians per second. Off when absent.
+   */
+  readonly recentre?: { readonly pitch: number; readonly delay: number; readonly rate: number };
   /** Lowest pitch, radians (looking down); ≤ 0. */
   readonly minPitch: number;
   /** Highest pitch, radians (looking up); ≥ 0. */
@@ -273,15 +291,16 @@ export function stickResponse(stick: ActionVector, settings: StickLookSettings):
  */
 export function lookTurn(input: LookInput, settings: LookSettings, dt: number): LookTurn {
   const up = settings.invertY ? -1 : 1;
+  const right = settings.invertX === true ? -1 : 1;
   let yaw = 0;
   let pitch = 0;
   if (input.mouse !== undefined) {
-    yaw -= input.mouse.x * settings.sensitivity;
+    yaw -= input.mouse.x * settings.sensitivity * right;
     pitch += input.mouse.y * settings.sensitivity * up;
   }
   if (input.stick !== undefined) {
     const rate = stickResponse(input.stick, settings.stick);
-    yaw -= rate.x * settings.stick.yawRate * dt;
+    yaw -= rate.x * settings.stick.yawRate * dt * right;
     pitch += rate.y * settings.stick.pitchRate * dt * up;
   }
   return { yaw: yaw + 0, pitch: pitch + 0 };
@@ -301,20 +320,34 @@ export function clampPitch(
  * the world must have registered) do not turn.
  */
 export function playerLookSystem<TInput>(
-  settings: LookSettings = DEFAULT_LOOK_SETTINGS,
+  source: LookSettings | (() => LookSettings) = DEFAULT_LOOK_SETTINGS,
 ): System<TInput> {
+  // Seconds of moving without look input so far (auto-centre's delay); it is only a pacing counter.
+  let idle = 0;
   return {
     name: 'player-look',
     run({ world, inputs, clock }) {
       const frame = actionFrameOf(inputs);
       if (frame === undefined) return;
-      const turn = lookTurn({ mouse: frame.look, stick: frame.lookStick }, settings, 1 / clock.hz);
-      if (turn.yaw === 0 && turn.pitch === 0) return;
+      const settings = typeof source === 'function' ? source() : source;
+      const dt = 1 / clock.hz;
+      const turn = lookTurn({ mouse: frame.look, stick: frame.lookStick }, settings, dt);
+      const looking = turn.yaw !== 0 || turn.pitch !== 0;
+      const moving = frame.move.x !== 0 || frame.move.y !== 0;
+      idle = looking || !moving ? 0 : idle + dt;
+      const { recentre } = settings;
+      const easing = recentre !== undefined && !looking && idle > recentre.delay;
+      if (!looking && !easing) return;
       world.query(PlayerLook).forEach((id, current) => {
         if (world.has(id, ViewAnchor)) return;
+        let pitch = current.pitch + turn.pitch;
+        if (easing) {
+          const step = recentre.rate * dt;
+          pitch += Math.max(-step, Math.min(step, recentre.pitch - pitch));
+        }
         world.set(id, PlayerLook, {
           yaw: wrapYaw(current.yaw + turn.yaw),
-          pitch: clampPitch(current.pitch + turn.pitch, settings),
+          pitch: clampPitch(pitch, settings),
         });
       });
     },
@@ -476,6 +509,11 @@ export interface PlayerCombatOptions {
   readonly melee?: PlayerMeleeOptions;
   /** A bow and quiver (mw-e05.3); absent = none. */
   readonly bow?: PlayerBowOptions;
+  /**
+   * The equipment rules whose armor load (ADR-0003) shapes the player's roll, stamina regen,
+   * sprint, absorption, poise and footstep noise (mw-e04.16); absent = armor changes nothing.
+   */
+  readonly equipment?: EquipmentRules;
 }
 
 /** The horizontal direction a look yaw faces (yaw 0 faces −z). */
@@ -561,7 +599,9 @@ function climbStaminaSystem<TInput>(tuning: Frozen<ControllerTuning>): System<TI
       w.query(CharacterController, StaminaComponent).forEach((entity, state) => {
         if (state.traversal !== 'climb') return;
         const climb = characterTuning(w, entity, tuning).climb ?? DEFAULT_CLIMB_TUNING;
-        if (climb.staminaPerSecond > 0) drainStamina(w, entity, climb.staminaPerSecond / clock.hz);
+        if (climb.staminaPerSecond <= 0 || state.climb === undefined) return;
+        const perSecond = climbDrainPerSecond(w, state.climb.surface, climb);
+        drainStamina(w, entity, perSecond / clock.hz);
       });
     },
   };
@@ -579,8 +619,18 @@ export interface PlayerOptions {
   readonly tuning: Frozen<ControllerTuning>;
   /** Look input; each setting defaults to DEFAULT_LOOK_SETTINGS. */
   readonly look?: Partial<LookSettings>;
+  /**
+   * Read every tick and laid over `look`: the player's own look options (sensitivity, invert,
+   * auto-centre, mw-e31.6), which can change while playing. A replay passes none.
+   */
+  readonly lookLive?: () => Partial<LookSettings>;
   /** The pitch the player starts with, radians (clamped to the limits); defaults to level (0). */
   readonly pitch?: number;
+  /**
+   * Wraps each tick's run of the character controller system so glue can time it (mw-e02.8). It
+   * must call `run` once; the sim itself reads no clock.
+   */
+  readonly measure?: (run: () => void) => void;
   /** Falling below this world-space height resets position and look to `player-start`. */
   readonly fallResetY?: number;
   /** Stamina, the action timeline and the dodge (see the file header); absent = movement only. */
@@ -591,6 +641,16 @@ export interface PlayerOptions {
   readonly climb?: PlayerClimbOptions;
   /** Wading, swimming, sinking and breath in the scene's water (mw-e02.14); absent = none. */
   readonly water?: PlayerWaterOptions;
+  /**
+   * Material id → footstep loudness offset, dB relative to stone (`materialLoudness` of the
+   * content's materials, mw-e02.11); absent = every surface is as loud as stone.
+   */
+  readonly footstepOffsets?: SurfaceOffsets;
+  /**
+   * The scene's tagged surface regions (mw-e09.4): where one holds the feet, its surface (carpet,
+   * gravel…) replaces the ground collider's material in footstep events. Absent = the collider's.
+   */
+  readonly surfaces?: SurfaceMap;
   /**
    * Status definitions (mw-e06.24): the player's `moveSpeed` statuses (slowed, rooted) scale its
    * speed, read through `modifiedStat`; absent = statuses leave movement alone.
@@ -616,6 +676,12 @@ export interface PlayerClimbOptions {
    * options' and whatever the capability registry grants the player (mw-e19.2) apply to both.
    */
   readonly capabilities?: readonly string[];
+  /**
+   * Capability id -> the climb difficulty (1-3) it lets the player attempt (content's capability
+   * `climbDifficulty`, mw-e10.9); the player's best is the highest of the capabilities it holds
+   * (1 with none). Absent = no limit beyond each grade's own capability.
+   */
+  readonly difficulty?: ReadonlyMap<string, number>;
 }
 
 /** The player's mantling and ledge hangs (mw-e02.12). */
@@ -682,12 +748,32 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   }
   const { combat } = options;
   world.register(CharacterController, CharacterTuning, CharacterLocomotion, PlayerLook, ViewAnchor);
-  world.addSystem(playerLookSystem(look));
+  world.addSystem(
+    playerLookSystem(
+      options.lookLive === undefined ? look : () => ({ ...look, ...options.lookLive?.() }),
+    ),
+  );
   const melee = combat?.melee;
   if (combat !== undefined) {
     const { moves } = combat;
     world.register(StaminaComponent, ...ACTION_TIMELINE_COMPONENTS, DodgeComponent);
-    world.addSystem(staminaSystem()).addSystem(dodgeInputSystem({ facing: lookFacing }));
+    const { equipment } = combat;
+    if (equipment !== undefined) {
+      world.register(ArmorLoadComponent);
+      world.register(CharacterEncumbrance);
+      world.addSystem(
+        armorLoadSystem({
+          equipment,
+          ...(combat.stamina !== undefined && { stamina: combat.stamina }),
+        }),
+      );
+    }
+    world.addSystem(staminaSystem()).addSystem(
+      dodgeInputSystem({
+        facing: lookFacing,
+        ...(equipment !== undefined && { loadClass: loadClassReader(equipment) }),
+      }),
+    );
     if (melee !== undefined) {
       world.register(...MELEE_COMPONENTS);
       world.addSystem(blockSystem({ moves }));
@@ -724,6 +810,7 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
     world.addSystem(dodgeMotionSystem({ moves, facing: lookFacing }));
   }
   const { ledges, climb, water } = options;
+  const offsetOf: SurfaceOffsets = options.footstepOffsets ?? (() => undefined);
   // The options' fixed list plus whatever the capability registry grants the player (mw-e19.2), read
   // live so a grant or revoke changes traversal from the next check.
   const fixed = [...(ledges?.capabilities ?? []), ...(climb?.capabilities ?? [])];
@@ -744,11 +831,16 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   }
   if (climb !== undefined) {
     if (!world.isRegistered(ClimbRopeComponent)) world.register(ClimbRopeComponent);
+    const grants = climb.difficulty;
     hooks.push(
       climbTraversal({
         world,
         capabilities,
         handsFull: (entity) => refuseGrab(world, entity, 'climb'),
+        ...(grants !== undefined && {
+          maxDifficulty: (entity: EntityId | undefined) =>
+            maxClimbDifficulty(capabilities(entity), grants),
+        }),
         stamina: (entity) =>
           combat === undefined || entity === undefined
             ? undefined
@@ -771,6 +863,7 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
       collision: options.collision,
       tuning: options.tuning,
       ...(hooks.length > 0 && { hooks }),
+      ...(options.measure !== undefined && { measure: options.measure }),
       input: (inputs, entity) => {
         const frame = actionFrameOf(inputs);
         const look = world.get(entity, PlayerLook);
@@ -791,11 +884,17 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
               };
         // Statuses and combat take the slower of the two; what the carrier holds slows it on top
         // (ADR-0003: carry stacks with other restraints).
+        // An Overloaded wearer walks: sprint is stripped from what the controller sees (mw-e04.16).
+        const loaded =
+          combat?.equipment !== undefined &&
+          loadClassReader(combat.equipment)(world, entity) === 'overloaded'
+            ? { ...frame, sprint: UP }
+            : frame;
         const actions =
           fought === undefined && carrying === undefined && statusScale === 1
-            ? frame
+            ? loaded
             : restrainMovement(
-                frame,
+                loaded,
                 Math.min(fought?.scale ?? 1, statusScale) * (carrying?.scale ?? 1),
                 fought?.noJump === true || carrying?.noJump === true ? true : undefined,
               );
@@ -809,6 +908,8 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
         };
       },
       noclip: (entity) => hasCheat(world, entity, 'noclip'),
+      // Hiding in a wardrobe holds the player where the hiding rules put it (mw-e03.23).
+      held: (entity) => isHidden(world, entity),
     }),
   );
   if (climb !== undefined && combat !== undefined) {
@@ -830,17 +931,30 @@ export function installPlayer<TInput>(world: World<TInput>, options: PlayerOptio
   world.addSystem(
     locomotionSystem<TInput>({
       tuning: options.tuning,
-      ...(water !== undefined && {
-        material: (entity: EntityId) => {
-          const state = world.get(entity, CharacterController);
-          const tuning =
-            characterTuning(world, entity, options.tuning).water ?? DEFAULT_WATER_TUNING;
-          return state !== undefined &&
-            waterDepthAt(water.volumes, state.position) >= tuning.wadeDepth
-            ? WATER_MATERIAL
-            : undefined;
-        },
-      }),
+      // Footsteps carry the ground's material and wet / frozen state, or water while wading (mw-e02.11).
+      surface: (entity: EntityId) => {
+        const own = characterTuning(world, entity, options.tuning);
+        const surfaces = own.stealth?.surfaces ?? DEFAULT_FOOTSTEP_SURFACES;
+        const state = world.get(entity, CharacterController);
+        const wading =
+          water !== undefined &&
+          state !== undefined &&
+          waterDepthAt(water.volumes, state.position) >=
+            (own.water ?? DEFAULT_WATER_TUNING).wadeDepth;
+        const ground = wading
+          ? { material: WATER_MATERIAL, wetness: 1, frozen: false, burning: false }
+          : groundUnder(world, entity);
+        if (ground === undefined) return undefined;
+        if (wading || options.surfaces === undefined || state === undefined) {
+          return footSurface(ground, offsetOf, surfaces);
+        }
+        return surfaceAt(options.surfaces, state.position, surfaces, ground, offsetOf);
+      },
+      noise: (entity: EntityId) => movementProfileOf(world, entity, options.tuning)?.noise,
+      encumbrance: (entity: EntityId) =>
+        world.isRegistered(CharacterEncumbrance)
+          ? world.get(entity, CharacterEncumbrance)?.noise
+          : undefined,
       moving: (inputs, entity) => {
         const move = actionFrameOf(inputs)?.move;
         const held = move !== undefined && (move.x !== 0 || move.y !== 0);

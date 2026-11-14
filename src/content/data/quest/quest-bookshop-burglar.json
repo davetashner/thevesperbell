@@ -1,0 +1,257 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-bookshop-burglar",
+  "title": "The Bookshop Burglar",
+  "summary": "Books are going missing from the Lamplit Stacks at night, and not the valuable ones. Mortimer, who guards the shop and is not a good witness, says he has bitten something small and green. Somebody ought to sit up and see what it is.",
+  "notes": "Side quest of Briar Glen (bible 5.1, 5.11, 6.1 quest 1; mw-e39.10), any class. Mirela gives it (ask-books, or a thief accepting her retrieval job). Objectives bind to what exists: the stakeout is a scene in mirela-stacks (burglar.staked-out), the trail is two readable notes on Market Green (events note-ink-prints-stacks and note-ink-prints-well; the readables are placed by the Stacks door and the Glen Well), and finding Snig is the caught-1 node of snig-tunnels (his tunnels are not placed yet, so he is reached in the conversation room until E26 places the Rootcellar camp; follow-up bead). Four resolutions, each decided by burglar.outcome, which snig-tunnels and the stakeout write: deal (Snig agrees, Mirela agrees lessons, burglar.lessons-agreed; goblins.standing friendly, snig.lessons true, the rare book Silence of Goblins), turned-in (Snig in Hale's cell, burglar.snig-jailed; goblins.standing hostile, snig.lessons false, bounty coin), sold-book (a thief sold Snig a book of his own; goblins.standing neutral, snig.lessons false) and light (a sorcerer raised a light in the Stacks so Mortimer and Snig met face to face; goblins.standing neutral, snig.lessons false, and Snig does not come back, snig-tunnels scary-1). None is a failure. Letting Snig go leaves the outcome open: he can be met again. The thief's jailbreak after turned-in needs the jail system (follow-up bead).",
+  "givers": ["npc-mirela"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "burglar.told"
+      },
+      {
+        "kind": "fact",
+        "fact": "mirela.thief-job.accepted"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "stakeout",
+      "text": "Sit up in the Lamplit Stacks after ten at night, with a poker and a blanket, and see what comes through the transom.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "fact",
+            "fact": "burglar.staked-out"
+          },
+          "stage": "trail"
+        }
+      ]
+    },
+    {
+      "id": "trail",
+      "text": "Whatever it was left ink on the floor. Follow the footprints out of the Stacks and across Market Green; they end at the Glen Well.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "objectiveState",
+            "quest": "quest-bookshop-burglar",
+            "objective": "find-snig",
+            "state": "complete"
+          },
+          "stage": "settle"
+        }
+      ]
+    },
+    {
+      "id": "settle",
+      "text": "The thief is a goblin scout called Snig, and he only wanted the pictures. Decide what happens to him: he can be turned in, taught, sold a book of his own, or scared."
+    }
+  ],
+  "initialStage": "stakeout",
+  "objectives": [
+    {
+      "id": "sit-up",
+      "kind": "fact",
+      "text": "Sit up in the Stacks after ten and see who comes.",
+      "params": {
+        "fact": "burglar.staked-out"
+      },
+      "stage": "stakeout"
+    },
+    {
+      "id": "read-the-shop-prints",
+      "kind": "event",
+      "text": "Look at the ink footprints by the Stacks door.",
+      "params": {
+        "event": "note-ink-prints-stacks"
+      },
+      "optional": true
+    },
+    {
+      "id": "follow-the-trail",
+      "kind": "event",
+      "text": "Follow the footprints to the Glen Well.",
+      "params": {
+        "event": "note-ink-prints-well"
+      },
+      "optional": true
+    },
+    {
+      "id": "find-snig",
+      "kind": "dialogueNode",
+      "text": "Find the thief below the well.",
+      "params": {
+        "dialogue": "snig-tunnels",
+        "node": "caught-1"
+      },
+      "stage": "trail"
+    },
+    {
+      "id": "tell-mirela",
+      "kind": "fact",
+      "text": "Tell Mirela how it ended.",
+      "params": {
+        "fact": "burglar.reported"
+      },
+      "optional": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "light",
+      "approach": "magic",
+      "priority": 70,
+      "when": {
+        "kind": "factCmp",
+        "fact": "burglar.outcome",
+        "op": "eq",
+        "value": "light"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "neutral"
+        },
+        {
+          "kind": "setFact",
+          "fact": "snig.lessons",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "burglar-resolved",
+          "data": {
+            "method": "light"
+          }
+        }
+      ],
+      "journal": "You raised a light in the dark of the Stacks, and a book and a goblin each saw the other and decided the other was the monster. Snig will not be back, and by morning every goblin in the cutting knew about the scary reading one. The shelves are safe. Mortimer has not said a word since."
+    },
+    {
+      "id": "deal",
+      "approach": "diplomacy",
+      "priority": 60,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "deal"
+          },
+          {
+            "kind": "fact",
+            "fact": "burglar.lessons-agreed"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "friendly"
+        },
+        {
+          "kind": "setFact",
+          "fact": "snig.lessons",
+          "value": true
+        },
+        {
+          "kind": "giveItem",
+          "item": "book-silence-of-goblins",
+          "count": 1
+        },
+        {
+          "kind": "emit",
+          "event": "burglar-resolved",
+          "data": {
+            "method": "deal"
+          }
+        }
+      ],
+      "journal": "Snig brings back the books, Mirela teaches him his letters on the second step for goblin salvage, and Mortimer sits on the third and is civil. The cutting thinks well of you, and Mirela has pressed on you a rare book about the goblins, which she says will be a comfort to nobody."
+    },
+    {
+      "id": "sold-book",
+      "approach": "trickery",
+      "priority": 50,
+      "when": {
+        "kind": "factCmp",
+        "fact": "burglar.outcome",
+        "op": "eq",
+        "value": "sold-book"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "neutral"
+        },
+        {
+          "kind": "setFact",
+          "fact": "snig.lessons",
+          "value": false
+        },
+        {
+          "kind": "emit",
+          "event": "burglar-resolved",
+          "data": {
+            "method": "sold-book"
+          }
+        }
+      ],
+      "journal": "A thief knows what a thief wants. You sold Snig a book of his own, a snake in it and all, and he has stopped climbing through Mirela's transom. He is as happy as a small green thing can be, and he still cannot read a word of it."
+    },
+    {
+      "id": "turned-in",
+      "approach": "other",
+      "priority": 40,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "factCmp",
+            "fact": "burglar.outcome",
+            "op": "eq",
+            "value": "turned-in"
+          },
+          {
+            "kind": "fact",
+            "fact": "burglar.snig-jailed"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "hostile"
+        },
+        {
+          "kind": "setFact",
+          "fact": "snig.lessons",
+          "value": false
+        },
+        {
+          "kind": "gold",
+          "delta": 20
+        },
+        {
+          "kind": "emit",
+          "event": "burglar-resolved",
+          "data": {
+            "method": "turned-in"
+          }
+        }
+      ],
+      "journal": "Captain Hale has Snig in the cell, with bread and a blanket, and the council's small bounty is in your pocket. The books are safe. The cutting has gone cold on you, and somewhere under the well a goblin who was fond of pictures is being very quiet."
+    }
+  ]
+}

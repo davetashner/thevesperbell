@@ -75,6 +75,11 @@ export interface InputFilter<TInput> {
   readonly name: string;
   /** Whether the systems see `input` this tick. */
   keep(input: TInput, world: World<TInput>): boolean;
+  /**
+   * What the systems see of an input that was kept (mw-e03.23: a player hiding in a wardrobe keeps
+   * only their look and Interact). Absent: the input as it was. Must be deterministic and pure.
+   */
+  map?(input: TInput, world: World<TInput>): unknown;
 }
 
 /**
@@ -150,6 +155,7 @@ export class World<TInput = unknown> {
   private commands: Command[] = [];
   private nextEntity: EntityId = 1;
   private stepping = false;
+  private restoreCount = 0;
 
   constructor(options: WorldOptions) {
     this.root = Rng.create(options.seed);
@@ -192,6 +198,22 @@ export class World<TInput = unknown> {
     return this.factStore;
   }
 
+  /**
+   * Counts structural changes (spawns, despawns, components added or removed). Watchers that depend
+   * on which entities exist compare it between ticks instead of scanning.
+   */
+  get structureVersion(): number {
+    return this.structure.version;
+  }
+
+  /**
+   * How many times `restore` has replaced this world's state. Not part of the state (snapshots and
+   * hashes leave it out): watchers that keep in-memory views compare it to know their view is stale.
+   */
+  get restores(): number {
+    return this.restoreCount;
+  }
+
   /** The physics this world owns and steps, if it has any. */
   get physics(): PhysicsPort | undefined {
     return this.physicsPort;
@@ -216,6 +238,21 @@ export class World<TInput = unknown> {
   /** Whether exactly this component type is registered (optional features check before reading). */
   isRegistered(type: ComponentType<unknown>): boolean {
     return this.stores.get(type.name)?.type === type;
+  }
+
+  /**
+   * Drops a registered type that no entity holds, so the world hashes as if it had never been
+   * registered (rolling back the first use of an on-demand component). Does nothing, returning
+   * false, mid-step (changes may be queued), when the type is not this exact one or is in use.
+   */
+  unregisterIfEmpty(type: ComponentType<unknown>): boolean {
+    const store = this.stores.get(type.name);
+    if (this.stepping || store?.type !== type || store.size > 0) return false;
+    this.stores.delete(type.name);
+    for (const key of [...this.queries.keys()]) {
+      if ((JSON.parse(key) as string[]).includes(type.name)) this.queries.delete(key);
+    }
+    return true;
   }
 
   /** Appends a system; systems run in the order they were added. */
@@ -348,7 +385,11 @@ export class World<TInput = unknown> {
       const filtered =
         filters.length === 0
           ? inputs
-          : inputs.filter((input) => filters.every((filter) => filter.keep(input, this)));
+          : inputs
+              .filter((input) => filters.every((filter) => filter.keep(input, this)))
+              .map((input) =>
+                filters.reduce((seen, f) => (f.map ? (f.map(seen, this) as TInput) : seen), input),
+              );
       const ctx: TickContext<TInput> = {
         world: this,
         inputs: filtered,
@@ -467,6 +508,7 @@ export class World<TInput = unknown> {
     }
     this.events.clear();
     this.settle();
+    this.restoreCount += 1;
   }
 
   private issue(command: Command): void {

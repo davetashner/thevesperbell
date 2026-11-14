@@ -53,6 +53,313 @@ test('AC-1: perf-baseline at High, 1440p-equivalent: frame time p95 ≤ 16.7 ms 
   });
 });
 
+// The valley scenes (mw-ju8.2: the open-air levels with a backdrop card, the heaviest scenes in the
+// game today) at both presets. High is the baseline's 1280×720 viewport at DPR 2 (2560×1440 buffer).
+// Low is a 1920×1080 buffer at DPR 1 with `?quality=low`. That is the contract's Low resolution only:
+// this machine is not the integrated GPU class Low targets (Iris Xe, base M1 8 GB), so a pass here
+// says nothing about that class. The production build has no backdrop card (it loads only in dev
+// until the images are approved), so these frames do not include it.
+const VALLEYS = ['valley-01', 'valley-02', 'valley-03'] as const;
+const PRESETS = {
+  high: { viewport: { width: 1280, height: 720 }, deviceScaleFactor: 2, label: '1280×720 @2x' },
+  low: { viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, label: '1920×1080 @1x' },
+} as const;
+
+for (const preset of ['high', 'low'] as const) {
+  test.describe(`valleys at ${preset}`, () => {
+    test.use({
+      viewport: PRESETS[preset].viewport,
+      deviceScaleFactor: PRESETS[preset].deviceScaleFactor,
+    });
+    for (const scene of VALLEYS) {
+      test(`AC-1: ${scene} at ${preset}: frame time p95 ≤ 16.7 ms over 1,800 frames`, async ({
+        page,
+      }, testInfo) => {
+        test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+        await instrument(page);
+        const sample = await sampleFrames(page, {
+          scene,
+          preset,
+          capS: FRAME_CAP_S,
+          minSamples: SAMPLE_FRAMES,
+          viewport: PRESETS[preset].label,
+        });
+        console.log(describeLongTasks(`${scene} ${preset} sampling`, sample.longTasks));
+        await enforce(testInfo, 'reference', {
+          browser: browserName(page),
+          frames: sample.run,
+          measurements: [
+            ...frameMeasurements(sample),
+            {
+              metric: 'longTasksOver200ms',
+              value: sample.longTasks.over200,
+              scene,
+              preset,
+            },
+          ],
+        });
+      });
+    }
+  });
+}
+
+// The Briarwood greybox (mw-e25.1 AC-4: 300 × 250 m of placeholder trunks and bramble gates) at the High
+// preset, the same sampling as the valleys. Reference machine only.
+test.describe('briarwood at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-4: briarwood at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'briarwood',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('briarwood high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'briarwood',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
+// The Briar Glen grey-box town (mw-e24.2 AC-4: 180 × 140 m, viewed from Market Green) at the High
+// preset, the same sampling as the Briarwood. Reference machine only.
+test.describe('briar-glen-green at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-4: the town from Market Green at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'briar-glen-green',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('briar-glen-green high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'briar-glen-green',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
+// Mooring's Watch (mw-e25.6 AC-3: 180 × 100 m, viewed from the tower roof over the valley) at the High
+// preset, the same sampling as the Briarwood. Reference machine only.
+test.describe('moorings-watch at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the roof view over the valley at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'moorings-watch',
+      spawn: 'roof-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('moorings-watch high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'moorings-watch',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
+// Bellwater Priory (mw-e26.5 AC-3: 120 × 130 m, viewed from the belfry deck over the nave) at the High
+// preset, the same sampling as Mooring's Watch. Reference machine only.
+test.describe('bellwater-priory at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the belfry view over the nave at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'bellwater-priory',
+      spawn: 'belfry-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('bellwater-priory high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'bellwater-priory',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
+// The Deepworks (mw-e26.2 AC-3: about 220 × 335 m over three levels, viewed from the south end of the cutting hall) at the High
+// preset, the same sampling as Mooring's Watch. Reference machine only.
+test.describe('deepworks at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the cutting hall view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'deepworks',
+      spawn: 'cutting-hall-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('deepworks high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'deepworks',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
+// The Knot's outer half (mw-e26.9 AC-3: about 125 × 260 m, viewed from the south end of the Ossuary entry hall) at the High
+// preset, the same sampling as the Deepworks. Reference machine only.
+test.describe('knot-outer at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the Ossuary view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'knot-outer',
+      spawn: 'ossuary-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('knot-outer high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'knot-outer',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
+// The Knot's inner half (mw-e26.10 AC-3: about 100 × 175 m, viewed from the Cradle's south entrance) at the High
+// preset, the same sampling as the Deepworks. Reference machine only.
+test.describe('knot-inner at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-3: the Cradle view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'knot-inner',
+      spawn: 'cradle-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('knot-inner high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'knot-inner',
+          preset: 'high',
+        },
+      ],
+    });
+  });
+});
+
 // The wall-clock load budgets that used to be PR e2e assertions (mw-e41.8): same moments, measured
 // in the page, enforced here against the reference machine. Budgets: perf/perf-budgets.json.
 test.describe('load budgets', () => {
@@ -124,6 +431,43 @@ test.describe('load budgets', () => {
     await enforce(testInfo, 'reference', {
       browser: browserName(page),
       measurements: [{ metric: 'transitionToPlayableMs', value, scene: 'valley-02' }],
+    });
+  });
+});
+
+// Wendmouth Harbour (mw-e40.1 AC-4: 200 × 160 m, viewed from the Stone Wharf along the quay) at the High
+// preset, the same sampling as the priory. Reference machine only.
+test.describe('wendmouth-harbour at high', () => {
+  test.use({
+    viewport: PRESETS.high.viewport,
+    deviceScaleFactor: PRESETS.high.deviceScaleFactor,
+  });
+  test('AC-4: the Stone Wharf view at high: frame time p95 ≤ 16.7 ms over 1,800 frames', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout((FRAME_CAP_S + 120) * 1_000);
+    await instrument(page);
+    const sample = await sampleFrames(page, {
+      scene: 'wendmouth-harbour',
+      spawn: 'wharf-view',
+      preset: 'high',
+      capS: FRAME_CAP_S,
+      minSamples: SAMPLE_FRAMES,
+      viewport: PRESETS.high.label,
+    });
+    console.log(describeLongTasks('wendmouth-harbour high sampling', sample.longTasks));
+    await enforce(testInfo, 'reference', {
+      browser: browserName(page),
+      frames: sample.run,
+      measurements: [
+        ...frameMeasurements(sample),
+        {
+          metric: 'longTasksOver200ms',
+          value: sample.longTasks.over200,
+          scene: 'wendmouth-harbour',
+          preset: 'high',
+        },
+      ],
     });
   });
 });

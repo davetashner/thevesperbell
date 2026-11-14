@@ -14,6 +14,8 @@
 import { z } from 'zod';
 import type { Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
+import { PLAYER_CLASSES } from './controller.ts';
+import { worldPropertiesSchema } from '../world-properties.ts';
 import { creatureAudioSchema } from './creature-audio.ts';
 import { hitReactionsSchema, poiseRegenSchema, resistancesSchema } from './damage.ts';
 import {
@@ -176,10 +178,17 @@ export const creatureSchema = z.strictObject({
     .describe(
       'Hit regions beyond the body (mw-e05.6): head, weak points, armoured plates. Shapes come with the rig.',
     ),
-  properties: z
-    .array(contentId)
-    .prefault([])
-    .describe('World-property tags (e03), e.g. "flammable", "conductive".'),
+  properties: worldPropertiesSchema
+    .prefault({})
+    .describe(
+      "World properties of its body (e03, mw-e03.24): the same ones objects have, so it burns, soaks, freezes and conducts by the same rules. Omitted ones take the flesh material's, then the actor defaults (flammable, ignites at 450 °C, burns 6 s).",
+    ),
+  aflame: z
+    .boolean()
+    .prefault(false)
+    .describe(
+      'Permanently on fire (a fire elemental): it burns whatever it touches and nothing puts it out; its fire resistance only spares it the damage (mw-e03.24).',
+    ),
   resistances: resistancesSchema,
   poiseRegen: poiseRegenSchema,
   reactions: hitReactionsSchema,
@@ -193,6 +202,27 @@ export const creatureSchema = z.strictObject({
         .optional()
         .describe(
           'Starting stance toward the player that overrides its faction’s; absent = the faction’s.',
+        ),
+      baseline: z
+        .int()
+        .min(-100)
+        .max(100)
+        .optional()
+        .describe(
+          'Disposition toward the player (−100..100) it starts at and decays back to (mw-e12.9); absent = seeded from its stance toward the player.',
+        ),
+      decayPerMinute: z
+        .number()
+        .positive()
+        .optional()
+        .describe(
+          'Points of disposition it drifts back toward its baseline per game minute; absent = it never forgets.',
+        ),
+      classAffinity: z
+        .partialRecord(z.enum(PLAYER_CLASSES), z.int().min(-100).max(100))
+        .optional()
+        .describe(
+          'Offset added to the starting disposition for a player of each class (mw-e22.4), e.g. a fence warms to a thief; absent or unlisted class = 0.',
         ),
     })
     .prefault({})
@@ -220,6 +250,11 @@ export const creatureSchema = z.strictObject({
     .array(contentId)
     .prefault([])
     .describe('Non-hostile affordances offered to the player, e.g. "feed", "talk", "pet".'),
+  dialogue: ref('dialogue')
+    .optional()
+    .describe(
+      'Dialogue the player starts by talking to it (mw-e22.9): with it, Interact offers Talk, the creature pauses its routine and faces the player, and the dialogue runs with this creature as the NPC (its id is the NPC id dialogue conditions and effects name). Absent = it cannot be talked to.',
+    ),
   loot: contentId.optional().describe('Loot table id (E18); absent = drops only what it carries.'),
   shield: ref('shield')
     .optional()

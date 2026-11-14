@@ -2,11 +2,12 @@
   "$schema": "../material.schema.json",
   "id": "glass",
   "name": "Glass",
-  "notes": "Window glass, bottles, lanterns, jars. Non-flammable. Density 2500 kg/m³ (soda-lime glass). Very fragile: 5 J (a thrown stone or a dropped bottle) breaks it. Transparent. Walking on glass (shards) is the loudest surface (+12 dB, audio bible §7.3: glass-shards are very loud). Hard surface: arrows ricochet (or shatter it via fragile). (mw-e03.31)",
+  "notes": "Window glass, bottles, lanterns, jars. Non-flammable. Density 2500 kg/m³ (soda-lime glass). Very fragile: 5 J (a thrown stone or a dropped bottle) breaks it. Transparent. Walking on glass (shards) is the loudest surface (+12 dB, audio bible §7.3: glass-shards are very loud). Hard surface: arrows ricochet (or shatter it via fragile). (mw-e03.31) Barely absorbs water: wetness caps at its absorbency (mw-e03.6).",
   "footstepLoudness": 12,
   "impactSound": "sfx-impact-glass",
   "properties": {
     "density": 2500,
+    "absorbency": 0,
     "hp": 10,
     "fragile": 5,
     "friction": 0.3,

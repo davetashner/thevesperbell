@@ -134,7 +134,9 @@ describe('options menu', () => {
 describe('formatting', () => {
   it('reads slider values in their unit and key codes as keys', () => {
     expect(formatSlider({ unit: 'percent' }, 0.8)).toBe('80%');
-    expect(formatSlider({ unit: 'times' }, 1.25)).toBe('×1.3');
+    expect(formatSlider({ unit: 'times' }, 1.25)).toBe('×1.25');
+    expect(formatSlider({ unit: 'times' }, 1.5)).toBe('×1.5');
+    expect(formatSlider({ unit: 'times' }, 1)).toBe('×1.0');
     expect(formatSlider({ unit: 'degrees' }, 72.4)).toBe('72°');
     expect(keyLabel('KeyE')).toBe('E');
     expect(keyLabel('Digit1')).toBe('1');

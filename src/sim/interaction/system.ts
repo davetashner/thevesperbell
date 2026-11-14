@@ -163,6 +163,7 @@ export function affordancesOf(world: World<never>, entity: EntityId): readonly A
 }
 
 const NO_FILTERS: readonly FocusFilter[] = Object.freeze([]);
+const NO_DEMOTIONS: readonly FocusDemotion[] = Object.freeze([]);
 
 const NO_KIT: InteractorKit = Object.freeze({ capabilities: [], items: [] });
 
@@ -212,6 +213,98 @@ export function addFocusFilter<TInput>(world: World<TInput>, filter: FocusFilter
   list.push(filter);
   return () => {
     const at = list.indexOf(filter);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
+/**
+ * A rule that words an affordance's prompt for the actor's focus: the label to show for `affordance`
+ * of `target` ("Take arrows (3)"), or undefined to keep the affordance's own. The first rule that
+ * answers wins. Rules are not state and must only read the world.
+ */
+export type AffordanceLabel = (
+  world: World<never>,
+  actor: EntityId,
+  target: EntityId,
+  affordance: Affordance,
+) => string | undefined;
+
+const labelRules = new WeakMap<World<never>, AffordanceLabel[]>();
+
+/** Adds `rule` to `world`'s prompts (see `AffordanceLabel`). Returns a function that removes it. */
+export function addAffordanceLabel<TInput>(
+  world: World<TInput>,
+  rule: AffordanceLabel,
+): () => void {
+  const w: World<never> = world;
+  let own = labelRules.get(w);
+  if (own === undefined) labelRules.set(w, (own = []));
+  const list = own;
+  list.push(rule);
+  return () => {
+    const at = list.indexOf(rule);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
+/** The prompt text of `affordance` of `target` for `actor`. */
+function labelFor(
+  world: World<never>,
+  actor: EntityId,
+  target: EntityId,
+  affordance: Affordance,
+): string {
+  for (const rule of labelRules.get(world) ?? []) {
+    const label = rule(world, actor, target, affordance);
+    if (label !== undefined) return label;
+  }
+  return affordance.label;
+}
+
+/**
+ * A rule that makes `target` yield to anything else `actor` could focus: while it holds, the object is
+ * focused only when no other candidate is in reach (a stuck arrow in a chest must never keep the chest
+ * from opening). Like filters, demotions are rules, not state, and must only read the world.
+ */
+export type FocusDemotion = (world: World<never>, actor: EntityId, target: EntityId) => boolean;
+
+const focusDemotions = new WeakMap<World<never>, FocusDemotion[]>();
+
+/** Adds `demotion` to `world`'s focus (see `FocusDemotion`). Returns a function that removes it. */
+export function addFocusDemotion<TInput>(
+  world: World<TInput>,
+  demotion: FocusDemotion,
+): () => void {
+  const w: World<never> = world;
+  let own = focusDemotions.get(w);
+  if (own === undefined) focusDemotions.set(w, (own = []));
+  const list = own;
+  list.push(demotion);
+  return () => {
+    const at = list.indexOf(demotion);
+    if (at >= 0) list.splice(at, 1);
+  };
+}
+
+/**
+ * A rule that names what `target` is embedded in: its colliders never block reach to it, as its own do
+ * not (an arrow stuck in a wall sits on the wall's surface, so the ray to it grazes the wall). Returns
+ * the host entity, or undefined/null for none. Like filters, hosts are rules, not state, and must only
+ * read the world.
+ */
+export type ReachHost = (world: World<never>, target: EntityId) => EntityId | null | undefined;
+
+const reachHosts = new WeakMap<World<never>, ReachHost[]>();
+
+/** Adds `rule` to `world`'s reach tests (see `ReachHost`). Returns a function that removes it. */
+export function addReachHost<TInput>(world: World<TInput>, rule: ReachHost): () => void {
+  const w: World<never> = world;
+  let own = reachHosts.get(w);
+  if (own === undefined) reachHosts.set(w, (own = []));
+  const list = own;
+  list.push(rule);
+  return () => {
+    const at = list.indexOf(rule);
     if (at >= 0) list.splice(at, 1);
   };
 }
@@ -312,6 +405,9 @@ export function playerView(
 
 const NO_BODIES: readonly BodyId[] = Object.freeze([]);
 
+/** How far above an object's focus point its reach ray ends, metres (see `reachable`). */
+const REACH_LIFT = 0.1;
+
 /**
  * An entity's own colliders in the physics port: its physics object's body and its bound level
  * colliders (mw-e03.10). Pass it as `bodiesOf` once the physics-object components are registered
@@ -338,11 +434,22 @@ export function interactionSystem<TInput>(
     ((world: World<TInput>, actor: EntityId) => playerView(world, actor, settings.reachHeight));
   const inputOf = options.input ?? ((inputs: readonly TInput[]) => actionFrameOf(inputs)?.interact);
 
-  /** Whether nothing solid but the target's own colliders lies between `from` and `to`. */
-  const reachable = (world: World<TInput>, target: EntityId, from: Vec3, to: Vec3): boolean => {
+  /**
+   * Whether nothing solid but the target's own colliders lies between `from` and `to`. The ray ends
+   * `REACH_LIFT` above `to`: a creature's placement is its feet, which rest exactly on a floor's top face,
+   * and whether a ray ending on a face counts as touching it is down to rounding (it did at some floor
+   * heights and not at others), so the floor under it would hide it from Talk.
+   */
+  const reachable = (world: World<TInput>, target: EntityId, from: Vec3, point: Vec3): boolean => {
     if (sight === undefined) return true;
+    if (from.x === point.x && from.y === point.y && from.z === point.z) return true;
+    const to = { x: point.x, y: point.y + REACH_LIFT, z: point.z };
     if (from.x === to.x && from.y === to.y && from.z === to.z) return true;
-    const own = bodiesOf(world, target);
+    const own = [...bodiesOf(world, target)];
+    for (const rule of reachHosts.get(world) ?? []) {
+      const host = rule(world, target);
+      if (host !== undefined && host !== null) own.push(...bodiesOf(world, host));
+    }
     let clear = true;
     sight.forEachCrossing(from, to, (body) => {
       clear = own.includes(body);
@@ -370,7 +477,9 @@ export function interactionSystem<TInput>(
     current: EntityId | null,
   ): ScoredFocus | undefined => {
     const filters = focusFilters.get(world) ?? NO_FILTERS;
+    const demotions = focusDemotions.get(world) ?? NO_DEMOTIONS;
     const scored: ScoredFocus[] = [];
+    const yielding: ScoredFocus[] = [];
     for (const entity of all) {
       if (entity === actor || !isRevealed(world, entity)) continue;
       if (filters.some((excluded) => excluded(world, actor, entity))) continue;
@@ -383,9 +492,10 @@ export function interactionSystem<TInput>(
         settings,
       );
       if (score === undefined || !reachable(world, entity, view.origin, placement)) continue;
-      scored.push({ entity, score });
+      const yields = demotions.some((demoted) => demoted(world, actor, entity));
+      (yields ? yielding : scored).push({ entity, score });
     }
-    return selectFocus(scored, current, settings);
+    return selectFocus(scored.length > 0 ? scored : yielding, current, settings);
   };
 
   return {
@@ -505,7 +615,7 @@ export function interactionPrompt(
     const reason = reasonFor(world, actor, kit, target, affordance);
     return {
       verb: affordance.verb,
-      label: affordance.label,
+      label: labelFor(world, actor, target, affordance),
       available: reason === undefined,
       reason: reason ?? '',
     };

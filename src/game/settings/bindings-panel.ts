@@ -221,6 +221,9 @@ export function bindingsPanel(
   const list = h('div', { className: 'vb-stack', data: { bindingsList: '' } }, ...rows);
   list.style.maxHeight = '45vh';
   list.style.overflowY = 'auto';
+  // Room for the focus ring inside the scroller, and for focus scrolling to leave it.
+  list.style.padding = '0.5rem';
+  list.style.scrollPadding = '0.75rem';
 
   const resetAll = button({
     label: 'Reset all bindings',

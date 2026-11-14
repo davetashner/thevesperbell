@@ -182,3 +182,30 @@ describe('screen feedback glue (mw-e29.5)', () => {
     expect(overlay.element.dataset['vignette']).toBe('0.50');
   });
 });
+
+describe('reduce screen effects (mw-e31.7)', () => {
+  it('draws no vignette and no low-health grade while it is on', () => {
+    let reduce = true;
+    const world = new World<never>({ seed: 1 }).register(...DAMAGE_COMPONENTS);
+    const player = world.spawn();
+    giveCombatant(world, player, { health: 100, player: true });
+    const overlay = new ScreenFeedback();
+    const glue = attachScreenFeedback({
+      world,
+      player,
+      shake: new CameraShake(),
+      vignette: new DamageVignette(),
+      overlay,
+      reduceEffects: () => reduce,
+    });
+    new DamageModel().apply(world, player, physical(90));
+    world.events.flush();
+    glue.frame(0);
+    expect(overlay.element.dataset['vignette']).toBe('0.00');
+    expect(overlay.element.hidden).toBe(true);
+    reduce = false;
+    glue.frame(10);
+    expect(Number(overlay.element.dataset['vignette'])).toBeGreaterThan(0);
+    expect(Number(overlay.element.dataset['desaturation'])).toBeGreaterThan(0);
+  });
+});

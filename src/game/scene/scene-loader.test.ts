@@ -86,23 +86,44 @@ describe('scene loader glue (mw-e00.21)', () => {
   it('lists the scenes in the content and defaults to the testbed', () => {
     const { loader } = setup();
     expect(loader.available()).toEqual([
+      'bellwater-priory',
+      'brazier-hall',
+      'briar-glen-green',
       'briar-glen-lane',
+      'briarwood',
       'bridgeward-college',
+      'chandelier-room',
+      'chimes',
       'combat-sandbox',
+      'dark-crossing',
+      'deepworks',
+      'frozen-channel',
+      'hiding-room',
       'kit-gallery',
+      'knot-inner',
+      'knot-outer',
       'lighting-room',
       'marsh-store',
       'mechanism-room',
+      'moorings-watch',
       'perf-baseline',
+      'prefab-gallery',
+      'recoil-corridor',
+      'scales-room',
       'skeleton-pen',
       'sleeping-ox',
       'slice',
+      'sunbeam-hall',
       'testbed',
       'under-the-bridge',
       'valley-01',
       'valley-02',
       'valley-03',
+      'variant-room',
+      'vertical-hall',
+      'watchers',
       'weak-wall-room',
+      'wendmouth-harbour',
     ]);
     expect(loader.available()).toContain(DEFAULT_SCENE);
     expect(loader.current).toBeUndefined();
@@ -175,7 +196,7 @@ describe('scene loader glue (mw-e00.21)', () => {
     const current = loader.load('testbed');
     expect(() => loader.load('does-not-exist')).toThrow(UnknownSceneError);
     expect(() => loader.load('does-not-exist')).toThrow(
-      'unknown scene "does-not-exist"; available scenes: briar-glen-lane, bridgeward-college, combat-sandbox, kit-gallery, lighting-room, marsh-store, mechanism-room, perf-baseline, skeleton-pen, sleeping-ox, slice, testbed, under-the-bridge, valley-01, valley-02, valley-03, weak-wall-room',
+      'unknown scene "does-not-exist"; available scenes: bellwater-priory, brazier-hall, briar-glen-green, briar-glen-lane, briarwood, bridgeward-college, chandelier-room, chimes, combat-sandbox, dark-crossing, deepworks, frozen-channel, hiding-room, kit-gallery, knot-inner, knot-outer, lighting-room, marsh-store, mechanism-room, moorings-watch, perf-baseline, prefab-gallery, recoil-corridor, scales-room, skeleton-pen, sleeping-ox, slice, sunbeam-hall, testbed, under-the-bridge, valley-01, valley-02, valley-03, variant-room, vertical-hall, watchers, weak-wall-room, wendmouth-harbour',
     );
     expect(loader.current).toBe(current);
   });

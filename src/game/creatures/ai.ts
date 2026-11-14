@@ -3,7 +3,7 @@
 // and the behaviour runtime (src/sim/ai) on the navmesh (src/sim/nav). src/main.ts and the headless
 // game world (src/tools/replay/testbed-player-scenario.ts) wire them the same way:
 //
-// - `startSceneNoise` (when a scene loads): builds the scene's sound graph from its acoustics and the
+// - `startSceneNoise` (when a scene loads; it also makes every footstep and landing a noise, mw-e09.5): builds the scene's sound graph from its acoustics and the
 //   loaded door spawns (`soundGraphFromScene`) and installs noise propagation with the shipped
 //   stealth noise tuning and each door profile's leaf material. A level change swaps the graph
 //   (`load`); `unload` leaves an empty graph (every noise falls off with distance alone).
@@ -27,25 +27,38 @@
 // position and whether it stands on the navmesh, how many times one was seen off it, and perception's
 // spend against its budget.
 
-import { STEALTH_ID, type GameContent } from '@content/index';
+import {
+  compileSurfaceTable,
+  STEALTH_ID,
+  SURFACE_TABLE_ID,
+  type GameContent,
+} from '@content/index';
 import {
   approach,
   BrainComponent,
   buildSoundGraph,
   compileBehaviours,
+  createSurfaceMap,
+  DEFAULT_FOOTSTEP_SURFACES,
   entitySource,
+  hourNow,
   installAi,
   installAwareness,
+  installFootstepNoise,
+  isFriendlyToPlayer,
   installNoisePropagation,
   LineOfSight,
+  meshWithRopeLinks,
   NavMesh,
   navmeshNavigation,
   NavRouteComponent,
   perceptionSystem,
   perceptSourcePresent,
   PlacementComponent,
+  ropeLinkRows,
   soundGraphFromScene,
   straightDistance,
+  surfaceAt,
   straightLineNavigation,
   worldNavDoors,
   type AiNavigation,
@@ -53,11 +66,14 @@ import {
   type AttackLookup,
   type BehaviourTable,
   type EntityId,
+  type FactionTable,
   type LightField,
   type LoadedScene,
+  type NavDoorLookup,
   type NavmeshNavigation,
   type NoisePropagation,
   type PerceptionSystem,
+  type SurfaceMap,
   type SightWorld,
   type TravelRequest,
   type Vec3,
@@ -86,19 +102,33 @@ export function startSceneNoise<TInput>(
 ): SceneNoise {
   const graphOf = (scene: LoadedScene) =>
     soundGraphFromScene(content.get('scene', scene.id), scene);
+  const noise = content.get('stealth', STEALTH_ID).noise;
+  const surfaces = compileSurfaceTable(content.get('surface-table', SURFACE_TABLE_ID));
+  const mapOf = (scene: LoadedScene): SurfaceMap =>
+    createSurfaceMap({ table: surfaces, regions: scene.layout.surfaces });
+  let surfaceMap = mapOf(loaded);
   const propagation = installNoisePropagation(world, {
     graph: graphOf(loaded),
-    tuning: content.get('stealth', STEALTH_ID).noise,
+    tuning: noise,
     // Door entities exist only for door profiles content has (the mechanisms build them).
     doorMaterial: (profile) => content.get('door', profile).material.id,
+  });
+  // Every footstep and landing is a noise (mw-e09.5); creatures have no collider to read, so their
+  // steps sound by the scene's tagged surfaces (else stone).
+  installFootstepNoise(world, {
+    tuning: noise.footsteps,
+    surfaces,
+    creatureSurface: (position) => surfaceAt(surfaceMap, position, DEFAULT_FOOTSTEP_SURFACES),
   });
   return {
     propagation,
     load(scene) {
       propagation.setGraph(graphOf(scene));
+      surfaceMap = mapOf(scene);
     },
     unload() {
       propagation.setGraph(buildSoundGraph(EMPTY_GRAPH));
+      surfaceMap = createSurfaceMap({ table: surfaces });
     },
   };
 }
@@ -116,10 +146,18 @@ export function sceneDoors(loaded: LoadedScene): ReadonlyMap<string, EntityId> {
   return doors;
 }
 
+/** The rope links of a world with no ropes hanging (JSON of their rows). */
+const NO_ROPES = '[]';
+
 /** AI travel on the loaded scene's navmesh, or in straight lines without one (see the file header). */
 export class SceneNavigation implements AiNavigation {
   #navmesh: NavmeshNavigation | undefined;
   #mesh: NavMesh | undefined;
+  /** The baked mesh without rope links, and the doors it travels with. */
+  #base: NavMesh | undefined;
+  #doors: NavDoorLookup | undefined;
+  /** The rope links `#mesh` was built with (JSON of their rows), to notice a change. */
+  #ropeKey = NO_ROPES;
 
   /** The loaded scene's navmesh, or undefined (straight-line travel). */
   get mesh(): NavMesh | undefined {
@@ -136,14 +174,41 @@ export class SceneNavigation implements AiNavigation {
     this.unload(world);
     const mesh = sceneNavMesh(content, loaded.id);
     if (mesh === undefined) return;
+    this.#base = mesh;
+    this.#doors = worldNavDoors(world, sceneDoors(loaded));
+    this.#ropeKey = NO_ROPES;
     this.#mesh = mesh;
-    this.#navmesh = navmeshNavigation({ mesh, doors: worldNavDoors(world, sceneDoors(loaded)) });
+    this.#navmesh = navmeshNavigation({ mesh, doors: this.#doors });
+  }
+
+  /**
+   * Gives the navmesh the climb links of the ropes hanging now (mw-e10.9) and takes away those of ropes
+   * that are gone; call it each tick (it only rebuilds when the ropes changed). Routes planned on the
+   * old links are dropped.
+   */
+  syncRopes(world: World<never>): void {
+    const base = this.#base;
+    if (base === undefined || this.#doors === undefined) return;
+    const rows = ropeLinkRows(base, world);
+    const key = JSON.stringify(rows);
+    if (key === this.#ropeKey) return;
+    this.#ropeKey = key;
+    const mesh = meshWithRopeLinks(base, world);
+    this.#mesh = mesh;
+    this.#navmesh = navmeshNavigation({ mesh, doors: this.#doors });
+    this.#dropRoutes(world);
   }
 
   /** Back to straight lines; every agent's route (planned on the old mesh) is dropped. */
   unload(world: World<never>): void {
     this.#mesh = undefined;
     this.#navmesh = undefined;
+    this.#base = undefined;
+    this.#doors = undefined;
+    this.#dropRoutes(world);
+  }
+
+  #dropRoutes(world: World<never>): void {
     if (!world.isRegistered(NavRouteComponent)) return;
     for (const entity of world.query(NavRouteComponent).ids()) {
       world.remove(entity, NavRouteComponent);
@@ -176,6 +241,11 @@ export interface CreatureAiOptions {
   readonly sight: SightWorld;
   /** How AI travels (`SceneNavigation`). */
   readonly navigation: AiNavigation;
+  /**
+   * The factions: creatures that are friends of the player (shopkeepers, the Watch) do not notice
+   * its footsteps (mw-e09.5). Without it every creature does.
+   */
+  readonly factions?: FactionTable;
 }
 
 /** Installed creature senses and AI. */
@@ -194,12 +264,15 @@ export function installCreatureAi<TInput>(
   options: CreatureAiOptions,
 ): CreatureAi {
   const w: World<never> = world;
-  const { content, player } = options;
+  const { content, player, factions } = options;
   const perception = perceptionSystem<unknown>(w, {
     lineOfSight: new LineOfSight({ world: options.sight }),
     light: options.light,
     visibility: content.get('stealth', STEALTH_ID).visibility,
     ...(player !== undefined && { targets: () => [player] }),
+    ...(factions !== undefined && {
+      noticesMovement: (agent: EntityId) => !isFriendlyToPlayer(w, factions, agent),
+    }),
   });
   world.addSystem(perception);
   installAwareness(w, {
@@ -211,7 +284,8 @@ export function installCreatureAi<TInput>(
   const navigation = world.isRegistered(StatusLedgerComponent)
     ? statusScaledNavigation(options.navigation, statusLookup(content.all('status')))
     : options.navigation;
-  installAi(world, { behaviours, navigation, attacks });
+  // Routines switch by the game's hour (mw-8551); a world with no clock reads no windows.
+  installAi(world, { behaviours, navigation, attacks, hourOfDay: hourNow });
   return { perception, behaviours };
 }
 

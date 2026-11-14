@@ -6,6 +6,7 @@
   "facts": [
     {
       "key": "entity:*.opened",
+      "persistence": "permanent",
       "type": "bool",
       "default": false,
       "description": "The door, gate, chest or hatch has been opened (by hand, key, lockpick, spell or mechanism). Level variants and saves read it to restore the entity open.",
@@ -13,6 +14,7 @@
     },
     {
       "key": "entity:*.looted",
+      "persistence": "permanent",
       "type": "bool",
       "default": false,
       "description": "The container or corpse has been emptied by the player. Saves and loot tables read it so it stays empty.",

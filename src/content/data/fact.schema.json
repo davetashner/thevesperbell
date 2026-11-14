@@ -54,11 +54,70 @@
               },
               "persistence": {
                 "default": "permanent",
-                "description": "How long a written value lasts; `permanent` keeps it in saves forever.",
+                "description": "How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt).",
                 "type": "string",
                 "enum": [
-                  "permanent"
+                  "permanent",
+                  "reset-on-rest",
+                  "reset-after",
+                  "transient",
+                  "decays-to"
                 ]
+              },
+              "resetAfter": {
+                "description": "Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required.",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "decaysTo": {
+                "description": "Only with persistence `decays-to`, where it is required.",
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        }
+                      ]
+                    },
+                    "description": "Saved values that decay (e.g. [\"burning\"])."
+                  },
+                  "to": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    ],
+                    "description": "The value a loaded game holds instead (e.g. \"burnt\")."
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
               },
               "type": {
                 "type": "string",
@@ -107,11 +166,70 @@
               },
               "persistence": {
                 "default": "permanent",
-                "description": "How long a written value lasts; `permanent` keeps it in saves forever.",
+                "description": "How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt).",
                 "type": "string",
                 "enum": [
-                  "permanent"
+                  "permanent",
+                  "reset-on-rest",
+                  "reset-after",
+                  "transient",
+                  "decays-to"
                 ]
+              },
+              "resetAfter": {
+                "description": "Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required.",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "decaysTo": {
+                "description": "Only with persistence `decays-to`, where it is required.",
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        }
+                      ]
+                    },
+                    "description": "Saved values that decay (e.g. [\"burning\"])."
+                  },
+                  "to": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    ],
+                    "description": "The value a loaded game holds instead (e.g. \"burnt\")."
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
               },
               "type": {
                 "type": "string",
@@ -162,11 +280,70 @@
               },
               "persistence": {
                 "default": "permanent",
-                "description": "How long a written value lasts; `permanent` keeps it in saves forever.",
+                "description": "How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt).",
                 "type": "string",
                 "enum": [
-                  "permanent"
+                  "permanent",
+                  "reset-on-rest",
+                  "reset-after",
+                  "transient",
+                  "decays-to"
                 ]
+              },
+              "resetAfter": {
+                "description": "Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required.",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "decaysTo": {
+                "description": "Only with persistence `decays-to`, where it is required.",
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        }
+                      ]
+                    },
+                    "description": "Saved values that decay (e.g. [\"burning\"])."
+                  },
+                  "to": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    ],
+                    "description": "The value a loaded game holds instead (e.g. \"burnt\")."
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
               },
               "type": {
                 "type": "string",
@@ -226,11 +403,70 @@
               },
               "persistence": {
                 "default": "permanent",
-                "description": "How long a written value lasts; `permanent` keeps it in saves forever.",
+                "description": "How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt).",
                 "type": "string",
                 "enum": [
-                  "permanent"
+                  "permanent",
+                  "reset-on-rest",
+                  "reset-after",
+                  "transient",
+                  "decays-to"
                 ]
+              },
+              "resetAfter": {
+                "description": "Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required.",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "decaysTo": {
+                "description": "Only with persistence `decays-to`, where it is required.",
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        }
+                      ]
+                    },
+                    "description": "Saved values that decay (e.g. [\"burning\"])."
+                  },
+                  "to": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    ],
+                    "description": "The value a loaded game holds instead (e.g. \"burnt\")."
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
               },
               "type": {
                 "type": "string",
@@ -287,11 +523,70 @@
               },
               "persistence": {
                 "default": "permanent",
-                "description": "How long a written value lasts; `permanent` keeps it in saves forever.",
+                "description": "How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt).",
                 "type": "string",
                 "enum": [
-                  "permanent"
+                  "permanent",
+                  "reset-on-rest",
+                  "reset-after",
+                  "transient",
+                  "decays-to"
                 ]
+              },
+              "resetAfter": {
+                "description": "Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required.",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "decaysTo": {
+                "description": "Only with persistence `decays-to`, where it is required.",
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        }
+                      ]
+                    },
+                    "description": "Saved values that decay (e.g. [\"burning\"])."
+                  },
+                  "to": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    ],
+                    "description": "The value a loaded game holds instead (e.g. \"burnt\")."
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
               },
               "type": {
                 "type": "string",

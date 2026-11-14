@@ -22,6 +22,14 @@ export const PALETTE = Object.freeze({
   wayfinder: '#F2C94C',
 });
 
+/** The dialogue plate and text (mw-e22.10); the plate's alpha is at least 90%, 100% with the setting. */
+export const DIALOGUE_PLATE = PALETTE.ink;
+export const DIALOGUE_TEXT = PALETTE.cream;
+export const DIALOGUE_MUTED = PALETTE.parchment;
+/** High-contrast dialogue: white on solid black. */
+export const DIALOGUE_HIGH_CONTRAST_PLATE = '#000000';
+export const DIALOGUE_HIGH_CONTRAST_TEXT = '#FFFFFF';
+
 /** Token name (without the leading `--`) → default value. */
 export const UI_TOKENS: Readonly<Record<string, string>> = Object.freeze({
   // Colour (style bible §9: parchment panels, ink text, hearth hover, ember warnings).
@@ -50,8 +58,11 @@ export const UI_TOKENS: Readonly<Record<string, string>> = Object.freeze({
   // Type (style bible §9.1; the fonts are self-hosted by mw-e37, system fallbacks until then).
   'ui-font-body': "'Alegreya Sans', 'Atkinson Hyperlegible', system-ui, sans-serif",
   'ui-font-heading': "'Cinzel', Georgia, serif",
-  'ui-font-size': '16px',
+  // 16px, rising with the window to 18px at 1080p (1.6667vh) so body text reads from a couch or desk.
+  'ui-font-size': 'max(16px, 1.6667vh)',
   'ui-text-scale': '1',
+  // Opacity (0-1) of the ink plate behind HUD text; 0 keeps the plain shadowed text.
+  'ui-text-backdrop-opacity': '0',
   // Space, shape, motion.
   'ui-space-1': '0.25rem',
   'ui-space-2': '0.5rem',
@@ -86,6 +97,18 @@ ${tokens}
   line-height: 1.4;
   color: var(--ui-color-text);
 }
+.vb-ui[data-font='dyslexia'] {
+  --ui-font-body: 'OpenDyslexic', 'Lexend', 'Atkinson Hyperlegible', 'Trebuchet MS', Verdana, sans-serif;
+  --ui-font-heading: var(--ui-font-body);
+  letter-spacing: 0.03em;
+  word-spacing: 0.1em;
+}
+.vb-interact, .vb-target-name, .vb-target-note, .vb-boss-name, .vb-reticle-spell, .vb-reticle-note {
+  --ui-backdrop: rgb(30 27 46 / calc(var(--ui-text-backdrop-opacity) * 100%));
+  background: var(--ui-backdrop);
+  box-shadow: 0 0 0 0.2em var(--ui-backdrop);
+  border-radius: 0.2em;
+}
 .vb-ui[data-motion='reduce'] { --ui-motion-scale: 0; }
 @media (prefers-reduced-motion: reduce) {
   .vb-ui:not([data-motion='full']) { --ui-motion-scale: 0; }
@@ -113,6 +136,8 @@ ${tokens}
   max-width: min(60rem, 100%);
   max-height: 100%;
   overflow: auto;
+  /* Focus scrolling stops this far from the edge, so a control's ring is never cut by the panel. */
+  scroll-padding: var(--ui-space-3);
   padding: var(--ui-space-4);
   background: var(--ui-color-panel);
   color: var(--ui-color-text);
@@ -126,11 +151,16 @@ ${tokens}
 .vb-panel h1 { font-size: ${size(1.75)}; }
 .vb-panel h2 { font-size: ${size(1.25)}; }
 .vb-panel h3 { font-size: ${size(1.05)}; }
+.vb-ui [hidden] { display: none !important; }
 .vb-ui :focus { outline: none; }
 .vb-ui :focus-visible,
 .vb-ui[data-modality='nav'] :focus {
   outline: var(--ui-focus-width) solid var(--ui-color-focus);
   outline-offset: var(--ui-focus-offset);
+  /* A two-tone ring: the ink outline sits between two bands of the light panel colour (the offset gap
+     and a halo outside it), so it stands out on a dark backdrop as well as on parchment, and reads
+     as a shape rather than a colour change. */
+  box-shadow: 0 0 0 calc(var(--ui-focus-offset) + var(--ui-focus-width) + 2px) var(--ui-color-panel-raised);
 }
 .vb-button {
   font: inherit;
@@ -157,6 +187,7 @@ ${tokens}
 .vb-list {
   position: relative;
   overflow-y: auto;
+  scroll-padding: var(--ui-space-3);
   border: 1px solid var(--ui-color-text-muted);
   border-radius: var(--ui-radius);
   background: var(--ui-color-panel-raised);
@@ -170,7 +201,7 @@ ${tokens}
   white-space: nowrap;
 }
 .vb-list-item[aria-selected='true'] { background: var(--ui-color-accent); }
-.vb-tabs [role='tablist'] { display: flex; gap: var(--ui-space-1); }
+.vb-tabs [role='tablist'] { display: flex; flex-wrap: wrap; gap: var(--ui-space-1); }
 .vb-tab {
   font: inherit;
   color: var(--ui-color-text);
@@ -182,6 +213,8 @@ ${tokens}
 }
 .vb-tab[aria-selected='true'] { border-bottom-color: var(--ui-color-text); font-weight: 700; }
 .vb-tabpanel { padding: var(--ui-space-2) 0; }
+/* A panel that is also a .vb-stack/.vb-row would otherwise keep its display and show every tab at once. */
+.vb-tabpanel[hidden] { display: none; }
 .vb-toggle {
   font: inherit;
   color: var(--ui-color-text);
@@ -190,6 +223,8 @@ ${tokens}
 }
 .vb-toggle, .vb-slider, .vb-select {
   display: inline-flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   align-items: center;
   gap: var(--ui-space-2);
   padding: var(--ui-space-1) var(--ui-space-2);
@@ -218,14 +253,14 @@ ${tokens}
 .vb-toggle[aria-checked='true'] .vb-toggle-track { background: var(--ui-color-text); }
 .vb-toggle[aria-checked='true'] .vb-toggle-track::after { transform: translateX(1.2em); }
 .vb-slider-track {
-  width: 10em;
+  width: min(10em, 100%);
   height: 0.5em;
   border-radius: 0.25em;
   background: var(--ui-color-text-muted);
   position: relative;
 }
 .vb-slider-fill { position: absolute; inset: 0 auto 0 0; background: var(--ui-color-text); border-radius: inherit; }
-.vb-select-value { min-width: 6em; text-align: center; font-weight: 700; }
+.vb-select-value { min-width: min(6em, 100%); text-align: center; font-weight: 700; }
 .vb-meter {
   position: relative;
   width: 14em;
@@ -245,6 +280,29 @@ ${tokens}
 .vb-meter[data-kind='breath'] .vb-meter-fill { background: var(--ui-color-breath); }
 .vb-meter[data-kind='mana'] .vb-meter-fill { background: var(--ui-color-mana); }
 .vb-meter[data-kind='poise'] .vb-meter-fill { background: var(--ui-color-poise); }
+/* Colour is never the only cue (mw-e31.8): each bar also wears its own ink pattern over the whole bar,
+   so greyscale or colour-blind eyes tell them apart. Health is solid, stamina is diagonal stripes,
+   mana is dots, breath is horizontal bars, poise is upright ticks. */
+.vb-meter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.vb-meter[data-kind='stamina']::after {
+  background-image: repeating-linear-gradient(45deg, rgb(30 27 46 / 60%) 0 2px, transparent 2px 6px);
+}
+.vb-meter[data-kind='mana']::after {
+  background-image: radial-gradient(circle, rgb(30 27 46 / 65%) 1.2px, transparent 1.6px);
+  background-size: 6px 6px;
+}
+.vb-meter[data-kind='breath']::after {
+  background-image: repeating-linear-gradient(0deg, rgb(30 27 46 / 55%) 0 1px, transparent 1px 3px);
+}
+.vb-meter[data-kind='poise']::after {
+  background-image: repeating-linear-gradient(90deg, rgb(30 27 46 / 60%) 0 2px, transparent 2px 5px);
+}
 .vb-water-hud {
   position: absolute;
   left: 50%;
@@ -412,6 +470,8 @@ ${tokens}
   white-space: nowrap;
 }
 .vb-damage-number[data-kind='taken'] { color: var(--ui-color-damage); }
+/* Damage you take reads with a minus sign, so it differs from damage you deal without colour. */
+.vb-damage-number[data-kind='taken']::before { content: '\\2212'; }
 .vb-damage-number[hidden] { display: none; }
 .vb-lock-marker {
   position: absolute;
@@ -464,7 +524,7 @@ ${tokens}
   left: 0;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-size: 0.8rem;
+  font-size: ${size(0.8)};
   text-shadow: 0 0 2px var(--ui-color-hud-shadow), 0 0 2px var(--ui-color-hud-shadow);
 }
 .vb-reticle-spell { top: 1.1em; }
@@ -514,11 +574,13 @@ ${tokens}
 .vb-inventory-items { position: relative; flex: 3 1 20em; min-width: 0; }
 .vb-inventory-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(10em, 100%), 1fr));
   gap: var(--ui-space-2);
   max-height: 24em;
   overflow-y: auto;
-  padding: var(--ui-space-1);
+  /* Room inside the scroller for the focus ring (offset + width + halo), and for focus scrolling. */
+  padding: var(--ui-space-2);
+  scroll-padding: var(--ui-space-3);
 }
 .vb-inventory-grid[hidden], .vb-inventory-empty[hidden], .vb-item-details[hidden] { display: none; }
 .vb-item-card {
@@ -647,7 +709,7 @@ ${tokens}
 }
 .vb-spell-slot-key { left: 0.2em; top: 0.2em; }
 .vb-spell-slot-cost { right: 0.2em; bottom: 0.2em; color: var(--ui-color-mana); }
-.vb-spell-slot[data-state='unaffordable'] .vb-spell-slot-cost { color: var(--ui-color-warning); }
+.vb-spell-slot[data-state='unaffordable'] .vb-spell-slot-cost { color: var(--ui-color-warning); text-decoration: line-through; }
 .vb-spell-slot-timer { font-size: 1.2em; }
 .vb-spell-wheel {
   position: absolute;
@@ -677,7 +739,7 @@ ${tokens}
   border: 2px solid var(--ui-color-border);
   background: var(--ui-color-bar-track);
   text-align: center;
-  font-size: 0.85rem;
+  font-size: ${size(0.85)};
 }
 .vb-spell-wheel-slot[data-state='empty'] { opacity: 0.45; }
 .vb-spell-wheel-slot[data-state='unavailable'] { opacity: 0.6; }
@@ -689,7 +751,7 @@ ${tokens}
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: ${size(1.1)};
   text-shadow: 0 0 2px var(--ui-color-hud-shadow), 0 0 2px var(--ui-color-hud-shadow);
 }
 .vb-tooltip {
@@ -721,7 +783,7 @@ ${tokens}
   border-left: 4px solid var(--ui-color-accent);
   border-radius: var(--ui-radius);
 }
-.vb-toast[data-tone='warning'] { border-left-color: var(--ui-color-warning); }
+.vb-toast[data-tone='warning'] { border-left: 8px double var(--ui-color-warning); }
 .vb-panel.vb-container { width: min(26em, 100%); }
 .vb-container h1 { overflow-wrap: anywhere; }
 .vb-container-rows[hidden], .vb-container-empty[hidden] { display: none; }
@@ -742,7 +804,63 @@ ${tokens}
 .vb-container-status:empty { display: none; }
 .vb-container-hint { color: var(--ui-color-text-muted); font-size: ${size(0.875)}; }
 .vb-container-actions { flex-wrap: wrap; }
-.vb-panel.vb-shop { width: min(40em, 100%); }
+.vb-panel.vb-contest { width: min(34em, 100%); }
+.vb-contest h1 { overflow-wrap: anywhere; margin: 0; }
+.vb-contest p { margin: 0; overflow-wrap: anywhere; }
+.vb-contest-bet { flex-wrap: wrap; align-items: center; }
+.vb-contest-stake { font-variant-numeric: tabular-nums; font-weight: 700; }
+.vb-contest-status:empty { display: none; }
+.vb-contest-hud {
+  position: absolute;
+  top: var(--ui-space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 28em;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  background: var(--ui-color-panel);
+  color: var(--ui-color-text);
+  border-left: 4px solid var(--ui-color-accent);
+  border-radius: var(--ui-radius);
+  pointer-events: none;
+}
+.vb-contest-hud[hidden] { display: none; }
+.vb-contest-hud-title { margin: 0; font-size: ${size(1)}; }
+.vb-contest-hud-rows { margin: 0; padding: 0; list-style: none; font-variant-numeric: tabular-nums; }
+.vb-contest-hud-row[data-you='true'] { font-weight: 700; }
+.vb-contest-hud-meter { width: 100%; }
+.vb-contest-hud-meter[hidden] { display: none; }
+.vb-contest-hud-hints, .vb-contest-hud-message { margin: 0; overflow-wrap: anywhere; }
+.vb-contest-hud-message:empty { display: none; }
+.vb-panel.vb-reader { width: min(30em, 100%); }
+.vb-reader h1 { overflow-wrap: anywhere; margin: 0; }
+.vb-reader-byline, .vb-reader-page, .vb-reader-hint { margin: 0; color: var(--ui-color-text-muted); }
+.vb-reader-byline { font-style: italic; }
+.vb-reader-byline[hidden], .vb-reader-page[hidden], .vb-reader-actions[hidden] { display: none; }
+.vb-reader-body { max-height: 50vh; overflow-y: auto; line-height: 1.5; }
+.vb-reader-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vb-reader-hint { font-size: ${size(0.875)}; }
+.vb-reader-actions { flex-wrap: wrap; }
+.vb-panel.vb-journal { width: min(40em, 100%); }
+.vb-journal h1, .vb-journal h2 { overflow-wrap: anywhere; margin: 0; }
+.vb-journal-panel { max-height: 55vh; overflow-y: auto; }
+.vb-journal-entry { line-height: 1.5; }
+.vb-journal-entry p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vb-journal-status, .vb-journal-empty, .vb-journal-hint { margin: 0; color: var(--ui-color-text-muted); }
+.vb-journal-hint { font-size: ${size(0.875)}; }
+.vb-journal-objectives { margin: 0; padding: 0; list-style: none; }
+.vb-journal-objectives li { overflow-wrap: anywhere; }
+.vb-journal-check { font-family: monospace; }
+.vb-journal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.vb-screen[data-screen="epilogue"] { background: ${DIALOGUE_HIGH_CONTRAST_PLATE}; }
+.vb-panel.vb-epilogue { width: min(36em, 100%); text-align: center; background: transparent; }
+.vb-epilogue h1 { overflow-wrap: anywhere; margin: 0; }
+.vb-epilogue h1[hidden], .vb-epilogue-counter[hidden] { display: none; }
+.vb-epilogue-counter, .vb-epilogue-hint { margin: 0; color: var(--ui-color-text-muted); }
+.vb-epilogue-body { line-height: 1.6; font-size: ${size(1.25)}; }
+.vb-epilogue-body p { margin: 0; overflow-wrap: anywhere; }
+.vb-epilogue-hint { font-size: ${size(0.875)}; }
+.vb-epilogue-actions { flex-wrap: wrap; justify-content: center; }
+.vb-panel.vb-shop { width: min(40em, 100%); container-type: inline-size; }
 .vb-shop h1 { overflow-wrap: anywhere; margin: 0; }
 .vb-shop-header { display: flex; align-items: center; gap: var(--ui-space-3); }
 .vb-shop-portrait {
@@ -762,7 +880,7 @@ ${tokens}
 .vb-shop-greeting { margin: 0; font-style: italic; overflow-wrap: anywhere; }
 .vb-shop-crowns { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
 .vb-shop-panel[hidden] { display: none; }
-.vb-shop-rows { gap: var(--ui-space-1); max-height: 40vh; overflow-y: auto; padding: var(--ui-space-1); }
+.vb-shop-rows { gap: var(--ui-space-1); max-height: 40vh; overflow-y: auto; padding: var(--ui-space-2); scroll-padding: var(--ui-space-3); }
 .vb-shop-item {
   position: relative;
   display: grid;
@@ -803,6 +921,16 @@ ${tokens}
 .vb-shop-status, .vb-shop-hint { margin: 0; }
 .vb-shop-status:empty { display: none; }
 .vb-shop-hint { color: var(--ui-color-text-muted); font-size: ${size(0.875)}; }
+/* Narrow shop (a phone, or large text): each row stacks its price and stepper under the name. */
+@container (max-width: 30em) {
+  .vb-shop-header { flex-wrap: wrap; }
+  .vb-shop-who { flex: 1 1 100%; }
+  .vb-shop-portrait { width: 2.25em; height: 2.75em; }
+  .vb-shop-item { grid-template-columns: minmax(0, 1fr); }
+  .vb-button.vb-shop-row { grid-template-columns: auto minmax(0, 1fr); }
+  .vb-shop-price { grid-column: 2; text-align: left; }
+  .vb-shop-stepper { justify-content: flex-start; }
+}
 .vb-pickups {
   position: absolute;
   right: var(--ui-space-3);
@@ -811,7 +939,7 @@ ${tokens}
   flex-direction: column;
   align-items: flex-end;
   gap: var(--ui-space-2);
-  max-width: min(22em, 45%);
+  max-width: max(min(22em, 45%), min(14em, calc(100% - 2 * var(--ui-space-3))));
   pointer-events: none;
 }
 .vb-pickup {
@@ -845,15 +973,22 @@ ${tokens}
 .vb-pickup-flavour { font-style: italic; overflow-wrap: anywhere; }
 .vb-captions {
   position: absolute;
-  top: var(--ui-space-4);
+  /* Below the locked target's health bar (top centre), and no lower than the interact prompt (62%).
+     Lines that do not fit in that band wrap into a second column, which the clip hides whole; they
+     are still in the live region, and are the lowest priority (lines are in priority order). */
+  top: 5.5em;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
   align-items: center;
   gap: var(--ui-space-1);
   width: max-content;
   max-width: calc(100% - 2 * var(--ui-space-3));
+  max-height: calc(58% - 5.5em);
+  overflow: hidden;
   pointer-events: none;
 }
 .vb-captions[hidden] { display: none; }
@@ -862,7 +997,8 @@ ${tokens}
   align-items: center;
   gap: var(--ui-space-2);
   padding: var(--ui-space-1) var(--ui-space-3);
-  background: rgb(30 27 46 / 90%);
+  /* The plate is at least 90% so captions always read; the text background setting can raise it. */
+  background: rgb(30 27 46 / max(90%, calc(var(--ui-text-backdrop-opacity) * 100%)));
   color: var(--ui-color-hud-text);
   text-shadow: none;
   border-radius: var(--ui-radius);
@@ -870,7 +1006,7 @@ ${tokens}
 }
 .vb-captions[data-size='small'] .vb-caption { font-size: ${size(0.875)}; }
 .vb-captions[data-size='large'] .vb-caption { font-size: ${size(1.5)}; }
-.vb-caption-arrow { flex: none; display: inline-block; line-height: 1; color: var(--ui-color-accent); }
+.vb-caption-arrow { flex: none; display: inline-block; line-height: 1; font-size: 1.3em; color: var(--ui-color-accent); }
 .vb-caption-text { min-width: 0; overflow-wrap: anywhere; }
 .vb-glyph-prompt { display: inline-flex; align-items: center; gap: var(--ui-space-1); }
 .vb-glyph-prompt kbd {
@@ -909,6 +1045,125 @@ ${tokens}
   background: var(--ui-color-hud-text);
   transform-origin: left center;
   transform: scaleX(0);
+}
+.vb-dialogue {
+  /* The plate is at least 90% so the line always reads; the text background setting can raise it. */
+  --vb-dialogue-plate: rgb(30 27 46 / max(90%, calc(var(--ui-text-backdrop-opacity) * 100%)));
+  --vb-dialogue-text: ${DIALOGUE_TEXT};
+  --vb-dialogue-muted: ${DIALOGUE_MUTED};
+  --vb-dialogue-accent: ${PALETTE.hearth};
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  transform: translateX(-50%);
+  width: min(44rem, calc(100% - 2 * var(--ui-space-3)));
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-3);
+  font-size: ${size(1.125)};
+  color: var(--vb-dialogue-text);
+  background: var(--vb-dialogue-plate);
+  border: 2px solid var(--ui-color-border);
+  border-radius: var(--ui-radius);
+  text-shadow: none;
+  pointer-events: auto;
+}
+.vb-ui[data-contrast='high'] .vb-dialogue {
+  --vb-dialogue-plate: ${DIALOGUE_HIGH_CONTRAST_PLATE};
+  --vb-dialogue-text: ${DIALOGUE_HIGH_CONTRAST_TEXT};
+  --vb-dialogue-muted: ${DIALOGUE_HIGH_CONTRAST_TEXT};
+  --vb-dialogue-accent: ${DIALOGUE_HIGH_CONTRAST_TEXT};
+  border: 4px solid ${DIALOGUE_HIGH_CONTRAST_TEXT};
+}
+.vb-dialogue[hidden], .vb-dialogue [hidden] { display: none; }
+.vb-dialogue p, .vb-dialogue ol, .vb-dialogue h2 { margin: 0; }
+.vb-dialogue-main { display: flex; gap: var(--ui-space-3); min-height: 0; overflow-y: auto; }
+.vb-dialogue-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.vb-dialogue-portrait {
+  flex: none;
+  position: relative;
+  width: 4.5em;
+  height: 4.5em;
+  overflow: hidden;
+  border: 2px solid var(--vb-dialogue-muted);
+  border-radius: var(--ui-radius);
+  background: rgb(255 255 255 / 8%);
+}
+.vb-dialogue-portrait::before, .vb-dialogue-portrait::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--vb-dialogue-muted);
+}
+.vb-dialogue-portrait::before { top: 18%; width: 34%; height: 34%; border-radius: 50%; }
+.vb-dialogue-portrait::after { top: 58%; width: 72%; height: 70%; border-radius: 50% 50% 0 0; }
+.vb-dialogue-speaker {
+  font-family: var(--ui-font-heading);
+  font-weight: bold;
+  color: var(--vb-dialogue-accent);
+  overflow-wrap: anywhere;
+}
+.vb-dialogue-text { overflow-wrap: anywhere; cursor: pointer; }
+.vb-dialogue-pending { color: transparent; }
+.vb-dialogue-outcome {
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border-left: 4px solid var(--vb-dialogue-accent);
+  font-size: ${size(0.875)};
+}
+.vb-dialogue-outcome-title { font-weight: bold; }
+.vb-dialogue-choices { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--ui-space-1); }
+.vb-dialogue-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25em 0.5em;
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border: 2px solid transparent;
+  border-radius: var(--ui-radius);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.vb-dialogue-choice[data-focused='true'] { border-color: var(--vb-dialogue-accent); background: rgb(255 255 255 / 12%); }
+.vb-dialogue-choice[data-locked='true'] { opacity: 0.75; cursor: not-allowed; }
+.vb-dialogue-choice[data-locked='true'] .vb-dialogue-choice-text { text-decoration: line-through; text-decoration-thickness: 1px; }
+.vb-dialogue-number { font-weight: bold; }
+.vb-dialogue-tag { display: inline-flex; gap: 0.25em; font-weight: bold; color: var(--vb-dialogue-accent); }
+.vb-dialogue-odds { font-size: ${size(0.875)}; font-style: italic; border: 1px solid currentColor; border-radius: var(--ui-radius); padding: 0 0.4em; }
+.vb-dialogue-reason { flex-basis: 100%; font-size: ${size(0.875)}; font-style: italic; }
+.vb-dialogue-history {
+  max-height: 14em;
+  overflow-y: auto;
+  padding: var(--ui-space-2);
+  border: 2px solid var(--vb-dialogue-muted);
+  border-radius: var(--ui-radius);
+}
+.vb-dialogue-history-title { font-size: ${size(1)}; font-family: var(--ui-font-heading); }
+.vb-dialogue-history-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--ui-space-1); }
+.vb-dialogue-history-entry[data-kind='choice'] { padding-left: 1.5em; font-style: italic; color: var(--vb-dialogue-accent); }
+.vb-dialogue-history-entry[data-kind='check'] { padding-left: 1.5em; font-size: ${size(0.875)}; }
+.vb-dialogue-history-entry[data-kind='divider'] { text-align: center; font-size: ${size(0.875)}; border-top: 1px solid var(--vb-dialogue-muted); padding-top: var(--ui-space-1); }
+.vb-dialogue-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--ui-space-2); flex-wrap: wrap; }
+.vb-dialogue-hint { font-size: ${size(0.875)}; font-style: italic; color: var(--vb-dialogue-muted); }
+.vb-dialogue-history-button {
+  font: inherit;
+  font-size: ${size(0.875)};
+  color: inherit;
+  background: transparent;
+  border: 2px solid var(--vb-dialogue-muted);
+  border-radius: var(--ui-radius);
+  padding: 0 var(--ui-space-2);
+  cursor: pointer;
+}
+.vb-dialogue-announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .vb-panel.vb-class-select { width: min(64rem, 100%); max-width: 100%; }
 .vb-class-cards {
@@ -969,7 +1224,7 @@ ${tokens}
   flex-direction: column;
   gap: var(--ui-space-2);
 }
-.vb-slot { display: flex; gap: var(--ui-space-2); align-items: stretch; }
+.vb-save-row { display: flex; gap: var(--ui-space-2); align-items: stretch; }
 .vb-slot-choose {
   flex: 1;
   display: flex;

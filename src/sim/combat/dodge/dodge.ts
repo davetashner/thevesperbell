@@ -35,6 +35,7 @@ import type { EntityId } from '../../core/component';
 import type { System, World } from '../../core/world';
 import { actionFrameOf, type ActionVector } from '../../input/action-frame';
 import type { Vec3 } from '../../stimulus/shapes';
+import type { LoadClass } from '../../inventory/equipment';
 import { PlayerCombatantComponent } from '../damage/components';
 import type { InvulnerabilityRule } from '../hits/system';
 import { ActionInputComponent, ActionTimelineComponent } from '../timeline/components';
@@ -46,6 +47,22 @@ export type DodgeFacing = (world: World<never>, entity: EntityId) => Vec3 | unde
 
 /** Facing when none is given: world −z (the player's look yaw 0). */
 export const DEFAULT_FACING: Vec3 = Object.freeze({ x: 0, y: 0, z: -1 });
+
+/**
+ * The moves a dodge press starts for each armor load class (mw-e04.16, ADR-0003), where they differ
+ * from the entity's own `roll` and `backstep`. Light, Medium and Heavy roll the lengths the ADR
+ * lists; Overloaded stumbles (no roll, no i-frames) for both presses.
+ */
+export type LoadDodgeMoves = Readonly<
+  Partial<Record<LoadClass, { readonly roll?: string; readonly backstep?: string }>>
+>;
+
+export const DEFAULT_LOAD_DODGES: LoadDodgeMoves = Object.freeze({
+  light: { roll: 'dodge-roll-light' },
+  medium: { roll: 'dodge-roll-medium' },
+  heavy: { roll: 'dodge-roll-heavy' },
+  overloaded: { roll: 'dodge-stumble', backstep: 'dodge-stumble' },
+});
 
 const ZERO: Vec3 = Object.freeze({ x: 0, y: 0, z: 0 });
 
@@ -87,10 +104,14 @@ export function requestDodge(
   entity: EntityId,
   move: ActionVector,
   facing: Vec3 = DEFAULT_FACING,
+  load?: { readonly loadClass: LoadClass; readonly moves?: LoadDodgeMoves },
 ): string {
   const dodge = requireDodge(world, entity);
   const requested = inputDirection(move, facing);
-  const id = requested === null ? dodge.backstep : dodge.roll;
+  const variant =
+    load === undefined ? undefined : (load.moves ?? DEFAULT_LOAD_DODGES)[load.loadClass];
+  const id =
+    requested === null ? (variant?.backstep ?? dodge.backstep) : (variant?.roll ?? dodge.roll);
   requestMove(world, entity, id);
   store(world, entity, { ...dodge, requested });
   return id;
@@ -100,6 +121,13 @@ export function requestDodge(
 export interface DodgeOptions {
   /** Where each entity faces (camera or lock-on); defaults to world −z. */
   readonly facing?: DodgeFacing;
+  /**
+   * The armor load class of an entity (mw-e04.16); undefined = none worn, and the entity rolls
+   * its own `roll` and `backstep`. Absent = nobody's load matters.
+   */
+  readonly loadClass?: (world: World<never>, entity: EntityId) => LoadClass | undefined;
+  /** Moves per load class; defaults to DEFAULT_LOAD_DODGES. */
+  readonly loadMoves?: LoadDodgeMoves;
 }
 
 /**
@@ -116,7 +144,16 @@ export function dodgeInputSystem<TInput>(options: DodgeOptions = {}): System<TIn
       const w: World<never> = world;
       const driven = w.query(DodgeComponent, ActionInputComponent, ActionTimelineComponent);
       for (const entity of driven.ids()) {
-        requestDodge(w, entity, frame.move, facingOf(options.facing, w, entity));
+        const loadClass = options.loadClass?.(w, entity);
+        requestDodge(
+          w,
+          entity,
+          frame.move,
+          facingOf(options.facing, w, entity),
+          loadClass === undefined
+            ? undefined
+            : { loadClass, ...(options.loadMoves !== undefined && { moves: options.loadMoves }) },
+        );
       }
     },
   };

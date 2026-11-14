@@ -32,6 +32,8 @@ export default class PerfReporter implements Reporter {
   onTestEnd(test: TestCase, result: TestResult): void {
     const project = test.parent.project()?.name;
     if (project === 'ci' || project === 'reference') this.mode = project;
+    // The latency project is reference mode too: the same machine, with vsync on (mw-e02.8).
+    if (project === 'latency') this.mode = 'reference';
     for (const attachment of result.attachments) {
       if (attachment.name === 'perf' && attachment.body !== undefined) {
         this.attachments.push(JSON.parse(attachment.body.toString('utf8')) as PerfAttachment);

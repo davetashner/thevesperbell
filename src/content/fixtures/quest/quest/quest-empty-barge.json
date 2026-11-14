@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../data/quest.schema.json",
+  "id": "quest-empty-barge",
+  "notes": "Conventions example (mw-e39.3), not shipped: quest ids are `quest-<slug>` (story bible 11.1), objective and resolution ids are plain kebab-case, facts are `<subject>.<state>`. Started by an effect (no `startWhen`). Real quests are written under E39.",
+  "title": "The Empty Barge",
+  "summary": "Mags Oakum's barge has gone down the river empty twice this week, and she hates running empty. Ottilie Marsh would like to know why.",
+  "givers": ["npc-ottilie"],
+  "objectives": [
+    {
+      "id": "see-the-barge",
+      "kind": "fact",
+      "text": "Look for the Patient Ann at Briar Glen Quay.",
+      "params": { "fact": "fixture-barge.seen-empty" }
+    },
+    {
+      "id": "ask-mags",
+      "kind": "fact",
+      "text": "Ask Mags why she runs empty.",
+      "params": { "fact": "fixture-barge.asked" }
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "asked-plainly",
+      "approach": "diplomacy",
+      "when": { "kind": "fact", "fact": "fixture-barge.asked" },
+      "journal": "Mags laughed, lit her pipe and said the river had been quiet. It had not. You noted that she did not look at the hold."
+    }
+  ]
+}

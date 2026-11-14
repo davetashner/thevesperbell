@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import {
   clampTextScale,
   reducedMotion,
+  setDyslexiaFont,
   setMotionPreference,
+  setTextBackdrop,
   setTextScale,
   textScale,
 } from '@ui/comfort';
@@ -23,6 +25,23 @@ describe('comfort hooks', () => {
     expect(root.style.getPropertyValue('--ui-text-scale')).toBe('2');
     expect(textScale(root)).toBe(2);
     expect(setTextScale(root, 9)).toBe(2);
+  });
+
+  it('sets and clamps the text backdrop opacity', () => {
+    const root = document.createElement('div');
+    expect(setTextBackdrop(root, 0.5)).toBe(0.5);
+    expect(root.style.getPropertyValue('--ui-text-backdrop-opacity')).toBe('0.5');
+    expect(setTextBackdrop(root, 7)).toBe(1);
+    expect(setTextBackdrop(root, -1)).toBe(0);
+    expect(setTextBackdrop(root, Number.NaN)).toBe(0);
+  });
+
+  it('AC-3: the dyslexia font toggles data-font on the root', () => {
+    const root = document.createElement('div');
+    setDyslexiaFont(root, true);
+    expect(root.dataset['font']).toBe('dyslexia');
+    setDyslexiaFont(root, false);
+    expect(root.dataset['font']).toBeUndefined();
   });
 
   it('reduced motion follows the root preference, else the OS', () => {

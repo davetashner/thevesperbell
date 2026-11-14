@@ -39,9 +39,11 @@ export const WORLD_SECTION_ID = 'world';
  * loading a save whose facts they would not find. v5 (mw-e12.14): the same for creatures, whose
  * runtime state (creature, condition, brain and perception components) the `creatures` section now
  * holds; an older save's creatures stay here (identity migration) and that section's `missing` hook
- * upgrades them.
+ * upgrades them. v6 (mw-e31.10): the difficulty config gains the `searchDuration` multiplier; the
+ * stored difficulty is sparse and an absent multiplier is neutral, so the migration is the identity
+ * (a v5 save, with no difficulty block or without the new key, loads as Adventurer).
  */
-export const WORLD_SECTION_VERSION = 5;
+export const WORLD_SECTION_VERSION = 6;
 
 const worldSnapshotSchema = z.strictObject({
   seed: z.number(),
@@ -130,6 +132,12 @@ export interface SaveRegistryOptions {
    * deterministic and leave the world valid.
    */
   readonly beforeWrite?: (world: World) => void;
+  /**
+   * Runs after every section of a load applied, so systems that cache state derived from what a
+   * load replaced (the quest runtime's evaluations, mw-e23.11) can bring it up to date. A throw
+   * fails the load like a section's: the world is restored.
+   */
+  readonly afterRead?: (world: World) => void;
 }
 
 /** Sections that make up a save, in apply order (the world section first). */
@@ -142,16 +150,24 @@ export class SaveRegistry {
   private factsOwner: string | undefined;
 
   private readonly beforeWrite: ((world: World) => void) | undefined;
+  private readonly afterRead: ((world: World) => void) | undefined;
 
   constructor(options: SaveRegistryOptions = {}) {
     const onDemand = options.onDemand ?? [];
     this.beforeWrite = options.beforeWrite;
+    this.afterRead = options.afterRead;
     this.ordered = [
       defineSaveSection<WorldSnapshot>({
         id: WORLD_SECTION_ID,
         version: WORLD_SECTION_VERSION,
         schema: worldSnapshotSchema,
-        migrations: { 1: (data) => data, 2: (data) => data, 3: (data) => data, 4: (data) => data },
+        migrations: {
+          1: (data) => data,
+          2: (data) => data,
+          3: (data) => data,
+          4: (data) => data,
+          5: (data) => data,
+        },
         serialize: (world) => {
           const { facts, ...snapshot } = world.snapshot();
           const components = Object.fromEntries(
@@ -279,6 +295,8 @@ export class SaveRegistry {
         if (entry.missing === true) entry.section.missing?.(world, context(applying));
         else entry.section.deserialize(world, entry.data, context(applying));
       }
+      applying = 'after-read';
+      this.afterRead?.(world);
     } catch (cause) {
       world.restore(before);
       return { ok: false, error: new SaveApplyError(applying, cause) };

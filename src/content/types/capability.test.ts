@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { gameContentSources } from '../game-content.ts';
+import { gameContentSources, loadGameContent } from '../game-content.ts';
 import { ContentLoadError, loadContent, type ContentSource } from '../loader.ts';
 import { contentChecks, contentTypes } from '../registry.ts';
 import { serializeContent } from '../schema.ts';
@@ -8,6 +8,7 @@ import {
   CAPABILITY_ID_PATTERN,
   capabilityKeys,
   capabilitySchema,
+  climbDifficultyGrants,
   type CapabilityGroupInput,
 } from './capability.ts';
 
@@ -120,5 +121,34 @@ describe('capability definitions (mw-e19.2)', () => {
 describe('the shipped capabilities', () => {
   describeContent('capability', 'parses and round-trips', (entry) => {
     expect(capabilitySchema.parse(JSON.parse(serializeContent(entry)))).toEqual(entry);
+  });
+});
+
+describe('climb difficulty grants (mw-e10.9)', () => {
+  it('AC-1/AC-2: the thief’s rough-stone verb reaches difficulty 3 and nothing else grants one', () => {
+    const grants = climbDifficultyGrants(loadGameContent().all('capability'));
+    expect(Object.fromEntries(grants)).toEqual({ 'verb.climb.rough': 3 });
+  });
+
+  it('collects the grants of every group and takes none from capabilities without one', () => {
+    const grants = climbDifficultyGrants([
+      { capabilities: [{ id: 'verb.climb.ledge' }, { id: 'tool.grip', climbDifficulty: 2 }] },
+      { capabilities: [{ id: 'verb.climb.sheer', climbDifficulty: 3 }] },
+    ]);
+    expect([...grants]).toEqual([
+      ['tool.grip', 2],
+      ['verb.climb.sheer', 3],
+    ]);
+  });
+
+  it('a grant is a whole difficulty from 1 to 3', () => {
+    const def = (climbDifficulty: number) => ({
+      ...group('test', ['verb.climb.x']),
+      capabilities: [{ id: 'verb.climb.x', name: 'x', description: 'x', climbDifficulty }],
+    });
+    expect(problems(def(3))).toEqual([]);
+    expect(problems(def(0))).toHaveLength(1);
+    expect(problems(def(4))).toHaveLength(1);
+    expect(problems(def(1.5))).toHaveLength(1);
   });
 });

@@ -91,6 +91,7 @@ describe('pnpm save:fixture / save:check', () => {
       'level-deltas',
       'merchants',
       'game-clock',
+      'contests',
     ]);
     expect(real.worlds.length).toBeGreaterThan(0);
     const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);

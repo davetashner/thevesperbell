@@ -9,7 +9,22 @@ describeContent('testprop', 'visits every entry once', (entry) => {
 
 describe('content test harness', () => {
   it('describeContent generated one named test per entry, credited on the test meta', () => {
-    expect(seen).toEqual(['barrel', 'bottle', 'chandelier', 'clay-pot', 'crate', 'lever', 'plank']);
+    expect(seen).toEqual([
+      'anvil',
+      'barrel',
+      'bottle',
+      'bridge-plank',
+      'chandelier',
+      'clay-pot',
+      'crate',
+      'lens-stand',
+      'lever',
+      'limp-body',
+      'mirror-stand',
+      'plank',
+      'statue',
+      'stone-block',
+    ]);
   });
 
   it('markExercised appends type:id to the test meta', ({ task }) => {

@@ -1,0 +1,11 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "writ-forged-lantern",
+  "category": "quest",
+  "name": "Forged Lantern writ",
+  "description": "A release writ under a Lantern Court seal in correct red wax. The crown is pressed to the left of the lamp. Mirela insists you found it on the road.",
+  "notes": "mw-m97i: forged by Mirela (mirela-stacks forge-fx); Cray takes it and passes it unless the player already tried a bribe (then she catches it: the crown is on the wrong side of the lamp). Quest item: noSell, noDrop.",
+  "icon": "icon-item-writ-forged-lantern-01",
+  "value": 1,
+  "stackable": false
+}

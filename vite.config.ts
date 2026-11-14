@@ -5,6 +5,7 @@ import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 import { DEFAULT_EXCLUDES, readExclusionGlobs } from './scripts/check-coverage-exclusions.ts';
 import { ContentCoverageReporter } from './scripts/content-coverage-reporter.ts';
+import { chunkReportPlugin } from './scripts/size/chunk-report.ts';
 import { readLayers, vitestThresholds } from './scripts/coverage-layers.ts';
 
 /**
@@ -50,15 +51,32 @@ export default defineConfig({
   // Rapier's deterministic build (ADR-0001) imports its .wasm as an ES module; the plugin emits it
   // as a separate asset fetched by the lazily imported physics chunk (mw-e00.19).
   // Its typings declare `any`, hence the cast.
-  plugins: [wasm() as Plugin, controllerHotReload()],
+  // chunkReportPlugin lists each production chunk's source modules for the size check (mw-e32.3).
+  plugins: [wasm() as Plugin, controllerHotReload(), chunkReportPlugin(import.meta.dirname)],
   define: {
     __BUILD_SHA__: JSON.stringify(buildSha()),
     // The debug console (mw-e33.1) is built in unless VESPER_DEBUG_CONSOLE=off (a release build);
     // even then it only loads in dev builds or with ?debug=1 (src/game/debug-console-gate.ts).
     __DEBUG_CONSOLE__: JSON.stringify(process.env['VESPER_DEBUG_CONSOLE'] !== 'off'),
+    // The input latency and controller cost probe (mw-e02.8): built in with VESPER_LATENCY_PROBE=on
+    // (the perf suite's build); the dev server has it too (src/main.ts also checks import.meta.env.DEV).
+    // Any other build drops the probe's code (tests/toolchain/latency-probe-stripped.test.ts).
+    __LATENCY_PROBE__: JSON.stringify(process.env['VESPER_LATENCY_PROBE'] === 'on'),
   },
   resolve: {
     tsconfigPaths: true,
+  },
+  // The perf build is served cross-origin isolated (mw-e02.8): performance.now() then ticks every
+  // 5 µs instead of 100 µs, which the controller and camera cost samples (tens of microseconds each)
+  // need. Only for the probe build; nothing else sets these headers.
+  preview: {
+    headers:
+      process.env['VESPER_LATENCY_PROBE'] === 'on'
+        ? {
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+          }
+        : {},
   },
   server: {
     watch: {
@@ -97,6 +115,9 @@ export default defineConfig({
     server: { deps: { inline: [/@dimforge\/rapier3d-deterministic/] } },
     include: ['src/**/*.test.ts', 'tests/**/*.test.ts', 'scripts/**/*.test.ts'],
     environment: 'node',
+    // CI runners are shared and loaded; content-heavy integration tests (navmesh re-bakes, full content
+    // loads) routinely pass 5 s there while running in about a second locally. A hang still fails.
+    testTimeout: process.env['CI'] ? 30_000 : 5_000,
     // The content reporter records which content entries passing tests exercised (mw-e00.18).
     reporters: ['default', new ContentCoverageReporter()],
     coverage: {
@@ -107,7 +128,10 @@ export default defineConfig({
       reporter: ['text', 'json-summary', 'lcov'],
       reportsDirectory: 'coverage',
       // Per-layer gates (contract §3) from coverage-layers.json; the ratchet reads the same file.
-      thresholds: vitestThresholds(readLayers()),
+      // A coverage shard (CI's coverage-shard jobs, mw-txg) sees only a slice of the suite, so
+      // it must not enforce them; the merge job checks them once on the merged coverage.
+      thresholds:
+        process.env['VESPER_COVERAGE_SHARD'] === '1' ? {} : vitestThresholds(readLayers()),
     },
   },
 });

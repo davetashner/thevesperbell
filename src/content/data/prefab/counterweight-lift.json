@@ -1,0 +1,70 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "counterweight-lift",
+  "name": "Counterweight lift",
+  "description": "A lift gate raised by a counterweight: put enough weight on the plate (a crate, a statue, a companion) and the gate rises; take it off and the gate falls. The plate's window is the counterweight, so too little keeps it shut and, with a ceiling, too much does too.",
+  "tags": ["weight"],
+  "parameters": {
+    "counterweight": {
+      "type": "number",
+      "description": "Weight on the plate that raises the lift.",
+      "unit": "kg",
+      "min": 1,
+      "max": 1000,
+      "default": 30
+    }
+  },
+  "spawns": [
+    {
+      "local": "plate",
+      "at": [0, 0, 0],
+      "plate": {
+        "minWeight": "$counterweight",
+        "width": 1.5,
+        "depth": 1.5
+      }
+    },
+    {
+      "local": "lift",
+      "at": [0, 0, 2],
+      "door": {
+        "profile": "portcullis"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "raised",
+        "kind": "lever",
+        "entity": "plate"
+      },
+      {
+        "id": "gate",
+        "kind": "receiver",
+        "receiver": "door",
+        "entity": "lift"
+      }
+    ],
+    "wires": [
+      {
+        "from": "raised",
+        "to": "gate"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "weight",
+      "description": "Anything resting on the plate counts by its weight.",
+      "spawn": "plate"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "raised",
+      "description": "On while the lift gate is raised.",
+      "node": "raised"
+    }
+  ]
+}

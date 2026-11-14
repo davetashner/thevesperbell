@@ -1,0 +1,6 @@
+{
+  "$schema": "../disposition-rule.schema.json",
+  "id": "attacked",
+  "notes": "The player hit this creature. One blow turns a stranger wary (mw-e12.9 AC-1).",
+  "delta": -40
+}

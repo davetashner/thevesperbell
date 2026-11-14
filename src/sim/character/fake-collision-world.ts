@@ -170,6 +170,12 @@ export class FakeCollisionWorld implements CollisionWorld {
     return this.bodies.length;
   }
 
+  /** Whether the collider was authored without a velocity (level geometry, never a moving platform). */
+  isStatic(body: BodyId): boolean {
+    const found = this.bodies[body - 1];
+    return found !== undefined && found.shape.velocity === undefined;
+  }
+
   /** Changes a collider's velocity, m/s. */
   setVelocity(body: BodyId, velocity: Vec3): void {
     this.body(body).velocity = velocity;

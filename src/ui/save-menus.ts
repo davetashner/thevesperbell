@@ -323,7 +323,7 @@ function slotRow<T extends SlotEntry>(
   choose.addEventListener('click', () => {
     options.onChoose(entry);
   });
-  const row = h('li', { className: 'vb-slot', data: { slot: entry.id } }, choose);
+  const row = h('li', { className: 'vb-save-row', data: { slot: entry.id } }, choose);
   if (!entry.empty) {
     const remove = button({
       label: SAVE_MENU_TEXT.delete,

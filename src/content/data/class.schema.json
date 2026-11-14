@@ -78,6 +78,16 @@
       },
       "description": "Capabilities granted at new game, with the permanent class source (ADR-0004)."
     },
+    "mvpCapabilities": {
+      "minItems": 2,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(verb|spell|arrow|tool|trick|technique|sense)\\.[a-z0-9.-]+$",
+        "description": "Capability id declared in src/content/data/capability/, e.g. \"spell.mage-hand\"."
+      },
+      "description": "The capability profile at the MVP progression milestone (mw-e15.8): the starting capabilities plus what the first trainers, books and tools give. The puzzle coverage audit (docs/design/puzzle-coverage.md) asks what a class with exactly these can solve."
+    },
     "signature": {
       "minItems": 1,
       "type": "array",
@@ -214,6 +224,7 @@
     "iconId",
     "portraitId",
     "startingCapabilities",
+    "mvpCapabilities",
     "signature",
     "startingKit",
     "proficiencies",

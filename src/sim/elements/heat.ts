@@ -12,6 +12,7 @@ import type { EntityId } from '../core/component';
 import { setProperty, WorldProperties } from '../properties/components';
 import { PROPERTY_ID_PATTERN, WORLD_PROPERTY_SPECS } from '../properties/spec';
 import { PlacementComponent } from '../stimulus/placement';
+import { heatInertiaOf } from './actors';
 import { cellsOf, exchangeWithCells } from './cells';
 import type { ElementRule } from './rules';
 
@@ -97,7 +98,7 @@ export function heatExchangeRule(config: HeatConfig): ElementRule {
             'temperature',
             cells,
             temperature,
-            config.exchangeRate,
+            config.exchangeRate / heatInertiaOf(world, entity),
             config.cellShare,
             epsilon,
           );

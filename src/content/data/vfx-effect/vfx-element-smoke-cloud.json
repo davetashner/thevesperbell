@@ -1,0 +1,35 @@
+{
+  "id": "vfx-element-smoke-cloud",
+  "notes": "Smoke in the element field (mw-e03.28), grey-box: one looping alpha-blended puff source held on each dense smoke cell, so a smoky room reads as a drifting cloud (style bible §8: smoke sits in the world, not additive). Low priority: culled first.",
+  "priority": 15,
+  "duration": 2,
+  "loop": true,
+  "lowRateScale": 0.4,
+  "emitters": [
+    {
+      "id": "puffs",
+      "texture": "vfx-base-smoke-noise-01",
+      "blend": "alpha",
+      "rate": 2.5,
+      "lifetime": { "min": 2, "max": 3 },
+      "speed": { "min": 0.05, "max": 0.2 },
+      "coneDeg": 180,
+      "spawnRadius": 0.25,
+      "gravity": -0.1,
+      "drag": 0.3,
+      "size": [
+        { "t": 0, "v": 0.6 },
+        { "t": 1, "v": 1.4 }
+      ],
+      "color": [
+        { "t": 0, "color": "#3A2A22" },
+        { "t": 1, "color": "#8B9498" }
+      ],
+      "alpha": [
+        { "t": 0, "v": 0 },
+        { "t": 0.25, "v": 0.4 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

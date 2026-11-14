@@ -79,6 +79,7 @@ import {
   refreshAffordances,
   setSwitch,
   slamDoor,
+  doorLoudness,
   SLAM_SPEED,
   switchPositions,
   syncSwitchNodes,
@@ -1018,6 +1019,28 @@ describe('slamming a door open (a kick, mw-e04.18)', () => {
     openDoor(world, other);
     steps(world, Math.ceil(60 / SLAM_SPEED) + 1);
     expect(doorState(doorOf(world, other))).toBe('opening');
+  });
+
+  it('AC-2 (mw-e03.25): a slammed door is at least 3 times the sound pressure of one shut by hand, and a slow close is quieter still', () => {
+    const { world, log } = setup();
+    const pressure = (db: number) => 10 ** (db / 20);
+    const slammed = door(world);
+    slamDoor(world, slammed);
+    const eased = door(world);
+    openDoor(world, eased);
+    steps(world, 70);
+    closeDoor(world, eased);
+    const slow = door(world);
+    openDoor(world, slow);
+    steps(world, 70);
+    moveDoor(world, slow, 0, null, { speed: 0.25, source: null });
+    world.events.flush();
+    const [slam, open, close, , slowClose] = log.noises.map((e) => e.loudness);
+    expect(slam).toBeDefined();
+    expect(pressure(must(slam)) / pressure(must(open))).toBeGreaterThanOrEqual(3);
+    expect(must(close)).toBe(must(open));
+    expect(must(slowClose)).toBeLessThan(must(close));
+    expect(doorLoudness({ loudness: 50 })).toBe(50);
   });
 
   it('a slammed door that meets something stops against it and says who slammed it', () => {

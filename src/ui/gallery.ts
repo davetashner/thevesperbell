@@ -13,7 +13,7 @@ import {
   UI_INTENT_GLYPHS,
 } from './components/overlays';
 import { tabs } from './components/tabs';
-import { VitalsHud, type VitalsViewModel } from './hud';
+import { Meter, VitalsHud, type VitalsViewModel } from './hud';
 import type { Screen, UiRoot } from './screens';
 
 export const GALLERY_SCREEN = 'gallery';
@@ -33,6 +33,17 @@ const SPELLS = Array.from({ length: 48 }, (_, i) => `Spell ${String(i + 1)}`);
 
 function section(title: string, ...children: (Node | string)[]): HTMLElement {
   return h('section', { className: 'vb-stack' }, h('h2', { text: title }), ...children);
+}
+
+/** Every bar kind, full and stacked as in the HUD, to check each reads without colour (mw-e31.8). */
+function indicatorBars(): HTMLElement {
+  const kinds = ['health', 'stamina', 'mana', 'breath', 'poise'] as const;
+  const bars = kinds.map((kind) => {
+    const meter = new Meter({ label: `${kind} bar`, kind });
+    meter.update({ value: 80, max: 100 }, 0);
+    return meter.element;
+  });
+  return h('div', { className: 'vb-stack', data: { testid: 'indicator-bars' } }, ...bars);
 }
 
 export interface GalleryOptions {
@@ -190,6 +201,7 @@ export function openGallery(ui: UiRoot, options: GalleryOptions = {}): Gallery {
           }).element,
         ),
         section('Tooltip', tipHolder),
+        section('Indicators', indicatorBars()),
         section(
           'HUD pieces',
           h(

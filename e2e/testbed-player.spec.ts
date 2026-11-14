@@ -260,6 +260,7 @@ test('AC-4 (mw-e02.6): running and jumping play the rig’s run and jump clips, 
 test('AC-6 (mw-e02.13): the bot climbs the ivy wall and mantles onto the platform on top, with no console errors', async ({
   page,
 }) => {
+  test.setTimeout(120_000); // CI's ~1 fps runner (mw-fd3)
   const problems = collectProblems(page);
   await play(page);
   const route = await page.evaluate(
@@ -437,14 +438,15 @@ test('AC-5: walking the narrow corridor with pillars, no frame puts the near pla
 });
 
 test('mw-e02.4: the mouse wheel zooms the orbit camera between 2 and 6 m', async ({ page }) => {
+  test.setTimeout(120_000); // CI's ~1 fps runner (mw-fd3)
   const problems = collectProblems(page);
   await play(page);
   expect((await orbitCamera(page)).zoom).toBe(3.5);
   const canvas = page.getByTestId('game-canvas');
   await canvas.dispatchEvent('wheel', { deltaY: -100 });
-  await expect.poll(async () => (await orbitCamera(page)).zoom).toBe(3);
+  await expect.poll(async () => (await orbitCamera(page)).zoom, { timeout: 30_000 }).toBe(3);
   for (let i = 0; i < 12; i++) await canvas.dispatchEvent('wheel', { deltaY: 100 });
-  await expect.poll(async () => (await orbitCamera(page)).zoom).toBe(6);
+  await expect.poll(async () => (await orbitCamera(page)).zoom, { timeout: 30_000 }).toBe(6);
   expect(problems).toEqual([]);
 });
 

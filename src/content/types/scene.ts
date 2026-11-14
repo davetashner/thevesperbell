@@ -18,9 +18,11 @@
 import { z } from 'zod';
 import { contentId, ref } from '../schema.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
+import { conditionSchema } from './condition.ts';
 import { interactableSchema } from './interaction.ts';
 import { ITEM_STACK_GUARD } from './item.ts';
 import { KIT_PURPOSES, vec3Schema } from './kit.ts';
+import { FOOTSTEP_SURFACES } from './material.ts';
 
 /** Placements snap to this fraction of a grid cell. */
 export const SCENE_SNAP_STEP = 0.25;
@@ -177,15 +179,74 @@ export const scenePlateSchema = z.strictObject({
  * its spherical hit zone. Signal graphs read it through lever nodes bound to the spawn; a signal into
  * a `mechanism` receiver bound to it resets it.
  */
+const supportShare = z.number().min(0).max(1);
+
 /**
- * Makes a spawn a cuttable rope (mw-e05.13): a cord hanging straight down from the spawn point that
- * slash or pierce damage (an arrow with a cutting head, a thrown blade, a spell) severs. Whatever names
- * it in `suspendedFrom` hangs from it and falls as a physics object when it is cut or burnt. It gets
- * the `cuttable` world property.
+ * Makes a rope hold its span to hit points (mw-e03.13): hits wear its `hp` down instead of severing
+ * it at once, and the load of what hangs from its span can snap it.
+ */
+export const sceneSupportSchema = z.strictObject({
+  rating: z
+    .number()
+    .positive()
+    .optional()
+    .describe(
+      'Heaviest load its span carries, kg: what hangs from it and rests on that. Over it, the weakest rope of the span snaps. Omit: never overloads.',
+    ),
+  resistances: z
+    .strictObject({
+      blunt: supportShare.optional().describe('Share of blunt damage ignored.'),
+      slash: supportShare.optional().describe('Share of slash damage ignored.'),
+      pierce: supportShare.optional().describe('Share of pierce damage ignored (1: a chain).'),
+      force: supportShare.optional().describe('Share of a shove (force) ignored.'),
+    })
+    .default({})
+    .describe('Share of each kind of hit it ignores; a kind left out is 0.'),
+  span: contentId
+    .optional()
+    .describe(
+      'Ropes of a scene with the same span share one load and fail together (a bridge’s two ropes); what hangs from one hangs from the span.',
+    ),
+});
+
+/**
+ * Makes a spawn a rope (mw-e05.13, mw-e03.13): a cord from the spawn point straight down `length`
+ * metres, or to `to`. By default slash or pierce damage (an arrow with a cutting head, a thrown blade,
+ * a spell) severs it at once; with `support` it has hit points and a load rating instead. Whatever
+ * names it in `suspendedFrom` hangs from it and falls as a physics object when it is cut, burnt or
+ * snapped. It gets the `cuttable` world property.
  */
 export const sceneRopeSchema = z.strictObject({
-  length: z.number().positive().describe('How far it hangs straight down, metres.'),
+  length: z
+    .number()
+    .positive()
+    .optional()
+    .describe('How far it hangs straight down, metres (or give `to`).'),
+  to: gridPosition.optional().describe('Its other anchor, grid cells (or give `length`).'),
   radius: z.number().positive().optional().describe('Half its thickness, metres (default 0.05).'),
+  support: sceneSupportSchema
+    .optional()
+    .describe('Gives it hit points and a load rating (mw-e03.13): see the support fields.'),
+});
+
+/** Rope bridge prefab (mw-e03.13): planks hung between two ropes, expanded into spawns. */
+export const sceneBridgeSchema = z.strictObject({
+  to: gridPosition.describe(
+    'The far end, grid cells: level with the spawn and along x or z, so a bridge runs straight.',
+  ),
+  planks: z.int().min(1).max(64).describe('How many planks, evenly spaced from end to end.'),
+  plank: ref('testprop').describe('The plank prop: its first size axis is the bridge’s width.'),
+  rating: z
+    .number()
+    .positive()
+    .describe('Heaviest load the bridge carries, kg: planks, what rests on them, and who walks.'),
+  resistances: sceneSupportSchema.shape.resistances.describe(
+    'Share of each kind of hit its two ropes ignore.',
+  ),
+  width: z
+    .number()
+    .positive()
+    .describe('Distance between the two ropes, metres: the plank prop’s width.'),
 });
 
 const colourSchema = z
@@ -296,6 +357,54 @@ export const sceneImpactSwitchSchema = z.strictObject({
 });
 
 /**
+ * Gives a movable prop its push rules (mw-e15.4; `push.config`, mw-e02.18): a rail to slide along, a
+ * grid to snap to, a step to turn by. The prop must be `pushable` (a world property) and offers the
+ * push and rotate verbs through the spawn's `interact`. Nothing here names a kind of object.
+ */
+export const scenePushSchema = z.strictObject({
+  axis: z
+    .tuple([z.number(), z.number()])
+    .optional()
+    .describe('Unit direction (x, z) the prop may only slide along (a rail); omit for free.'),
+  grid: z
+    .number()
+    .positive()
+    .optional()
+    .describe(
+      'Grid cell size, metres: the prop moves one cardinal axis at a time and settles on a cell centre.',
+    ),
+  rotateStep: z
+    .number()
+    .positive()
+    .max(180)
+    .optional()
+    .describe('Degrees one rotate turns it by; omit for a prop that does not turn.'),
+});
+
+/**
+ * Makes a spawn a volume of liquid (mw-e15.4; `liquid.volume`, mw-e03.6): a basin, a pond, a flooded
+ * pit. The spawn point is the middle of its floor. An open `drain` lowers the level; a signal into a
+ * `mechanism` receiver bound to the spawn opens or closes it (a valve).
+ */
+export const sceneLiquidSchema = z.strictObject({
+  size: z
+    .tuple([z.number().positive(), z.number().positive(), z.number().positive()])
+    .describe('Width (x), height to the brim (y) and depth (z) of the volume, metres.'),
+  liquid: ref('material').describe('The liquid it holds: a material with `liquid` (water, oil).'),
+  depth: z
+    .number()
+    .positive()
+    .describe('How deep the liquid stands at the start, metres (not above the brim).'),
+  drain: z
+    .strictObject({
+      rate: z.number().positive().describe('Level fall while open, m/s.'),
+      open: z.boolean().default(false).describe('Starts open.'),
+    })
+    .optional()
+    .describe('A drain, opened and closed by a signal or code (the valve of a basin).'),
+});
+
+/**
  * Makes a spawn a lootable container (mw-e18.3): a chest, barrel, bookshelf or corpse. What it holds
  * from the start, plus its loot table rolled once on the first open; both persist with the level.
  */
@@ -321,6 +430,54 @@ export const sceneContainerSchema = z.strictObject({
     .boolean()
     .optional()
     .describe('Starts locked; defaults to true when it has a lock (needs one).'),
+  stash: z
+    .strictObject({
+      capacityKg: z
+        .number()
+        .positive()
+        .max(1000)
+        .describe('Most the bodies stashed in it may weigh together, kg.'),
+    })
+    .optional()
+    .describe('Room for bodies (mw-e03.23): a carried body goes in if it fits.'),
+});
+
+const localOffset = z
+  .tuple([z.number().min(-5).max(5), z.number().min(-1).max(5), z.number().min(-5).max(5)])
+  .describe('Metres in the spot’s frame: x right of the opening, y up, z out of it.');
+
+/**
+ * Makes a spawn a hiding spot (mw-e03.23): a wardrobe, barrel or haystack an actor can slip into to
+ * break line of sight. The spawn's `yaw` is which way its opening faces.
+ */
+export const sceneHidingSchema = z.strictObject({
+  capacity: z.int().min(1).max(8).default(1).describe('Actors that fit at once; default 1.'),
+  concealment: z
+    .number()
+    .min(0)
+    .max(1)
+    .default(1)
+    .describe('How well it hides whoever is inside, 0–1; 1 takes them out of every sight query.'),
+  peek: z.boolean().default(true).describe('The occupant may look out through the opening.'),
+  enterDb: z.number().min(0).max(120).optional().describe('Noise of getting in, dB at 1 m; 30.'),
+  exitDb: z.number().min(0).max(120).optional().describe('Noise of getting out, dB at 1 m; 24.'),
+  size: z
+    .tuple([
+      z.number().positive().max(6),
+      z.number().positive().max(6),
+      z.number().positive().max(6),
+    ])
+    .optional()
+    .describe('Greybox box drawn for it, metres along x, y, z, standing on the spawn point.'),
+  look: z.enum(['wood', 'hay']).default('wood').describe('Colour of that box.'),
+  inside: localOffset.optional().describe('Where an occupant stands; the spot’s origin.'),
+  eye: localOffset.optional().describe('Where the peek camera sits; 1.5 m above `inside`.'),
+  exits: z
+    .array(localOffset)
+    .min(1)
+    .max(6)
+    .optional()
+    .describe('Exit points in order of preference; one 0.9 m out of the opening.'),
 });
 
 /**
@@ -489,6 +646,11 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Places an item here as a world item the player can take, drop and throw (mw-e17.7).',
     ),
+  owner: contentId
+    .optional()
+    .describe(
+      'Whom the item or container here belongs to, a faction or NPC id (mw-e27.9): taking from it without permission flags the goods stolen and records a theft fact (needs item or container).',
+    ),
   creature: ref('creature')
     .optional()
     .describe('Creature to spawn here (mw-e12.4); faces the spawn’s yaw.'),
@@ -533,13 +695,56 @@ export const sceneSpawnSchema = z.strictObject({
       phases: z
         .array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/))
         .min(1)
+        .optional()
         .describe(
           'Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for.',
+        ),
+      hours: z
+        .tuple([z.number().min(0).max(24), z.number().min(0).max(24)])
+        .optional()
+        .describe(
+          'From and to, hours of the day, [from, to) (wraps past midnight when from > to): the spawn is there only inside this window of the world clock (mw-e24.13). A schedule is a creature’s spawns, each with its own window, across the scenes it moves between.',
+        ),
+    })
+    .refine(({ phases, hours }) => phases !== undefined || hours !== undefined, {
+      message: 'presence needs phases, hours or both',
+    })
+    .refine(({ hours }) => hours === undefined || hours[0] !== hours[1], {
+      message: 'the window is empty: from equals to',
+      path: ['hours'],
+    })
+    .optional()
+    .describe(
+      'The spawn is only there during these phases of the day and/or hours of the clock (mw-ju8.14, mw-e27.12, mw-e24.13); with both, both must hold. Its creature is not spawned and its `interact` is switched off at any other time, and both come and go as the clock crosses a boundary while the player is in the scene.',
+    ),
+  spawnIf: conditionSchema
+    .optional()
+    .describe(
+      'The spawn exists only while this world condition holds (mw-e27.8): checked when the scene loads and again when a fact it reads changes, so the world reacts to what the player did (e.g. { "fact": "miller.rescued" }).',
+    ),
+  despawnIf: conditionSchema
+    .optional()
+    .describe(
+      'The spawn is removed while this world condition holds (mw-e27.8); the opposite of spawnIf. With both, it exists only when spawnIf holds and despawnIf does not.',
+    ),
+  variant: z
+    .strictObject({
+      group: contentId.describe('Variant group id: the spawns of the scene that share it.'),
+      when: conditionSchema
+        .optional()
+        .describe(
+          'This variant is chosen while the condition holds; absent = the default, chosen when no variant listed before it matches.',
         ),
     })
     .optional()
     .describe(
-      'The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene.',
+      'Makes the spawn one variant of a group (mw-e27.8): exactly one variant of the group is active, the first listed in the scene whose `when` holds (a variant without `when` always matches, so list it last as the fallback). A group with no fallback warns (variantWarnings) because nothing spawns when none matches.',
+    ),
+  swapInView: z
+    .boolean()
+    .optional()
+    .describe(
+      'Lets spawnIf, despawnIf and variant changes happen while the spawn is on the player’s screen (mw-e27.8). By default a change waits until the spawn is out of view, so nothing pops in or out in front of the player.',
     ),
   carries: z
     .array(
@@ -590,6 +795,11 @@ export const sceneSpawnSchema = z.strictObject({
     .describe(
       'Makes the spawned entity a cuttable rope hanging down from its position (mw-e05.13).',
     ),
+  bridge: sceneBridgeSchema
+    .optional()
+    .describe(
+      'Makes the spawn one end of a rope bridge (mw-e03.13): two support ropes and their planks, hung level from the spawn to `to`.',
+    ),
   suspendedFrom: z
     .string()
     .min(1)
@@ -614,11 +824,25 @@ export const sceneSpawnSchema = z.strictObject({
   lightReceiver: sceneLightReceiverSchema
     .optional()
     .describe('Makes the spawned entity a light receiver that beams switch on (mw-e03.17).'),
+  push: scenePushSchema
+    .optional()
+    .describe('Gives a movable prop push rules: a rail, a grid, a rotation step (mw-e15.4).'),
+  liquid: sceneLiquidSchema
+    .optional()
+    .describe('Makes the spawned entity a volume of liquid, with an optional drain (mw-e15.4).'),
   container: sceneContainerSchema
     .optional()
     .describe(
       'Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3).',
     ),
+  bulky: contentId
+    .optional()
+    .describe(
+      'Makes a movable prop a shoulder-carry (a body, a statue part; mw-e03.23): heavier than a hand-carry, and it fits in a container with room for bodies. The id says what it is.',
+    ),
+  hiding: sceneHidingSchema
+    .optional()
+    .describe('Makes the spawned entity a hiding spot an actor can slip into (mw-e03.23).'),
 });
 
 const lightLevel = z.number().min(0).max(1);
@@ -833,6 +1057,30 @@ export const sceneRegionSchema = z
   });
 
 /**
+ * A box of the scene tagged with an acoustic surface (mw-e09.4): a carpet on a wooden floor, a gravel
+ * path, a creaky bridge. `surfaceAt` (src/sim/surfaces) reads the highest `priority` box holding a
+ * position, whatever collider is underfoot; the first listed wins a tie. The box must reach the
+ * feet: its y range includes the floor height.
+ */
+export const sceneSurfaceSchema = z
+  .strictObject({
+    id: contentId.describe('Name of the surface region, unique in the scene, e.g. hall-carpet.'),
+    min: vec3Schema.describe('Lower corner, grid cells.'),
+    max: vec3Schema.describe('Upper corner, grid cells; above min on every axis.'),
+    surface: z
+      .enum(FOOTSTEP_SURFACES)
+      .describe('The footstep surface (audio bible §7.3) of everything inside, e.g. carpet.'),
+    priority: z
+      .int()
+      .default(0)
+      .describe('Where boxes overlap, the higher priority wins; the first listed wins a tie.'),
+  })
+  .refine(({ min, max }) => max[0] > min[0] && max[1] > min[1] && max[2] > min[2], {
+    message: 'max must be above min on every axis',
+    path: ['max'],
+  });
+
+/**
  * A way out of the scene into another (mw-e01.11): a box the player walks into, the scene it leads to
  * and the named spawn of that scene the player arrives at, facing the way the spawn's yaw says.
  * Arrival spawns are ordinary marker spawns by convention called `arrive-from-<this scene id>`; the
@@ -869,6 +1117,22 @@ export const sceneAmbienceSchema = z.strictObject({
     .describe('Id of one of the scene’s regions; leave out to cover the whole scene.'),
 });
 
+/**
+ * Places an instance of a puzzle prefab (mw-e15.4): the prefab, where it stands, how it is turned
+ * and its parameter values. The loader expands it into spawns named `<id>-<local>` and a signal
+ * graph named `<id>` (src/content/prefabs.ts) before anything else reads the scene.
+ */
+export const scenePrefabSchema = z.strictObject({
+  id: contentId.describe('Instance id: prefixes its spawns and names its signal graph.'),
+  prefab: ref('prefab').describe('The prefab to place.'),
+  at: gridPosition,
+  yaw,
+  params: z
+    .record(z.string(), z.union([z.number(), z.boolean(), z.string()]))
+    .default({})
+    .describe('Parameter values; a parameter with no default must be given.'),
+});
+
 export const sceneSchema = z
   .strictObject({
     id: contentId.describe('Scene id; also the ?scene= URL value.'),
@@ -903,6 +1167,10 @@ export const sceneSchema = z
       .array(sceneRegionSchema)
       .default([])
       .describe('Tagged boxes, e.g. a river (mw-ju8.1); data only until a system reads them.'),
+    surfaces: z
+      .array(sceneSurfaceSchema)
+      .default([])
+      .describe('Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4).'),
     transitions: z
       .array(sceneTransitionSchema)
       .default([])
@@ -911,6 +1179,12 @@ export const sceneSchema = z
       .array(sceneAmbienceSchema)
       .default([])
       .describe('Ambience zones placed over regions of the scene or all of it (mw-e28.13).'),
+    prefabs: z
+      .array(scenePrefabSchema)
+      .optional()
+      .describe(
+        'Puzzle prefab instances (mw-e15.4); expanded into spawns and signal graphs when the content loads, so a loaded scene never has this field.',
+      ),
   })
   .superRefine((scene, ctx) => {
     const transitionIds = new Set<string>();
@@ -930,6 +1204,17 @@ export const sceneSchema = z
           message: `transition "${transition.id}" leads back into its own scene`,
         });
       }
+    });
+    const surfaceIds = new Set<string>();
+    scene.surfaces.forEach((surface, index) => {
+      if (surfaceIds.has(surface.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['surfaces', index, 'id'],
+          message: `surface region id "${surface.id}" is used twice in this scene`,
+        });
+      }
+      surfaceIds.add(surface.id);
     });
     const regionIds = new Set<string>();
     scene.regions.forEach((region, index) => {
@@ -971,6 +1256,13 @@ export const sceneSchema = z
           message: `spawn "${spawn.id}" hangs from "${spawn.suspendedFrom}", which is not a rope spawn of this scene`,
         });
       }
+      if (spawn.owner !== undefined && spawn.item === undefined && spawn.container === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['spawns', index, 'owner'],
+          message: `spawn "${spawn.id}" has an owner but is neither an item nor a container`,
+        });
+      }
       if (spawn.creature !== undefined) return;
       for (const key of [
         'faction',
@@ -988,6 +1280,9 @@ export const sceneSchema = z
         });
       }
     });
+    // With prefab instances the spawns they bring are not here yet: the loader expands them and
+    // parses the scene again, which makes these checks over the whole scene.
+    const expanded = (scene.prefabs ?? []).length === 0;
     scene.signals.forEach((signal, index) => {
       signal.checkpoints.forEach((node, at) => {
         if (signal.checkpoints.indexOf(node) === at) return;
@@ -998,7 +1293,7 @@ export const sceneSchema = z
         });
       });
       for (const [name, id] of Object.entries(signal.bindings)) {
-        if (seen.has(id)) continue;
+        if (seen.has(id) || !expanded) continue;
         ctx.addIssue({
           code: 'custom',
           path: ['signals', index, 'bindings', name],
@@ -1006,7 +1301,8 @@ export const sceneSchema = z
         });
       }
     });
-    if (scene.acoustics !== undefined) checkAcoustics(scene.spawns, scene.acoustics, ctx);
+    if (scene.acoustics !== undefined && expanded)
+      checkAcoustics(scene.spawns, scene.acoustics, ctx);
     checkRoutes(scene, ctx);
   });
 
@@ -1176,6 +1472,51 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
       issue('container', 'starts locked but has no lock');
     }
   }
+  if (spawn.bulky !== undefined && spawn.prop === undefined) {
+    issue('bulky', 'is carried but is not a movable prop');
+  }
+  if (spawn.hiding !== undefined) {
+    for (const [key, what] of [
+      ['container', 'a container'],
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a hiding spot and ${what}`);
+    }
+    if (spawn.interact !== undefined) {
+      issue(
+        'interact',
+        'is a hiding spot: its affordances follow who is inside, so it declares none',
+      );
+    }
+  }
+  const { push } = spawn;
+  if (push !== undefined) {
+    if (spawn.prop === undefined) issue('push', 'has push rules but is not a movable prop');
+    if (push.axis === undefined && push.grid === undefined && push.rotateStep === undefined) {
+      issue('push', 'sets no rail, grid or rotation step');
+    }
+    if (push.axis !== undefined && Math.abs(Math.hypot(push.axis[0], push.axis[1]) - 1) > 1e-6) {
+      issue('push', 'has an axis that is not a unit vector');
+    }
+  }
+  const { liquid } = spawn;
+  if (liquid !== undefined) {
+    if (liquid.depth > liquid.size[1]) issue('liquid', 'starts deeper than its brim');
+    for (const [key, what] of [
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['prop', 'a prop'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a liquid volume and ${what}`);
+    }
+  }
   const { plate } = spawn;
   if (plate !== undefined) {
     const others = [
@@ -1192,6 +1533,15 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     }
   }
   if (spawn.rope !== undefined) {
+    if ((spawn.rope.length === undefined) === (spawn.rope.to === undefined)) {
+      issue('rope', 'needs exactly one of length and to');
+    }
+    if (spawn.rope.to !== undefined && spawn.rope.support === undefined) {
+      issue(
+        'rope',
+        'runs to another point but has no support: a cuttable rope hangs straight down',
+      );
+    }
     for (const [key, what] of [
       ['door', 'a door'],
       ['switch', 'a switch'],
@@ -1207,6 +1557,29 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
   }
   if (spawn.suspendedFrom !== undefined) {
     if (spawn.prop === undefined) issue('suspendedFrom', 'hangs but is not a movable prop');
+  }
+  const { bridge } = spawn;
+  if (bridge !== undefined) {
+    const [x0, y0, z0] = spawn.at;
+    const [x1, y1, z1] = bridge.to;
+    if (y1 !== y0) issue('bridge', 'must run level: `to` is at another height');
+    if ((x1 === x0) === (z1 === z0)) {
+      issue('bridge', 'must run along x or z, and be longer than nothing');
+    }
+    for (const [key, what] of [
+      ['rope', 'a rope'],
+      ['door', 'a door'],
+      ['switch', 'a switch'],
+      ['plate', 'a plate'],
+      ['impactSwitch', 'an impact switch'],
+      ['container', 'a container'],
+      ['item', 'an item'],
+      ['creature', 'a creature'],
+      ['prop', 'a prop'],
+      ['suspendedFrom', 'hanging from a rope'],
+    ] as const) {
+      if (spawn[key] !== undefined) issue(key, `cannot be both a rope bridge and ${what}`);
+    }
   }
   const { impactSwitch } = spawn;
   if (impactSwitch !== undefined) {

@@ -45,6 +45,12 @@ export const PERF_METRICS = {
    * GC, parsing, timers. What CI can judge, where software rendering makes every frame a long task.
    */
   nonFrameLongTasksOver200ms: 'count',
+  /** Move key's keydown to the end of the first frame the player's drawn transform changed, p95 of 50 presses (mw-e02.8). */
+  inputToMotionP95Ms: 'ms',
+  /** Wall time of one character controller system run (one sim tick), p95 over 60 s of traversal. */
+  controllerTickP95Ms: 'ms',
+  /** Wall time of one orbit camera placement (one drawn frame), p95 over 60 s of traversal. */
+  cameraFrameP95Ms: 'ms',
   /** Frame interval percentiles in a scene, ms. */
   frameP50Ms: 'ms',
   frameP95Ms: 'ms',
@@ -180,7 +186,7 @@ export function evaluate(budget: PerfBudget, value: number | undefined): BudgetR
     max: budget.max,
     source: budget.source,
   };
-  const name = `${budget.id} (${budget.metric}${budget.scene === undefined ? '' : ` in ${budget.scene}`})`;
+  const name = `${budget.id} (${budget.metric}${budget.scene === undefined ? '' : ` in ${budget.scene}`}${budget.preset === undefined ? '' : ` at ${budget.preset}`})`;
   if (value === undefined || !Number.isFinite(value)) {
     return {
       ...base,
@@ -219,11 +225,25 @@ export function budgetsFor(
   );
 }
 
-/** A value measured by the suite for one metric (and the scene it was measured in, if any). */
+/** A value measured by the suite for one metric (and the scene and preset it was measured in, if any). */
 export interface Measurement {
   readonly metric: PerfMetric;
   readonly value: number;
   readonly scene?: string;
+  /** The quality preset measured; absent means High, the default. */
+  readonly preset?: 'low' | 'high';
+}
+
+/**
+ * Whether `measurement` is the value `budget` judges: same metric, in the budget's scene when it names
+ * one, and at the budget's preset when it names one (a measurement with no preset is High).
+ */
+export function measures(budget: PerfBudget, measurement: Measurement): boolean {
+  return (
+    measurement.metric === budget.metric &&
+    (budget.scene === undefined || measurement.scene === budget.scene) &&
+    (budget.preset === undefined || (measurement.preset ?? 'high') === budget.preset)
+  );
 }
 
 /** Judges every budget against the measurement of its metric (and scene, when it names one). */
@@ -232,12 +252,6 @@ export function evaluateAll(
   measurements: readonly Measurement[],
 ): BudgetResult[] {
   return budgets.map((budget) =>
-    evaluate(
-      budget,
-      measurements.find(
-        (m) =>
-          m.metric === budget.metric && (budget.scene === undefined || m.scene === budget.scene),
-      )?.value,
-    ),
+    evaluate(budget, measurements.find((m) => measures(budget, m))?.value),
   );
 }

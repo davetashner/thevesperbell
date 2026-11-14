@@ -1,0 +1,9 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "bridge-plank",
+  "name": "Bridge plank",
+  "mass": 2,
+  "flammable": true,
+  "tags": ["hanging"],
+  "body": { "size": [1.2, 0.1, 0.46], "material": "wood" }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "vfx-element-steam-puff",
+  "notes": "One-shot steam puff (mw-e29.8) where a burning thing is doused: a pale hiss of vapour, played once by the element-state bridge on the burning to wet transition. Reuses the smoke noise texture the steam cloud uses; alpha-blended so it sits in the world (style bible §8).",
+  "priority": 33,
+  "duration": 1,
+  "emitters": [
+    {
+      "id": "vapour",
+      "texture": "vfx-base-smoke-noise-01",
+      "blend": "alpha",
+      "bursts": [{ "at": 0, "count": 9 }],
+      "lifetime": { "min": 0.6, "max": 1 },
+      "speed": { "min": 0.5, "max": 1 },
+      "coneDeg": 35,
+      "spawnRadius": 0.12,
+      "gravity": -0.5,
+      "drag": 1.2,
+      "size": [
+        { "t": 0, "v": 0.2 },
+        { "t": 1, "v": 0.6 }
+      ],
+      "color": "#EEF5F7",
+      "alpha": [
+        { "t": 0, "v": 0.55 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

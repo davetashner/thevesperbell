@@ -1,0 +1,66 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "ownership",
+  "name": "Ownership and theft facts",
+  "notes": "mw-e27.9: thefts are recorded as entity-scoped facts on a synthetic entity theft-<n> in the level they happened in, plus a global counter. Saves carry them.",
+  "facts": [
+    {
+      "key": "ownership.thefts",
+      "type": "int",
+      "default": 0,
+      "description": "How many thefts have ever been recorded (mw-e27.9); the next theft is entity theft-<n>. Never reset.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.owner",
+      "type": "id",
+      "default": null,
+      "description": "The faction or NPC id the goods were stolen from (mw-e27.9); set on the theft entity entity:<level>/theft-<n>.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.item",
+      "type": "id",
+      "default": null,
+      "description": "The item definition id that was stolen.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.units",
+      "type": "int",
+      "default": 0,
+      "description": "Units of the item still unreturned; a partial return lowers it.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.place",
+      "type": "id",
+      "default": null,
+      "description": "The spawn id of the owned thing (container or world item) it was taken from.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.tick",
+      "type": "tick",
+      "default": 0,
+      "description": "The sim tick of the theft.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.witnessed",
+      "type": "enum",
+      "values": ["unknown", "seen", "unseen"],
+      "default": "unknown",
+      "description": "Whether anyone saw it: unknown until witness resolution (the AI, e10/e11) says seen or unseen.",
+      "owner": "ownership"
+    },
+    {
+      "key": "entity:*.theft.status",
+      "type": "enum",
+      "values": ["stolen", "returned"],
+      "default": "stolen",
+      "description": "stolen until the goods are returned into the owner's container, then returned.",
+      "owner": "ownership"
+    }
+  ]
+}

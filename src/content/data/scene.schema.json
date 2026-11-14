@@ -194,6 +194,12 @@
                 "maximum": 1,
                 "description": "How soaked it is (dry … saturated), 0 … 1."
               },
+              "absorbency": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1."
+              },
               "frozen": {
                 "type": "boolean",
                 "description": "Frozen solid."
@@ -620,7 +626,9 @@
                         "pick-up",
                         "read",
                         "search",
+                        "stash",
                         "hide",
+                        "leave",
                         "climb",
                         "talk",
                         "push",
@@ -756,6 +764,11 @@
             ],
             "additionalProperties": false
           },
+          "owner": {
+            "description": "Whom the item or container here belongs to, a faction or NPC id (mw-e27.9): taking from it without permission flags the goods stolen and records a theft fact (needs item or container).",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
           "creature": {
             "description": "Creature to spawn here (mw-e12.4); faces the spawn’s yaw.",
             "type": "string",
@@ -879,23 +892,70 @@
             "additionalProperties": false
           },
           "presence": {
-            "description": "The spawn is only there during these phases of the day (mw-ju8.14, mw-e27.12): its creature is not spawned and its `interact` is switched off in any other phase, and both come and go as the clock crosses a phase boundary while the player is in the scene.",
+            "description": "The spawn is only there during these phases of the day and/or hours of the clock (mw-ju8.14, mw-e27.12, mw-e24.13); with both, both must hold. Its creature is not spawned and its `interact` is switched off at any other time, and both come and go as the clock crosses a boundary while the player is in the scene.",
             "type": "object",
             "properties": {
               "phases": {
+                "description": "Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for.",
                 "minItems": 1,
                 "type": "array",
                 "items": {
                   "type": "string",
                   "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-                },
-                "description": "Ids of the clock phases (time.phase: dawn, day, dusk, night) the spawn is there for."
+                }
+              },
+              "hours": {
+                "description": "From and to, hours of the day, [from, to) (wraps past midnight when from > to): the spawn is there only inside this window of the world clock (mw-e24.13). A schedule is a creature’s spawns, each with its own window, across the scenes it moves between.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 24
+                  },
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 24
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              }
+            },
+            "additionalProperties": false
+          },
+          "spawnIf": {
+            "description": "The spawn exists only while this world condition holds (mw-e27.8): checked when the scene loads and again when a fact it reads changes, so the world reacts to what the player did (e.g. { \"fact\": \"miller.rescued\" }).",
+            "$ref": "#/$defs/condition"
+          },
+          "despawnIf": {
+            "description": "The spawn is removed while this world condition holds (mw-e27.8); the opposite of spawnIf. With both, it exists only when spawnIf holds and despawnIf does not.",
+            "$ref": "#/$defs/condition"
+          },
+          "variant": {
+            "description": "Makes the spawn one variant of a group (mw-e27.8): exactly one variant of the group is active, the first listed in the scene whose `when` holds (a variant without `when` always matches, so list it last as the fallback). A group with no fallback warns (variantWarnings) because nothing spawns when none matches.",
+            "type": "object",
+            "properties": {
+              "group": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Variant group id: the spawns of the scene that share it."
+              },
+              "when": {
+                "description": "This variant is chosen while the condition holds; absent = the default, chosen when no variant listed before it matches.",
+                "$ref": "#/$defs/condition"
               }
             },
             "required": [
-              "phases"
+              "group"
             ],
             "additionalProperties": false
+          },
+          "swapInView": {
+            "description": "Lets spawnIf, despawnIf and variant changes happen while the spawn is on the player’s screen (mw-e27.8). By default a change waits until the spawn is out of view, so nothing pops in or out in front of the player.",
+            "type": "boolean"
           },
           "carries": {
             "description": "What the spawned creature carries and drops where it dies, as world items (mw-e01.5), e.g. the slice skeleton’s key (needs creature).",
@@ -965,6 +1025,12 @@
                 "minimum": 0,
                 "maximum": 1,
                 "description": "How soaked it is (dry … saturated), 0 … 1."
+              },
+              "absorbency": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1."
               },
               "frozen": {
                 "type": "boolean",
@@ -1446,18 +1512,168 @@
             "type": "object",
             "properties": {
               "length": {
+                "description": "How far it hangs straight down, metres (or give `to`).",
                 "type": "number",
-                "exclusiveMinimum": 0,
-                "description": "How far it hangs straight down, metres."
+                "exclusiveMinimum": 0
+              },
+              "to": {
+                "description": "Its other anchor, grid cells (or give `length`).",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
               },
               "radius": {
                 "description": "Half its thickness, metres (default 0.05).",
                 "type": "number",
                 "exclusiveMinimum": 0
+              },
+              "support": {
+                "description": "Gives it hit points and a load rating (mw-e03.13): see the support fields.",
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "description": "Heaviest load its span carries, kg: what hangs from it and rests on that. Over it, the weakest rope of the span snaps. Omit: never overloads.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "resistances": {
+                    "default": {},
+                    "description": "Share of each kind of hit it ignores; a kind left out is 0.",
+                    "type": "object",
+                    "properties": {
+                      "blunt": {
+                        "description": "Share of blunt damage ignored.",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "slash": {
+                        "description": "Share of slash damage ignored.",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "pierce": {
+                        "description": "Share of pierce damage ignored (1: a chain).",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "force": {
+                        "description": "Share of a shove (force) ignored.",
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "span": {
+                    "description": "Ropes of a scene with the same span share one load and fail together (a bridge’s two ropes); what hangs from one hangs from the span.",
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "bridge": {
+            "description": "Makes the spawn one end of a rope bridge (mw-e03.13): two support ropes and their planks, hung level from the spawn to `to`.",
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "The far end, grid cells: level with the spawn and along x or z, so a bridge runs straight."
+              },
+              "planks": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 64,
+                "description": "How many planks, evenly spaced from end to end."
+              },
+              "plank": {
+                "description": "The plank prop: its first size axis is the bridge’s width.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "testprop"
+              },
+              "rating": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Heaviest load the bridge carries, kg: planks, what rests on them, and who walks."
+              },
+              "resistances": {
+                "default": {},
+                "description": "Share of each kind of hit its two ropes ignore.",
+                "type": "object",
+                "properties": {
+                  "blunt": {
+                    "description": "Share of blunt damage ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "slash": {
+                    "description": "Share of slash damage ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "pierce": {
+                    "description": "Share of pierce damage ignored (1: a chain).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "force": {
+                    "description": "Share of a shove (force) ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Distance between the two ropes, metres: the plank prop’s width."
               }
             },
             "required": [
-              "length"
+              "to",
+              "planks",
+              "plank",
+              "rating",
+              "width"
             ],
             "additionalProperties": false
           },
@@ -1816,6 +2032,103 @@
             },
             "additionalProperties": false
           },
+          "push": {
+            "description": "Gives a movable prop push rules: a rail, a grid, a rotation step (mw-e15.4).",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "description": "Unit direction (x, z) the prop may only slide along (a rail); omit for free.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "grid": {
+                "description": "Grid cell size, metres: the prop moves one cardinal axis at a time and settles on a cell centre.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "rotateStep": {
+                "description": "Degrees one rotate turns it by; omit for a prop that does not turn.",
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "liquid": {
+            "description": "Makes the spawned entity a volume of liquid, with an optional drain (mw-e15.4).",
+            "type": "object",
+            "properties": {
+              "size": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Width (x), height to the brim (y) and depth (z) of the volume, metres."
+              },
+              "liquid": {
+                "description": "The liquid it holds: a material with `liquid` (water, oil).",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "material"
+              },
+              "depth": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "How deep the liquid stands at the start, metres (not above the brim)."
+              },
+              "drain": {
+                "description": "A drain, opened and closed by a signal or code (the valve of a basin).",
+                "type": "object",
+                "properties": {
+                  "rate": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "Level fall while open, m/s."
+                  },
+                  "open": {
+                    "default": false,
+                    "description": "Starts open.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "rate"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "size",
+              "liquid",
+              "depth"
+            ],
+            "additionalProperties": false
+          },
           "container": {
             "description": "Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3).",
             "type": "object",
@@ -1861,6 +2174,176 @@
               "locked": {
                 "description": "Starts locked; defaults to true when it has a lock (needs one).",
                 "type": "boolean"
+              },
+              "stash": {
+                "description": "Room for bodies (mw-e03.23): a carried body goes in if it fits.",
+                "type": "object",
+                "properties": {
+                  "capacityKg": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000,
+                    "description": "Most the bodies stashed in it may weigh together, kg."
+                  }
+                },
+                "required": [
+                  "capacityKg"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "bulky": {
+            "description": "Makes a movable prop a shoulder-carry (a body, a statue part; mw-e03.23): heavier than a hand-carry, and it fits in a container with room for bodies. The id says what it is.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "hiding": {
+            "description": "Makes the spawned entity a hiding spot an actor can slip into (mw-e03.23).",
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "default": 1,
+                "description": "Actors that fit at once; default 1.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              },
+              "concealment": {
+                "default": 1,
+                "description": "How well it hides whoever is inside, 0–1; 1 takes them out of every sight query.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "peek": {
+                "default": true,
+                "description": "The occupant may look out through the opening.",
+                "type": "boolean"
+              },
+              "enterDb": {
+                "description": "Noise of getting in, dB at 1 m; 30.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 120
+              },
+              "exitDb": {
+                "description": "Noise of getting out, dB at 1 m; 24.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 120
+              },
+              "size": {
+                "description": "Greybox box drawn for it, metres along x, y, z, standing on the spawn point.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 6
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 6
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 6
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "look": {
+                "default": "wood",
+                "description": "Colour of that box.",
+                "type": "string",
+                "enum": [
+                  "wood",
+                  "hay"
+                ]
+              },
+              "inside": {
+                "description": "Where an occupant stands; the spot’s origin.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "eye": {
+                "description": "Where the peek camera sits; 1.5 m above `inside`.",
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 5
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -5,
+                    "maximum": 5
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "exits": {
+                "description": "Exit points in order of preference; one 0.9 m out of the opening.",
+                "minItems": 1,
+                "maxItems": 6,
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": -5,
+                      "maximum": 5
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 5
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -5,
+                      "maximum": 5
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "description": "Metres in the spot’s frame: x right of the opening, y up, z out of it."
+                }
               }
             },
             "additionalProperties": false
@@ -2543,6 +3026,92 @@
         "additionalProperties": false
       }
     },
+    "surfaces": {
+      "default": [],
+      "description": "Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the surface region, unique in the scene, e.g. hall-carpet."
+          },
+          "min": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Lower corner, grid cells."
+          },
+          "max": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Upper corner, grid cells; above min on every axis."
+          },
+          "surface": {
+            "type": "string",
+            "enum": [
+              "stone",
+              "wood",
+              "wood-hollow",
+              "dirt",
+              "grass",
+              "gravel",
+              "mud",
+              "water-shallow",
+              "snow-ice",
+              "metal-grate",
+              "straw",
+              "carpet",
+              "bone-litter",
+              "leaves",
+              "glass-shards"
+            ],
+            "description": "The footstep surface (audio bible §7.3) of everything inside, e.g. carpet."
+          },
+          "priority": {
+            "default": 0,
+            "description": "Where boxes overlap, the higher priority wins; the first listed wins a tie.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "min",
+          "max",
+          "surface"
+        ],
+        "additionalProperties": false
+      }
+    },
     "transitions": {
       "description": "Volumes that lead to another scene, and where the player arrives (mw-e01.11).",
       "type": "array",
@@ -2640,6 +3209,76 @@
         ],
         "additionalProperties": false
       }
+    },
+    "prefabs": {
+      "description": "Puzzle prefab instances (mw-e15.4); expanded into spawns and signal graphs when the content loads, so a loaded scene never has this field.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Instance id: prefixes its spawns and names its signal graph."
+          },
+          "prefab": {
+            "description": "The prefab to place.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "x-contentRef": "prefab"
+          },
+          "at": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Position in grid cells (x, y, z), snapped to SCENE_SNAP_STEP."
+          },
+          "yaw": {
+            "default": 0,
+            "description": "Rotation about +y in degrees: 0, 90, 180 or 270.",
+            "type": "number",
+            "enum": [
+              0,
+              90,
+              180,
+              270
+            ]
+          },
+          "params": {
+            "default": {},
+            "description": "Parameter values; a parameter with no default must be given.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": [
+                "number",
+                "boolean",
+                "string"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "prefab",
+          "at"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [
@@ -2648,5 +3287,659 @@
     "camera",
     "placements"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "condition": {
+      "description": "A condition over world facts and live state: one of fact, count, entities, signal, sustained, all, any, not (docs/design/conditions.md).",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "fact": {
+              "type": "string",
+              "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$",
+              "description": "Fact key to test. Alone: the (bool) fact is true. With one operator: that comparison holds."
+            },
+            "eq": {
+              "description": "The fact equals this value.",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "neq": {
+              "description": "The fact does not equal this value (unset counts as unequal).",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "gt": {
+              "description": "The (int or tick) fact is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "The (int or tick) fact is at least this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "The (int or tick) fact is less than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "The (int or tick) fact is at most this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "has": {
+              "description": "true: the fact holds a value (set, or declared with a non-null default); false: none.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "fact"
+          ],
+          "additionalProperties": false,
+          "description": "Tests one fact, with at most one operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "string",
+              "pattern": "^entity:([a-z0-9]+(?:-[a-z0-9]+)*|\\*)\\/\\*\\.([a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*)$",
+              "description": "Entity facts to count: `entity:<level>/*.<fact>` (one level) or `entity:*/*.<fact>` (every level). Counts those holding true."
+            },
+            "eq": {
+              "description": "The count equals this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "neq": {
+              "description": "The count does not equal this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gt": {
+              "description": "The count is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "The count is at least this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "The count is less than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "The count is at most this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "count"
+          ],
+          "additionalProperties": false,
+          "description": "Counts true entity facts matching a pattern, compared with exactly one operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "object",
+              "properties": {
+                "tag": {
+                  "description": "Entities carrying this tag (an entity tag, or the tag of a scene spawn).",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "entity": {
+                  "description": "The entity of the scene spawn with this id.",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                }
+              },
+              "additionalProperties": false,
+              "description": "Which entities to test. `{ \"tag\": … }`, `{ \"entity\": … }` or both; `{}` is every entity with a placement."
+            },
+            "where": {
+              "description": "Predicates (property, tag, element) an entity must all pass.",
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "property"
+                      },
+                      "property": {
+                        "type": "string",
+                        "enum": [
+                          "material",
+                          "temperature",
+                          "flammable",
+                          "ignitionPoint",
+                          "fuel",
+                          "burning",
+                          "wetness",
+                          "absorbency",
+                          "frozen",
+                          "freezePoint",
+                          "conductive",
+                          "charge",
+                          "weight",
+                          "fragile",
+                          "hp",
+                          "density",
+                          "climbable",
+                          "liftable",
+                          "pushable",
+                          "remoteActuatable",
+                          "hideable",
+                          "reflective",
+                          "transparent",
+                          "opaque",
+                          "soundDamping",
+                          "friction",
+                          "impactAbsorb",
+                          "owner",
+                          "liquid",
+                          "flammableGas",
+                          "extinguishable",
+                          "windResistance",
+                          "flameRadius",
+                          "waterSurface",
+                          "unstable",
+                          "suspended",
+                          "support",
+                          "breakable",
+                          "bashable",
+                          "cuttable",
+                          "shootable",
+                          "softAnchor",
+                          "surfaceHardness",
+                          "chargeActivated",
+                          "lightActivated",
+                          "hidden",
+                          "trapped",
+                          "trap",
+                          "container",
+                          "remains",
+                          "noiseMultiplier"
+                        ],
+                        "description": "World property to compare (absent = its default)."
+                      },
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "eq",
+                          "ne",
+                          "lt",
+                          "lte",
+                          "gt",
+                          "gte"
+                        ],
+                        "description": "Comparison; lt/lte/gt/gte need a number property."
+                      },
+                      "value": {
+                        "description": "Value to compare with.",
+                        "type": [
+                          "number",
+                          "boolean",
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "property",
+                      "op",
+                      "value"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "tag"
+                      },
+                      "tag": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "description": "Tag the entity must carry, e.g. \"player\"."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "tag"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "facing"
+                      },
+                      "facing": {
+                        "type": "string",
+                        "enum": [
+                          "north",
+                          "east",
+                          "south",
+                          "west"
+                        ],
+                        "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "facing"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "element"
+                      },
+                      "element": {
+                        "type": "string",
+                        "enum": [
+                          "fire",
+                          "water",
+                          "ice",
+                          "charge"
+                        ],
+                        "description": "fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "element"
+                    ],
+                    "additionalProperties": false
+                  }
+                ],
+                "description": "One condition; every condition of a filter must hold."
+              }
+            },
+            "inside": {
+              "description": "The entity must stand in this box, sphere or capsule, in world coordinates.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "box",
+                      "description": "Shape: an axis-aligned box."
+                    },
+                    "center": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Centre of the box, metres."
+                    },
+                    "halfExtents": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Half the size per axis."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "center",
+                    "halfExtents"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "sphere",
+                      "description": "Shape: a sphere."
+                    },
+                    "center": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Centre of the sphere, metres."
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "center",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "capsule",
+                      "description": "Shape: a capsule, a segment swept by a radius."
+                    },
+                    "from": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "One end of the capsule’s segment, metres."
+                    },
+                    "to": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "The other end of the capsule’s segment, metres."
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "from",
+                    "to",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "match": {
+              "description": "all: at least one entity is selected and every one passes; any: one passes; none: none passes.",
+              "type": "string",
+              "enum": [
+                "all",
+                "any",
+                "none"
+              ]
+            },
+            "eq": {
+              "description": "The number of entities that pass equals this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "neq": {
+              "description": "The number that pass does not equal this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gt": {
+              "description": "The number that pass is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "At least this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "Fewer than this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "At most this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "entities"
+          ],
+          "additionalProperties": false,
+          "description": "Property predicates over live entities: how many of them pass, and where they are. Exactly one of match or an operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "signal": {
+              "type": "string",
+              "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$",
+              "description": "Signal graph id and node id, e.g. \"vault/gate-open\". Holds while the output is on."
+            },
+            "port": {
+              "description": "Output port of the node; default: its first.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "required": [
+            "signal"
+          ],
+          "additionalProperties": false,
+          "description": "True while a signal graph node output is on (mark the node `observed`)."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sustained": {
+              "description": "The condition that must keep holding.",
+              "$ref": "#/$defs/condition"
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 3600,
+              "description": "Seconds of sim time it must hold, without a break."
+            }
+          },
+          "required": [
+            "sustained",
+            "seconds"
+          ],
+          "additionalProperties": false,
+          "description": "True once the condition has held, without a break, for that long."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "all": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/condition"
+              },
+              "description": "Every condition holds."
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "additionalProperties": false,
+          "description": "True when every condition in the list holds."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "any": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/condition"
+              },
+              "description": "At least one holds."
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "additionalProperties": false,
+          "description": "True when at least one condition in the list holds."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "not": {
+              "description": "The condition that must not hold.",
+              "$ref": "#/$defs/condition"
+            }
+          },
+          "required": [
+            "not"
+          ],
+          "additionalProperties": false,
+          "description": "True when the condition does not hold."
+        }
+      ]
+    }
+  }
 }

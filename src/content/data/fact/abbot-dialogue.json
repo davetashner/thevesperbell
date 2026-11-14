@@ -1,0 +1,58 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "abbot-dialogue",
+  "name": "Sleepless Abbot dialogue facts",
+  "notes": "mw-e39.9: facts the abbot's dialogue (abbot-cradle, bible 5.12, 4.1 beats 11-12) reads and writes, and the dreamer mark Horn and Mirela read (bible 4.5, 7.3). abbot.fate is in endings.json and clatter.restored / clatter.fate in endings.json and rootcellar-dialogue.json.",
+  "facts": [
+    {
+      "key": "abbot.reveal-heard",
+      "type": "bool",
+      "default": false,
+      "description": "The abbot has spoken aloud for the first time: the Act III reveal (bible 4.1 beat 11). Set by abbot-cradle.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "abbot.in-cradle",
+      "type": "bool",
+      "default": false,
+      "description": "The player has entered the Cradle, where the abbot conducts (bible 4.1 beat 12). Expected writer: the Cradle scene (E26); switches abbot-cradle from the reveal to the Cradle talk.",
+      "owner": "scene"
+    },
+    {
+      "key": "abbot.wraith-down",
+      "type": "bool",
+      "default": false,
+      "description": "The abbot's wraith body has been beaten in the Cradle fight. Expected writer: the wraith combat (E13); lets abbot-cradle resolve the Fight (abbot.fate defeated).",
+      "owner": "combat"
+    },
+    {
+      "key": "abbot.resolution",
+      "type": "enum",
+      "values": ["none", "fight", "trick", "persuade", "join"],
+      "default": "none",
+      "description": "How the player took on the abbot in the Cradle (bible 4.1 beat 12); abbot.fate says how it ended. Set by abbot-cradle.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "abbot.tongue-recovered",
+      "type": "bool",
+      "default": false,
+      "description": "The player took the Vesper Bell's tongue back from the abbot (fight, trick or persuade; not join). Stand-in until the tongue is an item; expected reader: the belfry climb (mw-e39.4 follow-up). Set by abbot-cradle.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "abbot.temptation-refused",
+      "type": "bool",
+      "default": false,
+      "description": "The player turned down the abbot's class-aimed gift (bible 4.5). Set by abbot-cradle.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "dreamer.marked",
+      "type": "bool",
+      "default": false,
+      "description": "The player accepted the abbot's help (sorcerer's Lull or any class's gift): Hushlings ignore them, they hear the song in town, Mirela knows and Horn trusts them less (bible 4.5, 7.3). Set by abbot-cradle; read by horn-warden and mirela-stacks.",
+      "owner": "dialogue"
+    }
+  ]
+}

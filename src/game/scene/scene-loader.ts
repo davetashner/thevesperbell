@@ -19,8 +19,12 @@
 
 import { materialPresets, type GameContent } from '@content/index';
 import {
+  addMaterialProperties,
+  addPropPhysics,
   addSceneBreakables,
   addScenePhysics,
+  placeEntity,
+  placementProperties,
   installObjectRecovery,
   at,
   BreakableComponent,
@@ -28,6 +32,7 @@ import {
   PhysicsObjectComponent,
   SceneTransformComponent,
   sceneEntities,
+  spawnSceneSpawn,
   unloadScene,
   type EntityId,
   type KitLookup,
@@ -145,6 +150,8 @@ const RECOVERY_DEPTH = 20;
 
 export class SceneLoader<TObject, TCommand = unknown> {
   private loaded: LoadedScene | undefined;
+  /** Spawns a fact brought in after the load (mw-e27.8), by spawn id. */
+  private readonly live = new Map<string, EntityId>();
   private killY = -Infinity;
   private recoveryInstalled = false;
   private readonly kit: KitLookup;
@@ -152,6 +159,14 @@ export class SceneLoader<TObject, TCommand = unknown> {
   constructor(private readonly options: SceneLoaderOptions<TObject, TCommand>) {
     const { content } = options;
     this.kit = (id) => (content.has('kit', id) ? content.get('kit', id) : undefined);
+  }
+
+  /**
+   * The height under which an object has fallen out of the loaded scene, metres: 20 m under its
+   * lowest solid. Set whenever a scene loads with physics (puzzles return critical objects from it).
+   */
+  get killPlane(): number {
+    return this.killY;
   }
 
   /** The loaded scene, if any. */
@@ -220,14 +235,92 @@ export class SceneLoader<TObject, TCommand = unknown> {
   }
 
   /**
+   * Adds spawn `spawn` of the loaded scene (one its fact gate left out, mw-e27.8) to the sim and the
+   * renderer the way `load` does for a prop or marker: its entity, its physics body or properties and
+   * its render object. What its content adds on top (interaction, breakable, creature) is the caller's.
+   * Call between sim steps.
+   * @throws Error when no scene is loaded or the spawn is already there.
+   */
+  addSpawn(spawn: SceneSpawnPlacement): EntityId {
+    const entity = this.addSpawnToSim(spawn);
+    this.bindSpawn(spawn, entity);
+    return entity;
+  }
+
+  /**
+   * The sim half of `addSpawn`: the entity, its body or properties, no render object. Unlike
+   * `addSpawn` it may run inside a sim step (a puzzle respawner does); bind the render object with
+   * `bindSpawn` once the step is over and the entity is alive.
+   * @throws Error when no scene is loaded or the spawn is already there.
+   */
+  addSpawnToSim(spawn: SceneSpawnPlacement): EntityId {
+    const { loaded } = this;
+    if (loaded === undefined) throw new Error('no scene is loaded');
+    const { world, content, physics } = this.options;
+    const existing = this.entityOfSpawn(spawn.id);
+    if (existing !== undefined && world.isAlive(existing)) {
+      throw new Error(`spawn "${spawn.id}" is already in scene "${loaded.id}"`);
+    }
+    const entity = spawnSceneSpawn(world, loaded.id, spawn);
+    const own = placementProperties(spawn.properties);
+    const body =
+      physics !== undefined && spawn.prop !== undefined
+        ? propBodies(content)(spawn.prop)
+        : undefined;
+    const materials = materialPresets(content.all('material'));
+    if (body !== undefined) {
+      addPropPhysics(world, entity, body, materials, spawn.position, spawn.rotation, own);
+    } else if (physics !== undefined && Object.keys(own).length > 0) {
+      addMaterialProperties(world, entity, materials, own);
+      placeEntity(world, entity, spawn.position);
+    }
+    this.live.set(spawn.id, entity);
+    return entity;
+  }
+
+  /** The render half of `addSpawn`: binds the render object of `spawn`'s live `entity`. */
+  bindSpawn(spawn: SceneSpawnPlacement, entity: EntityId): void {
+    const { sync, objects, binding, content, physics } = this.options;
+    const body =
+      physics !== undefined && spawn.prop !== undefined
+        ? propBodies(content)(spawn.prop)
+        : undefined;
+    sync.bind(
+      entity,
+      body === undefined
+        ? binding(objects.spawn(spawn), readSceneTransform)
+        : binding(
+            objects.body?.(spawn, body.size) ?? objects.spawn(spawn),
+            readPhysicsObjectTransform,
+          ),
+    );
+  }
+
+  /** Removes spawn `id` (loaded with the scene or added since): its entity and render object. */
+  removeSpawn(id: string): boolean {
+    const entity = this.entityOfSpawn(id);
+    if (entity === undefined) return false;
+    const { world, sync } = this.options;
+    this.live.delete(id);
+    sync.unbind(entity);
+    if (world.isAlive(entity)) world.destroy(entity);
+    return true;
+  }
+
+  /** The entity of spawn `id` while it exists (alive or not) in the loaded scene. */
+  entityOfSpawn(id: string): EntityId | undefined {
+    return this.live.get(id) ?? this.loaded?.spawns.find(({ spawn }) => spawn.id === id)?.entity;
+  }
+
+  /**
    * Quest-critical objects of `loaded` that name a recovery anchor (mw-e17.14) return to it when they
    * fall out of the scene: the kill plane is 20 m under its lowest solid. Installed on the first such
    * scene, so a world without any has no recovery rules.
    */
   private watchRecoveries(loaded: LoadedScene): void {
-    if (!loaded.layout.spawns.some((spawn) => spawn.recovery !== undefined)) return;
     const lowest = Math.min(0, ...loaded.layout.parts.map((part) => part.min.y));
     this.killY = lowest - RECOVERY_DEPTH;
+    if (!loaded.layout.spawns.some((spawn) => spawn.recovery !== undefined)) return;
     if (this.recoveryInstalled) return;
     this.recoveryInstalled = true;
     installObjectRecovery(this.options.world, () => ({ killY: this.killY }));
@@ -239,7 +332,9 @@ export class SceneLoader<TObject, TCommand = unknown> {
     if (loaded === undefined) return;
     this.loaded = undefined;
     const { world, sync, colliders } = this.options;
-    for (const entity of sceneEntities(loaded)) sync.unbind(entity);
+    for (const entity of [...sceneEntities(loaded), ...this.live.values()]) sync.unbind(entity);
+    for (const entity of this.live.values()) if (world.isAlive(entity)) world.destroy(entity);
+    this.live.clear();
     unloadScene(world, loaded, colliders);
     this.options.light?.setEnvironment({});
   }

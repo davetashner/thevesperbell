@@ -1,0 +1,16 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-vesperine-hours",
+  "title": "The Vesperine Hours",
+  "author": "The Vesperine Order",
+  "notes": "Bible 7.2: the hymnal and key item; the one home of the Vesper hymn (AC-3). Margin note is Clatter (Brother Anselm Hobb) as a novice, who sang flat. Lore: the bell (rung every dusk), the Long Vespers (what happens when it is not).",
+  "locations": ["place-lamplit-stacks", "place-bellwater-priory"],
+  "pages": [
+    {
+      "text": "THE VESPERINE HOURS\nFor the use of Bellwater Priory\n\nVespers, to be sung at dusk by the whole house, standing, and rung at the last word.\n\nSleep, you who were not born. Sleep, you who fell. The day is rung. The door is kept.\n\nThe bell answers the last line. Let no brother speak between the hymn and the bell.\n\n(In the margin, in a child's hand: Brother A. sings this flat.)"
+    },
+    {
+      "text": "Of the keeping of the hours. Matins is for the sleepless, Lauds for the waking, and Vespers for the sleeping, who cannot keep it for themselves. The house keeps it on their behalf. The bell is rung at every dusk without fail, in storm and in plague and in grief, for the note goes down the Sounding Shaft and the thing below is quieted by it.\n\nIf the bell cannot be rung, do not sing the hymn alone below the fourth stair. The song will answer."
+    }
+  ]
+}

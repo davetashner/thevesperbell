@@ -74,6 +74,12 @@
           "supporting": {
             "description": "A supporting (numeric) entry rather than a verb (ADR-0004 P1, P2); default false.",
             "type": "boolean"
+          },
+          "climbDifficulty": {
+            "description": "The hardest climb difficulty (1 ladders, ropes and ivy; 2 rough stone and timber; 3 sheer faces) holding this capability lets the actor attempt (mw-e10.9); an actor attempts the highest of its capabilities, and 1 with none. Absent = grants none.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
           }
         },
         "required": [

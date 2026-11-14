@@ -15,9 +15,8 @@
 //   lofted a little, at a speed by weight class.
 // - No-drop items (quest items by default, mw-e17.2 AC-5) are refused with reason `no-drop` for both
 //   (AC-4), so the slice's gallery key can never be lost.
-// - Impact noise: each `physicsImpact` of a world item emits one `noiseEmitted` whose loudness comes
-//   from the item's weight class (AC-3), attributed to whoever dropped or threw it. What it sounds
-//   like is the cue sheets' (physicsImpact plays the material's impact set), never this module's.
+// - Impact noise: a world item's impacts are noises like any physics object's (src/sim/noise/impacts.ts:
+//   energy × material, attributed to whoever dropped or threw it, mw-e03.25).
 //
 // Everything a world item does physically comes from properties, never from its type: its body's
 // mass is its `weight` (from the weight class unless its world properties say otherwise), its
@@ -47,8 +46,16 @@ import {
 import { cos, sin } from '../math';
 import type { BreakableProfileLookup } from '../breakables/components';
 import { makeBreakable } from '../breakables/system';
-import { noiseEmitted } from '../noise/events';
-import { addPhysicsObject, physicsImpact } from '../physics/objects';
+import {
+  recordTheft,
+  stolenFlags,
+  tagOwner,
+  theftTag,
+  UNKNOWN_LEVEL,
+  type OwnerTag,
+  type PermissionCheck,
+} from '../ownership/ownership';
+import { addPhysicsObject } from '../physics/objects';
 import { PlayerLook } from '../player/player';
 import {
   addMaterialProperties,
@@ -67,25 +74,12 @@ export const WEIGHT_CLASS_KG: Readonly<Record<WeightClass, number>> = Object.fre
   heavy: 8,
 });
 
-/**
- * Loudness of a world item's impact by weight class, dB at 1 m (AC-3): a dropped key ticks, a
- * dropped shield clangs. For scale, breakables break at 70–85 dB.
- */
-export const IMPACT_LOUDNESS_DB: Readonly<Record<WeightClass, number>> = Object.freeze({
-  light: 50,
-  medium: 60,
-  heavy: 70,
-});
-
 /** Throw speed by weight class, m/s. */
 export const THROW_SPEED: Readonly<Record<WeightClass, number>> = Object.freeze({
   light: 9,
   medium: 7,
   heavy: 5,
 });
-
-/** The noise kind of a world item's impact. */
-export const ITEM_IMPACT_NOISE = 'item-impact';
 
 /** How far in front of the actor's feet a dropped item appears, m (clear of the 0.35 m capsule). */
 export const DROP_DISTANCE = 0.6;
@@ -154,6 +148,8 @@ export interface WorldItemSpec {
   readonly velocity?: Vec3;
   /** Who dropped or threw it; defaults to null. */
   readonly by?: EntityId | null;
+  /** Whom it belongs to (mw-e27.9): taking it without permission is a theft. */
+  readonly owner?: OwnerTag;
 }
 
 /** Why a pick-up was refused (the entity stays in the world). */
@@ -270,6 +266,8 @@ export interface WorldItemsOptions {
    * item naming a profile this lookup lacks stays an ordinary item.
    */
   readonly breakables?: BreakableProfileLookup;
+  /** Whether an actor may take what an owner's things hold without theft (mw-e27.9); default: only the owner. */
+  readonly permits?: PermissionCheck;
 }
 
 /** Where a released item starts: its box centre, rotation and (for a throw) velocity. */
@@ -327,6 +325,7 @@ export class WorldItems {
   readonly #materials: MaterialPresets;
   readonly #name: (def: WorldItemDef) => string;
   readonly #breakables: BreakableProfileLookup | undefined;
+  readonly #permits: PermissionCheck | undefined;
 
   /** `items`: every item definition (the content registry's). */
   constructor(items: Iterable<WorldItemDef>, options: WorldItemsOptions = {}) {
@@ -336,6 +335,7 @@ export class WorldItems {
     this.#materials = options.materials ?? new Map();
     this.#name = options.name ?? ((def) => readableName(def.id));
     this.#breakables = options.breakables;
+    this.#permits = options.permits;
   }
 
   /** Whether `defId` is a known item. */
@@ -409,6 +409,7 @@ export class WorldItems {
     );
     // A jar breaks like any breakable (mw-ju8.4): the breakables system tests the physics impact of
     // a hard drop or throw against its material's fragile threshold; nothing of it is left to pick up.
+    if (spec.owner !== undefined) tagOwner(world, entity, spec.owner);
     const profile =
       def.breakable === undefined ? undefined : this.#breakables?.(def.breakable.profile);
     if (profile !== undefined) makeBreakable(world, entity, profile);
@@ -423,13 +424,20 @@ export class WorldItems {
   pickUp(world: World<never>, actor: EntityId, entity: EntityId): PickUpResult {
     const item = world.get(entity, WorldItemComponent);
     if (item === undefined) throw new RangeError(`entity ${String(entity)} is not a world item`);
-    const { defId, count, flags } = item;
+    const { defId, count } = item;
+    // Taking another's property without permission flags the units stolen and records the theft
+    // (mw-e27.9); only once the inventory has taken them, so a refused take is no theft.
+    let flags = item.flags;
     let result: PickUpResult;
     if (this.def(defId).category === 'currency') {
       this.inventory.addGold(world, actor, count);
       result = { ok: true, instanceIds: [] };
     } else {
+      const take = { item: defId, count, flags };
+      const tag = theftTag(world, actor, entity, take, this.#permits);
+      if (tag !== undefined) flags = stolenFlags(flags, tag);
       result = this.inventory.add(world, actor, defId, count, flags) as PickUpResult;
+      if (result.ok && tag !== undefined) recordTheft(world, actor, tag, take);
     }
     if (!result.ok) {
       world.events.emit(itemPickupRefused, {
@@ -623,18 +631,6 @@ export function installWorldItems<TInput>(
     if (taken.has(target)) return;
     if (items.pickUp(sim, actor, target).ok) taken.add(target);
   });
-  world.events.on(physicsImpact, ({ entity, position }) => {
-    const item = world.get(entity, WorldItemComponent);
-    if (item === undefined) return;
-    world.events.emit(noiseEmitted, {
-      tick: world.tick,
-      position,
-      loudness: IMPACT_LOUDNESS_DB[items.def(item.defId).weightClass],
-      kind: ITEM_IMPACT_NOISE,
-      entity,
-      source: item.by,
-    });
-  });
   world.addSystem(worldItemsSystem(items, options));
 }
 
@@ -642,20 +638,26 @@ export function installWorldItems<TInput>(
 export interface ItemSpawnEntity {
   readonly entity: EntityId;
   readonly spawn: {
+    /** Its id in the level; a theft of it is filed under it (mw-e27.9). */
+    readonly id?: string;
     readonly position: Vec3;
     readonly rotation: Quat;
     readonly item?: { readonly id: string; readonly count: number } | undefined;
+    /** Whom it belongs to (mw-e27.9). */
+    readonly owner?: string | undefined;
   };
 }
 
 /**
  * Makes every loaded spawn that names an item that world item, resting on the spawn's floor point.
- * Returns those entities, in scene order.
+ * An item with an `owner` is its owner's (mw-e27.9), filed under `level`. Returns those entities, in
+ * scene order.
  */
 export function addSceneItems(
   world: World<never>,
   items: WorldItems,
   spawns: readonly ItemSpawnEntity[],
+  level: string = UNKNOWN_LEVEL,
 ): EntityId[] {
   const placed: EntityId[] = [];
   for (const { entity, spawn } of spawns) {
@@ -667,6 +669,9 @@ export function addSceneItems(
       count: spawn.item.count,
       position: { x, y: y + half.y, z },
       rotation: spawn.rotation,
+      ...(spawn.owner !== undefined && {
+        owner: { owner: spawn.owner, level, place: spawn.id ?? String(entity) },
+      }),
     });
     placed.push(entity);
   }

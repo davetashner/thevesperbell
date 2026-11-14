@@ -376,6 +376,37 @@ describe('SaveRegistry', () => {
     expect(target.snapshot()).toEqual(before);
   });
 
+  it('mw-e23.11: afterRead runs once every section applied, and a throw rolls the load back', () => {
+    const seen: number[] = [];
+    const sections = (afterRead: (world: World) => void) =>
+      new SaveRegistry({ afterRead })
+        .register(
+          componentSection('positions', Position, z.object({ x: z.number(), y: z.number() })),
+        )
+        .register(componentSection('health', Health, anyNumber))
+        .register(componentSection('bags', Bag, z.object({ items: z.array(z.string()) })));
+    const source = randomWorld(21);
+    const bytes = sections(() => undefined).write(source, options);
+    const target = freshWorld();
+    const loaded = sections((world) => {
+      seen.push(world.query(Position).ids().length);
+    }).read(target, bytes);
+    expect(loaded).toMatchObject({ ok: true });
+    expect(seen).toEqual([source.query(Position).ids().length]);
+
+    const boom = new Error('late');
+    const failing = freshWorld();
+    const before = failing.snapshot();
+    const error = errorOf(
+      sections(() => {
+        throw boom;
+      }).read(failing, bytes),
+    );
+    expect(error).toBeInstanceOf(SaveApplyError);
+    expect(error).toMatchObject({ section: 'after-read', cause: boom });
+    expect(failing.snapshot()).toEqual(before);
+  });
+
   it('checks a save without touching any world: everything but apply', () => {
     const registry = threeSections().register({
       id: 'fragile',

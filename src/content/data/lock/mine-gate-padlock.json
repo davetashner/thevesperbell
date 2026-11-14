@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "mine-gate-padlock",
+  "name": "Deepworks front gate padlock",
+  "notes": "The padlock on the boarded mine gate's front door (mw-e26.2): a thief with lockpicks can pick it (tier 2), and Vane's key is the social route (bible 4.1 beat 5). No key item exists yet; the gate puzzle that writes deepworks.gate-open and opens the way is mw-e25.10.",
+  "tier": 2,
+  "pickTier": 2,
+  "hint": "A rusted padlock on a chain. Vane's seal is stamped in the wax."
+}

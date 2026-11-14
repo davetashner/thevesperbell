@@ -91,3 +91,15 @@ describe('component gallery', () => {
     expect(own.toasts.element.isConnected).toBe(false);
   });
 });
+
+describe('indicator bars (mw-e31.8)', () => {
+  it('AC-1: the gallery shows every bar kind, each in its own data-kind', () => {
+    const gallery = openGallery(ui);
+    const kinds = [
+      ...gallery.screen.element.querySelectorAll<HTMLElement>(
+        '[data-testid="indicator-bars"] .vb-meter',
+      ),
+    ].map((el) => el.dataset['kind']);
+    expect(kinds).toEqual(['health', 'stamina', 'mana', 'breath', 'poise']);
+  });
+});

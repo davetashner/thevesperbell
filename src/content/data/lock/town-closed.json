@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "town-closed",
+  "name": "Briar Glen shut door",
+  "notes": "The door of a Briar Glen building whose interior is not built yet (mw-e24.2): a closed shop or house with nobody answering. No key exists, so it shows the locked prompt; a thief with lockpicks can pick it (tier 1). The interior beads (mw-e24.5, mw-e24.7, mw-e24.8, mw-e24.9, mw-e24.11) replace each of these doors with a transition.",
+  "tier": 1,
+  "pickTier": 1,
+  "hint": "Closed. Nobody answers."
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "../move.schema.json",
+  "id": "mace-light",
+  "notes": "Mace swing (mw-e04.15): the short reach class's fast swing, 8/3/12 ticks (the bead's numbers), 10 stamina, 22 blunt, 25 poise. Horizontal, but short weapons never clang off walls. PLACEHOLDER TUNING for the owner: stamina and damage. Its sound and trail reuse the sword's cues; its clip id is reserved for the weapon animation (art), so until then it has no clip.",
+  "verb": "attack",
+  "frames": {
+    "startup": 8,
+    "active": 3,
+    "recovery": 12
+  },
+  "staminaCost": 10,
+  "cancelWindows": [
+    {
+      "into": "dodge",
+      "from": 15,
+      "to": 22
+    }
+  ],
+  "damage": {
+    "amounts": {
+      "blunt": 22
+    },
+    "poiseDamage": 25,
+    "staminaDamage": 14
+  },
+  "hitbox": {
+    "track": "mace-arc",
+    "shape": {
+      "kind": "capsule",
+      "from": {
+        "x": 0.2,
+        "y": 1.1,
+        "z": 0.3
+      },
+      "to": {
+        "x": 0.2,
+        "y": 1.1,
+        "z": 0.95
+      },
+      "radius": 0.12
+    },
+    "reach": "short",
+    "swing": "horizontal"
+  },
+  "presentation": {
+    "anim": "anim-knight-mace-light",
+    "audioCue": "sfx-knight-sword-swing-light",
+    "vfxCue": "vfx-sword-trail-light"
+  }
+}

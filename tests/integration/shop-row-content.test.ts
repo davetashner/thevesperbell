@@ -21,6 +21,12 @@ const itemIds = new Set(items.map((item) => item.id));
  */
 const NOT_FOR_SALE = new Set([
   'gold',
+  // Contraband Pages quest items and the novel (mw-m97i): given and taken by dialogue, not sold.
+  'crate-impounded-books',
+  'writ-vane-chair',
+  'writ-forged-lantern',
+  'romance-hearts-against-the-tide',
+  'letter-anselm-hobb', // mw-3n0f: Anselm's letter, given by Hollis and taken by Clatter
   'rusted-gallery-key',
   'testbed-closet-key',
   'valley-chest-key',
@@ -28,6 +34,13 @@ const NOT_FOR_SALE = new Set([
   'bent-pick-head',
   'rusted-lamp-hook',
   'rusted-knife',
+  // The climbing rope is found in levels and tied at their rope hooks (mw-e10.9); whether and where
+  // a shop sells it is the economy pass's call.
+  'climbing-rope',
+  // Starter weapons for the reach and wall recoil rules (mw-e04.15); weapon loot is e18.
+  'spear',
+  'mace',
+  'halberd',
   'rusted-arming-sword',
   'dented-iron-cap',
   'ember',
@@ -133,8 +146,14 @@ describe('the village shop row merchants (mw-ju8.5)', () => {
   });
 
   it('AC-1: every catalogue item is stocked by at least one shop', () => {
+    // Story books (book-<slug>, mw-e39.44) are placed by the world and bookshop-stock beads, not the village shop row.
     const unstocked = items
-      .filter((item) => !NOT_FOR_SALE.has(item.id) && stockedBy(item.id).length === 0)
+      .filter(
+        (item) =>
+          !NOT_FOR_SALE.has(item.id) &&
+          !item.id.startsWith('book-') &&
+          stockedBy(item.id).length === 0,
+      )
       .map((item) => item.id);
     expect(unstocked).toEqual([]);
   });

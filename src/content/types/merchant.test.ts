@@ -117,7 +117,7 @@ describe('merchant schema', () => {
   });
 });
 
-describe('merchant checks', () => {
+describe('merchant checks', { timeout: 30_000 }, () => {
   it('AC-1: the two fixture merchants validate (and load with their item and loot-table refs)', () => {
     const merchants = loadDevContent()
       .all('merchant')

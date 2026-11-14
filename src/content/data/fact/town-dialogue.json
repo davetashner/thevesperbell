@@ -1,0 +1,64 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "town-dialogue",
+  "name": "Town dialogue facts",
+  "notes": "mw-e39.6: world-state facts read and written by the Briar Glen character dialogues (Vane, the Pells, Juniper, Oswin, Duggan). vane.fate and tansy.saved are registered with the endings.",
+  "facts": [
+    {
+      "key": "vane.ledger.obtained",
+      "type": "bool",
+      "default": false,
+      "description": "Harrow Vane's Deepworks ledger (the horn-coin sales, bible 4.1 beat 6) is in the player's hands. Set by the Deepworks ledger pickup; read by the Vane confrontation (vane-bounty).",
+      "owner": "dialogue"
+    },
+    {
+      "key": "duggan.testimony",
+      "type": "bool",
+      "default": false,
+      "description": "Duggan Marl has agreed to testify that Vane's foreman planted the goblin trinkets on orders (Framed in Brass, bible 6.1). Set by duggan-testimony; read by the Vane confrontation.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "bell-tongue.destroyed",
+      "type": "bool",
+      "default": false,
+      "description": "The Vesper Bell's original bronze tongue has been destroyed, so a recast is the only way to ring it true (bible 5.7). Set by the main quest when the tongue is lost; read by oswin-forge to offer the recast.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "oswin.recast-commissioned",
+      "type": "bool",
+      "default": false,
+      "description": "Oswin Brand has been commissioned to recast the Vesper Bell's tongue from his father's mould (imperfectly, bible 5.7). Set by oswin-forge.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hollis.bible-lent",
+      "type": "bool",
+      "default": false,
+      "description": "Hollis Pell has handed over the Pell family Bible with Brother Anselm's letter (side quest The Name on the Bones, bible 6.1). Set by hollis-pell.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hollis.library-card-given",
+      "type": "bool",
+      "default": false,
+      "description": "Hollis gave a sorcerer Tansy's library card (bible 5.5). Stand-in until the item exists. Set by hollis-pell.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hollis.spare-key-given",
+      "type": "bool",
+      "default": false,
+      "description": "Hollis gave a thief the bakery's spare key (bible 5.5). Stand-in until the item exists. Set by hollis-pell.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "juniper.draught-confessed",
+      "type": "bool",
+      "default": false,
+      "description": "Juniper Fenn has told the player that her sleep-draughts make the song easier to follow (bible 5.6). Set by juniper-fenn.",
+      "owner": "dialogue"
+    }
+  ]
+}

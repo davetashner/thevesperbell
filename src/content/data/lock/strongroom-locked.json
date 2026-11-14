@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "strongroom-locked",
+  "name": "Customs House strongroom lock",
+  "notes": "The strongroom door in the Customs House (mw-e40.1; the route is mw-e40.3, route-matrix customs-strongroom): a tier-2 lock a thief picks (tool.lockpick); a knight can break it, loudly; Cray's key is the social route. No key lies about.",
+  "tier": 2,
+  "pickTier": 2,
+  "hint": "Locked. The Inspector keeps the key."
+}

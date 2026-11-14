@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "stone-block",
+  "name": "Stone block",
+  "mass": 120,
+  "flammable": false,
+  "tags": ["puzzle"],
+  "body": {
+    "size": [1, 1, 1],
+    "material": "stone"
+  }
+}

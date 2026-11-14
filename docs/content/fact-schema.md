@@ -15,7 +15,11 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `facts[].description` | string | required | What the fact records, when it changes and what reads it (designers, owner review). |
 | `facts[].owner` | id | required | System that writes the fact, e.g. "signals", "quest", "interaction". |
 | `facts[].renamedFrom` | list of string (at least 1) | — | Keys this fact was saved under before (any older spelling; for a template, older templates). A save holding one loads into this key with its value (mw-e27.4); never remove an entry once a build shipped it. |
-| `facts[].persistence` | `"permanent"` | `"permanent"` | How long a written value lasts; `permanent` keeps it in saves forever. |
+| `facts[].persistence` | `"permanent"` \| `"reset-on-rest"` \| `"reset-after"` \| `"transient"` \| `"decays-to"` | `"permanent"` | How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt). |
+| `facts[].resetAfter` | integer > 0 | — | Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required. |
+| `facts[].decaysTo` | object | — | Only with persistence `decays-to`, where it is required. |
+| `facts[].decaysTo.from` | list of boolean or integer or id (at least 1) | required | Saved values that decay (e.g. ["burning"]). |
+| `facts[].decaysTo.to` | boolean or integer or id | required | The value a loaded game holds instead (e.g. "burnt"). |
 | `facts[].type` | `"bool"` | required | A true/false flag. |
 | `facts[].default` | boolean | required | Value read before the fact is first written. |
 | `facts[].type` | `"int"` | required | A whole number (a count, a stage). |

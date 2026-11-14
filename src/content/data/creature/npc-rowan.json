@@ -1,0 +1,43 @@
+{
+  "$schema": "../creature.schema.json",
+  "id": "npc-rowan",
+  "family": "human",
+  "tags": ["npc", "missing"],
+  "stats": {
+    "health": 60,
+    "poise": 20,
+    "mass": 75,
+    "size": "medium"
+  },
+  "senses": "humanoid",
+  "locomotion": "humanoid",
+  "attacks": [],
+  "faction": "townsfolk",
+  "disposition": {
+    "towardPlayer": "friendly"
+  },
+  "personality": {
+    "bravery": 0.5,
+    "curiosity": 0.6,
+    "aggression": 0,
+    "diligence": 0.6,
+    "sociability": 0.6,
+    "greed": 0.3
+  },
+  "behaviour": {
+    "profile": "shopkeeper"
+  },
+  "audio": {
+    "idleLoop": "sfx-human-idle",
+    "footsteps": "sfx-human-step",
+    "alertBark": "sfx-human-bark-alert",
+    "telegraph": "sfx-human-telegraph",
+    "hurt": "sfx-human-hurt",
+    "poiseBreak": "sfx-human-stagger",
+    "death": "sfx-human-death"
+  },
+  "presentation": {
+    "mesh": "placeholder-capsule",
+    "sfx": "placeholder"
+  }
+}

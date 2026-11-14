@@ -1,0 +1,12 @@
+{
+  "$schema": "../disposition-rule.schema.json",
+  "id": "theft",
+  "notes": "The player stole from this creature (the owner, who saw it: crime.theft). The base delta is scaled by how valuable the item was: a loaf is a grudge, a family heirloom is a betrayal.",
+  "delta": -10,
+  "valueTiers": [
+    { "minValue": 0, "scale": 1 },
+    { "minValue": 25, "scale": 2 },
+    { "minValue": 100, "scale": 3 },
+    { "minValue": 500, "scale": 5 }
+  ]
+}

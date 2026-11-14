@@ -1,0 +1,11 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "romance-hearts-against-the-tide",
+  "category": "misc",
+  "name": "Hearts Against the Tide",
+  "description": "A cheap, much-thumbed romance from Mirela's back table: a harbour pilot, a lighthouse keeper's daughter and a storm that cannot be blamed for everything. Cover price twenty-five crowns.",
+  "notes": "mw-m97i: Inspector Cray's secret weakness (bible 5.13). Offered to her at the customs desk; she takes it for the evidence room. Value 25 sits in the cheap-goods end of the economy bands; owner to confirm. Placement (Mirela's table, Nell's crate) is mw-r5nw/mw-ily9.",
+  "icon": "icon-item-romance-hearts-against-the-tide-01",
+  "value": 25,
+  "stackable": false
+}

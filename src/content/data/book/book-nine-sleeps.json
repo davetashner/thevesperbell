@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-nine-sleeps",
+  "title": "Nine Sleeps",
+  "author": "Corvin Ashgrove",
+  "notes": "Bible 7.2: forbidden; Mirela's back room; never sold. The abbot's treatise on Somnomancy, lore pages only. The first chapter that teaches Lull belongs to the spellbook-flavour work, not here. Long Vespers source from the abbot's own theory.",
+  "locations": ["place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "NINE SLEEPS: a treatise on the depths of sleep, by the late Abbot of Bellwater.\n\nThe Order reckons nine sleeps, from the doze at vespers down to the sleep with no dreamer in it. The ninth is not death. It is the place where dreams are written.\n\nThe song beneath the hill is no cry and no hunger only. It is a language, the language dreams are written in, and whoever learns to read it may learn to write in it. A sleeper can be taught anything. A sleeper can be told that his name is not his name.\n\nThis book is forbidden by the Lantern Court. The Court is right to forbid it. I wrote it anyway."
+    }
+  ]
+}

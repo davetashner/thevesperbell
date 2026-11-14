@@ -240,7 +240,10 @@ test('mw-ju8.43 AC-2: the lane at 22:00 is clearly darker than at 12:00 and its 
   const problems = collectProblems(page);
   await openLane(page);
   await takeControl(page);
-  await runConsole(page, 'tp 0 0 4');
+  // Stand at the lane's middle, clear of the watch brazier (-5.5, 2.25) and the riverbank one (10.75,
+  // 8.25): they burn in any scene that starts mechanisms (this one places the arrival graph,
+  // mw-e39.38), and beside one the frame's average is lifted by a lit wall, not by the daylight.
+  await runConsole(page, 'tp 0 0 14');
   await turnTo(page, { x: 0, z: 40 });
 
   await runConsole(page, 'time set 1 12:00');

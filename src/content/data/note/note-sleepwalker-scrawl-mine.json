@@ -1,0 +1,12 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-sleepwalker-scrawl-mine",
+  "title": "A scrawl on the mine wall",
+  "notes": "Bible 7.5: the sleepwalker's scrawl in the lower Deepworks (\"it's so pretty down here\"). Chalk on stone; one of the walkers, unnamed.",
+  "locations": ["place-deepworks"],
+  "pages": [
+    {
+      "text": "it's so pretty down here"
+    }
+  ]
+}

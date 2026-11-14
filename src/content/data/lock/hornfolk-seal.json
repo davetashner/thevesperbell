@@ -1,0 +1,10 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "hornfolk-seal",
+  "name": "Hornfolk seal on the secret door to the Cradle",
+  "notes": "The stone door in the east wall of Horn's Hall (mw-e26.10 AC-2), the secret sorcerer route to the Cradle (bible 4.2 and the books paragraph: fragments of Hornfolk inscription unlock the Cradle's secret route). Magically sealed: keys and picks fail until a spell dispels it. Reading the runes beside the door with the fragments in hand (a bead filed from mw-e26.10) is what lets a sorcerer do so; nothing in the greybox does yet.",
+  "tier": 5,
+  "pickTier": null,
+  "sealed": true,
+  "hint": "Cut with runes that you only half read. The stone is humming."
+}

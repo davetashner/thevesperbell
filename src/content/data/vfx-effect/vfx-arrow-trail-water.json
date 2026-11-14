@@ -1,0 +1,32 @@
+{
+  "id": "vfx-arrow-trail-water",
+  "notes": "Water arrow (mw-e29.11): drops shaken off the sodden shaft that fall rather than rise, so a water arrow reads by motion as well as colour (water #3F7FA0, highlight #CFEFFF, like the wet-state drip). Plays while it flies and stops at its impact.",
+  "priority": 30,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "drops",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "alpha",
+      "rate": 26,
+      "lifetime": { "min": 0.3, "max": 0.55 },
+      "speed": { "min": 0, "max": 0.4 },
+      "coneDeg": 180,
+      "spawnRadius": 0.03,
+      "gravity": 8,
+      "size": [
+        { "t": 0, "v": 0.07 },
+        { "t": 1, "v": 0.03 }
+      ],
+      "color": [
+        { "t": 0, "color": "#CFEFFF" },
+        { "t": 1, "color": "#3F7FA0" }
+      ],
+      "alpha": [
+        { "t": 0, "v": 0.85 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

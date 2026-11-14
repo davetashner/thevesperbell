@@ -1,0 +1,15 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-10-big-one-soft-room",
+  "notes": "The Fold. True; the town won't believe it. Goblin-sourced, so only offered when goblins.standing is not hostile. Told by Kettleback and Snig.",
+  "region": "valley",
+  "source": ["npc-kettleback", "npc-snig"],
+  "sourceTags": ["goblins"],
+  "truth": "true",
+  "target": "place-fold",
+  "text": "Big One doesn't eat people. Big One puts them in the soft room and gives us bread for them.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Beds, and bread. All of it. The town will never believe me if I say so, so I shan't."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "breakwater-door",
+  "name": "Breakwater Undertow door",
+  "notes": "The iron door at the foot of the harbour-wall stair on the breakwater, into the smugglers' tunnel to the Undertow (mw-e40.1, route is mw-e40.12; route-matrix undertow): a tier-2 lock a thief picks, a knight bursts. No key lies about.",
+  "tier": 2,
+  "pickTier": 2,
+  "hint": "Barred from the tunnel side. Wet bootprints lead in."
+}

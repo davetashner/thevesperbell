@@ -9,6 +9,7 @@
 
 import type { z } from 'zod';
 import { canonicalJson, fnv1a64 } from './hash.ts';
+import { expandScenePrefabs } from './prefabs.ts';
 import { ContentRef } from './schema.ts';
 
 /** A registry: content type name → schema of one entry. Every schema's output has a string `id`. */
@@ -170,7 +171,12 @@ export function loadContent<R extends ContentSchemas>(
 ): Catalogue<R> {
   const issues: ContentIssue[] = [];
   const sorted = [...sources].sort((a, b) => (a.path < b.path ? -1 : 1));
-  const loaded = sorted.flatMap((source) => loadFile(schemas, source, issues) ?? []);
+  const parsed = sorted.flatMap((source) => loadFile(schemas, source, issues) ?? []);
+  // Puzzle prefab instances become plain spawns and signal graphs before anything else looks at
+  // the scenes (mw-e15.4); a registry without prefabs passes through untouched.
+  const loaded = parsed.some((e) => e.type === 'prefab')
+    ? expandScenePrefabs(parsed, issues)
+    : parsed;
 
   // The first file (in path order) to define each `type:id`; later ones are duplicates.
   const firstFile = new Map<string, string>();

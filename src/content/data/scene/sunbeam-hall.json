@@ -1,0 +1,168 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "sunbeam-hall",
+  "name": "Sunbeam hall",
+  "description": "Greybox reference puzzle for light (mw-e15.9): a shaft of sunlight shines north from the south-west corner of a 10 m hall; two mirror stands, turned with Interact, can carry it east and north to a beam sensor by the north-east wall, and a brazier stands beside the sensor. When the sensor is lit, or the brazier burns, for a second the puzzle sunbeam-hall is solved and the portcullis to the north rises. The beam is not the only way: a burning barrel waits by the south wall for anyone willing to carry flame to the brazier, and a fire spell (Ember) lights it from across the room. Reach it with ?scene=sunbeam-hall.",
+  "grid": 1,
+  "camera": {
+    "position": [-7, 8, -8],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [5, 1, 5]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, -5],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -5]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, -5],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, 5],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0, 0, 5]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, 5],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-5, 0, -3],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-5, 0, 0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [-5, 0, 3],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [5, 0, -3],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [5, 0, 0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [5, 0, 3],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [0, 0, 9],
+      "scale": [1, 1, 4]
+    },
+    {
+      "piece": "wall",
+      "at": [-1, 0, 9],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [1, 0, 9],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 13]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -3.5],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "torch-barrel",
+      "at": [1.5, 0, -3.5],
+      "prop": "barrel",
+      "tags": ["torch-barrel"],
+      "properties": {
+        "burning": true,
+        "fuel": 900
+      }
+    },
+    {
+      "id": "vault-gate",
+      "at": [0, 0, 5],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "vault-prize",
+      "at": [0, 0, 11],
+      "tags": ["goal"]
+    }
+  ],
+  "prefabs": [
+    {
+      "id": "sun",
+      "prefab": "beam-source",
+      "at": [-3, 0, -4],
+      "params": {
+        "kind": "sunlight"
+      }
+    },
+    {
+      "id": "mirror-a",
+      "prefab": "rotatable-mirror",
+      "at": [-3, 0, 0]
+    },
+    {
+      "id": "mirror-b",
+      "prefab": "rotatable-mirror",
+      "at": [3, 0, 0]
+    },
+    {
+      "id": "eye",
+      "prefab": "beam-sensor",
+      "at": [3, 0, 3.5]
+    },
+    {
+      "id": "lamp",
+      "prefab": "brazier",
+      "at": [4.25, 0, 4.5]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "sunbeam-hall"
+    }
+  ],
+  "light": {
+    "ambient": 0.4
+  }
+}

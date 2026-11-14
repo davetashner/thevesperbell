@@ -2,7 +2,21 @@ import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import { describe, expect, it } from 'vitest';
 import { KNIGHT_SHIELD_ID, loadGameContent } from '@content/index';
 import {
+  ACTION_TIMELINE_COMPONENTS,
+  actionTimelineSystem,
   ARROW_COMPONENTS,
+  box,
+  FakeCollisionWorld,
+  giveActionTimeline,
+  giveFacing,
+  giveHitboxes,
+  giveStamina,
+  placeEntity,
+  requestMove,
+  StaminaComponent,
+  staminaSystem,
+  WallRecoil,
+  type WallRecoilInfo,
   ArrowComponent,
   BlameComponent,
   CharacterController,
@@ -149,5 +163,39 @@ describe('training dummy (mw-e04.6)', () => {
     expect(w.isRegistered(ArrowComponent)).toBe(true);
     const own = world().register(...ARROW_COMPONENTS);
     expect(() => startTestbedCombat(own, combat, [])).not.toThrow();
+  });
+
+  it('mw-e04.15: with a level to probe, the player’s halberd sweep clangs off a corridor wall, a brute’s does not', () => {
+    const combat = prepareTestbedCombat(loadGameContent());
+    expect(combat.reach.wallRecoil.ticks).toBe(30);
+    const v = (x: number, y: number, z: number) => ({ x, y, z });
+    const corridor = new FakeCollisionWorld([
+      box(v(-5, -1, -5), v(5, 0, 30)),
+      box(v(-2, 0, -5), v(-1, 3, 30)),
+      box(v(1, 0, -5), v(2, 3, 30)),
+    ]);
+    const run = (collision: FakeCollisionWorld | undefined, withPlayer: boolean) => {
+      const w = world().register(...ACTION_TIMELINE_COMPONENTS, StaminaComponent);
+      w.addSystem(staminaSystem()).addSystem(actionTimelineSystem({ moves: combat.moves }));
+      const fighters = [w.spawn(), w.spawn()] as const;
+      startTestbedCombat(w, combat, [], withPlayer ? fighters[0] : undefined, collision);
+      fighters.forEach((fighter, i) => {
+        placeEntity(w, fighter, v(0, 0, i * 12), 0.35);
+        giveActionTimeline(w, fighter);
+        giveStamina(w, fighter);
+        giveFacing(w, fighter);
+        giveHitboxes(w, fighter);
+        requestMove(w, fighter, 'halberd-sweep');
+      });
+      const recoils: WallRecoilInfo[] = [];
+      w.events.on(WallRecoil, (e) => recoils.push(e));
+      for (let i = 0; i < 60; i++) w.step();
+      return { recoils: recoils.map((r) => r.entity), player: fighters[0] };
+    };
+    const armed = run(corridor, true);
+    expect(armed.recoils).toEqual([armed.player]);
+    // No level to probe, or no player to recoil: the system is not installed.
+    expect(run(undefined, true).recoils).toEqual([]);
+    expect(run(corridor, false).recoils).toEqual([]);
   });
 });

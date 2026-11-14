@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-01-wolves-walk-through",
+  "notes": "The song reaches animals too; the wolf den in the Briarwood and Juniper's silent-wolves worry. Juniper tells it in juniper-fenn.",
+  "region": "valley",
+  "source": ["npc-juniper"],
+  "truth": "true",
+  "target": "place-briarwood",
+  "text": "Wolves let the sleepwalkers walk right through the pack. Didn't even look up.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Told you. Wolves and sleepwalkers, side by side. Juniper will say the same, and she was not pleased about it."
+  }
+}

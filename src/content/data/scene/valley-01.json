@@ -115,6 +115,11 @@
       }
     },
     {
+      "id": "arrive-from-slice",
+      "at": [0.0, 0, 4.0],
+      "tags": ["arrival"]
+    },
+    {
       "id": "arrive-from-valley-02",
       "at": [6.0, 0, 48.0],
       "yaw": 180,
@@ -234,6 +239,13 @@
       "min": [4.5, -1, 51.5],
       "max": [7.5, 3, 53.5],
       "scene": "valley-02",
+      "spawn": "arrive-from-valley-01"
+    },
+    {
+      "id": "south-gate",
+      "min": [-3, -1, 0.25],
+      "max": [3, 3, 1.75],
+      "scene": "slice",
       "spawn": "arrive-from-valley-01"
     }
   ]

@@ -1,6 +1,7 @@
 {
   "$schema": "../merchant.schema.json",
   "id": "brand-forge",
+  "hours": { "open": 6, "close": 20 },
   "notes": "Brand's Forge, Briar Glen (story bible §3.5 and §5.7; mw-ju8.5): Oswin Brand (npc-oswin), seventy, deaf in one ear and loud in both, who forged tools for the mine and swords for nobody until now. The village's weapons and armour: swords, knives, body armour from padded gambesons to tempered mail, all four helmets, mail gauntlets, riveted boots and every shield. Gruff and a little greedy about it, so markup 1.3 (default; band 1.1-1.5) and buy rate 0.4 (band 0.3-0.6); weapons and armour are his specialties (bonus at the default 1.2), so he pays best for the gear he can reforge. He also buys shields and ammunition (arrowheads, story bible class reactions) but nothing else. 400 gold in the till (the economy doc's light armour set is about 320 at default markup, so he can pay for a pile of gear but not an adventurer's whole haul), refilling 80 a day. Finest pieces (longsword, tempered mail, kettle helm, kite shield) are one-offs that do not restock. Prices follow the catalogue's values (mw-ju8.3) and will move with the balance pass.",
   "npcId": "npc-oswin",
   "displayName": "Oswin Brand",

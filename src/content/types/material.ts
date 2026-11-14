@@ -190,6 +190,16 @@ export function materialPresets(
 }
 
 /**
+ * Material id → surface loudness offset, dB relative to stone (its `footstepLoudness`): how much
+ * louder than stone it rings when something hits it (mw-e03.25).
+ */
+export function materialLoudness(
+  materials: readonly Pick<MaterialDef, 'id' | 'footstepLoudness'>[],
+): ReadonlyMap<string, number> {
+  return new Map(materials.map((m) => [m.id, m.footstepLoudness]));
+}
+
+/**
  * Material id → what it becomes when it burns out: a material id, or null when it burns away. The
  * lookup the sim's fire rules take (`fireRules({ burnt })`); non-flammable materials are absent.
  */

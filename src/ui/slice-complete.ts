@@ -17,6 +17,7 @@ export const SLICE_COMPLETE_TEXT = Object.freeze({
   time: 'Run time',
   characterClass: 'Class',
   returnToTitle: 'Return to title',
+  continueOn: 'Continue on the mountain road',
   saving: 'Saving your progress…',
   saved: 'Progress saved.',
   /** Shown when the completion autosave did not happen; never claims the run was saved. */
@@ -37,6 +38,8 @@ export interface SliceCompleteOptions {
   readonly save: CompletionSave;
   /** Return to title was chosen (the card stays open; the game leaves for the title). */
   readonly onReturn: () => void;
+  /** Continue was chosen: the card closes and the player walks on (mw-e24.21). */
+  readonly onContinue?: () => void;
 }
 
 export interface SliceCompleteCard {
@@ -71,6 +74,12 @@ export function openSliceComplete(ui: UiRoot, options: SliceCompleteOptions): Sl
     onPress: options.onReturn,
   });
   returnButton.dataset['testid'] = 'slice-complete-return';
+  const onContinue = options.onContinue;
+  const continueButton =
+    onContinue === undefined
+      ? undefined
+      : button({ label: SLICE_COMPLETE_TEXT.continueOn, onPress: onContinue });
+  if (continueButton !== undefined) continueButton.dataset['testid'] = 'slice-complete-continue';
   const stat = (label: string, value: string, testid: string): HTMLElement =>
     h('p', { data: { testid } }, h('span', { text: `${label}: ` }), h('strong', { text: value }));
   const content = h(
@@ -82,7 +91,12 @@ export function openSliceComplete(ui: UiRoot, options: SliceCompleteOptions): Sl
       ? []
       : [stat(SLICE_COMPLETE_TEXT.characterClass, options.className, 'slice-complete-class')]),
     status,
-    h('div', { className: 'vb-row' }, returnButton),
+    h(
+      'div',
+      { className: 'vb-row' },
+      returnButton,
+      ...(continueButton === undefined ? [] : [continueButton]),
+    ),
   );
   const screen = ui.push({
     id: SLICE_COMPLETE_SCREEN,

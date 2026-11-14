@@ -1,0 +1,55 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "brazier",
+  "name": "Brazier",
+  "description": "A brazier that burns, can be put out by water or wind and is relit by any heat, with a fire sensor so the puzzle can ask whether it burns. It is a light source: its light and heat are the world's, not the prefab's.",
+  "tags": ["fire", "light"],
+  "parameters": {
+    "unlit": {
+      "type": "boolean",
+      "description": "Starts dark (heat lights it).",
+      "default": true
+    }
+  },
+  "spawns": [
+    {
+      "local": "brazier",
+      "at": [0, 0.75, 0],
+      "tags": ["brazier"],
+      "lightSource": {
+        "variant": "brazier",
+        "unlit": "$unlit"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "lit",
+        "kind": "sensor",
+        "entity": "brazier",
+        "filter": [
+          {
+            "test": "element",
+            "element": "fire"
+          }
+        ]
+      }
+    ],
+    "wires": []
+  },
+  "inputs": [
+    {
+      "name": "heat",
+      "description": "Any heat stimulus lights it; water or wind puts it out.",
+      "spawn": "brazier"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "lit",
+      "description": "On while the brazier burns.",
+      "node": "lit"
+    }
+  ]
+}

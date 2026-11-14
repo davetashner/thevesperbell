@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "mode": "reference",
+  "sha": "8d58fc5",
+  "date": "2026-11-12T05:56:24.602Z",
+  "browser": "chrome 157.0.8103.51",
+  "results": [
+    {
+      "id": "briarwood-frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.4,
+      "delta": -14.299999999999999,
+      "pass": true,
+      "message": "briarwood-frame-p50-high (frameP50Ms in briarwood at high): 2.40 ms within budget ≤ 16.70 ms (−14.30 ms (−85.6%))"
+    },
+    {
+      "id": "briarwood-frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 3.2,
+      "delta": -13.5,
+      "pass": true,
+      "message": "briarwood-frame-p95-high (frameP95Ms in briarwood at high): 3.20 ms within budget ≤ 16.70 ms (−13.50 ms (−80.8%))"
+    },
+    {
+      "id": "briarwood-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "briarwood-long-tasks-high (longTasksOver200ms in briarwood at high): 0 within budget ≤ 0 (+0)"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "frameP50Ms",
+      "value": 2.4,
+      "scene": "briarwood",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3.2,
+      "scene": "briarwood",
+      "preset": "high"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "briarwood",
+      "preset": "high"
+    }
+  ],
+  "frames": [
+    {
+      "scene": "briarwood",
+      "preset": "high",
+      "frame": {
+        "count": 1800,
+        "p50": 2.4,
+        "p95": 3.2,
+        "p99": 3.6,
+        "max": 4.6,
+        "mean": 2.072444444444465
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.200000047683716,
+        "p95": 2.9000000953674316,
+        "p99": 3.200000047683716,
+        "max": 4.400000095367432,
+        "mean": 1.9181111092699898
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  ],
+  "pass": true
+}

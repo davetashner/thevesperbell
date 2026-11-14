@@ -10,7 +10,8 @@
       "pitchJitter": 0.05,
       "volumeDb": -9,
       "priority": 35,
-      "caption": "caption.door-open"
+      "caption": "caption.door-open",
+      "gameplayCritical": true
     },
     {
       "event": "doorStateChanged",
@@ -20,7 +21,8 @@
       "pitchJitter": 0.05,
       "volumeDb": -9,
       "priority": 35,
-      "caption": "caption.door-close"
+      "caption": "caption.door-close",
+      "gameplayCritical": true
     },
     {
       "event": "doorStateChanged",

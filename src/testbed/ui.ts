@@ -7,7 +7,12 @@
 // status line), `container` and `container-empty` (the container window, mw-e18.4, over a demo chest;
 // a take is echoed on its status line, Take All on #app[data-container-took]). `__ui.pickups()` shows
 // demo pickup toasts, a discovery among them.
-import { createSettingsStore, OPTIONS_SCREEN, openOptionsMenu } from '@game/settings/index';
+import {
+  comfortDefaults,
+  createSettingsStore,
+  OPTIONS_SCREEN,
+  openOptionsMenu,
+} from '@game/settings/index';
 import {
   browserGeometry,
   CONTAINER_SCREEN,
@@ -19,6 +24,9 @@ import {
   openInventory,
   PickupToasts,
   reducedMotion,
+  setDyslexiaFont,
+  setIndicatorPalette,
+  setTextBackdrop,
   setTextScale,
   UiRoot,
   type ContainerWindowModel,
@@ -43,7 +51,23 @@ let gallery: Gallery = openGallery(ui, {
   reducedMotion: () => reducedMotion(ui.element, matchMedia),
 });
 
-const settings = createSettingsStore({ storage: () => window.localStorage });
+const settings = createSettingsStore({
+  storage: () => window.localStorage,
+  initial: comfortDefaults((q) => window.matchMedia(q)),
+});
+// The accessibility settings drive the root live, as in the game (src/main.ts); ?scale= wins at load.
+if (scale === null) setTextScale(ui.element, settings.get('accessibility.textScale'));
+settings.on('accessibility.textScale', (value) => setTextScale(ui.element, value));
+setDyslexiaFont(ui.element, settings.get('accessibility.dyslexiaFont'));
+settings.on('accessibility.dyslexiaFont', (on) => {
+  setDyslexiaFont(ui.element, on);
+});
+setIndicatorPalette(ui.element, settings.get('accessibility.indicatorPalette'));
+settings.on('accessibility.indicatorPalette', (id) => {
+  setIndicatorPalette(ui.element, id);
+});
+setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
+settings.on('accessibility.textBackground', (value) => setTextBackdrop(ui.element, value));
 
 const demoItem = (id: number, item: Omit<InventoryItemModel, 'id'>): InventoryItemModel => ({
   id,

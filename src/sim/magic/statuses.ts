@@ -24,6 +24,7 @@ import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
 import type { AiNavigation, TravelRequest } from '../ai/navigation';
+import { elementMoveScale } from '../elements/actors';
 import { readProperty } from '../properties/components';
 import type { WorldPropertyKey } from '../properties/spec';
 import { placementOf } from '../stimulus/placement';
@@ -203,15 +204,17 @@ export function modifiedStat(
 
 /**
  * The fraction of normal speed `entity` moves at under its statuses (`moveSpeed`: slowed, rooted…), 1
- * with none and in a world with no spells installed. Never negative.
+ * with none and in a world with no spells installed, times the elements' (frozen solid 0, chilled
+ * slower; mw-e03.24). Never negative.
  */
 export function statusMoveScale(
   world: World<never>,
   lookup: StatusLookup,
   entity: EntityId,
 ): number {
-  if (!world.isRegistered(StatusLedgerComponent)) return 1;
-  return Math.max(0, modifiedStat(world, lookup, entity, 'moveSpeed', 1));
+  const elements = elementMoveScale(world, entity); // frozen solid or chilled (mw-e03.24)
+  if (!world.isRegistered(StatusLedgerComponent)) return elements;
+  return Math.max(0, modifiedStat(world, lookup, entity, 'moveSpeed', 1)) * elements;
 }
 
 /** `navigation` with every agent's travel speed scaled by its `moveSpeed` statuses. */

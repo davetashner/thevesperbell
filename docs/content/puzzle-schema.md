@@ -15,6 +15,30 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `entities[].id` | id | required | Id of a spawn in the puzzle’s scene. |
 | `entities[].role` | string | required | What the entity is to the puzzle, e.g. "brazier to be lit". |
 | `entities[].critical` | boolean | `false` | The puzzle needs it: losing it could softlock the puzzle (see `policy.recovery`). |
+| `discovery` | object | — | How the puzzle is found. Without it, the first thing the player does to a listed entity finds it. |
+| `discovery.volume` | object | — | Walking in finds the puzzle: a box, sphere or capsule in world coordinates (the scene’s own, unlike a signal graph’s, which is placed relative to an origin). |
+| `discovery.volume.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `discovery.volume.center` | object | required | Centre of the box, metres. |
+| `discovery.volume.center.x` | number | required | Metres. |
+| `discovery.volume.center.y` | number | required | Metres. |
+| `discovery.volume.center.z` | number | required | Metres. |
+| `discovery.volume.halfExtents` | object | required | Half the size per axis. |
+| `discovery.volume.halfExtents.x` | number ≥ 0 | required | Metres. |
+| `discovery.volume.halfExtents.y` | number ≥ 0 | required | Metres. |
+| `discovery.volume.halfExtents.z` | number ≥ 0 | required | Metres. |
+| `discovery.volume.kind` | `"sphere"` | required | Shape: a sphere. |
+| `discovery.volume.center` | object | required | Centre of the sphere, metres. |
+| `discovery.volume.radius` | number ≥ 0 | required | Metres. |
+| `discovery.volume.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `discovery.volume.from` | object | required | One end of the capsule’s segment, metres. |
+| `discovery.volume.from.x` | number | required | Metres. |
+| `discovery.volume.from.y` | number | required | Metres. |
+| `discovery.volume.from.z` | number | required | Metres. |
+| `discovery.volume.to` | object | required | The other end of the capsule’s segment, metres. |
+| `discovery.volume.to.x` | number | required | Metres. |
+| `discovery.volume.to.y` | number | required | Metres. |
+| `discovery.volume.to.z` | number | required | Metres. |
+| `discovery.interact` | id | — | Id of a listed entity; using it finds the puzzle (a plaque, a lever). |
 | `goal` | `condition` | required | True when the puzzle is solved, whatever made it so (docs/design/conditions.md). |
 | `solutions` | list of object (at least 1) | required | Intended solutions; the goal may also come true by a route nobody declared. |
 | `solutions[].id` | id | required | Solution id, unique in the puzzle (telemetry and solver reports). |
@@ -30,7 +54,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `solutions[].steps[].target` | id or `"player"` | required | Id of the listed entity that moves, or "player". |
 | `solutions[].steps[].to` | id | required | Id of the listed entity it ends up on or at (a plate, a ledge). |
 | `solutions[].steps[].do` | `"interact"` | required | Step kind: the player uses an affordance. |
-| `solutions[].steps[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"hide"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | Affordance verb used on it, e.g. "pull". |
+| `solutions[].steps[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"stash"` \| `"hide"` \| `"leave"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | Affordance verb used on it, e.g. "pull". |
 | `solutions[].steps[].do` | `"reach"` | required | Step kind: the player gets to the target. |
 | `solutions[].steps[].do` | `"wait"` | required | Step kind: time passes. |
 | `solutions[].steps[].seconds` | number > 0 | required | Seconds to wait (water freezes, a timer runs). |
@@ -40,17 +64,22 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `policy.recovery` | list of object | `[]` | Diegetic recovery from lost objects and stuck mechanisms. |
 | `policy.recovery[].kind` | `"respawn"` | required | Policy kind: a lost critical entity reappears. |
 | `policy.recovery[].entity` | id | required | Id of the listed critical entity that is replaced. |
-| `policy.recovery[].seconds` | number > 0 | required | Seconds after it is lost that a new one appears. |
+| `policy.recovery[].seconds` | number > 0 | required | Seconds after it is lost (destroyed or burnt out) that a new one appears. |
 | `policy.recovery[].kind` | `"reset"` | required | Policy kind: a trigger resets the mechanisms. |
 | `policy.recovery[].trigger` | id | required | Id of the listed entity that resets the puzzle (a lever). |
-| `hints` | list of object | `[]` | The hint ladder: tiers fire in order while the player is stuck. |
+| `policy.recovery[].fact` | string | — | Declared int fact counted up by each reset (telemetry, quests, hints). |
+| `hints` | list of object | `[]` | The hint ladder: tiers fire in order while the player is stuck (seconds since the puzzle was found, or failed attempts). Defaults: tier 1 at 180 s or 3 attempts, tier 2 at 360 s, tier 3 at 600 s. |
 | `hints[].afterSeconds` | number > 0 | required | Seconds in progress before the tier fires; tiers are in increasing order. |
 | `hints[].afterAttempts` | integer ≥ 1 | — | Failed attempts that fire the tier sooner, whichever comes first. |
 | `hints[].bark` | string | — | What the player character mutters. |
 | `hints[].highlight` | list of id (at least 1) | — | Listed entities that glint or pulse to draw the eye. |
+| `hints[].rumour` | string | — | Declared bool fact set true when the tier fires: an NPC rumour (dialogue conditions read it) is unlocked. |
 | `hints[].variants` | list of object | `[]` | Class-aware barks: the first whose capability the player has replaces `bark`. |
 | `hints[].variants[].capability` | string | required | Used when the player has this capability. |
 | `hints[].variants[].bark` | string | required | The bark for a player with that capability. |
+| `failures` | list of object | `[]` | Signal outputs whose pulses are failed attempts (a sequence node’s `failed` port): each rising edge counts one towards a tier’s `afterAttempts`. |
+| `failures[].signal` | string | required | Signal graph id and node id, e.g. "chimes/order". |
+| `failures[].port` | id | — | Output port of the node; default: its first. |
 | `tags` | list of id | `[]` | Free-form tags; "mvp" requires 2+ solutions. |
 | `focus` | list of `"knight"` \| `"archer"` \| `"sorcerer"` \| `"thief"` | `[]` | Classes the puzzle is meant to showcase; empty = none in particular. |
 | `outputs` | object | required | Facts written when the puzzle is solved. |
@@ -58,10 +87,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `outputs.set` | list of object | `[]` | Further facts written when solved (doors, rewards and quests read these). |
 | `outputs.set[].fact` | string | required | Declared fact the puzzle writes when solved. |
 | `outputs.set[].value` | boolean or integer or string | required | A bool, a whole number or a string (enum value or content id), fitting the fact type. |
+| `outputs.signals` | list of string | `[]` | Lever nodes switched on, or button nodes pressed, when solved, as "<graph>/<node>"; a graph the scene places wires them to doors and lights. A repeatable puzzle switches levers back off when it reopens. |
+| `outputs.rewards` | list of id | `[]` | Reward hook ids announced once, the first time the puzzle is solved (the reward systems listen for them). |
 
 ## `condition`
 
-A condition over world facts: one of fact, count, all, any, not (docs/design/conditions.md).
+A condition over world facts and live state: one of fact, count, entities, signal, sustained, all, any, not (docs/design/conditions.md).
 
 A `condition` is exactly one of these objects:
 
@@ -90,19 +121,81 @@ A `condition` is exactly one of these objects:
 | `lt` | integer | — | The count is less than this. |
 | `lte` | integer | — | The count is at most this. |
 
-### 3. True when every condition in the list holds.
+### 3. Property predicates over live entities: how many of them pass, and where they are. Exactly one of match or an operator.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `entities` | object | required | Which entities to test. `{ "tag": … }`, `{ "entity": … }` or both; `{}` is every entity with a placement. |
+| `entities.tag` | id | — | Entities carrying this tag (an entity tag, or the tag of a scene spawn). |
+| `entities.entity` | id | — | The entity of the scene spawn with this id. |
+| `where` | list of object | — | Predicates (property, tag, element) an entity must all pass. |
+| `where[].test` | `"property"` | required |  |
+| `where[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"absorbency"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
+| `where[].op` | `"eq"` \| `"ne"` \| `"lt"` \| `"lte"` \| `"gt"` \| `"gte"` | required | Comparison; lt/lte/gt/gte need a number property. |
+| `where[].value` | number or boolean or string | required | Value to compare with. |
+| `where[].test` | `"tag"` | required |  |
+| `where[].tag` | id | required | Tag the entity must carry, e.g. "player". |
+| `where[].test` | `"facing"` | required |  |
+| `where[].facing` | `"north"` \| `"east"` \| `"south"` \| `"west"` | required | Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east. |
+| `where[].test` | `"element"` | required |  |
+| `where[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
+| `inside` | object | — | The entity must stand in this box, sphere or capsule, in world coordinates. |
+| `inside.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `inside.center` | object | required | Centre of the box, metres. |
+| `inside.center.x` | number | required | Metres. |
+| `inside.center.y` | number | required | Metres. |
+| `inside.center.z` | number | required | Metres. |
+| `inside.halfExtents` | object | required | Half the size per axis. |
+| `inside.halfExtents.x` | number ≥ 0 | required | Metres. |
+| `inside.halfExtents.y` | number ≥ 0 | required | Metres. |
+| `inside.halfExtents.z` | number ≥ 0 | required | Metres. |
+| `inside.kind` | `"sphere"` | required | Shape: a sphere. |
+| `inside.center` | object | required | Centre of the sphere, metres. |
+| `inside.radius` | number ≥ 0 | required | Metres. |
+| `inside.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `inside.from` | object | required | One end of the capsule’s segment, metres. |
+| `inside.from.x` | number | required | Metres. |
+| `inside.from.y` | number | required | Metres. |
+| `inside.from.z` | number | required | Metres. |
+| `inside.to` | object | required | The other end of the capsule’s segment, metres. |
+| `inside.to.x` | number | required | Metres. |
+| `inside.to.y` | number | required | Metres. |
+| `inside.to.z` | number | required | Metres. |
+| `match` | `"all"` \| `"any"` \| `"none"` | — | all: at least one entity is selected and every one passes; any: one passes; none: none passes. |
+| `eq` | integer | — | The number of entities that pass equals this. |
+| `neq` | integer | — | The number that pass does not equal this. |
+| `gt` | integer | — | The number that pass is greater than this. |
+| `gte` | integer | — | At least this many pass. |
+| `lt` | integer | — | Fewer than this many pass. |
+| `lte` | integer | — | At most this many pass. |
+
+### 4. True while a signal graph node output is on (mark the node `observed`).
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `signal` | string | required | Signal graph id and node id, e.g. "vault/gate-open". Holds while the output is on. |
+| `port` | id | — | Output port of the node; default: its first. |
+
+### 5. True once the condition has held, without a break, for that long.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `sustained` | `condition` | required | The condition that must keep holding. |
+| `seconds` | number > 0 ≤ 3600 | required | Seconds of sim time it must hold, without a break. |
+
+### 6. True when every condition in the list holds.
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `all` | list of `condition` (at least 1) | required | Every condition holds. |
 
-### 4. True when at least one condition in the list holds.
+### 7. True when at least one condition in the list holds.
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `any` | list of `condition` (at least 1) | required | At least one holds. |
 
-### 5. True when the condition does not hold.
+### 8. True when the condition does not hold.
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |

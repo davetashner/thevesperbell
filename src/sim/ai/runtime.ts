@@ -31,6 +31,9 @@
 // think; it searches for its `leashSearchS` and then takes Searching's timeout. A leashed agent
 // takes no transition into Combat while it believes its target is beyond its leash.
 //
+// Conversing (mw-e22.9, conversing.ts): an agent in a conversation with the player is skipped
+// altogether (its routine paused) until the conversation ends.
+//
 // All brain state is plain data in `ai.brain`. A despawned agent's brain leaves with it at the end
 // of the tick, so from then on nothing runs for it; an agent whose behaviour this world does not
 // know is skipped.
@@ -38,6 +41,7 @@
 import type { AlertState, BehaviourEvent } from '@content/index';
 import type { AttackLookup } from '../combat/attacks/executor';
 import { HealthComponent } from '../combat/damage/components';
+import { isFrozenSolid } from '../elements/actors';
 import { GuardComponent, setBlockHeld } from '../combat/melee/components';
 import type { EntityId } from '../core/component';
 import type { System, World } from '../core/world';
@@ -52,6 +56,8 @@ import {
   type CompiledState,
 } from './behaviour';
 import { DEFAULT_ATTACK_TOKENS, isStaggered } from './combat';
+import { isConversing } from './conversing';
+import { onErrand, stepErrands } from './errand';
 import { AlertStateChanged, BrainComponent, type Blackboard, type Brain } from './components';
 import { leashAllows, leashBroken } from './leash';
 import { DEFAULT_MEMORY_TUNING, type MemoryTuning } from './memory';
@@ -74,7 +80,7 @@ export interface AiOptions {
    * The hour of the day, 0–24, that routine windows are read against (the world clock, mw-e27.12);
    * without it windows are not read and every creature walks the first route of its routine.
    */
-  readonly hourOfDay?: (world: World<never>) => number;
+  readonly hourOfDay?: (world: World<never>) => number | undefined;
   /** How target memory decays and predicts (mw-e11.8); defaults to `DEFAULT_MEMORY_TUNING`. */
   readonly memory?: MemoryTuning;
   /**
@@ -280,6 +286,7 @@ function aiSystem<TInput>(runtime: AiRuntime): System<TInput> {
         hz,
         ports: runtime.ports,
       };
+      stepErrands(world, runtime.ports.navigation, hz);
       const brains = world.query(BrainComponent);
       /** Points the view at an agent; returns its behaviour, or undefined to skip it. */
       const focus = (entity: EntityId, brain: Brain): CompiledBehaviour | undefined => {
@@ -288,6 +295,12 @@ function aiSystem<TInput>(runtime: AiRuntime): System<TInput> {
         // A creature at zero health is dead: it does not think, move, leash or fight on.
         const health = getIf(world, entity, HealthComponent);
         if (health !== undefined && health.current <= 0) return undefined;
+        // Frozen solid, it does nothing until it thaws (mw-e03.24).
+        if (isFrozenSolid(world, entity)) return undefined;
+        // Talking to the player, it keeps still until the conversation ends (mw-e22.9).
+        if (isConversing(world, entity)) return undefined;
+        // Walking an errand (a scheduled person coming or going), its brain waits (mw-8551).
+        if (onErrand(world, entity)) return undefined;
         view.entity = entity;
         view.brain = brain;
         view.creature = getIf(world, entity, CreatureComponent);
@@ -371,6 +384,11 @@ export function installAi<TInput>(world: World<TInput>, options: AiOptions): voi
 /** The compiled behaviour `id` of `world`'s AI, or undefined (also when AI is not installed). */
 export function aiBehaviour(world: World<never>, id: string): CompiledBehaviour | undefined {
   return runtimes.get(world)?.behaviours.get(id);
+}
+
+/** How `world`'s AI travels, or undefined when AI is not installed. */
+export function aiNavigation(world: World<never>): AiNavigation | undefined {
+  return runtimes.get(world)?.ports.navigation;
 }
 
 /** The ports of `world`'s AI (AI must be installed). */

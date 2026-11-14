@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../data/fact.schema.json",
+  "id": "narrative-example",
+  "name": "Narrative conventions example facts",
+  "notes": "Facts the conventions example quest (mw-e39.3) reads. Never shipped. Real keys are `<subject>.<state>` (horn.fate, clatter.restored); fixtures carry a `fixture-` prefix.",
+  "facts": [
+    {
+      "key": "fixture-barge.asked",
+      "type": "bool",
+      "default": false,
+      "description": "The player asked Mags Oakum why her barge runs empty (conventions example).",
+      "owner": "quest"
+    },
+    {
+      "key": "fixture-barge.seen-empty",
+      "type": "bool",
+      "default": false,
+      "description": "The player saw the Patient Ann tied up empty at Briar Glen Quay (conventions example).",
+      "owner": "quest"
+    }
+  ]
+}

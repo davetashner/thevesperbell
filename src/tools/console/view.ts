@@ -158,6 +158,9 @@ export function mountConsoleView(options: ConsoleViewOptions): ConsoleView {
     print([`> ${line}`], 'input');
     const result = commands.execute(line);
     print(result.lines, result.ok ? 'ok' : 'error');
+    void result.later?.then((done) => {
+      print(done.lines, done.ok ? 'ok' : 'error');
+    });
     return result;
   };
 

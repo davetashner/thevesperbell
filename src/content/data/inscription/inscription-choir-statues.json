@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-choir-statues",
+  "title": "The singing monks",
+  "notes": "Bible 7.1: Vesperine statues sing, mouths open; the choir plaque. The monks believed in the song; the Hornfolk covered their ears: two postures, same job.",
+  "locations": ["place-bellwater-priory"],
+  "pages": [
+    {
+      "text": "(Along the choir, a row of carved monks with their mouths open. On the plinth of the first, a plaque:)\n\nLET THE MOUTH BE OPEN THAT THE EAR BE SHUT. THE BROTHERS SING SO THE VALLEY MAY NOT HEAR."
+    }
+  ]
+}

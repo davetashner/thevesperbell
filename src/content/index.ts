@@ -165,6 +165,8 @@ export {
   MOVEMENT_STANCES,
   STEALTH_GAITS,
   stealthTuningSchema,
+  footstepSurfacesSchema,
+  type FootstepSurfaces,
   type MovementStance,
   type StealthGait,
   type StealthTuning,
@@ -276,11 +278,16 @@ export {
   CONDITION_MAX_DEPTH,
   CONDITION_OPERATORS,
   COUNT_PATTERN,
+  ENTITY_MATCHES,
+  SIGNAL_REF,
+  SUSTAINED_MAX_SECONDS,
   conditionSchema,
   namedConditionSchema,
   type Condition,
   type CountCondition,
+  type EntitiesCondition,
   type FactCondition,
+  type SignalCondition,
   type NamedCondition,
   type NamedConditionInput,
 } from './types/condition.ts';
@@ -289,6 +296,7 @@ export {
   capabilityId,
   capabilityIds,
   capabilitySchema,
+  climbDifficultyGrants,
   checkCapabilities,
   type CapabilityGroup,
   type CapabilityGroupInput,
@@ -309,7 +317,10 @@ export {
   type ClassEntry,
 } from './types/class.ts';
 export {
+  DIFFICULTY_PRESET_KEYS,
   GAME_CONFIG_ID,
+  difficultyConfigSchema,
+  difficultyPresetSchema,
   gameSchema,
   type GameConfig,
   type GameConfigEntry,
@@ -376,11 +387,15 @@ export {
   CREATURE_MIN_WINDUP_TICKS,
   CREATURE_UNBLOCKABLE_WINDUP_TICKS,
 } from './attack-checks.ts';
+export { checkWeapons, hitboxExtent } from './weapon-checks.ts';
 export {
   CONDITION_USAGES,
   checkConditions,
+  conditionEntityRefs,
   conditionProblems,
+  signalIndex,
   type ConditionProblem,
+  type SignalIndex,
   type ConditionUsage,
 } from './condition-checks.ts';
 export {
@@ -398,6 +413,12 @@ export {
   type FactionDef,
   type FactionDefInput,
 } from './types/faction.ts';
+export {
+  ATTACKED_EVENT,
+  dispositionRuleSchema,
+  type DispositionRuleDef,
+  type DispositionRuleDefInput,
+} from './types/disposition-rule.ts';
 export {
   KIT_PURPOSES,
   KIT_SHAPES,
@@ -489,6 +510,7 @@ export {
   BURNT_DESTROYED,
   burntMaterials,
   burntStateSchema,
+  materialLoudness,
   materialPresets,
   materialPropertiesSchema,
   materialSchema,
@@ -510,6 +532,20 @@ export {
   type StatusStackRule,
 } from './types/status.ts';
 export {
+  compileElementFeedback,
+  ELEMENT_FEEDBACK_ID,
+  elementFeedbackSchema,
+  MAX_ELEMENT_HANDLES,
+  type ElementFeedbackDef,
+  type ElementFeedbackDefInput,
+  type ElementFeedbackEntry,
+  type ElementFeedbackTable,
+  type ElementFieldRule,
+  type ElementLookDef,
+  type ElementStateRule,
+  type ElementTransitionRule,
+} from './types/element-feedback.ts';
+export {
   HIT_STOP_ID,
   HIT_STOP_TIERS,
   MAX_HIT_STOP_TICKS,
@@ -521,6 +557,41 @@ export {
   type HitStopTable,
   type HitStopTier,
 } from './types/hit-stop.ts';
+export {
+  REACH_CLASS_TABLE_ID,
+  compileReachClasses,
+  reachClassSchema,
+  type ReachClassDef,
+  type ReachClassDefInput,
+  type ReachClassEntry,
+  type ReachTable,
+} from './types/reach-class.ts';
+export {
+  DEFAULT_SURFACE,
+  FOOTSTEP_SOUND_PATTERN,
+  MAX_SURFACE_VARIANCE_DB,
+  SURFACE_TABLE_ID,
+  compileSurfaceTable,
+  surfaceTableSchema,
+  type AcousticSurface,
+  type SurfaceTableDef,
+  type SurfaceTableDefInput,
+  type SurfaceTableEntry,
+} from './types/surface-table.ts';
+export {
+  contestSchema,
+  type ContestDef,
+  type ContestDefInput,
+  type ContestEntry,
+} from './types/contest.ts';
+export {
+  PERSUASION_BANDS,
+  PERSUASION_ID,
+  persuasionSchema,
+  type PersuasionDef,
+  type PersuasionDefInput,
+  type PersuasionEntry,
+} from './types/persuasion.ts';
 export {
   DOOR_SOUND_STATES,
   MAX_NOISE_LOSS_DB,
@@ -675,6 +746,18 @@ export {
   type SpellStimulusElement,
 } from './types/spell.ts';
 export {
+  SPELL_VFX_MAX_PULSE_HZ,
+  SPELL_VFX_SLOTS,
+  spellVfxBlockSchema,
+  spellVfxTemplateSchema,
+  type SpellVfxBlock,
+  type SpellVfxBlockInput,
+  type SpellVfxSlot,
+  type SpellVfxTemplateDef,
+  type SpellVfxTemplateDefInput,
+} from './types/spell-vfx.ts';
+export { checkSpellVfx } from './spell-vfx-checks.ts';
+export {
   HEX_COLOUR_PATTERN,
   VFX_BLEND_MODES,
   VFX_QUALITY_TIERS,
@@ -715,3 +798,12 @@ export {
   type AmbienceEntry,
   type AmbienceOneShot,
 } from './types/ambience.ts';
+export {
+  EDGE_KINDS,
+  OWNER_EPICS,
+  TRAVEL_MODES,
+  WORLD_AREAS,
+  worldSchema,
+  type WorldMap,
+  type WorldMapInput,
+} from './types/world.ts';

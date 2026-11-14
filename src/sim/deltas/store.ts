@@ -17,7 +17,13 @@
 import type { EntityId } from '../core/component';
 import type { World } from '../core/world';
 import { encodeCanonical, xxHash32 } from '../snapshot';
-import type { DeltaApplyReport, LevelBaseline, LevelDeltas, WorldPersistence } from './persistence';
+import type {
+  DeltaApplyReport,
+  LevelBaseline,
+  LevelDeltas,
+  SettleReport,
+  WorldPersistence,
+} from './persistence';
 
 /** A level just entered: its baseline (for later captures) and what applying its deltas did. */
 export interface EnteredLevel {
@@ -46,6 +52,8 @@ export function hashLevelDeltas(levels: readonly LevelDeltas[]): string {
 export class LevelDeltaStore {
   readonly #stored = new Map<string, LevelDeltas>();
   #current: CurrentLevel | undefined;
+  /** The persistence of the level entered last: the one that reads the stored levels' deltas. */
+  #lastPersistence: WorldPersistence | undefined;
 
   /** The id of the loaded level, if any. */
   get current(): string | undefined {
@@ -73,17 +81,39 @@ export class LevelDeltaStore {
     persistence: WorldPersistence,
     level: string,
     authored: Iterable<readonly [string, EntityId]>,
+    dormant: Iterable<string> = [],
   ): EnteredLevel {
     if (this.#current !== undefined) {
       throw new Error(
         `level "${level}" entered while "${this.#current.baseline.level}" is still loaded`,
       );
     }
-    const baseline = persistence.baseline(world, level, authored);
+    const baseline = persistence.baseline(world, level, authored, dormant);
     this.#current = { persistence, baseline };
+    this.#lastPersistence = persistence;
     const stored = this.#stored.get(level);
     this.#stored.delete(level);
     return { baseline, report: stored && persistence.apply(world, baseline, stored) };
+  }
+
+  /**
+   * Takes the current level's authored entities `ids` out because a fact gate closed on them (mw-e27.8),
+   * keeping their changes. Call before destroying them.
+   * @throws Error when no level is current.
+   */
+  retire(world: World<never>, ids: readonly string[]): void {
+    const { persistence, baseline } = this.#currentLevel();
+    persistence.retire(world, baseline, ids);
+  }
+
+  /**
+   * Puts authored entities (`[stable id, entity]`) back into the current level because a fact gate
+   * opened, applying the changes kept for them (mw-e27.8). Call between steps, right after spawning.
+   * @throws Error when no level is current.
+   */
+  activate(world: World<never>, entities: Iterable<readonly [string, EntityId]>): DeltaApplyReport {
+    const { persistence, baseline } = this.#currentLevel();
+    return persistence.activate(world, baseline, entities);
   }
 
   /**
@@ -115,6 +145,35 @@ export class LevelDeltaStore {
     this.#stored.set(deltas.level, deltas);
   }
 
+  /**
+   * Settles the loaded level after its entities were restored from a save: transient properties
+   * start over and fires burn out (WorldPersistence.settle). Nothing when no level is loaded.
+   */
+  settle(world: World<never>): SettleReport | undefined {
+    if (this.#current === undefined) return undefined;
+    return this.#current.persistence.settle(world, this.#current.baseline);
+  }
+
+  /**
+   * The player rests (persistence policies, mw-e27.7): `rest-reset` state of every level that is not
+   * loaded is dropped from its stored deltas, and the loaded level's goes back to its baseline.
+   * Returns the levels whose stored deltas changed and the aspects reset live.
+   */
+  rest(world: World<never>): { readonly stored: readonly string[]; readonly live: number } {
+    const stored: string[] = [];
+    const persistence = this.#current?.persistence ?? this.#lastPersistence;
+    if (persistence !== undefined) {
+      for (const deltas of [...this.#stored.values()].sort(byLevel)) {
+        const reset = persistence.resetOnRest(deltas);
+        if (reset === deltas) continue;
+        this.#stored.set(deltas.level, reset);
+        stored.push(deltas.level);
+      }
+    }
+    const live = this.#current?.persistence.restLive(world, this.#current.baseline) ?? 0;
+    return { stored, live };
+  }
+
   /** Replaces the stored deltas with `levels`, except the current level's (file header). */
   restore(levels: readonly LevelDeltas[]): void {
     this.#stored.clear();
@@ -123,9 +182,13 @@ export class LevelDeltaStore {
     }
   }
 
-  #captureCurrent(world: World<never>): LevelDeltas {
+  #currentLevel(): CurrentLevel {
     if (this.#current === undefined) throw new Error('no level is loaded');
-    const { persistence, baseline } = this.#current;
+    return this.#current;
+  }
+
+  #captureCurrent(world: World<never>): LevelDeltas {
+    const { persistence, baseline } = this.#currentLevel();
     return persistence.capture(world, baseline);
   }
 }

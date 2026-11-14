@@ -285,9 +285,77 @@
       "tags": ["bed", "furniture", "rented-room"]
     },
     {
+      "id": "read-friend-note-door",
+      "at": [6.25, 0, -1],
+      "tags": ["readable", "note-friend-below-door"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the folded note on the floor"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
       "id": "washstand",
       "at": [6, 0.5, 0.25],
       "tags": ["furniture", "rented-room"]
+    },
+    {
+      "id": "npc-oswin-evening",
+      "at": [4.0, 0.0, 0.5],
+      "tags": ["schedule:oswin", "activity:drink"],
+      "yaw": 90,
+      "creature": "npc-oswin",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [20, 23] }
+    },
+    {
+      "id": "townsfolk-1-evening",
+      "at": [0.5, 0.0, 1.5],
+      "tags": ["townsfolk", "schedule:townsfolk-1", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-2-evening",
+      "at": [0, 0.0, -1.0],
+      "tags": ["townsfolk", "schedule:townsfolk-2", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-weaver",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-3-evening",
+      "at": [1.25, 0.0, 2.5],
+      "tags": ["townsfolk", "schedule:townsfolk-3", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-miner",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-4-evening",
+      "at": [-0.75, 0.0, -2.75],
+      "tags": ["townsfolk", "schedule:townsfolk-4", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-neighbour",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
+    },
+    {
+      "id": "townsfolk-5-evening",
+      "at": [4.0, 0.0, 2.0],
+      "tags": ["townsfolk", "schedule:townsfolk-5", "activity:drink"],
+      "yaw": 180,
+      "creature": "npc-townsfolk-carter",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [18, 22] }
     }
   ],
   "light": {
@@ -304,6 +372,41 @@
   "environment": {
     "sky": "#1E1B2E"
   },
+  "surfaces": [
+    {
+      "id": "common-room-boards",
+      "min": [-5, -0.5, -4],
+      "max": [5, 1, 4],
+      "surface": "wood"
+    },
+    {
+      "id": "door-runner",
+      "min": [-0.75, -0.5, -3.75],
+      "max": [0.75, 1, 0.5],
+      "surface": "carpet",
+      "priority": 1
+    },
+    {
+      "id": "hearth-rug",
+      "min": [1.5, -0.5, 1],
+      "max": [4.5, 1, 3],
+      "surface": "carpet",
+      "priority": 1
+    },
+    {
+      "id": "rented-room-boards",
+      "min": [5, -0.5, -3],
+      "max": [9, 1, 1],
+      "surface": "wood"
+    },
+    {
+      "id": "rented-room-rug",
+      "min": [5.5, -0.5, -2.5],
+      "max": [7.5, 1, 0],
+      "surface": "carpet",
+      "priority": 1
+    }
+  ],
   "transitions": [
     {
       "id": "street-exit",

@@ -6,6 +6,7 @@
 
 import type { GameContent } from '@content/index';
 import {
+  arrowLookup,
   classOf,
   installCreatureDrops,
   LootTables,
@@ -35,7 +36,13 @@ export function startCreatureDrops<T>(
   }
   const carried = new Map<string, readonly LootStack[]>();
   for (const { id, carries } of spawns) if (carries !== undefined) carried.set(id, carries);
+  // An arrow's world item is the ammo item that names it (mw-e05.7): a creature's intact arrows drop.
+  const arrowItems = new Map<string, string>();
+  for (const item of content.all('item')) {
+    if (item.category === 'ammo') arrowItems.set(item.ammo.arrow.id, item.id);
+  }
   return installCreatureDrops(world, {
+    arrows: { lookup: arrowLookup(content.all('arrow')), itemOf: (arrow) => arrowItems.get(arrow) },
     level,
     items,
     loot: new LootTables(content.all('loot-table'), content.all('item')),

@@ -1,0 +1,83 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "timed-door",
+  "name": "Timed door",
+  "description": "A door opened by a button that stays open for a while and then shuts: the diegetic timer of a run-through puzzle. The door is moved only by the signal, never by hand.",
+  "tags": ["time"],
+  "parameters": {
+    "profile": {
+      "type": "enum",
+      "description": "What kind of door.",
+      "values": ["sliding-door", "portcullis"],
+      "default": "sliding-door"
+    },
+    "openSeconds": {
+      "type": "number",
+      "description": "Seconds the door stays open after the button.",
+      "unit": "s",
+      "min": 0.5,
+      "max": 120,
+      "default": 6
+    }
+  },
+  "spawns": [
+    {
+      "local": "door",
+      "at": [0, 0, 0],
+      "door": {
+        "profile": "$profile"
+      }
+    },
+    {
+      "local": "button",
+      "at": [1.5, 0, -0.5],
+      "switch": {
+        "kind": "button"
+      }
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "press",
+        "kind": "button",
+        "entity": "button"
+      },
+      {
+        "id": "open",
+        "kind": "timer",
+        "seconds": "$openSeconds"
+      },
+      {
+        "id": "leaf",
+        "kind": "receiver",
+        "receiver": "door",
+        "entity": "door"
+      }
+    ],
+    "wires": [
+      {
+        "from": "press",
+        "to": "open"
+      },
+      {
+        "from": "open",
+        "to": "leaf"
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "press",
+      "description": "The button; pressing again while open restarts the timer.",
+      "spawn": "button"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "open",
+      "description": "On while the door is held open by the timer.",
+      "node": "open"
+    }
+  ]
+}

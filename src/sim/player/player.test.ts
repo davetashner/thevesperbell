@@ -20,6 +20,7 @@ import { InMemoryColliderSink } from '../physics/static-colliders';
 import { registerWorldProperties } from '../properties/components';
 import { sceneLedges } from '../climb/ledges';
 import { LEDGE_HANG_CAPABILITY } from '../climb/mantle';
+import { HiddenComponent } from '../hiding/state';
 import { layoutScene, type SceneSpawnPlacement } from '../scene/layout';
 import { hashWorld } from '../snapshot';
 import { addCapabilities, CapabilityRegistry } from '../progression/capabilities';
@@ -45,6 +46,8 @@ import { applyStatus } from '../magic/statuses';
 import { installStimuli } from '../stimulus/stimulus';
 import { placeEntity, PlacementComponent } from '../stimulus/placement';
 import { LockOnComponent, NO_LOCK } from '../targeting/components';
+import { LocomotionEvents } from '../character/locomotion';
+import { createSurfaceMap } from '../surfaces/surfaces';
 
 const TUNING: Frozen<ControllerTuning> = {
   capsule: { radius: 0.35, height: 1.8, crouchHeight: 1.0 },
@@ -113,6 +116,18 @@ function setup(sensitivity?: number, extra: Partial<PlayerOptions> = {}) {
 const spawn = (yaw: SceneSpawnPlacement['yaw'], tags: string[]) =>
   ({ ...LAYOUT.spawns[0], yaw, tags }) as SceneSpawnPlacement;
 
+describe('player hiding (mw-e03.23)', () => {
+  it('a player hidden in a spot is held where it is: movement input does nothing', () => {
+    const { world, player, state } = setup();
+    world.register(HiddenComponent);
+    world.step([frame({})]);
+    const at = state().position;
+    world.add(player, HiddenComponent, { spot: 999, concealment: 1, since: 0, from: at });
+    for (let i = 0; i < 30; i++) world.step([frame({ move: [0, 1], held: ['sprint'] })]);
+    expect(state().position).toEqual(at);
+  });
+});
+
 describe('wrapYaw', () => {
   it('keeps angles in (−π, π]', () => {
     expect(wrapYaw(0)).toBe(0);
@@ -122,6 +137,20 @@ describe('wrapYaw', () => {
     expect(wrapYaw(3 * Math.PI)).toBeCloseTo(Math.PI, 12);
     expect(wrapYaw(1.5 * Math.PI)).toBeCloseTo(-Math.PI / 2, 12);
     expect(wrapYaw(-1.5 * Math.PI)).toBeCloseTo(Math.PI / 2, 12);
+  });
+});
+
+describe('player controller timing hook (mw-e02.8)', () => {
+  it('measure wraps the controller system once per tick', () => {
+    let wrapped = 0;
+    const { world } = setup(undefined, {
+      measure: (run: () => void) => {
+        wrapped += 1;
+        run();
+      },
+    });
+    for (let i = 0; i < 5; i++) world.step([frame({ move: [0, 1] })]);
+    expect(wrapped).toBe(5);
   });
 });
 
@@ -449,6 +478,58 @@ describe('look pitch (mw-e02.4)', () => {
     expect(inverted.pitch()).toBeCloseTo(-0.1, 12);
   });
 
+  it('mw-e31.6 AC-1: invertY flips pitch for the same mouse movement, and invertX flips yaw', () => {
+    const plain = setup(0.01);
+    plain.world.step([frame({ look: 5, lookY: 100 })]);
+    const flipped = setup(undefined, { look: { sensitivity: 0.01, invertY: true, invertX: true } });
+    flipped.world.step([frame({ look: 5, lookY: 100 })]);
+    expect(flipped.pitch()).toBeCloseTo(-(plain.pitch() ?? NaN), 12);
+    expect(flipped.yaw()).toBeCloseTo(-(plain.yaw() ?? NaN), 12);
+    const stick = lookTurn(
+      { stick: { x: 1, y: 0 } },
+      { ...DEFAULT_LOOK_SETTINGS, invertX: true },
+      0.1,
+    );
+    expect(stick.yaw).toBeGreaterThan(0);
+  });
+
+  it('mw-e31.6: lookLive is read every tick, so a changed sensitivity applies at once', () => {
+    let sensitivity = 0.01;
+    const { world, pitch } = setup(undefined, { lookLive: () => ({ sensitivity }) });
+    world.step([frame({ lookY: 10 })]);
+    expect(pitch()).toBeCloseTo(0.1, 12);
+    sensitivity = 0.02;
+    world.step([frame({ lookY: 10 })]);
+    expect(pitch()).toBeCloseTo(0.3, 12);
+  });
+
+  it('mw-e31.6: auto-centre eases pitch back after a delay of moving without look input', () => {
+    const recentre = { pitch: 0, delay: 0.5, rate: 1 };
+    const { world, pitch } = setup(undefined, {
+      look: { sensitivity: 0.01, recentre },
+      pitch: 0.5,
+    });
+    const hold = (spec: Parameters<typeof frame>[0], ticks: number): void => {
+      for (let i = 0; i < ticks; i++) world.step([frame(spec)]);
+    };
+    hold({}, 120); // standing still never recentres
+    expect(pitch()).toBe(0.5);
+    hold({ move: [0, 1] }, 30); // moving, still inside the 0.5 s delay
+    expect(pitch()).toBe(0.5);
+    hold({ move: [0, 1] }, 31); // past the delay: easing at 1 rad/s
+    expect(pitch()).toBeLessThan(0.5);
+    const eased = pitch() ?? NaN;
+    world.step([frame({ move: [0, 1], lookY: 10 })]); // looking resets the delay and wins
+    expect(pitch()).toBeCloseTo(eased + 0.1, 12);
+    hold({ move: [0, 1] }, 20);
+    expect(pitch()).toBeCloseTo(eased + 0.1, 12);
+    hold({ move: [0, 1] }, 600); // eases all the way to the target without overshooting
+    expect(pitch()).toBe(0);
+    const off = setup(undefined, { pitch: 0.5 });
+    for (let i = 0; i < 300; i++) off.world.step([frame({ move: [0, 1] })]);
+    expect(off.pitch()).toBe(0.5); // off by default
+  });
+
   it('AC-1: pitch input beyond the clamp keeps pitch within −70°..+60°', () => {
     expect(DEFAULT_LOOK_SETTINGS.minPitch).toBeCloseTo(-70 * DEG, 12);
     expect(DEFAULT_LOOK_SETTINGS.maxPitch).toBeCloseTo(60 * DEG, 12);
@@ -578,5 +659,53 @@ describe('right-stick look through the ActionFrame (mw-e02.9)', () => {
       return hashWorld(world);
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('footstep surfaces (mw-e09.4)', () => {
+  const rug = {
+    id: 'rug',
+    surface: 'carpet',
+    priority: 0,
+    min: { x: -50, y: -5, z: -50 },
+    max: { x: 50, y: 5, z: 50 },
+  };
+  const table = new Map(
+    [
+      ['stone', 0],
+      ['carpet', -10],
+    ].map(([id, offsetDb]) => [
+      id as string,
+      {
+        id: id as string,
+        offsetDb: offsetDb as number,
+        varianceDb: 0,
+        sfx: `sfx-foot-${id as string}`,
+      },
+    ]),
+  );
+
+  function walk(regions: (typeof rug)[]) {
+    const { world } = setup(undefined, {
+      surfaces: createSurfaceMap({ table, regions }),
+    });
+    const steps: { material?: string; surfaceDb: number }[] = [];
+    world.events.on(LocomotionEvents, (e) => {
+      if (e.kind === 'footstep') steps.push(e);
+    });
+    for (let i = 0; i < 120; i++) world.step([frame({ move: [0, 1] })]);
+    return steps;
+  }
+
+  it('AC-1: a carpet region under the feet tags footsteps carpet at -10 dB', () => {
+    const steps = walk([rug]);
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material === 'carpet' && s.surfaceDb === -10)).toBe(true);
+  });
+
+  it('with no region at the feet, the ground collider still says what it is', () => {
+    const steps = walk([{ ...rug, min: { x: 40, y: -5, z: 40 } }]);
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material !== 'carpet')).toBe(true);
   });
 });

@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-vesper-bell",
+  "title": "The Vesper Bell",
+  "notes": "Cast into the belfry bell: the bell's purpose (bell source, object), plus the hymn around the rim (AC-3: identical copy). The tongue is missing (Long Vespers).",
+  "locations": ["place-bellwater-priory"],
+  "pages": [
+    {
+      "text": "(Around the rim of the great cracked bell, in plain Vesperine capitals:)\n\nSleep, you who were not born. Sleep, you who fell. The day is rung. The door is kept.\n\nCAST FOR THE ORDER OF THE VESPER BELL. LET THE NOTE GO DOWN."
+    }
+  ]
+}

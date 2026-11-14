@@ -37,6 +37,8 @@ import type { ContentCheck, ContentIssue, Frozen } from '../loader.ts';
 import { contentId, ref } from '../schema.ts';
 import { worldPropertiesSchema } from '../world-properties.ts';
 import { capabilityId, capabilityIds, localisationKey } from './capability.ts';
+import { DAMAGE_TYPES } from './damage.ts';
+import { REACH_CLASSES } from './move.ts';
 import type { LockDef } from './lock.ts';
 import { SPELL_SCHOOLS, type SpellDefinition, type SpellSchool } from './spell.ts';
 
@@ -456,6 +458,12 @@ const bookSchema = z
       .boolean()
       .default(false)
       .describe('Whispers from the pages while it is carried or read.'),
+    clueFor: z
+      .array(ref('puzzle'))
+      .default([])
+      .describe(
+        'Puzzles its text is a clue to (mw-e15.5): reading it adds `clue.<item id>` to each puzzle’s trail, so a solve and its hint attribution can say a book helped. The text itself says what the clue is.',
+      ),
   })
   .describe('Book data (mw-e07.1).');
 
@@ -525,6 +533,12 @@ const itemOptions = [
       equip: equipSchema(['main-hand', 'off-hand', 'both-hands']),
       weapon: z
         .strictObject({
+          reach: z
+            .enum(REACH_CLASSES)
+            .describe(
+              'Reach class of the weapon (mw-e04.15): metres and wall recoil come from the ' +
+                'reach-class table. Bows and staves, which do not strike, still declare one.',
+            ),
           moves: z
             .array(ref('move'))
             .default([])
@@ -539,7 +553,21 @@ const itemOptions = [
       category: z.literal('armor'),
       equip: equipSchema(ARMOR_SLOTS),
       armor: z
-        .strictObject({ weightKg: kilograms('Weight counted towards the wearer’s load.') })
+        .strictObject({
+          weightKg: kilograms('Weight counted towards the wearer’s load.'),
+          absorption: z
+            .partialRecord(z.enum(DAMAGE_TYPES), z.number().positive())
+            .default({})
+            .describe(
+              'Flat points of each damage type this piece takes off every hit (mw-e04.16); the ' +
+                'wearer’s absorption is the sum over its armor pieces. Unlisted types: 0.',
+            ),
+          poise: z
+            .number()
+            .nonnegative()
+            .default(0)
+            .describe('Poise this piece adds to the wearer’s maximum poise (mw-e04.16).'),
+        })
         .describe('Armor data.'),
     })
     .describe('An armor piece for the head, body, hands or feet.'),
@@ -596,6 +624,18 @@ const itemOptions = [
       ...base,
       category: z.literal('tool'),
       equip: equipSchema(['tool-belt']).optional(),
+      rope: z
+        .strictObject({
+          length: z
+            .number()
+            .positive()
+            .max(50)
+            .describe('How far the rope hangs from its anchor once tied, metres.'),
+        })
+        .optional()
+        .describe(
+          'Makes the tool a climbing rope (mw-e10.9): tied at a level’s rope anchor with Interact, it hangs this far and climbs like any rope until untied.',
+        ),
     })
     .describe('A tool, e.g. lockpicks; usually grants its verb while carried (ADR-0004).'),
   z

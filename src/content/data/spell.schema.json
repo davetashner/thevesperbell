@@ -1740,6 +1740,221 @@
       "pattern": "^vfx-[a-z0-9]+(?:-[a-z0-9]+)*$",
       "description": "VFX cue id (style bible §15.1)."
     },
+    "vfx": {
+      "type": "object",
+      "properties": {
+        "castWindup": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "castRelease": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "projectile": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "impact": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "area": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "beam": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "sustainOnTarget": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        "summon": {
+          "type": "object",
+          "properties": {
+            "template": {
+              "description": "The template to use; it must fill this slot.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "x-contentRef": "spell-vfx-template"
+            },
+            "tint": {
+              "description": "Overrides the template tint.",
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "scale": {
+              "description": "Overrides the template scale.",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "Visuals by template (docs/vfx/spell-hooks.md): a template per slot, an optional tint and scale. A slot left out is not drawn."
+    },
     "sfxCue": {
       "type": "string",
       "pattern": "^sfx-[a-z0-9]+(?:-[a-z0-9]+)*$",

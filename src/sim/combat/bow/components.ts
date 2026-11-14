@@ -163,3 +163,28 @@ export function returnArrow(world: World<never>, entity: EntityId, arrow: string
   if (!quiver?.slots.some((slot) => slot.arrow === arrow)) return;
   world.set(entity, QuiverComponent, adjusted(quiver, arrow, 1));
 }
+
+/**
+ * Puts `count` whole arrows of type `arrow` into `entity`'s quiver (arrows taken back from the world,
+ * mw-e05.7), adding the slot when the quiver has none of that type. False (and nothing changes)
+ * without a quiver.
+ */
+export function addArrows(
+  world: World<never>,
+  entity: EntityId,
+  arrow: string,
+  count: number,
+): boolean {
+  const quiver = world.get(entity, QuiverComponent);
+  if (quiver === undefined) return false;
+  if (quiver.slots.some((slot) => slot.arrow === arrow)) {
+    world.set(entity, QuiverComponent, adjusted(quiver, arrow, count));
+  } else {
+    world.set(
+      entity,
+      QuiverComponent,
+      Object.freeze({ slots: Object.freeze([...quiver.slots, Object.freeze({ arrow, count })]) }),
+    );
+  }
+  return true;
+}

@@ -56,6 +56,7 @@ export interface PauseControllerOptions {
   readonly unsavedProgress: () => boolean;
   /** Keyboard codes bound to Pause (the sampler's bindings: Esc, P). */
   readonly pauseKeys: () => readonly string[];
+  readonly openJournal: () => void;
   readonly openSettings: () => void;
   readonly openSave: () => void;
   readonly openLoad: () => void;
@@ -102,6 +103,9 @@ export class PauseController {
       onChoose: (action) => {
         switch (action) {
           case 'resume':
+            break;
+          case 'journal':
+            this.#options.openJournal();
             break;
           case 'settings':
             this.#options.openSettings();

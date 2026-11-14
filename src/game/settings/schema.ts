@@ -70,7 +70,7 @@ const volume = (label: string, help: string, value = 1): SliderSetting =>
   slider({ label, help, min: 0, max: 1, step: 0.05, default: value, unit: 'percent' });
 
 /** The current schema version of stored settings. Bump it with a migration on a breaking change. */
-export const SETTINGS_VERSION = 2;
+export const SETTINGS_VERSION = 4;
 
 /** Every category and setting, in menu order. */
 export const SETTINGS_SCHEMA = {
@@ -87,7 +87,19 @@ export const SETTINGS_SCHEMA = {
         label: 'Crouch',
         help: 'Hold the key to stay crouched, or press it once to crouch and again to stand.',
         options: holdOrToggle,
-        default: 'toggle',
+        default: 'hold',
+      }),
+      block: choice({
+        label: 'Block',
+        help: 'Hold the button to keep your shield up, or press it once to raise it and again to lower it.',
+        options: holdOrToggle,
+        default: 'hold',
+      }),
+      aim: choice({
+        label: 'Aim and draw',
+        help: 'Hold the attack button to draw the bow, or press it once to draw and again to loose.',
+        options: holdOrToggle,
+        default: 'hold',
       }),
       interact: keybind({
         label: 'Interact',
@@ -116,6 +128,11 @@ export const SETTINGS_SCHEMA = {
       invertX: toggle({
         label: 'Invert horizontal look',
         help: 'Pushing right turns the camera left.',
+        default: false,
+      }),
+      autoCentre: toggle({
+        label: 'Auto-centre',
+        help: 'While you run without touching the look controls, the camera eases back to a level view.',
         default: false,
       }),
       shakeScale: slider({
@@ -192,12 +209,53 @@ export const SETTINGS_SCHEMA = {
     settings: {
       textScale: slider({
         label: 'Text size',
-        help: 'Scales every menu and HUD text.',
+        help: 'Scales every menu and HUD text, from 80% to 200%.',
         min: 0.8,
         max: 2,
         step: 0.1,
         default: 1,
-        unit: 'times',
+        unit: 'percent',
+      }),
+      dyslexiaFont: toggle({
+        label: 'Dyslexia-friendly font',
+        help: 'Switches menus and HUD text to a wider, more distinct typeface with extra letter spacing.',
+        default: false,
+      }),
+      indicatorPalette: choice({
+        label: 'Indicator colours',
+        help: 'Recolours the health, stamina and mana bars and the alert markers for a kind of colour blindness. Every cue also has a shape or pattern.',
+        options: [
+          { value: 'default', label: 'Default' },
+          { value: 'deuteranopia', label: 'Deuteranopia' },
+          { value: 'protanopia', label: 'Protanopia' },
+          { value: 'tritanopia', label: 'Tritanopia' },
+        ],
+        default: 'default',
+      }),
+      textBackground: slider({
+        label: 'Text background',
+        help: 'Puts a dark plate behind prompts, target names, dialogue and other HUD text. 0 shows the text alone.',
+        min: 0,
+        max: 1,
+        step: 0.05,
+        default: 0,
+        unit: 'percent',
+      }),
+      revealSpeed: choice({
+        label: 'Dialogue text speed',
+        help: 'How fast a line of dialogue types out. Instant shows the whole line at once. Enter shows the rest of a line.',
+        options: [
+          { value: 'instant', label: 'Instant' },
+          { value: 'slow', label: 'Slow' },
+          { value: 'normal', label: 'Normal' },
+          { value: 'fast', label: 'Fast' },
+        ],
+        default: 'normal',
+      }),
+      highContrast: toggle({
+        label: 'High contrast dialogue',
+        help: 'Draws dialogue in white on solid black with a bold outline.',
+        default: false,
       }),
       hudScale: slider({
         label: 'HUD size',
@@ -217,6 +275,16 @@ export const SETTINGS_SCHEMA = {
           { value: 'full', label: 'Full' },
         ],
         default: 'system',
+      }),
+      reduceFlashing: toggle({
+        label: 'Reduce flashing',
+        help: 'Dims full-screen flashes, such as the red hit vignette, and lets at most three through a second.',
+        default: false,
+      }),
+      reduceScreenEffects: toggle({
+        label: 'Reduce screen effects',
+        help: 'Turns off the red hit vignette and the colour drain at low health.',
+        default: false,
       }),
       subtitles: toggle({
         label: 'Subtitles',
@@ -250,18 +318,75 @@ export const SETTINGS_SCHEMA = {
     settings: {
       difficulty: choice({
         label: 'Difficulty',
-        help: 'How hard fights hit and how forgiving the world is. Change it any time.',
+        help: 'Story is forgiving, Adventurer is the game as made, Veteran hits harder and sees more. Custom uses the assists below. Change it any time.',
         options: [
           { value: 'story', label: 'Story' },
-          { value: 'normal', label: 'Normal' },
-          { value: 'hard', label: 'Hard' },
+          { value: 'adventurer', label: 'Adventurer' },
+          { value: 'veteran', label: 'Veteran' },
+          { value: 'custom', label: 'Custom' },
         ],
-        default: 'normal',
+        default: 'adventurer',
+      }),
+      customDamageTaken: slider({
+        label: 'Damage you take',
+        help: 'How hard enemies and hazards hit you. Below x1.0 is easier. Changing it switches Difficulty to Custom.',
+        min: 0.25,
+        max: 4,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customParryWindow: slider({
+        label: 'Parry and dodge timing',
+        help: 'How long the parry and dodge windows last. Above x1.0 is more forgiving. Changing it switches Difficulty to Custom.',
+        min: 0.5,
+        max: 3,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customDetectionSpeed: slider({
+        label: 'Enemy notice speed',
+        help: 'How fast enemies notice you. Below x1.0 gives you more time to hide. Changing it switches Difficulty to Custom.',
+        min: 0.25,
+        max: 4,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customSearchDuration: slider({
+        label: 'Enemy search time',
+        help: 'How long an enemy keeps searching where it last saw you. Below x1.0 gives up sooner. Changing it switches Difficulty to Custom.',
+        min: 0.25,
+        max: 4,
+        step: 0.05,
+        default: 1,
+        unit: 'times',
+      }),
+      customPuzzleHints: toggle({
+        label: 'Puzzle hints',
+        help: 'Lets the world offer a hint when you are stuck on a puzzle. Changing it switches Difficulty to Custom.',
+        default: true,
+      }),
+      customFallDamage: toggle({
+        label: 'Fall damage',
+        help: 'Falls, crushing and other hazards hurt you. Off makes them harmless. Changing it switches Difficulty to Custom.',
+        default: true,
       }),
       damageNumbers: toggle({
         label: 'Damage numbers',
         help: 'Shows the damage you deal over your target and the damage you take.',
         default: true,
+      }),
+      lastKnownMarker: toggle({
+        label: 'Last-known-position marker',
+        help: 'Shows a faint ghost where a creature that lost sight of you believes you are.',
+        default: false,
+      }),
+      noiseRipples: toggle({
+        label: 'Noise ripples',
+        help: 'Draws a ring on the ground showing how far a noise carries.',
+        default: false,
       }),
     },
   },

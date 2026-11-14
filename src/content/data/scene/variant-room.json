@@ -1,0 +1,70 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "variant-room",
+  "name": "Variant room",
+  "description": "A bare room that reacts to facts (mw-e27.8): a breakable crate of boards that is only there once variants.cellar.sealed is true, and a miller that is a villager (npc-hollis standing in) after variants.miller.rescued and a crate of his things before it (a variant group with a default). Kept apart from the testbed (console: facts.set variants.miller.rescued true).",
+  "grid": 1,
+  "camera": {
+    "position": [-5, 6, -6],
+    "target": [0, 0, 2]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 1.5],
+      "scale": [3, 1, 4.5]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -3],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 6],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3, 0, 1.5],
+      "yaw": 90,
+      "scale": [4.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [3, 0, 1.5],
+      "yaw": 90,
+      "scale": [4.5, 1, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, 0.75],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "boards",
+      "at": [-2, 0, 4],
+      "prop": "crate",
+      "breakable": { "profile": "crate", "contents": ["plank"] },
+      "spawnIf": { "fact": "variants.cellar.sealed" }
+    },
+    {
+      "id": "miller-rescued",
+      "at": [2, 0, 4],
+      "creature": "npc-hollis",
+      "variant": { "group": "miller", "when": { "fact": "variants.miller.rescued" } }
+    },
+    {
+      "id": "miller-missing",
+      "at": [2, 0, 4],
+      "prop": "crate",
+      "variant": { "group": "miller" }
+    }
+  ],
+  "light": {
+    "ambient": 0.4,
+    "directional": [{ "id": "sun", "direction": [-0.45, -1, 0.3], "level": 0.5, "reach": 60 }]
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "$schema": "../../../data/quest.schema.json",
+  "id": "the-name-on-the-bones",
+  "notes": "Format fixture (mw-e23.1), not shipped: story bible §6.1 side quest 5. Started by an effect (a dialogue with Clatter), three pieces in any order, two ways to get the letter, a failure that moves the quest to another stage and one that ends it with the bittersweet resolution.",
+  "title": "The Name on the Bones",
+  "summary": "Clatter cannot remember his own name. A psalter, a pear tree and a letter might help him.",
+  "stages": [
+    {
+      "id": "gather",
+      "text": "Find the three things Clatter half remembers."
+    },
+    {
+      "id": "another-copy",
+      "text": "The psalter is ash. There may be another copy in the priory."
+    }
+  ],
+  "objectives": [
+    {
+      "id": "psalter",
+      "kind": "fact",
+      "text": "Find Clatter's psalter among the Forgotten.",
+      "params": {
+        "fact": "fixture-bones.psalter"
+      }
+    },
+    {
+      "id": "pear-tree",
+      "kind": "fact",
+      "text": "Make the dead pear tree in the priory garden bloom, once.",
+      "params": {
+        "fact": "fixture-bones.pear-bloomed"
+      }
+    },
+    {
+      "id": "garden",
+      "kind": "enterArea",
+      "text": "Visit the priory garden.",
+      "optional": true,
+      "params": {
+        "area": "priory-garden"
+      }
+    },
+    {
+      "id": "ask-hollis",
+      "kind": "talkTo",
+      "text": "Ask Hollis about the Pell family Bible.",
+      "optional": true,
+      "params": {
+        "npc": "npc-hollis"
+      }
+    },
+    {
+      "id": "letter",
+      "kind": "fact",
+      "text": "Bring back his sister's letter.",
+      "params": {
+        "fact": "fixture-bones.letter"
+      }
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "asked-hollis",
+      "approach": "diplomacy",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.psalter"
+          },
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.pear-bloomed"
+          },
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.letter"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "fixture-bones.letter-stolen"
+            }
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.restored",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hollis",
+          "delta": 10
+        }
+      ],
+      "journal": "Hollis read the letter first, and wept, and gave it freely. Clatter heard his sister's name and then his own: Brother Anselm Hobb."
+    },
+    {
+      "id": "stole-the-letter",
+      "approach": "stealth",
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.psalter"
+          },
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.pear-bloomed"
+          },
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.letter"
+          },
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.letter-stolen"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.restored",
+          "value": true
+        }
+      ],
+      "journal": "The letter came off the Pell shelf without anyone the wiser. Clatter heard his name, and you carry the theft quietly."
+    },
+    {
+      "id": "half-a-name",
+      "approach": "other",
+      "priority": -1,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.psalter"
+          },
+          {
+            "kind": "fact",
+            "fact": "fixture-bones.letter"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.restored",
+          "value": true
+        }
+      ],
+      "journal": "No blossom, but the psalter and the letter were enough for most of a name. Clatter says it will do. He says it twice."
+    }
+  ],
+  "failures": [
+    {
+      "id": "psalter-burnt",
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-bones.psalter-burnt"
+      },
+      "journal": "The psalter burnt, and Clatter sat very still for a long time. Maybe the priory kept another copy.",
+      "continuation": {
+        "kind": "setStage",
+        "stage": "another-copy"
+      }
+    },
+    {
+      "id": "time-ran-out",
+      "deadlineDays": 30,
+      "journal": "A month gone, and Clatter has stopped asking. What you found will have to be enough.",
+      "continuation": {
+        "kind": "resolve",
+        "resolution": "half-a-name"
+      }
+    }
+  ]
+}

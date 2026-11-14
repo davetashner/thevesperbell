@@ -2,7 +2,7 @@
   "$schema": "../puzzle.schema.json",
   "id": "testbed-room-lever",
   "name": "Testbed: throw the room lever",
-  "notes": "Grey-box example of the puzzle schema (mw-e15.1), not story canon. The goal is the outcome (the lever is thrown), so pulling it, reaching it with Mage Hand or knocking it over with the crate all count. When mw-e15.2 adds live-property predicates the goal can read the lever's state directly instead of a fact.",
+  "notes": "Grey-box example of the puzzle schema (mw-e15.1), not story canon. The goal is the outcome (the lever is thrown), so pulling it, reaching it with Mage Hand or knocking it over with the crate all count. The goal still reads a stand-in fact: the testbed lever prop has no live switch state yet (mw-e15.2 can read one once it does).",
   "scene": "testbed",
   "entities": [
     { "id": "room-lever", "role": "the lever to throw" },

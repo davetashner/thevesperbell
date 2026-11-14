@@ -57,6 +57,205 @@
       },
       "description": "The level entities the puzzle is about; steps, hints and recovery name these."
     },
+    "discovery": {
+      "description": "How the puzzle is found. Without it, the first thing the player does to a listed entity finds it.",
+      "type": "object",
+      "properties": {
+        "volume": {
+          "description": "Walking in finds the puzzle: a box, sphere or capsule in world coordinates (the scene’s own, unlike a signal graph’s, which is placed relative to an origin).",
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "box",
+                  "description": "Shape: an axis-aligned box."
+                },
+                "center": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Centre of the box, metres."
+                },
+                "halfExtents": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Half the size per axis."
+                }
+              },
+              "required": [
+                "kind",
+                "center",
+                "halfExtents"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "sphere",
+                  "description": "Shape: a sphere."
+                },
+                "center": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Centre of the sphere, metres."
+                },
+                "radius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Metres."
+                }
+              },
+              "required": [
+                "kind",
+                "center",
+                "radius"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "capsule",
+                  "description": "Shape: a capsule, a segment swept by a radius."
+                },
+                "from": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "One end of the capsule’s segment, metres."
+                },
+                "to": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Metres."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false,
+                  "description": "The other end of the capsule’s segment, metres."
+                },
+                "radius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Metres."
+                }
+              },
+              "required": [
+                "kind",
+                "from",
+                "to",
+                "radius"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "interact": {
+          "description": "Id of a listed entity; using it finds the puzzle (a plaque, a lever).",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        }
+      },
+      "additionalProperties": false
+    },
     "goal": {
       "description": "True when the puzzle is solved, whatever made it so (docs/design/conditions.md).",
       "$ref": "#/$defs/condition"
@@ -204,7 +403,9 @@
                         "pick-up",
                         "read",
                         "search",
+                        "stash",
                         "hide",
+                        "leave",
                         "climb",
                         "talk",
                         "push",
@@ -353,7 +554,7 @@
                   "seconds": {
                     "type": "number",
                     "exclusiveMinimum": 0,
-                    "description": "Seconds after it is lost that a new one appears."
+                    "description": "Seconds after it is lost (destroyed or burnt out) that a new one appears."
                   }
                 },
                 "required": [
@@ -362,7 +563,7 @@
                   "seconds"
                 ],
                 "additionalProperties": false,
-                "description": "A lost critical entity reappears where it spawned (a crate chute)."
+                "description": "A lost critical entity reappears where it spawned (a crate chute), once the spot is clear; a spot that is taken is tried again every 2 s."
               },
               {
                 "type": "object",
@@ -376,6 +577,11 @@
                     "type": "string",
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                     "description": "Id of the listed entity that resets the puzzle (a lever)."
+                  },
+                  "fact": {
+                    "description": "Declared int fact counted up by each reset (telemetry, quests, hints).",
+                    "type": "string",
+                    "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
                   }
                 },
                 "required": [
@@ -383,7 +589,7 @@
                   "trigger"
                 ],
                 "additionalProperties": false,
-                "description": "Using the trigger returns the puzzle’s mechanisms to their authored state."
+                "description": "Using the trigger returns the listed doors and switches to their authored state and the puzzle to in-progress (a solved puzzle ignores it)."
               }
             ],
             "description": "How the puzzle recovers when a key object is lost or a mechanism is stuck."
@@ -394,7 +600,7 @@
     },
     "hints": {
       "default": [],
-      "description": "The hint ladder: tiers fire in order while the player is stuck.",
+      "description": "The hint ladder: tiers fire in order while the player is stuck (seconds since the puzzle was found, or failed attempts). Defaults: tier 1 at 180 s or 3 attempts, tier 2 at 360 s, tier 3 at 600 s.",
       "type": "array",
       "items": {
         "type": "object",
@@ -425,6 +631,11 @@
               "description": "Id of an entity listed in `entities`."
             }
           },
+          "rumour": {
+            "description": "Declared bool fact set true when the tier fires: an NPC rumour (dialogue conditions read it) is unlocked.",
+            "type": "string",
+            "pattern": "^(?:entity:[a-z0-9]+(?:-[a-z0-9]+)*\\/[a-z0-9]+(?:-[a-z0-9]+)*\\.)?[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
+          },
           "variants": {
             "default": [],
             "description": "Class-aware barks: the first whose capability the player has replaces `bark`.",
@@ -453,6 +664,30 @@
         },
         "required": [
           "afterSeconds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "failures": {
+      "default": [],
+      "description": "Signal outputs whose pulses are failed attempts (a sequence node’s `failed` port): each rising edge counts one towards a tier’s `afterAttempts`.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "signal": {
+            "type": "string",
+            "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$",
+            "description": "Signal graph id and node id, e.g. \"chimes/order\"."
+          },
+          "port": {
+            "description": "Output port of the node; default: its first.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "signal"
         ],
         "additionalProperties": false
       }
@@ -524,6 +759,24 @@
             ],
             "additionalProperties": false
           }
+        },
+        "signals": {
+          "default": [],
+          "description": "Lever nodes switched on, or button nodes pressed, when solved, as \"<graph>/<node>\"; a graph the scene places wires them to doors and lights. A repeatable puzzle switches levers back off when it reopens.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$"
+          }
+        },
+        "rewards": {
+          "default": [],
+          "description": "Reward hook ids announced once, the first time the puzzle is solved (the reward systems listen for them).",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
         }
       },
       "required": [
@@ -546,7 +799,7 @@
   "additionalProperties": false,
   "$defs": {
     "condition": {
-      "description": "A condition over world facts: one of fact, count, all, any, not (docs/design/conditions.md).",
+      "description": "A condition over world facts and live state: one of fact, count, entities, signal, sustained, all, any, not (docs/design/conditions.md).",
       "anyOf": [
         {
           "type": "object",
@@ -675,6 +928,475 @@
           ],
           "additionalProperties": false,
           "description": "Counts true entity facts matching a pattern, compared with exactly one operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "object",
+              "properties": {
+                "tag": {
+                  "description": "Entities carrying this tag (an entity tag, or the tag of a scene spawn).",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "entity": {
+                  "description": "The entity of the scene spawn with this id.",
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                }
+              },
+              "additionalProperties": false,
+              "description": "Which entities to test. `{ \"tag\": … }`, `{ \"entity\": … }` or both; `{}` is every entity with a placement."
+            },
+            "where": {
+              "description": "Predicates (property, tag, element) an entity must all pass.",
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "property"
+                      },
+                      "property": {
+                        "type": "string",
+                        "enum": [
+                          "material",
+                          "temperature",
+                          "flammable",
+                          "ignitionPoint",
+                          "fuel",
+                          "burning",
+                          "wetness",
+                          "absorbency",
+                          "frozen",
+                          "freezePoint",
+                          "conductive",
+                          "charge",
+                          "weight",
+                          "fragile",
+                          "hp",
+                          "density",
+                          "climbable",
+                          "liftable",
+                          "pushable",
+                          "remoteActuatable",
+                          "hideable",
+                          "reflective",
+                          "transparent",
+                          "opaque",
+                          "soundDamping",
+                          "friction",
+                          "impactAbsorb",
+                          "owner",
+                          "liquid",
+                          "flammableGas",
+                          "extinguishable",
+                          "windResistance",
+                          "flameRadius",
+                          "waterSurface",
+                          "unstable",
+                          "suspended",
+                          "support",
+                          "breakable",
+                          "bashable",
+                          "cuttable",
+                          "shootable",
+                          "softAnchor",
+                          "surfaceHardness",
+                          "chargeActivated",
+                          "lightActivated",
+                          "hidden",
+                          "trapped",
+                          "trap",
+                          "container",
+                          "remains",
+                          "noiseMultiplier"
+                        ],
+                        "description": "World property to compare (absent = its default)."
+                      },
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "eq",
+                          "ne",
+                          "lt",
+                          "lte",
+                          "gt",
+                          "gte"
+                        ],
+                        "description": "Comparison; lt/lte/gt/gte need a number property."
+                      },
+                      "value": {
+                        "description": "Value to compare with.",
+                        "type": [
+                          "number",
+                          "boolean",
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "property",
+                      "op",
+                      "value"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "tag"
+                      },
+                      "tag": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "description": "Tag the entity must carry, e.g. \"player\"."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "tag"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "facing"
+                      },
+                      "facing": {
+                        "type": "string",
+                        "enum": [
+                          "north",
+                          "east",
+                          "south",
+                          "west"
+                        ],
+                        "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "facing"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "test": {
+                        "type": "string",
+                        "const": "element"
+                      },
+                      "element": {
+                        "type": "string",
+                        "enum": [
+                          "fire",
+                          "water",
+                          "ice",
+                          "charge"
+                        ],
+                        "description": "fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0."
+                      }
+                    },
+                    "required": [
+                      "test",
+                      "element"
+                    ],
+                    "additionalProperties": false
+                  }
+                ],
+                "description": "One condition; every condition of a filter must hold."
+              }
+            },
+            "inside": {
+              "description": "The entity must stand in this box, sphere or capsule, in world coordinates.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "box",
+                      "description": "Shape: an axis-aligned box."
+                    },
+                    "center": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Centre of the box, metres."
+                    },
+                    "halfExtents": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Half the size per axis."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "center",
+                    "halfExtents"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "sphere",
+                      "description": "Shape: a sphere."
+                    },
+                    "center": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Centre of the sphere, metres."
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "center",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "capsule",
+                      "description": "Shape: a capsule, a segment swept by a radius."
+                    },
+                    "from": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "One end of the capsule’s segment, metres."
+                    },
+                    "to": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "y": {
+                          "type": "number",
+                          "description": "Metres."
+                        },
+                        "z": {
+                          "type": "number",
+                          "description": "Metres."
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false,
+                      "description": "The other end of the capsule’s segment, metres."
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Metres."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "from",
+                    "to",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "match": {
+              "description": "all: at least one entity is selected and every one passes; any: one passes; none: none passes.",
+              "type": "string",
+              "enum": [
+                "all",
+                "any",
+                "none"
+              ]
+            },
+            "eq": {
+              "description": "The number of entities that pass equals this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "neq": {
+              "description": "The number that pass does not equal this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gt": {
+              "description": "The number that pass is greater than this.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gte": {
+              "description": "At least this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lt": {
+              "description": "Fewer than this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "lte": {
+              "description": "At most this many pass.",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "entities"
+          ],
+          "additionalProperties": false,
+          "description": "Property predicates over live entities: how many of them pass, and where they are. Exactly one of match or an operator."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "signal": {
+              "type": "string",
+              "pattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)\\/([a-z0-9]+(?:-[a-z0-9]+)*)$",
+              "description": "Signal graph id and node id, e.g. \"vault/gate-open\". Holds while the output is on."
+            },
+            "port": {
+              "description": "Output port of the node; default: its first.",
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "required": [
+            "signal"
+          ],
+          "additionalProperties": false,
+          "description": "True while a signal graph node output is on (mark the node `observed`)."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sustained": {
+              "description": "The condition that must keep holding.",
+              "$ref": "#/$defs/condition"
+            },
+            "seconds": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 3600,
+              "description": "Seconds of sim time it must hold, without a break."
+            }
+          },
+          "required": [
+            "sustained",
+            "seconds"
+          ],
+          "additionalProperties": false,
+          "description": "True once the condition has held, without a break, for that long."
         },
         {
           "type": "object",

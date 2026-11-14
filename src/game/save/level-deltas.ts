@@ -110,9 +110,12 @@ export function levelDeltasSaveSection(options: LevelDeltasSectionOptions = {}):
         }
       }
       levelDeltasOf(world).restore(levels);
+      // The loaded level came back exactly from the world section; its fires and wetness settle (mw-e27.7).
+      levelDeltasOf(world).settle(world);
     },
     missing: (world) => {
       levelDeltasOf(world).restore([]);
+      levelDeltasOf(world).settle(world);
     },
   });
 }

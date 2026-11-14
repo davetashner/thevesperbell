@@ -156,9 +156,11 @@ describe('fact checks', () => {
       .all('signal-graph')
       .flatMap((g) => FACT_USAGES['signal-graph']?.(g as never) ?? []);
     expect(usages.map((u) => u.key).sort()).toEqual([
+      'briar-glen.arrived',
       'chapel-of-echoes.portcullis-dropped',
       'kestrel-lock.gate-open',
       'slice.complete',
+      'wendmouth.visited',
     ]);
   });
 

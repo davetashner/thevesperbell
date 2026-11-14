@@ -60,6 +60,32 @@ describe('the slice-complete card (mw-e01.18)', () => {
     expect(onReturn).toHaveBeenCalledOnce();
   });
 
+  it('mw-e24.21: Continue, when offered, closes the card; without it there is no such button', () => {
+    openSliceComplete(ui, {
+      seconds: 0,
+      className: '',
+      save: { state: 'saved' },
+      onReturn: vi.fn(),
+    });
+    expect(document.querySelector('[data-testid="slice-complete-continue"]')).toBeNull();
+    ui.top?.close();
+    const onContinue = vi.fn(() => {
+      ui.top?.close();
+    });
+    const card = openSliceComplete(ui, {
+      seconds: 0,
+      className: '',
+      save: { state: 'saved' },
+      onReturn: vi.fn(),
+      onContinue,
+    });
+    // Return to title stays the focused choice.
+    expect(document.activeElement).toBe(card.returnButton);
+    document.querySelector<HTMLElement>('[data-testid="slice-complete-continue"]')?.click();
+    expect(onContinue).toHaveBeenCalledOnce();
+    expect(ui.top).toBeUndefined();
+  });
+
   it('Back does not dismiss the card', () => {
     openSliceComplete(ui, {
       seconds: 0,

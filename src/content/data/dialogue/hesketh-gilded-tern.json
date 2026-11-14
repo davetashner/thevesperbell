@@ -1,0 +1,515 @@
+{
+  "$schema": "../dialogue.schema.json",
+  "id": "hesketh-gilded-tern",
+  "notes": "mw-e39.20: Captain Hesketh of the Gilded Tern (bible 5.14). Crew hiring is an emit hook (hesketh.crew-signed); the shanghai scene is entered by the entry shanghai when the contest system sets hesketh.shanghaied (bible 4.5: losing the Drowned Gull contest) and resolves to a day's work or a successful argument, both emit hesketh.shanghai-scene. Tereza's debt of honour opens the gangway (hesketh.board-requested). The veiled passenger in the locked berth is never revealed (MVP).",
+  "speakers": [
+    {
+      "id": "hesketh",
+      "npc": "npc-hesketh"
+    }
+  ],
+  "entries": [
+    {
+      "id": "shanghai",
+      "when": {
+        "kind": "fact",
+        "fact": "hesketh.shanghaied"
+      },
+      "node": "shanghai-1"
+    },
+    {
+      "id": "return",
+      "when": {
+        "kind": "dialogue.visitedCount",
+        "id": "hub",
+        "op": "gte",
+        "value": 1
+      },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": {
+        "kind": "playerClass",
+        "class": "knight"
+      },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": {
+        "kind": "playerClass",
+        "class": "archer"
+      },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": {
+        "kind": "playerClass",
+        "class": "sorcerer"
+      },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": {
+        "kind": "playerClass",
+        "class": "thief"
+      },
+      "node": "greet-thief"
+    },
+    {
+      "id": "first-any",
+      "node": "greet-any"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Hesketh, master of the Gilded Tern. Knight, is it? I can use a marine's discipline on deck. A tidy sword is good for tidy cargo. Do you have a berth in mind, or a grudge?",
+      "next": "hub"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Hesketh, Gilded Tern. You have the look of someone who spots things far off. I could use that in the crow's nest. Pirates, rocks, the harbourmaster. All equally unwelcome.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Captain Hesketh. A sorcerer, I see. Mind the rigging, and mind the rum. Can you charm a wind? The harbour is flat as a plate and I am three days late for it.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Captain Hesketh, and this is my ship, and every crate aboard is already accounted for. I have a good memory for cargo. I should hate to test it on you. Welcome aboard, nearly.",
+      "next": "hub"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Hesketh, Captain, Gilded Tern. We load slowly, we sail when the cargo is aboard, and we do not discuss the cargo. Is it work or passage you are after?",
+      "next": "hub"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Back on the quay. Good. The Tern waits for no one, except when she does. Out with it.",
+      "next": "hub"
+    },
+    {
+      "id": "shanghai-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Awake, are you? You lost the contest at the Drowned Gull, and a shilling bought your name on my articles. It is all legal. I never say anything that is not. Welcome to the Gilded Tern's hold.",
+      "next": "shanghai-choice"
+    },
+    {
+      "id": "shanghai-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "work-passage",
+          "text": "Fine. What do I work off?",
+          "next": "shanghai-work-fx"
+        },
+        {
+          "id": "argue-release",
+          "text": "That contract is a farce, Captain.",
+          "next": "argue-check"
+        }
+      ]
+    },
+    {
+      "id": "shanghai-work-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hesketh.shanghaied",
+          "value": false
+        },
+        {
+          "kind": "setFact",
+          "fact": "hesketh.shanghai.served",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.shanghai-scene",
+          "data": {
+            "outcome": "work"
+          }
+        }
+      ],
+      "next": "shanghai-work-1"
+    },
+    {
+      "id": "shanghai-work-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Scrub the deck, stow the crates, and not a word about what is under the tarpaulins. A day's labour, and you are back on the quay with a sore back and a story.",
+      "end": true
+    },
+    {
+      "id": "argue-check",
+      "kind": "check",
+      "approach": "persuade",
+      "difficulty": 11,
+      "modifiers": [
+        {
+          "when": {
+            "kind": "disposition",
+            "npc": "npc-hesketh",
+            "op": "gte",
+            "value": 5
+          },
+          "bonus": 3,
+          "label": "He respects a good argument"
+        }
+      ],
+      "success": "argue-win",
+      "failure": "argue-lose"
+    },
+    {
+      "id": "argue-win",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hesketh.shanghaied",
+          "value": false
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hesketh",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.shanghai-scene",
+          "data": {
+            "outcome": "released"
+          }
+        }
+      ],
+      "next": "argue-win-1"
+    },
+    {
+      "id": "argue-win-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Hm. The articles say 'willing hand'. You do not look willing. Fair. Over the side, then, politely, by the gangway. And do not tell Nell the drink was watered.",
+      "end": true
+    },
+    {
+      "id": "argue-lose",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "A farce, is it? Signed in your own ink. Well: work it off, and I will say it was a great honour. The deck is that way.",
+      "next": "shanghai-work-fx"
+    },
+    {
+      "id": "hub",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ask-tern",
+          "text": "Tell me about the Gilded Tern.",
+          "once": true,
+          "next": "tern-1"
+        },
+        {
+          "id": "ask-sail",
+          "text": "When do you sail?",
+          "once": true,
+          "next": "sail-1"
+        },
+        {
+          "id": "ask-berth",
+          "text": "Who is in the locked berth?",
+          "once": true,
+          "next": "berth-1"
+        },
+        {
+          "id": "hire",
+          "text": "Are you hiring?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "hesketh.crew-hired"
+            }
+          },
+          "next": "hire-1"
+        },
+        {
+          "id": "ask-passage",
+          "text": "Tereza said I might come aboard.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "tereza.tern-access"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "hesketh.gangway-open"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "passage-1"
+        },
+        {
+          "id": "marine-knight",
+          "text": "A marine's berth, then.",
+          "when": {
+            "kind": "playerClass",
+            "class": "knight"
+          },
+          "once": true,
+          "next": "marine-fx"
+        },
+        {
+          "id": "crow-archer",
+          "text": "I'll take the crow's nest.",
+          "when": {
+            "kind": "playerClass",
+            "class": "archer"
+          },
+          "once": true,
+          "next": "crow-fx"
+        },
+        {
+          "id": "wind-sorcerer",
+          "text": "I could give you a Gust.",
+          "when": {
+            "kind": "playerClass",
+            "class": "sorcerer"
+          },
+          "once": true,
+          "next": "wind-fx"
+        },
+        {
+          "id": "hold-thief",
+          "text": "Perhaps a quiet corner of the hold.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "once": true,
+          "next": "hold-1"
+        },
+        {
+          "id": "leave",
+          "text": "That's all.",
+          "next": "farewell"
+        }
+      ]
+    },
+    {
+      "id": "farewell",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Fair winds, and mind the gangway; it has opinions.",
+      "end": true
+    },
+    {
+      "id": "tern-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Three masts, forty tons of ironwork and a hold built for silver. She goes where the cargo goes, and when it is ready. Old, but quicker than she looks. Rather like me.",
+      "next": "hub"
+    },
+    {
+      "id": "sail-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "When the last crate is stowed, and the tide, the wind and the harbourmaster agree. Not before. Do not look at the hoist; it is slow, and it is dignified.",
+      "next": "hub"
+    },
+    {
+      "id": "berth-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "A passenger. Paid in advance, and paid well. Keeps the berth locked and the lamp low, and I take their coin and do not ask. A captain who asks loses his cargo.",
+      "next": "hub"
+    },
+    {
+      "id": "hire-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Hiring? Hands, yes, when the weather is fair and my crew is drunk. It is hard work, simple coin, and no questions about the cargo. Are you willing?",
+      "next": "hire-choice"
+    },
+    {
+      "id": "hire-choice",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "sign-crew",
+          "text": "Sign me on.",
+          "next": "sign-fx"
+        },
+        {
+          "id": "not-now",
+          "text": "Not today.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "sign-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hesketh.crew-hired",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hesketh",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.crew-signed",
+          "data": {
+            "role": "deckhand"
+          }
+        }
+      ],
+      "next": "sign-1"
+    },
+    {
+      "id": "sign-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Done. Report at dawn, bring your own boots. Keep the crew ranks clean and your questions few. The Tern will remember you, and so will I.",
+      "next": "hub"
+    },
+    {
+      "id": "passage-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Tereza sent you? Then you are no stranger. The debt of honour is a bore, and you are its price. Aboard, and be quick. The gangway is open.",
+      "next": "passage-fx"
+    },
+    {
+      "id": "passage-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "hesketh.gangway-open",
+          "value": true
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-hesketh",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.board-requested",
+          "data": {
+            "via": "tereza"
+          }
+        }
+      ],
+      "next": "hub"
+    },
+    {
+      "id": "marine-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hesketh",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.guard-berth-offered"
+        }
+      ],
+      "next": "marine-1"
+    },
+    {
+      "id": "marine-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "A marine. I have not had one since the Isles. Mind the passengers' doors, keep the deck clear, and do not fight the crew. Good pay; steady work; long watch.",
+      "next": "hub"
+    },
+    {
+      "id": "crow-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hesketh",
+          "delta": 2
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.lookout-offered"
+        }
+      ],
+      "next": "crow-1"
+    },
+    {
+      "id": "crow-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Good. Climb when the light is bad and shout when you see anything that is not sea. And do not shoot the gulls; they are the crew's friends.",
+      "next": "hub"
+    },
+    {
+      "id": "wind-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-hesketh",
+          "delta": 3
+        },
+        {
+          "kind": "emit",
+          "event": "hesketh.wind-asked"
+        }
+      ],
+      "next": "wind-1"
+    },
+    {
+      "id": "wind-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Can you? A steady north-west, from the harbour mouth. My sails would weep for joy. I cannot pay, but the crew will remember it; they have long memories and short tempers.",
+      "next": "hub"
+    },
+    {
+      "id": "hold-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Quiet corner of my hold. No, thank you. I have forty tons of other people's cargo down there and a very good memory. I should hate for you to improve my inventory.",
+      "next": "hub"
+    }
+  ]
+}

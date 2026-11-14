@@ -1,0 +1,24 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "watchers",
+  "name": "Watchers wiring",
+  "notes": "The wiring of the watchers' hall (scene watchers, mw-e15.10): the puzzle runtime switches the vault latch on when the puzzle watchers is solved, which raises the portcullis. The goal reads the statues' facing directly, so no node reads them. Binding names are the scene's spawn ids.",
+  "nodes": [
+    {
+      "id": "vault-latch",
+      "kind": "lever"
+    },
+    {
+      "id": "vault-gate",
+      "kind": "receiver",
+      "receiver": "door",
+      "entity": "vault-gate"
+    }
+  ],
+  "wires": [
+    {
+      "from": "vault-latch",
+      "to": "vault-gate"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "crate-heist",
+  "name": "The Crate for Mr. S— facts",
+  "notes": "mw-e39.21: facts written and read by quest-crate-for-mr-s. crate.intercepted and tern.sailed are registered by main-quest; the dialogue stand-ins (evidence.*, quell.*, cray.*) are reused as they are.",
+  "facts": [
+    {
+      "key": "crate.method",
+      "type": "enum",
+      "values": ["none", "heist", "paper", "net", "force", "ice", "leverage", "sailed"],
+      "default": "none",
+      "description": "How Vane's crate was taken (bible 6.1 quest 6): heist (ballast swap and re-seal), paper (Cray's lawful seizure), net (archer cut), force (knight brawl), ice (freeze the pool or Gust the hoist), leverage (Quell), or sailed (the Tern left first). Written by quest-crate-for-mr-s.",
+      "owner": "quest"
+    },
+    {
+      "key": "heist.undetected",
+      "type": "bool",
+      "default": false,
+      "description": "The ballast swap and re-seal were done with no alarm raised: nobody ever knows (bible 6.1 quest 6, perfect execution). Written by the Crate for Mr. S— heist resolution.",
+      "owner": "quest"
+    },
+    {
+      "key": "heist.alarm",
+      "type": "bool",
+      "default": false,
+      "description": "The night watchman or the harbour watch raised the alarm at bay nine. Written by the bay nine level (stealth, E09) and by the force resolution; blocks the undetected heist resolution.",
+      "owner": "scene"
+    },
+    {
+      "key": "manifest.honest.obtained",
+      "type": "bool",
+      "default": false,
+      "description": "The player has Vane's honest manifest of bay nine (Vane evidence). Written by every Crate for Mr. S— resolution that takes the crate.",
+      "owner": "quest"
+    },
+    {
+      "key": "namestone.obtained",
+      "type": "bool",
+      "default": false,
+      "description": "The player has the Hornfolk name-stone from Vane's crate (befriend-Horn trigger, bible 4.3). Written by the Crate for Mr. S— resolutions; read by horn-warden alongside horn.name-stone-held.",
+      "owner": "quest"
+    },
+    {
+      "key": "lowtide.standing",
+      "type": "enum",
+      "values": ["neutral", "hostile"],
+      "default": "neutral",
+      "description": "The Low Tide Company's standing towards the player: hostile after a dockside brawl at bay nine (bible 3.4). Written by the force resolution of the Crate for Mr. S—.",
+      "owner": "quest"
+    },
+    {
+      "key": "cray.arrival.flagged",
+      "type": "bool",
+      "default": false,
+      "description": "Inspector Cray arrives at the end of the bay nine brawl and will question the player (the force branch of the Crate for Mr. S—). Read by cray-customs and the Wendmouth scene (follow-up).",
+      "owner": "quest"
+    },
+    {
+      "key": "tern.sails-with-ballast",
+      "type": "bool",
+      "default": false,
+      "description": "The Gilded Tern will sail with rocks in Vane's crate, because the heist swapped them in (bible 6.1 quest 6). Read by the Wendmouth scene and the epilogue (post-MVP hook).",
+      "owner": "quest"
+    },
+    {
+      "key": "manifest.customs-copy.obtainable",
+      "type": "bool",
+      "default": false,
+      "description": "The Tern sailed before the crate was taken, so only the customs house copy of the manifest remains to be had (note-cargo-manifest). Written by the sailed resolution of the Crate for Mr. S—.",
+      "owner": "quest"
+    }
+  ]
+}

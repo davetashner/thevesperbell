@@ -45,6 +45,23 @@ const valid = {
       floor: -25,
       materials: [{ material: 'wood', floor: -15 }],
     },
+    impact: { minEnergy: 1, refEnergy: 10, refDb: 60, dbPerDecade: 10, maxDb: 100 },
+    footsteps: {
+      gaitDb: { sneak: 25, walk: 40, run: 55, sprint: 65 },
+      creatureGait: {
+        walkFrom: 0.2,
+        runFrom: 2.5,
+        sprintFrom: 6,
+        stride: { walk: 0.75, run: 1.6, sprint: 2.05 },
+      },
+      landing: {
+        minHeight: 0.5,
+        curve: [
+          { height: 0.5, db: 30 },
+          { height: 3, db: 70 },
+        ],
+      },
+    },
   },
 } satisfies StealthDefInput;
 
@@ -233,6 +250,39 @@ describe('stealth noise tuning (mw-e09.3)', () => {
     expect(problems(withNoise({ doors: { ...valid.noise.doors, materials } }))).toEqual([
       'noise.doors.materials.0: door gains must never rise from open to ajar to closed',
     ]);
+  });
+
+  it('mw-e03.25: the impact curve needs its minimum energy at or below its reference energy', () => {
+    const impact = { ...valid.noise.impact, minEnergy: 20 };
+    expect(problems(withNoise({ impact }))).toEqual([
+      'noise.impact.minEnergy: minEnergy must not exceed refEnergy',
+    ]);
+    expect(problems(withNoise({ impact: { ...valid.noise.impact, minEnergy: 10 } }))).toEqual([]);
+  });
+
+  it('mw-e09.5: gaits, creature speeds and the landing curve must rise', () => {
+    const f = valid.noise.footsteps;
+    const bad = (patch: object) => problems(withNoise({ footsteps: { ...f, ...patch } }));
+    expect(bad({})).toEqual([]);
+    expect(bad({ gaitDb: { ...f.gaitDb, walk: 60 } })).toEqual([
+      'noise.footsteps.gaitDb: gaits must never get quieter: sneak ≤ walk ≤ run ≤ sprint',
+    ]);
+    expect(bad({ creatureGait: { ...f.creatureGait, runFrom: 7 } })).toEqual([
+      'noise.footsteps.creatureGait: creature gait speeds must rise: walk ≤ run ≤ sprint',
+    ]);
+    const landing = (curve: object[]) => bad({ landing: { minHeight: 0.5, curve } });
+    expect(
+      landing([
+        { height: 3, db: 70 },
+        { height: 3, db: 80 },
+      ]),
+    ).toEqual(['noise.footsteps.landing.curve.1.height: landing heights must rise']);
+    expect(
+      landing([
+        { height: 1, db: 70 },
+        { height: 3, db: 60 },
+      ]),
+    ).toEqual(['noise.footsteps.landing.curve.1.db: a landing never gets quieter with height']);
   });
 
   it('names a material listed twice', () => {

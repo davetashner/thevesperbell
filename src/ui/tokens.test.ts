@@ -32,6 +32,44 @@ describe('UI tokens (style bible §9)', () => {
     expect(css).toContain("[data-motion='reduce'] { --ui-motion-scale: 0; }");
   });
 
+  it('AC-4: body text is 16px, rising to 18px at 1080p, and no font size is rem-fixed', () => {
+    expect(UI_TOKENS['ui-font-size']).toBe('max(16px, 1.6667vh)');
+    expect(1080 * 0.016667).toBeGreaterThanOrEqual(18);
+    expect(uiStyleSheet()).not.toMatch(/font-size: [\d.]+rem/);
+  });
+
+  it('mw-e31.5: the caption plate follows the text background setting but never drops below 90%', () => {
+    expect(uiStyleSheet()).toContain(
+      'rgb(30 27 46 / max(90%, calc(var(--ui-text-backdrop-opacity) * 100%)))',
+    );
+  });
+
+  it('mw-e31.11: the focus ring is two-tone, honours the hidden attribute and leaves room in scrollers', () => {
+    const css = uiStyleSheet();
+    // Ink outline between two bands of the light panel colour: visible on dark and light grounds.
+    expect(css).toMatch(
+      /\.vb-ui\[data-modality='nav'\] :focus \{[^}]*outline: var\(--ui-focus-width\) solid[^}]*box-shadow: 0 0 0 calc\(/,
+    );
+    expect(css).toContain('.vb-ui [hidden] { display: none !important; }');
+    expect(css).toMatch(/\.vb-panel \{[^}]*scroll-padding: var\(--ui-space-3\)/);
+    expect(css).toContain('.vb-save-row {');
+    expect(css).not.toContain('.vb-slot { display: flex');
+  });
+
+  it('the dyslexia font and the text backdrop are token driven, and tabs wrap', () => {
+    const css = uiStyleSheet();
+    expect(css).toContain(".vb-ui[data-font='dyslexia']");
+    expect(css).toContain('--ui-text-backdrop-opacity');
+    expect(css).toContain("[role='tablist'] { display: flex; flex-wrap: wrap;");
+    expect(css).toContain('.vb-tabpanel[hidden] { display: none; }');
+    // Narrow layouts (phone width, or large text): pickups keep a readable width, the shop stacks rows.
+    expect(css).toContain('max-width: max(min(22em, 45%), min(14em,');
+    expect(css).toContain('@container (max-width: 30em)');
+    expect(css.indexOf('@container (max-width: 30em)')).toBeGreaterThan(
+      css.indexOf('.vb-shop-item {'),
+    );
+  });
+
   it('installs the stylesheet once', () => {
     installUiStyles(document);
     installUiStyles(document);

@@ -1,0 +1,51 @@
+{
+  "$schema": "../move.schema.json",
+  "id": "halberd-sweep",
+  "notes": "Halberd sweep (mw-e04.15): the long reach class's wide horizontal arc, 22/6/30 ticks, 25 stamina, 38 slash, 40 poise, 120 degrees across about 3 m. It rules a hall and clangs off a corridor: a horizontal long swing that meets a wall in the first half of its active window before any creature recoils for 30 ticks. PLACEHOLDER TUNING for the owner: frames, stamina and damage. Its sound and trail reuse the sword's cues; its clip id is reserved for the weapon animation (art), so until then it has no clip.",
+  "verb": "attack",
+  "frames": {
+    "startup": 22,
+    "active": 6,
+    "recovery": 30
+  },
+  "staminaCost": 25,
+  "cancelWindows": [
+    {
+      "into": "dodge",
+      "from": 32,
+      "to": 57
+    }
+  ],
+  "damage": {
+    "amounts": {
+      "slash": 38
+    },
+    "poiseDamage": 40,
+    "staminaDamage": 28
+  },
+  "hitbox": {
+    "track": "halberd-sweep-arc",
+    "shape": {
+      "kind": "capsule",
+      "from": {
+        "x": 0.2,
+        "y": 1.3,
+        "z": 0.6
+      },
+      "to": {
+        "x": 0.2,
+        "y": 1.3,
+        "z": 2.85
+      },
+      "radius": 0.1
+    },
+    "reach": "long",
+    "swing": "horizontal"
+  },
+  "hitStop": "heavy",
+  "presentation": {
+    "anim": "anim-knight-halberd-sweep",
+    "audioCue": "sfx-knight-sword-swing-heavy",
+    "vfxCue": "vfx-sword-trail-heavy"
+  }
+}

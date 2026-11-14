@@ -29,6 +29,7 @@ export const SIGNAL_NODE_KINDS = [
   'counter',
   'sequence',
   'random',
+  'clue',
   'receiver',
   'set-property',
 ] as const;
@@ -47,6 +48,8 @@ const ENTITY_RECEIVERS: readonly string[] = ['door', 'light', 'spawner', 'mechan
 export const PREDICATE_OPS = ['eq', 'ne', 'lt', 'lte', 'gt', 'gte'] as const;
 /** Elements a filter can test for (mirrors the sim's SIGNAL_ELEMENTS). */
 export const SIGNAL_ELEMENTS = ['fire', 'water', 'ice', 'charge'] as const;
+/** Compass directions a facing test names (mirrors the sim's FACINGS). */
+export const FACINGS = ['north', 'east', 'south', 'west'] as const;
 /** Node kinds a loop may pass through (mirrors the sim's REGISTERED_KINDS). */
 export const REGISTERED_KINDS: readonly string[] = ['delay', 'latch'];
 
@@ -69,21 +72,30 @@ const vec3 = z.strictObject({ x: coordinate, y: coordinate, z: coordinate });
 const size = z.number().min(0).describe('Metres.');
 
 /** A trigger volume's shape, relative to where the level places the graph. */
-const volumeShapeSchema = z
+export const volumeShapeSchema = z
   .discriminatedUnion('kind', [
     z.strictObject({
-      kind: z.literal('box'),
-      center: vec3,
+      kind: z.literal('box').describe('Shape: an axis-aligned box.'),
+      center: vec3.describe('Centre of the box, metres.'),
       halfExtents: z
         .strictObject({ x: size, y: size, z: size })
         .describe('Half the size per axis.'),
     }),
-    z.strictObject({ kind: z.literal('sphere'), center: vec3, radius: size }),
-    z.strictObject({ kind: z.literal('capsule'), from: vec3, to: vec3, radius: size }),
+    z.strictObject({
+      kind: z.literal('sphere').describe('Shape: a sphere.'),
+      center: vec3.describe('Centre of the sphere, metres.'),
+      radius: size,
+    }),
+    z.strictObject({
+      kind: z.literal('capsule').describe('Shape: a capsule, a segment swept by a radius.'),
+      from: vec3.describe('One end of the capsule’s segment, metres.'),
+      to: vec3.describe('The other end of the capsule’s segment, metres.'),
+      radius: size,
+    }),
   ])
   .describe('Box, sphere or capsule, relative to the graph origin.');
 
-const predicateSchema = z
+export const predicateSchema = z
   .discriminatedUnion('test', [
     z.strictObject({
       test: z.literal('property'),
@@ -94,6 +106,14 @@ const predicateSchema = z
     z.strictObject({
       test: z.literal('tag'),
       tag: contentId.describe('Tag the entity must carry, e.g. "player".'),
+    }),
+    z.strictObject({
+      test: z.literal('facing'),
+      facing: z
+        .enum(FACINGS)
+        .describe(
+          'Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east.',
+        ),
     }),
     z.strictObject({
       test: z.literal('element'),
@@ -180,6 +200,24 @@ const nodeSchema = z
       ...base,
       kind: z.literal('random'),
       outcomes: portNames('Output port names, one pulsed per rising edge.'),
+    }),
+    z.strictObject({
+      ...base,
+      kind: z.literal('clue'),
+      cues: z
+        .array(contentId)
+        .min(1)
+        .describe(
+          'Cue ids sounded in order, e.g. "chime-low"; a cue sheet rule maps each to a sound.',
+        ),
+      spacing: z
+        .number()
+        .positive()
+        .optional()
+        .describe('Seconds between cues; default 1. The first sounds on the rising edge.'),
+      entity: binding
+        .optional()
+        .describe('Where the sound comes from (a spawn); without one the cues have no position.'),
     }),
     z.strictObject({
       ...base,
@@ -420,7 +458,7 @@ function checkGraph(graph: Graph, ctx: z.RefinementCtx): void {
     if (node.kind === 'latch' && counts['set'] === 0 && counts['toggle'] === 0) {
       issue(['nodes', i], `node "${node.id}" (latch) needs a wire into "set" or "toggle"`);
     }
-    const sink = node.kind === 'receiver' || node.kind === 'set-property';
+    const sink = node.kind === 'receiver' || node.kind === 'set-property' || node.kind === 'clue';
     if (!sink && node.observed !== true && !drives.has(node.id)) {
       issue(['nodes', i], `node "${node.id}" drives nothing: wire an output or mark it "observed"`);
     }

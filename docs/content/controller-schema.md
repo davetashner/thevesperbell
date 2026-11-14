@@ -74,6 +74,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `climb.maxCornerAngle` | number 0–90 | required | Sharpest turn between two faces a climber follows round a corner, degrees. |
 | `climb.slipGraceMs` | integer 0–10000 | required | How long a climber holds a surface that became impossible to hold (frozen, burning) before falling, whole ms. |
 | `climb.staminaPerSecond` | number 0–1000 | required | Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9). |
+| `climb.staminaByDifficulty` | list of any (at least 3) | — | Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2. |
 | `climb.jumpOff` | object | required | Jumping off a climbed surface. |
 | `climb.jumpOff.away` | number 0–20 | required | Speed away from the surface, m/s. |
 | `climb.jumpOff.up` | number 0–20 | required | Upward speed, m/s. |
@@ -114,6 +115,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `stealth.profiles.crouched.sprint` | object | required | At the sprint gait. |
 | `stealth.profiles.crouched.sprint.noise` | number 0–1 | required | Footstep noise multiplier, 0–1 (stand-sprint is 1): what stealth noise (mw-e09.5) scales by. |
 | `stealth.profiles.crouched.sprint.visibility` | number 0–1 | required | Visibility multiplier, 0–1 (stand-sprint is 1): what visibility scoring (mw-e09.2) scales by. |
+| `stealth.surfaces` | object | — | How wet and frozen ground changes footstep loudness; absent = the sim’s defaults. |
+| `stealth.surfaces.wetFrom` | number 0–1 | required | Wetness at or above which a step on the ground counts as wet, 0–1. |
+| `stealth.surfaces.wetDb` | number -20–20 | required | What a wet surface adds to the material’s footstep loudness (splash, slap), dB. |
+| `stealth.surfaces.frozenDb` | number -20–20 | required | What frozen ground adds to the material’s footstep loudness (crunch), dB. |
 | `water` | object | — | Wading, swimming and breath; absent = the sim’s defaults (DEFAULT_WATER_TUNING). |
 | `water.wadeDepth` | number > 0 ≤ 2 | required | Water at least this deep at the feet slows the character to a wade, m. |
 | `water.swimDepth` | number > 0 ≤ 3 | required | Water deeper than this at the feet is swum in (light and medium load) or sunk in (heavy and overloaded), m. |
@@ -202,6 +207,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `classes.<key>.climb.maxCornerAngle` | number 0–90 | — | Sharpest turn between two faces a climber follows round a corner, degrees. |
 | `classes.<key>.climb.slipGraceMs` | integer 0–10000 | — | How long a climber holds a surface that became impossible to hold (frozen, burning) before falling, whole ms. |
 | `classes.<key>.climb.staminaPerSecond` | number 0–1000 | — | Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9). |
+| `classes.<key>.climb.staminaByDifficulty` | list of any (at least 3) | — | Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2. |
 | `classes.<key>.climb.jumpOff` | object | — |  |
 | `classes.<key>.climb.jumpOff.away` | number 0–20 | — | Speed away from the surface, m/s. |
 | `classes.<key>.climb.jumpOff.up` | number 0–20 | — | Upward speed, m/s. |
@@ -242,6 +248,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `classes.<key>.stealth.profiles.crouched.sprint` | object | — |  |
 | `classes.<key>.stealth.profiles.crouched.sprint.noise` | number 0–1 | — | Footstep noise multiplier, 0–1 (stand-sprint is 1): what stealth noise (mw-e09.5) scales by. |
 | `classes.<key>.stealth.profiles.crouched.sprint.visibility` | number 0–1 | — | Visibility multiplier, 0–1 (stand-sprint is 1): what visibility scoring (mw-e09.2) scales by. |
+| `classes.<key>.stealth.surfaces` | object | — |  |
+| `classes.<key>.stealth.surfaces.wetFrom` | number 0–1 | — | Wetness at or above which a step on the ground counts as wet, 0–1. |
+| `classes.<key>.stealth.surfaces.wetDb` | number -20–20 | — | What a wet surface adds to the material’s footstep loudness (splash, slap), dB. |
+| `classes.<key>.stealth.surfaces.frozenDb` | number -20–20 | — | What frozen ground adds to the material’s footstep loudness (crunch), dB. |
 | `classes.<key>.water` | object | — |  |
 | `classes.<key>.water.wadeDepth` | number > 0 ≤ 2 | — | Water at least this deep at the feet slows the character to a wade, m. |
 | `classes.<key>.water.swimDepth` | number > 0 ≤ 3 | — | Water deeper than this at the feet is swum in (light and medium load) or sunk in (heavy and overloaded), m. |

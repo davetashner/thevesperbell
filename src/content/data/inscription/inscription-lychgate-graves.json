@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-lychgate-graves",
+  "title": "The lychgate graves",
+  "notes": "Bible 3.5: lychgate cemetery with Vesperine graves. A Long Vespers memorial; the grave plaque speaks of the brothers who did not return. Long Vespers source (object), no canon year numbers.",
+  "locations": ["place-briar-glen"],
+  "pages": [
+    {
+      "text": "(A long low stone at the head of the Vesperine graves. Some of the plots beneath are empty.)\n\nTO THE BROTHERS OF THE VESPER BELL, AND TO THOSE OF THIS PARISH WHO WENT WITH THEM, AT THE LONG VESPERS: WHO WERE NOT FOUND."
+    }
+  ]
+}

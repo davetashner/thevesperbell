@@ -1,11 +1,14 @@
 // Player mixer (mw-e28.5): the audio settings' volume sliders, mute-when-hidden, mono and night
 // mode drive the engine. Pure logic over structural interfaces so Node tests cover it; the browser
 // glue is `documentVisibility` in browser.ts and one `bindMixer` call in main.ts.
-import { dbToGain } from './buses.ts';
 import type { BusId } from './manifest.ts';
 
-/** Quietest audible level; slider 0 is exact mute below it. */
-export const MIN_DB = -60;
+/**
+ * Perceptual slider curve (mw-e31.9): linear gain = slider ^ SLIDER_EXPONENT. A 10 dB drop sounds
+ * about half as loud, so 50% lands at -10 dB (0.5 ^ 5/3 = 0.315) and 100% is unity. Low positions
+ * fall away quickly (10% is about -33 dB) and 0 is exact mute.
+ */
+export const SLIDER_EXPONENT = 5 / 3;
 
 /** Seconds every mixer change ramps over, so nothing clicks. */
 export const MIXER_RAMP_S = 0.05;
@@ -44,10 +47,10 @@ const KEYS: readonly MixerKey[] = [
   'audio.nightMode',
 ];
 
-/** Slider position 0–1 to linear gain: 0 is exactly 0, otherwise −60 dB at the bottom up to 0 dB. */
+/** Slider position 0–1 to linear gain on the perceptual curve; 0 and bad input are exact mute. */
 export function sliderToGain(slider: number): number {
   if (!(slider > 0)) return 0;
-  return dbToGain(MIN_DB * (1 - Math.min(1, slider)));
+  return Math.min(1, slider) ** SLIDER_EXPONENT;
 }
 
 export interface MixerEngine {

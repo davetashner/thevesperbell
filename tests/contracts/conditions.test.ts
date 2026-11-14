@@ -15,7 +15,10 @@ import {
   COUNT_PATTERN,
   ConditionError,
   declareFacts,
+  ENTITY_MATCHES,
   formatExplanation,
+  SIGNAL_REF,
+  SUSTAINED_MAX_SECONDS,
   World,
   type Condition,
 } from '@sim/index';
@@ -90,5 +93,43 @@ describe('condition contract', () => {
     expect(compiled.evaluate(world.facts)).toBe(true);
     world.facts.set('horn.fate', 'dead');
     expect(compiled.evaluate(world.facts)).toBe(false);
+  });
+});
+
+describe('live condition contract (mw-e15.2)', () => {
+  it('content and sim share the signal reference, hold limit and match modes', () => {
+    expect(content.SIGNAL_REF.source).toBe(SIGNAL_REF.source);
+    expect(content.SUSTAINED_MAX_SECONDS).toBe(SUSTAINED_MAX_SECONDS);
+    expect(content.ENTITY_MATCHES).toEqual(ENTITY_MATCHES);
+  });
+
+  it('a live condition content accepts compiles in the sim and reads what it says', () => {
+    const parsed: Condition = content.conditionSchema.parse({
+      all: [
+        {
+          entities: { tag: 'brazier' },
+          where: [{ test: 'element', element: 'fire' }],
+          match: 'all',
+        },
+        { signal: 'vault/gate', port: 'out' },
+        {
+          sustained: {
+            entities: {},
+            where: [{ test: 'property', property: 'weight', op: 'gte', value: 40 }],
+            inside: {
+              kind: 'box',
+              center: { x: 0, y: 0, z: 0 },
+              halfExtents: { x: 1, y: 1, z: 1 },
+            },
+            match: 'any',
+          },
+          seconds: 3,
+        },
+      ],
+    });
+    const { live } = compileCondition(parsed);
+    expect(live.properties).toEqual(['burning', 'weight']);
+    expect(live.signals).toEqual([{ graph: 'vault', node: 'gate', port: 'out' }]);
+    expect([live.structure, live.spatial, live.timed, live.tags]).toEqual([true, true, true, true]);
   });
 });

@@ -1,0 +1,57 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "wendmouth-areas",
+  "name": "Wendmouth quest areas",
+  "notes": "Player volumes that are quest areas (enterArea objectives of The Crate for Mr. S—, mw-e39.21): the Bonded Warehouse hall and bay nine, and the Undertow vault. Entering either completes its case-the-warehouse or visit-the-undertow objective. The node ids are the area ids.",
+  "nodes": [
+    {
+      "id": "bonded-warehouse",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 50,
+          "y": 1.5,
+          "z": 53
+        },
+        "halfExtents": {
+          "x": 15.5,
+          "y": 3,
+          "z": 16.5
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "undertow",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 86,
+          "y": -3,
+          "z": 35
+        },
+        "halfExtents": {
+          "x": 12,
+          "y": 1.8,
+          "z": 14.5
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    }
+  ],
+  "wires": []
+}

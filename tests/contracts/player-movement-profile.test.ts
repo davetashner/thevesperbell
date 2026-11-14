@@ -10,6 +10,7 @@ import {
   actionVector,
   box,
   CharacterEncumbrance,
+  DEFAULT_FOOTSTEP_SURFACES,
   DEFAULT_STEALTH_TUNING,
   FakeCollisionWorld,
   installPlayer,
@@ -56,7 +57,10 @@ function player() {
 
 describe('the shipped player’s movement profiles (mw-e02.10)', () => {
   it('states the sim’s default stealth tuning', () => {
-    expect(tuning.stealth).toEqual(DEFAULT_STEALTH_TUNING);
+    expect(tuning.stealth).toEqual({
+      ...DEFAULT_STEALTH_TUNING,
+      surfaces: DEFAULT_FOOTSTEP_SURFACES,
+    });
   });
 
   it('AC-1: crouch-walking at the crouch speed is 0.15 noise at the crouch capsule’s height', () => {

@@ -1,0 +1,93 @@
+{
+  "id": "vfx-element-charge-arc",
+  "notes": "Charged state (mw-e03.28), grey-box: short jagged yellow-white arcs thrown off in every direction (style bible \u00a72.3 Storm: instant, jagged; #FFF36B, white core, #5B6CFF accent) over a steady soft glow. Each arc lives about a tenth of a second and they are small and unsynchronised, so there is no screen flash (3 Hz and 25 % area limits); reduced motion emits a quarter as many. Final art: mw-e29 asset beads.",
+  "priority": 40,
+  "duration": 1,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "arcs",
+      "texture": "vfx-base-spark-streak-01",
+      "blend": "additive",
+      "rate": 36,
+      "lifetime": {
+        "min": 0.08,
+        "max": 0.16
+      },
+      "speed": {
+        "min": 1.5,
+        "max": 3
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.3,
+      "gravity": 0,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.32
+        },
+        {
+          "t": 1,
+          "v": 0.1
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 0.5,
+          "color": "#FFF36B"
+        },
+        {
+          "t": 1,
+          "color": "#5B6CFF"
+        }
+      ]
+    },
+    {
+      "id": "glow",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 4,
+      "lifetime": {
+        "min": 0.5,
+        "max": 0.7
+      },
+      "speed": {
+        "min": 0,
+        "max": 0.1
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.2,
+      "gravity": 0,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.3
+        },
+        {
+          "t": 1,
+          "v": 0.4
+        }
+      ],
+      "color": "#FFF36B",
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0
+        },
+        {
+          "t": 0.4,
+          "v": 0.3
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ],
+      "minTier": "high"
+    }
+  ]
+}

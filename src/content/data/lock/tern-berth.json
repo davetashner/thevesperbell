@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "tern-berth",
+  "name": "Gilded Tern passenger berth lock",
+  "notes": "The locked passenger berth of Mr. S—'s agent in the Gilded Tern's stern cabin (mw-e40.1, route is mw-e40.14; route-matrix gilded-tern): a tier-3 lock a thief picks (tool.lockpick). No key lies about.",
+  "tier": 3,
+  "pickTier": 3,
+  "hint": "Locked. Somebody on the other side is very quiet."
+}

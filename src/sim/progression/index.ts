@@ -2,5 +2,6 @@
 // the capability-unlock rules with prerequisite chains (mw-e19.3); applying a class at new game
 // (mw-e19.5).
 export * from './capabilities';
+export * from './capability-checkpoint';
 export * from './classes';
 export * from './unlocks';

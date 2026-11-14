@@ -34,13 +34,15 @@ export interface CommandSpec<TArgs, THost> {
   readonly args: z.ZodType<TArgs>;
   /** Candidates for argument `index` (0-based), filtered by the typed prefix. */
   readonly complete?: (index: number, host: THost) => readonly string[];
-  run(args: TArgs, host: THost): ConsoleReply;
+  run(args: TArgs, host: THost): ConsoleRun;
 }
 
 /** The outcome of one typed line. */
 export interface ConsoleResult {
   readonly ok: boolean;
   readonly lines: readonly string[];
+  /** Set when the command is still working (mw-e27.6): what it prints once it finishes. */
+  readonly later?: Promise<ConsoleResult>;
 }
 
 /** The outcome of Tab: the new input line and, when ambiguous, the candidates. */
@@ -50,6 +52,9 @@ export interface Completion {
 }
 
 type AnyCommand<THost> = CommandSpec<unknown, THost>;
+
+/** What `run` may return: a reply now, or a promise of one (a command that reads storage). */
+export type ConsoleRun = ConsoleReply | Promise<ConsoleReply>;
 
 const lines = (reply: ConsoleReply): readonly string[] =>
   reply === undefined ? [] : typeof reply === 'string' ? [reply] : reply;
@@ -115,11 +120,22 @@ export class CommandRegistry<THost> {
         ],
       };
     }
+    const failed = (error: unknown): ConsoleResult =>
+      error instanceof ConsoleError
+        ? { ok: false, lines: error.lines }
+        : { ok: false, lines: [`${spec.name} failed: ${String(error)}`] };
     try {
-      return { ok: true, lines: lines(spec.run(parsed.data, this.host)) };
+      const reply = spec.run(parsed.data, this.host);
+      if (reply instanceof Promise) {
+        const later = reply.then(
+          (done): ConsoleResult => ({ ok: true, lines: lines(done) }),
+          failed,
+        );
+        return { ok: true, lines: [], later };
+      }
+      return { ok: true, lines: lines(reply) };
     } catch (error) {
-      if (error instanceof ConsoleError) return { ok: false, lines: error.lines };
-      return { ok: false, lines: [`${spec.name} failed: ${String(error)}`] };
+      return failed(error);
     }
   }
 

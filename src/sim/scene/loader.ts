@@ -19,6 +19,7 @@ import {
   type SceneSpawnPlacement,
   type SceneSpec,
 } from './layout';
+import { presentSpawnIds } from './variants';
 
 /** Marks every entity a scene load created (`scene.member`; a snapshot key, never renamed). */
 export interface SceneMember {
@@ -72,7 +73,10 @@ export function registerSceneComponents<T>(world: World<T>): World<T> {
 /** What a load created, for unloading and for binding render objects. */
 export interface LoadedScene {
   readonly id: string;
+  /** The scene as loaded: its spawns are those that exist now (spawnIf, despawnIf, variants, mw-e27.8). */
   readonly layout: SceneLayout;
+  /** Every spawn the scene authors, those its gates left out at load included (mw-e27.8). */
+  readonly authoredSpawns: readonly SceneSpawnPlacement[];
   /** The scene's root entity (identity transform); the static geometry binds to it. */
   readonly root: EntityId;
   /** One entity per placement, in scene order. */
@@ -95,6 +99,32 @@ function spawnMember<T>(world: World<T>, scene: string, transform: SceneTransfor
 }
 
 /**
+ * Spawns the entity of one scene spawn (member, transform and spawn components). `loadScene` does it
+ * for every spawn that exists at load; a spawn a fact brought in later (mw-e27.8) is made the same way.
+ */
+export function spawnSceneSpawn<T>(
+  world: World<T>,
+  scene: string,
+  spawn: SceneSpawnPlacement,
+): EntityId {
+  const entity = spawnMember(
+    world,
+    scene,
+    Object.freeze({ position: spawn.position, rotation: spawn.rotation }),
+  );
+  world.add(
+    entity,
+    SceneSpawnComponent,
+    Object.freeze({
+      id: spawn.id,
+      ...(spawn.prop !== undefined && { prop: spawn.prop }),
+      tags: spawn.tags,
+    }),
+  );
+  return entity;
+}
+
+/**
  * Loads `scene` into `world` (which must have the scene components registered) and its solid parts
  * into `colliders`.
  * @throws SceneLayoutError when the scene names a kit piece `kit` does not have (nothing is loaded).
@@ -105,7 +135,15 @@ export function loadScene<T>(
   kit: KitLookup,
   colliders: StaticColliderSink,
 ): LoadedScene {
-  const layout = layoutScene(scene, kit);
+  const authored = layoutScene(scene, kit);
+  const present = new Set(presentSpawnIds(authored.spawns, world.facts));
+  const layout =
+    present.size === authored.spawns.length
+      ? authored
+      : Object.freeze({
+          ...authored,
+          spawns: Object.freeze(authored.spawns.filter(({ id: spawn }) => present.has(spawn))),
+        });
   const id = layout.id;
   const root = spawnMember(world, id, IDENTITY);
   const pieces = layout.pieces.map((piece) => {
@@ -127,29 +165,16 @@ export function loadScene<T>(
     );
     return entity;
   });
-  const spawns = layout.spawns.map((spawn) => {
-    const entity = spawnMember(
-      world,
-      id,
-      Object.freeze({ position: spawn.position, rotation: spawn.rotation }),
-    );
-    world.add(
-      entity,
-      SceneSpawnComponent,
-      Object.freeze({
-        id: spawn.id,
-        ...(spawn.prop !== undefined && { prop: spawn.prop }),
-        tags: spawn.tags,
-      }),
-    );
-    return Object.freeze({ entity, spawn });
-  });
+  const spawns = layout.spawns.map((spawn) =>
+    Object.freeze({ entity: spawnSceneSpawn(world, id, spawn), spawn }),
+  );
   const handles = layout.parts.flatMap((part) =>
     part.collider === undefined ? [] : [colliders.add(part.collider)],
   );
   return Object.freeze({
     id,
     layout,
+    authoredSpawns: authored.spawns,
     root,
     pieces: Object.freeze(pieces),
     spawns: Object.freeze(spawns),

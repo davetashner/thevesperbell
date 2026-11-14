@@ -48,7 +48,8 @@
                     "properties": {
                       "kind": {
                         "type": "string",
-                        "const": "box"
+                        "const": "box",
+                        "description": "Shape: an axis-aligned box."
                       },
                       "center": {
                         "type": "object",
@@ -71,7 +72,8 @@
                           "y",
                           "z"
                         ],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "description": "Centre of the box, metres."
                       },
                       "halfExtents": {
                         "type": "object",
@@ -113,7 +115,8 @@
                     "properties": {
                       "kind": {
                         "type": "string",
-                        "const": "sphere"
+                        "const": "sphere",
+                        "description": "Shape: a sphere."
                       },
                       "center": {
                         "type": "object",
@@ -136,7 +139,8 @@
                           "y",
                           "z"
                         ],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "description": "Centre of the sphere, metres."
                       },
                       "radius": {
                         "type": "number",
@@ -156,7 +160,8 @@
                     "properties": {
                       "kind": {
                         "type": "string",
-                        "const": "capsule"
+                        "const": "capsule",
+                        "description": "Shape: a capsule, a segment swept by a radius."
                       },
                       "from": {
                         "type": "object",
@@ -179,7 +184,8 @@
                           "y",
                           "z"
                         ],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "description": "One end of the capsule’s segment, metres."
                       },
                       "to": {
                         "type": "object",
@@ -202,7 +208,8 @@
                           "y",
                           "z"
                         ],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "description": "The other end of the capsule’s segment, metres."
                       },
                       "radius": {
                         "type": "number",
@@ -242,6 +249,7 @@
                             "fuel",
                             "burning",
                             "wetness",
+                            "absorbency",
                             "frozen",
                             "freezePoint",
                             "conductive",
@@ -333,6 +341,30 @@
                       "required": [
                         "test",
                         "tag"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "test": {
+                          "type": "string",
+                          "const": "facing"
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": [
+                            "north",
+                            "east",
+                            "south",
+                            "west"
+                          ],
+                          "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                        }
+                      },
+                      "required": [
+                        "test",
+                        "facing"
                       ],
                       "additionalProperties": false
                     },
@@ -487,6 +519,7 @@
                             "fuel",
                             "burning",
                             "wetness",
+                            "absorbency",
                             "frozen",
                             "freezePoint",
                             "conductive",
@@ -578,6 +611,30 @@
                       "required": [
                         "test",
                         "tag"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "test": {
+                          "type": "string",
+                          "const": "facing"
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": [
+                            "north",
+                            "east",
+                            "south",
+                            "west"
+                          ],
+                          "description": "Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east."
+                        }
+                      },
+                      "required": [
+                        "test",
+                        "facing"
                       ],
                       "additionalProperties": false
                     },
@@ -878,6 +935,49 @@
               },
               "kind": {
                 "type": "string",
+                "const": "clue"
+              },
+              "cues": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "description": "Cue ids sounded in order, e.g. \"chime-low\"; a cue sheet rule maps each to a sound."
+              },
+              "spacing": {
+                "description": "Seconds between cues; default 1. The first sounds on the rising edge.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "entity": {
+                "description": "Where the sound comes from (a spawn); without one the cues have no position.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "cues"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Node id, unique in the graph; wires refer to it."
+              },
+              "observed": {
+                "description": "Outputs are read outside the graph (puzzle goal, quest), so unwired is fine.",
+                "type": "boolean"
+              },
+              "kind": {
+                "type": "string",
                 "const": "receiver"
               },
               "receiver": {
@@ -965,6 +1065,12 @@
                     "minimum": 0,
                     "maximum": 1,
                     "description": "How soaked it is (dry … saturated), 0 … 1."
+                  },
+                  "absorbency": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1."
                   },
                   "frozen": {
                     "type": "boolean",
@@ -1280,6 +1386,12 @@
                     "minimum": 0,
                     "maximum": 1,
                     "description": "How soaked it is (dry … saturated), 0 … 1."
+                  },
+                  "absorbency": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1."
                   },
                   "frozen": {
                     "type": "boolean",

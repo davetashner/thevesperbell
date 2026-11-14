@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "undertow-trapdoor",
+  "name": "Drowned Gull cellar trapdoor lock",
+  "notes": "The cellar door under the Drowned Gull, the trapdoor to the Undertow (mw-e40.1, route is mw-e40.6 and mw-e40.12): locked until Nell Gannet opens it or the thief finds the trap (fact world.undertow.trapdoor-found). Tier 2, cannot be picked.",
+  "tier": 2,
+  "pickTier": null,
+  "hint": "A trapdoor under the bar. Nell has the key."
+}

@@ -57,3 +57,10 @@ export {
 export * from './screen-feedback.ts';
 export * from './trail-controller.ts';
 export * from './trail-tints.ts';
+export * from './element-feedback.ts';
+export * from './element-fields.ts';
+export * from './element-look.ts';
+export * from './magic-materials.ts';
+export * from './corpse-glue.ts';
+export * from './arrow-fx.ts';
+export * from './awareness-fx.ts';

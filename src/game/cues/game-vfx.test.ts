@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { loadGameContent } from '@content/index';
+import { loadGameContent, vfxCueSheetSchema } from '@content/index';
 import { addProperties, fireIgnited, registerWorldProperties, World } from '@sim/index';
 import type { VfxSpawnOptions } from '../vfx/index.ts';
 import { attachGameVfx } from './game-vfx.ts';
 
 const content = loadGameContent();
+const fireSheet = vfxCueSheetSchema.parse({
+  id: 'fire-loop-test',
+  notes: 'A looping flame, for the wiring test (the burning loop itself is the element bridge’s).',
+  rules: [{ event: 'fireIgnited', layer: 'fire', effect: 'vfx-fire-burn-loop' }],
+});
 
 describe('game VFX wiring (mw-e29.3)', () => {
   it('spawns the shipped sheets’ effects for world events until detached', () => {
@@ -18,7 +23,7 @@ describe('game VFX wiring (mw-e29.3)', () => {
         alive: () => true,
         has: () => true,
       },
-      sheets: content.all('vfx-cue-sheet'),
+      sheets: [...content.all('vfx-cue-sheet'), fireSheet],
       materials: content.all('material'),
       arrows: content.all('arrow'),
       locate: () => ({ position: { x: 0, y: 0, z: 0 } }),

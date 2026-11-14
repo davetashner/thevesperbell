@@ -105,4 +105,24 @@ describe('CommandRegistry', () => {
     expect(r.list().map((c) => c.name)).toEqual(['boom', 'lines', 'say']);
     expect(r.get('say')?.summary).toBe('say words');
   });
+
+  it('hands back a command that is still working as `later` (mw-e27.6)', async () => {
+    const r = new CommandRegistry({});
+    const spec = { summary: '', usage: '', args: z.tuple([]) };
+    r.registerCommand({ ...spec, name: 'slow', run: () => Promise.resolve(['a', 'b']) });
+    r.registerCommand({
+      ...spec,
+      name: 'slow-nice',
+      run: () => Promise.reject(new ConsoleError(['no slot'])),
+    });
+    r.registerCommand({ ...spec, name: 'slow-bug', run: () => Promise.reject(new Error('bug')) });
+    const slow = r.execute('slow');
+    expect(slow).toMatchObject({ ok: true, lines: [] });
+    await expect(slow.later).resolves.toEqual({ ok: true, lines: ['a', 'b'] });
+    await expect(r.execute('slow-nice').later).resolves.toEqual({ ok: false, lines: ['no slot'] });
+    await expect(r.execute('slow-bug').later).resolves.toEqual({
+      ok: false,
+      lines: ['slow-bug failed: Error: bug'],
+    });
+  });
 });

@@ -30,6 +30,10 @@
 //    (mw-e05.21): arrows the player's bow looses fly against the level (the collision world given)
 //    and every hurtbox, honouring the same i-frames, and resolve hits through the same damage model.
 //
+// Wall recoil (mw-e04.15): right after the hit-volume system, the player's horizontal medium and long
+// swings that meet the level (the collision world given) in the first half of their window, before
+// any creature, end in a 30-tick recoil and a WallRecoil event.
+//
 // The player's bow (mw-e05.21): `bow` goes to setupTestbedPlayer with the shortbow and a testbed
 // quiver (TESTBED_QUIVER), put away at the start so the attack button still swings the sword. Its
 // buttons (TESTBED_BOW_BUTTONS) keep clear of the knight's parry on ability 3.
@@ -43,6 +47,7 @@ import {
   compileBow,
   compileHitStop,
   compileMoves,
+  compileReachClasses,
   compileSandbox,
   compileShield,
   compileSocketTracks,
@@ -50,6 +55,7 @@ import {
   HIT_STOP_ID,
   KNIGHT_SHIELD_ID,
   PLAYER_CONTROLLER_ID,
+  REACH_CLASS_TABLE_ID,
   TRAINING_DUMMY_TARGETABLE_ID,
   type ControllerTuning,
   type EnvironmentDamageTuning,
@@ -57,6 +63,8 @@ import {
   type GameContent,
   type HitStopTable,
   type MoveTable,
+  type ReachTable,
+  materialPresets,
 } from '@content/index';
 import {
   ACTION_TIMELINE_COMPONENTS,
@@ -82,6 +90,7 @@ import {
   installHitReactions,
   installKick,
   installArrows,
+  installArrowRetrieval,
   installHitStop,
   installMeleeStrikes,
   installParry,
@@ -93,7 +102,9 @@ import {
   KNIGHT_SHIELD_BASH,
   makePushable,
   MELEE_COMPONENTS,
+  type MaterialPresets,
   noAllies,
+  playerViewRule,
   PhysicsObjectComponent,
   PlacementComponent,
   pushCharacter,
@@ -118,6 +129,7 @@ import {
   type SocketTrackLookup,
   type Spawner,
   type World,
+  wallRecoilSystem,
 } from '@sim/index';
 import { spawnTrainingDummy, trainingDummySpawns } from './training-dummy';
 
@@ -164,6 +176,8 @@ export interface TestbedCombat {
   readonly damage: DamageModel;
   /** Hit-stop ticks per hit tier (mw-e04.11). */
   readonly hitStop: HitStopTable;
+  /** Reach class metres and the wall recoil rule (mw-e04.15). */
+  readonly reach: ReachTable;
   /** The combat sandbox's tuning and move table (mw-e04.9). */
   readonly sandbox: CombatSandboxOptions;
   /** The debug console's spawners for the sandbox's dummies (`dummy`, `attacker-dummy`). */
@@ -178,6 +192,8 @@ export interface TestbedCombat {
   readonly bow: TestbedBow;
   /** Each creature's size class, by creature id (the kick knocks back small ones, mw-e04.18). */
   readonly creatureSizes: ReadonlyMap<string, string>;
+  /** Material presets, which make an arrow at rest a wooden thing that can burn (mw-e05.7). */
+  readonly materials: MaterialPresets;
 }
 
 /** Compiles the knight's combat from `content` (see the file header, step 1). */
@@ -206,12 +222,14 @@ export function prepareTestbedCombat(content: GameContent): TestbedCombat {
     },
     damage,
     hitStop: compileHitStop(content.get('hit-stop', HIT_STOP_ID)),
+    reach: compileReachClasses(content.get('reach-class', REACH_CLASS_TABLE_ID)),
     sandbox,
     spawners: sandboxSpawners(sandbox),
     targetable,
     character: content.get('controller', PLAYER_CONTROLLER_ID),
     environment: content.get('environment-damage', DEFAULT_ENVIRONMENT_DAMAGE_ID),
     creatureSizes: new Map(content.all('creature').map((c) => [c.id, c.stats.size])),
+    materials: materialPresets(content.all('material')),
     bow: {
       bows: bowLookup(content.all('bow').map(compileBow)),
       arrows: arrowLookup(content.all('arrow')),
@@ -322,6 +340,18 @@ export function startTestbedCombat<TInput>(
   world.addSystem(
     hitVolumeSystem({ isAlly: noAllies, invulnerable: invulnerabilityRule(combat.moves) }),
   );
+  // The player's horizontal medium and long swings clang off the level (mw-e04.15); without a level
+  // to probe, or without a player, nothing recoils.
+  if (collision !== undefined && player !== undefined) {
+    world.addSystem(
+      wallRecoilSystem({
+        moves: combat.moves,
+        reach: combat.reach,
+        collision,
+        recoils: (_, entity) => entity === player,
+      }),
+    );
+  }
   installMeleeStrikes(world, combat);
   installHitStop(world, { moves: combat.moves, table: combat.hitStop });
   installParry(world, {
@@ -349,6 +379,14 @@ export function startTestbedCombat<TInput>(
       arrows: combat.bow.arrows,
       damage: combat.damage,
       invulnerable: invulnerabilityRule(combat.moves),
+      ...(collision !== undefined && { collision }),
+    });
+    // Arrows stay where they land and can be taken back (mw-e05.7). What counts as in view for the
+    // 64-arrow cap is read from the player's position and look, never from the camera (view.ts).
+    installArrowRetrieval(world, {
+      arrows: combat.bow.arrows,
+      inView: playerViewRule(),
+      materials: combat.materials,
       ...(collision !== undefined && { collision }),
     });
   }

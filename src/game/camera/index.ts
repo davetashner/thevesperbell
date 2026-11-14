@@ -2,6 +2,7 @@
 // (mw-e05.21).
 export * from './aim-zoom';
 export * from './lock-framing';
+export * from './look-options';
 export * from './occlusion';
 export * from './orbit-camera';
 export * from './shake';

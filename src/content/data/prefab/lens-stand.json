@@ -1,0 +1,66 @@
+{
+  "$schema": "../prefab.schema.json",
+  "id": "lens-stand",
+  "name": "Lens stand",
+  "description": "A lens on a stand: a beam passing through it comes out stronger (focused), enough to light a receiver that needs more than a sunbeam. Turns in steps with Interact.",
+  "tags": ["light", "weight"],
+  "parameters": {
+    "focus": {
+      "type": "number",
+      "description": "Intensity multiplier of a beam that passes through.",
+      "min": 1,
+      "max": 8,
+      "default": 2
+    },
+    "stepAngle": {
+      "type": "number",
+      "description": "Degrees one turn rotates the lens.",
+      "unit": "degrees",
+      "min": 5,
+      "max": 180,
+      "default": 90
+    }
+  },
+  "spawns": [
+    {
+      "local": "lens",
+      "at": [0, 0, 0],
+      "prop": "lens-stand",
+      "properties": {
+        "pushable": true,
+        "opaque": false
+      },
+      "optic": {
+        "kind": "lens",
+        "normal": [0, 0, -1],
+        "radius": 0.5,
+        "focus": "$focus"
+      },
+      "push": {
+        "rotateStep": "$stepAngle"
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "rotate",
+            "label": "Turn lens"
+          }
+        ]
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "name": "turn",
+      "description": "Interact turns the lens by one step.",
+      "spawn": "lens"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "lens",
+      "description": "The lens entity: a beam through it is multiplied by its focus.",
+      "spawn": "lens"
+    }
+  ]
+}

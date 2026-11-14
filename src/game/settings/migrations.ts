@@ -38,9 +38,39 @@ const v1ToV2: SettingsMigration = (settings) => {
   return next;
 };
 
+/**
+ * v2 → v3: the crouch hold-or-toggle option shipped before it did anything, with a default of toggle.
+ * It now drives the crouch key (mw-e31.3) and defaults to hold, so a value stored while it was inert
+ * is dropped rather than suddenly changing how the key behaves.
+ */
+const v2ToV3: SettingsMigration = (settings) => {
+  const controls = settings['controls'];
+  if (!isRecord(controls) || !('crouch' in controls)) return settings;
+  const rest = Object.fromEntries(Object.entries(controls).filter(([key]) => key !== 'crouch'));
+  return { ...settings, controls: rest };
+};
+
+/**
+ * v3 → v4: the placeholder difficulty choices Story / Normal / Hard become the real presets
+ * (mw-e31.10): Normal is Adventurer and Hard is Veteran; Story keeps its name. Anything else is left
+ * for the repair step, which falls back to the default.
+ */
+const v3ToV4: SettingsMigration = (settings) => {
+  const gameplay = settings['gameplay'];
+  if (!isRecord(gameplay)) return settings;
+  const renamed: Record<string, string> = { normal: 'adventurer', hard: 'veteran' };
+  const stored = gameplay['difficulty'];
+  const next = typeof stored === 'string' ? renamed[stored] : undefined;
+  return next === undefined
+    ? settings
+    : { ...settings, gameplay: { ...gameplay, difficulty: next } };
+};
+
 /** `SETTINGS_MIGRATIONS[n]` upgrades version n to n + 1. */
 export const SETTINGS_MIGRATIONS: Readonly<Record<number, SettingsMigration>> = Object.freeze({
   1: v1ToV2,
+  2: v2ToV3,
+  3: v3ToV4,
 });
 
 /**

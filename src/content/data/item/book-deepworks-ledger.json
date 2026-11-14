@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-deepworks-ledger",
+  "category": "book",
+  "name": "Deepworks Ledger",
+  "description": "Deepworks Ledger, by Vane Deepworks, clerk's hand.",
+  "notes": "Inventory item for the story book text data/book/book-deepworks-ledger.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-deepworks-ledger.page-<n>. Value 60 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-deepworks-ledger-01",
+  "value": 60,
+  "stackable": false,
+  "book": {
+    "title": "Deepworks Ledger",
+    "author": "Vane Deepworks, clerk's hand",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-deepworks-ledger.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "rare"
+  }
+}

@@ -63,6 +63,13 @@
         "predator"
       ]
     },
+    "dispositionSpread": {
+      "default": 0,
+      "description": "Fraction of a change in one member’s disposition toward the player that the other members take too (mw-e22.4): 0.5 turns -20 into -10 for each. 0 = members judge the player alone.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
     "relations": {
       "description": "Stances toward specific factions that differ from `towardOthers`.",
       "default": [],

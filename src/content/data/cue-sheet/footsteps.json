@@ -12,7 +12,8 @@
       "pitchJitter": 0.04,
       "volumeJitterDb": 1,
       "priority": 30,
-      "caption": "caption.footsteps"
+      "caption": "caption.footsteps",
+      "gameplayCritical": true
     },
     {
       "event": "LocomotionEvents",
@@ -25,7 +26,8 @@
       "pitchJitter": 0.04,
       "volumeJitterDb": 1,
       "priority": 30,
-      "caption": "caption.footsteps"
+      "caption": "caption.footsteps",
+      "gameplayCritical": true
     },
     {
       "event": "LocomotionEvents",
@@ -39,7 +41,8 @@
       "volumeJitterDb": 1,
       "volumeDb": 3,
       "priority": 30,
-      "caption": "caption.footsteps"
+      "caption": "caption.footsteps",
+      "gameplayCritical": true
     },
     {
       "event": "LocomotionEvents",
@@ -53,7 +56,8 @@
       "volumeJitterDb": 1,
       "volumeDb": -10,
       "priority": 30,
-      "caption": "caption.footsteps"
+      "caption": "caption.footsteps",
+      "gameplayCritical": true
     },
     {
       "event": "LocomotionEvents",

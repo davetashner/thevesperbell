@@ -93,8 +93,8 @@ describe('rebind', () => {
     expect(bindings.jump).toEqual(['KeyF']);
     bindings = rebound(bindings, 'jump', 'KeyH', 1);
     expect(bindings.jump).toEqual(['KeyF', 'KeyH']);
-    bindings = rebound(bindings, 'jump', 'KeyJ', 1);
-    expect(bindings.jump).toEqual(['KeyF', 'KeyJ']);
+    bindings = rebound(bindings, 'jump', 'KeyN', 1);
+    expect(bindings.jump).toEqual(['KeyF', 'KeyN']);
   });
 
   it('rejects bad slots and empty codes', () => {
@@ -190,7 +190,7 @@ describe('serialise / deserialise (the settings-store seam, mw-e02.22)', () => {
 });
 
 describe('gamepad bindings (mw-e02.9)', () => {
-  it('the default Xbox layout binds every button action but cycle target, slow walk (a light stick), drop and throw (on the inventory screen, mw-e17.10), with no conflicts', () => {
+  it('the default Xbox layout binds every button action but cycle target, slow walk (a light stick), drop and throw (on the inventory screen, mw-e17.10) and the journal (the pause menu, mw-e23.6), with no conflicts', () => {
     expect(findConflicts(DEFAULT_PAD_BINDINGS)).toEqual([]);
     expect(DEFAULT_PAD_BINDINGS.jump).toEqual(['PadA']);
     expect(DEFAULT_PAD_BINDINGS.crouch).toEqual(['PadRS']);
@@ -216,6 +216,7 @@ describe('gamepad bindings (mw-e02.9)', () => {
       ...Array.from({ length: 8 }, (_, i) => `spellSlot${String(i + 1)}`),
       'spellPrev',
       'spellNext',
+      'journal',
       'drop',
       'throw',
     ]);

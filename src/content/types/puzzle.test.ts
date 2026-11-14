@@ -50,7 +50,16 @@ const valid = {
   ],
   tags: [MVP_TAG],
   focus: ['knight', 'sorcerer'],
-  outputs: { solvedFact: 'test.solved', set: [{ fact: 'test.door-open', value: true }] },
+  discovery: {
+    volume: { kind: 'box', center: { x: 0, y: 1, z: 0 }, halfExtents: { x: 2, y: 2, z: 2 } },
+    interact: 'lever',
+  },
+  outputs: {
+    solvedFact: 'test.solved',
+    set: [{ fact: 'test.door-open', value: true }],
+    signals: ['test-room/gate-open'],
+    rewards: ['test-reward'],
+  },
 } satisfies PuzzleInput;
 
 const problems = (value: unknown) =>
@@ -69,6 +78,7 @@ describe('puzzle schema (mw-e15.1)', () => {
         steps: [{ do: 'reach', target: 'plate' }],
       })),
       policy: undefined,
+      discovery: undefined,
       hints: undefined,
       tags: undefined,
       focus: undefined,
@@ -81,8 +91,27 @@ describe('puzzle schema (mw-e15.1)', () => {
       [],
       [],
     ]);
+    expect([minimal.outputs.signals, minimal.outputs.rewards, minimal.discovery]).toEqual([
+      [],
+      [],
+      undefined,
+    ]);
     expect(minimal.entities[0]?.critical).toBe(false);
     expect(minimal.solutions[0]?.capabilities).toEqual([]);
+  });
+
+  it('mw-e15.11: a hint tier may be a rumour alone; failure signals default to none and must be graph/node', () => {
+    expect(
+      problems({
+        ...valid,
+        hints: [{ afterSeconds: 60, rumour: 'test.heard' }],
+        failures: [{ signal: 'bells/order', port: 'failed' }],
+      }),
+    ).toEqual([]);
+    expect(puzzleSchema.parse({ ...valid, failures: undefined }).failures).toEqual([]);
+    expect(problems({ ...valid, failures: [{ signal: 'bells' }] })).toEqual([
+      'failures.0.signal: must be "<graph>/<node>"',
+    ]);
   });
 
   it('AC-3: an mvp puzzle with fewer than 2 declared solutions fails', () => {
@@ -168,9 +197,29 @@ describe('puzzle schema (mw-e15.1)', () => {
     ).toEqual([
       'solutions.0.capabilities.0: must be a capability id, e.g. "spell.mage-hand"',
       "solutions.1.steps.0.do: Invalid discriminator value. Expected 'stimulus' | 'move' | 'interact' | 'reach' | 'wait'",
-      'hints.0: a hint tier needs a bark or a highlight',
+      'hints.0: a hint tier needs a bark, a highlight or a rumour',
       'focus.0: Invalid option: expected one of "knight"|"archer"|"sorcerer"|"thief"',
       'outputs.solvedFact: must be a fact key',
+    ]);
+  });
+});
+
+describe('puzzle discovery and outputs (mw-e15.3)', () => {
+  it('needs a volume or a trigger, names a listed trigger, and checks signal ids', () => {
+    expect(problems({ ...valid, discovery: {} })).toEqual([
+      'discovery: needs a volume or an interact trigger',
+    ]);
+    expect(problems({ ...valid, discovery: { interact: 'door' } })).toEqual([
+      'discovery.interact: "door" is not one of the puzzle\'s entities',
+    ]);
+    expect(
+      problems({
+        ...valid,
+        outputs: { solvedFact: 'test.solved', signals: ['gate'], rewards: ['No'] },
+      }),
+    ).toEqual([
+      'outputs.signals.0: must be "<graph>/<node>"',
+      'outputs.rewards.0: must be lowercase kebab-case, e.g. "forgotten-miner"',
     ]);
   });
 });

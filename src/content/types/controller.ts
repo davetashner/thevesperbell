@@ -261,6 +261,12 @@ export const climbTuningSchema = z
       .describe(
         'Stamina drained while climbing (characters with a stamina pool), stamina/s; at 0 stamina the climber falls. Progression may change it (mw-e10.9).',
       ),
+    staminaByDifficulty: z
+      .tuple([z.number().min(0).max(10), z.number().min(0).max(10), z.number().min(0).max(10)])
+      .optional()
+      .describe(
+        'Multiplier on staminaPerSecond for climb difficulty 1, 2 and 3 (ladders, ropes and ivy / rough stone and timber / sheer faces), so harder climbs tire faster (mw-e10.9); absent = 1, 1.5 and 2.',
+      ),
     jumpOff: z
       .strictObject({
         away: z.number().min(0).max(20).describe('Speed away from the surface, m/s.'),
@@ -427,6 +433,33 @@ const stanceTableSchema = z
   )
   .describe('Noise and visibility for every stance × gait (every combination must be defined).');
 
+/** What the state of the ground adds to a footstep's loudness (mw-e02.11). */
+export const footstepSurfacesSchema = z
+  .strictObject({
+    wetFrom: z
+      .number()
+      .min(0)
+      .max(1)
+      .describe('Wetness at or above which a step on the ground counts as wet, 0–1.'),
+    wetDb: z
+      .number()
+      .min(-20)
+      .max(20)
+      .describe('What a wet surface adds to the material’s footstep loudness (splash, slap), dB.'),
+    frozenDb: z
+      .number()
+      .min(-20)
+      .max(20)
+      .describe('What frozen ground adds to the material’s footstep loudness (crunch), dB.'),
+  })
+  .describe(
+    'Footstep loudness by ground state (mw-e02.11): surface dB = the material’s footstepLoudness ' +
+      'plus wetDb when wet plus frozenDb when frozen; loudness = noise × 10^(dB/20).',
+  );
+
+/** Wet and frozen ground footstep tuning (see footstepSurfacesSchema). */
+export type FootstepSurfaces = z.output<typeof footstepSurfacesSchema>;
+
 export const stealthTuningSchema = z
   .strictObject({
     slowWalk: z
@@ -444,6 +477,11 @@ export const stealthTuningSchema = z
       })
       .describe('The slow walk: the quietest gait, from the modifier or a light stick.'),
     profiles: stanceTableSchema,
+    surfaces: footstepSurfacesSchema
+      .optional()
+      .describe(
+        'How wet and frozen ground changes footstep loudness; absent = the sim’s defaults.',
+      ),
   })
   .describe(
     'Movement profiles for stealth (mw-e02.10): the slow walk and the noise and visibility of every stance × gait.',
@@ -636,6 +674,7 @@ export const controllerOverrideSchema = z
       .partial()
       .extend({
         slowWalk: stealthTuningSchema.shape.slowWalk.partial().optional(),
+        surfaces: footstepSurfacesSchema.partial().optional(),
         profiles: z
           .strictObject(
             Object.fromEntries(

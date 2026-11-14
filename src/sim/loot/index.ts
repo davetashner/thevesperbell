@@ -3,3 +3,4 @@
 export * from './containers';
 export * from './drops';
 export * from './tables';
+export * from './stash';

@@ -1,0 +1,72 @@
+{
+  "$schema": "../socket-track.schema.json",
+  "id": "spear-thrust-lunge",
+  "notes": "Spear thrust (move spear-thrust, 4 active ticks, mw-e04.15): the point drives 0.5 m forward through the active window (0, 0.2, 0.35, 0.45, 0.5 m), fast then easing, so the tip reaches about 2.9 m from the root: the long reach class's 3.0 m.",
+  "keys": [
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0.2
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0.35
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0.45
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    }
+  ]
+}

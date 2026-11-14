@@ -1,0 +1,52 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-ending-cards",
+  "kind": "ending",
+  "notes": "One card per headline ending (bible 4.4), shown before that ending's epilogue slides. The card is chosen by ending.headline, set by the resolution of quest-labyrinth-beneath-briar-glen.",
+  "sequences": [
+    {
+      "id": "vespers-rung",
+      "title": "Vespers Rung",
+      "notes": "Horn alive; the abbot at rest or defeated; the bell rung; Vane not bought.",
+      "endings": ["vespers-rung"],
+      "pages": [
+        {
+          "text": "The bell rings at dusk again, wrong and beautiful, and the Nightjar sleeps. Horn keeps the dark below. Briar Glen learns to go to bed with the windows open."
+        }
+      ]
+    },
+    {
+      "id": "last-warden",
+      "title": "The Last Warden",
+      "notes": "Horn dead; the bell rung; Vane not bought.",
+      "endings": ["last-warden"],
+      "pages": [
+        {
+          "text": "The bell is rung and the sleepers are home. But the Knot has lost its warden, and a labyrinth with no one to keep it is only a very large question."
+        }
+      ]
+    },
+    {
+      "id": "hirelings-silence",
+      "title": "The Hireling's Silence",
+      "notes": "Sided with Vane (vane.fate bribed-player); the bell rung.",
+      "endings": ["hirelings-silence"],
+      "pages": [
+        {
+          "text": "The bell is rung, mostly, and you were paid. Briar Glen prospers on what lies below the Line, and does not ask what that costs."
+        }
+      ]
+    },
+    {
+      "id": "long-vespers",
+      "title": "The Long Vespers",
+      "notes": "The player joined the abbot, or the bell failed.",
+      "endings": ["long-vespers"],
+      "pages": [
+        {
+          "text": "The song never stopped. The bell stayed silent, and Briar Glen slept, and the valley after it. So, for a very long time, did you."
+        }
+      ]
+    }
+  ]
+}

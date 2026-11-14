@@ -3,6 +3,7 @@
 A desktop-first, browser-based fantasy action RPG. Start with [`CONSTITUTION.md`](CONSTITUTION.md)
 for the vision and [`docs/backlog-contract.md`](docs/backlog-contract.md) for how work is planned and tested.
 The backlog is published at https://thevesperbell.com/backlog.html.
+To contribute, read [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Build, launch and play
 
@@ -100,6 +101,8 @@ Load any scene with `?scene=<id>` (an unknown id lists the available ones):
 | `combat-sandbox`  | Arena with a training dummy and an attacker dummy for practising block, parry and dodge (see [Combat sandbox](#combat-sandbox)). |
 | `mechanism-room`  | Every mechanism: lever and portcullis, burnable wooden door, locked iron door, timed button door, crank and trapdoor. |
 | `weak-wall-room`  | A cracked wall to smash with a heavy attack and a breakable crate. |
+| `chandelier-room` | A chandelier and an anvil hanging from ropes, and a rope bridge rated for 150 kg: shoot or burn a rope, or load the bridge too heavily. |
+| `vertical-hall` | A 5 m rafter platform in a tall hall with a ladder up, a rough stone face for the thief and a hook to tie a climbing rope off (mw-e10.9). |
 | `lighting-room`   | Torches, a burning crate and moonlight, with dark corners to hide in. |
 | `kit-gallery`     | Every grey-box kit piece in a row (an art check, not gameplay). |
 | `skeleton-pen`    | A walled yard with the Forgotten roster at their posts - miner, archer, shield-bearer and brute - to fight one at a time (mw-ju8.19). |
@@ -162,7 +165,8 @@ Dying plays a death beat, then the death screen lets you reload a save or restar
 | `pnpm e2e:shards <n> <of>` | Spec files for CI shard n of `of` (weights in `e2e/shards.json`) |
 | `pnpm bench`         | Vitest benchmarks (`*.bench.ts`) that assert sim perf budgets    |
 | `pnpm perf`          | Perf budget suite, CI mode (see [Perf budgets](#perf-budgets)); `PERF_HEAP_IDLE_S=30` shortens the 5-minute heap idle |
-| `pnpm perf:ref`      | Perf budget suite, reference mode: absolute frame-time budgets on the reference machine only |
+| `pnpm perf:ref`      | Perf budget suite, reference mode: absolute frame-time, input-latency and controller-cost budgets on the reference machine only |
+| `pnpm perf:latency`  | Just the input-latency and controller/camera cost budgets (`latency` project, reference machine only) |
 | `pnpm perf:budgets`  | Validates `perf/perf-budgets.json`: every budget quotes the contract's hardware baseline |
 | `pnpm content:coverage` | After `pnpm test`: fails listing content entries no passing test exercised |
 | `pnpm content:schemas`  | Regenerates `src/content/data/<type>.schema.json` for editor autocompletion |
@@ -199,7 +203,10 @@ has two modes:
 - **Reference mode** (`pnpm perf:ref`, by hand on the reference machine — MacBook Pro M1 Pro, Chrome):
   headed Chrome, uncapped, 2560×1440 drawing buffer, 1,800 frames after a 3 s warm-up in the
   `perf-baseline` scene. It fails unless frame time p50 and p95 are ≤ 16.7 ms and no task of 200 ms or
-  more, frame renders included, runs while frames are sampled. Writes
+  more, frame renders included, runs while frames are sampled. The same is run for `valley-01`..`valley-03` at High and at Low (mw-ju8.2).
+  Low here is a 1920×1080 buffer at DPR 1 with `?quality=low`: the contract's Low resolution, not its
+  hardware (an integrated GPU), so it says nothing about that class. The production build has no
+  backdrop card (dev only until the images are approved). Writes
   `perf/results/<date>-<sha>.json`; commit it so results build a trend. Close other apps first.
   Reference mode also holds the wall-clock load budgets that PR e2e specs used to assert (mw-e41.8;
   `e2e/perf/flows.ts`, same in-page timing hooks): cold slice load and the title's New Game → Knight →
@@ -208,6 +215,27 @@ has two modes:
   mode, because software GL on shared runners makes absolute loads jitter (restarts measured 9–10 s
   there). CI mode adds no relative or ceiling guard for them; its throttled testbed load and warm
   reload budgets remain. PR e2e specs keep only functional assertions and hang-protection timeouts.
+
+Input latency and controller cost are budgeted too (mw-e02.8), by the `latency` project
+(`e2e/perf/latency.perf.ts`, `pnpm perf:latency`, part of `pnpm perf:ref`): headed Chrome with vsync on on the
+reference machine, the page's frames paced to 60 fps (30 fps for the Low case). In the greybox testbed,
+50 synthetic move key presses must show input-to-motion latency p95 ≤ 100 ms at High (target ≤ 50 ms) and ≤ 133 ms
+at Low paced to 30 fps: keydown event to the end of the first frame callback in which the player's drawn transform
+moved. During 60 s of scripted traversal the character controller system must cost ≤ 0.3 ms per sim tick and the
+orbit camera placement ≤ 0.2 ms per frame, both p95. The probe (`src/tools/perf/latency-probe.ts`, `?latency`) exists
+only in the dev server and in builds made with `VESPER_LATENCY_PROBE=on` (the latency project builds one into
+`test-results/latency-build`, served cross-origin isolated for a 5 µs `performance.now()`); a production build does not
+contain it (`tests/toolchain/latency-probe-stripped.test.ts`). The CI project keeps measuring the production build.
+These need a real display and GPU, so they run by hand on the reference machine, not on PRs or nightly. The controller's half
+also runs nightly as `tests/bench/controller-cost.bench.ts` (`pnpm bench`, the same ≤ 0.3 ms p95 over 60 s of the traversal
+course, timed through the controller system's `measure` hook; about 0.05 ms measured).
+
+The sim's own per-tick cost has budgets too (mw-e03.30), in vitest benches (`pnpm bench`, nightly):
+`tests/bench/sim-stress.bench.ts` times fire spread over 2,000 active cells (p95 ≤ 2.0 ms on the
+reference machine, ≤ 3.5 ms low preset), a flooded room freezing, and a gas explosion over 200
+physics bodies (no tick over 8 ms), next to `physics-objects.bench.ts` and `light-field.bench.ts`.
+Far from the player the element field steps at a reduced rate (chunks over 40 m away every 4th
+tick, keyed by distance and tick number only, `FieldLod` in `src/sim/field/diffusion.ts`).
 
 Every run writes `test-results/perf-report.json` and prints a per-budget table. `perf-baseline`
 (`/?scene=perf-baseline`) is the stress scene: 64 crates kept tumbling by force blasts at its
@@ -238,6 +266,20 @@ The dummies and the knight's placeholder numbers are content: `src/content/data/
 each fighter — a fall, a wall strike, a crushing object or a hazard — with falls priced by
 `src/content/data/environment-damage/default.json`. `?frames` adds the overlay to any scene; the sandbox's sim seed is
 fixed, so e2e tests and replays see the same arena every time.
+
+### World state console (debug builds)
+
+Test a late-game branch without replaying the game. These commands ship only with the debug console
+(never in a `VESPER_DEBUG_CONSOLE=off` release build); changes go out as sim commands, so replays record them.
+
+| Command | What it does |
+| --- | --- |
+| `facts.list [prefix]`, `facts.get <key>` | Set facts (optionally under a prefix), or one fact's value, type and default |
+| `facts.set <key> <value>` | Write a declared fact from the next tick (undeclared keys and bad values print an error); dependent conditions re-evaluate |
+| `deltas.list [level]` | Levels with changes, or one level's changed entities and spawned records |
+| `state.snapshot [name]`, `state.restore [name]` | Keep the facts and level deltas in memory, and put them back (the loaded level's entities keep their state) |
+| `state.diff <a> <b>` | Facts and per-level deltas that differ between two of: a save slot (`manual-1`, `quick`...), `live`, a snapshot name |
+| `state.panel [on\|off]` | A panel over the game listing the facts and level deltas |
 
 ## Layout
 

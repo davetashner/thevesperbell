@@ -1,0 +1,22 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "mace",
+  "category": "weapon",
+  "name": "Mace",
+  "description": "A flanged iron head on a short haft. It has never needed to be clever.",
+  "notes": "A one-handed starter mace (mw-e04.15): short reach, a fast 8/3/12 swing. Not placed anywhere yet (weapon loot is e18); no model yet (art).",
+  "icon": "icon-item-mace-01",
+  "value": 38,
+  "weightClass": "medium",
+  "worldProperties": {
+    "material": "iron"
+  },
+  "equip": {
+    "slot": "main-hand",
+    "proficiencies": ["maces"]
+  },
+  "weapon": {
+    "reach": "short",
+    "moves": ["mace-light"]
+  }
+}

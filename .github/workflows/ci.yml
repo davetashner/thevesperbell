@@ -1,8 +1,9 @@
 name: CI
 
 # Required checks reference these job names; keep them stable (mw-e00.3, mw-e00.10):
-# lint, typecheck, unit, coverage-gate, coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
-# e2e-playthrough jobs), build, beads-validate.
+# lint, typecheck, unit, coverage-gate (aggregates the coverage-shard jobs), coverage-ratchet, e2e-smoke (aggregates the e2e-shard and
+# e2e-playthrough jobs), build, beads-validate. interaction-matrix (mw-e03.26), world-validate (mw-e24.1), dialogue-validate (mw-e22.8), narrative-lint (mw-e39.24) and puzzle-validate
+# (mw-e15.6) and size-budget (mw-e32.3) are not required contexts yet.
 # Gate tiers (mw-e41.5, docs/ci-gates.md): this workflow is the per-PR tier. Vitest bench, Firefox and
 # WebKit audio and the perf budget suite live in slow-gates.yml and run nightly (nightly.yml); only
 # main pushes still run the perf suite here, to publish the baseline.
@@ -45,15 +46,53 @@ jobs:
     steps:
       - run: echo "Unit tests run in coverage-gate; vitest bench runs nightly (docs/ci-gates.md)."
 
-  # The only job that runs the unit and integration tests (mw-e41.2); a failing test fails it.
-  coverage-gate:
+  # The unit and integration tests run here, in 6 parallel vitest shards (mw-e41.2, mw-txg): the
+  # whole run took 13-23 min on hosted runners, sharded each job is a few minutes. A shard enforces
+  # no coverage thresholds (it sees a slice of the suite; VESPER_COVERAGE_SHARD=1 turns them off in
+  # vite.config.ts) and uploads its blob report; coverage-gate merges them. A failing test fails its shard.
+  coverage-shard:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    env:
+      VESPER_COVERAGE_SHARD: '1'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      # Per-layer thresholds from coverage-layers.json; fails naming the file and metric.
-      - run: pnpm test:coverage
+      - run: pnpm exec vitest run --coverage --coverage.reporter=json-summary --reporter=default --reporter=blob --shard=${{ matrix.shard }}/6
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vitest-blob-${{ matrix.shard }}
+          path: .vitest/blob/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+
+  # Required aggregate (mw-txg): merges the shards' blob reports into one run, so the per-layer
+  # thresholds of coverage-layers.json are enforced once on the merged coverage and the content
+  # reporter sees every shard's tests; then the checks that read that output.
+  coverage-gate:
+    needs: coverage-shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Every coverage shard passed
+        run: test "${{ needs.coverage-shard.result }}" = success
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: vitest-blob-*
+          merge-multiple: true
+          path: .vitest/blob
+      # Per-layer thresholds from coverage-layers.json; fails naming the file and metric. Rewrites
+      # coverage/content-coverage.json from every shard's passing tests.
+      - run: pnpm test:coverage:merge
       # coverage-exclusions.md is the only source of exclusions and glue-layer gaps.
       - run: pnpm coverage:exclusions
       # Every content entry is exercised by a passing test (contract §3, mw-e00.18); reads the report
@@ -111,11 +150,13 @@ jobs:
   # the median weight. The required e2e-smoke check below passes only when every e2e job does.
   e2e-shard:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 20: the specs take up to about 11 minutes and the browser install has needed up to 7 on a
+    # slow apt mirror (mw-86s, PR #382).
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -127,12 +168,16 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - name: Run this shard's specs
         run: |
-          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 5)
+          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 6)
           # An empty list would make Playwright run every spec.
           if [ -z "$files" ]; then echo "Shard ${{ matrix.shard }} has no specs."; exit 0; fi
           pnpm e2e --project=chromium $files
@@ -178,9 +223,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - if: steps.browsers.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install --with-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - if: steps.browsers.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        # A slow apt mirror once held this step for a whole shard timeout (mw-86s): give each
+        # try 2 minutes and retry (a stuck try usually succeeds at once on retry), so it fails fast instead.
+        run: for try in 1 2 3; do timeout 120 pnpm exec playwright install-deps chromium && break; [ "$try" = 3 ] && exit 1; echo "retrying ($try)"; sleep 10; done
       - run: pnpm e2e --project=playthrough
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -215,6 +264,7 @@ jobs:
       bench: false
       audio: false
       perf: true
+      matrix: false
 
   build:
     runs-on: ubuntu-latest
@@ -223,6 +273,147 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm build
+
+  # Size budgets over the release build (mw-e32.3, perf/size-budgets.json): initial JS <= 1.5 MB gzipped,
+  # initial payload <= 50 MB, textures <= 4 MB, audio loops <= 3 MB, and no src/tools module in any
+  # chunk. The job summary shows the change against main's last successful run; on a push to main the
+  # measured report is uploaded as the baseline (a missing baseline only drops the delta). Not a
+  # required check yet (owner change, scripts/repo-settings.env).
+  size-budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # The release build: debug console off, as shipped.
+      - run: pnpm build:release
+      - name: Download main's latest size report
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main --event push \
+            --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name size-report --dir baseline \
+              || echo "Could not download the size report from main run $run_id."
+          fi
+      - run: pnpm size:check --baseline baseline/size-report.json
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'push'
+        with:
+          name: size-report
+          path: build-report/size-report.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  # The interaction matrix (mw-e03.26): 500 generated worlds of 300 ticks from a fixed seed must keep
+  # every invariant (budget 60 s), and the committed matrix must match the sim. On a pull request the
+  # regenerated matrix is diffed against the base branch and the diff goes to the job summary, so a
+  # rule change that alters what an element does is visible to reviewers. A failure prints the seed
+  # and the shrunk world. The coverage run only samples 20 worlds; the 500-world run is skipped there
+  # and runs here, outside coverage, where it takes about 10 s.
+  interaction-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - name: 500 worlds x 300 ticks, fixed seed
+        env:
+          ELEMENT_MATRIX_WORLDS: '500'
+        run: pnpm exec vitest run tests/integration/element-matrix-run.test.ts
+      - name: Regenerate the matrix and attach its diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          pnpm content:matrix
+          doc=docs/design/interaction-matrix.md
+          stale=0
+          git diff --quiet -- "$doc" || stale=1
+          if [ "$EVENT" = pull_request ]; then
+            git fetch --no-tags origin "$BASE"
+            since=$(git merge-base "origin/$BASE" HEAD)
+            {
+              echo '## Interaction matrix'
+              echo
+              if git diff --quiet "$since" -- "$doc"; then
+                echo 'No element rule changed what an element does: the matrix is unchanged.'
+              else
+                echo "Regenerated matrix against \`$BASE\`:"
+                echo
+                echo '```diff'
+                git diff "$since" -- "$doc"
+                echo '```'
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ "$stale" = 1 ]; then
+            echo "::error title=Interaction matrix::$doc is stale; run pnpm content:matrix and commit it."
+            exit 1
+          fi
+
+  # The puzzle solvability validator (mw-e15.6, docs/design/puzzles.md): every declared solution of every
+  # puzzle is proven reachable by a bounded abstract search (10 s per puzzle) and its step list is run in
+  # the headless sim. The job fails when an mvp puzzle has an unreachable or diverging declared solution;
+  # other puzzles are reported in the log. It runs outside coverage, in a few seconds.
+  # It also audits per-class solution coverage (mw-e15.8): docs/design/puzzle-coverage.md must be what
+  # `pnpm puzzle:coverage --write` generates, every mvp puzzle needs 2 distinct validated solutions and
+  # 3 of 4 classes able to solve it, and the step summary shows what a PR changed.
+  puzzle-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm puzzle:validate
+      - name: Puzzle coverage gate and report check
+        run: |
+          git fetch --depth=1 origin main
+          git show origin/main:docs/design/puzzle-coverage.md > "$RUNNER_TEMP/base-coverage.md" || : > "$RUNNER_TEMP/base-coverage.md"
+          pnpm puzzle:coverage --check --summary --base "$RUNNER_TEMP/base-coverage.md" >> "$GITHUB_STEP_SUMMARY"
+
+  # The world map validator (mw-e24.1, docs/design/world-map.md): every node of
+  # src/content/data/world/connectivity.json is reachable from the town spawn with the base classes'
+  # capabilities, the bible's loops exist, the main quest never needs Wendmouth or the barge. Shortcut
+  # facts no placed content writes yet are warnings. Runs in seconds.
+  world-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm world:validate
+
+  # The dialogue validator (mw-e22.8, docs/design/dialogue-format.md): every dialogue under
+  # src/content/data/dialogue/ must parse, resolve its content references, have every node reachable
+  # from an entry, an exit on every step, no unanswerable choice and no loop with no way out. Over-long
+  # text and one-class option sets are warnings. Runs in seconds.
+  dialogue-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm dialogue:validate
+
+  # The narrative lint (mw-e39.24, docs/narrative/content-conventions.md): story content against the
+  # canon glossary. Near-miss names, canon numbers that contradict bible 11.3 and dangling fact, NPC,
+  # item, quest, scene or place ids are errors; class-gate, variants-fallback, tone and British-spelling
+  # findings are warnings. Runs in seconds.
+  narrative-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm narrative:lint
 
   # Runs on every PR, not behind a .beads/** path filter: a required check that is skipped by a path
   # filter blocks merging, and this takes seconds.

@@ -83,6 +83,12 @@
           "maximum": 1,
           "description": "How soaked it is (dry … saturated), 0 … 1."
         },
+        "absorbency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1."
+        },
         "frozen": {
           "type": "boolean",
           "description": "Frozen solid."

@@ -22,13 +22,20 @@ describe('testprop content', () => {
     const content = loadGameContent();
     expect(Object.isFrozen(content)).toBe(true);
     expect(content.all('testprop').map((p) => p.id)).toEqual([
+      'anvil',
       'barrel',
       'bottle',
+      'bridge-plank',
       'chandelier',
       'clay-pot',
       'crate',
+      'lens-stand',
       'lever',
+      'limp-body',
+      'mirror-stand',
       'plank',
+      'statue',
+      'stone-block',
     ]);
     expect(content.get('testprop', 'crate').breaksInto?.toString()).toBe('testprop:plank');
     expect(content.get('testprop', 'plank').tags).toEqual([]);

@@ -37,11 +37,23 @@ import {
   refuseGrab,
   type GrabRefused,
 } from '../carry/state';
-import { climbTraversal, DEFAULT_CLIMB_TUNING } from './climb';
+import {
+  climbDrainPerSecond,
+  climbRefused,
+  climbTraversal,
+  DEFAULT_CLIMB_TUNING,
+  DEFAULT_STAMINA_BY_DIFFICULTY,
+  type ClimbRefused,
+} from './climb';
 import { sceneLedges } from './ledges';
 import { DEFAULT_LEDGE_TUNING, ledgeTraversal } from './mantle';
 import { ClimbRopeComponent, makeRope, sceneRopes, spawnRope } from './ropes';
-import { CLIMB_ICE_CAPABILITY, CLIMB_ROUGH_CAPABILITY } from './surfaces';
+import {
+  CLIMB_ICE_CAPABILITY,
+  CLIMB_REFUSAL_TEXT,
+  CLIMB_ROUGH_CAPABILITY,
+  maxClimbDifficulty,
+} from './surfaces';
 
 /** The mw-e02.2 starting numbers, without ledge or climb blocks (the sim's defaults apply). */
 const BASE: Frozen<ControllerTuning> = {
@@ -166,6 +178,10 @@ interface RigOptions {
   readonly minimal?: boolean;
   /** Whether the character's hands are full: hooks are asked before they start a grab. */
   readonly handsFull?: (entity: EntityId | undefined) => boolean;
+  /** Step the character with no entity (a plain controller that is no one's player). */
+  readonly anonymous?: boolean;
+  /** The hardest climb difficulty the character attempts (mw-e10.9); unlimited when absent. */
+  readonly maxDifficulty?: (entity: EntityId | undefined) => number;
 }
 
 /** A character in a scene of kit pieces with the ledge and climb hooks, stepped by the controller. */
@@ -179,6 +195,7 @@ class Rig {
   stamina: number | undefined = undefined;
   readonly trace: CharacterState[] = [];
   private readonly hooks: TraversalHook[] = [];
+  private readonly anonymous: boolean;
 
   constructor(pieces: readonly Piece[], options: RigOptions = {}) {
     this.world = registerWorldProperties(registerSceneComponents(new World<never>({ seed: 3 })));
@@ -229,9 +246,11 @@ class Rig {
             capabilities: caps,
             stamina: (entity) => (entity === PLAYER ? this.stamina : undefined),
             ...(options.handsFull !== undefined && { handsFull: options.handsFull }),
+            ...(options.maxDifficulty !== undefined && { maxDifficulty: options.maxDifficulty }),
             ...(options.noLedges !== true && { ledges }),
           }),
     );
+    this.anonymous = options.anonymous === true;
     this.tuning = options.tuning ?? TUNED;
     this.state = initialCharacterState(options.feet ?? v(0, 0, 0));
     this.step(IDLE_INPUT, 3);
@@ -250,7 +269,7 @@ class Rig {
         tuning: this.tuning,
         params,
         hooks: this.hooks,
-        entity: PLAYER,
+        ...(!this.anonymous && { entity: PLAYER }),
       });
       this.trace.push(this.state);
     }
@@ -1056,5 +1075,143 @@ describe('grabbing while carrying (mw-e17.14)', () => {
     });
     loaded.step(FORWARD, 90);
     expect(loaded.modes()).toEqual([null]);
+  });
+});
+
+describe('climb difficulty and refusals (mw-e10.9)', () => {
+  /** Content's capability grants, as the game builds them: the thief's rough verb reaches 3. */
+  const GRANTS = new Map([[CLIMB_ROUGH_CAPABILITY, 3]]);
+  const rough = () => tower(ROUGH);
+
+  function refusals(rig: Rig): ClimbRefused[] {
+    const seen: ClimbRefused[] = [];
+    rig.world.events.on(climbRefused, (event) => seen.push(event));
+    return seen;
+  }
+
+  it('AC-1: a thief with max climb difficulty 3 jumps at a difficulty-2 wall and enters Climbing', () => {
+    const capabilities = [CLIMB_ROUGH_CAPABILITY];
+    const max = maxClimbDifficulty(capabilities, GRANTS);
+    expect(max).toBe(3);
+    const rig = new Rig([rough()], {
+      feet: v(1.6, 0, 0),
+      capabilities,
+      maxDifficulty: () => max,
+    });
+    const seen = refusals(rig);
+    rig.step(input({ forward: 1, jump: true }));
+    expect(rig.state.traversal).toBe('climb');
+    rig.world.events.flush();
+    expect(seen).toEqual([]);
+  });
+
+  it('AC-2: a knight with max climb difficulty 1 is refused the same wall, with a reason prompt', () => {
+    const max = maxClimbDifficulty([], GRANTS);
+    expect(max).toBe(1);
+    // Even holding the rough capability (a learned trick), difficulty 2 is past its best.
+    const rig = new Rig([rough()], {
+      feet: v(1.6, 0, 0),
+      capabilities: [CLIMB_ROUGH_CAPABILITY],
+      maxDifficulty: () => max,
+    });
+    const seen = refusals(rig);
+    rig.step(input({ forward: 1, jump: true }));
+    expect(rig.state.traversal).toBeNull();
+    rig.step(input({ forward: 1, jump: true }), 5);
+    rig.world.events.flush();
+    expect(seen).toHaveLength(1);
+    expect(seen[0]).toMatchObject({
+      actor: PLAYER,
+      surface: rig.piece(1),
+      refusal: { reason: 'too-difficult', difficulty: 2, max: 1 },
+      text: CLIMB_REFUSAL_TEXT['too-difficult'],
+    });
+  });
+
+  it('AC-2: a knight bumping the wall without a jump is not nagged, and a ladder is no refusal', () => {
+    const knight = new Rig([rough(), ladder()], { feet: v(1.6, 0, 0), maxDifficulty: () => 1 });
+    const seen = refusals(knight);
+    knight.step(FORWARD, 30);
+    knight.world.events.flush();
+    expect(seen).toEqual([]);
+    const free = new Rig([tower(), ladder()], { feet: v(1, 0, 0), maxDifficulty: () => 1 });
+    free.until(FORWARD, climbing);
+  });
+
+  it('AC-2: a knight without the capability is told it does not know how, a rope refuses the same way', () => {
+    const rig = new Rig([rough()], { feet: v(1.6, 0, 0) });
+    const seen = refusals(rig);
+    rig.step(input({ forward: 1, jump: true }));
+    rig.world.events.flush();
+    expect(seen.map((event) => event.refusal.reason)).toEqual(['needs-capability']);
+    // Frozen rope: slippery, refused the same way (no ice tools).
+    const frozen = new Rig([ropePiece(2, 0, 0, 3)], { feet: v(1.5, 0, 0) });
+    const frozenSeen = refusals(frozen);
+    assignProperty(frozen.world, frozen.piece(1), 'frozen', true);
+    frozen.step(FORWARD, 3);
+    frozen.world.events.flush();
+    expect(frozenSeen.map((event) => event.refusal.reason)).toEqual(['slippery']);
+    expect(frozen.state.traversal).toBeNull();
+  });
+
+  it('a character with no entity is refused silently (nobody to tell), and a rope needs a jump when ropes are not walked on', () => {
+    const anonymous = new Rig([rough()], {
+      feet: v(1.6, 0, 0),
+      anonymous: true,
+      maxDifficulty: () => 1,
+    });
+    const seen = refusals(anonymous);
+    anonymous.step(input({ forward: 1, jump: true }), 5);
+    anonymous.world.events.flush();
+    expect(anonymous.state.traversal).toBeNull();
+    expect(seen).toEqual([]);
+    // Ropes are not in walkOn here: bumping one attaches nothing and refuses nothing.
+    const tuning = { ...TUNED, climb: { ...DEFAULT_CLIMB_TUNING, walkOn: [] } };
+    const rope = new Rig([ropePiece(2, 0, 0, 3)], { feet: v(1.5, 0, 0), tuning });
+    const ropeSeen = refusals(rope);
+    rope.step(FORWARD, 30);
+    rope.world.events.flush();
+    expect(rope.state.traversal).toBeNull();
+    expect(ropeSeen).toEqual([]);
+  });
+
+  it('the best difficulty is read live: lowering it mid-climb lets go, and a burnt-out surface is no refusal', () => {
+    let max = 3;
+    const rig = new Rig([tower(ROUGH)], {
+      feet: v(1.6, 0, 0),
+      capabilities: CLIMBER,
+      maxDifficulty: () => max,
+    });
+    rig.step(input({ forward: 1, jump: true }));
+    rig.step(FORWARD, 10);
+    expect(rig.state.traversal).toBe('climb');
+    max = 1;
+    rig.step(FORWARD, 2);
+    expect(rig.state.traversal).toBeNull();
+    const charred = new Rig([tower(ROUGH)], {
+      feet: v(1.6, 0, 0),
+      capabilities: CLIMBER,
+      maxDifficulty: () => 3,
+    });
+    const seen = refusals(charred);
+    assignProperty(charred.world, charred.piece(1), 'climbable', 'none');
+    charred.step(input({ forward: 1, jump: true }), 3);
+    charred.world.events.flush();
+    expect(seen).toEqual([]);
+  });
+
+  it('climbing drains by difficulty: ladders and ropes 1×, rough stone 1.5×, sheer 2×', () => {
+    const rig = new Rig([tower(), ladder(), rough()]);
+    const rate = (n: number, tuning = DEFAULT_CLIMB_TUNING) =>
+      climbDrainPerSecond(rig.world, rig.piece(n), tuning);
+    expect(DEFAULT_STAMINA_BY_DIFFICULTY).toEqual([1, 1.5, 2]);
+    expect(rate(2)).toBe(5);
+    expect(rate(3)).toBe(7.5);
+    assignProperty(rig.world, rig.piece(3), 'climbable', 'sheer');
+    expect(rate(3)).toBe(10);
+    expect(rate(3, { ...DEFAULT_CLIMB_TUNING, staminaByDifficulty: [1, 2, 4] })).toBe(20);
+    // A surface that is no longer climbable (burnt away) drains the base rate.
+    assignProperty(rig.world, rig.piece(3), 'climbable', 'none');
+    expect(rate(3)).toBe(5);
   });
 });

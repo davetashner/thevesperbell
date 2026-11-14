@@ -21,6 +21,7 @@ import {
 } from '@content/index';
 import {
   addInventory,
+  CarryBulkyComponent,
   addQuickSlots,
   addSceneItems,
   Consumables,
@@ -114,11 +115,18 @@ export function startWorldItems<T>(
   items: WorldItems,
   spawns: readonly ItemSpawnEntity[],
   player: EntityId | undefined,
+  level?: string,
 ): EntityId[] {
   const sim = world as unknown as World<never>;
   installWorldItems(world, items, { busy: (w, actor) => holdOf(w, actor) !== undefined });
   if (player !== undefined && inventoryOf(sim, player) === undefined) addInventory(sim, player);
-  return addSceneItems(sim, items, spawns);
+  return addSceneItems(sim, items, spawns, level);
+}
+
+/** A scene spawn that may be a shoulder-carry, and its entity (as `LoadedScene.spawns` lists them). */
+export interface BulkySpawn {
+  readonly entity: EntityId;
+  readonly spawn: { readonly bulky?: string | undefined };
 }
 
 /**
@@ -130,9 +138,10 @@ export function startCarry<T>(
   world: World<T>,
   content: Pick<GameContent, 'get' | 'has'>,
   collision: CollisionWorld,
+  spawns: readonly BulkySpawn[] = [],
 ): CarryController {
   installPush(world, { collision });
-  return installCarry(world, {
+  const carry = installCarry(world, {
     collision,
     limit: (w, actor) => {
       const id = classOf(w, actor);
@@ -141,6 +150,11 @@ export function startCarry<T>(
         : DEFAULT_CARRY_LIMIT_KG;
     },
   });
+  // Props the scene calls bulky (a body) are shoulder-carries (mw-e03.23).
+  for (const { entity, spawn } of spawns) {
+    if (spawn.bulky !== undefined) world.add(entity, CarryBulkyComponent, { kind: spawn.bulky });
+  }
+  return carry;
 }
 
 /**

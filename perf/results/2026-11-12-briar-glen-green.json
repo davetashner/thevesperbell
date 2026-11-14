@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "mode": "reference",
+  "sha": "0dac5bf",
+  "date": "2026-11-12T10:12:32.125Z",
+  "browser": "chrome 157.0.8103.51",
+  "results": [
+    {
+      "id": "briar-glen-green-frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.9,
+      "delta": -13.799999999999999,
+      "pass": true,
+      "message": "briar-glen-green-frame-p50-high (frameP50Ms in briar-glen-green at high): 2.90 ms within budget ≤ 16.70 ms (−13.80 ms (−82.6%))"
+    },
+    {
+      "id": "briar-glen-green-frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 6,
+      "delta": -10.7,
+      "pass": true,
+      "message": "briar-glen-green-frame-p95-high (frameP95Ms in briar-glen-green at high): 6.00 ms within budget ≤ 16.70 ms (−10.70 ms (−64.1%))"
+    },
+    {
+      "id": "briar-glen-green-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "briar-glen-green-long-tasks-high (longTasksOver200ms in briar-glen-green at high): 0 within budget ≤ 0 (+0)"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "frameP50Ms",
+      "value": 2.9,
+      "scene": "briar-glen-green",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 6,
+      "scene": "briar-glen-green",
+      "preset": "high"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "briar-glen-green",
+      "preset": "high"
+    }
+  ],
+  "frames": [
+    {
+      "scene": "briar-glen-green",
+      "preset": "high",
+      "frame": {
+        "count": 1800,
+        "p50": 2.9,
+        "p95": 6,
+        "p99": 6.3,
+        "max": 6.9,
+        "mean": 2.6888333333333394
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.6999999284744263,
+        "p95": 5.799999952316284,
+        "p99": 6.100000023841858,
+        "max": 6.700000047683716,
+        "mean": 2.47588888724645
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  ],
+  "pass": true
+}

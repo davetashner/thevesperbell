@@ -237,25 +237,31 @@
       "id": "shop-counter",
       "at": [-2, 0, 0.75],
       "tags": ["counter", "shop", "merchant:marsh-general-store", "dev-crowns:400"],
-      "interact": {
-        "affordances": [
-          {
-            "verb": "talk",
-            "label": "Trade"
-          }
-        ],
-        "radius": 1.5
-      }
+      "interact": { "affordances": [{ "verb": "talk", "label": "Trade" }], "radius": 1.5 },
+      "presence": { "hours": [6, 21] }
+    },
+    {
+      "id": "shelf-loaf",
+      "at": [2, 0, -2.5],
+      "tags": ["stock"],
+      "item": { "id": "bread-loaf" },
+      "owner": "npc-ottilie"
+    },
+    {
+      "id": "back-box",
+      "at": [-3.5, 0, -2.5],
+      "tags": ["stock"],
+      "container": { "contents": [{ "item": "healing-draught" }] },
+      "owner": "npc-ottilie"
     },
     {
       "id": "npc-ottilie",
       "at": [-2, 0, 3],
       "yaw": 180,
-      "tags": ["shopkeeper"],
+      "tags": ["shopkeeper", "schedule:ottilie"],
       "creature": "npc-ottilie",
-      "leash": {
-        "radius": 3
-      }
+      "leash": { "radius": 3 },
+      "presence": { "hours": [6, 21] }
     },
     {
       "id": "hearth-ground",
@@ -362,6 +368,15 @@
       "id": "arrive-from-briar-glen-lane",
       "at": [0, 0, -2.5],
       "tags": ["arrival"]
+    },
+    {
+      "id": "npc-ottilie-upstairs",
+      "at": [-3.0, 3.5, 2.0],
+      "tags": ["schedule:ottilie", "activity:home", "upstairs"],
+      "yaw": 90,
+      "creature": "npc-ottilie",
+      "leash": { "radius": 1.5 },
+      "presence": { "hours": [21, 6] }
     }
   ],
   "light": {
@@ -378,6 +393,34 @@
   "environment": {
     "sky": "#1E1B2E"
   },
+  "surfaces": [
+    {
+      "id": "shop-boards",
+      "min": [-5, -0.5, -4],
+      "max": [5, 1.5, 4],
+      "surface": "wood"
+    },
+    {
+      "id": "stair-boards",
+      "min": [3, 1.5, -3],
+      "max": [5, 3.5, 3],
+      "surface": "wood"
+    },
+    {
+      "id": "home-boards",
+      "min": [-5, 2.5, -2],
+      "max": [5, 4.5, 4],
+      "surface": "wood-hollow",
+      "priority": 1
+    },
+    {
+      "id": "home-rug",
+      "min": [-3, 2.5, 0],
+      "max": [1, 4.5, 3],
+      "surface": "carpet",
+      "priority": 2
+    }
+  ],
   "transitions": [
     {
       "id": "street-exit",

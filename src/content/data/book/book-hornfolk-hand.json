@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-hornfolk-hand",
+  "title": "A Primer of the Hornfolk Hand",
+  "author": "Lucan Ferrow, antiquary",
+  "notes": "Extra shelf book: Hornfolk magic is inscription (3.2). Horn-role source: the Wardens and their humming; the statues cover their ears. Explains the Knot as a sentence without giving the puzzle away.",
+  "locations": ["place-bellwater-priory", "place-bridgeward-college", "place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "The Hornfolk did not write to be read. They wrote to bind.\n\nTo them a line of carving is a spell, and a long line of carving is a long spell: a corridor cut as a sentence never finished is a prison for anything that cannot read. Wardens of the people walked such corridors in their generations, humming low in the throat so that what slept at the centre would not hear itself.\n\nTheir statues cover their ears. I took this for grief. A monk of the old Order set me right: it is not grief. It is the posture of a man doing a job.\n\nI could read none of the runes at the Standing Horn. I was glad of it."
+    }
+  ]
+}

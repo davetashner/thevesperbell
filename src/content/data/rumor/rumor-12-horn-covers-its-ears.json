@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-12-horn-covers-its-ears",
+  "notes": "The Standing Horn and Hornfolk statue language. Juniper tells it in juniper-fenn.",
+  "region": "valley",
+  "source": ["npc-juniper"],
+  "truth": "true",
+  "target": "place-standing-horn",
+  "text": "They say the stone horn in the woods covers its ears so it won't hear the maze calling.",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "Ears covered, the statue. You see it too. I always thought that was no accident."
+  }
+}

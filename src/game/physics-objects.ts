@@ -9,10 +9,11 @@
 // characters) before the player's controller steps. And it breaks things (mw-e03.11): breakables
 // listen to those stimuli and to physics impacts (src/sim/breakables).
 
-import type { GameContent } from '@content/index';
+import { materialLoudness, STEALTH_ID, type GameContent } from '@content/index';
 import {
   CharacterController,
   installBreakables,
+  installImpactNoise,
   installPhysicsObjects,
   installStimuli,
   physicsBudgetExceeded,
@@ -20,6 +21,7 @@ import {
   stimulusSystem,
   type BreakablesOptions,
   type EntityId,
+  type ImpactNoiseOptions,
   type PhysicsBudgetExceeded,
   type PropBody,
   type PropBodyLookup,
@@ -47,6 +49,20 @@ export interface GamePhysicsOptions {
   readonly beforeStimuli?: (world: World<never>) => void;
   /** Installs systems that read the tick's resolved stimuli: the element field and fire rules. */
   readonly afterStimuli?: (world: World<never>) => void;
+  /**
+   * Makes physics impacts noises, by energy and material (mw-e03.25); see `impactNoiseOptions`.
+   * Without it impacts are silent (worlds that only test physics).
+   */
+  readonly impactNoise?: ImpactNoiseOptions;
+}
+
+/** The shipped impact noise curve and material loudness offsets (`installGamePhysics`'s `impactNoise`). */
+export function impactNoiseOptions(content: Pick<GameContent, 'get' | 'all'>): ImpactNoiseOptions {
+  const offsets = materialLoudness(content.all('material'));
+  return {
+    curve: content.get('stealth', STEALTH_ID).noise.impact,
+    offsetOf: (id) => offsets.get(id),
+  };
 }
 
 /**
@@ -66,6 +82,7 @@ export function installGamePhysics<T>(world: World<T>, options: GamePhysicsOptio
   sim.addSystem(stimulusSystem());
   options.afterStimuli?.(sim);
   installBreakables(sim, options.breakables);
+  if (options.impactNoise !== undefined) installImpactNoise(sim, options.impactNoise);
   if (onBudgetExceeded !== undefined) sim.events.on(physicsBudgetExceeded, onBudgetExceeded);
   return world;
 }

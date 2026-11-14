@@ -593,23 +593,23 @@ describe('the player in water (mw-e02.14)', () => {
         onDrown: (_, amount) => drowned.push(amount),
       },
     });
-    const steps: { material: string | undefined }[] = [];
+    const steps: { material: string | undefined; wet: boolean }[] = [];
     world.events.on(LocomotionEvents, (e) => {
-      if (e.kind === 'footstep') steps.push({ material: e.material });
+      if (e.kind === 'footstep') steps.push({ material: e.material, wet: e.wet });
     });
     return { world, entity, steps, drowned };
   }
 
-  it('AC-1: wading footsteps report the material water; dry ones carry none', () => {
+  it('AC-1: wading footsteps report the material water (and wet); dry ones carry the ground’s', () => {
     const p = player();
     for (let i = 0; i < HZ; i++) p.world.step([press()]);
     const dry = p.steps.length;
     expect(dry).toBeGreaterThan(0);
-    expect(p.steps.every((s) => s.material === undefined)).toBe(true);
+    expect(p.steps.every((s) => s.material === 'generic' && !s.wet)).toBe(true);
     for (let i = 0; i < 3 * HZ; i++) p.world.step([press()]);
     const wading = p.steps.slice(dry);
     expect(wading.length).toBeGreaterThan(2);
-    expect(wading.every((s) => s.material === 'water')).toBe(true);
+    expect(wading.every((s) => s.material === 'water' && s.wet)).toBe(true);
     expect(p.world.get(p.entity, CharacterLocomotion)?.state).toBe('run');
   });
 

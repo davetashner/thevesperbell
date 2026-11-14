@@ -1,6 +1,7 @@
 {
   "$schema": "../merchant.schema.json",
   "id": "marsh-general-store",
+  "hours": { "open": 6, "close": 21 },
   "notes": "Marsh's General Store, Briar Glen (story bible §3.5 and §5.15; mw-ju8.9): the first shop past the bridge, run by Ottilie Marsh (npc-ottilie), a friendly, shrewd general merchant for basics. Her original stock stands (owner approved); mw-ju8.5 added the clothier's side from the catalogue (tunic, cloaks, merchant's coat, gloves, boots) and a few cheap food and jar basics. The specialist shops are Brand's Forge, Fenn's Fletchery & Simples and Pell's Bakery. Prices sit at the economy doc's default band: markup 1.25 (band 1.1-1.5) and buy rate 0.4 (band 0.3-0.6); consumables and tools are her specialties (bonus left at the default 1.2). She buys weapons, armour, shields, ammo, consumables, tools and odds and ends, never keys or quest items. The 250 gold reserve is about three-quarters of a light armour set at default markup (economy doc: about 320), so one big sale does not empty her but a pile of mail will: it refills 60 a day. Stock counts are small and restock slowly for ammunition and potions only. Item values are the placeholders the balance tool will re-base onto the economy bands, so these prices will move with them. No opening hours until the in-game clock exists (mw-e27.12).",
   "npcId": "npc-ottilie",
   "displayName": "Ottilie Marsh",

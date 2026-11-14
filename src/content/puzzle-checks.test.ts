@@ -99,6 +99,36 @@ describe('puzzle load checks (mw-e15.1)', () => {
     ]);
   });
 
+  it('mw-e15.7: a respawned entity must be a prop, and a reset fact a declared int', () => {
+    const issues = loadIssues([
+      puzzle((p) => ({
+        ...p,
+        entities: [
+          ...p.entities,
+          { id: 'player-start', role: 'a marker', critical: true },
+          { id: 'ghost', role: 'not placed', critical: true },
+        ],
+        policy: {
+          repeatable: false,
+          recovery: [
+            { kind: 'respawn', entity: 'player-start', seconds: 5 },
+            { kind: 'respawn', entity: 'ghost', seconds: 5 },
+            { kind: 'reset', trigger: 'room-lever' },
+            { kind: 'reset', trigger: 'room-lever', fact: 'testbed.nope' },
+            { kind: 'reset', trigger: 'room-lever', fact: 'testbed.room-lever.thrown' },
+            { kind: 'reset', trigger: 'room-lever', fact: 'ownership.thefts' },
+          ],
+        },
+      })),
+    ]);
+    expect(issues).toEqual([
+      `${FILE}#/entities/3/id: puzzle:zz-test names entity "ghost", which level "testbed" (${SCENE}) does not place`,
+      `${FILE}#/policy/recovery/0/entity: puzzle:zz-test respawns "player-start", which is not a prop spawn of level "testbed": only a prop can be dropped again`,
+      `${FILE}#/policy/recovery/3/fact: puzzle:zz-test names undeclared fact "testbed.nope": declare it in src/content/data/fact/`,
+      `${FILE}#/policy/recovery/4/fact: puzzle:zz-test reset fact "testbed.room-lever.thrown" must be int, not bool`,
+    ]);
+  });
+
   it('a puzzle in a missing scene is reported once, by the reference check', () => {
     const issues = loadIssues([puzzle((p) => ({ ...p, scene: 'no-such-level' }))]);
     expect(issues).toHaveLength(1);
@@ -107,5 +137,78 @@ describe('puzzle load checks (mw-e15.1)', () => {
 
   it('ignores entries of other types', () => {
     expect(checkPuzzles([{ type: 'testprop', file: 'x.json', value: { id: 'x' } }])).toEqual([]);
+  });
+
+  it('mw-e15.2: a goal may read only entities the puzzle lists, and signals that exist', () => {
+    const goal = (g: unknown) => puzzle((p) => ({ ...p, goal: g }));
+    expect(
+      loadIssues([
+        goal({
+          all: [
+            { entities: { entity: 'room-lever' }, match: 'any' },
+            { sustained: { entities: { entity: 'loose-crate' }, match: 'any' }, seconds: 2 },
+            { entities: { tag: 'brazier' }, match: 'all' },
+            { signal: 'greybox-rune-plates/west-plate', port: 'active' },
+          ],
+        }),
+      ]),
+    ).toEqual([]);
+    expect(
+      loadIssues([
+        goal({
+          all: [
+            { entities: { entity: 'west-brazier' }, match: 'any' },
+            { not: { entities: { entity: 'room-lever' }, match: 'none' } },
+            { signal: 'greybox-rune-plates/missing' },
+          ],
+        }),
+      ]),
+    ).toEqual([
+      `${FILE}#/goal/all/2/signal: puzzle:zz-test reads node "missing", which signal graph "greybox-rune-plates" does not have`,
+      `${FILE}#/goal/all/0/entities/entity: puzzle:zz-test goal reads entity "west-brazier", which the puzzle does not list in \`entities\``,
+    ]);
+  });
+
+  it('mw-e15.3: the signals a puzzle drives are lever or button nodes of a graph its scene places', () => {
+    const drive = (...signals: string[]) =>
+      loadIssues([puzzle((p) => ({ ...p, outputs: { ...p.outputs, signals } }))]);
+    expect(drive('nowhere/gate')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "nowhere/gate", but there is no signal graph "nowhere"`,
+    ]);
+    expect(drive('mechanism-room/missing')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "mechanism-room/missing", but graph "mechanism-room" has no node "missing"`,
+    ]);
+    expect(drive('mechanism-room/north-gate')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "mechanism-room/north-gate", a receiver node: only a lever (switched on) or a button (pressed) can be driven from outside the graph`,
+    ]);
+    expect(drive('mechanism-room/north-lever', 'mechanism-room/east-button')).toEqual([
+      `${FILE}#/outputs/signals/0: puzzle:zz-test drives signal "mechanism-room/north-lever", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
+      `${FILE}#/outputs/signals/1: puzzle:zz-test drives signal "mechanism-room/east-button", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
+    ]);
+  });
+
+  it('mw-e15.11: failure signals name a node of a graph the scene places, and a rumour is a declared bool fact', () => {
+    const fail = (...signals: string[]) =>
+      loadIssues([
+        puzzle((p) => ({ ...p, failures: signals.map((signal) => ({ signal, port: 'failed' })) })),
+      ]);
+    expect(fail('nowhere/order')).toEqual([
+      `${FILE}#/failures/0: puzzle:zz-test counts failures from signal "nowhere/order", but there is no signal graph "nowhere"`,
+    ]);
+    expect(fail('mechanism-room/missing')).toEqual([
+      `${FILE}#/failures/0: puzzle:zz-test counts failures from signal "mechanism-room/missing", but graph "mechanism-room" has no node "missing"`,
+    ]);
+    expect(fail('mechanism-room/north-lever')).toEqual([
+      `${FILE}#/failures/0: puzzle:zz-test counts failures from signal "mechanism-room/north-lever", but level "testbed" (${SCENE}) does not place signal graph "mechanism-room"`,
+    ]);
+    const rumour = (key: string) =>
+      loadIssues([puzzle((p) => ({ ...p, hints: [{ afterSeconds: 60, rumour: key }] }))]);
+    expect(rumour('testbed.nope')).toEqual([
+      `${FILE}#/hints/0/rumour: puzzle:zz-test names undeclared fact "testbed.nope": declare it in src/content/data/fact/`,
+    ]);
+    expect(rumour('ownership.thefts')).toEqual([
+      `${FILE}#/hints/0/rumour: puzzle:zz-test rumour fact "ownership.thefts" must be bool, not int`,
+    ]);
+    expect(rumour('testbed.room-lever.thrown')).toEqual([]);
   });
 });

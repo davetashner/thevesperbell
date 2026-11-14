@@ -53,7 +53,22 @@ export interface Chunk {
   calm: number;
   /** Asleep chunks hold no layers and are skipped by diffusion until touched. */
   asleep: boolean;
+  /**
+   * The allocated chunk across each face (+x, -x, +y, -y, +z, -z; face ^ 1 is the opposite one),
+   * kept by `allocate` and `release`, so the diffusion kernel finds a neighbour without hashing.
+   */
+  readonly links: (Chunk | undefined)[];
 }
+
+/** Chunk coordinate steps across the six faces, in the order of `Chunk.links`. */
+const LINK_STEPS: readonly (readonly [number, number, number])[] = [
+  [1, 0, 0],
+  [-1, 0, 0],
+  [0, 1, 0],
+  [0, -1, 0],
+  [0, 0, 1],
+  [0, 0, -1],
+];
 
 /** `items[index]` for an index known to be in range (noUncheckedIndexedAccess can't see it). */
 export function at<T>(items: ArrayLike<T>, index: number): T {
@@ -310,7 +325,14 @@ export class ElementField {
       conductivity: undefined,
       calm: 0,
       asleep: false,
+      links: [undefined, undefined, undefined, undefined, undefined, undefined],
     };
+    LINK_STEPS.forEach(([dx, dy, dz], face) => {
+      const other = this.chunks.get(chunkKey(cx + dx, cy + dy, cz + dz));
+      if (other === undefined) return;
+      chunk.links[face] = other;
+      other.links[face ^ 1] = chunk;
+    });
     this.chunks.set(chunkKey(cx, cy, cz), chunk);
     this.sorted = undefined;
     return chunk;
@@ -318,6 +340,9 @@ export class ElementField {
 
   /** Frees a chunk. Internal to the field module. */
   release(chunk: Chunk): void {
+    chunk.links.forEach((other, face) => {
+      if (other !== undefined) other.links[face ^ 1] = undefined;
+    });
     this.chunks.delete(chunkKey(chunk.cx, chunk.cy, chunk.cz));
     this.sorted = undefined;
   }

@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-17-tern-pays-double",
+  "notes": "Bible 6.2: the Gilded Tern's shanghai route (3.6, 5.14). Reed trades it for the toll in reed-kestrel-lock.",
+  "region": "harbour",
+  "source": ["npc-reed"],
+  "truth": "true",
+  "target": "npc-hesketh",
+  "text": "The Gilded Tern pays double for crew who don't ask what's in the hold.",
+  "secondHand": {
+    "teller": "npc-dot",
+    "text": "Lock-keepers say the Gilded Tern pays double for crew who don't ask what's in the hold. Don't you go signing on."
+  }
+}

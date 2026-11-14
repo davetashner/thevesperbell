@@ -321,6 +321,9 @@ export function worldCueLookups(
   const creatureAudio = new Map<string, CreatureAudio | undefined>(
     (options.creatures ?? []).map((c) => [c.id, c.audio && knownSlots(c.audio, knownCue)]),
   );
+  /** Whether the manifest has a walking set for the surface; without a manifest, none is assumed. */
+  const hasFootstepSet = (surface: string): boolean =>
+    options.knownCue?.(`sfx-foot-${surface}-walk`) === true;
   const warned = new Set<string>();
   const warn =
     options.warn ??
@@ -360,7 +363,11 @@ export function worldCueLookups(
     arrowCuesOf: (arrow) => arrowCues.get(arrow),
     surfaceOfMaterial: (material) => {
       const surface = surfaces.get(material);
-      return surface !== undefined && known.has(surface) ? surface : undefined;
+      if (surface !== undefined) return surface; // every declared surface is in `known`
+      // A tagged region's surface (mw-1jm) arrives as the event's material ("gravel", "carpet"), not a
+      // material id: it plays when the manifest has its set. One with no set yet ("carpet") returns
+      // nothing, so the step sounds as the ground under it, as before.
+      return !surfaces.has(material) && hasFootstepSet(material) ? material : undefined;
     },
     surfaceUnder: (entity) => {
       const ground = read(entity, CharacterController)?.groundBody;

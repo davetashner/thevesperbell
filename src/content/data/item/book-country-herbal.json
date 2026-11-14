@@ -1,0 +1,23 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-country-herbal",
+  "category": "book",
+  "name": "A Country Herbal for the Glen",
+  "description": "A Country Herbal for the Glen, by Hester Lowe, midwife.",
+  "notes": "Inventory item for the story book text data/book/book-country-herbal.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-country-herbal.page-<n>. Value 30 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads.",
+  "icon": "icon-item-book-country-herbal-01",
+  "value": 30,
+  "stackable": false,
+  "book": {
+    "title": "A Country Herbal for the Glen",
+    "author": "Hester Lowe, midwife",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-country-herbal.page-1"
+      }
+    ],
+    "legality": "licensed",
+    "rarity": "common"
+  }
+}

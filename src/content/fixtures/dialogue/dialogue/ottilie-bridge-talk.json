@@ -1,0 +1,114 @@
+{
+  "$schema": "../../../data/dialogue.schema.json",
+  "id": "ottilie-bridge-talk",
+  "notes": "Conventions example (mw-e39.3), not shipped: the class-variant pattern of docs/narrative/content-conventions.md. One entry per class greeting (entry ids `first-<class>`, node ids `greet-<class>`), a return entry chosen by dialogue.visitedCount, an unconditioned fallback, and class-gated options with the class in the option id. Ottilie Marsh, story bible 5.15. Real conversations are written under E39.",
+  "speakers": [{ "id": "ottilie", "npc": "npc-ottilie" }],
+  "entries": [
+    {
+      "id": "return",
+      "when": { "kind": "dialogue.visitedCount", "id": "menu", "op": "gte", "value": 1 },
+      "node": "welcome-back"
+    },
+    {
+      "id": "first-knight",
+      "when": { "kind": "playerClass", "class": "knight" },
+      "node": "greet-knight"
+    },
+    {
+      "id": "first-archer",
+      "when": { "kind": "playerClass", "class": "archer" },
+      "node": "greet-archer"
+    },
+    {
+      "id": "first-sorcerer",
+      "when": { "kind": "playerClass", "class": "sorcerer" },
+      "node": "greet-sorcerer"
+    },
+    {
+      "id": "first-thief",
+      "when": { "kind": "playerClass", "class": "thief" },
+      "node": "greet-thief"
+    },
+    { "id": "first-any", "node": "greet-any" }
+  ],
+  "nodes": [
+    {
+      "id": "greet-knight",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Armour on a Tuesday. Mind the step; the bridge stones are slick, and I'd rather you didn't scrape my doorframe.",
+      "next": "menu"
+    },
+    {
+      "id": "greet-archer",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Green cloak, bow, muddy boots. The Briarwood sends its regards. Wipe them, please.",
+      "next": "menu"
+    },
+    {
+      "id": "greet-sorcerer",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "You'll be wanting Mirela's shop, not mine. Mine has gloves, though, and ink does stain.",
+      "next": "menu"
+    },
+    {
+      "id": "greet-thief",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Light on your feet. Good. The scales are honest and so is the till; I count it twice.",
+      "next": "menu"
+    },
+    {
+      "id": "greet-any",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Mind the step. Ottilie Marsh. First shop past the bridge, and the scales are honest, whatever you've heard.",
+      "next": "menu"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Back again, and in one piece. That's more than I can say for my hinges.",
+      "next": "menu"
+    },
+    {
+      "id": "menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "browse",
+          "text": "What have you got?",
+          "effects": [
+            { "kind": "emit", "event": "shop.open", "data": { "merchant": "marsh-general-store" } }
+          ],
+          "end": true
+        },
+        {
+          "id": "oath-knight",
+          "text": "I keep the watch on the bridge for a night's lodging. Has anyone crossed who shouldn't?",
+          "when": { "kind": "playerClass", "class": "knight" },
+          "once": true,
+          "next": "bridge-news"
+        },
+        {
+          "id": "tracks-archer",
+          "text": "Have you seen wolf tracks by the bridge?",
+          "when": { "kind": "playerClass", "class": "archer" },
+          "once": true,
+          "next": "bridge-news"
+        },
+        { "id": "leave", "text": "Just looking. Thank you.", "end": true }
+      ]
+    },
+    {
+      "id": "bridge-news",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Wolves, no. Mags Oakum's barge has gone down the river empty twice this week, and she hates running empty.",
+      "next": "menu"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "../narration.schema.json",
+  "id": "narration-first-night",
+  "kind": "first-night",
+  "notes": "The first night (bible 4.1 beat 2, 4.5): three variants, each ending on the horned shadow. followed: the player keeps her in sight to the mine gate. lost-her: the player loses her in the lanes and reaches the gate late. blocked-by-wolves: Briar Wolves bar the road and, oddly, let her pass. The scripted encounter is mw-hl3y; this is its text.",
+  "sequences": [
+    {
+      "id": "followed",
+      "title": "Following",
+      "notes": "The player stayed within sight of her all the way to the mine gate.",
+      "pages": [
+        {
+          "text": "You follow. She does not hurry and she does not look back. Her bare feet find every cold flagstone as though she walked this road each night, and the humming never changes pitch. You reach for her shoulder once. The humming swells, and you take your hand away."
+        },
+        {
+          "text": "Past the last lamp, past the schoolhouse and its dark windows, up the rise to the Deepworks. The gate is a wall of black timber, barred from the outside. She stops in front of it as if waiting to be let in."
+        },
+        {
+          "text": "Something moves behind the bars. A shape rises, taller than the gatehouse door and crowned with horns, and it lifts Tansy as gently as a man lifts a sleeping dog off a chair. Then it turns, and the dark folds shut behind them. The gate stays barred. She is gone, and you are alone in the road with one question: what carries a child so carefully?",
+          "beat": "horned-shadow"
+        }
+      ]
+    },
+    {
+      "id": "lost-her",
+      "title": "Lost in the lanes",
+      "notes": "The player lost sight of her and arrived at the gate late (bible 4.5: losing Tansy on night one doesn't matter).",
+      "pages": [
+        {
+          "text": "You follow, and for a while you keep her. Then a cart shed, a turn in a lane, a dog that does not bark, and the street ahead is empty. The humming goes on without you somewhere up the hill, thin as a thread."
+        },
+        {
+          "text": "You run. The road to the mine is the only road she could have taken, and by the time you reach the Deepworks the gate is barred and quiet and there is nothing to see."
+        },
+        {
+          "text": "Then a movement above the bars: something huge and horned, turning toward you as if it had heard you coming. It is not hurrying. It looks almost sorry. It lifts something small and pale from the dust, and the dark closes over the pair of them. You were a minute too late. You could have been an hour.",
+          "beat": "horned-shadow"
+        }
+      ]
+    },
+    {
+      "id": "blocked-by-wolves",
+      "title": "The wolves",
+      "notes": "Briar Wolves (who, oddly, let her through) block the player on the mine road.",
+      "pages": [
+        {
+          "text": "Three wolves step out of the dark across the mine road, grey and thin, their shoulders low. Your hand is on your weapon before you know it. Tansy walks between them as if they were gateposts."
+        },
+        {
+          "text": "They let her pass. They lower their heads as she goes by, and close the road behind her, and face you. They do not snarl. They watch you the way a dog watches a stranger at a gate: not hungry, only dutiful."
+        },
+        {
+          "text": "Up the road, beyond the wolves, the bars of the mine gate show pale. Behind them the shadow of something huge and horned bends to lift a small figure in white. The wolves turn their heads toward it all together, and then it is gone, and only the humming is left, fading down into the mine.",
+          "beat": "horned-shadow"
+        }
+      ]
+    }
+  ]
+}

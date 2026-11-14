@@ -59,6 +59,7 @@ describe('pause menu', () => {
     expect(menu.screen.element.getAttribute('aria-label')).toBe(PAUSE_MENU_TEXT.title);
     expect([...document.querySelectorAll('button')].map((b) => b.textContent)).toEqual([
       'Resume',
+      'Journal',
       'Settings',
       'Save',
       'Load',
@@ -73,9 +74,9 @@ describe('pause menu', () => {
     const chosen: PauseAction[] = [];
     const onClose = vi.fn();
     const menu = openPauseMenu(ui, { onChoose: (action) => chosen.push(action), onClose });
-    for (const action of ['settings', 'save', 'load', 'quit'] as const)
+    for (const action of ['journal', 'settings', 'save', 'load', 'quit'] as const)
       menu.buttons[action].click();
-    expect(chosen).toEqual(['settings', 'save', 'load', 'quit']);
+    expect(chosen).toEqual(['journal', 'settings', 'save', 'load', 'quit']);
     expect(ui.top).toBe(menu.screen);
     menu.buttons.resume.click();
     expect(chosen.at(-1)).toBe('resume');
@@ -107,16 +108,16 @@ describe('pause menu', () => {
     layOut();
     const pad = virtualPad();
     const visited = [active().dataset['action']];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       pad.press(13); // d-pad down
       visited.push(active().dataset['action']);
     }
-    expect(visited).toEqual(['resume', 'settings', 'save', 'load', 'quit']);
+    expect(visited).toEqual(['resume', 'journal', 'settings', 'save', 'load', 'quit']);
     // The ring shows: focus came from the pad, so the root is in navigation modality.
     expect(ui.element.dataset['modality']).toBe('nav');
     pad.press(13); // nothing below Quit: focus stays
     expect(active()).toBe(menu.buttons.quit);
-    for (let i = 0; i < 4; i++) pad.press(12); // d-pad up, back to the top
+    for (let i = 0; i < 5; i++) pad.press(12); // d-pad up, back to the top
     expect(active()).toBe(menu.buttons.resume);
     pad.press(1); // B resumes
     expect(ui.top).toBeUndefined();

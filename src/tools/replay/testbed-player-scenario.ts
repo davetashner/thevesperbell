@@ -51,8 +51,10 @@ import {
   startCarry,
   startWorldItems,
 } from '@game/items/index';
+import { hasHiding, startHiding } from '@game/hiding/index';
 import { hasContainers, prepareContainers, startContainers } from '@game/items/containers';
 import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
+import { sceneHost, startPuzzles } from '@game/puzzles/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
 import { createGameLight, installGameLight, type GameLight } from '@game/light/index';
 import { installGameFire } from '@game/fire';
@@ -63,7 +65,7 @@ import {
   statusLookup,
   type GameMagic,
 } from '@game/magic/index';
-import { installGamePhysics, playerFocus } from '@game/physics-objects';
+import { impactNoiseOptions, installGamePhysics, playerFocus } from '@game/physics-objects';
 import { setupTestbedPlayer, type TransformReader } from '@game/player/index';
 import { SceneLoader } from '@game/scene/index';
 import {
@@ -74,6 +76,7 @@ import {
   HIT_VOLUME_COMPONENTS,
   installDebugCommands,
   DAY_CLOCK_FACTS,
+  MINUTE_FACT,
   PHASE_FACT,
   installSlainFacts,
   LEDGE_HANG_CAPABILITY,
@@ -84,6 +87,7 @@ import {
   RapierSightWorld,
   registerSceneComponents,
   World,
+  type PuzzleRuntime,
   zeroHealth,
   type ActionFrame,
   type RapierModule,
@@ -93,6 +97,7 @@ import {
   type SceneMechanisms,
   type Consumables,
   type WorldItems,
+  sceneExits,
 } from '@sim/index';
 
 import { actionFrameCommand } from './action-frame-command';
@@ -195,8 +200,12 @@ export interface HeadlessGame<TInput> {
   readonly consumables: Consumables;
   /** The scene's doors and switches (mw-e03.18), or undefined in a scene without mechanisms. */
   readonly mechanisms: SceneMechanisms | undefined;
+  /** The scene's puzzles (mw-e15.3), or undefined when it has none. */
+  readonly puzzles: PuzzleRuntime | undefined;
   /** The scene's containers (mw-e18.3), in scene order. */
   readonly containers: readonly EntityId[];
+  /** The scene's hiding spots (mw-e03.23), when it has any. */
+  readonly hiding: ReturnType<typeof startHiding> | undefined;
   /** The creatures content has, and what the scene's creature spawns spawned (mw-e12.4). */
   readonly creatures: GameCreatures;
   readonly sceneCreatures: SceneCreatures;
@@ -204,6 +213,8 @@ export interface HeadlessGame<TInput> {
   readonly sync: RenderSync;
   /** The loaded scene. */
   readonly scene: LoadedScene;
+  /** The scene loader that loaded it (fact-gated spawns come and go through it, mw-e27.8). */
+  readonly scenes: SceneLoader<object, TInput>;
   /** The light field (mw-e03.37), as the game installs it. */
   readonly light: GameLight;
   /** The scene's noise propagation (mw-e09.22). */
@@ -242,6 +253,7 @@ export function createGameWorld<TInput>(
     environment,
     content = loadGameContent(),
     phase,
+    minute,
     magic: withMagic = false,
   }: {
     seed: number;
@@ -256,6 +268,11 @@ export function createGameWorld<TInput>(
      * phases of the day are there or not by it. Without it the world has no clock and they all are.
      */
     phase?: string;
+    /**
+     * The minute of the day the clock reads (`time.minute`, 0-1439; mw-e24.13): scheduled spawns
+     * (`presence.hours`) are there or not by it. Declares the clock's facts like `phase` does.
+     */
+    minute?: number;
     /**
      * Spells and fire as src/main.ts installs them (mw-e06.15): the spell pipeline before the
      * stimulus system, the element field and fire rules after it, the player with a mana pool.
@@ -283,6 +300,7 @@ export function createGameWorld<TInput>(
   const collisionWorld = new RapierCollisionWorld(physics);
   let magic: GameMagic | undefined;
   installGamePhysics(world, {
+    impactNoise: impactNoiseOptions(content),
     focus: focus.read,
     levelColliders: light.colliders,
     ...(withMagic && {
@@ -298,7 +316,7 @@ export function createGameWorld<TInput>(
         });
       },
       afterStimuli: (sim: World<never>) => {
-        installGameFire(sim, content);
+        installGameFire(sim, content, { damage: combat.damage, focus: focus.read });
       },
     }),
   });
@@ -358,7 +376,7 @@ export function createGameWorld<TInput>(
   const items = prepareWorldItems(content);
   startWorldItems(world, items, scene.spawns, player);
   // Carrying (mw-e02.17): liftable objects, as src/main.ts starts them.
-  startCarry(world, content, collision);
+  startCarry(world, content, collision, scene.spawns);
   // Consumables (mw-e17.6): the use pipeline and the player's quick slots.
   const consumables = prepareConsumables(content, items);
   startConsumables(world, consumables, player);
@@ -376,13 +394,21 @@ export function createGameWorld<TInput>(
     : undefined;
   // Containers (mw-e18.3) in scenes that have them, after mechanisms (which unlock a locked chest).
   const containers = hasContainers(scene.layout)
-    ? startContainers(world, prepareContainers(content, items.inventory), scene, content)
+    ? startContainers(world, prepareContainers(content, items.inventory, items), scene, content)
     : [];
+  // Hiding spots (mw-e03.23) in scenes that have them, as src/main.ts starts them.
+  const hiding = hasHiding(scene.layout)
+    ? startHiding(world, scene, {
+        collision,
+        capsule: controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID)).capsule,
+      })
+    : undefined;
   // Creatures (mw-e12.4) with senses and AI (mw-e11.21, mw-e11.23): perception sees the player by
   // the light field over the sim's Rapier world; AI walks the scene's navmesh.
-  if (phase !== undefined) {
+  if (phase !== undefined || minute !== undefined) {
     for (const [key, spec] of Object.entries(DAY_CLOCK_FACTS)) world.facts.declare(key, spec);
-    world.facts.set(PHASE_FACT, phase);
+    if (phase !== undefined) world.facts.set(PHASE_FACT, phase);
+    if (minute !== undefined) world.facts.set(MINUTE_FACT, minute);
   }
   const sceneCreatures = startCreatures(world, creatures, combat, scene.layout.spawns, {
     content,
@@ -397,8 +423,17 @@ export function createGameWorld<TInput>(
   startCreatureDrops(world, content, items, scene.id, scene.layout.spawns);
   const aiWatch = watchCreatureAi(world, sceneCreatures.ai, navigation);
   // Spawns that keep to some phases of the day come and go with the clock (mw-ju8.14).
-  watchPresence(world, creatures.spawn, scene.layout.spawns);
+  watchPresence(world, creatures.spawn, scene.layout.spawns, undefined, {
+    exits: sceneExits(scene.layout),
+  });
+  // Puzzles (mw-e15.3) in scenes that have some, last: they read what everything else did this tick.
+  const puzzles = startPuzzles(world, content, scene.id, {
+    player,
+    host: sceneHost(world, scenes, content),
+    killY: () => scenes.killPlane,
+  });
   return {
+    puzzles,
     world,
     player,
     combat,
@@ -407,10 +442,12 @@ export function createGameWorld<TInput>(
     consumables,
     mechanisms,
     containers,
+    hiding,
     creatures,
     sceneCreatures,
     sync,
     scene,
+    scenes,
     light,
     noise,
     navigation,

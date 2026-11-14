@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique table id; the game reads \"surfaces\"."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Where the numbers come from (bead, tuning status)."
+    },
+    "surfaces": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "stone",
+              "wood",
+              "wood-hollow",
+              "dirt",
+              "grass",
+              "gravel",
+              "mud",
+              "water-shallow",
+              "snow-ice",
+              "metal-grate",
+              "straw",
+              "carpet",
+              "bone-litter",
+              "leaves",
+              "glass-shards"
+            ],
+            "description": "Footstep surface id (audio bible §7.3)."
+          },
+          "offsetDb": {
+            "type": "number",
+            "minimum": -20,
+            "maximum": 20,
+            "description": "Loudness offset relative to stone, dB, −20 to +20."
+          },
+          "varianceDb": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 6,
+            "description": "Step-to-step spread of the loudness, dB (± this much, seeded), 0–6."
+          },
+          "sfx": {
+            "type": "string",
+            "pattern": "^sfx-foot-[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Sound set id the audio layer plays for this surface, e.g. \"sfx-foot-carpet\"."
+          },
+          "creak": {
+            "type": "object",
+            "properties": {
+              "chance": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Probability per step of a creak, 0–1 (seeded)."
+              },
+              "db": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 20,
+                "description": "Extra loudness of a creaking step, dB."
+              }
+            },
+            "required": [
+              "chance",
+              "db"
+            ],
+            "additionalProperties": false,
+            "description": "A board that sometimes betrays the step: a seeded chance of an extra loud step."
+          }
+        },
+        "required": [
+          "id",
+          "offsetDb",
+          "varianceDb",
+          "sfx"
+        ],
+        "additionalProperties": false
+      },
+      "description": "One row per footstep surface of the audio bible §7.3: all of them, each once."
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "surfaces"
+  ],
+  "additionalProperties": false
+}

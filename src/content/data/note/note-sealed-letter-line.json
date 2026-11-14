@@ -1,0 +1,13 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-sealed-letter-line",
+  "title": "Mr. S—'s sealed letter",
+  "notes": "Bible 6.1 quest 6: Mr. S—'s sealed letter, unreadable in the MVP beyond one line. Keeps the buyer's identity open (11.3 deliberately open). The invented line is for the owner to check.",
+  "locations": ["place-bay-nine"],
+  "damaged": true,
+  "pages": [
+    {
+      "text": "[illegible] the fourth is in Wendmouth and waits for the Tern. Keep the stone apart from the coin. [missing]"
+    }
+  ]
+}

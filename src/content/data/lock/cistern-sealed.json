@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "cistern-sealed",
+  "name": "Bellwater Priory cistern door",
+  "notes": "The priory end of the cistern, in the nave's west wall (mw-e26.5): barred from the other side until the Glen Well route and the jail drain are wired (mw-e24.10, mw-e26.20), which replace this lock. No key exists; tier 3.",
+  "tier": 3,
+  "pickTier": 3,
+  "hint": "Barred from the other side."
+}

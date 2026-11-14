@@ -1,0 +1,42 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "knot-inner",
+  "name": "Knot inner half: quest areas",
+  "notes": "The main quest's inner Knot areas in the knot-inner scene (mw-e26.10, mw-5wg). The player-filtered volumes `horns-hall`, `the-fold` and `the-cradle` are the quest areas of those ids (reach-horns-hall, the Fold objective, reach-the-cradle). The quest reads them, so they are not wired. The Sounding Shaft's top volume (`sounding-shaft-top`) belongs to the priory's belfry deck and the shaft climb (mw-e26.18).",
+  "nodes": [
+    {
+      "id": "horns-hall",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 90, "y": 3, "z": 44 },
+        "halfExtents": { "x": 40, "y": 5, "z": 30 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    {
+      "id": "the-fold",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 35, "y": 2, "z": 45 },
+        "halfExtents": { "x": 15, "y": 4, "z": 11 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    {
+      "id": "the-cradle",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 90, "y": 3, "z": 124 },
+        "halfExtents": { "x": 24, "y": 5, "z": 24 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    }
+  ],
+  "wires": []
+}

@@ -21,7 +21,10 @@ import { addSignalGraph } from '../signals/runtime';
 import { PlacementComponent, placeEntity } from '../stimulus/placement';
 import type { DoorProfileLookup, LockLookup, SwitchKind } from './components';
 import { makeLightSource } from '../light/sources';
+import { createVolume } from '../liquids/volumes';
+import { addPushConfig } from '../push/push';
 import { makeCuttable, suspendFrom } from './ropes';
+import { linkSpan, makeSupport } from './supports';
 import { makeImpactSwitch, syncImpactSwitchNodes } from './impacts';
 import { makePlate, syncPlateNodes } from './plates';
 import { makeBeamEmitter, makeLightReceiver, makeOptic } from '../light/beams';
@@ -88,6 +91,7 @@ export function addSceneMechanisms<T>(
   const plates: EntityId[] = [];
   const impactSwitches: EntityId[] = [];
   const ropes: EntityId[] = [];
+  const spans = new Map<string, EntityId[]>();
   const lights: EntityId[] = [];
   const receivers: EntityId[] = [];
   const interactive = sim.isRegistered(InteractableComponent);
@@ -130,12 +134,47 @@ export function addSceneMechanisms<T>(
       });
       plates.push(entity);
     }
+    const { push } = spawn;
+    if (push !== undefined) {
+      addPushConfig(sim, entity, {
+        ...(push.axis !== undefined && { axis: push.axis }),
+        ...(push.grid !== undefined && { grid: push.grid }),
+        ...(push.rotateStep !== undefined && { rotateStep: push.rotateStep }),
+      });
+    }
+    const { liquid } = spawn;
+    if (liquid !== undefined) {
+      const presets = need(options.materials, `liquid "${spawn.id}" needs the material presets`);
+      const { x, y, z } = spawn.position;
+      const [hx, hz] = [liquid.size.x / 2, liquid.size.z / 2];
+      createVolume(sim, presets, {
+        entity,
+        min: { x: x - hx, y, z: z - hz },
+        max: { x: x + hx, y: y + liquid.size.y, z: z + hz },
+        layers: [{ liquid: liquid.liquid, depth: liquid.depth }],
+        ...(liquid.drain !== undefined && { drain: liquid.drain }),
+      });
+    }
     const { rope } = spawn;
     if (rope !== undefined) {
-      makeCuttable(sim, entity, spawn.position, rope.length, {
-        ...(rope.radius !== undefined && { radius: rope.radius }),
-        ...(options.colliders !== undefined && { colliders: options.colliders }),
-      });
+      const { support } = rope;
+      if (support === undefined) {
+        makeCuttable(sim, entity, spawn.position, rope.length, {
+          ...(rope.radius !== undefined && { radius: rope.radius }),
+          ...(options.colliders !== undefined && { colliders: options.colliders }),
+        });
+      } else {
+        const { x, y, z } = spawn.position;
+        makeSupport(sim, entity, spawn.position, rope.to ?? { x, y: y - rope.length, z }, {
+          ...(rope.radius !== undefined && { radius: rope.radius }),
+          resistances: support.resistances,
+          ...(support.rating !== undefined && { rating: support.rating }),
+          ...(options.colliders !== undefined && { colliders: options.colliders }),
+        });
+        if (support.span !== undefined) {
+          spans.set(support.span, [...(spans.get(support.span) ?? []), entity]);
+        }
+      }
       ropes.push(entity);
     }
     const { lightSource: light } = spawn;
@@ -222,6 +261,7 @@ export function addSceneMechanisms<T>(
     );
     suspendFrom(sim, entity, rope);
   }
+  for (const members of spans.values()) linkSpan(sim, members);
   const graphs = loaded.layout.signals.map((signal, index) => {
     const def = need(options.graphs(signal.graph), `unknown signal graph "${signal.graph}"`);
     const bindings: Record<string, EntityId> = {};

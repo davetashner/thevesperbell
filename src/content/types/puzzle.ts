@@ -5,11 +5,12 @@
 // Steps describe what happens to the world (heat reaches the brazier, the crate ends up on the
 // plate), never which trigger fires, so solutions stay systemic. Around that: the reset and recovery
 // policy (mw-e15.7), a hint ladder (mw-e15.11), tags (`mvp`, class focus) and the facts it writes
-// when solved (mw-e15.3 runs it).
+// when solved (mw-e15.3 runs it): how it is found (`discovery`: a volume in world coordinates or a
+// trigger entity), the lever and button signals it drives and its reward hooks.
 //
 // The goal is the shared condition language (docs/design/conditions.md), registered in
-// CONDITION_USAGES; mw-e15.2 extends that language with live-property, signal and volume predicates
-// and they become valid here unchanged. This schema checks what one file can: ids unique, every step,
+// CONDITION_USAGES; its live leaves (entity property predicates, signals, volumes, sustained holds,
+// mw-e15.2) are valid here unchanged. This schema checks what one file can: ids unique, every step,
 // highlight and recovery names a listed entity, a step's capability is one its solution declares,
 // and an `mvp` puzzle declares at least two solutions. The load check (src/content/puzzle-checks.ts)
 // checks the rest against other content: listed entities are spawns of the scene, capabilities are
@@ -18,9 +19,10 @@
 import { z } from 'zod';
 import { contentId, ref } from '../schema.ts';
 import { capabilityId } from './capability.ts';
-import { conditionSchema } from './condition.ts';
+import { conditionSchema, SIGNAL_REF } from './condition.ts';
 import { FACT_KEY_PATTERN } from './fact.ts';
 import { AFFORDANCE_VERB_IDS } from './interaction.ts';
+import { volumeShapeSchema } from './signal-graph.ts';
 import { SPELL_STIMULUS_ELEMENTS } from './spell.ts';
 
 /** The four classes (CONSTITUTION §1), for a puzzle's class focus. */
@@ -136,6 +138,11 @@ const hintTierSchema = z
       .min(1)
       .optional()
       .describe('Listed entities that glint or pulse to draw the eye.'),
+    rumour: factKey
+      .optional()
+      .describe(
+        'Declared bool fact set true when the tier fires: an NPC rumour (dialogue conditions read it) is unlocked.',
+      ),
     variants: z
       .array(
         z.strictObject({
@@ -146,9 +153,10 @@ const hintTierSchema = z
       .default([])
       .describe('Class-aware barks: the first whose capability the player has replaces `bark`.'),
   })
-  .refine((tier) => tier.bark !== undefined || tier.highlight !== undefined, {
-    message: 'a hint tier needs a bark or a highlight',
-  });
+  .refine(
+    (tier) => tier.bark !== undefined || tier.highlight !== undefined || tier.rumour !== undefined,
+    { message: 'a hint tier needs a bark, a highlight or a rumour' },
+  );
 
 const recoverySchema = z
   .discriminatedUnion('kind', [
@@ -156,15 +164,25 @@ const recoverySchema = z
       .strictObject({
         kind: z.literal('respawn').describe('Policy kind: a lost critical entity reappears.'),
         entity: entity.describe('Id of the listed critical entity that is replaced.'),
-        seconds: z.number().positive().describe('Seconds after it is lost that a new one appears.'),
+        seconds: z
+          .number()
+          .positive()
+          .describe('Seconds after it is lost (destroyed or burnt out) that a new one appears.'),
       })
-      .describe('A lost critical entity reappears where it spawned (a crate chute).'),
+      .describe(
+        'A lost critical entity reappears where it spawned (a crate chute), once the spot is clear; a spot that is taken is tried again every 2 s.',
+      ),
     z
       .strictObject({
         kind: z.literal('reset').describe('Policy kind: a trigger resets the mechanisms.'),
         trigger: entity.describe('Id of the listed entity that resets the puzzle (a lever).'),
+        fact: factKey
+          .optional()
+          .describe('Declared int fact counted up by each reset (telemetry, quests, hints).'),
       })
-      .describe('Using the trigger returns the puzzle’s mechanisms to their authored state.'),
+      .describe(
+        'Using the trigger returns the listed doors and switches to their authored state and the puzzle to in-progress (a solved puzzle ignores it).',
+      ),
   ])
   .describe('How the puzzle recovers when a key object is lost or a mechanism is stuck.');
 
@@ -181,6 +199,21 @@ export const puzzleSchema = z
       .array(puzzleEntitySchema)
       .min(1)
       .describe('The level entities the puzzle is about; steps, hints and recovery name these.'),
+    discovery: z
+      .strictObject({
+        volume: volumeShapeSchema
+          .optional()
+          .describe(
+            'Walking in finds the puzzle: a box, sphere or capsule in world coordinates (the scene’s own, unlike a signal graph’s, which is placed relative to an origin).',
+          ),
+        interact: contentId
+          .optional()
+          .describe('Id of a listed entity; using it finds the puzzle (a plaque, a lever).'),
+      })
+      .optional()
+      .describe(
+        'How the puzzle is found. Without it, the first thing the player does to a listed entity finds it.',
+      ),
     goal: conditionSchema.describe(
       'True when the puzzle is solved, whatever made it so (docs/design/conditions.md).',
     ),
@@ -204,7 +237,23 @@ export const puzzleSchema = z
     hints: z
       .array(hintTierSchema)
       .default([])
-      .describe('The hint ladder: tiers fire in order while the player is stuck.'),
+      .describe(
+        'The hint ladder: tiers fire in order while the player is stuck (seconds since the puzzle was found, or failed attempts). Defaults: tier 1 at 180 s or 3 attempts, tier 2 at 360 s, tier 3 at 600 s.',
+      ),
+    failures: z
+      .array(
+        z.strictObject({
+          signal: z
+            .string()
+            .regex(SIGNAL_REF, 'must be "<graph>/<node>"')
+            .describe('Signal graph id and node id, e.g. "chimes/order".'),
+          port: contentId.optional().describe('Output port of the node; default: its first.'),
+        }),
+      )
+      .default([])
+      .describe(
+        'Signal outputs whose pulses are failed attempts (a sequence node’s `failed` port): each rising edge counts one towards a tier’s `afterAttempts`.',
+      ),
     tags: z
       .array(contentId)
       .default([])
@@ -225,6 +274,18 @@ export const puzzleSchema = z
           )
           .default([])
           .describe('Further facts written when solved (doors, rewards and quests read these).'),
+        signals: z
+          .array(z.string().regex(SIGNAL_REF, 'must be "<graph>/<node>"'))
+          .default([])
+          .describe(
+            'Lever nodes switched on, or button nodes pressed, when solved, as "<graph>/<node>"; a graph the scene places wires them to doors and lights. A repeatable puzzle switches levers back off when it reopens.',
+          ),
+        rewards: z
+          .array(contentId)
+          .default([])
+          .describe(
+            'Reward hook ids announced once, the first time the puzzle is solved (the reward systems listen for them).',
+          ),
       })
       .describe('Facts written when the puzzle is solved.'),
   })
@@ -261,6 +322,15 @@ export const puzzleSchema = z
         }
       });
     });
+    const { discovery } = puzzle;
+    if (discovery !== undefined) {
+      if (discovery.volume === undefined && discovery.interact === undefined) {
+        issue(['discovery'], 'needs a volume or an interact trigger');
+      }
+      if (discovery.interact !== undefined) {
+        needListed(['discovery', 'interact'], discovery.interact);
+      }
+    }
     const tagged = puzzle.tags.includes(MVP_TAG);
     if (tagged && puzzle.solutions.length < MVP_MIN_SOLUTIONS) {
       issue(

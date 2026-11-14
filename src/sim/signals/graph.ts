@@ -45,6 +45,7 @@ export const SIGNAL_NODE_KINDS = [
   'counter',
   'sequence',
   'random',
+  'clue',
   'receiver',
   'set-property',
 ] as const;
@@ -112,8 +113,26 @@ export interface ElementPredicate {
   readonly element: SignalElement;
 }
 
-/** One condition of a filter. Filters read properties and tags, never object type ids. */
-export type SignalPredicate = PropertyPredicate | TagPredicate | ElementPredicate;
+/**
+ * The compass directions a facing test names: north is +z, east +x, south -z, west -x (the way the
+ * hall of the demo scene runs), and a turn of +90° (a rotate step) takes north to east.
+ */
+export const FACINGS = ['north', 'east', 'south', 'west'] as const;
+
+/** A compass direction. */
+export type Facing = (typeof FACINGS)[number];
+
+/**
+ * The entity's physics body faces this way (mw-e15.4): the nearest compass direction of where its
+ * front (+z before any turn) points now. A statue turned by the push rules reads as another facing.
+ */
+export interface FacingPredicate {
+  readonly test: 'facing';
+  readonly facing: Facing;
+}
+
+/** One condition of a filter. Filters read properties, tags and facing, never object type ids. */
+export type SignalPredicate = PropertyPredicate | TagPredicate | ElementPredicate | FacingPredicate;
 
 /** A trigger volume's shape, in world coordinates (or relative to the graph's origin, see runtime). */
 export type VolumeShape = BoxShape | SphereShape | CapsuleShape;
@@ -213,6 +232,22 @@ export interface RandomNode extends NodeBase {
   /** Output port names (at least two). */
   readonly outcomes: readonly string[];
 }
+/**
+ * A sound clue emitter (mw-e15.5): on a rising edge of `in` it plays its `cues` one after another,
+ * `spacing` seconds apart (the first at once), each as a `soundClueCued` event anchored at the
+ * bound `entity` (the sound's source), so a cue sheet gives it a positional sound and a caption.
+ * A new edge while it is playing is ignored. `out` is true from the edge until the last cue has
+ * played.
+ */
+export interface ClueNode extends NodeBase {
+  readonly kind: 'clue';
+  /** Cue ids in the order they sound (at least one); a cue sheet rule maps each to a sound. */
+  readonly cues: readonly string[];
+  /** Seconds between one cue and the next; default 1. */
+  readonly spacing?: number;
+  /** Where the sound comes from; without one the cues have no position. */
+  readonly entity?: string;
+}
 /** Drives a door, light, spawner, audio cue, world fact or mechanism: see `signalReceived`. */
 export interface ReceiverNode extends NodeBase {
   readonly kind: 'receiver';
@@ -244,6 +279,7 @@ export type SignalNodeDef =
   | CounterNode
   | SequenceNode
   | RandomNode
+  | ClueNode
   | ReceiverNode
   | SetPropertyNode;
 
@@ -393,6 +429,11 @@ function checkPredicate(p: SignalPredicate, path: (string | number)[], problems:
         fail(`unknown element "${p.element}"`);
       }
       return;
+    case 'facing':
+      if (!(FACINGS as readonly string[]).includes(p.facing)) {
+        fail(`unknown facing "${p.facing}"; one of ${FACINGS.join(', ')}`);
+      }
+      return;
     case 'property': {
       if (!isWorldPropertyKey(p.property)) {
         fail(`unknown world property "${String(p.property)}"`);
@@ -505,6 +546,15 @@ function checkNode(node: SignalNodeDef, path: (string | number)[], problems: Pro
       return;
     case 'random':
       checkPortNames(node.outcomes, [...path, 'outcomes'], problems);
+      return;
+    case 'clue':
+      if (node.cues.length === 0) fail('cues', 'a clue needs at least one cue');
+      node.cues.forEach((cue, i) => {
+        if (!isId(cue)) fail('cues', `cue ${String(i)} must be a lowercase kebab-case id`);
+      });
+      if (node.spacing !== undefined && !isFiniteAtLeast(node.spacing, 0, true)) {
+        fail('spacing', 'must be a finite number > 0');
+      }
       return;
     case 'receiver':
       if (!(SIGNAL_RECEIVERS as readonly string[]).includes(node.receiver)) {

@@ -79,6 +79,7 @@ describe('arrow cues (mw-e05.19)', () => {
           volumeJitterDb: 0,
           volumeDb: 0,
           cooldownMs: 0,
+          gameplayCritical: false,
         },
       ],
     };

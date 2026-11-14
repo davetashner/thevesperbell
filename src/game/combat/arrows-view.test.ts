@@ -20,7 +20,13 @@ import {
 } from '@sim/index';
 import { ActionSampler } from '../input';
 import { RenderSync, type SceneBinding } from '../loop/render-sync';
-import { arrowReadout, bindArrows, pointAlong, readArrowTransform } from './arrows-view';
+import {
+  arrowReadout,
+  bindArrows,
+  pointAlong,
+  readArrowTransform,
+  readWobbledArrowTransform,
+} from './arrows-view';
 import { frameDataView, sandboxFrameData } from './frame-data';
 import {
   prepareTestbedCombat,
@@ -106,6 +112,7 @@ describe('arrows on screen (mw-e05.21)', () => {
       flying: 0,
       stuck: 0,
       dropped: 0,
+      intact: 0,
       latest: null,
     });
     const arrow = fireArrow(world, combat.bow.arrows, {
@@ -170,9 +177,27 @@ describe('arrows on screen (mw-e05.21)', () => {
       direction: { x: 1, y: 0, z: 0 },
       in: null,
       tick: 0,
+      intact: true,
     });
     const both = arrowReadout(world, () => true);
     expect(both).toMatchObject({ flying: 1, stuck: 1, dropped: 1 });
+    // Only the dropped arrow was added whole; the one that stuck from flight need not be.
+    expect(both.intact).toBeGreaterThanOrEqual(1);
+    // A broken arrow lies there too but is not counted whole.
+    const broken = world.spawn();
+    world.add(broken, ArrowRestComponent, {
+      arrow: 'blunt',
+      shooter: null,
+      state: 'dropped',
+      position: { x: 2, y: 0, z: 1 },
+      direction: { x: 1, y: 0, z: 0 },
+      in: null,
+      tick: 0,
+      intact: false,
+    });
+    const after = arrowReadout(world, () => true);
+    expect(after.dropped).toBe(both.dropped + 1);
+    expect(after.intact).toBe(both.intact);
     expect(both.latest?.entity).toBe(dropped);
     expect(both.latest?.entity).toBeGreaterThan(next);
     // Anything else has no arrow transform.
@@ -249,5 +274,30 @@ describe('creature projectiles on screen (mw-ju8.19)', () => {
     const bare = new World<never>({ seed: 1 });
     expect(bindArrows(bare, new RenderSync(bare), headless)).toBe(0);
     expect(readArrowTransform(bare, bare.spawn())).toBeUndefined();
+  });
+});
+
+describe('stuck arrow wobble on screen (mw-e29.11)', () => {
+  it('AC-2: the quiver turns the shaft about its tip and leaves a still arrow untouched', () => {
+    const world = new World<never>({ seed: 1 }).register(ArrowComponent, ArrowRestComponent);
+    const arrow = world.spawn();
+    world.add(arrow, ArrowRestComponent, {
+      arrow: 'standard',
+      shooter: null,
+      state: 'stuck',
+      position: { x: 1, y: 2, z: 3 },
+      direction: { x: 0, y: 0, z: 1 },
+      in: null,
+      tick: 0,
+      intact: true,
+    });
+    const still = readWobbledArrowTransform(world, arrow, () => 0);
+    expect(still).toEqual(readArrowTransform(world, arrow));
+    const quivering = readWobbledArrowTransform(world, arrow, () => 0.1);
+    expect(quivering?.position).toEqual({ x: 1, y: 2, z: 3 });
+    // The tip stays put and the shaft's far end swings to the side by about sin(0.1) of its length.
+    const tail = rotateZ(quivering?.rotation ?? { x: 0, y: 0, z: 0, w: 1 });
+    expect(Math.hypot(tail.x, tail.y)).toBeCloseTo(Math.sin(0.1), 6);
+    expect(readWobbledArrowTransform(world, world.spawn(), () => 0.1)).toBeUndefined();
   });
 });

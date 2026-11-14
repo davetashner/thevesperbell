@@ -45,7 +45,7 @@ describe('facts in saves', () => {
   });
 
   it('a world without facts saves no facts field; a v1 save migrates to v2 unchanged', () => {
-    expect(WORLD_SECTION_VERSION).toBe(5);
+    expect(WORLD_SECTION_VERSION).toBe(6);
     const registry = new SaveRegistry();
     const bytes = registry.write(new World({ seed: 4 }), options);
     const decoded = decodeSave(bytes);

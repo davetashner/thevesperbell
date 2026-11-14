@@ -8,6 +8,17 @@ import { GAME_CONFIG_ID, gameSchema, type GameConfigInput } from './game.ts';
 
 const GAME_FILE = 'src/content/data/game/game.json';
 
+const PRESET = {
+  damageTaken: 1,
+  damageDealt: 1,
+  detectionSpeed: 1,
+  parryWindow: 1,
+  dodgeWindow: 1,
+  fallDamage: 1,
+  puzzleHints: 1,
+  searchDuration: 1,
+};
+
 const config = (over: Partial<GameConfigInput> = {}): GameConfigInput => ({
   id: GAME_CONFIG_ID,
   notes: 'Test.',
@@ -18,6 +29,10 @@ const config = (over: Partial<GameConfigInput> = {}): GameConfigInput => ({
     start: { day: 1, minute: 360 },
     phases: [{ id: 'day', startMinute: 0 }],
     pauseScreens: {},
+  },
+  difficulty: {
+    default: 'adventurer',
+    presets: { story: PRESET, adventurer: PRESET, veteran: PRESET },
   },
   ...over,
 });
@@ -109,5 +124,35 @@ describe('game configuration (mw-e01.15)', () => {
       ).success,
     ).toBe(false);
     expect(gameSchema.safeParse({ ...config(), clock: undefined }).success).toBe(false);
+  });
+
+  it('mw-e31.10: the difficulty block needs every preset with every multiplier, and nothing else', () => {
+    const presets = { story: PRESET, adventurer: PRESET, veteran: PRESET };
+    expect(gameSchema.safeParse(config()).success).toBe(true);
+    const partial: Record<string, number> = { ...PRESET };
+    delete partial['searchDuration'];
+    const cases: unknown[] = [
+      { default: 'adventurer', presets: { ...presets, story: partial } },
+      { default: 'adventurer', presets: { ...presets, veteran: { ...PRESET, extra: 1 } } },
+      { default: 'adventurer', presets: { ...presets, story: { ...PRESET, damageTaken: -1 } } },
+      { default: 'custom', presets },
+      { default: 'adventurer', presets: { story: PRESET, adventurer: PRESET } },
+    ];
+    for (const difficulty of cases) {
+      expect(gameSchema.safeParse(config({ difficulty: difficulty as never })).success).toBe(false);
+    }
+    expect(gameSchema.safeParse({ ...config(), difficulty: undefined }).success).toBe(false);
+  });
+
+  it('mw-e31.10: the shipped presets are the documented table', () => {
+    const content = loadContent(contentTypes, gameContentSources(), contentChecks);
+    const { default: start, presets } = content.get('game', GAME_CONFIG_ID).difficulty;
+    expect(start).toBe('adventurer');
+    expect(presets.story).toMatchObject({
+      damageTaken: 0.5,
+      parryWindow: 1.5,
+      detectionSpeed: 0.6,
+    });
+    expect(Object.values(presets.adventurer).every((value) => value === 1)).toBe(true);
   });
 });

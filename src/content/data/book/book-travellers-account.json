@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-travellers-account",
+  "title": "A Traveller's Account of the Glen",
+  "author": "Perpetua Wyld, gentlewoman",
+  "notes": "Bible 7.2: common book (Sleeping Ox lending shelf). Written when the bell still rang, so it is a bell source from outside the valley; the innkeeper line is the bible quote.",
+  "locations": ["place-sleeping-ox", "place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "The inhabitants are uncommonly literate for stone-cutters and uncommonly nervous about sunset. Asked why the priory bell rings so loud, the innkeeper told me, \"So nobody has to hear anything else.\"\n\nAt dusk the bell rang, and the whole town stopped what it was doing to listen, and went to bed when it stopped. I have never seen a town sleep so soundly. Nor, I thought, so on purpose.\n\nThe beer is good. The beds are damp. The stone is the finest I have ever put my hand on, and I would not put my hand on it after dark."
+    }
+  ]
+}

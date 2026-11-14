@@ -45,9 +45,12 @@ import {
   type AffordanceGate,
 } from '../interaction/system';
 import type { AffordanceSpec } from '../interaction/affordance';
+import { LiquidVolumeComponent } from '../liquids/components';
+import { setDrainOpen } from '../liquids/volumes';
 import { noiseEmitted } from '../noise/events';
 import { bodyMaterialOf, PhysicsColliderComponent, rigidBodiesOf } from '../physics/objects';
 import type { ColliderHandle, StaticColliderSink } from '../physics/static-colliders';
+import { log } from '../math';
 import { readProperty } from '../properties/components';
 import { ScenePieceComponent } from '../scene/loader';
 import { pressButton, setLever, signalReceived } from '../signals/runtime';
@@ -68,6 +71,7 @@ import {
   type Door,
   type DoorBlocks,
   type DoorProfile,
+  type DoorSlam,
   type Lock,
   type LockSpec,
   type Switch,
@@ -95,6 +99,7 @@ import {
   resetImpactSwitch,
 } from './impacts';
 import { CuttableComponent, ropeFeeds, ropesSystem, SuspendedComponent } from './ropes';
+import { SupportComponent, supportFeeds, supportsSystem } from './supports';
 import { PlateComponent, platesSystem, resetPlate, type PlateOptions } from './plates';
 import {
   BeamEmitterComponent,
@@ -104,10 +109,22 @@ import {
   OpticComponent,
 } from '../light/beams';
 import type { StaticOccluders } from '../light/occluders';
+import { ChargeReceiverComponent, resetChargeReceiver } from './charge-receivers';
 import { lightReceiversSystem, resetLightReceiver } from './receivers';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
 export const SLAM_SPEED = 4;
+
+/**
+ * Noise of `door` setting off, dB 1 m away: its profile's loudness (a hand-swung door) plus
+ * 20·log10 of how many times faster than that it swings, so a door slammed at 4× is 4× the
+ * sound pressure (+12 dB) of the same door eased shut (mw-e03.25).
+ */
+export function doorLoudness(door: Pick<Door, 'loudness' | 'slam'>): number {
+  return door.slam === undefined
+    ? door.loudness
+    : door.loudness + (20 * log(door.slam.speed)) / Math.LN10;
+}
 
 /** `door` without its slam (the key is absent, not undefined, so snapshots match ordinary doors). */
 function unslammed(door: Door): Door {
@@ -338,7 +355,7 @@ function emitState(
     world.events.emit(noiseEmitted, {
       tick: world.tick,
       position,
-      loudness: after.loudness,
+      loudness: doorLoudness(after),
       kind: 'door',
       entity,
       source,
@@ -395,13 +412,15 @@ export function moveDoor(
   entity: EntityId,
   target: 0 | 1,
   source: EntityId | null = null,
+  slam?: DoorSlam,
 ): boolean {
   const door = world.get(entity, DoorComponent);
   if (door === undefined || door.broken || door.target === target) return false;
   const lock = lockOf(world, entity);
   if (lock?.locked === true) return refuse(world, entity, lock, 'locked', source);
   if (stuck(world, entity, door)) return jam(world, entity, source);
-  writeDoor(world, entity, door, { ...unslammed(door), target, blockedBy: null }, source);
+  const moving = { ...unslammed(door), target, blockedBy: null };
+  writeDoor(world, entity, door, slam === undefined ? moving : { ...moving, slam }, source);
   refreshAffordances(world, entity);
   return true;
 }
@@ -419,12 +438,11 @@ export function slamDoor(
   speed = SLAM_SPEED,
 ): boolean {
   const door = world.get(entity, DoorComponent);
-  if (door === undefined || doorState(door) !== 'closed' || !moveDoor(world, entity, 1, source)) {
-    return false;
-  }
-  const moving = known(world.get(entity, DoorComponent)); // moveDoor just wrote it
-  world.set(entity, DoorComponent, { ...moving, slam: { speed, source } });
-  return true;
+  return (
+    door !== undefined &&
+    doorState(door) === 'closed' &&
+    moveDoor(world, entity, 1, source, { speed, source })
+  );
 }
 
 /** Opens `entity`'s door (see `moveDoor`). */
@@ -824,9 +842,11 @@ export function installMechanisms<TInput>(
     ImpactSwitchComponent,
     CuttableComponent,
     SuspendedComponent,
+    SupportComponent,
     BeamEmitterComponent,
     OpticComponent,
     LightReceiverComponent,
+    ChargeReceiverComponent,
   );
   const occluders = options.occluders as Partial<StaticOccluders> | undefined;
   const tracer =
@@ -841,6 +861,7 @@ export function installMechanisms<TInput>(
   world.addSystem(impactSwitchesSystem());
   world.addSystem(beamsSystem(tracer));
   world.addSystem(lightReceiversSystem(tracer));
+  world.addSystem(supportsSystem());
   world.addSystem(ropesSystem());
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
@@ -854,9 +875,13 @@ export function installMechanisms<TInput>(
   world.onRemove(CuttableComponent, (_entity, rope) => {
     removeFrom(rules.colliders, rope.collider);
   });
+  world.onRemove(SupportComponent, (_entity, support) => {
+    removeFrom(rules.colliders, support.collider);
+  });
   const offs = [
     impactFeeds(world),
     ropeFeeds(world),
+    supportFeeds(world),
     addAffordanceGate(world, keyGate(rules)),
     world.events.on(interacted, ({ actor, target, verb }) => {
       if (w.has(target, SwitchComponent)) {
@@ -891,9 +916,16 @@ export function installMechanisms<TInput>(
         if (value) resetPlate(w, entity, graph);
       } else if (w.has(entity, LightReceiverComponent)) {
         if (value) resetLightReceiver(w, entity, graph);
+      } else if (w.has(entity, ChargeReceiverComponent)) {
+        if (value) resetChargeReceiver(w, entity, graph);
       } else if (w.has(entity, ImpactSwitchComponent)) {
         // Likewise an impact switch: on resets it (a latching one's way off).
         if (value) resetImpactSwitch(w, entity, graph);
+      } else if (w.isRegistered(LiquidVolumeComponent) && w.has(entity, LiquidVolumeComponent)) {
+        // A valve: on opens the volume's drain, off closes it (a volume with no drain ignores it).
+        if (w.get(entity, LiquidVolumeComponent)?.drain !== undefined) {
+          setDrainOpen(w, entity, value);
+        }
       } else if (w.has(entity, DoorComponent)) moveDoor(w, entity, value ? 1 : 0, graph);
       else setSwitch(w, entity, value ? 1 : 0, graph);
     }),

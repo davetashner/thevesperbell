@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../data/quest.schema.json",
+  "id": "the-captain-below",
+  "notes": "Format fixture (mw-e23.1), not shipped: the successor The Captain's Boots starts when the wrong draught is given. Started by an effect (no `startWhen`).",
+  "title": "The Captain Below",
+  "summary": "The Captain went into the mine in his sleep and has not come back. Every hour counts.",
+  "givers": ["npc-juniper"],
+  "objectives": [
+    {
+      "id": "reach-the-adit",
+      "kind": "enterArea",
+      "text": "Follow the Captain into the Weeping Adit.",
+      "params": {
+        "area": "weeping-adit"
+      }
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "carried-home",
+      "approach": "other",
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-below.captain-home"
+      },
+      "journal": "You found him asleep on his feet at a crossing and walked him home. He woke at his own door with mine dust to his knees."
+    },
+    {
+      "id": "watch-sent",
+      "approach": "diplomacy",
+      "priority": -1,
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-below.watch-sent"
+      },
+      "journal": "You raised the Watch. They brought him up before dawn. It cost him some pride, and the town a long day of talk."
+    }
+  ]
+}

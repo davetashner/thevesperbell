@@ -19,6 +19,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `properties.ignitionPoint` | number -273.15–10000 | — | Temperature at which it ignites, °C. |
 | `properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `properties.frozen` | boolean | — | Frozen solid. |
 | `properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `properties.conductive` | boolean | — | Conducts electric charge. |

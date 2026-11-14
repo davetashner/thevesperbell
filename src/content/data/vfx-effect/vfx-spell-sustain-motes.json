@@ -1,0 +1,68 @@
+{
+  "id": "vfx-spell-sustain-motes",
+  "notes": "Sustain on target: motes orbit up around the target while a status or channel holds. Part of the spell VFX template library (mw-e29.10): drawn in neutral light greys so a spell's tint recolours it (src/game/spell-vfx/tint.ts); built from the existing base textures, no new art.",
+  "priority": 45,
+  "duration": 1.2,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "motes",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "additive",
+      "rate": 18,
+      "lifetime": {
+        "min": 0.8,
+        "max": 1.2
+      },
+      "speed": {
+        "min": 0.05,
+        "max": 0.2
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.4,
+      "gravity": -0.4,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.01
+        },
+        {
+          "t": 0.3,
+          "v": 0.06
+        },
+        {
+          "t": 1,
+          "v": 0.01
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#FFFFFF"
+        },
+        {
+          "t": 0.3,
+          "color": "#D9D9D9"
+        },
+        {
+          "t": 1,
+          "color": "#9A9A9A"
+        }
+      ],
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0
+        },
+        {
+          "t": 0.3,
+          "v": 1
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ]
+    }
+  ]
+}

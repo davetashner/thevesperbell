@@ -85,19 +85,24 @@ import {
   type InteractionPrompt,
   type InteractorKit,
   type LineOfSight,
+  type EquipmentRules,
   type LoadClass,
   type LoadedScene,
   type SightWorld,
   type TargetLocator,
   type TraversalMode,
   type World,
+  type LookSettings,
   type StatusLookup,
+  type SurfaceMap,
+  type SurfaceOffsets,
 } from '@sim/index';
 import type { TestbedBow } from '../combat/testbed-combat';
 import {
   AimZoom,
   applyOrbitPose,
   LockFraming,
+  lookForward,
   lookSettings,
   nearPlaneClear,
   OrbitCamera,
@@ -245,8 +250,23 @@ export interface PlayerAnimationView {
   readonly publish?: (probe: CharacterProbe) => void;
 }
 
+/**
+ * Times the player's per-tick controller and per-frame camera cost (mw-e02.8). Present only in
+ * builds with the latency probe (src/tools/perf/latency-probe.ts), so a release build times nothing.
+ */
+export interface PlayerTiming {
+  /** A millisecond clock (performance.now in the page). */
+  readonly now: () => number;
+  /** Receives the wall time of one controller system run, ms. */
+  readonly controller: (ms: number) => void;
+  /** Receives the wall time of one camera placement, ms. */
+  readonly camera: (ms: number) => void;
+}
+
 export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly world: World<TCommand>;
+  /** Times the controller and camera (the perf suite's latency probe); absent = untimed. */
+  readonly timing?: PlayerTiming;
   /** The loaded scene; the player spawns at its `player-start` spawn, or at `startSpawn`. */
   readonly scene: LoadedScene;
   /** The spawn to start at instead of `player-start`: an area transition's arrival (mw-e01.11). */
@@ -273,6 +293,10 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   readonly shake?: (dt: number) => ShakeOffset;
   /** Mouse look, radians per count; defaults to the camera tuning's. */
   readonly sensitivity?: number;
+  /** The player's live look options (liveLook, mw-e31.6), read every sim tick. Absent = the content's. */
+  readonly lookLive?: () => LookSettings;
+  /** The resting vertical field of view, degrees, read every frame (the FOV option, mw-e31.6). */
+  readonly fov?: () => number;
   /**
    * The moves the player may perform (`compileMoves` of the game content): gives it stamina, an
    * action timeline and the dodge roll and backstep (mw-e04.8). Absent = movement only.
@@ -290,6 +314,12 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
   /** Gives the player lock-on (mw-e02.16); absent = none. */
   readonly lockOn?: TestbedLockOn;
   /**
+   * Where the camera looks while the player is in a conversation (mw-e22.9): the NPC's head, or
+   * undefined when not talking. The camera frames the two of them exactly as a lock-on does (a lock
+   * wins), so it needs `lockOn` for its framing; no cutscene, the player keeps control.
+   */
+  readonly conversationFocus?: () => Vec3 | undefined;
+  /**
    * Mantling and ledge hangs over the scene's ledges (mw-e02.12); the world must have the world
    * properties registered (a ledge's hold reads them). Absent = none.
    */
@@ -306,18 +336,45 @@ export interface TestbedPlayerOptions<TObject, TCommand> {
    */
   readonly water?: TestbedWaterOptions;
   /**
+   * Material id → footstep loudness offset, dB relative to stone (`materialLoudness`, mw-e02.11),
+   * so footstep events carry how loud the ground is. Absent = every ground reads as stone.
+   */
+  readonly footstepOffsets?: SurfaceOffsets;
+  /** The scene's surface regions and table (mw-e09.4); footsteps read the region under the feet. */
+  readonly surfaces?: SurfaceMap;
+  /**
    * A bow and quiver (mw-e05.21), with `moves`: drawn, the camera narrows to its aim. The world's
    * arrow system (startTestbedCombat) flies what it looses. Absent = none.
    */
   readonly bow?: TestbedBow;
   /** Status definitions: slowed and rooted scale the player's speed (mw-e06.24). */
   readonly statuses?: StatusLookup;
+  /** Equipment rules whose armor load shapes the player's combat and noise (mw-e04.16). */
+  readonly equipment?: EquipmentRules;
+  /**
+   * The peek hook (mw-e03.23): while `view` answers for the player (it hides in a wardrobe), the
+   * camera sits at the view's eye and looks where it says instead of orbiting, and `body(false)`
+   * hides the player's own body; `body(true)` shows it again. Absent = the orbit camera always.
+   */
+  readonly peek?: {
+    readonly view: (entity: EntityId) => PeekView | undefined;
+    readonly body: (visible: boolean) => void;
+  };
+}
+
+/** Where the peek camera sits and which way it looks (the look yaw and pitch, radians). */
+export interface PeekView {
+  readonly eye: { readonly x: number; readonly y: number; readonly z: number };
+  readonly yaw: number;
+  readonly pitch: number;
 }
 
 /** The player's climbing (mw-e02.13). */
 export interface TestbedClimbOptions {
   /** The player's climbing capabilities (e.g. CLIMB_ROUGH_CAPABILITY), on top of the registry's (mw-e19.2). */
   readonly capabilities?: readonly string[];
+  /** Capability id -> the climb difficulty it lets the player attempt (mw-e10.9); absent = no limit. */
+  readonly difficulty?: ReadonlyMap<string, number>;
 }
 
 /** The player's water (mw-e02.14). */
@@ -437,8 +494,16 @@ export function setupTestbedPlayer<TObject, TCommand>(
     options.melee === undefined || lockOn === undefined
       ? options.melee
       : { ...options.melee, target: lockedTarget, locate: lockOn.locate ?? placedTargetPosition };
+  const { timing } = options;
   const entity = installPlayer(world, {
     spawns: scene.layout.spawns,
+    ...(timing !== undefined && {
+      measure: (run: () => void) => {
+        const start = timing.now();
+        run();
+        timing.controller(timing.now() - start);
+      },
+    }),
     ...(options.startSpawn !== undefined && { startSpawn: options.startSpawn }),
     collision,
     tuning,
@@ -451,11 +516,14 @@ export function setupTestbedPlayer<TObject, TCommand>(
       ...look,
       ...(options.sensitivity !== undefined && { sensitivity: options.sensitivity }),
     },
+    ...(options.lookLive !== undefined && { lookLive: options.lookLive }),
     pitch: toRadians(cameraTuning.pitch.initial),
     ...(options.ledges !== undefined && {
       ledges: { index: sceneLedges(scene), ...options.ledges },
     }),
     ...(options.climb !== undefined && { climb: options.climb }),
+    ...(options.footstepOffsets !== undefined && { footstepOffsets: options.footstepOffsets }),
+    ...(options.surfaces !== undefined && { surfaces: options.surfaces }),
     ...(options.statuses !== undefined && { statuses: options.statuses }),
     ...(options.water !== undefined && {
       water: { volumes: waterVolumes(scene.layout.regions), ...options.water },
@@ -465,6 +533,7 @@ export function setupTestbedPlayer<TObject, TCommand>(
         moves: options.moves,
         ...(melee !== undefined && { melee }),
         ...(options.bow !== undefined && { bow: options.bow }),
+        ...(options.equipment !== undefined && { equipment: options.equipment }),
       },
     }),
   });
@@ -580,8 +649,12 @@ export function setupTestbedPlayer<TObject, TCommand>(
 
   /** Eases the lens toward the bow's aim while the player draws (mw-e05.21). */
   const zoomLens = (dt: number): void => {
-    if (aim === undefined) return;
-    const fov = aim.zoom.update(isDrawing(world, entity), aim.fov, aim.time, dt);
+    const rest = options.fov?.() ?? cameraTuning.fov;
+    let fov = rest;
+    if (aim !== undefined) {
+      aim.zoom.rest = rest;
+      fov = aim.zoom.update(isDrawing(world, entity), aim.fov, aim.time, dt);
+    }
     if (fov === camera.fov) return;
     camera.fov = fov;
     camera.updateProjectionMatrix?.();
@@ -614,10 +687,29 @@ export function setupTestbedPlayer<TObject, TCommand>(
   let drivesCamera = true;
   let pulled = 0;
 
+  let bodyShown = true;
+  /** Puts the camera at the peek view's eye; returns whether the player is hiding. */
+  const peekCamera = (): boolean => {
+    const view = options.peek?.view(entity);
+    const visible = view === undefined;
+    if (visible !== bodyShown) {
+      bodyShown = visible;
+      options.peek?.body(visible);
+    }
+    if (view === undefined) return false;
+    const forward = lookForward(view.yaw, view.pitch);
+    const { eye } = view;
+    camera.position.set(eye.x, eye.y, eye.z);
+    camera.lookAt(eye.x + forward.x, eye.y + forward.y, eye.z + forward.z);
+    drove = false; // coming out is a cut back to the orbit camera
+    return true;
+  };
+
   const placeCamera = (alpha: number, dt: number): void => {
     const state = world.get(entity, CharacterController);
     const look = world.get(entity, PlayerLook);
     if (shown === undefined || state === undefined || look === undefined) return;
+    if (peekCamera()) return;
     const height = state.crouched ? tuning.capsule.crouchHeight : tuning.capsule.height;
     // Coming back from the debug camera is a cut: no recovery from wherever it last was.
     if (!drove) {
@@ -628,7 +720,9 @@ export function setupTestbedPlayer<TObject, TCommand>(
     const feet = shown.position;
     const simView = { yaw: yawOf(shown.rotation), pitch: drawnPitch(look.pitch, alpha) };
     const pivot = { x: feet.x, y: feet.y + cameraTuning.pivotHeight, z: feet.z };
-    const framed = framing?.update(simView, pivot, lockTarget()?.point, dt) ?? simView;
+    const framed =
+      framing?.update(simView, pivot, lockTarget()?.point ?? options.conversationFocus?.(), dt) ??
+      simView;
     const view =
       pulled === 0
         ? framed
@@ -679,7 +773,12 @@ export function setupTestbedPlayer<TObject, TCommand>(
     frame(info) {
       const dt = info === undefined ? 0 : secondsSince(lastMs, info.timeMs);
       if (info !== undefined) lastMs = info.timeMs;
-      if (drivesCamera) placeCamera(info?.alpha ?? 1, dt);
+      if (drivesCamera && timing === undefined) placeCamera(info?.alpha ?? 1, dt);
+      else if (drivesCamera && timing !== undefined) {
+        const start = timing.now();
+        placeCamera(info?.alpha ?? 1, dt);
+        timing.camera(timing.now() - start);
+      }
       body?.frame(info?.alpha ?? 1, dt);
       if (publish === undefined || world.tick === publishedTick) return;
       const current = readout();

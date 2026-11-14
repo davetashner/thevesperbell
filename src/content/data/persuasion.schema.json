@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "const": "persuasion",
+      "description": "Always \"persuasion\": there is one table."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Where the numbers come from (bead, tuning status)."
+    },
+    "base": {
+      "type": "integer",
+      "minimum": -50,
+      "maximum": 50,
+      "description": "Score every check starts from."
+    },
+    "bandModifiers": {
+      "type": "object",
+      "properties": {
+        "hostile": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "Added when the NPC's disposition band is hostile."
+        },
+        "cold": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "Added when the NPC's disposition band is cold."
+        },
+        "neutral": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "Added when the NPC's disposition band is neutral."
+        },
+        "friendly": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "Added when the NPC's disposition band is friendly."
+        },
+        "devoted": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "Added when the NPC's disposition band is devoted."
+        }
+      },
+      "required": [
+        "hostile",
+        "cold",
+        "neutral",
+        "friendly",
+        "devoted"
+      ],
+      "additionalProperties": false,
+      "description": "Score change per NPC disposition band (hostile, cold, neutral, friendly, devoted)."
+    },
+    "labels": {
+      "type": "object",
+      "properties": {
+        "easyFrom": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991,
+          "description": "Margin (score minus difficulty) from which a check is easy."
+        },
+        "fairFrom": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991,
+          "description": "Margin from which a check is fair."
+        },
+        "hardFrom": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991,
+          "description": "Margin from which a check is hard; below it, impossible."
+        }
+      },
+      "required": [
+        "easyFrom",
+        "fairFrom",
+        "hardFrom"
+      ],
+      "additionalProperties": false,
+      "description": "Difficulty labels the UI shows, by margin."
+    },
+    "modifiers": {
+      "default": [],
+      "description": "Class, capability, item or fact modifiers that apply to every check.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "approaches": {
+            "description": "The approaches it applies to. Omit: every approach.",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "persuade",
+                "intimidate",
+                "deceive",
+                "charm"
+              ]
+            }
+          },
+          "when": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The logic kind, e.g. \"playerClass\"."
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": {},
+            "description": "A logic DSL condition: an object with a `kind` and that kind’s fields."
+          },
+          "bonus": {
+            "type": "integer",
+            "minimum": -50,
+            "maximum": 50
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Why, in the words shown to the player."
+          }
+        },
+        "required": [
+          "when",
+          "bonus",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "personality": {
+      "default": [],
+      "description": "Modifiers from the NPC’s personality, matched on its creature definition.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "approaches": {
+            "description": "The approaches it applies to. Omit: every approach.",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "persuade",
+                "intimidate",
+                "deceive",
+                "charm"
+              ]
+            }
+          },
+          "trait": {
+            "type": "string",
+            "enum": [
+              "bravery",
+              "curiosity",
+              "aggression",
+              "diligence",
+              "sociability",
+              "greed"
+            ],
+            "description": "A creature personality trait (0–1)."
+          },
+          "atLeast": {
+            "description": "Applies at or above this.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "atMost": {
+            "description": "Applies at or below this.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "bonus": {
+            "type": "integer",
+            "minimum": -50,
+            "maximum": 50
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Why, in the words shown to the player."
+          }
+        },
+        "required": [
+          "trait",
+          "bonus",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "base",
+    "bandModifiers",
+    "labels"
+  ],
+  "additionalProperties": false,
+  "description": "Persuasion tuning."
+}

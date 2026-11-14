@@ -1,0 +1,92 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "hiding-room",
+  "name": "Hiding room",
+  "description": "A bare room for hiding (mw-e03.23): a wardrobe on the east wall, a haystack, a barrel, a chest with room for two bodies' worth of weight and two limp bodies to carry. Kept apart from the testbed so the specs that walk the testbed are not in its way.",
+  "grid": 1,
+  "camera": {
+    "position": [-10, 12, -10],
+    "target": [0, 0, 2]
+  },
+  "placements": [
+    { "piece": "floor", "at": [0, 0, 0], "scale": [5, 1, 5] },
+    { "piece": "wall", "at": [0, 0, -5], "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [0, 0, 5], "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [-5, 0, 0], "yaw": 90, "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [5, 0, 0], "yaw": 90, "scale": [5, 1, 1] }
+  ],
+  "spawns": [
+    { "id": "player-start", "at": [0, 0, -3], "tags": ["player-start"] },
+    {
+      "id": "hiding-wardrobe",
+      "at": [4.5, 0, 1.5],
+      "yaw": 270,
+      "properties": { "material": "wood" },
+      "hiding": {
+        "capacity": 1,
+        "concealment": 1,
+        "size": [0.6, 1.9, 0.9],
+        "look": "wood",
+        "exits": [
+          [0, 0, 0.95],
+          [0.7, 0, 0.95],
+          [-0.7, 0, 0.95]
+        ]
+      }
+    },
+    {
+      "id": "hiding-haystack",
+      "at": [1.5, 0, 3],
+      "yaw": 180,
+      "properties": { "material": "straw" },
+      "hiding": {
+        "capacity": 1,
+        "concealment": 0.9,
+        "size": [1.4, 1, 1.4],
+        "look": "hay",
+        "exits": [
+          [0, 0, 1.2],
+          [1.1, 0, 0.6],
+          [-1.1, 0, 0.6]
+        ]
+      }
+    },
+    {
+      "id": "hiding-barrel",
+      "at": [-4, 0, 4.25],
+      "yaw": 180,
+      "properties": { "material": "wood" },
+      "hiding": {
+        "capacity": 1,
+        "concealment": 0.85,
+        "peek": false,
+        "size": [0.7, 0.9, 0.7],
+        "look": "wood",
+        "exits": [
+          [0, 0, 0.8],
+          [0.6, 0, 0.6],
+          [-0.6, 0, 0.6]
+        ]
+      }
+    },
+    { "id": "body-chest", "at": [-2, 0, 3.5], "container": { "stash": { "capacityKg": 60 } } },
+    {
+      "id": "limp-body-a",
+      "at": [-0.5, 0, 2.25],
+      "prop": "limp-body",
+      "bulky": "body",
+      "properties": { "liftable": true }
+    },
+    {
+      "id": "limp-body-b",
+      "at": [0.5, 0, 2.25],
+      "prop": "limp-body",
+      "bulky": "body",
+      "properties": { "liftable": true }
+    }
+  ],
+  "light": {
+    "ambient": 0.4,
+    "directional": [{ "id": "sun", "direction": [-0.45, -1, 0.3], "level": 0.5, "reach": 60 }]
+  }
+}

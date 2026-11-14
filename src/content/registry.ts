@@ -15,18 +15,24 @@
 
 import { checkAnimation } from './anim-checks.ts';
 import { checkCreatureAttacks } from './attack-checks.ts';
+import { checkWeapons } from './weapon-checks.ts';
 import { checkBehaviours } from './behaviour-checks.ts';
 import { checkCreatureAudio } from './creature-audio-checks.ts';
 import { checkConditions } from './condition-checks.ts';
+import { checkDialogues } from './dialogue-checks.ts';
 import { checkFacts } from './fact-checks.ts';
+import { checkReadables } from './readable-checks.ts';
 import { checkLootTables } from './loot-checks.ts';
 import { checkSpellStatuses } from './spell-status-checks.ts';
 import { checkWeakpoints } from './weakpoint-checks.ts';
 import { checkSceneSignals } from './mechanism-checks.ts';
 import { checkRepopulation } from './repopulation-checks.ts';
+import { checkVariants } from './variant-checks.ts';
 import { checkRecoveryAnchors } from './recovery-checks.ts';
 import { checkSceneTransitions } from './transition-checks.ts';
+import { checkPrefabs } from './prefabs.ts';
 import { checkPuzzles } from './puzzle-checks.ts';
+import { checkWorld } from './world-checks.ts';
 import type { Catalogue, ContentCheck, EntryOf } from './loader.ts';
 import { animClipSchema } from './types/anim-clip.ts';
 import { ambienceSchema } from './types/ambience.ts';
@@ -42,14 +48,20 @@ import { checkClasses, classSchema } from './types/class.ts';
 import { namedConditionSchema } from './types/condition.ts';
 import { controllerSchema } from './types/controller.ts';
 import { creatureSchema } from './types/creature.ts';
+import { dialogueSchema } from './types/dialogue.ts';
+import { persuasionSchema } from './types/persuasion.ts';
+import { contestSchema } from './types/contest.ts';
 import { cueSheetSchema } from './types/cue-sheet.ts';
 import { doorSchema } from './types/door.ts';
+import { elementFeedbackSchema } from './types/element-feedback.ts';
 import { environmentDamageSchema } from './types/environment-damage.ts';
 import { factSchema } from './types/fact.ts';
+import { dispositionRuleSchema } from './types/disposition-rule.ts';
 import { factionSchema } from './types/faction.ts';
 import { gameSchema } from './types/game.ts';
 import { checkItems, itemSchema } from './types/item.ts';
 import { hitStopSchema } from './types/hit-stop.ts';
+import { reachClassSchema } from './types/reach-class.ts';
 import { kitSchema } from './types/kit.ts';
 import { lockSchema } from './types/lock.ts';
 import { lockOnSchema } from './types/lock-on.ts';
@@ -60,21 +72,30 @@ import { materialSchema } from './types/material.ts';
 import { moveSchema } from './types/move.ts';
 import { checkNavmeshes, navmeshSchema } from './types/navmesh.ts';
 import { puzzleSchema } from './types/puzzle.ts';
+import { questSchema } from './types/quest.ts';
 import { checkRespawnRules, respawnRulesSchema } from './types/respawn-rules.ts';
 import { sandboxSchema } from './types/sandbox.ts';
+import { prefabSchema } from './types/prefab.ts';
 import { sceneSchema } from './types/scene.ts';
 import { senseSchema } from './types/sense.ts';
 import { shieldSchema } from './types/shield.ts';
 import { signalGraphSchema } from './types/signal-graph.ts';
 import { checkSocketTracks, socketTrackSchema } from './types/socket-track.ts';
 import { spellSchema } from './types/spell.ts';
+import { spellVfxTemplateSchema } from './types/spell-vfx.ts';
+import { checkSpellVfx } from './spell-vfx-checks.ts';
 import { statusSchema } from './types/status.ts';
 import { stealthSchema } from './types/stealth.ts';
+import { surfaceTableSchema } from './types/surface-table.ts';
 import { targetableSchema } from './types/targetable.ts';
 import { testPropSchema } from './types/testprop.ts';
 import { checkUnlocks, unlockSchema } from './types/unlock.ts';
 import { vfxCueSheetSchema } from './types/vfx-cue-sheet.ts';
 import { vfxEffectSchema } from './types/vfx-effect.ts';
+import { worldSchema } from './types/world.ts';
+import { narrationSchema } from './types/narration.ts';
+import { rumorSchema } from './types/rumor.ts';
+import { bookTextSchema, inscriptionSchema, noteSchema } from './types/readable.ts';
 
 /** Content type name → schema of one entry. */
 export const contentTypes = {
@@ -84,6 +105,7 @@ export const contentTypes = {
   arrow: arrowSchema,
   attack: attackSchema,
   behaviour: behaviourSchema,
+  book: bookTextSchema,
   bow: bowSchema,
   breakable: breakableSchema,
   camera: cameraSchema,
@@ -92,13 +114,17 @@ export const contentTypes = {
   condition: namedConditionSchema,
   controller: controllerSchema,
   creature: creatureSchema,
+  dialogue: dialogueSchema,
   'cue-sheet': cueSheetSchema,
+  'disposition-rule': dispositionRuleSchema,
   door: doorSchema,
+  'element-feedback': elementFeedbackSchema,
   'environment-damage': environmentDamageSchema,
   fact: factSchema,
   faction: factionSchema,
   game: gameSchema,
   'hit-stop': hitStopSchema,
+  inscription: inscriptionSchema,
   item: itemSchema,
   kit: kitSchema,
   lock: lockSchema,
@@ -109,7 +135,15 @@ export const contentTypes = {
   merchant: merchantSchema,
   move: moveSchema,
   navmesh: navmeshSchema,
+  note: noteSchema,
+  prefab: prefabSchema,
   puzzle: puzzleSchema,
+  quest: questSchema,
+  narration: narrationSchema,
+  persuasion: persuasionSchema,
+  contest: contestSchema,
+  'reach-class': reachClassSchema,
+  rumor: rumorSchema,
   'respawn-rules': respawnRulesSchema,
   sandbox: sandboxSchema,
   scene: sceneSchema,
@@ -118,13 +152,16 @@ export const contentTypes = {
   'signal-graph': signalGraphSchema,
   'socket-track': socketTrackSchema,
   spell: spellSchema,
+  'spell-vfx-template': spellVfxTemplateSchema,
   status: statusSchema,
   stealth: stealthSchema,
+  'surface-table': surfaceTableSchema,
   targetable: targetableSchema,
   testprop: testPropSchema,
   unlock: unlockSchema,
   'vfx-cue-sheet': vfxCueSheetSchema,
   'vfx-effect': vfxEffectSchema,
+  world: worldSchema,
 };
 
 /** Checks across entries, run on every load of the registered types (see loader.ts). */
@@ -135,7 +172,10 @@ export const contentChecks: readonly ContentCheck[] = [
   checkSocketTracks,
   checkCapabilities,
   checkPuzzles,
+  checkDialogues,
+  checkPrefabs,
   checkCreatureAttacks,
+  checkWeapons,
   checkCreatureAudio,
   checkBehaviours,
   checkUnlocks,
@@ -149,8 +189,12 @@ export const contentChecks: readonly ContentCheck[] = [
   checkNavmeshes,
   checkRespawnRules,
   checkRepopulation,
+  checkVariants,
   checkSpellStatuses,
+  checkSpellVfx,
   checkWeakpoints,
+  checkWorld,
+  checkReadables,
 ];
 
 export type ContentTypes = typeof contentTypes;

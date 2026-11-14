@@ -76,6 +76,12 @@ interface SequenceState {
 interface ReceiverState {
   readonly value: boolean;
 }
+interface ClueState extends EdgeState {
+  /** Tick the playing run began, or -1 when idle. */
+  readonly start: number;
+  /** Cues of the run already sounded. */
+  readonly next: number;
+}
 
 /** One node's stored state (its shape depends on the node's kind). */
 export type SignalNodeState =
@@ -89,6 +95,7 @@ export type SignalNodeState =
   | CounterState
   | SequenceState
   | ReceiverState
+  | ClueState
   | Readonly<Record<string, never>>;
 
 /** A placed graph: the `signal.graph` component's value. */
@@ -120,6 +127,8 @@ function initialState(node: SignalNodeDef): SignalNodeState {
       return { count: 0, last: false };
     case 'sequence':
       return { progress: 0, last: node.steps.map(() => false) };
+    case 'clue':
+      return { last: false, start: -1, next: 0 };
     case 'receiver':
     case 'set-property':
       return { value: false };
@@ -223,6 +232,27 @@ export interface SignalReceipt {
  * on and off, spawners and audio cues fire on `value: true`, fact setters write world facts.
  */
 export const signalReceived = defineEvent<SignalReceipt>('signalReceived');
+
+/** One cue of a clue node's run sounded (mw-e15.5). */
+export interface SoundClueCue {
+  readonly graph: EntityId;
+  readonly graphId: string;
+  readonly node: string;
+  /** The sound's source (the node's bound entity), or null when it has none. */
+  readonly entity: EntityId | null;
+  /** The cue id, e.g. `chime-high`. */
+  readonly cue: string;
+  /** Position in the run (0-based) and the run's length. */
+  readonly index: number;
+  readonly count: number;
+  readonly tick: number;
+}
+
+/**
+ * Fired for each cue of a clue node, in order, `spacing` apart. Presentation (a cue sheet) turns it
+ * into a positional sound and a sound caption; the sim itself stays silent.
+ */
+export const soundClueCued = defineEvent<SoundClueCue>('soundClueCued');
 
 /**
  * Makes `world` run signal graphs: registers the graph and tag components. Call once at setup,
@@ -549,6 +579,31 @@ function evaluate(world: World<never>, graph: EntityId, instance: SignalGraphIns
             : -1;
         node.outcomes.forEach((outcome, k) => out(node, outcome, k === chosen));
         states[node.id] = { last: input };
+        break;
+      }
+      case 'clue': {
+        const input = read(i, 'in');
+        const { last } = state as ClueState;
+        let { start, next } = state as ClueState;
+        if (input && !last && start < 0) {
+          start = tick;
+          next = 0;
+        }
+        const step = ticksFor(node.spacing ?? 1, world.clock.hz);
+        while (start >= 0 && next < node.cues.length && tick >= start + next * step) {
+          world.events.emit(soundClueCued, {
+            ...crossing,
+            node: node.id,
+            entity: bound(node.entity),
+            cue: known(node.cues[next]),
+            index: next,
+            count: node.cues.length,
+          });
+          next++;
+        }
+        if (next >= node.cues.length) start = -1;
+        out(node, 'out', start >= 0);
+        states[node.id] = { last: input, start, next };
         break;
       }
       case 'receiver': {

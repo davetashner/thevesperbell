@@ -65,6 +65,11 @@ export class RenderSync {
     return this.bindings.has(entity);
   }
 
+  /** The scene object bound to `entity`, if any (read-only access for presentation layers). */
+  objectOf(entity: EntityId): unknown {
+    return this.bindings.get(entity)?.binding.object;
+  }
+
   /**
    * Binds a scene object to a live entity. The object starts at the entity's current transform (no
    * interpolation from an old position). Rebinding an entity disposes its previous object.

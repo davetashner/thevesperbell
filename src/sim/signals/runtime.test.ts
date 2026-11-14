@@ -23,12 +23,14 @@ import {
   signalOutput,
   signalReceived,
   signalSystem,
+  soundClueCued,
   toggleLever,
   volumeEntered,
   volumeExited,
   volumeOccupants,
   type SignalGraphOptions,
   type SignalReceipt,
+  type SoundClueCue,
   type VolumeCrossing,
 } from './runtime';
 
@@ -536,6 +538,104 @@ describe('sequence nodes', () => {
     ]);
     press();
     expect(press('c', 'a', 'b')).toEqual([true, false]);
+  });
+});
+
+/** The cues a graph sounds, as `tick:cue` strings in order. */
+function cues(w: World<never>): { seen: string[]; events: SoundClueCue[] } {
+  const seen: string[] = [];
+  const events: SoundClueCue[] = [];
+  w.events.on(soundClueCued, (e: SoundClueCue) => {
+    seen.push(`${String(e.tick)}:${e.cue}`);
+    events.push(e);
+  });
+  return { seen, events };
+}
+
+describe('clue nodes (mw-e15.5)', () => {
+  function emitter(spacing?: number) {
+    const w = world();
+    const g = place(
+      w,
+      graph(
+        [
+          { id: 'listen', kind: 'button' },
+          {
+            id: 'chimes',
+            kind: 'clue',
+            cues: ['chime-low', 'chime-high', 'chime-mid'],
+            entity: 'gate',
+            ...(spacing !== undefined && { spacing }),
+          },
+        ],
+        [['listen', 'chimes']],
+      ),
+    );
+    return { w, g, ...cues(w) };
+  }
+
+  it('AC-1: a clue emitter with cues [low, high, mid], triggered, fires three cue events in order at 1.0 s spacing', () => {
+    const { w, g, seen, events } = emitter();
+    pressButton(w, g, 'listen');
+    for (let i = 0; i < 4 * HZ; i++) w.step();
+    // The press is tick 0's input; the world is 10 Hz, so 1.0 s is 10 ticks.
+    const first = events[0]?.tick ?? -1;
+    expect(seen).toEqual([
+      `${String(first)}:chime-low`,
+      `${String(first + HZ)}:chime-high`,
+      `${String(first + 2 * HZ)}:chime-mid`,
+    ]);
+    expect(events.map((e) => [e.index, e.count])).toEqual([
+      [0, 3],
+      [1, 3],
+      [2, 3],
+    ]);
+    expect(events.every((e) => e.entity !== null && e.node === 'chimes' && e.graphId === 'g')).toBe(
+      true,
+    );
+  });
+
+  it('plays at the configured spacing, is on while it plays and ignores a press mid-run', () => {
+    const { w, g, seen } = emitter(0.5);
+    pressButton(w, g, 'listen');
+    w.step();
+    expect(signalOutput(w, g, 'chimes')).toBe(true);
+    pressButton(w, g, 'listen'); // a press mid-run does not restart it
+    for (let i = 0; i < 5; i++) w.step();
+    expect(seen).toHaveLength(2); // the press at tick 1 added nothing
+    for (let i = 0; i < 6; i++) w.step(); // the run ends on the third cue (tick 10)
+    expect(signalOutput(w, g, 'chimes')).toBe(false);
+    pressButton(w, g, 'listen');
+    for (let i = 0; i < 3 * HZ; i++) w.step();
+    // 0.5 s is 5 ticks: three cues, then the later press (after the run ended) plays it again.
+    expect(seen).toHaveLength(6);
+    const ticks = seen.map((entry) => Number(entry.split(':')[0]));
+    expect(ticks.slice(0, 3).map((t) => t - (ticks[0] ?? 0))).toEqual([0, 5, 10]);
+    expect(signalOutput(w, g, 'chimes')).toBe(false);
+  });
+
+  it('an unbound clue has no source, and a run resumes after a snapshot restore', () => {
+    const w = world();
+    const g = addSignalGraph(
+      w,
+      graph(
+        [
+          { id: 'listen', kind: 'button' },
+          { id: 'chimes', kind: 'clue', cues: ['chime-low', 'chime-high'] },
+        ],
+        [['listen', 'chimes']],
+      ),
+    );
+    const { events } = cues(w);
+    pressButton(w, g, 'listen');
+    w.step();
+    expect(events.map((e) => e.entity)).toEqual([null]);
+    const saved = w.snapshot();
+    for (let i = 0; i < 2 * HZ; i++) w.step();
+    expect(events).toHaveLength(2);
+    w.restore(saved);
+    for (let i = 0; i < 2 * HZ; i++) w.step();
+    expect(events).toHaveLength(3); // the second cue sounded again after the restore, once
   });
 });
 

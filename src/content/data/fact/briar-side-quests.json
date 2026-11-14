@@ -1,0 +1,129 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "briar-side-quests",
+  "name": "The Bookshop Burglar and The Captain's Boots facts",
+  "notes": "mw-e39.10: facts written and read by quest-bookshop-burglar and quest-captains-boots and by the Briar Glen dialogues they added scenes and options to. burglar.outcome, snig.lessons, hale.secret.kept, hale.secret.exposed and hale.sleepwalking.revealed are registered with the dialogues that read them (rootcellar-dialogue, hub-dialogue) and reused as they are.",
+  "facts": [
+    {
+      "key": "burglar.told",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela has told the player that books are going missing from the Lamplit Stacks and asked for a night watch (The Bookshop Burglar, bible 6.1 quest 1). Set by mirela-stacks (ask-books, or a thief accepting her retrieval job); starts the quest.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "burglar.staked-out",
+      "type": "bool",
+      "default": false,
+      "description": "The player has sat up in the Stacks at night and seen the thief run (ink-smudged footprints lead out of the back door). Set by the stakeout scene in mirela-stacks.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "burglar.lessons-agreed",
+      "type": "bool",
+      "default": false,
+      "description": "Mirela has agreed to give Snig reading lessons for goblin salvage (burglar.outcome deal). Set by mirela-stacks; the deal resolution needs it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "burglar.snig-jailed",
+      "type": "bool",
+      "default": false,
+      "description": "Captain Hale has taken Snig into the cell (burglar.outcome turned-in) and paid the bounty. Set by hale-watch; the turn-in resolution needs it. The thief's jailbreak that follows is a later bead.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "burglar.reported",
+      "type": "bool",
+      "default": false,
+      "description": "The player has told Mirela how the burglary ended, so she can react to it. Set by mirela-stacks.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "boots.noticed",
+      "type": "bool",
+      "default": false,
+      "description": "The player has heard that Captain Hale's boots are dusty every morning (rumour 8 from Dot, or Juniper). Starts The Captain's Boots with hale.boots.asked and hale.boots.confessed. Set by dot-sleeping-ox and juniper-fenn.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.night-followed",
+      "type": "bool",
+      "default": false,
+      "description": "The player has watched Hale sleepwalk toward the mine at night (The Captain's Boots, bible 6.1 quest 2). Set by the night scene in hale-watch; opens the ways of settling it.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.route-followed",
+      "type": "bool",
+      "default": false,
+      "description": "The player followed Hale all the way along the sleepwalkers' route and learned the Briarwood shortcut (The Captain's Boots). Set by the night scene in hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "route.briarwood.revealed",
+      "type": "bool",
+      "default": false,
+      "description": "The sleepwalkers' route, and with it the Briarwood shortcut to the priory (bible 6.1 quest 2), is known. Set by the follow-the-route resolution of The Captain's Boots.",
+      "owner": "quest"
+    },
+    {
+      "key": "boots.method",
+      "type": "enum",
+      "values": ["none", "tea", "sleep", "tied", "bell", "route"],
+      "default": "none",
+      "description": "How the player is settling Hale's sleepwalking: wakeful tea, the wrong (sleep) draught, tying him to his bed with his consent, a bell on his door, or shadowing the route. A decision record set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.draught",
+      "type": "enum",
+      "values": ["none", "tea", "sleep"],
+      "default": "none",
+      "description": "The draught Hale last drank on the player's word. Sleep at night starts the Hale walks in branch of The Captain's Boots (the quest reads it); cleared when he is brought home.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.tied-consent",
+      "type": "bool",
+      "default": false,
+      "description": "Hale agreed to be tied to his bed at night. Set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.bell-hung",
+      "type": "bool",
+      "default": false,
+      "description": "A bell hangs on Hale's door so that he cannot leave unheard. Set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "hale.walked-in",
+      "type": "bool",
+      "default": false,
+      "description": "Hale took the sleep draught and walked up the mine road in the night (the Hale walks in branch). Set by the quest on nightfall; hale-watch plays the fetching scene while it holds and hale.retrieved does not.",
+      "owner": "quest"
+    },
+    {
+      "key": "hale.retrieved",
+      "type": "bool",
+      "default": false,
+      "description": "Hale has been fetched home from the mine gate after walking in. Set by hale-watch.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "juniper.tea-ready",
+      "type": "bool",
+      "default": false,
+      "description": "Juniper has brewed wakeful tea from the player's two bellwort roots. Set by juniper-fenn.",
+      "owner": "dialogue"
+    },
+    {
+      "key": "juniper.draught-sold",
+      "type": "bool",
+      "default": false,
+      "description": "Juniper sold the player a sleep draught for the captain (the wrong draught). Set by juniper-fenn.",
+      "owner": "dialogue"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-saltmarch-sea-tales",
+  "title": "Saltmarch Sea Tales",
+  "author": "Anonymous, translated",
+  "notes": "Extra shelf book: Tidemarket imports (3.6). The sunken figurehead rumour and the sea-serpent; harbour colour for Wendmouth.",
+  "locations": ["place-tidemarket", "place-drowned-gull", "place-lamplit-stacks"],
+  "pages": [
+    {
+      "text": "In the Saltmarch they say the sea has a mind of its own and a very small sense of humour.\n\nThe sailor Ione Bryce swore she saw a serpent off the breakwater at Wendmouth, green as a bottle and wide as a barge, with a woman's face made of wood. She followed it for a mile with a lantern. In the morning the harbour master told her it was a figurehead, sunk with its ship. She said, \"Then why did it follow me?\"\n\nThe harbour master had no answer. Nobody ever does. The tale is told in every tavern between the Isles and the river, and the figurehead has never once been fetched up."
+    }
+  ]
+}

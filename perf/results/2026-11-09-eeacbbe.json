@@ -1,0 +1,649 @@
+{
+  "schema": 1,
+  "mode": "reference",
+  "sha": "eeacbbe",
+  "date": "2026-11-09T02:35:50.647Z",
+  "browser": "chrome 156.0.8078.81",
+  "results": [
+    {
+      "id": "frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.9,
+      "delta": -13.799999999999999,
+      "pass": true,
+      "message": "frame-p50-high (frameP50Ms in perf-baseline at high): 2.90 ms within budget ≤ 16.70 ms (−13.80 ms (−82.6%))"
+    },
+    {
+      "id": "frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 3.8,
+      "delta": -12.899999999999999,
+      "pass": true,
+      "message": "frame-p95-high (frameP95Ms in perf-baseline at high): 3.80 ms within budget ≤ 16.70 ms (−12.90 ms (−77.2%))"
+    },
+    {
+      "id": "long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "long-tasks-high (longTasksOver200ms in perf-baseline at high): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "valley-01-frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.5,
+      "delta": -14.2,
+      "pass": true,
+      "message": "valley-01-frame-p50-high (frameP50Ms in valley-01 at high): 2.50 ms within budget ≤ 16.70 ms (−14.20 ms (−85.0%))"
+    },
+    {
+      "id": "valley-01-frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 3.2,
+      "delta": -13.5,
+      "pass": true,
+      "message": "valley-01-frame-p95-high (frameP95Ms in valley-01 at high): 3.20 ms within budget ≤ 16.70 ms (−13.50 ms (−80.8%))"
+    },
+    {
+      "id": "valley-01-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "valley-01-long-tasks-high (longTasksOver200ms in valley-01 at high): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "valley-01-frame-p50-low",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 1.6,
+      "delta": -15.1,
+      "pass": true,
+      "message": "valley-01-frame-p50-low (frameP50Ms in valley-01 at low): 1.60 ms within budget ≤ 16.70 ms (−15.10 ms (−90.4%))"
+    },
+    {
+      "id": "valley-01-frame-p95-low",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 2.8,
+      "delta": -13.899999999999999,
+      "pass": true,
+      "message": "valley-01-frame-p95-low (frameP95Ms in valley-01 at low): 2.80 ms within budget ≤ 16.70 ms (−13.90 ms (−83.2%))"
+    },
+    {
+      "id": "valley-01-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "valley-01-long-tasks-low (longTasksOver200ms in valley-01 at low): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "valley-02-frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.5,
+      "delta": -14.2,
+      "pass": true,
+      "message": "valley-02-frame-p50-high (frameP50Ms in valley-02 at high): 2.50 ms within budget ≤ 16.70 ms (−14.20 ms (−85.0%))"
+    },
+    {
+      "id": "valley-02-frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 3.3,
+      "delta": -13.399999999999999,
+      "pass": true,
+      "message": "valley-02-frame-p95-high (frameP95Ms in valley-02 at high): 3.30 ms within budget ≤ 16.70 ms (−13.40 ms (−80.2%))"
+    },
+    {
+      "id": "valley-02-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "valley-02-long-tasks-high (longTasksOver200ms in valley-02 at high): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "valley-02-frame-p50-low",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 1.5,
+      "delta": -15.2,
+      "pass": true,
+      "message": "valley-02-frame-p50-low (frameP50Ms in valley-02 at low): 1.50 ms within budget ≤ 16.70 ms (−15.20 ms (−91.0%))"
+    },
+    {
+      "id": "valley-02-frame-p95-low",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 2.9,
+      "delta": -13.799999999999999,
+      "pass": true,
+      "message": "valley-02-frame-p95-low (frameP95Ms in valley-02 at low): 2.90 ms within budget ≤ 16.70 ms (−13.80 ms (−82.6%))"
+    },
+    {
+      "id": "valley-02-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "valley-02-long-tasks-low (longTasksOver200ms in valley-02 at low): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "valley-03-frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.4,
+      "delta": -14.299999999999999,
+      "pass": true,
+      "message": "valley-03-frame-p50-high (frameP50Ms in valley-03 at high): 2.40 ms within budget ≤ 16.70 ms (−14.30 ms (−85.6%))"
+    },
+    {
+      "id": "valley-03-frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 3.3,
+      "delta": -13.399999999999999,
+      "pass": true,
+      "message": "valley-03-frame-p95-high (frameP95Ms in valley-03 at high): 3.30 ms within budget ≤ 16.70 ms (−13.40 ms (−80.2%))"
+    },
+    {
+      "id": "valley-03-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "valley-03-long-tasks-high (longTasksOver200ms in valley-03 at high): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "valley-03-frame-p50-low",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 1.7,
+      "delta": -15,
+      "pass": true,
+      "message": "valley-03-frame-p50-low (frameP50Ms in valley-03 at low): 1.70 ms within budget ≤ 16.70 ms (−15.00 ms (−89.8%))"
+    },
+    {
+      "id": "valley-03-frame-p95-low",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 3,
+      "delta": -13.7,
+      "pass": true,
+      "message": "valley-03-frame-p95-low (frameP95Ms in valley-03 at low): 3.00 ms within budget ≤ 16.70 ms (−13.70 ms (−82.0%))"
+    },
+    {
+      "id": "valley-03-long-tasks-low",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps at 1080p",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "valley-03-long-tasks-low (longTasksOver200ms in valley-03 at low): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "load-to-playable-slice",
+      "metric": "loadToPlayableMs",
+      "unit": "ms",
+      "max": 10000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: Initial load to playable ≤ 10 s on a 50 Mbps connection",
+      "value": 1061,
+      "delta": -8939,
+      "pass": true,
+      "message": "load-to-playable-slice (loadToPlayableMs in slice): 1061.00 ms within budget ≤ 10000.00 ms (−8939.00 ms (−89.4%))"
+    },
+    {
+      "id": "front-door-load",
+      "metric": "frontDoorLoadMs",
+      "unit": "ms",
+      "max": 10000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: Initial load to playable ≤ 10 s on a 50 Mbps connection",
+      "value": 1354,
+      "delta": -8646,
+      "pass": true,
+      "message": "front-door-load (frontDoorLoadMs in slice): 1354.00 ms within budget ≤ 10000.00 ms (−8646.00 ms (−86.5%))"
+    },
+    {
+      "id": "first-frame-warm",
+      "metric": "firstFrameMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 313,
+      "delta": -2687,
+      "pass": true,
+      "message": "first-frame-warm (firstFrameMs in front-door): 313.00 ms within budget ≤ 3000.00 ms (−2687.00 ms (−89.6%))"
+    },
+    {
+      "id": "save-load-testbed",
+      "metric": "saveLoadToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 529,
+      "delta": -2471,
+      "pass": true,
+      "message": "save-load-testbed (saveLoadToPlayableMs in testbed): 529.00 ms within budget ≤ 3000.00 ms (−2471.00 ms (−82.4%))"
+    },
+    {
+      "id": "save-load-slice",
+      "metric": "saveLoadToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 803,
+      "delta": -2197,
+      "pass": true,
+      "message": "save-load-slice (saveLoadToPlayableMs in slice): 803.00 ms within budget ≤ 3000.00 ms (−2197.00 ms (−73.2%))"
+    },
+    {
+      "id": "continue-slice",
+      "metric": "continueToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 465,
+      "delta": -2535,
+      "pass": true,
+      "message": "continue-slice (continueToPlayableMs in slice): 465.00 ms within budget ≤ 3000.00 ms (−2535.00 ms (−84.5%))"
+    },
+    {
+      "id": "restart-area-slice",
+      "metric": "restartToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 748,
+      "delta": -2252,
+      "pass": true,
+      "message": "restart-area-slice (restartToPlayableMs in slice): 748.00 ms within budget ≤ 3000.00 ms (−2252.00 ms (−75.1%))"
+    },
+    {
+      "id": "area-transition-valley",
+      "metric": "transitionToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 259,
+      "delta": -2741,
+      "pass": true,
+      "message": "area-transition-valley (transitionToPlayableMs in valley-02): 259.00 ms within budget ≤ 3000.00 ms (−2741.00 ms (−91.4%))"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "frameP50Ms",
+      "value": 2.9,
+      "scene": "perf-baseline"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3.8,
+      "scene": "perf-baseline"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "perf-baseline"
+    },
+    {
+      "metric": "frameP50Ms",
+      "value": 2.5,
+      "scene": "valley-01",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3.2,
+      "scene": "valley-01",
+      "preset": "high"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "valley-01",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP50Ms",
+      "value": 2.5,
+      "scene": "valley-02",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3.3,
+      "scene": "valley-02",
+      "preset": "high"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "valley-02",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP50Ms",
+      "value": 2.4,
+      "scene": "valley-03",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3.3,
+      "scene": "valley-03",
+      "preset": "high"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "valley-03",
+      "preset": "high"
+    },
+    {
+      "metric": "frameP50Ms",
+      "value": 1.6,
+      "scene": "valley-01",
+      "preset": "low"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 2.8,
+      "scene": "valley-01",
+      "preset": "low"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "valley-01",
+      "preset": "low"
+    },
+    {
+      "metric": "frameP50Ms",
+      "value": 1.5,
+      "scene": "valley-02",
+      "preset": "low"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 2.9,
+      "scene": "valley-02",
+      "preset": "low"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "valley-02",
+      "preset": "low"
+    },
+    {
+      "metric": "frameP50Ms",
+      "value": 1.7,
+      "scene": "valley-03",
+      "preset": "low"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3,
+      "scene": "valley-03",
+      "preset": "low"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "valley-03",
+      "preset": "low"
+    },
+    {
+      "metric": "loadToPlayableMs",
+      "value": 1061,
+      "scene": "slice"
+    },
+    {
+      "metric": "frontDoorLoadMs",
+      "value": 1354,
+      "scene": "slice"
+    },
+    {
+      "metric": "firstFrameMs",
+      "value": 313,
+      "scene": "front-door"
+    },
+    {
+      "metric": "saveLoadToPlayableMs",
+      "value": 529,
+      "scene": "testbed"
+    },
+    {
+      "metric": "saveLoadToPlayableMs",
+      "value": 803,
+      "scene": "slice"
+    },
+    {
+      "metric": "continueToPlayableMs",
+      "value": 465,
+      "scene": "slice"
+    },
+    {
+      "metric": "restartToPlayableMs",
+      "value": 748,
+      "scene": "slice"
+    },
+    {
+      "metric": "transitionToPlayableMs",
+      "value": 259,
+      "scene": "valley-02"
+    }
+  ],
+  "frames": [
+    {
+      "scene": "perf-baseline",
+      "frame": {
+        "count": 1800,
+        "p50": 2.9,
+        "p95": 3.8,
+        "p99": 4.4,
+        "max": 5.3,
+        "mean": 2.397555555555549
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.799999952316284,
+        "p95": 3.600000023841858,
+        "p99": 4.299999952316284,
+        "max": 5.100000023841858,
+        "mean": 2.291944444378217
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    },
+    {
+      "scene": "valley-01",
+      "preset": "high",
+      "frame": {
+        "count": 1800,
+        "p50": 2.5,
+        "p95": 3.2,
+        "p99": 3.8,
+        "max": 4.9,
+        "mean": 2.1113888888889054
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.300000011920929,
+        "p95": 3,
+        "p99": 3.5,
+        "max": 4.5,
+        "mean": 1.9764444443252351
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    },
+    {
+      "scene": "valley-02",
+      "preset": "high",
+      "frame": {
+        "count": 1800,
+        "p50": 2.5,
+        "p95": 3.3,
+        "p99": 4,
+        "max": 105.2,
+        "mean": 2.247000000000008
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.300000011920929,
+        "p95": 3.100000023841858,
+        "p99": 3.5,
+        "max": 104.5,
+        "mean": 2.0746111105216873
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    },
+    {
+      "scene": "valley-03",
+      "preset": "high",
+      "frame": {
+        "count": 1800,
+        "p50": 2.4,
+        "p95": 3.3,
+        "p99": 4.2,
+        "max": 5.1,
+        "mean": 2.1699444444444524
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.300000011920929,
+        "p95": 3.100000023841858,
+        "p99": 4,
+        "max": 4.900000035762787,
+        "mean": 2.0373333341214392
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    },
+    {
+      "scene": "valley-01",
+      "preset": "low",
+      "frame": {
+        "count": 1800,
+        "p50": 1.6,
+        "p95": 2.8,
+        "p99": 3.2,
+        "max": 4,
+        "mean": 1.6465555555555489
+      },
+      "work": {
+        "count": 1800,
+        "p50": 1.5,
+        "p95": 2.699999988079071,
+        "p99": 2.899999976158142,
+        "max": 3.699999988079071,
+        "mean": 1.532444444961018
+      },
+      "viewport": "1920×1080 @1x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    },
+    {
+      "scene": "valley-02",
+      "preset": "low",
+      "frame": {
+        "count": 1800,
+        "p50": 1.5,
+        "p95": 2.9,
+        "p99": 3.5,
+        "max": 83,
+        "mean": 1.7613333333333299
+      },
+      "work": {
+        "count": 1800,
+        "p50": 1.300000011920929,
+        "p95": 2.700000047683716,
+        "p99": 3.199999988079071,
+        "max": 82.30000001192093,
+        "mean": 1.6287777772214678
+      },
+      "viewport": "1920×1080 @1x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    },
+    {
+      "scene": "valley-03",
+      "preset": "low",
+      "frame": {
+        "count": 1800,
+        "p50": 1.7,
+        "p95": 3,
+        "p99": 3.4,
+        "max": 4.6,
+        "mean": 1.6992777777777746
+      },
+      "work": {
+        "count": 1800,
+        "p50": 1.5,
+        "p95": 2.899999976158142,
+        "p99": 3.199999988079071,
+        "max": 3.699999988079071,
+        "mean": 1.5832222217321397
+      },
+      "viewport": "1920×1080 @1x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  ],
+  "pass": true
+}

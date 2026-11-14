@@ -19,7 +19,7 @@ import { Died, type Death } from '../combat/damage/events';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
-import { improveStance, isStance, worsenStance, type Stance } from './stance';
+import { improveStance, isFriendlyStance, isStance, worsenStance, type Stance } from './stance';
 import { PLAYER_FACTION, UNALIGNED_FACTION, type FactionTable } from './table';
 
 /** A creature's (or the player's) faction and its own stances that override the faction's. */
@@ -201,6 +201,30 @@ export function relation(
   const other = world.get(b, FactionMemberComponent);
   if (self === undefined || other === undefined) return 'neutral';
   return self.toward[other.faction] ?? factionStance(world, table, self.faction, other.faction);
+}
+
+/**
+ * How `entity` regards the player: its own override, else its faction's current stance toward
+ * `player`; undefined when it belongs to no faction.
+ */
+export function stanceTowardPlayer(
+  world: World<never>,
+  table: FactionTable,
+  entity: EntityId,
+): Stance | undefined {
+  const self = world.get(entity, FactionMemberComponent);
+  if (self === undefined) return undefined;
+  return self.toward[PLAYER_FACTION] ?? factionStance(world, table, self.faction, PLAYER_FACTION);
+}
+
+/** Whether `entity` is an ally or friend of the player (a shopkeeper, the Watch), now. */
+export function isFriendlyToPlayer(
+  world: World<never>,
+  table: FactionTable,
+  entity: EntityId,
+): boolean {
+  const stance = stanceTowardPlayer(world, table, entity);
+  return stance !== undefined && isFriendlyStance(stance);
 }
 
 /**

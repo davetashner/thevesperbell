@@ -10,7 +10,8 @@ import type { System, World } from '../core/world';
 import { stimulusResolved } from '../stimulus/stimulus';
 import type { FieldConfigInput } from './config';
 import { applyStimulusToField } from './coupling';
-import { stepField, type FieldStepReport } from './diffusion';
+import { stepField, type FieldLod, type FieldStepReport } from './diffusion';
+import type { Vec3 } from '../stimulus/shapes';
 import { ElementField } from './grid';
 
 /** The field component (`element.field`; a snapshot and save key, never renamed). */
@@ -48,15 +49,20 @@ export function elementFieldOf(world: World<never>): ElementField {
 
 /**
  * The system that steps the element field once per tick; add it after `stimulusSystem` so this
- * tick's stimuli are in the field before it diffuses. `onStep` receives each tick's report.
+ * tick's stimuli are in the field before it diffuses. `onStep` receives each tick's report. With
+ * `focus` (the player's position, undefined while there is none) the field runs at a reduced rate
+ * far from it (`FieldLod`, mw-e03.30); without, every awake chunk steps every tick.
  */
 export function elementFieldSystem<TInput>(
   onStep?: (report: FieldStepReport) => void,
+  focus?: () => Vec3 | undefined,
 ): System<TInput> {
   return {
     name: 'element-field',
-    run: ({ world }) => {
-      const report = stepField(elementFieldOf(world));
+    run: ({ world, tick }) => {
+      const anchor = focus?.();
+      const lod: FieldLod | undefined = anchor === undefined ? undefined : { tick, anchor };
+      const report = stepField(elementFieldOf(world), lod);
       onStep?.(report);
     },
   };

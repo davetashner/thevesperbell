@@ -47,7 +47,8 @@
       "pitchJitter": 0.05,
       "cooldownMs": 3000,
       "priority": 70,
-      "caption": "caption.alert-bark"
+      "caption": "caption.alert-bark",
+      "gameplayCritical": true
     },
     {
       "event": "aiAlertStateChanged",
@@ -59,7 +60,8 @@
       "pitchJitter": 0.05,
       "cooldownMs": 3000,
       "priority": 70,
-      "caption": "caption.alert-bark"
+      "caption": "caption.alert-bark",
+      "gameplayCritical": true
     }
   ]
 }

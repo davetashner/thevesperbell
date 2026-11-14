@@ -42,6 +42,17 @@ describe('SoundCaptions (mw-e28.14)', () => {
     );
   });
 
+  it('mw-e31.5 AC-1: a caption 90° to the right turns its arrow to point right, and the words say so too', () => {
+    const w = new SoundCaptions();
+    w.update(model({ captions: [{ key: 'r', text: '[Footsteps, right]', bearingDeg: 90 }] }));
+    const line = lines(w)[0];
+    expect(line?.querySelector<HTMLElement>('.vb-caption-arrow')?.style.transform).toBe(
+      'rotate(90deg)',
+    );
+    // Direction is never colour alone: a shape (the arrow) and the words carry it.
+    expect(line?.textContent).toContain('right');
+  });
+
   it('keeps a line (and its place in the live region) while its arrow turns, writing in 5° steps', () => {
     const w = new SoundCaptions();
     w.update(model());

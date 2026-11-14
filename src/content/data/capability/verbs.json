@@ -2,7 +2,7 @@
   "$schema": "../capability.schema.json",
   "id": "verbs",
   "name": "Traversal verbs",
-  "notes": "Climbing and ledge capabilities the sim checks today (src/sim/climb: surfaces.ts and mantle.ts name these ids). Mantling and ladders, ropes and ivy need none. Every class starts with verb.climb.ledge and the thief also with verb.climb.rough (class data, mw-e19.4); until class selection applies them (mw-e19.5) the testbed grants verb.climb.ledge to the player.",
+  "notes": "A capability may grant a climb difficulty (climbDifficulty, mw-e10.9): the hardest climb its holder attempts, 1 (ladders, ropes, ivy) with none, 2 rough stone and timber, 3 sheer faces; the thief's verb.climb.rough reaches 3, so a knight stops at 1 and is told so. Climbing and ledge capabilities the sim checks today (src/sim/climb: surfaces.ts and mantle.ts name these ids). Mantling and ladders, ropes and ivy need none. Every class starts with verb.climb.ledge and the thief also with verb.climb.rough (class data, mw-e19.4); until class selection applies them (mw-e19.5) the testbed grants verb.climb.ledge to the player.",
   "capabilities": [
     {
       "id": "verb.climb.ledge",
@@ -13,7 +13,8 @@
       "id": "verb.climb.rough",
       "name": "Climb Rough Stone",
       "description": "Jump at a rough stone or timber wall and climb it (mw-e02.13).",
-      "classAffinity": "thief"
+      "classAffinity": "thief",
+      "climbDifficulty": 3
     },
     {
       "id": "verb.climb.sheer",

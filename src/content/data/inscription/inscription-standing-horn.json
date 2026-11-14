@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-standing-horn",
+  "title": "The Standing Horn",
+  "notes": "Bible 7.1 posture and 3.5: Hornfolk menhir, hands over its ears. A runic base-line, translated. Horn-role source (object).",
+  "locations": ["place-standing-horn", "place-briarwood"],
+  "pages": [
+    {
+      "text": "(A tall grey stone, a figure cut into it with both hands over its ears. Along the base, in blocky runes, someone has scratched a translation with a nail.)\n\nWE HOLD. WE LISTEN TO NOTHING. THE WARDEN WALKS SO THAT YOU MAY SLEEP."
+    }
+  ]
+}

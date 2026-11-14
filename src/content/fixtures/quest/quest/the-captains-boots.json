@@ -1,0 +1,145 @@
+{
+  "$schema": "../../../data/quest.schema.json",
+  "id": "the-captains-boots",
+  "notes": "Format fixture (mw-e23.1), not shipped: story bible §6.1 side quest 2. Four resolutions (tea, consent, bell, route), a hidden optional objective, stages, a quest started by a condition and a failure that starts a successor quest.",
+  "title": "The Captain's Boots",
+  "summary": "Captain Hale's boots are dusty every morning, and he swears he never leaves his bed. Juniper has noticed. Somebody ought to find out where he goes.",
+  "givers": ["npc-juniper"],
+  "startWhen": {
+    "kind": "fact",
+    "fact": "fixture-boots.noticed"
+  },
+  "stages": [
+    {
+      "id": "follow",
+      "text": "Follow the Captain at night and see where he walks."
+    },
+    {
+      "id": "settle",
+      "text": "Now you know. Put a stop to the walking before he walks too far."
+    }
+  ],
+  "objectives": [
+    {
+      "id": "follow-captain",
+      "kind": "fact",
+      "text": "Follow the Captain after dark.",
+      "stage": "follow",
+      "params": {
+        "fact": "fixture-boots.night-followed"
+      }
+    },
+    {
+      "id": "fetch-bellwort",
+      "kind": "haveItem",
+      "text": "Fetch bellwort root for Juniper's wakeful tea.",
+      "optional": true,
+      "activeWhen": {
+        "kind": "objectiveState",
+        "quest": "the-captains-boots",
+        "objective": "follow-captain",
+        "state": "complete"
+      },
+      "params": {
+        "item": "bellwort-root",
+        "count": 2
+      }
+    },
+    {
+      "id": "give-bellwort",
+      "kind": "deliverItem",
+      "text": "Bring the bellwort to Juniper.",
+      "optional": true,
+      "stage": "settle",
+      "params": {
+        "item": "bellwort-root",
+        "npc": "npc-juniper",
+        "count": 2
+      }
+    },
+    {
+      "id": "learn-route",
+      "kind": "fact",
+      "text": "Learn the sleepwalkers' route.",
+      "hidden": true,
+      "optional": true,
+      "params": {
+        "fact": "fixture-boots.route-learned"
+      }
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "wakeful-tea",
+      "approach": "other",
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-boots.tea-given"
+      },
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-juniper",
+          "delta": 5
+        }
+      ],
+      "journal": "A cup of Juniper's wakeful tea, not the sleep draught, and the Captain slept the whole night in his own bed. His boots were clean by morning."
+    },
+    {
+      "id": "tied-to-bed",
+      "approach": "diplomacy",
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-boots.consented-tie"
+      },
+      "journal": "You asked, and Hale agreed, red to the ears, to be tied to his bedpost with a soft rope. He does not speak of it. He does not need to."
+    },
+    {
+      "id": "bell-on-the-door",
+      "approach": "trickery",
+      "priority": -1,
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-boots.bell-hung"
+      },
+      "journal": "A little brass bell on his door. He woke to it at the Bell Line stones, confused, and went back to bed. It is not a cure, but it is a start."
+    },
+    {
+      "id": "sleepwalkers-route",
+      "approach": "stealth",
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-boots.route-learned"
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "fixture-boots.shortcut-known",
+          "value": true
+        }
+      ],
+      "journal": "You followed him the whole way and learned the route he walks. It runs through Briarwood, and it is a better road to the priory than any map shows."
+    }
+  ],
+  "failures": [
+    {
+      "id": "walked-all-the-way-in",
+      "when": {
+        "kind": "fact",
+        "fact": "fixture-boots.draught-given"
+      },
+      "effects": [
+        {
+          "kind": "disposition",
+          "npc": "npc-juniper",
+          "delta": -3
+        }
+      ],
+      "journal": "The sleep draught was the wrong bottle. Hale walked past the Bell Line stones and did not turn back. Juniper will not look at you.",
+      "continuation": {
+        "kind": "startQuest",
+        "quest": "the-captain-below"
+      }
+    }
+  ]
+}

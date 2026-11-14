@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadGameContent, materialPresets } from '@content/index';
 import {
   addMaterialProperties,
+  addProperties,
   applyStimulus,
   entitiesWithProperty,
   ElementFieldComponent,
@@ -15,8 +16,9 @@ import {
   registerWorldProperties,
   stimulusSystem,
   World,
+  WorldPersistence,
 } from '@sim/index';
-import { installGameFire } from './fire';
+import { fireSettleOptions, installGameFire } from './fire';
 
 describe('fire in the game (mw-e06.15)', () => {
   it('heat on a wooden crate sets it alight through the installed fire rules', () => {
@@ -85,4 +87,26 @@ describe('fire in the game (mw-e06.15)', () => {
     expect(readProperty(world, torch, 'burning')).toBe(false);
     expect(world.isAlive(straw)).toBe(false);
   }, 30_000);
+});
+
+describe('fire settled on load (mw-e27.7)', () => {
+  it('a burning wooden crate burns out to its charred state; a lantern stays when spent', () => {
+    const content = loadGameContent();
+    const world = installStimuli(registerWorldProperties(new World<never>({ seed: 1 })));
+    const crate = world.spawn();
+    addMaterialProperties(world, crate, materialPresets(content.all('material')), {
+      material: 'wood',
+    });
+    const persistence = new WorldPersistence({ settle: fireSettleOptions(content) });
+    const baseline = persistence.baseline(world, 'room', [['spawn:crate', crate]]);
+    addProperties(world, crate, { burning: true });
+    expect(persistence.settle(world, baseline).burnt).toBe(1);
+    expect(readProperty(world, crate, 'burning')).toBe(false);
+    expect(readProperty(world, crate, 'material')).not.toBe('wood');
+    const options = fireSettleOptions(content);
+    world.register(...lightComponents);
+    const lantern = spawnLightSource(world, 'lantern', { x: 0, y: 1, z: 0 });
+    expect(options.keepWhenSpent?.(world, lantern)).toBe(true);
+    expect(options.keepWhenSpent?.(world, crate)).toBe(false);
+  });
 });

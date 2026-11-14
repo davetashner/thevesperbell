@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "road-not-open",
+  "name": "Briar Glen unbuilt road gate",
+  "notes": "The gate at the end of a town road whose scene is not built yet (the mine road, mw-e25.23; the priory road, mw-e25.25): a planned edge stub that the town tour (mw-e24.2 AC-3) marks and the later bead replaces with a transition. No key exists. A tier-3 lock so no early pick opens a way that leads nowhere.",
+  "tier": 3,
+  "pickTier": 3,
+  "hint": "The road beyond is not open yet."
+}

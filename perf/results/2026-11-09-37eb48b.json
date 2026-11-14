@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "mode": "reference",
+  "sha": "37eb48b",
+  "date": "2026-11-09T01:57:02.854Z",
+  "browser": "chrome 156.0.8078.81",
+  "results": [
+    {
+      "id": "frame-p50-high",
+      "metric": "frameP50Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 2.8,
+      "delta": -13.899999999999999,
+      "pass": true,
+      "message": "frame-p50-high (frameP50Ms in perf-baseline): 2.80 ms within budget ≤ 16.70 ms (−13.90 ms (−83.2%))"
+    },
+    {
+      "id": "frame-p95-high",
+      "metric": "frameP95Ms",
+      "unit": "ms",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 3.9,
+      "delta": -12.799999999999999,
+      "pass": true,
+      "message": "frame-p95-high (frameP95Ms in perf-baseline): 3.90 ms within budget ≤ 16.70 ms (−12.80 ms (−76.6%))"
+    },
+    {
+      "id": "long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "unit": "count",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "value": 0,
+      "delta": 0,
+      "pass": true,
+      "message": "long-tasks-high (longTasksOver200ms in perf-baseline): 0 within budget ≤ 0 (+0)"
+    },
+    {
+      "id": "load-to-playable-slice",
+      "metric": "loadToPlayableMs",
+      "unit": "ms",
+      "max": 10000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: Initial load to playable ≤ 10 s on a 50 Mbps connection",
+      "value": 1514.699999988079,
+      "delta": -8485.300000011921,
+      "pass": true,
+      "message": "load-to-playable-slice (loadToPlayableMs in slice): 1514.70 ms within budget ≤ 10000.00 ms (−8485.30 ms (−84.9%))"
+    },
+    {
+      "id": "front-door-load",
+      "metric": "frontDoorLoadMs",
+      "unit": "ms",
+      "max": 10000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: Initial load to playable ≤ 10 s on a 50 Mbps connection",
+      "value": 1518,
+      "delta": -8482,
+      "pass": true,
+      "message": "front-door-load (frontDoorLoadMs in slice): 1518.00 ms within budget ≤ 10000.00 ms (−8482.00 ms (−84.8%))"
+    },
+    {
+      "id": "first-frame-warm",
+      "metric": "firstFrameMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 310,
+      "delta": -2690,
+      "pass": true,
+      "message": "first-frame-warm (firstFrameMs in front-door): 310.00 ms within budget ≤ 3000.00 ms (−2690.00 ms (−89.7%))"
+    },
+    {
+      "id": "save-load-testbed",
+      "metric": "saveLoadToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 708,
+      "delta": -2292,
+      "pass": true,
+      "message": "save-load-testbed (saveLoadToPlayableMs in testbed): 708.00 ms within budget ≤ 3000.00 ms (−2292.00 ms (−76.4%))"
+    },
+    {
+      "id": "save-load-slice",
+      "metric": "saveLoadToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 908,
+      "delta": -2092,
+      "pass": true,
+      "message": "save-load-slice (saveLoadToPlayableMs in slice): 908.00 ms within budget ≤ 3000.00 ms (−2092.00 ms (−69.7%))"
+    },
+    {
+      "id": "continue-slice",
+      "metric": "continueToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 471,
+      "delta": -2529,
+      "pass": true,
+      "message": "continue-slice (continueToPlayableMs in slice): 471.00 ms within budget ≤ 3000.00 ms (−2529.00 ms (−84.3%))"
+    },
+    {
+      "id": "restart-area-slice",
+      "metric": "restartToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 750,
+      "delta": -2250,
+      "pass": true,
+      "message": "restart-area-slice (restartToPlayableMs in slice): 750.00 ms within budget ≤ 3000.00 ms (−2250.00 ms (−75.0%))"
+    },
+    {
+      "id": "area-transition-valley",
+      "metric": "transitionToPlayableMs",
+      "unit": "ms",
+      "max": 3000,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: warm reload ≤ 3 s",
+      "value": 360,
+      "delta": -2640,
+      "pass": true,
+      "message": "area-transition-valley (transitionToPlayableMs in valley-02): 360.00 ms within budget ≤ 3000.00 ms (−2640.00 ms (−88.0%))"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "frameP50Ms",
+      "value": 2.8,
+      "scene": "perf-baseline"
+    },
+    {
+      "metric": "frameP95Ms",
+      "value": 3.9,
+      "scene": "perf-baseline"
+    },
+    {
+      "metric": "longTasksOver200ms",
+      "value": 0,
+      "scene": "perf-baseline"
+    },
+    {
+      "metric": "loadToPlayableMs",
+      "value": 1514.699999988079,
+      "scene": "slice"
+    },
+    {
+      "metric": "frontDoorLoadMs",
+      "value": 1518,
+      "scene": "slice"
+    },
+    {
+      "metric": "firstFrameMs",
+      "value": 310,
+      "scene": "front-door"
+    },
+    {
+      "metric": "saveLoadToPlayableMs",
+      "value": 708,
+      "scene": "testbed"
+    },
+    {
+      "metric": "saveLoadToPlayableMs",
+      "value": 908,
+      "scene": "slice"
+    },
+    {
+      "metric": "continueToPlayableMs",
+      "value": 471,
+      "scene": "slice"
+    },
+    {
+      "metric": "restartToPlayableMs",
+      "value": 750,
+      "scene": "slice"
+    },
+    {
+      "metric": "transitionToPlayableMs",
+      "value": 360,
+      "scene": "valley-02"
+    }
+  ],
+  "frames": [
+    {
+      "scene": "perf-baseline",
+      "frame": {
+        "count": 1800,
+        "p50": 2.8,
+        "p95": 3.9,
+        "p99": 5,
+        "max": 5.6,
+        "mean": 2.396555555555547
+      },
+      "work": {
+        "count": 1800,
+        "p50": 2.699999988079071,
+        "p95": 3.600000023841858,
+        "p99": 4.800000011920929,
+        "max": 5.399999976158142,
+        "mean": 2.2905555556548967
+      },
+      "viewport": "1280×720 @2x",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  ],
+  "pass": true
+}

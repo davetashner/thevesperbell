@@ -35,6 +35,7 @@ import {
   type PerceptionOptions,
   type TargetSighting,
 } from './system';
+import { HiddenComponent } from '../hiding/state';
 import { touchPercept } from './touch';
 import { DEFAULT_PERCEPTION_TUNING } from './tuning';
 
@@ -355,11 +356,31 @@ describe('perception: hearing (mw-e11.5)', () => {
   // Through the doorway: two legs of √(25 + 1 + 64) m, −20·log10 of their sum; the wall loses 30 dB.
   const ROUTE_LOSS = -distanceGainDb(2 * Math.sqrt(90));
 
-  function hearingWorld(trace: PerceptionOptions['trace'] = {}) {
-    const s = setup({ trace });
+  function hearingWorld(
+    trace: PerceptionOptions['trace'] = {},
+    noticesMovement?: PerceptionOptions['noticesMovement'],
+  ) {
+    const s = setup({ trace, ...(noticesMovement !== undefined && { noticesMovement }) });
     installNoisePropagation(s.world, { graph: GRAPH });
     return s;
   }
+
+  it('mw-e03.23: a hidden target’s noise is still heard (hearing is untouched)', () => {
+    const { world, reports, step } = hearingWorld();
+    const guard = addAgent(world, HUMANOID, LISTENER);
+    const player = addPlayer(world, SOURCE);
+    world.register(HiddenComponent);
+    world.add(player, HiddenComponent, { spot: 999, concealment: 1, since: 0, from: ORIGIN });
+    step(1);
+    emitNoise(world, {
+      position: SOURCE,
+      loudness: 45 + ROUTE_LOSS,
+      kind: 'hide-enter',
+      source: player,
+    });
+    step();
+    expect(perceptsOf(reports, guard).map((p) => p.sense)).toEqual(['hearing']);
+  });
 
   it('AC-5: a 45 dB noise heard through a doorway carries the doorway’s position, not the source', () => {
     const levels: number[] = [];
@@ -393,6 +414,56 @@ describe('perception: hearing (mw-e11.5)', () => {
     expect(perceptsOf(reports, guard).map((p) => [p.source, p.certainty])).toEqual([
       ['sound:step', 1],
       ['sound:cough', 1],
+    ]);
+  });
+
+  it('mw-e09.5: it notices its target’s footsteps and landings, never another creature’s', () => {
+    const { world, reports, step } = hearingWorld();
+    const guard = addAgent(world, HUMANOID, LISTENER);
+    const colleague = addAgent(world, HUMANOID, { x: 6, y: 0, z: -4 });
+    const player = addPlayer(world, { x: 8, y: 0, z: -4 });
+    step(1);
+    const at = { x: 6, y: 0, z: -4 };
+    const walker = (who: EntityId | null, kind: string): void => {
+      emitNoise(world, { position: at, loudness: 60, kind, entity: who, source: who });
+    };
+    walker(colleague, 'footstep');
+    walker(colleague, 'landing');
+    walker(null, 'footstep');
+    walker(colleague, 'door');
+    walker(player, 'footstep');
+    walker(player, 'landing');
+    step();
+    expect(perceptsOf(reports, guard).map((p) => p.source)).toEqual([
+      'entity:' + String(colleague), // the door it slammed is still a sound
+      'entity:' + String(player),
+      'entity:' + String(player),
+    ]);
+  });
+
+  it('mw-e09.5: an agent that does not notice movement still hears every other noise', () => {
+    const quiet: PerceptionOptions['noticesMovement'] = (agent) => agent !== guards.friend;
+    const guards = { friend: -1 };
+    const { world, reports, step } = hearingWorld({}, quiet);
+    const friend = addAgent(world, HUMANOID, LISTENER);
+    const watcher = addAgent(world, HUMANOID, { x: 5, y: 0, z: -3 });
+    guards.friend = friend;
+    const player = addPlayer(world, { x: 8, y: 0, z: -4 });
+    step(1);
+    const at = { x: 6, y: 0, z: -4 };
+    emitNoise(world, {
+      position: at,
+      loudness: 60,
+      kind: 'footstep',
+      entity: player,
+      source: player,
+    });
+    emitNoise(world, { position: at, loudness: 60, kind: 'break' });
+    step();
+    expect(perceptsOf(reports, friend).map((p) => p.source)).toEqual(['sound:break']);
+    expect(perceptsOf(reports, watcher).map((p) => p.source)).toEqual([
+      'entity:' + String(player),
+      'sound:break',
     ]);
   });
 
@@ -679,5 +750,38 @@ describe('perception: touch (mw-e11.6)', () => {
         DEFAULT_PERCEPTION_TUNING,
       ),
     ).toBeUndefined();
+  });
+});
+
+describe('perception: hidden targets (mw-e03.23)', () => {
+  const hide = (world: World<never>, player: EntityId, concealment: number) => {
+    world.register(HiddenComponent);
+    world.add(player, HiddenComponent, { spot: 999, concealment, since: 0, from: ORIGIN });
+  };
+
+  it('a target hidden with concealment 1 is out of every sight query, and costs no sight lines', () => {
+    const { world, reports, step } = setup();
+    const player = addPlayer(world, ahead(10));
+    const guard = addAgent(world);
+    hide(world, player, 1);
+    step();
+    expect(perceptsOf(reports, guard)).toEqual([]);
+  });
+
+  it('a target half hidden is seen, but less than when it stands in the open', () => {
+    const open = setup();
+    addPlayer(open.world, ahead(5));
+    const watcher = addAgent(open.world);
+    open.step();
+    const plain = perceptsOf(open.reports, watcher)[0]?.strength ?? 0;
+    const half = setup();
+    const player = addPlayer(half.world, ahead(5));
+    const guard = addAgent(half.world);
+    hide(half.world, player, 0.5);
+    half.step();
+    const dimmed = perceptsOf(half.reports, guard)[0]?.strength ?? 0;
+    expect(plain).toBeGreaterThan(0);
+    expect(dimmed).toBeGreaterThan(0);
+    expect(dimmed).toBeLessThan(plain);
   });
 });

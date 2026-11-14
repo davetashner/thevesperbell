@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "bay-nine-seal",
+  "name": "Bay nine seal",
+  "notes": "The sealed iron door of bay nine in the Bonded Warehouse (mw-e40.1; route is mw-e40.4, route-matrix bay-nine): a tier-2 customs seal over a lock; the forged manifest and seal stamp or a pick open it. No key lies about.",
+  "tier": 2,
+  "pickTier": 2,
+  "hint": "Sealed with the customs stamp. Bay nine is bonded."
+}

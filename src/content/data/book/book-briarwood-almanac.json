@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-briarwood-almanac",
+  "title": "The Briarwood Hunter's Almanac",
+  "author": "Wat Fennimore, woodsman",
+  "notes": "Extra shelf book: Briarwood lore (3.5): wolves, the Sleepers' Path, the Standing Horn; Horn-role source in a hunter's idiom.",
+  "locations": ["place-briarwood", "place-fenns-fletchery"],
+  "pages": [
+    {
+      "text": "Wolves run the north bank from autumn. Mind the wind, and carry fire.\n\nThere is a line of trampled ferns in the wood that you will see only at night or if you have a sharp eye. I have followed it twice. Both times I turned back at the fifth tree and could not tell you why.\n\nThe Standing Horn in the clearing is Hornfolk work, a tall grey stone with a figure cut into it and its hands over its ears. Hunters touch it for luck. I do. There is something big, and old, and patient in these woods that wants no harm to come to anything, and I would sooner it thought well of me."
+    }
+  ]
+}

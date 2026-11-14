@@ -9,13 +9,20 @@ import {
   listenerPose,
 } from '@audio/index';
 import {
+  climbDifficultyGrants,
+  compileElementFeedback,
   controllerTuningFor,
+  ELEMENT_FEEDBACK_ID,
   GAME_CONFIG_ID,
   loadGameContent,
+  compileSurfaceTable,
+  materialLoudness,
+  SURFACE_TABLE_ID,
   materialPresets,
   PLAYER_CAMERA_ID,
   PLAYER_CONTROLLER_ID,
   PLAYER_CLASSES,
+  PERSUASION_ID,
   PLAYER_LOCK_ON_ID,
   RESPAWN_RULES_ID,
   type GameContent,
@@ -24,6 +31,7 @@ import {
 import {
   arrowReadout,
   bindArrows,
+  readWobbledArrowTransform,
   bindSandboxDummies,
   createSandboxHud,
   dummyReadout,
@@ -64,6 +72,7 @@ import {
   watchPresence,
   type GameCreatures,
 } from '@game/creatures/index';
+import { startRopes } from '@game/climb/ropes';
 import { bindBreakLeftovers, BreakWatch, hasBreakables } from '@game/breakables/index';
 import {
   bindWorldItems,
@@ -76,7 +85,24 @@ import {
 } from '@game/items/index';
 import { startInventoryUi, type InventoryUi } from '@game/items/inventory-screen';
 import { startContainerUi, type ContainerUi } from '@game/items/container-window';
+import {
+  Conversations,
+  conversationCapture,
+  createGameDispositions,
+  creatureIdOf,
+  dialogueVeto,
+  DIALOGUE_VETO_ID,
+  npcResolver,
+} from '@game/conversation/index';
+import type { DialogueDef } from '@content/types/dialogue';
 import { startShopUi } from '@game/shop/shop-window';
+import { ContestController } from '@game/contest/controller';
+import { contestsIn, installContests } from '@game/contest/install';
+import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
+import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
+import { startReaderUi } from '@game/reader/reader';
+import { buildJournal, JournalController, journalSources } from '@game/journal/journal';
+import { rumoursOf, startRumourUi } from '@game/rumours/rumours';
 import {
   ContainerWatch,
   hasContainers,
@@ -91,6 +117,7 @@ import {
   sceneCheckpoints,
   startMechanisms,
 } from '@game/mechanisms/index';
+import { hintReadout, PuzzleWatch, sceneHost, startPuzzles } from '@game/puzzles/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
 import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
@@ -129,7 +156,8 @@ import {
   object3DBinding,
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
-import { installGameFire } from '@game/fire';
+import { installGameLogic, questsOf } from '@game/logic/index';
+import { fireSettleOptions, installGameFire } from '@game/fire';
 import {
   attachSpellBar,
   attachSpellHud,
@@ -151,13 +179,19 @@ import {
 import { bootPhysics } from '@game/physics-loader';
 import {
   formatBudgetWarning,
+  impactNoiseOptions,
   installGamePhysics,
   playerFocus,
   propBodies,
 } from '@game/physics-objects';
 import {
+  comfortDefaults,
   createSettingsStore,
+  bindDifficulty,
+  choiceOf,
+  loadDifficultyPresets,
   BindingsEditor,
+  bindHoldToggle,
   loadBindings,
   openOptionsMenu,
   type SettingsStore,
@@ -183,6 +217,8 @@ import {
 } from '@game/light/index';
 import {
   attachPlayerInput,
+  climbHintModel,
+  climbHintOf,
   CONTROLLER_HOT_EVENT,
   DeathBeat,
   interactPromptModel,
@@ -190,6 +226,7 @@ import {
   readControllerFile,
   respawnRulesFrom,
   setupTestbedPlayer,
+  type ClimbHint,
   type ControllerHotUpdate,
   type TestbedPlayer,
   attachWaterHud,
@@ -199,8 +236,10 @@ import {
 import {
   readPhysicsObjectTransform,
   readSceneTransform,
+  ndcInView,
   resolveSceneRequest,
   SceneLoader,
+  watchSpawnVariants,
 } from '@game/scene/index';
 import {
   applyCarriedPlayer,
@@ -233,7 +272,16 @@ import { SaveSlots } from '@game/save/slots/index';
 import { openSaveStore, type OpenedSaveStore } from '@game/save/storage/index';
 import { missingFeatures } from '@game/support';
 import {
+  ArrowFx,
+  AwarenessFx,
+  attachCorpseDissolves,
+  type CorpseGlue,
   DamageVignette,
+  FlashLimiter,
+  type CombinedLook,
+  ElementFeedbackBridge,
+  GasFieldPresenter,
+  pulseFactor,
   SwingTrails,
   trailTints,
   vfxTextureManifest,
@@ -246,12 +294,26 @@ import { createLeftover, disposeLeftover } from '@render/breakables/index';
 import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
 import { createThrowArc } from '@render/player/index';
 import { createDoorLeaf, disposeDoorLeaf } from '@render/mechanisms/index';
+import { createHidingSpotMesh, disposeHidingSpotMesh } from '@render/hiding/index';
 import {
+  hasHiding,
+  HIDING_VETO_ID,
+  hidingVeto,
+  HidingWatch,
+  peekView,
+  readHidingSpot,
+  spotLooks,
+  startHiding,
+} from '@game/hiding/index';
+import {
+  breakArrowShaft,
+  createArrowFxRenderer,
   createArrowShaft,
   createSandboxDummy,
   createTrainingDummy,
   disposeArrowShaft,
 } from '@render/combat/index';
+import { createAwarenessRenderer } from '@render/stealth/awareness';
 import {
   createCreatureProxy,
   CreatureDeaths,
@@ -265,7 +327,7 @@ import { pickVariant, randomSalt, variantFromSearch } from '@render/creatures/va
 import { createHitVolumeOverlay } from '@render/debug/hit-volumes';
 import { applyEnvironment } from '@render/environment/index';
 import { applyLook, lookAt, type TimeOfDayLook } from '@game/light/time-of-day';
-import { Color } from 'three';
+import { Color, type Object3D } from 'three';
 import { createGreyboxView } from '@render/greybox/index';
 import { createLightRig } from '@render/light/index';
 import { AnimationController, compileGraph } from '@render/animation/index';
@@ -276,8 +338,17 @@ import {
   projectToNdc,
   readPlayerBlade,
 } from '@render/player/index';
-import { anyHiddenByBody, CameraShake } from '@game/camera/index';
+import { anyHiddenByBody, CameraShake, liveLook, lookSettings } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
+import { ElementLooks } from '@render/element-look';
+import { DEATH_TINT, MagicDemo } from '@render/magic-materials/demo';
+import {
+  parseFocusParam,
+  parseMagicParam,
+  parseQualityParam,
+} from '@render/magic-materials/demo-layout';
+import { DEATH_DISSOLVE_SECONDS } from '@render/magic-materials/rules';
+import { MagicMaterials } from '@render/magic-materials/index';
 import { createTrailRenderer } from '@render/vfx/trails';
 import { captureCanvasThumbnail, type CapturedThumbnail } from '@render/thumbnail';
 import {
@@ -300,14 +371,20 @@ import {
   installDebugCommands,
   installGameClock,
   installPlayerDeath,
+  isFriendlyToPlayer,
   isPlayerDead,
   LineOfSight,
   LEDGE_HANG_CAPABILITY,
   levelDeltasOf,
+  arrowSpawner,
+  installRestPolicies,
   persistDroppedItems,
+  persistRestingArrows,
   physicsBodiesOf,
   PhysicsObjectComponent,
   playerRespawned,
+  playerDied,
+  BowComponent,
   playerStart,
   RapierCollisionWorld,
   RapierSightWorld,
@@ -318,11 +395,13 @@ import {
   creaturesInstalled,
   CreatureComponent,
   PlacementComponent,
+  elementFieldOf,
   registerPersistence,
   installSlainFacts,
   registerSceneComponents,
   RespawnRules,
   sceneAuthoredEntities,
+  sceneDormantEntities,
   SceneSpawnComponent,
   SpilledComponent,
   testPropSpawners,
@@ -333,6 +412,11 @@ import {
   WorldPersistence,
   worldItemSpawner,
   zeroHealth,
+  createPersuasion,
+  DialogueRuntime,
+  installTalkGate,
+  npcBand,
+  climbRefused,
   DamageApplied,
   Died,
   hashWorld,
@@ -350,21 +434,20 @@ import {
   type LightEmitterView,
   type RapierPhysics,
   type Vec3,
+  EquipmentRules,
+  InventoryRules,
+  createSurfaceMap,
+  sceneExits,
 } from '@sim/index';
-import {
-  compactProbe,
-  playerAnimationProbe,
-  setupAnimationDemo,
-  type AnimDemo,
-} from '@tools/anim-demo/setup';
-import { bindDebugCameraInput, DebugCamera } from '@tools/debug-camera/index';
-import { layer as tools } from '@tools/index';
-import { sceneAgitator } from '@tools/perf/agitator';
-import { FramePerfProbe, formatPerfReport, parsePerfParam } from '@tools/perf/frame-probe';
-import { formatVfxStats, parseVfxParam, VfxDemo } from '@tools/vfx-demo/index';
+import { installLatencyProbe } from '@tools/perf/latency-probe';
+import type { AnimDemo, ArrowDemo, SpellVfxDemo, VfxDemo } from '@tools/dev-kit';
+import { SpellVfxLibrary, SpellVfxPlayer } from '@game/spell-vfx/index';
+import { SpellVfxView } from '@render/spell-vfx/index';
+import { SpellDemoFigures } from '@render/spell-vfx/demo';
 import {
   CombatHud,
   DamageNumbers,
+  DialogueBox,
   TargetBar,
   BossBar,
   HitMarkers,
@@ -380,6 +463,12 @@ import {
   ScreenFeedback,
   setMotionPreference,
   SoundCaptions,
+  setDyslexiaFont,
+  setIndicatorPalette,
+  awarenessColour,
+  setTextBackdrop,
+  setHighContrast,
+  UiInputAdapter,
   setTextScale,
   UiRoot,
   WaterHud,
@@ -436,11 +525,19 @@ type GameCommand =
   | SandboxCommand
   | UseQuickSlotCommand;
 
+// The demos and probes (src/tools/dev-kit.ts) are debug-build only: a release build folds this
+// import away, so none of them reaches any chunk (mw-e32.18). `dev` is undefined there.
+const dev = __DEBUG_CONSOLE__ ? await import('@tools/dev-kit') : undefined;
+
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
-  app.dataset['layers'] = [...layers, tools].join(' ');
+  app.dataset['layers'] = [...layers, 'tools'].join(' ');
   // Player settings (mw-e31.1): per-browser, loaded first; in memory when the browser blocks storage.
-  const settings = createSettingsStore({ storage: () => globalThis.localStorage });
+  const settings = createSettingsStore({
+    storage: () => globalThis.localStorage,
+    // A system that asks for reduced motion starts with no camera shake and reduced flashing (mw-e31.7).
+    initial: comfortDefaults((q) => globalThis.matchMedia(q)),
+  });
   app.dataset['settingsStore'] = settings.persistent ? 'local' : 'memory';
   startRenderer(app, startSaves(app), settings);
 }
@@ -497,11 +594,11 @@ function startRenderer(
 
   // ?perf (mw-e00.21 AC-6): times each whole frame callback (sim steps + render submission) and the
   // interval between frames, then logs percentiles once. See src/tools/perf/frame-probe.ts.
-  const perf = parsePerfParam(location.search);
+  const perf = dev?.parsePerfParam(location.search);
   const browserSources = browserFrameSources(globalThis.window);
   let sources = browserSources;
-  if (perf !== undefined) {
-    const probe = new FramePerfProbe(perf);
+  if (dev !== undefined && perf !== undefined) {
+    const probe = new dev.FramePerfProbe(perf);
     const { scheduler } = browserSources;
     sources = {
       ...browserSources,
@@ -515,7 +612,7 @@ function startRenderer(
               root.dataset['perf'] = JSON.stringify(report);
               const { calls, triangles } = view.renderer.info.render;
               root.dataset['renderInfo'] = JSON.stringify({ calls, triangles });
-              console.info(formatPerfReport(report));
+              console.info(dev.formatPerfReport(report));
             }
           }),
         cancel: (handle) => {
@@ -535,21 +632,23 @@ function startRenderer(
   };
   // ?debug=1 pages publish the view camera every frame, so a test can ask what is in view (mw-ju8.42).
   const publishLiveCamera = new URLSearchParams(location.search).get('debug') === '1';
-  const debugCamera = new DebugCamera({
-    read: () => ({
-      position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
-      rotation: {
-        x: camera.quaternion.x,
-        y: camera.quaternion.y,
-        z: camera.quaternion.z,
-        w: camera.quaternion.w,
+  const debugCamera =
+    dev &&
+    new dev.DebugCamera({
+      read: () => ({
+        position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+        rotation: {
+          x: camera.quaternion.x,
+          y: camera.quaternion.y,
+          z: camera.quaternion.z,
+          w: camera.quaternion.w,
+        },
+      }),
+      write: ({ position, rotation }) => {
+        camera.position.set(position.x, position.y, position.z);
+        camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
       },
-    }),
-    write: ({ position, rotation }) => {
-      camera.position.set(position.x, position.y, position.z);
-      camera.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-    },
-  });
+    });
 
   const hud = document.createElement('div');
   hud.dataset['testid'] = 'scene-hud';
@@ -560,7 +659,9 @@ function startRenderer(
   hint.textContent = DEBUG_CAMERA_HINT;
   const controls = document.createElement('p');
   controls.dataset['testid'] = 'player-controls-hint';
-  hud.append(label, controls, hint);
+  // The fly camera is a debug tool: a release build has neither it nor its hint.
+  hud.append(label, controls);
+  if (debugCamera !== undefined) hud.append(hint);
   root.append(hud);
 
   // Keyboard + mouse and gamepad → one ActionFrame per sim tick (mw-e02.1, mw-e02.9); a click on the
@@ -568,10 +669,17 @@ function startRenderer(
   // no click: the sampler polls it every tick while the page has focus.
   // Custom bindings saved through the settings store apply at startup (mw-e02.22).
   const savedBindings = loadBindings(settings);
+  // Hold or toggle for sprint, crouch, block and aim/draw (mw-e31.3): resolved in the sampler, before
+  // the sim, so the sim only sees held or not held. Aim toggles only while the bow is out, so a sword
+  // swing is never stuck on; a replayed input log stays on hold, as it was recorded.
+  let bowEquipped: () => boolean = () => false;
+  let toggleLocked = false;
   const sampler = new ActionSampler({
     bindings: savedBindings.bindings,
     padBindings: savedBindings.gamepad,
+    toggleApplies: (action) => action !== 'primaryAttack' || bowEquipped(),
   });
+  bindHoldToggle(settings, sampler, () => toggleLocked);
   // The options menu's Key bindings panel edits these live (mw-e31.2): each change saves and the
   // sampler maps the next sample through it.
   const bindingsEditor = new BindingsEditor(settings, (bindings) => {
@@ -591,6 +699,24 @@ function startRenderer(
   settings.on('accessibility.textScale', (scale) => {
     setTextScale(ui.element, scale);
   });
+  // Dyslexia-friendly font and the plate behind HUD text (accessibility.dyslexiaFont, .textBackground).
+  setDyslexiaFont(ui.element, settings.get('accessibility.dyslexiaFont'));
+  settings.on('accessibility.dyslexiaFont', (on) => {
+    setDyslexiaFont(ui.element, on);
+  });
+  // Colour-blind palette for the indicator colours (accessibility.indicatorPalette, mw-e31.8).
+  setIndicatorPalette(ui.element, settings.get('accessibility.indicatorPalette'));
+  settings.on('accessibility.indicatorPalette', (id) => {
+    setIndicatorPalette(ui.element, id);
+  });
+  setHighContrast(ui.element, settings.get('accessibility.highContrast'));
+  settings.on('accessibility.highContrast', (on) => {
+    setHighContrast(ui.element, on);
+  });
+  setTextBackdrop(ui.element, settings.get('accessibility.textBackground'));
+  settings.on('accessibility.textBackground', (opacity) => {
+    setTextBackdrop(ui.element, opacity);
+  });
   // The contextual Interact prompt (mw-e02.5): the player's focus, with the bound key or button.
   const interactPrompt = new InteractPrompt();
   ui.hud.append(interactPrompt.element);
@@ -602,6 +728,8 @@ function startRenderer(
   // The Inventory action (I, View) opens and closes the inventory screen (mw-e17.10), once the world
   // has one: seen in gameplay frames while it is closed, and in the frames drained while it pauses.
   let inventoryUi: InventoryUi | undefined;
+  // The journal (mw-e23.6): the Journal action (J) toggles it, and the pause menu opens it.
+  let journalUi: JournalController | undefined;
   // The container window and pickup toasts (mw-e18.4), once the player exists.
   let containerUi: ContainerUi | undefined;
   // The pause menu (mw-e01.3), once the world has a player: the Pause action (Esc, P, Menu) opens it
@@ -612,12 +740,14 @@ function startRenderer(
     sampleCommands: (tick) => {
       const frames = sampler.sampleCommands(tick);
       if (frames.some((frame) => frame.inventory.pressed)) inventoryUi?.toggle();
+      if (frames.some((frame) => frame.journal.pressed)) journalUi?.toggle();
       if (frames.some((frame) => frame.pause.pressed)) pauseUi?.pausePressed();
       return frames;
     },
     drain: () => {
       const frame = sampler.sample();
       if (frame.inventory.pressed) inventoryUi?.toggle();
+      if (frame.journal.pressed) journalUi?.toggle();
       pauseUi?.drained(frame.pause.pressed);
     },
   });
@@ -627,6 +757,8 @@ function startRenderer(
   ui.subscribe(({ capturesInput }) => {
     root.dataset['uiCapture'] = String(capturesInput);
     if (capturesInput && document.pointerLockElement !== null) document.exitPointerLock();
+    // A menu, dialogue or death screen opening lets toggled actions go; they do not resume after.
+    if (capturesInput) sampler.releaseToggles();
   });
   // The controls hint follows the device last used (mw-e02.9 AC-5); a disconnect says so (AC-4).
   let shown: InputDevice | 'gone' | undefined;
@@ -669,6 +801,8 @@ function startRenderer(
     window: globalThis.window,
     document: globalThis.document,
     element: view.canvas,
+    // A menu or an open conversation keeps the pointer free: a click on the canvas does not lock it.
+    held: () => ui.capturesInput,
     gamepad: {
       navigator: globalThis.navigator,
       hasFocus: () => document.hasFocus(),
@@ -683,6 +817,10 @@ function startRenderer(
     },
   });
   let player: TestbedPlayer | undefined;
+  // Talking to NPCs (mw-e22.9), once a scene with a talkable NPC has started.
+  let conversations: Conversations | undefined;
+  let dialogueFrame: ((nowMs: number) => void) | undefined;
+  let dialoguePoll: (() => void) | undefined;
   // Area transitions (mw-e01.11): a page that arrives from another area shows the loading overlay
   // (area name) if it takes longer than half a second to become playable, and publishes how long
   // the whole transition took in #app[data-transit]; a page that leaves hands off through
@@ -709,19 +847,21 @@ function startRenderer(
     hadLock = locked;
   });
 
-  bindDebugCameraInput(debugCamera, {
-    keys: globalThis.window,
-    surface: view.canvas,
-    onToggle: (active) => {
-      root.dataset['debugCamera'] = active ? 'on' : 'off';
-      hint.textContent = active ? `${DEBUG_CAMERA_HINT} · ON` : DEBUG_CAMERA_HINT;
-      // The fly camera shares WASD: the player lets go of input and the camera while it flies.
-      playerInput.enabled = !active;
-      if (player) player.drivesCamera = !active;
-      writeCameraData();
-    },
-  });
-  root.dataset['debugCamera'] = 'off';
+  if (dev !== undefined && debugCamera !== undefined) {
+    dev.bindDebugCameraInput(debugCamera, {
+      keys: globalThis.window,
+      surface: view.canvas,
+      onToggle: (active) => {
+        root.dataset['debugCamera'] = active ? 'on' : 'off';
+        hint.textContent = active ? `${DEBUG_CAMERA_HINT} · ON` : DEBUG_CAMERA_HINT;
+        // The fly camera shares WASD: the player lets go of input and the camera while it flies.
+        playerInput.enabled = !active;
+        if (player) player.drivesCamera = !active;
+        writeCameraData();
+      },
+    });
+    root.dataset['debugCamera'] = 'off';
+  }
 
   // Fixed-step sim on requestAnimationFrame (mw-e00.20). The sim owns its physics (mw-e03.35), so the
   // world starts once the physics module has loaded; the dynamic import keeps Rapier and its WASM
@@ -733,6 +873,25 @@ function startRenderer(
     installFactRegistry(world.facts, content);
     // The in-game clock (mw-e27.12), first so every system sees the tick's time; its data is game.json.
     installGameClock(world, content.get('game', GAME_CONFIG_ID).clock);
+    // The capability registry (mw-e19.2) is the world's, built early so the logic host can grant.
+    const capabilities = createCapabilityRegistry(content);
+    // The logic host and the quest runtime (mw-e23.11), before any save loads so the quests' fact
+    // keys are declared. Dialogue (mw-e22.9) and shops run their effects against `gameLogic.host`;
+    // content with no quests installs nothing. The save registry refreshes the quests after a load.
+    // Dispositions are the NPCs' opinions of the player (mw-e22.4): blows and thefts move them, and
+    // dialogue reads and changes them by NPC id (the creature's content id, `npcResolver`). Their
+    // component is added on the first change, so a world where nobody's opinion moves hashes as before.
+    const dispositions = createGameDispositions(world, content, () => player?.entity);
+    dispositions.listen();
+    const gameLogic = installGameLogic(world, {
+      world,
+      player: () => player?.entity,
+      inventory: new InventoryRules(content.all('item')),
+      capabilities,
+      quests: questsOf(content),
+      disposition: { dispositions, resolve: npcResolver(world) },
+    });
+    root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
     // The knight's sword and shield (mw-e04.6): moves, socket tracks, the wood shield and the
     // damage model with the shield rule; and the combat sandbox's tuning (mw-e04.9).
     const combat = prepareTestbedCombat(content);
@@ -770,6 +929,24 @@ function startRenderer(
     let wheelShape: ((frame: ActionFrame) => ActionFrame) | undefined;
     let spellBar: { frame(): void } | undefined;
     const afterStep: (() => void)[] = [];
+    // Contests (mw-opf6): the runner over the logic host, installed before any save loads so a carry
+    // or a load finds it. It advances the rivals and time limits once a step; the screens and play
+    // input start with the shop UI.
+    const contests = installContests(world, {
+      contests: contestsIn(content),
+      host: gameLogic.host,
+      player: () => player?.entity,
+    });
+    afterStep.push(() => {
+      contests.update();
+    });
+    // The input latency and controller cost probe (mw-e02.8): dev server and perf builds only, on a
+    // page with ?latency. In any other build `__LATENCY_PROBE__` is false and all of it is dropped.
+    const latency =
+      (__LATENCY_PROBE__ || import.meta.env.DEV) &&
+      new URLSearchParams(location.search).has('latency')
+        ? installLatencyProbe(globalThis)
+        : undefined;
     // Swept hitboxes and region-tagged hurtboxes (mw-e04.2). No faction table is loaded yet, so
     // nobody counts as an ally; ?hitboxes draws what the system tests each tick. The hit-volume
     // system itself joins after the player (startTestbedCombat), so swings sweep on their first
@@ -785,6 +962,8 @@ function startRenderer(
     installGamePhysics(world, {
       // Breaks spill their contents as props (mw-e03.11).
       breakables: { props, materials: materialPresets(content.all('material')) },
+      // Impacts are noises by energy and material (mw-e03.25).
+      impactNoise: impactNoiseOptions(content),
       focus: focus.read,
       onBudgetExceeded: (warning) => {
         console.warn(formatBudgetWarning(warning));
@@ -794,7 +973,7 @@ function startRenderer(
       // Spells (mw-e06.15): the pipeline and its systems, before the stimulus system so a spell's
       // heat and light resolve in the tick it is cast.
       afterStimuli: (sim) => {
-        installGameFire(sim, content);
+        installGameFire(sim, content, { damage: combat.damage, focus: focus.read });
       },
       beforeStimuli: (sim) => {
         magic = installGameMagic(sim, {
@@ -849,8 +1028,25 @@ function startRenderer(
     const vfxAnchor = (entity: EntityId) =>
       readPhysicsObjectTransform(world, entity) ??
       readDummyTransform(world, entity) ?? // any placed entity: the dummies and the player
-      readSceneTransform(world, entity);
-    const vfx = new VfxSystem({ effects: content.all('vfx-effect'), anchors: vfxAnchor });
+      readSceneTransform(world, entity) ??
+      readArrowTransform(world, entity); // arrows in flight and at rest: their trails follow them
+    // Spell VFX (mw-e29.10): templates by slot, tinted. Each spell's `vfx` block is resolved up front
+    // so the tinted effects it needs exist when the VfxSystem is built; with no spell using the
+    // block (and no `?spells=demo|<slot>`) this adds no effects and nothing runs per frame.
+    const spellLibrary = new SpellVfxLibrary(
+      content.all('spell-vfx-template'),
+      content.all('vfx-effect'),
+    );
+    for (const spell of content.all('spell')) spellLibrary.resolve(spell.vfx);
+    const spellDemoSteps = dev?.parseSpellDemoParam(location.search);
+    if (dev !== undefined && spellDemoSteps !== undefined) {
+      for (const block of Object.values(dev.spellDemoBlocks())) spellLibrary.resolve(block);
+    }
+    let spellDemo: SpellVfxDemo | undefined;
+    const vfx = new VfxSystem({
+      effects: [...content.all('vfx-effect'), ...spellLibrary.derivedEffects()],
+      anchors: (entity, socket) => spellDemo?.anchor(entity, socket) ?? vfxAnchor(entity),
+    });
     // VFX cue sheets (mw-e29.3): the same sim events as the audio cue sheets spawn effects — hit
     // dust and sparks, the parry flash, impact puffs, break debris, burning loops. Event-driven, so
     // nothing runs per frame while no effect is live.
@@ -863,8 +1059,138 @@ function startRenderer(
       locate: vfxAnchor,
       now: () => performance.now(),
     });
+    // Arrow effects (mw-e29.11) that are not particles: the wet decal, noise ring, rope unfurl,
+    // stuck-arrow wobble and broken shaft, from the same arrowImpact event as the cue sheets.
+    const arrowShafts = new Map<EntityId, Object3D>();
+    const arrowFx = new ArrowFx({
+      world,
+      arrows: content.all('arrow'),
+      now: () => performance.now(),
+      reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+      breakShaft: (entity) => {
+        const shaft = arrowShafts.get(entity);
+        if (shaft === undefined) return false;
+        breakArrowShaft(shaft);
+        return true;
+      },
+    });
+    arrowFx.attach();
+    const arrowFxView = createArrowFxRenderer(view.scene);
+    // Awareness feedback (mw-e29.12): the indicator over each alerted creature, and the two assists
+    // (last-known-position ghost, noise ripple), both off unless the player turns them on. Read-only
+    // over the sim; `?awareness=demo` lines up stand-ins in every state for the e2e and screenshots.
+    const awarenessDemo = dev?.parseAwarenessDemoParam(location.search) === true;
+    // Publishes #app[data-awareness] for the e2e only: this is built every frame otherwise.
+    const awarenessProbe =
+      awarenessDemo || new URLSearchParams(location.search).get('debug') === '1';
+    const awarenessFx = new AwarenessFx({
+      world,
+      now: () => performance.now(),
+      ghostEnabled: () => settings.get('gameplay.lastKnownMarker'),
+      ripplesEnabled: () => settings.get('gameplay.noiseRipples'),
+      // Shopkeepers and the Watch are friends: they greet, they do not hunt (mw-e09.5).
+      friendly: (entity) => isFriendlyToPlayer(world, creatures.spawn.factions, entity),
+      reducedMotion: () => reducedMotion(ui.element, (q) => globalThis.matchMedia(q)),
+      colourOf: (state) => awarenessColour(settings.get('accessibility.indicatorPalette'), state),
+      listener: () =>
+        player === undefined ? undefined : world.get(player.entity, PlacementComponent),
+      ...(dev !== undefined &&
+        awarenessDemo && {
+          agents: (into) => {
+            const at =
+              player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+            const origin = at ?? view.camera.position;
+            // The camera's forward (0, 0, -1) turned by its rotation, flattened to a heading.
+            const q = view.camera.quaternion;
+            const forwardX = -2 * (q.x * q.z + q.w * q.y);
+            const forwardZ = -(1 - 2 * (q.x * q.x + q.y * q.y));
+            return dev.awarenessDemoAgents(origin, Math.atan2(-forwardX, -forwardZ), into);
+          },
+        }),
+    });
+    awarenessFx.attach();
+    const awarenessView = createAwarenessRenderer(view.scene);
+    let publishedAwareness = '';
+    let lastDemoNoise = -Infinity;
+    let demoNoises = 0;
+    // Element state feedback (mw-e03.28): burning, wet, frozen and charged things get their VFX,
+    // mesh look and cue from the element-feedback table, by property, never entity type. Gas in
+    // the element field (smoke, steam) is drawn as clouds. Both read the sim and never write to it.
+    const elementTable = compileElementFeedback(
+      content.get('element-feedback', ELEMENT_FEEDBACK_ID),
+    );
+    const motionReduced = (): boolean => reducedMotion(ui.element, (q) => globalThis.matchMedia(q));
+    const elements = new ElementFeedbackBridge({
+      table: elementTable,
+      vfx,
+      events: world.events,
+      isAlive: (entity) => world.isAlive(entity),
+      boundsOf: (entity) => {
+        const placement = world.get(entity, PlacementComponent);
+        const at = placement ?? vfxAnchor(entity)?.position;
+        return at === undefined
+          ? undefined
+          : {
+              position: { x: at.x, y: at.y, z: at.z },
+              radius: placement?.radius ?? 0,
+            };
+      },
+      reducedMotion: motionReduced,
+      playCue: (cue, entity) => {
+        if (sounds.get(cue) !== undefined && audio.context?.state === 'running') {
+          audio.play(cue, { entity });
+        }
+      },
+    });
+    elements.attach();
+    const gasClouds = new GasFieldPresenter({
+      rules: elementTable.fields,
+      vfx,
+      field: () => {
+        try {
+          return elementFieldOf(world);
+        } catch {
+          return undefined;
+        }
+      },
+      reducedMotion: motionReduced,
+    });
+    const elementLooks = new ElementLooks();
+    // The magical material library (mw-e29.7): dissolve, fresnel glow, heat haze, rune decals,
+    // emissive pulse and soft particles in one look. Heat haze is High only; ?quality=low forces
+    // Low, otherwise the Graphics quality setting decides. ?magic lays the materials out as a testbed.
+    const magicLooks = new MagicMaterials({
+      renderer: view.renderer,
+      tier: parseQualityParam(location.search) ?? settings.get('display.quality'),
+      reducedMotion: motionReduced,
+    });
+    settings.on('display.quality', (tier) => {
+      if (parseQualityParam(location.search) === undefined) magicLooks.setTier(tier);
+    });
+    const magicMode = parseMagicParam(location.search);
+    let magicDemo: MagicDemo | undefined;
+    let publishedMagic = '';
+    // ?corpses publishes how many creature corpses are dissolving and how many have gone.
+    const corpsesProbe = new URLSearchParams(location.search).has('corpses');
+    let publishedCorpses = '';
+    let publishedElements = '';
+    // ?elements publishes the element feedback counters on #app[data-elements] (the e2e probe).
+    const elementsProbe = new URLSearchParams(location.search).has('elements');
     // Textures load by asset id from the texture manifest: generated placeholders (mw-e29.2) until
     // approved art replaces them under the same ids.
+    // The spell ring and beam drawings, and the testbed that shows every slot (?spells=...).
+    const spellView = new SpellVfxView(view.scene, magicLooks, motionReduced);
+    const spellPlayer = new SpellVfxPlayer({
+      vfx,
+      anchors: (entity, socket) => spellDemo?.anchor(entity, socket) ?? vfxAnchor(entity),
+      surfaces: spellView,
+    });
+    let spellDemoFigures: SpellDemoFigures | undefined;
+    let publishedSpellVfx = '';
+    if (dev !== undefined && spellDemoSteps !== undefined) {
+      spellDemo = new dev.SpellVfxDemo(spellPlayer, spellLibrary, spellDemoSteps);
+      spellDemoFigures = new SpellDemoFigures(view.scene, magicLooks);
+    }
     const vfxView = createVfxRenderer(view.scene, {
       textureUrl: vfxTextureUrls(vfxTextureManifest()),
     });
@@ -935,8 +1261,13 @@ function startRenderer(
       const json = JSON.stringify({ state, voices, cues: recentCues });
       if (json !== publishedAudio) root.dataset['audio'] = publishedAudio = json;
     };
-    const vfxMode = parseVfxParam(location.search);
+    const vfxMode = dev?.parseVfxParam(location.search);
     let vfxDemo: VfxDemo | undefined;
+    // ?arrows=demo|<id> looses the shipped arrows at the back wall and publishes what the arrow
+    // effects are doing on #app[data-arrow-fx] (the e2e probe, mw-e29.11).
+    const arrowDemoOrder = dev?.parseArrowDemoParam(location.search);
+    let arrowDemo: ArrowDemo | undefined;
+    let publishedArrowFx = '';
     let vfxStats: HTMLElement | undefined;
     let vfxStatsAgeMs = Infinity;
     if (vfxMode !== undefined) {
@@ -946,10 +1277,10 @@ function startRenderer(
     }
     const showVfxStats = (elapsedMs: number): void => {
       vfxStatsAgeMs += elapsedMs;
-      if (vfxStats === undefined || vfxStatsAgeMs < 250) return;
+      if (dev === undefined || vfxStats === undefined || vfxStatsAgeMs < 250) return;
       vfxStatsAgeMs = 0;
       const stats = vfx.stats();
-      vfxStats.textContent = formatVfxStats(stats);
+      vfxStats.textContent = dev.formatVfxStats(stats);
       root.dataset['vfx'] = JSON.stringify(stats);
     };
 
@@ -1028,10 +1359,19 @@ function startRenderer(
     let arrowsSeen = false;
     let publishedArrows = '';
     const drawArrows = (): void => {
-      const bound = bindArrows(world, sync, () => {
+      const bound = bindArrows(world, sync, (entity) => {
         const shaft = createArrowShaft();
         view.scene.add(shaft);
-        return { ...object3DBinding(shaft, readArrowTransform), dispose: disposeArrowShaft };
+        arrowShafts.set(entity, shaft);
+        return {
+          ...object3DBinding(shaft, (v, e) =>
+            readWobbledArrowTransform(v, e, arrowFx.wobble.bind(arrowFx)),
+          ),
+          dispose: (object: Object3D) => {
+            arrowShafts.delete(entity);
+            disposeArrowShaft(object);
+          },
+        };
       });
       if (bound > 0) arrowsSeen = true;
     };
@@ -1051,6 +1391,11 @@ function startRenderer(
     let deathBeat: DeathBeat | undefined;
     // The slice-complete card (mw-e01.18), opened the frame after slice.complete turns true.
     let sliceCard: SliceCompleteController | undefined;
+    // The epilogue slideshow (mw-e39.40): plays when the epilogue quest starts; the console previews it.
+    let epilogueUi: EpilogueUi | undefined;
+    // The class arrival and class beats (mw-aw1y): the narration window after a class is picked at the
+    // front door, and a class's own text when a trigger fires. #app[data-class-beat] is the e2e's readout.
+    let classBeatUi: ClassBeatUi | undefined;
     let captureAfterRender: ((capture: Promise<CapturedThumbnail>) => void) | undefined;
     // A save's thumbnail (mw-e30.11): the next drawn frame, or the placeholder when no frame comes
     // (a hidden tab). Manual saves and autosaves both take one.
@@ -1070,7 +1415,7 @@ function startRenderer(
     // selection right there (`startNewGame`), with no reload. The e2e reads the timings (page-relative
     // milliseconds) from #app[data-front-door]: the title shown, New Game pressed, the class applied.
     const titleFirst = opensTitle(location.search);
-    let startNewGame: (() => void) | undefined;
+    let startNewGame: ((back: () => void) => void) | undefined;
     const frontDoor: { titleMs?: number; newGameMs?: number; playableMs?: number } = {};
     const markFrontDoor = (step: keyof typeof frontDoor): void => {
       frontDoor[step] = Math.round(performance.now());
@@ -1082,13 +1427,19 @@ function startRenderer(
     let animation: AnimDemo | undefined;
     let creatureAnimation: AnimationDriver | undefined;
     let creatureDeaths: CreatureDeaths | undefined;
+    let corpseDissolves: CorpseGlue | undefined;
+    let creatureIds: (() => number[]) | undefined;
     let hitFlashes: HitFlashes | undefined;
     let frameClock: ((ms: number) => void) | undefined;
     let playerFade: OcclusionFade | undefined;
+    let climbHint: ClimbHint | undefined;
     let publishedProbe = '';
     // The AI debug overlay (mw-e11.17): loaded with the debug console (below), so release builds
     // never have it. `ai.freeze` holds the sim through simPaused; it draws before each render.
     let aiDebug: { held(): boolean; frame(): void } | undefined;
+    // The field debug overlay (mw-e03.29): loaded with the console too; undefined in release builds.
+    let fieldDebug: { frame(): void } | undefined;
+    let worldState: { frame(): void } | undefined;
     // Debug pages only (mw-e01.9): the input log's recorder or replay runs just before each sample.
     let beforeSample: ((tick: number) => void) | undefined;
     // While a replay still has inputs to play, the slice-complete card stays shut: its opening (in a
@@ -1123,10 +1474,12 @@ function startRenderer(
       },
       draw: (frame) => {
         uiInput.poll();
+        dialoguePoll?.();
         bridge.frame();
         const { timeMs } = frame;
+        dialogueFrame?.(timeMs);
         const elapsedMs = timeMs - (lastFrameMs ?? timeMs);
-        if (debugCamera.update(elapsedMs) || publishLiveCamera) writeCameraData();
+        if (debugCamera?.update(elapsedMs) || publishLiveCamera) writeCameraData();
         lastFrameMs = timeMs;
         deathBeat?.frame(frame.alpha);
         if (!replayPlaying()) sliceCard?.frame();
@@ -1151,7 +1504,8 @@ function startRenderer(
             gamepad: sampler.padBindings,
           });
           const dead = isPlayerDead(world, player.entity);
-          interactPrompt.update(interactPromptModel(dead ? undefined : player.prompt(), glyph));
+          const focus = interactPromptModel(dead ? undefined : player.prompt(), glyph);
+          interactPrompt.update(focus ?? climbHintModel(climbHint, performance.now()));
         }
         if (dummy !== undefined) {
           // The e2e reads the dummy's health here (mw-e04.6 AC-7).
@@ -1186,25 +1540,148 @@ function startRenderer(
         frameClock?.(timeMs);
         hitFlashes?.update(timeMs);
         creatureAnimation?.frame(frame.alpha, Math.max(0, elapsedMs) / 1000, camera.position);
-        if (animation !== undefined) {
+        if (dev !== undefined && animation !== undefined) {
           animation.driver.frame(frame.alpha, Math.max(0, elapsedMs) / 1000, camera.position);
-          const probe = JSON.stringify(compactProbe(animation.driver.probe()));
+          const probe = JSON.stringify(dev.compactProbe(animation.driver.probe()));
           if (probe !== publishedProbe) root.dataset['animation'] = publishedProbe = probe;
         }
         showControls();
         vfxDemo?.update(elapsedMs / 1000);
+        arrowDemo?.update(Math.max(0, elapsedMs) / 1000);
+        if (spellDemo !== undefined) {
+          // Feet and heading of the player, as the awareness demo reads them.
+          const at =
+            player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+          const q = camera.quaternion;
+          const forwardX = -2 * (q.x * q.z + q.w * q.y);
+          const forwardZ = -(1 - 2 * (q.x * q.x + q.y * q.y));
+          spellDemo.update(Math.max(0, elapsedMs) / 1000, {
+            origin: at ?? camera.position,
+            yaw: Math.atan2(-forwardX, -forwardZ),
+          });
+          spellDemoFigures?.update(spellDemo.figures());
+          const json = JSON.stringify({ ...spellDemo.stats, ...spellView.drawn });
+          if (json !== publishedSpellVfx) root.dataset['spellVfx'] = publishedSpellVfx = json;
+        }
+        spellPlayer.update(); // live beams follow their cast sockets; nothing with none alive
+        if (spellView.active) spellView.update(Math.max(0, elapsedMs) / 1000);
+        elements.update(camera.position);
+        gasClouds.update(elapsedMs / 1000, camera.position);
+        const looked = new Map<Object3D, CombinedLook>();
+        for (const [entity, look] of elements.looks()) {
+          const object = sync.objectOf(entity) as Object3D | undefined;
+          // A dying body is dressed by its dissolve alone (the element look would put the
+          // originals back over the dissolve's copies).
+          if (object !== undefined && corpseDissolves?.dying(entity) !== true) {
+            looked.set(object, look);
+          }
+        }
+        const reducedLooks = motionReduced();
+        elementLooks.sync(looked, (look) =>
+          pulseFactor((look as CombinedLook).pulseHz, timeMs / 1000, reducedLooks),
+        );
+        // Creature corpses dissolve and are removed (mw-e29.7 AC-3); after the element looks have
+        // settled, so the dissolve's material copies are the last thing on a dying body.
+        corpseDissolves?.update(Math.max(0, elapsedMs) / 1000);
+        if (corpsesProbe) {
+          const json = JSON.stringify({
+            dying: corpseDissolves?.size ?? 0,
+            gone: corpseDissolves?.removed ?? 0,
+            ids: creatureIds?.() ?? [],
+            progress: creatureIds?.().map((id) => corpseDissolves?.progressOf(id) ?? null) ?? [],
+            // Creature bodies still in the scene (a corpse that has dissolved is taken out of it).
+            proxies: view.scene.children.filter((child) => child.name.startsWith('creature:'))
+              .length,
+            seconds: DEATH_DISSOLVE_SECONDS,
+          });
+          if (json !== publishedCorpses) root.dataset['corpses'] = publishedCorpses = json;
+        }
+        if (magicDemo !== undefined) magicDemo.update(Math.max(0, elapsedMs) / 1000, camera);
+        else magicLooks.update(Math.max(0, elapsedMs) / 1000);
+        if (magicMode !== undefined) {
+          const json = JSON.stringify({ ...magicLooks.stats(), demo: magicDemo?.stats() });
+          if (json !== publishedMagic) root.dataset['magic'] = publishedMagic = json;
+        }
+        if (elementsProbe) {
+          const json = JSON.stringify({
+            ...elements.stats(),
+            clouds: gasClouds.clouds,
+            looks: elementLooks.size,
+            vfx: vfx.stats().effects,
+            // Loose bodies the e2e can put into states, with where they sit.
+            objects: world
+              .query(PhysicsObjectComponent)
+              .ids()
+              .map((id) => {
+                const at = world.get(id, PlacementComponent);
+                return { id, x: at?.x ?? 0, y: at?.y ?? 0, z: at?.z ?? 0 };
+              }),
+          });
+          if (json !== publishedElements) root.dataset['elements'] = publishedElements = json;
+        }
         vfx.update(elapsedMs / 1000, camera.position);
         vfxView.draw(vfx.batches, vfx.markers);
         if (swingTrails !== undefined) {
           swingTrails.frame();
           trailView.draw(swingTrails);
         }
+        arrowFx.frame();
+        arrowFxView.draw(arrowFx.view);
+        if (
+          dev !== undefined &&
+          awarenessDemo &&
+          performance.now() - lastDemoNoise >= dev.AWARENESS_DEMO_NOISE_MS
+        ) {
+          lastDemoNoise = performance.now();
+          demoNoises++;
+          const at =
+            player === undefined ? undefined : world.get(player.entity, PlacementComponent);
+          awarenessFx.ripple(dev.awarenessDemoNoise(at ?? camera.position, world.tick));
+        }
+        awarenessFx.frame(camera.position);
+        awarenessView.draw(awarenessFx.view, camera);
+        if (awarenessProbe) {
+          const { view: fx } = awarenessFx;
+          const json = JSON.stringify({
+            indicators: fx.indicators.map((i) => [
+              i.entity,
+              i.state,
+              i.shape,
+              Math.round(i.fill * 100),
+            ]),
+            ghosts: fx.ghosts.length,
+            ripples: fx.ripples.length,
+            started: awarenessFx.ripplesStarted,
+            demoNoises,
+          });
+          if (json !== publishedAwareness) root.dataset['awareness'] = publishedAwareness = json;
+        }
+        if (arrowDemo !== undefined) {
+          const { view: fxView } = arrowFx;
+          const json = JSON.stringify({
+            ...arrowDemo.stats,
+            decals: fxView.decals.map((d) => d.radius),
+            rings: fxView.rings.length,
+            ropes: fxView.ropes.length,
+            broken: fxView.broken.length,
+            wobbling: arrowFx.wobbling,
+            wobbles: arrowFx.wobblesStarted,
+            particles: vfx.stats().particles,
+          });
+          if (json !== publishedArrowFx) root.dataset['arrowFx'] = publishedArrowFx = json;
+        }
         showVfxStats(elapsedMs);
         audio.update(listenerPose(camera.position, camera.quaternion));
         publishAudio();
         drawLights();
         aiDebug?.frame();
+        fieldDebug?.frame();
+        worldState?.frame();
         view.renderFrame(timeMs);
+        if (latency !== undefined && player !== undefined) {
+          const drawn = (sync.objectOf(player.entity) as Object3D | undefined)?.position;
+          if (drawn !== undefined) latency.frame(performance.now(), drawn.x, drawn.y, drawn.z);
+        }
         // A save's thumbnail (mw-e30.11) is read straight after a render, while the frame is still
         // in the drawing buffer.
         const capture = captureAfterRender;
@@ -1324,7 +1801,7 @@ function startRenderer(
       sceneWater = waterVolumes(loaded.layout.regions);
       // The perf-baseline stress scene (mw-e32.1): blasts at its perf-agitator markers keep its props
       // moving; scenes without markers have no agitator.
-      const agitator = sceneAgitator(loaded.layout.spawns, world.clock.hz);
+      const agitator = dev?.sceneAgitator(loaded.layout.spawns, world.clock.hz);
       if (agitator !== undefined) {
         afterStep.push(() => {
           const blast = agitator.commandFor(world.tick);
@@ -1343,12 +1820,22 @@ function startRenderer(
       // ?allclasses unlocks every class.
       const playable = playableClasses(content, location.search, __DEBUG_CONSOLE__);
       const newGame = newGameRequest(location.search, playable);
-      const capabilities = createCapabilityRegistry(content);
       if (playerStart(loaded.layout.spawns) !== undefined) {
         // No class is chosen yet (mw-e19.5), so the player moves on the base profile.
         const tuning = controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID));
+        const footstepOffsets = materialLoudness(content.all('material'));
+        const armorRules = new EquipmentRules(content.all('item'), content.all('class'));
+        // Tagged surface regions (a carpet on a wooden floor) replace the collider's material in
+        // footstep events (mw-e09.4); an untagged position warns once in dev.
+        const surfaces = createSurfaceMap({
+          table: compileSurfaceTable(content.get('surface-table', SURFACE_TABLE_ID)),
+          regions: loaded.layout.surfaces,
+          warn: (message) => {
+            console.warn(message);
+          },
+        });
         const cameraTuning = content.get('camera', PLAYER_CAMERA_ID);
-        camera.fov = cameraTuning.fov;
+        camera.fov = settings.get('camera.fov');
         camera.near = cameraTuning.near;
         camera.updateProjectionMatrix();
         // The player's body is the grey-box humanoid, animated from its sim locomotion (mw-e02.6).
@@ -1363,11 +1850,26 @@ function startRenderer(
         let publishedSword = '';
         player = setupTestbedPlayer({
           world,
+          ...(latency !== undefined && {
+            timing: {
+              now: () => performance.now(),
+              controller: (ms) => {
+                latency.controllerTick(ms);
+              },
+              camera: (ms) => {
+                latency.cameraFrame(ms);
+              },
+            },
+          }),
           scene: loaded,
           ...(arrivalSpawn !== undefined && { startSpawn: arrivalSpawn }),
           sync,
           tuning,
           cameraTuning,
+          // The camera options (mw-e31.6): look sensitivity, invert and auto-centre reach the sim as
+          // input scaling, and a replay keeps the content's values so a recorded run replays as it was.
+          lookLive: liveLook(lookSettings(cameraTuning), cameraTuning, settings, () => replaying),
+          fov: () => settings.get('camera.fov'),
           collision,
           // The knight's moves: the dodge roll and backstep (mw-e04.8), the light chain and the
           // shield (mw-e04.6) are playable.
@@ -1380,11 +1882,18 @@ function startRenderer(
           // through the capability registry below.
           ledges: {},
           // Ladders, ropes and ivy for every class (mw-e02.13); rough walls need the climbing
-          // capability, which class data (mw-e02.3) will grant the thief.
-          climb: {},
+          // capability, which class data (mw-e02.3) will grant the thief. A climb harder than the
+          // player's best (a capability's climbDifficulty, mw-e10.9) is refused with a prompt.
+          climb: { difficulty: climbDifficultyGrants(content.all('capability')) },
           // Wading, swimming and sinking in the scene's water regions (mw-e02.14): the armor load
           // class decides swim or sink; breath running out is drowning damage.
-          water: playerWater({ content, world, damage: combat.damage }),
+          water: playerWater({ content, world, damage: combat.damage, equipment: armorRules }),
+          // Armor weight shapes the roll, stamina regen, sprint, absorption, poise and footstep
+          // noise through the same load class the water rules read (mw-e04.16).
+          equipment: armorRules,
+          // Footsteps say how loud the ground is: each material's footstepLoudness (mw-e02.11).
+          footstepOffsets: (material) => footstepOffsets.get(material),
+          surfaces,
           object: body.root,
           animation: {
             controller: new AnimationController(graph),
@@ -1397,8 +1906,8 @@ function startRenderer(
             // The e2e animation probe (mw-e02.6 AC-4): each layer's state and clip, and the states
             // and clips entered, oldest first.
             publish: (probe) => {
-              const json = JSON.stringify(playerAnimationProbe(probe));
-              if (json !== publishedPlayerProbe) {
+              const json = dev && JSON.stringify(dev.playerAnimationProbe(probe));
+              if (json !== undefined && json !== publishedPlayerProbe) {
                 root.dataset['playerAnimation'] = publishedPlayerProbe = json;
               }
               // Where the sword points (mw-a6t), in the body's space: the e2e checks the carry.
@@ -1420,12 +1929,21 @@ function startRenderer(
             profile: (id) => content.get('targetable', id),
             defeated: zeroHealth,
           },
+          // While the player talks to an NPC the camera frames the two of them (mw-e22.9).
+          conversationFocus: () => conversations?.focusPoint(),
           publish: (readout) => {
             root.dataset['player'] = JSON.stringify(readout);
           },
           // The e2e clipping probe (mw-e02.4 AC-5): frames drawn, and how many clipped (must be 0).
           publishCamera: (readout) => {
             root.dataset['orbitCamera'] = JSON.stringify(readout);
+          },
+          // Hiding in a wardrobe (mw-e03.23): the camera looks out of it and the body is hidden.
+          peek: {
+            view: (entity) => peekView(world, entity),
+            body: (visible) => {
+              body.root.visible = visible;
+            },
           },
           // Focus and Interact (mw-e02.5): reach is blocked by anything solid in the sim's Rapier
           // world. The e2e reads the player's interactions (latest last) from #app[data-interactions].
@@ -1485,8 +2003,8 @@ function startRenderer(
         );
         showControls();
       }
-      if (scene.id === 'testbed') {
-        animation = setupAnimationDemo({
+      if (dev !== undefined && scene.id === 'testbed') {
+        animation = dev.setupAnimationDemo({
           world,
           sync,
           content,
@@ -1647,12 +2165,20 @@ function startRenderer(
         });
         const feedback = new ScreenFeedback();
         ui.hud.append(feedback.element);
+        // Every full-screen flash goes through this one limiter; reduce-flashing caps its intensity.
+        const flashLimiter = new FlashLimiter();
+        const configureFlashes = (): void => {
+          flashLimiter.configure(settings.get('accessibility.reduceFlashing'));
+        };
+        configureFlashes();
+        settings.on('accessibility.reduceFlashing', configureFlashes);
         screenFeedback = attachScreenFeedback({
           world,
           player: player.entity,
           shake,
-          vignette: new DamageVignette(),
+          vignette: new DamageVignette(flashLimiter),
           overlay: feedback,
+          reduceEffects: () => settings.get('accessibility.reduceScreenEffects'),
         });
         // The breath meter (mw-e02.14): shown only while the player is short of breath, with the
         // armor's warning when it drags the player under.
@@ -1698,11 +2224,11 @@ function startRenderer(
       // box once it exists; the e2e reads the pack and the world items from #app[data-items], which
       // is rebuilt only after a take, drop, throw or refusal.
       const worldItems = prepareWorldItems(content);
-      startWorldItems(world, worldItems, loaded.spawns, player?.entity);
+      startWorldItems(world, worldItems, loaded.spawns, player?.entity, loaded.id);
       // Carrying (mw-e02.17): Interact lifts a liftable object up to the class's carry limit; Drop
       // (G) lets go, Drop with crouch places it, and Throw (T), held and released, throws it. The
       // arc a charged throw would fly is drawn while the button is held.
-      const carry = startCarry(world, content, new RapierCollisionWorld(physics));
+      const carry = startCarry(world, content, new RapierCollisionWorld(physics), loaded.spawns);
       const throwArc = createThrowArc();
       view.scene.add(throwArc.object);
       afterStep.push(() => {
@@ -1713,6 +2239,19 @@ function startRenderer(
       // yet (keys 1–4 are the abilities').
       const consumables = prepareConsumables(content, worldItems);
       startConsumables(world, consumables, player?.entity);
+      // Ropes (mw-e10.9): the scene's rope anchors take the climbing rope (tie and untie with
+      // Interact), and a refused climb says why on the Interact prompt.
+      startRopes(world, content, loaded, consumables.items.inventory, navigation);
+      // The e2e reads the latest refusal from #app[data-climb-refused] (the prompt itself is gone
+      // within a couple of seconds, which a slow runner's polling can miss).
+      world.events.on(climbRefused, (refused) => {
+        climbHint = climbHintOf(refused, performance.now());
+        root.dataset['climbRefused'] = JSON.stringify({
+          tick: refused.tick,
+          reason: refused.refusal.reason,
+          text: refused.text,
+        });
+      });
       // The inventory screen and the quick-slot strip (mw-e17.10): I or View opens the screen; its
       // actions reach the sim as commands. The e2e reads #app[data-inventory] (open/closed) and
       // #app[data-quick-slots].
@@ -1808,6 +2347,93 @@ function startRenderer(
         afterStep.push(() => {
           shop.afterStep();
         });
+        // The contest screens (mw-opf6): the entry window, the play panel and the play keys (F plays,
+        // H cheats at dice, N walks away). #app[data-contest] is the e2e's readout.
+        const contestUi = new ContestController({
+          ui,
+          world,
+          player: player.entity,
+          runner: contests.runner,
+          contests: contestsIn(content),
+          host: gameLogic.host,
+          toast: (text) => {
+            shop.toast(text);
+          },
+          positionOf: soundPositions(world, [readPhysicsObjectTransform, readDummyTransform]),
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          contestUi.afterStep();
+        });
+        globalThis.window.addEventListener('keydown', (event) => {
+          if (contestUi.keydown(event)) event.preventDefault();
+        });
+        // Reading (mw-kf4c): a spawn tagged `readable` plus a text id, read with Interact, opens the
+        // reader; the first read writes the text's evidence facts and publishes its logic events.
+        // #app[data-reader] (JSON: open, text, read) is the e2e's readout.
+        const reader = startReaderUi({
+          ui,
+          world,
+          content,
+          player: player.entity,
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          reader.afterStep();
+        });
+        // Rumours (mw-e22.11): a teller's `rumor.told` records the rumour, its target becomes a lead,
+        // visiting the target resolves it. No UI opens; #app[data-rumours] (JSON: heard, leads,
+        // investigated, debunked) is the e2e's readout.
+        const rumourHero = player.entity;
+        const rumours = startRumourUi({
+          world,
+          rumours: rumoursOf(content),
+          quests: gameLogic.quests,
+          player: () => rumourHero,
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          rumours.afterStep();
+        });
+        // The epilogue slideshow (mw-e39.40): the ending card and the slides of the epilogue quest,
+        // once the main quest resolves. #app[data-epilogue] (JSON: open, slide, preview, ended) is the
+        // e2e's readout.
+        if (gameLogic.quests !== undefined) {
+          const epilogue = startEpilogueUi({
+            ui,
+            world,
+            quests: gameLogic.quests,
+            content,
+            publish: (key, value) => {
+              root.dataset[key] = value;
+            },
+          });
+          epilogueUi = epilogue;
+          afterStep.push(() => {
+            epilogue.afterStep();
+          });
+          const classBeats = startClassBeatUi({
+            ui,
+            world,
+            quests: gameLogic.quests,
+            content,
+            // A debug boot into a named scene (?scene=) fires no beats (it sets arrival facts at once).
+            triggers: !new URLSearchParams(location.search).has('scene'),
+            publish: (key, value) => {
+              root.dataset[key] = value;
+            },
+          });
+          classBeatUi = classBeats;
+          afterStep.push(() => {
+            classBeats.afterStep();
+          });
+        }
       }
       // Class selection (mw-e19.5): the chosen class's capabilities, kit and stats go onto the player
       // once its inventory exists, and the player then moves on the class's controller tuning. The
@@ -1841,11 +2467,15 @@ function startRenderer(
           drawKit();
           if (frontDoor.newGameMs !== undefined) markFrontDoor('playableMs');
         };
-        const selectClass = (): void => {
+        const selectClass = (back?: () => void): void => {
           openClassSelect(ui, {
+            onBack: back,
             cards: classCards(content, playable),
             onConfirm: (id) => {
-              if (isPlayerClass(id) && playable.has(id)) choose(id);
+              if (isPlayerClass(id) && playable.has(id)) {
+                choose(id);
+                classBeatUi?.controller.startNewGame();
+              }
             },
           });
         };
@@ -1945,7 +2575,7 @@ function startRenderer(
       if (hasContainers(loaded.layout)) {
         const made = startContainers(
           world,
-          prepareContainers(content, worldItems.inventory),
+          prepareContainers(content, worldItems.inventory, worldItems),
           loaded,
           content,
         );
@@ -1957,6 +2587,30 @@ function startRenderer(
         };
         drawContainers();
         afterStep.push(drawContainers);
+      }
+      // Hiding spots (mw-e03.23): only in scenes that have them. Each is a grey box that follows its
+      // sim pose; the e2e reads who hides where from #app[data-hiding].
+      if (hasHiding(loaded.layout)) {
+        const { spots } = startHiding(world, loaded, {
+          collision,
+          capsule: controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID)).capsule,
+        });
+        for (const { entity, size, look } of spotLooks(loaded)) {
+          const object = createHidingSpotMesh(size, look);
+          view.scene.add(object);
+          sync.bind(entity, {
+            ...object3DBinding(object, (v, e) => readHidingSpot(v, e, size.y)),
+            dispose: disposeHidingSpotMesh,
+          });
+        }
+        const watch = new HidingWatch(world, spots, player?.entity);
+        let publishedHiding = '';
+        const drawHiding = (): void => {
+          const json = JSON.stringify(watch.readout());
+          if (json !== publishedHiding) root.dataset['hiding'] = publishedHiding = json;
+        };
+        drawHiding();
+        afterStep.push(drawHiding);
       }
       // World facts (mw-e01.4): the e2e reads the set facts, e.g. the slice's pass slice.complete
       // (docs/design/vertical-slice.md §5), from #app[data-facts], rewritten when one changes.
@@ -1979,12 +2633,166 @@ function startRenderer(
       });
       for (const line of sceneCreatureErrors(sceneCreatures)) console.error(line);
       // Creatures that keep to some phases of the day come and go with the clock (mw-ju8.14).
-      watchPresence(world, creatures.spawn, loaded.layout.spawns);
+      watchPresence(world, creatures.spawn, loaded.layout.spawns, undefined, {
+        inView: (point) => ndcInView(projectToNdc(camera, point)),
+        // People walk to a door, marker or way out to leave and come in by one (mw-8551).
+        exits: sceneExits(loaded.layout),
+      });
+      // Talking to NPCs (mw-e22.9): a creature whose content names a `dialogue` gets Talk on the
+      // Interact verb; talking pauses its routine, faces the player, runs the dialogue against the
+      // game's logic host and ends in a walk away or danger. Only where content has talkable
+      // creatures (the shipped bestiary has none yet; debug builds add the conversation room).
+      // #app[data-dialogue] (JSON) is the e2e's readout; the box is mw-e22.10's to replace.
+      // Persuasion checks (mw-e22.7) read the NPC's personality from its creature definition; option
+      // tags (mw-e22.6) read the class dialogue tag and the item icon from content.
+      const dialogueOfCreature = new Map(
+        content
+          .all('creature')
+          .flatMap((creature) =>
+            creature.dialogue === undefined ? [] : [[creature.id, creature.dialogue.id] as const],
+          ),
+      );
+      if (player !== undefined && dialogueOfCreature.size > 0) {
+        const dialogues = new Map(
+          content
+            .all('dialogue')
+            .map((dialogue) => [dialogue.id, dialogue as unknown as DialogueDef]),
+        );
+        const personalities = new Map(
+          content.all('creature').map((creature) => [creature.id, creature.personality]),
+        );
+        const persuasion = createPersuasion({
+          rules: content.get('persuasion', PERSUASION_ID),
+          personality: (npc) => personalities.get(npc),
+        });
+        const runtime = new DialogueRuntime({
+          world,
+          host: gameLogic.host,
+          dialogues: (id) => dialogues.get(id),
+          checks: persuasion.resolve,
+          preview: persuasion.preview,
+          tags: {
+            classTag: (classId) =>
+              content.all('class').find((def) => def.id === classId)?.dialogueTag,
+            itemIcon: (itemId) => content.all('item').find((item) => item.id === itemId)?.icon,
+          },
+        });
+        const talkable = (entity: EntityId) => {
+          const npc = creatureIdOf(world, entity);
+          const dialogue = npc === undefined ? undefined : dialogueOfCreature.get(npc);
+          return npc === undefined || dialogue === undefined ? undefined : { dialogue, npc };
+        };
+        installTalkGate(world, {
+          talkable,
+          hostile: (entity) => npcBand(dispositions.get(entity)) === 'hostile',
+          canParley: (dialogue, npc) => runtime.canParley(dialogue, npc),
+        });
+        // The dialogue screen (mw-e22.10): reveal speed and high contrast come from the settings, the
+        // text size and background opacity from the UI root; the mouse picks, the pad is polled below.
+        const dialogueBox = new DialogueBox({
+          choose: (index) => {
+            talking.activate(index);
+          },
+          focus: (index) => {
+            talking.focus(index);
+          },
+          advance: () => {
+            talking.advance();
+          },
+          toggleHistory: () => {
+            talking.toggleHistory();
+          },
+        });
+        ui.hud.append(dialogueBox.element);
+        dialogueBox.setRevealSpeed(settings.get('accessibility.revealSpeed'));
+        settings.on('accessibility.revealSpeed', (speed) => {
+          dialogueBox.setRevealSpeed(speed);
+        });
+        dialogueFrame = (ms) => {
+          dialogueBox.frame(ms);
+        };
+        const talking: Conversations = new Conversations({
+          reveal: {
+            active: () => dialogueBox.revealing,
+            finish: () => {
+              dialogueBox.finishReveal();
+            },
+          },
+          scrollHistory: (pixels) => {
+            dialogueBox.scrollHistory(pixels);
+          },
+          world,
+          player: player.entity,
+          runtime,
+          dialogueOf: (creature) => dialogueOfCreature.get(creature),
+          speakerName: (dialogue, speaker) =>
+            dialogues.get(dialogue)?.speakers.find((s) => s.id === speaker)?.name ?? speaker,
+          show: (model) => {
+            dialogueBox.update(model);
+          },
+          // Talking is modal for input (mw-e22.19): gameplay frames are withheld, pointer lock goes.
+          capture: conversationCapture(ui),
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        conversations = talking;
+        // The pad drives an open conversation (D-pad or stick, A, X for history, B closes it).
+        const dialoguePad = new UiInputAdapter((intent) => talking.intent(intent));
+        dialoguePad.attach({
+          window: { addEventListener: () => undefined, removeEventListener: () => undefined },
+          navigator: globalThis.navigator,
+          now: () => performance.now(),
+        });
+        dialoguePoll = () => {
+          dialoguePad.poll();
+        };
+        // An open conversation takes Enter, E and the number keys before the game's own bindings.
+        globalThis.window.addEventListener(
+          'keydown',
+          (event) => {
+            if (!talking.keydown(event)) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          },
+          true,
+        );
+        afterStep.push(() => {
+          talking.afterStep();
+        });
+        root.dataset['dialogue'] = JSON.stringify(talking.readout());
+      }
       // A placed creature's death sets its slain fact (mw-e01.7), e.g. entity:slice/skeleton.slain.
       installSlainFacts(world, scene.id, loaded.layout.spawns);
       // A dying creature drops what it carries and rolls its loot table (mw-e01.5): the slice's
       // skeleton drops the gallery key at its body.
       startCreatureDrops(world, content, worldItems, scene.id, loaded.layout.spawns);
+      // Puzzles (mw-e15.3): only in scenes whose content has some. The e2e reads their state from
+      // #app[data-puzzles]; a solve by a route nobody declared goes to the dev log as telemetry.
+      const puzzleHost = sceneHost(world, scenes, content);
+      afterStep.push(puzzleHost.flush);
+      const puzzles = startPuzzles(world, content, scene.id, {
+        player: player?.entity,
+        host: puzzleHost,
+        killY: () => scenes.killPlane,
+        report: (line) => {
+          console.info(`telemetry ${line}`);
+        },
+        // A hint tier fired (mw-e15.11): the bark and the entities to pulse. The HUD beads (mw-e31)
+        // draw them; until then they are published for the e2e and debug tools.
+        onHint: (hint) => {
+          root.dataset['puzzleHint'] = hintReadout(hint);
+        },
+      });
+      if (puzzles !== undefined) {
+        const puzzleWatch = new PuzzleWatch(puzzles);
+        const drawPuzzles = (): void => {
+          const json = puzzleWatch.changed();
+          if (json !== undefined) root.dataset['puzzles'] = json;
+        };
+        drawPuzzles();
+        afterStep.push(drawPuzzles);
+      }
       const watch = watchCreatureAi(world, sceneCreatures.ai, navigation);
       if (watch !== undefined) {
         let publishedAi = '';
@@ -2082,6 +2890,29 @@ function startRenderer(
       };
       drawCreatures();
       afterStep.push(drawCreatures);
+      // A creature's death: it falls, then dissolves over 1.2 s and its render entity is removed
+      // (mw-e29.7). Render-only: the sim keeps the entity (its health carries through saves), so
+      // its binding stays and only the drawn proxy goes.
+      corpseDissolves = attachCorpseDissolves({
+        events: world.events,
+        proxyOf: (entity) => creatureProxies.get(entity),
+        dissolve: (entity, proxy) =>
+          magicLooks.dissolve(proxy, {
+            tint: DEATH_TINT,
+            intensity: 1,
+            feet: proxy.position.y,
+            height: creatureHeights.get(entity) ?? 1.8,
+            seed: entity,
+          }),
+        progress: (dissolve, progress) => {
+          dissolve.setProgress(progress);
+        },
+        remove: (_entity, proxy, dissolve) => {
+          dissolve.dispose();
+          proxy.removeFromParent();
+        },
+      });
+      creatureIds = () => [...creatureProxies.keys()].map(Number);
       world.events.on(Died, ({ target }) => {
         const proxy = creatureProxies.get(target);
         if (proxy === undefined) return;
@@ -2137,10 +2968,26 @@ function startRenderer(
         sync.bind(entity, object3DBinding(object, readDummyTransform));
       }
       dummy = dummies[0];
-      if (vfxMode === 'demo' || vfxMode === 'stress') {
+      if (dev !== undefined && (vfxMode === 'demo' || vfxMode === 'stress')) {
         const [x, y, z] = scene.camera.target;
         const centre = playerStart(loaded.layout.spawns)?.position ?? { x, y, z };
-        vfxDemo = new VfxDemo(vfx, vfxMode, centre);
+        vfxDemo = new dev.VfxDemo(vfx, vfxMode, centre);
+      }
+      if (dev !== undefined && arrowDemoOrder !== undefined) {
+        arrowDemo = new dev.ArrowDemo(
+          world,
+          combat.bow.arrows,
+          arrowDemoOrder,
+          dev.parseArrowDemoLane(location.search),
+        );
+      }
+      if (magicMode !== undefined) {
+        magicDemo = new MagicDemo(
+          view.scene,
+          magicLooks,
+          magicMode,
+          parseFocusParam(location.search),
+        );
       }
       // Level deltas (mw-e27.3, mw-e27.4): with everything the scene spawned in place, before the
       // first tick, the level's baseline is taken and any changes stored for it are applied. Saves
@@ -2170,15 +3017,35 @@ function startRenderer(
       levelDeltasOf(world).enter(
         world,
         new WorldPersistence({
-          spawners: [worldItemSpawner(worldItems)],
+          spawners: [worldItemSpawner(worldItems), arrowSpawner()],
+          settle: fireSettleOptions(content),
           warn: (message) => {
             console.warn(message);
           },
         }),
         scene.id,
         sceneAuthoredEntities(world, loaded),
+        sceneDormantEntities(loaded),
       );
+      // Rest-reset policies (mw-e27.7): resting puts back what is declared to reset on rest.
+      installRestPolicies(world);
+      // Fact-gated spawns (mw-e27.8): spawnIf, despawnIf and variant groups were settled when the
+      // scene loaded; now they follow the facts, swapping only while the spawn is out of view.
+      const variants = watchSpawnVariants({
+        world,
+        loader: scenes,
+        content,
+        creatures: creatures.spawn,
+        inView: (point) => ndcInView(projectToNdc(camera, point)),
+      });
+      if (variants !== undefined) {
+        afterStep.push(() => {
+          variants.step();
+        });
+      }
       persistDroppedItems(world, () => scene.id);
+      // Arrows that stick in the level stay with it (mw-e05.7).
+      persistRestingArrows(world, () => scene.id);
       // The scene's ways into other scenes (mw-e01.11); answered by `transitions` below.
       if (player !== undefined) installSceneTransitions(world, loaded.layout, player.entity);
       label.textContent = sceneLabel(scene, __BUILD_SHA__);
@@ -2196,7 +3063,13 @@ function startRenderer(
     const progress = new SaveProgress(() => world.tick);
     // The "not safe to save now" checks (mw-e01.7): they hold back autosaves and disable the pause
     // menu's Save with their reason (mw-e01.3). In m1, a creature in Combat.
-    const saveVetoes = { [COMBAT_VETO_ID]: combatVeto(world) };
+    const saveVetoes = {
+      [COMBAT_VETO_ID]: combatVeto(world),
+      // Nor while the player hides in a wardrobe (mw-e03.23).
+      [HIDING_VETO_ID]: hidingVeto(world, () => player?.entity),
+      // Nor mid-conversation: the dialogue in progress is not saved (mw-e22.9).
+      [DIALOGUE_VETO_ID]: dialogueVeto(() => conversations),
+    };
     const safety = new SafetyVetoes();
     for (const [id, veto] of Object.entries(saveVetoes)) safety.register(id, veto);
     // Items no longer in content are dropped from a loaded save with a warning (mw-e17.8).
@@ -2290,9 +3163,9 @@ function startRenderer(
           },
           // New Game opens class selection over the scene behind the title; a scene with no player
           // to give a class to reloads into a new game instead.
-          newGame: () => {
+          newGame: (back) => {
             markFrontDoor('newGameMs');
-            if (startNewGame !== undefined) startNewGame();
+            if (startNewGame !== undefined) startNewGame(back);
             else location.search = searchWithoutMenu(location.search, { newgame: '' });
           },
           publish: (readout: SaveMenuReadout) => {
@@ -2389,9 +3262,32 @@ function startRenderer(
     let inPlay = false;
     if (player !== undefined && areaId !== undefined) {
       const hero = player.entity;
+      // The journal (mw-e23.6): only on the player's key or the pause menu, never by itself, so
+      // debug scene boots stay clear. #app[data-journal] (open or closed) is the e2e's readout.
+      const questRuntime = gameLogic.quests;
+      const journal =
+        questRuntime === undefined
+          ? undefined
+          : new JournalController({
+              ui,
+              canOpen: () => inPlay && playerInput.enabled && !isPlayerDead(world, hero),
+              keys: () => sampler.bindings.journal,
+              model: () =>
+                buildJournal(journalSources(content, { quests: questRuntime, facts: world.facts })),
+              publish: (state) => {
+                root.dataset['journal'] = state;
+              },
+            });
+      journalUi = journal;
+      globalThis.window.addEventListener('keydown', (event) => {
+        if (journal?.keydown(event) === true) event.preventDefault();
+      });
       const pause = new PauseController({
         ui,
         canPause: () => inPlay && playerInput.enabled && !isPlayerDead(world, hero),
+        openJournal: () => {
+          journal?.open(undefined, true);
+        },
         saveBlocked: () => safety.active()[0]?.reason ?? null,
         unsavedProgress: () => progress.unsaved,
         pauseKeys: () => sampler.bindings.pause,
@@ -2463,9 +3359,39 @@ function startRenderer(
       });
       world.events.on(playerRespawned, (respawned) => {
         root.dataset['respawned'] = JSON.stringify(respawned);
+        sampler.releaseToggles();
       });
+      world.events.on(playerDied, () => {
+        sampler.releaseToggles();
+      });
+      bowEquipped = () =>
+        world.isRegistered(BowComponent) && world.get(body.entity, BowComponent)?.equipped === true;
     }
     const pending: PendingLoad | undefined = takePendingLoad(session);
+    // Difficulty presets and assists (mw-e31.10): the settings feed the sim's DifficultyConfig as a
+    // command (so replays record it), a loaded save's config shows back in the settings, and each
+    // change is logged locally. #app[data-difficulty] reads the choice and the sim's multipliers.
+    const difficultyPresets = loadDifficultyPresets(content.get('game', GAME_CONFIG_ID));
+    const publishDifficulty = (): void => {
+      root.dataset['difficulty'] = JSON.stringify({
+        choice: choiceOf(world.difficulty, difficultyPresets),
+        config: world.difficulty,
+        tick: world.tick,
+      });
+    };
+    const difficulty = bindDifficulty({
+      settings,
+      world,
+      presets: difficultyPresets,
+      submit: (command) => {
+        commands.push(command);
+      },
+      telemetry: (event) => {
+        console.info(`telemetry ${JSON.stringify(event)}`);
+        publishDifficulty();
+      },
+    });
+    publishDifficulty();
     // The debug console (mw-e33.1): its own chunk, loaded only in dev builds or with ?debug=1.
     const consoleGate = {
       built: __DEBUG_CONSOLE__,
@@ -2506,6 +3432,10 @@ function startRenderer(
         inputRecorder.segment();
       const replay = (window as unknown as { mwInputReplay?: InputLogSegment }).mwInputReplay;
       replaying = replay !== undefined;
+      if (replaying) {
+        toggleLocked = true;
+        sampler.setToggled([]);
+      }
       const player =
         replay === undefined
           ? undefined
@@ -2544,8 +3474,20 @@ function startRenderer(
       };
     }
     if (debugPage) {
-      void Promise.all([import('@tools/console/start'), import('@tools/ai-debug/start')]).then(
-        ([{ startDebugConsole, unboundDebugSpawns }, { startAiDebug }]) => {
+      void Promise.all([
+        import('@tools/console/start'),
+        import('@tools/ai-debug/start'),
+        import('@tools/field-debug/start'),
+        import('@tools/world-state/start'),
+        import('@tools/epilogue/commands'),
+      ]).then(
+        ([
+          { startDebugConsole, unboundDebugSpawns },
+          { startAiDebug },
+          { startFieldDebug },
+          { startWorldState },
+          { registerEpilogueCommands },
+        ]) => {
           const bookmarks = new Map(
             (scenes.current?.layout.spawns ?? []).map(
               (spawn) => [spawn.id, spawn.position] as const,
@@ -2628,6 +3570,44 @@ function startRenderer(
               root.dataset['aiDebug'] = json;
             },
           });
+          // fields / inspect / stim (mw-e03.29): element-field and light heatmaps, the property
+          // inspector and the stimulus timeline. Off until a command turns it on; it only reads.
+          fieldDebug = startFieldDebug({
+            world,
+            registry: debugConsole.registry,
+            scene: view.scene,
+            camera,
+            root,
+            light: light.field,
+            cursorPoint: () =>
+              viewCentrePoint(physics, {
+                position: camera.position,
+                quaternion: camera.quaternion,
+              }),
+            publish: (json) => {
+              root.dataset['fieldDebug'] = json;
+            },
+          });
+          // epilogue.preview <ending> (mw-e39.40): plays the slideshow of a headline ending.
+          registerEpilogueCommands(debugConsole.registry, {
+            preview: (ending) => {
+              epilogueUi?.controller.queuePreview(ending);
+            },
+          });
+          // facts.* / deltas.list / state.* (mw-e27.6): inspect, edit, snapshot and diff the world's
+          // facts and per-level deltas, against live state, in-memory snapshots or save slots.
+          void saves.then(({ store }) => {
+            worldState = startWorldState({
+              world,
+              registry: debugConsole.registry,
+              root,
+              store,
+              saves: saveRegistry,
+              publish: (json) => {
+                root.dataset['worldState'] = json;
+              },
+            });
+          });
           // Props the console spawned get grey-box objects like the scene's own props: a movable one
           // a body-sized box following its physics pose.
           afterStep.push(() => {
@@ -2660,6 +3640,8 @@ function startRenderer(
       // publish the same state hash (mw-e01.16 AC-2, read by the e2e).
       root.dataset['bootState'] = JSON.stringify({ tick: world.tick, hash: hashWorld(world) });
       arrival?.playable();
+      // A recorded input replay runs on the difficulty it was recorded with, not the player's.
+      if (!replaying) difficulty.start();
       loop.start();
       inPlay = true;
       openRequestedMenu();
@@ -2667,6 +3649,9 @@ function startRenderer(
       void deathReload
         .then((reload) => reload.resume(pending))
         .finally(() => {
+          // The save's difficulty wins over the settings (an old save has none: Adventurer).
+          difficulty.adopt();
+          publishDifficulty();
           loop.start();
           inPlay = true;
         });

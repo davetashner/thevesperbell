@@ -129,6 +129,7 @@ describe('faction table', () => {
         towardPlayer: 'prey',
         towardMembers: 'ally',
         towardOthers: 'neutral',
+        dispositionSpread: 0,
         relations: [
           { faction: { type: 'faction', id: 'sheep' } as never, stance: 'prey', mutual: true },
         ],

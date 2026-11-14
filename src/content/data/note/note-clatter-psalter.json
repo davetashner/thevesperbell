@@ -1,0 +1,15 @@
+{
+  "$schema": "../note.schema.json",
+  "id": "note-clatter-psalter",
+  "title": "A burnt psalter",
+  "author": "Brother Anselm Hobb",
+  "notes": "Bible 6.1 quest 5 (The Name on the Bones; mw-e39.11): Clatter's psalter, lying among the Forgotten in the Ossuary. Half burnt; the flyleaf has his name in a gardener's hand. Does not quote the hymn (only book-vesperine-hours may). Reading it gives evidence.clatter-psalter, the first piece.",
+  "locations": ["place-knot"],
+  "evidence": ["evidence.clatter-psalter"],
+  "emits": ["clatter-psalter-found"],
+  "pages": [
+    {
+      "text": "A small psalter, scorched at the edges and gnawed by something. On the flyleaf, in a gardener's careful hand: A. Hobb. His. If found, return to the garden, where the pears are.\n\nBeneath it, in pencil, a later and wobblier line: Do not lend. Corvin never gives it back."
+    }
+  ]
+}

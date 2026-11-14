@@ -3,15 +3,14 @@ import { AudioEngine } from './engine.ts';
 import { FakeAudioContext, type FakeGain } from './fake-context.ts';
 import { SoundRegistry } from './manifest.ts';
 import {
-  MIN_DB,
   MIXER_RAMP_S,
+  SLIDER_EXPONENT,
   bindMixer,
   sliderToGain,
   type MixerKey,
   type MixerValues,
   type Visibility,
 } from './mixer.ts';
-import { dbToGain } from './buses.ts';
 import { documentVisibility } from './browser.ts';
 
 const DEFAULTS: { -readonly [K in MixerKey]: MixerValues[K] } = {
@@ -79,11 +78,14 @@ function gainAt(ctx: FakeAudioContext, index: number): FakeGain {
 }
 
 describe('slider curve (mw-e28.5)', () => {
-  it('AC-1: maps 0–1 onto −60..0 dB, so 50% is −30 dB and 100% is unity', () => {
-    expect(sliderToGain(0.5)).toBeCloseTo(dbToGain(MIN_DB / 2));
+  it('AC-2: 50% maps to about -10 dB, 100% is unity and the curve is monotonic', () => {
+    const db = (g: number): number => 20 * Math.log10(g);
+    expect(db(sliderToGain(0.5))).toBeGreaterThan(-11);
+    expect(db(sliderToGain(0.5))).toBeLessThan(-9);
     expect(sliderToGain(1)).toBe(1);
     expect(sliderToGain(2)).toBe(1);
-    expect(sliderToGain(0.05)).toBeCloseTo(dbToGain(-57));
+    expect(sliderToGain(0.05)).toBeCloseTo(0.05 ** SLIDER_EXPONENT);
+    expect(sliderToGain(0.3)).toBeLessThan(sliderToGain(0.4));
   });
 
   it('AC-2: 0 is exactly 0, and bad input is mute rather than NaN', () => {
@@ -109,6 +111,16 @@ describe('bindMixer', () => {
       { type: 'ramp', value: sliderToGain(0.5), time: 3 + MIXER_RAMP_S },
     ]);
     expect(MIXER_RAMP_S).toBe(0.05);
+  });
+
+  it('mw-e31.9 AC-1: music at 0 silences the music bus and leaves SFX alone', async () => {
+    const { ctx, engine } = engineRig('running');
+    const r = rig();
+    bindMixer(engine, r.settings, r.visibility);
+    await engine.unlock();
+    r.settings.set('audio.music', 0);
+    expect(gainAt(ctx, 1).gain.value).toBe(0);
+    expect(gainAt(ctx, 2).gain.value).toBe(1);
   });
 
   it('AC-2: slider 0 puts the bus gain at exactly 0 for every bus slider', async () => {
@@ -188,7 +200,7 @@ describe('bindMixer', () => {
     expect(ctx.gains[0]?.gain.value).toBe(0);
   });
 
-  it('AC-5: mono downmixes a hard-left source to equal channels; off passes it through', async () => {
+  it('mw-e31.9 AC-3: mono downmixes a hard-left source to equal channels; off passes it through', async () => {
     const { ctx, engine } = engineRig('running');
     const r = rig();
     bindMixer(engine, r.settings, r.visibility);

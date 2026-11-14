@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { gameContentSources } from '../game-content.ts';
+import { gameContentSources, loadGameContent } from '../game-content.ts';
 import { ContentLoadError, loadContent, type ContentSource } from '../loader.ts';
 import { contentChecks, contentTypes } from '../registry.ts';
 import { serializeContent } from '../schema.ts';
@@ -199,10 +199,25 @@ describe('item schema: weight (ADR-0003)', () => {
     expect(problems({ ...armor, armor: { weightKg: 0 } })).toHaveLength(1);
     expect(problems({ ...armor, armor: { weightKg: 21 } })).toHaveLength(1);
     expect(problems({ ...misc, weightKg: 1 })).toEqual([': Unrecognized key: "weightKg"']);
-    const weapon = { ...misc, category: 'weapon', equip: { slot: 'main-hand' }, weapon: {} };
-    expect(problems({ ...weapon, weapon: { weightKg: 2 } })).toEqual([
+    const weapon = {
+      ...misc,
+      category: 'weapon',
+      equip: { slot: 'main-hand' },
+      weapon: { reach: 'medium' },
+    };
+    expect(problems({ ...weapon, weapon: { reach: 'medium', weightKg: 2 } })).toEqual([
       'weapon: Unrecognized key: "weightKg"',
     ]);
+  });
+
+  it('AC-4: armor takes flat absorption per damage type and a poise bonus, both optional', () => {
+    const plate = { ...armor, armor: { weightKg: 12, absorption: { slash: 12 }, poise: 20 } };
+    expect(problems(plate)).toEqual([]);
+    expect(problems({ ...armor, armor: { weightKg: 4, absorption: { slash: 0 } } })).toHaveLength(
+      1,
+    );
+    expect(problems({ ...armor, armor: { weightKg: 4, absorption: { rust: 2 } } })).toHaveLength(1);
+    expect(problems({ ...armor, armor: { weightKg: 4, poise: -1 } })).toHaveLength(1);
   });
 
   it('armor goes in an armor slot and sets no noise multiplier of its own', () => {
@@ -450,5 +465,35 @@ describe('item flags: quest items (ADR-0003)', () => {
 describe('the shipped items (mw-e19.4 starting kits)', () => {
   describeContent('item', 'AC-1: validates and round-trips', (entry) => {
     expect(itemSchema.parse(JSON.parse(serializeContent(entry)))).toEqual(entry);
+  });
+});
+
+describe('the climbing rope item (mw-e10.9)', () => {
+  const rope = {
+    id: 'test-rope',
+    category: 'tool',
+    notes: 'Test.',
+    icon: 'icon-item-test-01',
+    value: 1,
+    rope: { length: 6 },
+  } satisfies ItemDefInput;
+
+  it('a tool can be a rope that hangs a positive length up to 50 m, and nothing else can', () => {
+    expect(problems(rope)).toEqual([]);
+    expect(parse(rope)).toMatchObject({ category: 'tool', rope: { length: 6 } });
+    expect(problems({ ...rope, rope: { length: 0 } })).toHaveLength(1);
+    expect(problems({ ...rope, rope: { length: 51 } })).toHaveLength(1);
+    expect(problems({ ...rope, rope: {} })).toHaveLength(1);
+    expect(problems({ ...rope, category: 'misc' })).not.toEqual([]);
+  });
+
+  it('the shipped climbing rope is a stackable tool that hangs 6 m and is made of rope', () => {
+    const shipped = loadGameContent().get('item', 'climbing-rope');
+    expect(shipped).toMatchObject({
+      category: 'tool',
+      stackable: true,
+      rope: { length: 6 },
+    });
+    expect(shipped.worldProperties?.material?.id).toBe('rope');
   });
 });

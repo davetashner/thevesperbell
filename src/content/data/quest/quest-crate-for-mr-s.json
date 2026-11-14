@@ -1,0 +1,770 @@
+{
+  "$schema": "../quest.schema.json",
+  "id": "quest-crate-for-mr-s",
+  "title": "The Crate for Mr. S—",
+  "summary": "Vane's next crate of relics sits in bay nine of Wendmouth's bonded warehouse, bound for the Gilded Tern and a buyer who signs himself Mr. S—. Inside, under the horn-coins, is a Hornfolk name-stone carved with Horn's mother's name. Take it before the Tern sails.",
+  "notes": "Side quest of Wendmouth (bible 3.6, 4.3, 6.1 quest 6; mw-e39.21), optional to the main quest: it writes crate.intercepted and horn.name-stone-held but the main quest reads no harbour fact to advance, and the quest never writes tern.sailed (the main quest does, when Act III begins). Started by whichever lead the player finds first: Nell on bay nine, Mags on the crates, Cray's suspicion of the seal or Quell's collapse. Every route is an optional objective and every resolution names the one it needs, so any class's route counts (route-matrix bay-nine, customs-strongroom, gilded-tern). How the player gets into bay nine (skylight, pick, dockhand's coat, forged stamp, Mage Hand on the seal) is the level's business: it emits crate.bay-opened and the other events when the obstacle is beaten. Wendmouth has no scene yet (follow-up bead), so the event and area objectives complete through completeObjective until then. Each resolution sets crate.method; the Tern sailing first resolves it as 'sailed' and leaves the customs manifest copy obtainable.",
+  "givers": ["npc-nell"],
+  "startWhen": {
+    "kind": "any",
+    "of": [
+      {
+        "kind": "fact",
+        "fact": "nell.bay-nine-told"
+      },
+      {
+        "kind": "fact",
+        "fact": "mags.crates-confessed"
+      },
+      {
+        "kind": "fact",
+        "fact": "cray.bay-nine.suspicion"
+      },
+      {
+        "kind": "fact",
+        "fact": "quell.collapsed"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "rumour",
+      "text": "Vane's next relic crate is waiting in bay nine of the bonded warehouse to be hoisted aboard the Gilded Tern, and the Tern sails when the trouble up the valley comes to a head. Whatever you do, do it before then.",
+      "transitions": [
+        {
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "case-the-warehouse",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "visit-the-undertow",
+                "state": "complete"
+              },
+              {
+                "kind": "fact",
+                "fact": "cray.seizure.agreed"
+              },
+              {
+                "kind": "fact",
+                "fact": "quell.crate-access"
+              },
+              {
+                "kind": "fact",
+                "fact": "cray.bay-nine.suspicion"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "cut-the-net",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "open-bay-nine",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "win-the-brawl",
+                "state": "complete"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "divert-the-crate",
+                "state": "complete"
+              }
+            ]
+          },
+          "stage": "plan"
+        }
+      ]
+    },
+    {
+      "id": "plan",
+      "text": "Bay nine has a hoist, a night watchman, a seal stamped by a clerk who has been dead for a year, and a quay door. There are several ways to get a crate out of it and every one of them is a story."
+    }
+  ],
+  "initialStage": "rumour",
+  "objectives": [
+    {
+      "id": "case-the-warehouse",
+      "kind": "enterArea",
+      "text": "Case the bonded warehouse and find bay nine.",
+      "params": {
+        "area": "bonded-warehouse"
+      },
+      "optional": true
+    },
+    {
+      "id": "visit-the-undertow",
+      "kind": "enterArea",
+      "text": "Ask the Undertow for a customs-seal stamp and a forged manifest.",
+      "params": {
+        "area": "undertow"
+      },
+      "optional": true
+    },
+    {
+      "id": "open-bay-nine",
+      "kind": "event",
+      "text": "Get into bay nine: over the roof and through the skylight, past the seal with a pick, in a dockhand's coat or with a forged stamp.",
+      "params": {
+        "event": "crate-bay-opened"
+      },
+      "optional": true
+    },
+    {
+      "id": "swap-for-ballast",
+      "kind": "event",
+      "text": "Swap the crate's contents for ballast.",
+      "params": {
+        "event": "crate-ballast-swapped"
+      },
+      "optional": true
+    },
+    {
+      "id": "reseal-the-crate",
+      "kind": "event",
+      "text": "Re-seal the crate so no one can tell.",
+      "params": {
+        "event": "crate-resealed"
+      },
+      "optional": true
+    },
+    {
+      "id": "win-over-cray",
+      "kind": "fact",
+      "text": "Give Inspector Cray the evidence she needs to seize bay nine lawfully.",
+      "params": {
+        "fact": "cray.seizure.agreed"
+      },
+      "optional": true
+    },
+    {
+      "id": "cray-seizes-the-crate",
+      "kind": "event",
+      "text": "Watch Cray's clerks seize the crate and take the name-stone from the strongroom.",
+      "params": {
+        "event": "crate-seized"
+      },
+      "optional": true
+    },
+    {
+      "id": "cut-the-net",
+      "kind": "event",
+      "text": "Cut the cargo net as the crate swings up to the Tern.",
+      "params": {
+        "event": "crate-net-cut"
+      },
+      "optional": true
+    },
+    {
+      "id": "fish-it-out",
+      "kind": "event",
+      "text": "Fish the crate out of the harbour at low tide before the Low Tide Company does.",
+      "params": {
+        "event": "crate-fished-out"
+      },
+      "optional": true
+    },
+    {
+      "id": "win-the-brawl",
+      "kind": "event",
+      "text": "Walk in and tell the watchman to stand aside, then win the dockside brawl.",
+      "params": {
+        "event": "bay-nine-brawl-won"
+      },
+      "optional": true
+    },
+    {
+      "id": "divert-the-crate",
+      "kind": "event",
+      "text": "Freeze the pool around the Tern and take the crate from the hold, or Gust the hoist so the crate lands on the wharf.",
+      "params": {
+        "event": "crate-diverted"
+      },
+      "optional": true
+    },
+    {
+      "id": "squeeze-quell",
+      "kind": "fact",
+      "text": "Confront Quell with the foundry invoice until he hands over the crate.",
+      "params": {
+        "fact": "quell.crate-access"
+      },
+      "optional": true
+    },
+    {
+      "id": "collect-from-quell",
+      "kind": "event",
+      "text": "Collect the crate from bay nine with Quell's access.",
+      "params": {
+        "event": "crate-collected"
+      },
+      "optional": true
+    }
+  ],
+  "resolutions": [
+    {
+      "id": "ballast-swap",
+      "approach": "stealth",
+      "priority": 60,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "reseal-the-crate",
+                "state": "complete"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "heist.alarm"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "heist"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "heist.undetected",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "tern.sails-with-ballast",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "heist"
+          }
+        }
+      ],
+      "journal": "Nobody saw you. The crate went back under its seal as heavy as it came, with rocks from a town made of them, and the name-stone is in your pocket. The Tern will sail with ballast, and Vane will be paid in angry letters."
+    },
+    {
+      "id": "ballast-swap-spotted",
+      "approach": "stealth",
+      "priority": 55,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "reseal-the-crate",
+                "state": "complete"
+              },
+              {
+                "kind": "fact",
+                "fact": "heist.alarm"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "heist"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "tern.sails-with-ballast",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "heist"
+          }
+        }
+      ],
+      "journal": "The crate is yours and the rocks are in it, but a lamp swung round the bay before you were done. The name-stone is safe; the harbour will be talking about the night watchman's alarm for a while."
+    },
+    {
+      "id": "paper-seizure",
+      "approach": "diplomacy",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "cray.seizure.agreed"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "cray-seizes-the-crate",
+                "state": "complete"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "paper"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "paper"
+          }
+        }
+      ],
+      "journal": "Inspector Cray's clerks opened bay nine by the book, with a warrant the dead clerk's seal could not answer. The crate sits in the strongroom under lawful seizure, and the name-stone and the honest manifest are yours."
+    },
+    {
+      "id": "net-cut",
+      "approach": "trickery",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "objectiveState",
+            "quest": "quest-crate-for-mr-s",
+            "objective": "fish-it-out",
+            "state": "complete"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "net"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "net"
+          }
+        }
+      ],
+      "journal": "The net parted, the crate dropped into the pool and you were in the water at low tide before the Low Tide Company had their boat out. The name-stone is sodden and entirely intact."
+    },
+    {
+      "id": "force",
+      "approach": "combat",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "objectiveState",
+            "quest": "quest-crate-for-mr-s",
+            "objective": "win-the-brawl",
+            "state": "complete"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "force"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "heist.alarm",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "lowtide.standing",
+          "value": "hostile"
+        },
+        {
+          "kind": "setFact",
+          "fact": "cray.arrival.flagged",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "force"
+          }
+        }
+      ],
+      "journal": "You told the watchman to stand aside, and the dock took offence. When the brawl with Nell's crew and the harbour watch was done, Inspector Cray was standing at the end of it, writing. The crate is yours; the Low Tide Company will not forget it."
+    },
+    {
+      "id": "ice-or-gust",
+      "approach": "magic",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "objectiveState",
+            "quest": "quest-crate-for-mr-s",
+            "objective": "divert-the-crate",
+            "state": "complete"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "ice"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "ice"
+          }
+        }
+      ],
+      "journal": "The pool went white and the crate came to you, whether you walked out to the Tern's hold over the ice or Gusted the hoist so it landed on the wharf. The name-stone is cold in your hand."
+    },
+    {
+      "id": "leverage-on-quell",
+      "approach": "diplomacy",
+      "priority": 50,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "tern.sailed"
+            }
+          },
+          {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "quell.crate-access"
+              },
+              {
+                "kind": "objectiveState",
+                "quest": "quest-crate-for-mr-s",
+                "objective": "collect-from-quell",
+                "state": "complete"
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "leverage"
+        },
+        {
+          "kind": "setFact",
+          "fact": "crate.intercepted",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "namestone.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "horn.name-stone-held",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.honest.obtained",
+          "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "evidence.honest-manifest",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "leverage"
+          }
+        }
+      ],
+      "journal": "Jasper Quell gave you bay nine's crate and his honest manifest, and asked for a head start on the mountain road. The name-stone is yours and no one in Wendmouth has to know why."
+    },
+    {
+      "id": "sailed",
+      "approach": "other",
+      "priority": 1,
+      "when": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "fact",
+            "fact": "tern.sailed"
+          },
+          {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "crate.intercepted"
+            }
+          }
+        ]
+      },
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "crate.method",
+          "value": "sailed"
+        },
+        {
+          "kind": "setFact",
+          "fact": "manifest.customs-copy.obtainable",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "crate-resolved",
+          "data": {
+            "method": "sailed"
+          }
+        }
+      ],
+      "journal": "The Gilded Tern has sailed with Vane's crate. Somewhere in a far city someone will open it. The customs house copy of the manifest is still on its hook, if you want proof of what he was shipping."
+    }
+  ]
+}

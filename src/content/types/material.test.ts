@@ -9,6 +9,7 @@ import { worldPropertiesSchema } from '../world-properties.ts';
 import {
   BURNT_DESTROYED,
   burntMaterials,
+  materialLoudness,
   IMPACT_SOUND_PATTERN,
   materialPresets,
   materialSchema,
@@ -130,6 +131,14 @@ describe('material presets', () => {
         message: 'material:wood references missing material:ash',
       },
     ]);
+  });
+
+  it('mw-e03.25: materialLoudness maps each material to its surface loudness offset', () => {
+    const loud = materialLoudness(loadGameContent().all('material'));
+    expect(loud.get('stone')).toBe(0);
+    expect(loud.get('glass')).toBe(12);
+    expect(loud.get('cloth')).toBe(-8);
+    expect(loud.size).toBe(loadGameContent().all('material').length);
   });
 
   it('mw-e03.5: burntMaterials maps flammable materials to what they become (null = burns away)', () => {

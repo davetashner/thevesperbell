@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-14-inspector-reads",
+  "notes": "Bible 6.2: Cray's secret (5.13); points at Contraband Pages (bible 6.1 quest 8). Nell tells it in nell-drowned-gull.",
+  "region": "harbour",
+  "source": ["npc-nell"],
+  "truth": "true",
+  "target": "npc-cray",
+  "text": "The Inspector reads every book she confiscates. Every one. Even the ones with kissing.",
+  "secondHand": {
+    "teller": "npc-dot",
+    "text": "A bargeman told me the harbour inspector reads every book she confiscates. Every one. Even the ones with kissing."
+  }
+}

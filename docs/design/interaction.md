@@ -23,7 +23,7 @@ in priority order.
 ```
 
 - `verb` is one of the closed list in `AFFORDANCE_VERBS` (`use`, `open`, `close`, `pull`, `press`,
-  `pick-up`, `read`, `search`, `hide`, `climb`, `talk`, `push`, `release`, `rotate`, `unlock`, `pick-lock`, `light`,
+  `pick-up`, `read`, `search`, `stash`, `hide`, `leave`, `climb`, `talk`, `push`, `release`, `rotate`, `unlock`, `pick-lock`, `light`,
   `extinguish`). Add a verb in the sim; the content schema then fails to compile until it lists it.
 - `requires`: every requirement must hold. A capability comes from the actor's class or skills, an
   item from what it carries (`Interactor` component: `capabilities`, `items`).

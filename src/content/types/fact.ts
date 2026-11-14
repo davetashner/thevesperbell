@@ -18,10 +18,21 @@ import { contentId } from '../schema.ts';
 export const FACT_VALUE_TYPES = ['bool', 'int', 'enum', 'id', 'tick'] as const;
 
 /**
- * Persistence policies. Only `permanent` exists until mw-e27.7 adds reset-on-rest, reset-after,
- * transient and decays-to policies.
+ * Persistence policies (mirrors the sim's FACT_PERSISTENCE_KINDS; mw-e27.7): `permanent` keeps a
+ * value in saves forever; `reset-on-rest` returns it to its default when the player rests;
+ * `reset-after` returns it `resetAfter` ticks after it was last written; `transient` is never saved
+ * (a loaded game starts at the default); `decays-to` saves it but loads a value in `decaysTo.from`
+ * as `decaysTo.to`.
  */
-export const FACT_PERSISTENCE = ['permanent'] as const;
+export const FACT_PERSISTENCE = [
+  'permanent',
+  'reset-on-rest',
+  'reset-after',
+  'transient',
+  'decays-to',
+] as const;
+
+const scalar = z.union([z.boolean(), z.int(), contentId]);
 
 const SEGMENT = '[a-z0-9]+(?:-[a-z0-9]+)*';
 
@@ -69,7 +80,23 @@ const common = {
   persistence: z
     .enum(FACT_PERSISTENCE)
     .default('permanent')
-    .describe('How long a written value lasts; `permanent` keeps it in saves forever.'),
+    .describe(
+      'How long a written value lasts: `permanent` (default) keeps it in saves forever; `reset-on-rest` returns it to its default when the player rests; `reset-after` (with `resetAfter`) returns it that many sim ticks after it was last written, loaded or not; `transient` is never saved; `decays-to` (with `decaysTo`) loads one of its values as another (a burning thing as burnt).',
+    ),
+  resetAfter: z
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      'Sim ticks after the last write at which the fact returns to its default; only with persistence `reset-after`, where it is required.',
+    ),
+  decaysTo: z
+    .strictObject({
+      from: z.array(scalar).min(1).describe('Saved values that decay (e.g. ["burning"]).'),
+      to: scalar.describe('The value a loaded game holds instead (e.g. "burnt").'),
+    })
+    .optional()
+    .describe('Only with persistence `decays-to`, where it is required.'),
 };
 
 /** One declared fact. The `default` is required: `null` (id and tick only) means "unset". */
@@ -104,6 +131,61 @@ const factDefSchema = z
   ])
   .describe('One fact: bool, int, enum (with `values`), id (a content id) or tick (a sim tick).');
 
+type Scalar = boolean | number | string;
+
+function fits(fact: FactDef, value: Scalar): boolean {
+  switch (fact.type) {
+    case 'bool':
+      return typeof value === 'boolean';
+    case 'int':
+      return typeof value === 'number';
+    case 'tick':
+      return typeof value === 'number' && value >= 0;
+    case 'id':
+      return typeof value === 'string';
+    case 'enum':
+      return typeof value === 'string' && fact.values.includes(value);
+  }
+}
+
+/** What is wrong with a fact's persistence policy: path within the fact and message. */
+function policyIssues(fact: FactDef): [(string | number)[], string][] {
+  const found: [(string | number)[], string][] = [];
+  const { persistence, resetAfter, decaysTo } = fact;
+  if (resetAfter !== undefined && persistence !== 'reset-after') {
+    found.push([
+      ['resetAfter'],
+      `resetAfter needs persistence "reset-after", not "${persistence}"`,
+    ]);
+  }
+  if (decaysTo !== undefined && persistence !== 'decays-to') {
+    found.push([['decaysTo'], `decaysTo needs persistence "decays-to", not "${persistence}"`]);
+  }
+  if (persistence === 'reset-after' && resetAfter === undefined) {
+    found.push([['resetAfter'], 'reset-after needs resetAfter (sim ticks)']);
+  }
+  if (persistence === 'decays-to') {
+    if (decaysTo === undefined) found.push([['decaysTo'], 'decays-to needs decaysTo']);
+    else {
+      [
+        ...decaysTo.from.map((value, i) => ['from', i, value] as const),
+        ['to', -1, decaysTo.to] as const,
+      ]
+        .filter(([, , value]) => !fits(fact, value))
+        .forEach(([part, i]) => {
+          found.push([
+            i < 0 ? ['decaysTo', part] : ['decaysTo', part, i],
+            `is not a value of type ${fact.type}`,
+          ]);
+        });
+    }
+  }
+  if ((persistence === 'reset-on-rest' || persistence === 'reset-after') && fact.default === null) {
+    found.push([['default'], `${persistence} needs a default to return to`]);
+  }
+  return found;
+}
+
 /** One file of the fact registry: `src/content/data/fact/<id>.json`. */
 export const factSchema = z
   .strictObject({
@@ -123,6 +205,7 @@ export const factSchema = z
       };
       if (seen.has(fact.key)) issue(['key'], `"${fact.key}" is declared twice in this file`);
       seen.add(fact.key);
+      for (const [path, message] of policyIssues(fact)) issue(path, message);
       const template = FACT_TEMPLATE_PATTERN.test(fact.key);
       fact.renamedFrom?.forEach((old, i) => {
         if (old === fact.key) issue(['renamedFrom', i], 'a fact cannot be renamed from itself');

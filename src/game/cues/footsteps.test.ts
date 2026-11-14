@@ -222,6 +222,14 @@ describe('surface-aware footsteps (mw-e28.6)', () => {
         kind: 'footstep',
         foot,
         gait: 'walk',
+        position: { x: 0, y: 0, z: 0 },
+        wet: false,
+        frozen: false,
+        burning: false,
+        profileNoise: 0.3,
+        encumbrance: 1,
+        surfaceDb: 0,
+        loudness: 0.3,
       });
       world.step();
     }

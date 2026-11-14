@@ -1,0 +1,53 @@
+{
+  "id": "vfx-arrow-impact-water",
+  "notes": "Water arrow burst (mw-e29.11): a splash of drops thrown out of the contact along the surface normal, with a short low mist (water #3F7FA0, highlight #CFEFFF, mist #9FC3D6). The wet decal on the ground and walls is drawn by the arrow effects at the 1.5 m radius the arrow's payload wets (src/game/vfx/arrow-fx.ts). Played from the arrow's own `cues.impactVfx`.",
+  "priority": 50,
+  "duration": 0.9,
+  "emitters": [
+    {
+      "id": "spray",
+      "texture": "vfx-base-soft-circle-01",
+      "blend": "alpha",
+      "bursts": [{ "at": 0, "count": 30 }],
+      "lifetime": { "min": 0.4, "max": 0.8 },
+      "speed": { "min": 1.5, "max": 4 },
+      "coneDeg": 75,
+      "spawnRadius": 0.06,
+      "gravity": 9,
+      "drag": 0.6,
+      "size": [
+        { "t": 0, "v": 0.14 },
+        { "t": 1, "v": 0.05 }
+      ],
+      "color": [
+        { "t": 0, "color": "#CFEFFF" },
+        { "t": 1, "color": "#3F7FA0" }
+      ],
+      "alpha": [
+        { "t": 0, "v": 0.95 },
+        { "t": 1, "v": 0 }
+      ]
+    },
+    {
+      "id": "mist",
+      "texture": "vfx-base-smoke-noise-01",
+      "blend": "alpha",
+      "bursts": [{ "at": 0, "count": 7 }],
+      "lifetime": { "min": 0.5, "max": 0.9 },
+      "speed": { "min": 0.5, "max": 1.4 },
+      "coneDeg": 90,
+      "spawnRadius": 0.1,
+      "gravity": -0.2,
+      "drag": 2,
+      "size": [
+        { "t": 0, "v": 0.45 },
+        { "t": 1, "v": 1.3 }
+      ],
+      "color": "#9FC3D6",
+      "alpha": [
+        { "t": 0, "v": 0.45 },
+        { "t": 1, "v": 0 }
+      ]
+    }
+  ]
+}

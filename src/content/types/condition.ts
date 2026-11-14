@@ -14,6 +14,7 @@
 import { z } from 'zod';
 import { contentId } from '../schema.ts';
 import { FACT_KEY_PATTERN } from './fact.ts';
+import { predicateSchema, volumeShapeSchema } from './signal-graph.ts';
 
 /** The deepest a condition may nest (mirrors the sim's CONDITION_MAX_DEPTH). */
 export const CONDITION_MAX_DEPTH = 64;
@@ -24,6 +25,15 @@ const SEGMENT = '[a-z0-9]+(?:-[a-z0-9]+)*';
 export const COUNT_PATTERN = new RegExp(
   `^entity:(${SEGMENT}|\\*)/\\*\\.(${SEGMENT}(?:\\.${SEGMENT})*)$`,
 );
+
+/** `<graph>/<node>` of a `signal` condition (mirrors the sim's SIGNAL_REF). */
+export const SIGNAL_REF = new RegExp(`^(${SEGMENT})/(${SEGMENT})$`);
+
+/** The most a `sustained` condition may ask for, seconds (mirrors the sim's SUSTAINED_MAX_SECONDS). */
+export const SUSTAINED_MAX_SECONDS = 3600;
+
+/** How the entities of an `entities` condition must pass (mirrors the sim's ENTITY_MATCHES). */
+export const ENTITY_MATCHES = ['all', 'any', 'none'] as const;
 
 /** Comparison operators (mirrors the sim's CONDITION_OPERATORS). */
 export const CONDITION_OPERATORS = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'] as const;
@@ -76,14 +86,69 @@ const countConditionSchema = z
   })
   .describe('Counts true entity facts matching a pattern, compared with exactly one operator.');
 
+const entitiesConditionSchema = z
+  .strictObject({
+    entities: z
+      .strictObject({
+        tag: contentId
+          .optional()
+          .describe('Entities carrying this tag (an entity tag, or the tag of a scene spawn).'),
+        entity: contentId.optional().describe('The entity of the scene spawn with this id.'),
+      })
+      .describe(
+        'Which entities to test. `{ "tag": … }`, `{ "entity": … }` or both; `{}` is every entity with a placement.',
+      ),
+    where: z
+      .array(predicateSchema)
+      .optional()
+      .describe('Predicates (property, tag, element) an entity must all pass.'),
+    inside: volumeShapeSchema
+      .optional()
+      .describe('The entity must stand in this box, sphere or capsule, in world coordinates.'),
+    match: z
+      .enum(ENTITY_MATCHES)
+      .optional()
+      .describe(
+        'all: at least one entity is selected and every one passes; any: one passes; none: none passes.',
+      ),
+    eq: bound('The number of entities that pass equals this.'),
+    neq: bound('The number that pass does not equal this.'),
+    gt: bound('The number that pass is greater than this.'),
+    gte: bound('At least this many pass.'),
+    lt: bound('Fewer than this many pass.'),
+    lte: bound('At most this many pass.'),
+  })
+  .describe(
+    'Property predicates over live entities: how many of them pass, and where they are. Exactly one of match or an operator.',
+  );
+
+const signalConditionSchema = z
+  .strictObject({
+    signal: z
+      .string()
+      .regex(SIGNAL_REF, 'must be "<graph>/<node>"')
+      .describe(
+        'Signal graph id and node id, e.g. "vault/gate-open". Holds while the output is on.',
+      ),
+    port: contentId.optional().describe('Output port of the node; default: its first.'),
+  })
+  .describe('True while a signal graph node output is on (mark the node `observed`).');
+
 /** A fact test (mirrors the sim's FactCondition). */
 export type FactCondition = z.output<typeof factConditionSchema>;
 /** A count of true entity facts (mirrors the sim's CountCondition). */
 export type CountCondition = z.output<typeof countConditionSchema>;
-/** A condition over world facts. */
+/** Property predicates over live entities (mirrors the sim's EntitiesCondition). */
+export type EntitiesCondition = z.output<typeof entitiesConditionSchema>;
+/** A signal output (mirrors the sim's SignalCondition). */
+export type SignalCondition = z.output<typeof signalConditionSchema>;
+/** A condition over world facts and live state. */
 export type Condition =
   | FactCondition
   | CountCondition
+  | EntitiesCondition
+  | SignalCondition
+  | { readonly sustained: Condition; readonly seconds: number }
   | { readonly all: readonly Condition[] }
   | { readonly any: readonly Condition[] }
   | { readonly not: Condition };
@@ -94,6 +159,18 @@ const conditionNode: z.ZodType<Condition> = z
     z.union([
       factConditionSchema,
       countConditionSchema,
+      entitiesConditionSchema,
+      signalConditionSchema,
+      z
+        .strictObject({
+          sustained: z.lazy(() => conditionNode).describe('The condition that must keep holding.'),
+          seconds: z
+            .number()
+            .positive()
+            .max(SUSTAINED_MAX_SECONDS)
+            .describe('Seconds of sim time it must hold, without a break.'),
+        })
+        .describe('True once the condition has held, without a break, for that long.'),
       z
         .strictObject({ all: z.array(conditionNode).min(1).describe('Every condition holds.') })
         .describe('True when every condition in the list holds.'),
@@ -110,10 +187,19 @@ const conditionNode: z.ZodType<Condition> = z
   .meta({
     id: 'condition',
     description:
-      'A condition over world facts: one of fact, count, all, any, not (docs/design/conditions.md).',
+      'A condition over world facts and live state: one of fact, count, entities, signal, sustained, all, any, not (docs/design/conditions.md).',
   });
 
-const KINDS = ['fact', 'count', 'all', 'any', 'not'] as const;
+const sustainedSeconds = z.number().positive().max(SUSTAINED_MAX_SECONDS);
+
+const LEAF_SCHEMAS = {
+  fact: factConditionSchema,
+  count: countConditionSchema,
+  entities: entitiesConditionSchema,
+  signal: signalConditionSchema,
+} as const;
+
+const KINDS = ['fact', 'count', 'all', 'any', 'not', 'entities', 'signal', 'sustained'] as const;
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -142,21 +228,53 @@ function walk(root: unknown, ctx: z.RefinementCtx): void {
     const kinds = isRecord(node) ? KINDS.filter((kind) => Object.hasOwn(node, kind)) : [];
     const [kind] = kinds;
     if (!isRecord(node) || kind === undefined || kinds.length > 1) {
-      issue(path, 'a condition is an object with exactly one of: fact, count, all, any, not');
+      issue(path, `a condition is an object with exactly one of: ${KINDS.join(', ')}`);
       continue;
     }
-    if (kind === 'fact' || kind === 'count') {
-      const schema = kind === 'fact' ? factConditionSchema : countConditionSchema;
+    if (kind === 'sustained') {
+      const seconds = sustainedSeconds.safeParse(node['seconds']);
+      for (const problem of seconds.error?.issues ?? [])
+        issue([...path, 'seconds'], problem.message);
+      const extra = Object.keys(node).filter((key) => key !== kind && key !== 'seconds');
+      if (extra.length > 0)
+        issue(path, `a sustained condition has no other fields (${extra.join(', ')})`);
+      stack.push({ node: node[kind], path: [...path, kind], depth: depth + 1 });
+      continue;
+    }
+    if (kind === 'fact' || kind === 'count' || kind === 'entities' || kind === 'signal') {
+      const schema = LEAF_SCHEMAS[kind];
       const result = schema.safeParse(node);
       for (const problem of result.error?.issues ?? []) {
         issue([...path, ...(problem.path as (string | number)[])], problem.message);
       }
-      const operators = Object.keys(node).filter((key) => key !== kind);
-      if (result.success && operators.length > 1) {
-        issue(path, `a ${kind} condition takes one operator, got ${operators.join(', ')}`);
+      const operators = Object.keys(node).filter((key) =>
+        (CONDITION_OPERATORS as readonly string[]).includes(key),
+      );
+      if (result.success && kind === 'fact' && operators.length + ('has' in node ? 1 : 0) > 1) {
+        issue(
+          path,
+          `a fact condition takes one operator, got ${Object.keys(node)
+            .filter((key) => key !== kind)
+            .join(', ')}`,
+        );
       }
-      if (result.success && kind === 'count' && operators.length === 0) {
-        issue(path, 'a count condition needs an operator (eq, gte…)');
+      if (result.success && kind === 'count' && operators.length !== 1) {
+        issue(
+          path,
+          operators.length === 0
+            ? 'a count condition needs an operator (eq, gte…)'
+            : `a count condition takes one operator, got ${operators.join(', ')}`,
+        );
+      }
+      if (
+        result.success &&
+        kind === 'entities' &&
+        operators.length + ('match' in node ? 1 : 0) !== 1
+      ) {
+        issue(
+          path,
+          'an entities condition needs exactly one of match (all, any, none) or an operator (eq, gte…)',
+        );
       }
       continue;
     }

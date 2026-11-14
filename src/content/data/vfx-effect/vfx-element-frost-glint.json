@@ -1,0 +1,89 @@
+{
+  "id": "vfx-element-frost-glint",
+  "notes": "Frozen state (mw-e03.28), grey-box: pale hexagonal-ish shards that hang and settle slowly (style bible \u00a72.3 Frost: slow, crystallising, settles; #8FD8FF, #EAF9FF) over a low cold mist. Still where fire and sparks move. Final art: mw-e29 asset beads.",
+  "priority": 30,
+  "duration": 1.5,
+  "loop": true,
+  "emitters": [
+    {
+      "id": "shards",
+      "texture": "vfx-base-shard-01",
+      "blend": "additive",
+      "rate": 8,
+      "lifetime": {
+        "min": 1.2,
+        "max": 1.8
+      },
+      "speed": {
+        "min": 0,
+        "max": 0.08
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.4,
+      "gravity": 0.15,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.2
+        },
+        {
+          "t": 1,
+          "v": 0.16
+        }
+      ],
+      "color": [
+        {
+          "t": 0,
+          "color": "#EAF9FF"
+        },
+        {
+          "t": 1,
+          "color": "#8FD8FF"
+        }
+      ]
+    },
+    {
+      "id": "mist",
+      "texture": "vfx-base-smoke-noise-01",
+      "blend": "alpha",
+      "rate": 3,
+      "lifetime": {
+        "min": 1.5,
+        "max": 2.2
+      },
+      "speed": {
+        "min": 0.02,
+        "max": 0.1
+      },
+      "coneDeg": 180,
+      "spawnRadius": 0.35,
+      "gravity": 0.2,
+      "size": [
+        {
+          "t": 0,
+          "v": 0.3
+        },
+        {
+          "t": 1,
+          "v": 0.6
+        }
+      ],
+      "color": "#CFEFFF",
+      "alpha": [
+        {
+          "t": 0,
+          "v": 0
+        },
+        {
+          "t": 0.3,
+          "v": 0.35
+        },
+        {
+          "t": 1,
+          "v": 0
+        }
+      ],
+      "minTier": "high"
+    }
+  ]
+}

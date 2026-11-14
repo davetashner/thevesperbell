@@ -1,0 +1,13 @@
+{
+  "$schema": "../book.schema.json",
+  "id": "book-masons-pocket-glenstone",
+  "title": "The Mason's Pocket Glenstone",
+  "author": "Gideon Pargeter, master mason",
+  "notes": "Extra shelf book: craft of the stone; Bell Line rule seen from the trade. Supports the stone-mine history (3.2).",
+  "locations": ["place-deepworks", "place-briar-glen"],
+  "pages": [
+    {
+      "text": "Glenstone is a freestone: it cuts clean in any direction and hardens in sea air, so a block that is soft as cheese in the cutting hall will ring like a bell on the quay at Wendmouth.\n\nCut with the bed, never against it. Work the face when the stone is wet from the hill. Mark every block on the underside with your own mark, for the stone will outlast your name and your mark is how it is remembered.\n\nThe old cutters will tell you the best bed runs deep. It does. They will also tell you the Rule: no shaft below the Bell Line. I never asked what is down there. A good mason knows what he does not want to cut."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-06-vane-buying-drinks",
+  "notes": "Vane's ledger and the horn-coin sales. Dot tells it for a drink in dot-sleeping-ox.",
+  "region": "valley",
+  "source": ["npc-dot"],
+  "truth": "true",
+  "target": "npc-vane",
+  "text": "Vane's been buying drinks for the whole mine crew and nobody's dug a thing in months. Where's the money from?",
+  "followUp": {
+    "teller": "npc-dot",
+    "text": "The ledger, then. Horn-coins. I said the money smelled of somewhere else."
+  }
+}

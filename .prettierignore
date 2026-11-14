@@ -1,5 +1,6 @@
 # Generated
 dist/
+build-report/
 coverage/
 playwright-report/
 test-results/

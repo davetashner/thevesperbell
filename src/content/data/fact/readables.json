@@ -1,0 +1,15 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "readables",
+  "name": "Readable texts read",
+  "notes": "mw-kf4c: the reader (src/game/reader/reader.ts) records the first read of every note, inscription and book as entity:readables/<text id>.read, so the evidence.* facts and the logic events a text publishes (readable.read, and an event named by the text id) fire once and a save keeps it.",
+  "facts": [
+    {
+      "key": "entity:*.read",
+      "type": "bool",
+      "default": false,
+      "description": "Whether the player has read this text (set on entity:readables/<text id> by the reader on the first read; never reset). The first read writes the text's evidence.* facts and publishes readable.read and the text's own event.",
+      "owner": "reader"
+    }
+  ]
+}

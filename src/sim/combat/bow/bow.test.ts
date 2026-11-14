@@ -48,6 +48,7 @@ import {
   giveBow,
   QuiverComponent,
   quiverCount,
+  addArrows,
   returnArrow,
   takeArrow,
   type QuiverSlot,
@@ -630,6 +631,21 @@ describe('the bow: equipping and the quiver (mw-e05.3)', () => {
     returnArrow(world, e, 'standard');
     expect(world.get(e, QuiverComponent)?.slots).toEqual(QUIVER);
     expect(quiverCount(world, e, 'fire')).toBe(0);
+  });
+
+  it('mw-e05.7: arrows taken back go into their slot, adding the slot when the quiver has none', () => {
+    const world = new World<never>({ seed: 1 }).register(BowComponent, QuiverComponent);
+    const e = world.spawn();
+    expect(addArrows(world, e, 'standard', 3)).toBe(false); // no quiver: nothing
+    giveBow(world, e, { bow: 'shortbow', quiver: QUIVER });
+    expect(addArrows(world, e, 'standard', 3)).toBe(true);
+    expect(quiverCount(world, e, 'standard')).toBe(8);
+    expect(addArrows(world, e, 'rope', 2)).toBe(true);
+    expect(quiverCount(world, e, 'rope')).toBe(2);
+    expect(world.get(e, QuiverComponent)?.slots.map((slot) => slot.arrow)).toEqual([
+      ...QUIVER.map((slot) => slot.arrow),
+      'rope',
+    ]);
   });
 });
 

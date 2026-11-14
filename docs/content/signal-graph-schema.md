@@ -15,8 +15,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].observed` | boolean | — | Outputs are read outside the graph (puzzle goal, quest), so unwired is fine. |
 | `nodes[].kind` | `"volume"` | required |  |
 | `nodes[].shape` | object | required | Box, sphere or capsule, relative to the graph origin. |
-| `nodes[].shape.kind` | `"box"` | required |  |
-| `nodes[].shape.center` | object | required |  |
+| `nodes[].shape.kind` | `"box"` | required | Shape: an axis-aligned box. |
+| `nodes[].shape.center` | object | required | Centre of the box, metres. |
 | `nodes[].shape.center.x` | number | required | Metres. |
 | `nodes[].shape.center.y` | number | required | Metres. |
 | `nodes[].shape.center.z` | number | required | Metres. |
@@ -24,24 +24,27 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].shape.halfExtents.x` | number ≥ 0 | required | Metres. |
 | `nodes[].shape.halfExtents.y` | number ≥ 0 | required | Metres. |
 | `nodes[].shape.halfExtents.z` | number ≥ 0 | required | Metres. |
-| `nodes[].shape.kind` | `"sphere"` | required |  |
+| `nodes[].shape.kind` | `"sphere"` | required | Shape: a sphere. |
+| `nodes[].shape.center` | object | required | Centre of the sphere, metres. |
 | `nodes[].shape.radius` | number ≥ 0 | required | Metres. |
-| `nodes[].shape.kind` | `"capsule"` | required |  |
-| `nodes[].shape.from` | object | required |  |
+| `nodes[].shape.kind` | `"capsule"` | required | Shape: a capsule, a segment swept by a radius. |
+| `nodes[].shape.from` | object | required | One end of the capsule’s segment, metres. |
 | `nodes[].shape.from.x` | number | required | Metres. |
 | `nodes[].shape.from.y` | number | required | Metres. |
 | `nodes[].shape.from.z` | number | required | Metres. |
-| `nodes[].shape.to` | object | required |  |
+| `nodes[].shape.to` | object | required | The other end of the capsule’s segment, metres. |
 | `nodes[].shape.to.x` | number | required | Metres. |
 | `nodes[].shape.to.y` | number | required | Metres. |
 | `nodes[].shape.to.z` | number | required | Metres. |
 | `nodes[].filter` | list of object | — | Conditions an entity must all pass. |
 | `nodes[].filter[].test` | `"property"` | required |  |
-| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
+| `nodes[].filter[].property` | `"material"` \| `"temperature"` \| `"flammable"` \| `"ignitionPoint"` \| `"fuel"` \| `"burning"` \| `"wetness"` \| `"absorbency"` \| `"frozen"` \| `"freezePoint"` \| `"conductive"` \| `"charge"` \| `"weight"` \| `"fragile"` \| `"hp"` \| `"density"` \| `"climbable"` \| `"liftable"` \| `"pushable"` \| `"remoteActuatable"` \| `"hideable"` \| `"reflective"` \| `"transparent"` \| `"opaque"` \| `"soundDamping"` \| `"friction"` \| `"impactAbsorb"` \| `"owner"` \| `"liquid"` \| `"flammableGas"` \| `"extinguishable"` \| `"windResistance"` \| `"flameRadius"` \| `"waterSurface"` \| `"unstable"` \| `"suspended"` \| `"support"` \| `"breakable"` \| `"bashable"` \| `"cuttable"` \| `"shootable"` \| `"softAnchor"` \| `"surfaceHardness"` \| `"chargeActivated"` \| `"lightActivated"` \| `"hidden"` \| `"trapped"` \| `"trap"` \| `"container"` \| `"remains"` \| `"noiseMultiplier"` | required | World property to compare (absent = its default). |
 | `nodes[].filter[].op` | `"eq"` \| `"ne"` \| `"lt"` \| `"lte"` \| `"gt"` \| `"gte"` | required | Comparison; lt/lte/gt/gte need a number property. |
 | `nodes[].filter[].value` | number or boolean or string | required | Value to compare with. |
 | `nodes[].filter[].test` | `"tag"` | required |  |
 | `nodes[].filter[].tag` | id | required | Tag the entity must carry, e.g. "player". |
+| `nodes[].filter[].test` | `"facing"` | required |  |
+| `nodes[].filter[].facing` | `"north"` \| `"east"` \| `"south"` \| `"west"` | required | Compass direction its body faces: north is +z, east +x; a +90° turn takes north to east. |
 | `nodes[].filter[].test` | `"element"` | required |  |
 | `nodes[].filter[].element` | `"fire"` \| `"water"` \| `"ice"` \| `"charge"` | required | fire = burning, water = wetness > 0, ice = frozen, charge = charge > 0. |
 | `nodes[].minCount` | integer ≥ 1 | — | Occupants needed for `active`; default 1. |
@@ -68,6 +71,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].steps` | list of id (at least 2) | required | Input port names in the expected order. |
 | `nodes[].kind` | `"random"` | required |  |
 | `nodes[].outcomes` | list of id (at least 2) | required | Output port names, one pulsed per rising edge. |
+| `nodes[].kind` | `"clue"` | required |  |
+| `nodes[].cues` | list of id (at least 1) | required | Cue ids sounded in order, e.g. "chime-low"; a cue sheet rule maps each to a sound. |
+| `nodes[].spacing` | number > 0 | — | Seconds between cues; default 1. The first sounds on the rising edge. |
+| `nodes[].entity` | id | — | Where the sound comes from (a spawn); without one the cues have no position. |
 | `nodes[].kind` | `"receiver"` | required |  |
 | `nodes[].receiver` | `"door"` \| `"light"` \| `"spawner"` \| `"audio-cue"` \| `"fact"` \| `"mechanism"` | required | What the signal drives. |
 | `nodes[].entity` | id | — | Required by door, light, spawner and mechanism. |
@@ -80,6 +87,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].on.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `nodes[].on.burning` | boolean | — | On fire right now. |
 | `nodes[].on.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `nodes[].on.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `nodes[].on.frozen` | boolean | — | Frozen solid. |
 | `nodes[].on.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `nodes[].on.conductive` | boolean | — | Conducts electric charge. |
@@ -138,6 +146,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `nodes[].off.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `nodes[].off.burning` | boolean | — | On fire right now. |
 | `nodes[].off.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `nodes[].off.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `nodes[].off.frozen` | boolean | — | Frozen solid. |
 | `nodes[].off.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `nodes[].off.conductive` | boolean | — | Conducts electric charge. |

@@ -1,0 +1,85 @@
+{
+  "$schema": "../socket-track.schema.json",
+  "id": "halberd-chop-arc",
+  "notes": "Halberd chop (move halberd-chop, 5 active ticks, mw-e04.15): a vertical overhead about the chest pivot (0, 1.5, 0), the head from 50 degrees raised to 15 degrees lowered. Vertical: it never recoils off a wall.",
+  "keys": [
+    {
+      "position": {
+        "x": 0,
+        "y": 0.5358,
+        "z": 1.1491
+      },
+      "rotation": {
+        "x": -0.422618,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.906308
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0.2713,
+        "z": 0.8604
+      },
+      "rotation": {
+        "x": -0.300706,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.953717
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0.0511,
+        "z": 0.3882
+      },
+      "rotation": {
+        "x": -0.130526,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.991445
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0.0146,
+        "z": -0.2088
+      },
+      "rotation": {
+        "x": 0.069756,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.997564
+      }
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 0.0511,
+        "z": -0.3882
+      },
+      "rotation": {
+        "x": 0.130526,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.991445
+      }
+    }
+  ]
+}

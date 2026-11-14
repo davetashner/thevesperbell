@@ -14,9 +14,9 @@
  * Bumped whenever a property is added, removed, renamed or changes type or range.
  * v1: the mw-e03.1 set. v2: mw-e03.31 additions (additive only: a v1 save loads unchanged).
  * v3: `climbable` is a grade enum (mw-e03.22); a stored 1/2/3 maps to ivy/rough/sheer.
- * v4: `remoteActuatable` (mw-e03.12). v5: `windResistance` (mw-e03.16). v6: `flameRadius` (mw-e03.49); all additive.
+ * v4: `remoteActuatable` (mw-e03.12). v5: `windResistance` (mw-e03.16). v6: `flameRadius` (mw-e03.49). v7: `absorbency` (mw-e03.6); all additive.
  */
-export const WORLD_PROPERTIES_VERSION = 6;
+export const WORLD_PROPERTIES_VERSION = 7;
 
 /** A light source's output. Colour is a render concern and lives outside the sim. */
 export interface LightEmission {
@@ -68,6 +68,8 @@ export interface WorldPropertyValues {
   burning: boolean;
   /** How soaked it is: 0 dry … 1 saturated. */
   wetness: number;
+  /** The most wetness it can hold, 0 (nothing soaks in: iron, glass) … 1 (a sponge); caps water stimuli. */
+  absorbency: number;
   /** Frozen solid (ice, or an object encased in it). */
   frozen: boolean;
   /** Temperature at or below which it freezes, °C. */
@@ -290,6 +292,14 @@ export const WORLD_PROPERTY_SPECS: {
   },
   burning: flag('On fire right now.'),
   wetness: unit01('How soaked it is (0 dry, 1 saturated).'),
+  absorbency: {
+    type: 'number',
+    min: 0,
+    max: 1,
+    unit: '',
+    default: 1,
+    doc: 'The most wetness it can hold (0 nothing soaks in, 1 fully absorbent). Water stimuli and submersion raise wetness no higher.',
+  },
   frozen: flag('Frozen solid.'),
   freezePoint: celsius(0, 'Temperature at or below which it freezes.'),
   conductive: flag('Conducts electric charge.'),

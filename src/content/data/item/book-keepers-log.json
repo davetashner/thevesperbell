@@ -1,0 +1,30 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "book-keepers-log",
+  "category": "book",
+  "name": "Keeper's Log, Mooring's Watch",
+  "description": "Keeper's Log, Mooring's Watch, by Sergeant Aldric Mooring.",
+  "notes": "Inventory item for the story book text data/book/book-keepers-log.json (mw-e39.44; text mw-e39.13). Reading opens its pages by textKey book-keepers-log.page-<n>. Value 45 is a lore book's price, below the 150-600 bookshop band (that band is for premium spellbooks); owner to confirm. Placement (loot, shelves, bookshop stock) is its own beads. Damaged: page(s) 2 unreadable (missingPages [1]).",
+  "icon": "icon-item-book-keepers-log-01",
+  "value": 45,
+  "stackable": false,
+  "book": {
+    "title": "Keeper's Log, Mooring's Watch",
+    "author": "Sergeant Aldric Mooring",
+    "kind": "tome",
+    "pages": [
+      {
+        "textKey": "book.book-keepers-log.page-1"
+      },
+      {
+        "textKey": "book.book-keepers-log.page-2"
+      }
+    ],
+    "condition": {
+      "state": "damaged",
+      "missingPages": [1]
+    },
+    "legality": "licensed",
+    "rarity": "uncommon"
+  }
+}

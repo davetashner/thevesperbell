@@ -11,7 +11,7 @@ import { CharacterController } from '../character/system';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
 import { PoiseBroken } from '../combat/damage/events';
-import { BlameComponent } from '../combat/environment/environment';
+import { blameOf, BlameComponent } from '../combat/environment/environment';
 import { HitReaction, type HitReactionInfo } from '../combat/reactions/events';
 import type { HitReactionKind } from '../combat/reactions/components';
 import { type BreakableProfile } from '../breakables/components';
@@ -54,7 +54,6 @@ import { WorldItemComponent } from '../items/world-items';
 import { addInventory } from '../inventory/inventory';
 import {
   aimOf,
-  CARRY_IMPACT_NOISE,
   DEFAULT_CARRY_TUNING,
   installCarry,
   objectPickedUp,
@@ -328,9 +327,7 @@ describe('carrying world objects (mw-e02.17)', () => {
     throwAfter(s, HZ);
     for (let i = 0; i < 90; i += 1) s.world.step([IDLE]);
     expect(positionOf(s, target).z).toBeLessThan(-3);
-    expect(s.noises.some((n) => n.kind === CARRY_IMPACT_NOISE && n.entity === target)).toBe(true);
-    const noise = s.noises.find((n) => n.kind === CARRY_IMPACT_NOISE);
-    expect(noise).toMatchObject({ loudness: 60, source: s.actor });
+    expect(blameOf(s.sim, target)).toBe(s.actor);
   });
 
   it('AC-3: a thrown fragile object breaks above its threshold and a noise at the break loudness follows', () => {
@@ -539,27 +536,14 @@ describe('carrying world objects (mw-e02.17)', () => {
     expect(s.refused).toEqual([]);
   });
 
-  it('impact noise skips non-liftable objects and an unblamed impact has no source', () => {
+  it('a liftable that has lost its body is still offered, not refused', () => {
     const s = setup();
-    const rock = s.world.spawn();
-    addProperties(s.sim, rock, { weight: 3 });
-    addPhysicsObject(s.sim, rock, {
-      shape: { kind: 'box', halfExtents: v(0.2, 0.2, 0.2) },
-      position: v(0, 3, -3),
-    });
-    for (let i = 0; i < 90; i += 1) s.world.step([IDLE]);
-    expect(s.noises).toEqual([]);
-    const light = crate(s, 0.5, {}, 0.1);
-    s.sim.remove(light, PhysicsObjectComponent);
+    const target = crate(s, 8);
+    s.sim.remove(target, PhysicsObjectComponent);
     s.world.step([IDLE]);
-    const pebble = s.world.spawn();
-    addProperties(s.sim, pebble, { liftable: true, weight: 4 });
-    addPhysicsObject(s.sim, pebble, {
-      shape: { kind: 'box', halfExtents: v(0.1, 0.1, 0.1) },
-      position: v(2, 3, -3),
-    });
-    for (let i = 0; i < 90; i += 1) s.world.step([IDLE]);
-    expect(s.noises).toMatchObject([{ kind: CARRY_IMPACT_NOISE, loudness: 60, source: null }]);
+    const prompt = interactionPrompt(s.sim, s.actor);
+    if (prompt?.target === target) expect(prompt.available).toBe(true);
+    expect(s.refused).toEqual([]);
   });
 
   it('carries round and capsule bodies too, held clear of the carrier', () => {
@@ -608,50 +592,14 @@ describe('carrying world objects (mw-e02.17)', () => {
     expect(positionOf(s, target).y).toBeGreaterThan(40);
   });
 
-  it('a world item that hits something makes no carry noise (its own rules do)', () => {
-    const s = setup();
-    const item = crate(s, 1);
-    s.world.add(item, WorldItemComponent, { defId: 'x', count: 1, flags: {}, by: null });
-    s.sim.remove(item, PhysicsObjectComponent);
-    const dropped = s.world.spawn();
-    addProperties(s.sim, dropped, { liftable: true, weight: 1 });
-    addPhysicsObject(s.sim, dropped, {
-      shape: { kind: 'box', halfExtents: v(0.1, 0.1, 0.1) },
-      position: v(3, 3, 0),
-    });
-    s.world.add(dropped, WorldItemComponent, { defId: 'x', count: 1, flags: {}, by: null });
-    for (let i = 0; i < 90; i += 1) s.world.step([IDLE]);
-    expect(s.noises).toEqual([]);
-  });
-
-  it('impact noise falls back to the last band for heavier objects, and to silence with none', () => {
-    const banded = setup({ tuning: { impactLoudness: [{ upToKg: 1, db: 30 }] } });
-    const heavy = banded.world.spawn();
-    addProperties(banded.sim, heavy, { liftable: true, weight: 9 });
-    addPhysicsObject(banded.sim, heavy, {
-      shape: { kind: 'box', halfExtents: v(0.1, 0.1, 0.1) },
-      position: v(3, 3, 0),
-    });
-    for (let i = 0; i < 90; i += 1) banded.world.step([IDLE]);
-    expect(banded.noises[0]?.loudness).toBe(30);
-    const mute = setup({ tuning: { impactLoudness: [] } });
-    const rock = mute.world.spawn();
-    addProperties(mute.sim, rock, { liftable: true, weight: 9 });
-    addPhysicsObject(mute.sim, rock, {
-      shape: { kind: 'box', halfExtents: v(0.1, 0.1, 0.1) },
-      position: v(3, 3, 0),
-    });
-    for (let i = 0; i < 90; i += 1) mute.world.step([IDLE]);
-    expect(mute.noises[0]?.loudness).toBe(0);
-  });
-
-  it('without blame in the world a thrown object has no thrower on record', () => {
+  it('without blame in the world a throw still works and records no thrower', () => {
     const s = setup({}, true, false);
     const target = crate(s, 8);
     lift(s, target);
     throwAfter(s, 20);
     for (let i = 0; i < 90; i += 1) s.world.step([IDLE]);
-    expect(s.noises.find((n) => n.entity === target)?.source).toBeNull();
+    expect(s.released.at(-1)).toMatchObject({ reason: 'thrown' });
+    expect(s.world.isRegistered(BlameComponent)).toBe(false);
   });
 
   it('shares an already registered world-item component with the world items rules', () => {

@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-millweir-keystone",
+  "title": "The keystone bell-mark",
+  "notes": "Bible 3.2: the Millweir keystone bell-mark bargemen touch for luck. A carved bell; nothing else.",
+  "locations": ["place-millweir"],
+  "pages": [
+    {
+      "text": "(A small bell, carved in the keystone of the weir, polished bright by the hands of bargemen. Beneath it, worn nearly smooth:)\n\nTOUCH AND GO WELL."
+    }
+  ]
+}

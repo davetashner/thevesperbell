@@ -2,16 +2,24 @@ import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import { describe, expect, it, vi } from 'vitest';
 import {
   compileMoves,
+  compileSurfaceTable,
   loadGameContent,
   PLAYER_CAMERA_ID,
   PLAYER_CONTROLLER_ID,
   PLAYER_LOCK_ON_ID,
+  SURFACE_TABLE_ID,
 } from '@content/index';
 import { markExercised } from '@content/testing';
 import { AnimationController, compileGraph } from '@render/animation/index';
 import {
+  ActionTimelineComponent,
+  addEquipment,
+  addInventory,
+  EquipmentRules,
+  InventoryRules,
   box,
   BowComponent,
+  createSurfaceMap,
   CharacterController,
   CombatFacingComponent,
   DAMAGE_COMPONENTS,
@@ -39,13 +47,14 @@ import {
   zeroHealth,
   type ActionFrame,
   type Interaction,
+  LocomotionEvents,
 } from '@sim/index';
 import { ActionSampler } from '../input';
 import { prepareTestbedCombat, startTestbedCombat, TRAINING_DUMMY } from '../combat';
 import { createGameLoop, FakeFrames, RenderSync, type SceneBinding, type Transform } from '../loop';
 import { installGamePhysics } from '../physics-objects';
 import { readSceneTransform, SceneLoader } from '../scene';
-import { lookForward, toRadians } from '../camera';
+import { lookForward, lookSettings, toRadians } from '../camera';
 import type { CharacterProbe } from '../animation';
 import {
   CROUCH_DROP,
@@ -385,6 +394,51 @@ describe('testbed player wiring (mw-e02.23)', () => {
     expect(camera.target.z - camera.at.z).toBeCloseTo(forward.z, 6);
   });
 
+  it('mw-e02.11: footstep events carry the ground material and the supplied loudness offset', () => {
+    const { world, sampler, run } = testbed({
+      footstepOffsets: (material) => (material === 'generic' ? 6 : 0),
+    });
+    const steps: { material?: string; surfaceDb: number }[] = [];
+    world.events.on(LocomotionEvents, (e) => {
+      if (e.kind === 'footstep') steps.push(e);
+    });
+    run(0.2);
+    sampler.down('KeyW');
+    run(1);
+    sampler.up('KeyW');
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material !== undefined)).toBe(true);
+    const flat = steps.filter((s) => s.material === 'generic');
+    expect(flat.every((s) => s.surfaceDb === 6)).toBe(true);
+  });
+
+  it('mw-e09.4 AC-1: a carpet region replaces the ground material and muffles the step', () => {
+    const table = compileSurfaceTable(content.get('surface-table', SURFACE_TABLE_ID));
+    const surfaces = createSurfaceMap({
+      table,
+      regions: [
+        {
+          id: 'rug',
+          min: { x: -10, y: -1, z: -10 },
+          max: { x: 10, y: 1, z: 10 },
+          surface: 'carpet',
+          priority: 0,
+        },
+      ],
+    });
+    const { world, sampler, run } = testbed({ surfaces });
+    const steps: { material?: string; surfaceDb: number }[] = [];
+    world.events.on(LocomotionEvents, (e) => {
+      if (e.kind === 'footstep') steps.push(e);
+    });
+    run(0.2);
+    sampler.down('KeyW');
+    run(1);
+    sampler.up('KeyW');
+    expect(steps.length).toBeGreaterThan(2);
+    expect(steps.every((s) => s.material === 'carpet' && s.surfaceDb === -10)).toBe(true);
+  });
+
   it('holding W for 1 s moves the player at least 4 m forward (+z), and the camera follows', () => {
     const { sampler, run, state, camera } = testbed();
     run(0.2);
@@ -397,6 +451,27 @@ describe('testbed player wiring (mw-e02.23)', () => {
     expect(after.z - before.z).toBeGreaterThanOrEqual(4);
     expect(Math.abs(after.x - before.x)).toBeLessThan(1e-3);
     expect(camera.at.z).toBeLessThan(after.z - 2); // still behind it
+  });
+
+  it('mw-e02.8: timing hands over one controller run per sim tick and one camera placement per frame', () => {
+    let clock = 0;
+    const controller: number[] = [];
+    const camera: number[] = [];
+    const { sampler, run, world } = testbed({
+      timing: {
+        now: () => (clock += 0.5),
+        controller: (ms) => controller.push(ms),
+        camera: (ms) => camera.push(ms),
+      },
+    });
+    const before = { controller: controller.length, camera: camera.length, tick: world.tick };
+    sampler.down('KeyW');
+    run(0.5);
+    sampler.up('KeyW');
+    expect(controller.length - before.controller).toBe(world.tick - before.tick);
+    expect(controller.length - before.controller).toBeGreaterThan(20);
+    expect(camera.length - before.camera).toBe(30);
+    expect([...controller, ...camera].every((ms) => ms === 0.5)).toBe(true);
   });
 
   it('the back wall stops the player: it rests in front of it and never passes through', () => {
@@ -496,6 +571,32 @@ describe('testbed player wiring (mw-e02.23)', () => {
     expect(publish).toHaveBeenCalledTimes(1);
     player.dispose(); // twice is harmless
     loop.stop();
+  });
+});
+
+describe('testbed peek camera (mw-e03.23)', () => {
+  it('while the peek hook answers the camera sits at its eye, looking where it says, with the body hidden', () => {
+    let view: { eye: { x: number; y: number; z: number }; yaw: number; pitch: number } | undefined;
+    const shown: boolean[] = [];
+    const { run, camera } = testbed({
+      peek: { view: () => view, body: (visible: boolean) => shown.push(visible) },
+    });
+    run(0.2);
+    const orbit = { ...camera.at };
+    expect(shown).toEqual([]); // nothing to change: the body was already shown
+    view = { eye: { x: 4.3, y: 1.5, z: 1.5 }, yaw: Math.PI / 2, pitch: 0 };
+    run(0.1);
+    expect(camera.at).toEqual({ x: 4.3, y: 1.5, z: 1.5 });
+    expect(camera.target.x).toBeCloseTo(3.3, 6); // looking west
+    expect(camera.target.z).toBeCloseTo(1.5, 6);
+    expect(shown).toEqual([false]);
+    run(0.1);
+    expect(shown).toEqual([false]); // told once
+    view = undefined;
+    run(0.2);
+    expect(shown).toEqual([false, true]);
+    expect(camera.at.x).not.toBe(4.3);
+    expect(camera.at).not.toEqual(orbit); // the orbit camera is back, from where the player stands
   });
 });
 
@@ -773,6 +874,28 @@ describe('testbed player animation (mw-e02.6)', () => {
     expect(body.poses.length).toBeGreaterThan(100);
   });
 
+  it('AC-1 (mw-e04.16): with equipment rules, the player rolls by its armor load class', () => {
+    const equipment = new EquipmentRules(content.all('item'), content.all('class'));
+    const { sampler, run, world, player } = testbed({ moves, equipment });
+    addInventory(world, player.entity);
+    addEquipment(world, player.entity, 'knight');
+    const inventory = new InventoryRules(content.all('item'));
+    for (const id of ['mail-hauberk', 'wooden-shield']) {
+      const added = inventory.add(world, player.entity, id, 1);
+      if (!added.ok) throw new Error('add failed');
+      equipment.equip(world, player.entity, added.instanceIds[0] ?? 0);
+    }
+    run(0.2);
+    sampler.down('KeyW');
+    run(0.1);
+    sampler.down('KeyR');
+    run(0.05);
+    sampler.up('KeyR');
+    expect(world.get(player.entity, ActionTimelineComponent)?.current?.move).toBe(
+      'dodge-roll-medium',
+    );
+  });
+
   it('a dodge plays its move clip on the whole body, then locomotion takes over again', () => {
     const body = animatedBody();
     const { sampler, run } = testbed({ animation: body.animation, moves });
@@ -937,6 +1060,37 @@ describe('testbed lock-on (mw-e02.16)', () => {
     player.drivesCamera = true;
     run(1 / 60);
     expect(offAxis(camera, { x: -3, z: 23 })).toBeLessThan(toRadians(10));
+  });
+});
+
+describe('conversation framing (mw-e22.9)', () => {
+  it('the camera swings to frame the NPC being talked to, without a lock, and back after', () => {
+    let focus: { x: number; y: number; z: number } | undefined;
+    const rig = testbed((physics) => ({
+      lockOn: {
+        tuning: content.get('lock-on', PLAYER_LOCK_ON_ID),
+        sight: new LineOfSight({ world: new RapierSightWorld(physics) }),
+        profile: (id: string) => content.get('targetable', id),
+      },
+      conversationFocus: () => focus,
+    }));
+    const { camera, state, run, player } = rig;
+    const offAxis = (point: { x: number; z: number }) => {
+      const look = Math.atan2(camera.target.x - camera.at.x, camera.target.z - camera.at.z);
+      const to = Math.atan2(point.x - camera.at.x, point.z - camera.at.z);
+      return Math.abs(Math.atan2(Math.sin(to - look), Math.cos(to - look)));
+    };
+    run(0.5);
+    const beforeOff = offAxis({ x: -6, z: 4 });
+    expect(beforeOff).toBeGreaterThan(toRadians(20));
+    focus = { x: -6, y: 1.6, z: 4 };
+    run(2);
+    expect(offAxis({ x: -6, z: 4 })).toBeLessThan(toRadians(10));
+    expect(state().lock).toBeNull();
+    expect(player.lockTarget()).toBeUndefined();
+    focus = undefined;
+    run(2);
+    expect(offAxis({ x: -6, z: 4 })).toBeGreaterThan(toRadians(20));
   });
 });
 
@@ -1111,6 +1265,58 @@ describe('testbed player with a bow (mw-e05.21)', () => {
     const settled = camera.rebuilt;
     run(0.5);
     expect(camera.rebuilt).toBe(settled); // a settled lens is not rebuilt every frame
+  });
+
+  it('mw-e31.6: the fov option sets the lens live, and a drawn bow still zooms from it', () => {
+    let wanted = 70;
+    const { sampler, run, camera } = testbed({
+      moves: combat.moves,
+      bow: combat.bow,
+      fov: () => wanted,
+    });
+    run(0.2);
+    expect(camera.fov).toBe(70);
+    wanted = 100;
+    run(2); // the lens eases to the new rest like it eases to the aim
+    expect(camera.fov).toBe(100);
+    tap(sampler, run, 'Digit4');
+    sampler.down('Mouse0');
+    run(2);
+    expect(camera.fov).toBe(aim.fov);
+    tap(sampler, run, 'Digit4'); // put the bow away mid-draw, as the test above does
+    sampler.up('Mouse0');
+    run(2);
+    expect(camera.fov).toBe(100);
+  });
+
+  it('mw-e31.6: the fov option also moves the lens of a player with no bow', () => {
+    let wanted = 85;
+    const { run, camera } = testbed({ fov: () => wanted });
+    run(0.2);
+    expect(camera.fov).toBe(85);
+    wanted = 60;
+    run(0.2);
+    expect(camera.fov).toBe(60);
+  });
+
+  it('mw-e31.6 AC-3: look options read live turn the same mouse counts further, without a rebuild', () => {
+    let scale = 1;
+    const { sampler, run, state } = testbed({
+      lookLive: () => ({
+        ...lookSettings(cameraTuning),
+        sensitivity: cameraTuning.mouseSensitivity * scale,
+      }),
+    });
+    run(0.2);
+    const yaw0 = state().yaw;
+    sampler.look(100, 0);
+    run(0.2);
+    const first = yaw0 - state().yaw;
+    scale = 2;
+    const yaw1 = state().yaw;
+    sampler.look(100, 0);
+    run(0.2);
+    expect(yaw1 - state().yaw).toBeCloseTo(2 * first, 9);
   });
 
   it('works with a camera that needs no projection rebuild, and reads a bow taken away as none', () => {

@@ -1,0 +1,14 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-16-river-humming",
+  "notes": "Bible 6.2: the song reaching the water; the river route into the lower Deepworks (3.6). Mags tells it in mags-patient-ann.",
+  "region": "harbour",
+  "source": ["npc-mags"],
+  "truth": "true",
+  "target": "place-weeping-adit",
+  "text": "River's been humming up by the Weeping Adit. Fish won't bite there.",
+  "secondHand": {
+    "teller": "npc-dot",
+    "text": "The bargemen say the river's been humming up by the Weeping Adit. Fish won't bite there."
+  }
+}

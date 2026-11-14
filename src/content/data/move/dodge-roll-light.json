@@ -1,0 +1,34 @@
+{
+  "$schema": "../move.schema.json",
+  "id": "dodge-roll-light",
+  "notes": "Dodge roll in a Light armor load (mw-e04.16, ADR-0003): 36 ticks, 20 stamina, i-frames ticks 2-14 (13 ticks), 3.6 m travel. Frames split as 2 startup, 13 active, 21 recovery; recovery cancels into the roll attack from tick 28. The unequipped roll (dodge-roll) keeps the original 3.0 m.",
+  "verb": "dodge",
+  "frames": {
+    "startup": 2,
+    "active": 13,
+    "recovery": 21
+  },
+  "staminaCost": 20,
+  "cancelWindows": [
+    {
+      "into": "attack",
+      "from": 28,
+      "to": 35,
+      "move": "roll-attack"
+    }
+  ],
+  "flags": {
+    "iframes": {
+      "from": 2,
+      "to": 14
+    }
+  },
+  "motion": {
+    "distance": 3.6,
+    "direction": "input"
+  },
+  "presentation": {
+    "anim": "anim-knight-dodge-roll",
+    "audioCue": "sfx-knight-dodge-roll-armor"
+  }
+}

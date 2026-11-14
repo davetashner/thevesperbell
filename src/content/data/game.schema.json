@@ -110,6 +110,232 @@
       ],
       "additionalProperties": false,
       "description": "The in-game clock (mw-e27.12)."
+    },
+    "difficulty": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "enum": [
+            "story",
+            "adventurer",
+            "veteran"
+          ],
+          "description": "The preset a player who has never chosen one plays on."
+        },
+        "presets": {
+          "type": "object",
+          "properties": {
+            "story": {
+              "type": "object",
+              "properties": {
+                "damageTaken": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales damage the player takes (1 = as authored). Allowed ranges are checked against the sim's."
+                },
+                "damageDealt": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales damage the player deals. Allowed ranges are checked against the sim's."
+                },
+                "detectionSpeed": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales how fast enemy awareness builds; lower is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "parryWindow": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales the parry timing window; higher is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "dodgeWindow": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales dodge invulnerability frames; higher is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "fallDamage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales fall, crush and hazard damage; 0 turns it off. Allowed ranges are checked against the sim's."
+                },
+                "puzzleHints": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales puzzle hint availability; 0 turns hints off. Allowed ranges are checked against the sim's."
+                },
+                "searchDuration": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales how long a creature searches at the last known position; lower is more forgiving. Allowed ranges are checked against the sim's."
+                }
+              },
+              "required": [
+                "damageTaken",
+                "damageDealt",
+                "detectionSpeed",
+                "parryWindow",
+                "dodgeWindow",
+                "fallDamage",
+                "puzzleHints",
+                "searchDuration"
+              ],
+              "additionalProperties": false,
+              "description": "Combat and stealth are forgiving: the story first."
+            },
+            "adventurer": {
+              "type": "object",
+              "properties": {
+                "damageTaken": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales damage the player takes (1 = as authored). Allowed ranges are checked against the sim's."
+                },
+                "damageDealt": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales damage the player deals. Allowed ranges are checked against the sim's."
+                },
+                "detectionSpeed": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales how fast enemy awareness builds; lower is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "parryWindow": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales the parry timing window; higher is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "dodgeWindow": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales dodge invulnerability frames; higher is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "fallDamage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales fall, crush and hazard damage; 0 turns it off. Allowed ranges are checked against the sim's."
+                },
+                "puzzleHints": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales puzzle hint availability; 0 turns hints off. Allowed ranges are checked against the sim's."
+                },
+                "searchDuration": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales how long a creature searches at the last known position; lower is more forgiving. Allowed ranges are checked against the sim's."
+                }
+              },
+              "required": [
+                "damageTaken",
+                "damageDealt",
+                "detectionSpeed",
+                "parryWindow",
+                "dodgeWindow",
+                "fallDamage",
+                "puzzleHints",
+                "searchDuration"
+              ],
+              "additionalProperties": false,
+              "description": "The game as authored; every multiplier 1."
+            },
+            "veteran": {
+              "type": "object",
+              "properties": {
+                "damageTaken": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales damage the player takes (1 = as authored). Allowed ranges are checked against the sim's."
+                },
+                "damageDealt": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales damage the player deals. Allowed ranges are checked against the sim's."
+                },
+                "detectionSpeed": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales how fast enemy awareness builds; lower is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "parryWindow": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales the parry timing window; higher is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "dodgeWindow": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales dodge invulnerability frames; higher is more forgiving. Allowed ranges are checked against the sim's."
+                },
+                "fallDamage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales fall, crush and hazard damage; 0 turns it off. Allowed ranges are checked against the sim's."
+                },
+                "puzzleHints": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales puzzle hint availability; 0 turns hints off. Allowed ranges are checked against the sim's."
+                },
+                "searchDuration": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Scales how long a creature searches at the last known position; lower is more forgiving. Allowed ranges are checked against the sim's."
+                }
+              },
+              "required": [
+                "damageTaken",
+                "damageDealt",
+                "detectionSpeed",
+                "parryWindow",
+                "dodgeWindow",
+                "fallDamage",
+                "puzzleHints",
+                "searchDuration"
+              ],
+              "additionalProperties": false,
+              "description": "Less forgiving combat and stealth."
+            }
+          },
+          "required": [
+            "story",
+            "adventurer",
+            "veteran"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "default",
+        "presets"
+      ],
+      "additionalProperties": false,
+      "description": "Difficulty presets (mw-e31.10)."
     }
   },
   "required": [
@@ -117,7 +343,8 @@
     "notes",
     "playableClasses",
     "startScene",
-    "clock"
+    "clock",
+    "difficulty"
   ],
   "additionalProperties": false
 }

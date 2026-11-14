@@ -26,6 +26,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `worldProperties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `worldProperties.burning` | boolean | — | On fire right now. |
 | `worldProperties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `worldProperties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `worldProperties.frozen` | boolean | — | Frozen solid. |
 | `worldProperties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `worldProperties.conductive` | boolean | — | Conducts electric charge. |
@@ -101,6 +102,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `use[].properties.fuel` | number 0–86400 | — | Seconds of burning left. |
 | `use[].properties.burning` | boolean | — | On fire right now. |
 | `use[].properties.wetness` | number 0–1 | — | How soaked it is (dry … saturated), 0 … 1. |
+| `use[].properties.absorbency` | number 0–1 | — | The most wetness it can hold (nothing soaks in … fully absorbent); water raises wetness no higher, 0 … 1. |
 | `use[].properties.frozen` | boolean | — | Frozen solid. |
 | `use[].properties.freezePoint` | number -273.15–10000 | — | Temperature at or below which it freezes, °C. |
 | `use[].properties.conductive` | boolean | — | Conducts electric charge. |
@@ -177,6 +179,7 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `equip.nonProficient.staminaCostMultiplier` | number 1–3 | `1.25` | Multiplier on the stamina its moves cost (combat reads it, mw-e04). 1 = no penalty; default 1.25. |
 | `equip.nonProficient.noiseMultiplier` | number 1–3 | `1` | Multiplier on the wearer’s noise, on top of the load class (clamped with it, ADR-0003). 1 = no penalty; default 1. |
 | `weapon` | object | required | Weapon data. |
+| `weapon.reach` | `"close"` \| `"short"` \| `"medium"` \| `"long"` | required | Reach class of the weapon (mw-e04.15): metres and wall recoil come from the reach-class table. Bows and staves, which do not strike, still declare one. |
 | `weapon.moves` | list of ref → move | — | Moves it adds to the wielder’s moveset; its heft lives there (mw-e04). |
 
 ## 2. An armor piece for the head, body, hands or feet.
@@ -193,6 +196,8 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `equip.nonProficient.noiseMultiplier` | number 1–3 | `1` | Multiplier on the wearer’s noise, on top of the load class (clamped with it, ADR-0003). 1 = no penalty; default 1. |
 | `armor` | object | required | Armor data. |
 | `armor.weightKg` | number > 0 ≤ 20 | required | Weight counted towards the wearer’s load. Kilograms (ADR-0003). |
+| `armor.absorption` | map of `"slash"` \| `"pierce"` \| `"blunt"` \| `"fire"` \| `"frost"` \| `"shock"` \| `"arcane"` \| `"poison"` → number > 0 | `{}` | Flat points of each damage type this piece takes off every hit (mw-e04.16); the wearer’s absorption is the sum over its armor pieces. Unlisted types: 0. |
+| `armor.poise` | number ≥ 0 | `0` | Poise this piece adds to the wearer’s maximum poise (mw-e04.16). |
 
 ## 3. A shield, held in the off hand.
 
@@ -248,6 +253,7 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `book.rarity` | `"common"` \| `"uncommon"` \| `"rare"` \| `"unique"` | required | How scarce it is; unique exactly when flags.unique. |
 | `book.coverArtId` | string | — | Cover art asset id; absent = "ui-book-cover-<item id>", the only value allowed. |
 | `book.cursedWhispers` | boolean | `false` | Whispers from the pages while it is carried or read. |
+| `book.clueFor` | list of ref → puzzle | — | Puzzles its text is a clue to (mw-e15.5): reading it adds `clue.<item id>` to each puzzle’s trail, so a solve and its hint attribution can say a book helped. The text itself says what the clue is. |
 
 ## 6. A key. Lives on the keyring (mw-e17.5).
 
@@ -277,6 +283,8 @@ An entry is exactly one of the objects below: the fields above, plus those of it
 | `equip.nonProficient.drawTimeMultiplier` | number 1–3 | `1.5` | Multiplier on the time to draw, ready or raise it (combat reads it, mw-e04/mw-e05). 1 = no penalty; default 1.5. |
 | `equip.nonProficient.staminaCostMultiplier` | number 1–3 | `1.25` | Multiplier on the stamina its moves cost (combat reads it, mw-e04). 1 = no penalty; default 1.25. |
 | `equip.nonProficient.noiseMultiplier` | number 1–3 | `1` | Multiplier on the wearer’s noise, on top of the load class (clamped with it, ADR-0003). 1 = no penalty; default 1. |
+| `rope` | object | — | Makes the tool a climbing rope (mw-e10.9): tied at a level’s rope anchor with Interact, it hangs this far and climbs like any rope until untied. |
+| `rope.length` | number > 0 ≤ 50 | required | How far the rope hangs from its anchor once tied, metres. |
 
 ## 9. A quest item: noSell and noDrop by default.
 

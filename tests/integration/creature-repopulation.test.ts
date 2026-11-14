@@ -107,7 +107,9 @@ function sleepAtInn(carry: ReturnType<typeof captureCarry>): ReturnType<typeof c
   >;
 }
 
-describe('creature repopulation over the valley (mw-ju8.29)', () => {
+// Each test runs whole valley worlds through kills and rests: about 1.5 s locally, but past
+// vitest's 5 s default under the CI coverage run.
+describe('creature repopulation over the valley (mw-ju8.29)', { timeout: 60_000 }, () => {
   it('AC-6: a killed miner stays dead without a rest, and is back at its spawn, fresh and unaware, after one', ({
     task,
   }) => {

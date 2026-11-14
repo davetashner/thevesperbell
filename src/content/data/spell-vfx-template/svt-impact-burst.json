@@ -1,0 +1,9 @@
+{
+  "$schema": "../spell-vfx-template.schema.json",
+  "id": "svt-impact-burst",
+  "slot": "impact",
+  "notes": "A ring flash, a puff of glow and shards where the spell lands. Tint and scale are defaults a spell can override.",
+  "tint": "#8B5CF6",
+  "scale": 1,
+  "effect": "vfx-spell-impact-burst"
+}

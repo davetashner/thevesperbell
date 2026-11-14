@@ -10,9 +10,10 @@ import { defineEvent } from '../core/events';
  * Why an action was refused: `stamina` — the pool is empty (mw-e04.5); `busy` — a buffered request
  * never became legal within the input buffer (the action timeline, mw-e04.4), or a bow draw was asked
  * for mid-move; `ammo` — the quiver has none of the selected arrow type (mw-e05.3); `traversal` —
- * the hands are busy mantling, hanging or climbing (mw-e02.33).
+ * the hands are busy mantling, hanging or climbing (mw-e02.33); `overloaded` — the armor load
+ * forbids it (sprint while Overloaded, mw-e04.16).
  */
-export type ActionRejectReason = 'stamina' | 'busy' | 'ammo' | 'traversal';
+export type ActionRejectReason = 'stamina' | 'busy' | 'ammo' | 'traversal' | 'overloaded';
 
 /** A refused action. */
 export interface ActionRejection {

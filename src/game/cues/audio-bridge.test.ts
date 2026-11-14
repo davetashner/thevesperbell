@@ -386,6 +386,25 @@ describe('cue bridge helpers', () => {
     expect(lookups.surfaceOfMaterial?.('unknown')).toBeUndefined();
   });
 
+  it('worldCueLookups plays a tagged region’s surface when the manifest has its set, else the ground (mw-1jm)', () => {
+    const world = registerWorldProperties(new World({ seed: 1 }));
+    const sets = new Set(['sfx-foot-gravel-walk', 'sfx-foot-stone-walk']);
+    const lookups = worldCueLookups(
+      world,
+      [
+        { id: 'water', impactSound: 'sfx-impact-water', footstepSurface: 'water-shallow' },
+        { id: 'iron', impactSound: 'sfx-impact-metal' },
+      ],
+      { knownCue: (cue) => sets.has(cue) },
+    );
+    // A region surface with a set plays it; one without (carpet) and unknown names fall back to the ground.
+    expect(lookups.surfaceOfMaterial?.('gravel')).toBe('gravel');
+    expect(lookups.surfaceOfMaterial?.('carpet')).toBeUndefined();
+    // Material ids keep their own mapping, and a material with no set of its own is not a surface.
+    expect(lookups.surfaceOfMaterial?.('iron')).toBeUndefined();
+    expect(lookups.surfaceOfMaterial?.('water')).toBe('water-shallow');
+  });
+
   it('a DamageApplied through the world bus plays the struck material’s impact cue', () => {
     const world = registerWorldProperties(new World({ seed: 1 }));
     const skeleton = world.spawn();

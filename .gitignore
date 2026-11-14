@@ -12,7 +12,9 @@ assets/_incoming/
 # Node / build / test output
 node_modules/
 dist/
+build-report/
 coverage/
+.vitest/
 playwright-report/
 test-results/
 audit.json

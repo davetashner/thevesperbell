@@ -1,0 +1,25 @@
+{
+  "$schema": "../rumor.schema.json",
+  "id": "rumor-18-sea-serpent",
+  "notes": "Bible 6.2: FALSE. The sunken figurehead (3.6). Debunked by diving to the figurehead off the breakwater, or by Mags laughing at you (mags-patient-ann river-serpent-1).",
+  "region": "harbour",
+  "source": ["npc-mags"],
+  "sourceTags": ["tidemarket"],
+  "truth": "false",
+  "target": "place-breakwater",
+  "text": "There's a sea serpent under the breakwater. Big as a barge. Eyes like lanterns.",
+  "secondHand": {
+    "teller": "npc-dot",
+    "text": "Wendmouth lot swear there's a sea serpent under the breakwater. Big as a barge. Eyes like lanterns. I'd not go swimming."
+  },
+  "debunk": [
+    {
+      "via": "dive",
+      "place": "place-breakwater"
+    },
+    {
+      "via": "ask",
+      "npc": "npc-mags"
+    }
+  ]
+}

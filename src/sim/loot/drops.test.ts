@@ -4,6 +4,7 @@
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import { describe, expect, it } from 'vitest';
 import { box } from '../character/greybox';
+import { ArrowRestComponent, type ArrowRest } from '../combat/arrows/components';
 import { Died } from '../combat/damage/events';
 import type { EntityId } from '../core/component';
 import { World } from '../core/world';
@@ -30,6 +31,7 @@ import {
   installCreatureDrops,
   type CreatureDropsOptions,
 } from './drops';
+import { TEST_ARROWS } from '../testing/arrows';
 import { LootTables, type LootStack, type LootTableDef } from './tables';
 
 const v = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
@@ -47,6 +49,8 @@ const ITEMS = [
   item('bone', 'misc'),
   item('gold', 'currency'),
   item('lockpicks', 'tool'),
+  item('standard-arrow', 'ammo'),
+  item('rope-arrow', 'ammo'),
 ];
 
 const ref = (id: string) => ({ id });
@@ -244,5 +248,222 @@ describe('creature drops (mw-e01.5)', () => {
     const bare = new World<never>({ seed: 1 });
     const thing = bare.spawn();
     expect(dropCreatureLoot(bare, options(s.items), thing)).toEqual([]);
+  });
+});
+
+describe('arrows in a dying creature (mw-e05.7)', () => {
+  const ARROWS = TEST_ARROWS;
+  const ITEM_OF = new Map([
+    ['standard', 'standard-arrow'],
+    ['rope', 'rope-arrow'],
+  ]);
+  const arrowOptions = (items: WorldItems) =>
+    options(items, {
+      arrows: { lookup: ARROWS, itemOf: (arrow) => ITEM_OF.get(arrow) },
+    });
+  const stick = (
+    t: ReturnType<typeof setup>,
+    host: EntityId | null,
+    arrow = 'standard',
+    over: Partial<ArrowRest> = {},
+  ): EntityId => {
+    const entity = t.world.spawn();
+    t.world.add(entity, ArrowRestComponent, {
+      arrow,
+      shooter: null,
+      state: 'stuck',
+      position: v(2.5, 1, 32.5),
+      direction: v(0, 0, 1),
+      in: host,
+      tick: 0,
+      intact: true,
+      ...over,
+    });
+    return entity;
+  };
+  const registered = () => {
+    const t = setup();
+    t.world.register(ArrowRestComponent);
+    return t;
+  };
+  const arrowsLying = (t: ReturnType<typeof setup>) =>
+    t.lying().filter((drop) => drop.item === 'standard-arrow' || drop.item === 'rope-arrow');
+
+  it('AC-4: a creature with 2 arrows in it drops those that were intact, and none of the broken', () => {
+    const t = registered();
+    installCreatureDrops(t.world, arrowOptions(t.items));
+    const miner = t.spawnCreature(v(2.5, 0, 32.5));
+    const a = stick(t, miner);
+    const b = stick(t, miner);
+    const broken = stick(t, miner, 'standard', { intact: false });
+    const elsewhere = stick(t, null);
+    t.die(miner);
+    t.world.step([]);
+    expect(arrowsLying(t)).toMatchObject([{ item: 'standard-arrow', count: 2, by: miner }]);
+    for (const arrow of [a, b, broken]) expect(t.world.isAlive(arrow)).toBe(false);
+    expect(t.world.isAlive(elsewhere)).toBe(true);
+    expect(
+      t.dropped.filter((d) => d.defId === 'standard-arrow').map((d) => [d.actor, d.count]),
+    ).toEqual([[miner, 2]]);
+  });
+
+  it('a spent trick arrow drops as the standard arrow it comes back as; a rope arrow stays a rope arrow', () => {
+    const t = registered();
+    installCreatureDrops(t.world, arrowOptions(t.items));
+    const miner = t.spawnCreature(v(2.5, 0, 32.5));
+    stick(t, miner, 'water');
+    stick(t, miner, 'standard');
+    stick(t, miner, 'rope');
+    stick(t, miner, 'broadhead'); // no item for it: it does not drop
+    t.die(miner);
+    t.world.step([]);
+    expect(
+      arrowsLying(t)
+        .map((d) => [d.item, d.count])
+        .sort(),
+    ).toEqual([
+      ['rope-arrow', 1],
+      ['standard-arrow', 2],
+    ]);
+  });
+
+  it('a shattered creature gives the same result: its death is the same Died', () => {
+    const run = (tags: string[]) => {
+      const t = registered();
+      installCreatureDrops(t.world, arrowOptions(t.items));
+      const miner = t.spawnCreature(v(2.5, 0, 32.5));
+      stick(t, miner);
+      stick(t, miner);
+      t.world.step([]);
+      t.world.events.emit(Died, {
+        tick: t.world.tick,
+        target: miner,
+        killer: null,
+        source: null,
+        tags,
+      });
+      t.world.events.flush();
+      t.world.step([]);
+      return arrowsLying(t).map((d) => [d.item, d.count]);
+    };
+    expect(run(['shatter'])).toEqual([['standard-arrow', 2]]);
+    expect(run(['shatter'])).toEqual(run([]));
+  });
+
+  it('the arrow that kills lands after the death and drops a tick later, beside the rest of the loot', () => {
+    const t = registered();
+    installCreatureDrops(t.world, arrowOptions(t.items));
+    const miner = t.spawnCreature(v(2.5, 0, 32.5));
+    const early = stick(t, miner);
+    t.world.step([]);
+    t.world.events.emit(Died, {
+      tick: t.world.tick,
+      target: miner,
+      killer: null,
+      source: null,
+      tags: [],
+    });
+    t.world.events.flush();
+    // The killing arrow comes to rest in the corpse in the same tick, after Died: not yet visible.
+    const killing = stick(t, miner);
+    expect(arrowsLying(t)).toMatchObject([{ item: 'standard-arrow', count: 1 }]);
+    t.world.step([]);
+    expect(arrowsLying(t)).toMatchObject([
+      { item: 'standard-arrow', count: 1 },
+      { item: 'standard-arrow', count: 1 },
+    ]);
+    const [first, second] = arrowsLying(t);
+    // Not stacked on the first spot: it lies on the ring around the feet, still within 1 m.
+    expect(flat(first?.at ?? v(0, 0, 0), second?.at ?? v(0, 0, 0))).toBeGreaterThan(0.1);
+    expect(flat(second?.at ?? v(0, 0, 0), v(2.5, 0, 32.5))).toBeLessThanOrEqual(1);
+    expect(t.world.isAlive(early)).toBe(false);
+    expect(t.world.isAlive(killing)).toBe(false);
+    // Nothing more comes of it.
+    t.world.step([]);
+    expect(arrowsLying(t)).toHaveLength(2);
+  });
+
+  it('a creature whose arrows were all broken drops none, and the killing one is left alone if broken', () => {
+    const t = registered();
+    installCreatureDrops(t.world, arrowOptions(t.items));
+    const miner = t.spawnCreature(v(2.5, 0, 32.5));
+    stick(t, miner, 'standard', { intact: false });
+    t.die(miner);
+    stick(t, miner, 'standard', { intact: false });
+    t.world.step([]);
+    expect(arrowsLying(t)).toEqual([]);
+    expect(t.world.query(ArrowRestComponent).ids()).toEqual([]);
+  });
+
+  it('without arrow options arrows stay stuck in the corpse, and uninstalling stops the late drops', () => {
+    const t = registered();
+    installCreatureDrops(t.world, options(t.items));
+    const miner = t.spawnCreature(v(2.5, 0, 32.5));
+    const arrow = stick(t, miner);
+    t.die(miner);
+    t.world.step([]);
+    expect(t.world.isAlive(arrow)).toBe(true);
+    expect(arrowsLying(t)).toEqual([]);
+
+    const u = registered();
+    const off = installCreatureDrops(u.world, arrowOptions(u.items));
+    const other = u.spawnCreature(v(2.5, 0, 32.5));
+    u.world.step([]);
+    u.world.events.emit(Died, {
+      tick: u.world.tick,
+      target: other,
+      killer: null,
+      source: null,
+      tags: [],
+    });
+    u.world.events.flush();
+    stick(u, other);
+    off();
+    u.world.step([]);
+    expect(arrowsLying(u)).toEqual([]);
+    // Dead creatures nobody drops for stay quiet.
+    u.world.events.emit(Died, {
+      tick: u.world.tick,
+      target: other,
+      killer: null,
+      source: null,
+      tags: [],
+    });
+    u.world.events.flush();
+    u.world.step([]);
+    expect(arrowsLying(u)).toEqual([]);
+  });
+
+  it('a creature gone before the late drop, or with no placement, drops nothing and does not throw', () => {
+    const t = registered();
+    installCreatureDrops(t.world, arrowOptions(t.items));
+    const miner = t.spawnCreature(v(2.5, 0, 32.5));
+    t.world.step([]);
+    t.world.events.emit(Died, {
+      tick: t.world.tick,
+      target: miner,
+      killer: null,
+      source: null,
+      tags: [],
+    });
+    t.world.events.flush();
+    t.world.destroy(miner);
+    t.world.step([]);
+    t.world.step([]);
+    expect(arrowsLying(t)).toEqual([]);
+    const plain = t.world.spawn(); // not a creature at all: dropCreatureLoot ignores it
+    const own = stick(t, plain);
+    t.world.step([]);
+    t.world.events.emit(Died, {
+      tick: t.world.tick,
+      target: plain,
+      killer: null,
+      source: null,
+      tags: [],
+    });
+    t.world.events.flush();
+    t.world.step([]);
+    t.world.step([]);
+    expect(t.world.isAlive(own)).toBe(true);
   });
 });

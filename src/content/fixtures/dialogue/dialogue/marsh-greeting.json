@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../data/dialogue.schema.json",
+  "id": "marsh-greeting",
+  "notes": "Format fixture (mw-e22.3), not shipped: Ottilie Marsh at Marsh's General Store (story bible §5.15), a first meeting and a return from one file. The return entry is chosen by dialogue.visitedCount; the news option is once-only. The real conversation is written under E39.",
+  "speakers": [{ "id": "ottilie", "npc": "npc-ottilie" }],
+  "entries": [
+    {
+      "id": "return",
+      "when": { "kind": "dialogue.visitedCount", "id": "welcome", "op": "gte", "value": 1 },
+      "node": "welcome-back"
+    },
+    { "id": "first-meeting", "node": "welcome" }
+  ],
+  "nodes": [
+    {
+      "id": "welcome",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Mind the step, the bridge stones are slick this time of year. Ottilie Marsh. First shop past the bridge, and the scales are honest, whatever you've heard.",
+      "next": "menu"
+    },
+    {
+      "id": "welcome-back",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Back again, and in one piece. That's more than I can say for the hinges on my door.",
+      "next": "menu"
+    },
+    {
+      "id": "menu",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "browse",
+          "text": "What have you got?",
+          "effects": [
+            { "kind": "emit", "event": "shop.open", "data": { "merchant": "marsh-general-store" } }
+          ],
+          "end": true
+        },
+        {
+          "id": "news",
+          "text": "Seen anyone odd cross the bridge lately?",
+          "once": true,
+          "next": "news-line"
+        },
+        { "id": "leave", "text": "Just looking. Thank you.", "end": true }
+      ]
+    },
+    {
+      "id": "news-line",
+      "kind": "line",
+      "speaker": "ottilie",
+      "text": "Odd? Love, it's a bridge. Though Mags Oakum's barge has gone down the river empty twice this week, and she hates running empty.",
+      "next": "menu"
+    }
+  ]
+}
