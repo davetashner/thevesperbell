@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- You can now walk from the Deepworks breach into the Knot: a doorway at the end of Vane's gallery opens onto the Outer Ring (a looping corridor round the Scales room with rune bands and spider nests), the Ossuary Galleries (bone niches, the sunk Dark Crossing room, Clatter's mushroom garden; the hall and the far hall join three ways) and the Chapel of Echoes, whose portcullis falls for good if you cut, shoot or burn the counterweight rope; each pair of areas has two ways through, a vent or crawlspace among them. The main quest's Knot areas now complete as you enter, and the four "friend below" notes of the Knot can be read (mw-e26.9, mw-cqfn).
 - The folded note from "a friend below" now waits on the floor of your room at the Sleeping Ox, and a second one is pinned by the Deepworks mine gate; reading either counts toward the main quest (mw-nro9).
 - Notes, notices and inscriptions placed in the world can now be read: Interact on one opens a reader window with its title and text (several pages turn with the arrow keys), Esc or Interact closes it, and the first read of a text records the evidence it proves so characters and quests can react to it (mw-kf4c).
 - Wendmouth's harbour texts now have places to be read (the customs house, bay nine, the Stone Wharf, Cray's desk and the Kestrel Lock toll board; the reader itself is still to come), Nell tells the rumour about her cellar, and Dot repeats the six harbour rumours second-hand until you have been to Wendmouth (mw-18w, mw-ily9).

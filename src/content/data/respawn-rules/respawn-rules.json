@@ -61,6 +61,14 @@
       "mode": "reload"
     },
     {
+      "id": "knot-outer-reload",
+      "notes": "Death in the Knot's outer half (mw-e26.9): the region is the whole scene; the death screen offers Load last save, and with no save the player restarts at the breach landing. Waking in the Fold, laid out by the Forgotten or carried by Kettleback is the PROPOSAL in docs/design/dungeon.md (Fold respawn logic, the `knot-*` rules); mw-e26.16 replaces this with those fact-conditioned rules.",
+      "region": "knot-outer",
+      "priority": 0,
+      "destination": { "scene": "knot-outer", "spawn": "player-start" },
+      "mode": "reload"
+    },
+    {
       "id": "wendmouth-harbour-reload",
       "notes": "Death in Wendmouth (mw-e40.1): the region is the whole harbour scene; the death screen offers Load last save, and with no save the harbour restarts on the Stone Wharf. Waking at the Sleeping Ox is the PROPOSAL in docs/design/dungeon.md (question 6).",
       "region": "wendmouth-harbour",

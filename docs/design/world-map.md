@@ -84,9 +84,9 @@ flowchart LR
     cistern["The cistern"]:::built
   end
   subgraph knot["The Knot"]
-    knot_outer_ring["The Outer Ring"]
-    ossuary_galleries["The Ossuary Galleries"]
-    chapel_of_echoes["The Chapel of Echoes"]
+    knot_outer_ring["The Outer Ring"]:::built
+    ossuary_galleries["The Ossuary Galleries"]:::built
+    chapel_of_echoes["The Chapel of Echoes"]:::built
     horns_hall["Horn's Hall"]
     the_fold["The Fold"]
     sounding_shaft_foot["The Sounding Shaft's foot"]
@@ -300,9 +300,9 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `priory-crypt-stair` | The crypt stair | priory | e26 | `bellwater-priory` | The stair down from the nave to the sealed crypt door; the Sunbeam puzzle's place (mw-e26.1, docs/design/dungeon.md). PROPOSAL: the bible gives the crypt but no stair. Built (mw-e26.5): a 3 m stair down east of the nave to a landing; the Sunbeam puzzle is mw-e26.15. |
 | `priory-crypt` | The priory crypt | priory | e26 | `bellwater-priory` | Sealed from below (bible 4.1 beat 9). Built (mw-e26.5) as a sealed vestibule behind a tier-3 locked door: no walking route from the priory side until world.priory-crypt.unsealed (mw-e26.20). |
 | `cistern` | The cistern | priory | e26 | `bellwater-priory` | Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as the stub the Glen Well route joins: a sealed vestibule behind the nave west wall door; glen-well-cistern (mw-e24.10) and nave-cistern (mw-e26.20) open it. |
-| `knot-outer-ring` | The Outer Ring | knot | e26 | planned | Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). |
-| `ossuary-galleries` | The Ossuary Galleries | knot | e26 | planned | The Forgotten; Clatter (bible 3.5). |
-| `chapel-of-echoes` | The Chapel of Echoes | knot | e26 | planned | Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14). |
+| `knot-outer-ring` | The Outer Ring | knot | e26 | `knot-outer` | Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). Built (mw-e26.9): the breach landing and a looping ring corridor round the Scales room, with rune-band and spider-nest markers; the Scales gate and a crawl vent lead north to the Ossuary. |
+| `ossuary-galleries` | The Ossuary Galleries | knot | e26 | `knot-outer` | The Forgotten; Clatter (bible 3.5). Built (mw-e26.9): an entry hall with bone niches, the sunk Dark Crossing room, Clatter's mushroom garden and an east gallery. |
+| `chapel-of-echoes` | The Chapel of Echoes | knot | e26 | `knot-outer` | Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14). Built (mw-e26.9): a 9 m nave with colonnades, four chime markers and the counterweight-hung portcullis in the north doorway; the Chimes puzzle and the trap's story are mw-e26.14. |
 | `horns-hall` | Horn's Hall | knot | e26 | planned | The Warden's hall outside the Fold (bible 3.5, 4.2). |
 | `the-fold` | The Fold | knot | e26 | planned | Sealed sleepers' vault; wake-up point (bible 3.5). |
 | `sounding-shaft-foot` | The Sounding Shaft's foot | knot | e26 | planned | Foot of the shaft to the belfry (bible 3.5, mw-e26.18). |
@@ -397,7 +397,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `nave-cistern` | `priory-nave` | `cistern` | door |  |  | planned: mw-e26.20 |
 | `glen-well-cistern` | `glen-well` | `cistern` | shortcut | `{"fact":"world.glen-well.rung-pulled"}` | `verb.climb.ledge` | planned: mw-e24.10 |
 | `jail-drain` | `jail-cell` | `cistern` | secret | `{"fact":"world.jail-drain.open"}` | `tool.lockpick`, `technique.shoulder-barge` | planned: mw-e24.8 |
-| `breach-outer-ring` | `breach` | `knot-outer-ring` | door |  |  | planned: mw-e26.9 |
+| `breach-outer-ring` | `breach` | `knot-outer-ring` | door |  |  | `deepworks/breach-door`, `knot-outer/breach-door` |
 | `outer-ring-ossuary` | `knot-outer-ring` | `ossuary-galleries` | path |  |  | planned: mw-e26.9 |
 | `ossuary-chapel` | `ossuary-galleries` | `chapel-of-echoes` | path |  |  | planned: mw-e26.9 |
 | `chapel-horns-hall` | `chapel-of-echoes` | `horns-hall` | path |  |  | planned: mw-e26.10 |
@@ -471,8 +471,11 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `deepworks` | `rootcellar-camp` | none (a marker spawn; walked inside the scene) |
 | `deepworks` | `silver-galleries` | none (a marker spawn one level down; the stair from the cutting hall and the cage lift lead to it) |
 | `deepworks` | `vane-sealed-gallery` | none (a marker spawn two levels down; mw-e26.4 builds its content and the seal) |
-| `deepworks` | `breach` | none (a marker spawn and the breach-threshold stub; mw-e26.9 builds the Outer Ring and the transition) |
+| `deepworks` | `breach` | `deepworks/breach-door` (breach-outer-ring) |
 | `deepworks` | `lower-deepworks` | none (a marker spawn; the Weeping Adit arrives beyond the channel, mw-e25.13) |
+| `knot-outer` | `knot-outer-ring` | `knot-outer/breach-door` (breach-outer-ring) |
+| `knot-outer` | `ossuary-galleries` | none (a marker spawn in the entry hall; the Scales gate and the ring vent lead in from the ring, inside the scene) |
+| `knot-outer` | `chapel-of-echoes` | none (a marker spawn in the nave; the chapel door and the bone chute lead in from the Ossuary, inside the scene) |
 | `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; the towpath gate in the south wall is the `wendmouth-harbour/towpath-gate` transition, the stopgap riverbank-wharf-link from under-the-bridge, mw-e40.26; the barge berth is where the barge will arrive, mw-e25.15) |
 | `wendmouth-harbour` | `tidemarket` | none (a marker spawn; walked inside the scene) |
 | `wendmouth-harbour` | `customs-house` | none (a marker spawn; walked inside the scene) |
@@ -521,7 +524,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e26.5 | `priory-gate-nave`, `nave-choir`, `nave-garden`, `nave-crypt-stair`, `crypt-stair-crypt` |
 | mw-e26.7 | `choir-scriptorium` |
 | mw-e26.8 | `nave-belfry` |
-| mw-e26.9 | `breach-outer-ring`, `outer-ring-ossuary`, `ossuary-chapel` |
+| mw-e26.9 | `outer-ring-ossuary`, `ossuary-chapel` |
 | mw-e26.10 | `chapel-horns-hall`, `horns-hall-cradle`, `cradle-shaft-foot` |
 | mw-e26.16 | `horns-hall-fold` |
 | mw-e26.18 | `sounding-shaft` |

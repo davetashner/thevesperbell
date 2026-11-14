@@ -1,0 +1,1473 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "knot-outer",
+  "name": "The Knot: Outer Ring, Ossuary and Chapel",
+  "description": "Bead mw-e26.9: the outer half of the labyrinth under Briar Glen as one connected greybox (about 125 x 260 m, one level plus the Dark Crossing pit). Through the Deepworks breach (breach-door, back to deepworks arrive-from-knot-outer; arrive-from-deepworks) a short landing opens onto the Outer Ring (knot-outer-ring): a looping corridor round a central Scales room (scales-room) with rune-band markers and loom-spider nests; the Scales gate (scales-gate, an open doorway until mw-e26.15 closes it) and a crawl vent (ring-vent) both lead north to the Ossuary Galleries (ossuary-galleries): an entry hall with bone niches, the sunk Dark Crossing room (dark-crossing, four metres of stair down and up), Clatter’s mushroom garden (clatter-garden) along the west side and an east gallery, so the hall and the far hall are joined three ways. The hall beyond the pit leads to the Chapel of Echoes (chapel-of-echoes, a 9 m nave with colonnades and the four chime markers) through a doorway (chapel-door) or the bone chute (bone-chute) from the garden. The chapel’s north doorway holds the portcullis (chapel-portcullis) on its counterweight rope (counterweight-rope; graph chapel-portcullis): cut, shoot or burn the rope and it drops for good; the north vent (chapel-vent-north) goes round it to the landing and the Horn’s Hall stub (horns-hall-stub, mw-e26.10). The four friend-below notes of the Knot are readable spawns.",
+  "grid": 1,
+  "camera": {
+    "position": [60, 60, -40],
+    "target": [60, 0, 130]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [60, -3, 126],
+      "scale": [16, 1, 8]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 5],
+      "scale": [8, 1, 5]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 14],
+      "scale": [40, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [24, 0, 50],
+      "scale": [4, 1, 32]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 30],
+      "scale": [16, 1, 12]
+    },
+    {
+      "piece": "floor",
+      "at": [96, 0, 50],
+      "scale": [4, 1, 32]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 86],
+      "scale": [40, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 91],
+      "scale": [16, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [95, 0, 104],
+      "scale": [1, 1, 14]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 93],
+      "scale": [34, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [43, 0, 95],
+      "scale": [35, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 97],
+      "scale": [34, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [43, 0, 99],
+      "scale": [35, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 101],
+      "scale": [34, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [43, 0, 103],
+      "scale": [35, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 105],
+      "scale": [34, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [43, 0, 107],
+      "scale": [35, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 110],
+      "scale": [34, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [26, 0, 126],
+      "scale": [18, 1, 14]
+    },
+    {
+      "piece": "floor",
+      "at": [100, 0, 131],
+      "scale": [16, 1, 13]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 142],
+      "scale": [34, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [62, 0, 146],
+      "scale": [54, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [42, 0, 155],
+      "scale": [34, 1, 7]
+    },
+    {
+      "piece": "floor",
+      "at": [100, 0, 150],
+      "scale": [16, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [91, 0, 153],
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [97, 0, 153],
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [103, 0, 153],
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [109, 0, 153],
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [11, 0, 173],
+      "scale": [1, 1, 11]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 173],
+      "scale": [32, 1, 11]
+    },
+    {
+      "piece": "floor",
+      "at": [51, 0, 185],
+      "scale": [41, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 211],
+      "scale": [32, 1, 25]
+    },
+    {
+      "piece": "floor",
+      "at": [56, 0, 237],
+      "scale": [36, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [21, 0, 244],
+      "scale": [1, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 240],
+      "scale": [32, 1, 2]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 246],
+      "scale": [20, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [50, 0, 251],
+      "scale": [30, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [60, 0, 255],
+      "scale": [20, 1, 3]
+    },
+    {
+      "piece": "stairs",
+      "at": [60, -1, 113],
+      "yaw": 180,
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [60, -2, 115],
+      "yaw": 180,
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [60, -3, 117],
+      "yaw": 180,
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [60, -3, 135],
+      "yaw": 0,
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [60, -2, 137],
+      "yaw": 0,
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [60, -1, 139],
+      "yaw": 0,
+      "scale": [2.0, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [8, 0, 127.0],
+      "yaw": 90,
+      "scale": [35.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [10, 0, 174.0],
+      "yaw": 90,
+      "scale": [12.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [12, 0, 173.0],
+      "yaw": 90,
+      "scale": [11.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [20, 0, 50.0],
+      "yaw": 90,
+      "scale": [40.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [20, 0, 244.0],
+      "yaw": 90,
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [22, 0, 244.0],
+      "yaw": 90,
+      "scale": [6.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28, 0, 50.0],
+      "yaw": 90,
+      "scale": [32.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28, 0, 173.0],
+      "yaw": 90,
+      "scale": [11.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28, 0, 211.0],
+      "yaw": 90,
+      "scale": [25.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28, 0, 240.0],
+      "yaw": 90,
+      "scale": [2.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40, 0, 246.0],
+      "yaw": 90,
+      "scale": [4.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [40, 0, 255.0],
+      "yaw": 90,
+      "scale": [3.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [44, -3, 126.0],
+      "yaw": 90,
+      "scale": [8.0, 2.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [44, 0, 30.0],
+      "yaw": 90,
+      "scale": [12.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [44, 0, 95.0],
+      "yaw": 90,
+      "scale": [5.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [44, 0, 111.0],
+      "yaw": 90,
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [44, 0, 142.0],
+      "yaw": 90,
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [44, 0, 158.0],
+      "yaw": 90,
+      "scale": [4.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [52, 0, 5.0],
+      "yaw": 90,
+      "scale": [5.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58, -3, 117.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58, -3, 135.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58, -2, 115.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58, -2, 137.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58, -1, 113.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [58, -1, 139.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, -3, 117.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, -3, 135.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, -2, 115.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, -2, 137.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, -1, 113.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60, -1, 139.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62, -3, 117.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62, -3, 135.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62, -2, 115.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62, -2, 137.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62, -1, 113.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [62, -1, 139.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [68, 0, 5.0],
+      "yaw": 90,
+      "scale": [5.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, -3, 126.0],
+      "yaw": 90,
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 30.0],
+      "yaw": 90,
+      "scale": [12.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 92.0],
+      "yaw": 90,
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 97.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 101.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 105.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 110.0],
+      "yaw": 90,
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 142.0],
+      "yaw": 90,
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76, 0, 155.0],
+      "yaw": 90,
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [78, 0, 95.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [78, 0, 99.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [78, 0, 103.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [78, 0, 107.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80, 0, 250.0],
+      "yaw": 90,
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [84, 0, 131.0],
+      "yaw": 90,
+      "scale": [13.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [84, 0, 150.0],
+      "yaw": 90,
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [90, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [92, 0, 50.0],
+      "yaw": 90,
+      "scale": [32.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [92, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [92, 0, 202.0],
+      "yaw": 90,
+      "scale": [40.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [94, 0, 104.0],
+      "yaw": 90,
+      "scale": [14.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [96, 0, 104.0],
+      "yaw": 90,
+      "scale": [14.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [96, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [98, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100, 0, 50.0],
+      "yaw": 90,
+      "scale": [40.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [102, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [104, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [108, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [110, 0, 153.0],
+      "yaw": 90,
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [116, 0, 135.0],
+      "yaw": 90,
+      "scale": [17.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60.0, 0, 0],
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [36.0, 0, 10],
+      "scale": [16.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [84.0, 0, 10],
+      "scale": [16.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [43.0, 0, 18],
+      "scale": [15.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, 0, 18],
+      "scale": [16.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60.0, 0, 42],
+      "scale": [16.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60.0, 0, 82],
+      "scale": [32.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [39.0, 0, 90],
+      "scale": [19.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 90],
+      "scale": [17.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [98.0, 0, 90],
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [26.0, 0, 92],
+      "scale": [18.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 94],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 96],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 98],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 100],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 102],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 104],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 106],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [77.0, 0, 108],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [51.0, 0, 112],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [69.0, 0, 112],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [51.0, -3, 118],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [69.0, -3, 118],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [89.0, 0, 118],
+      "scale": [5.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [106.0, 0, 118],
+      "scale": [10.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [51.0, -3, 134],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [69.0, -3, 134],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [51.0, 0, 140],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [69.0, 0, 140],
+      "scale": [7.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80.0, 0, 144],
+      "scale": [4.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [80.0, 0, 148],
+      "scale": [4.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [87.0, 0, 152],
+      "scale": [3.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [94.0, 0, 152],
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100.0, 0, 152],
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [106.0, 0, 152],
+      "scale": [2.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [113.0, 0, 152],
+      "scale": [3.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [91.0, 0, 154],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [97.0, 0, 154],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [103.0, 0, 154],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [109.0, 0, 154],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [43.0, 0, 162],
+      "scale": [15.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, 0, 162],
+      "scale": [16.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [9.0, 0, 162],
+      "scale": [1.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [20.0, 0, 162],
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [20.0, 0, 184],
+      "scale": [8.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [19.0, 0, 186],
+      "scale": [9.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [24.0, 0, 236],
+      "scale": [4.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [25.0, 0, 238],
+      "scale": [3.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [43.0, 0, 242],
+      "scale": [15.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [76.0, 0, 242],
+      "scale": [16.0, 3.0, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [31.0, 0, 250],
+      "scale": [9.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [30.0, 0, 252],
+      "scale": [10.0, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [60.0, 0, 258],
+      "scale": [20.0, 1.5, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [59, 0, 18]
+    },
+    {
+      "piece": "wall",
+      "at": [59, 3, 18],
+      "scale": [1, 0.5, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [59, 0, 90]
+    },
+    {
+      "piece": "wall",
+      "at": [59, 3, 90],
+      "scale": [1, 0.5, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [59, 0, 162]
+    },
+    {
+      "piece": "wall",
+      "at": [59, 3, 162],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [59, 0, 242]
+    },
+    {
+      "piece": "wall",
+      "at": [59, 3, 242],
+      "scale": [1, 2.0, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 168]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 168]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 174]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 174]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 180]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 180]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 186]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 186]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 192]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 192]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 198]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 198]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 204]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 204]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 210]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 210]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 216]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 216]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 222]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 222]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 228]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 228]
+    },
+    {
+      "piece": "pillar",
+      "at": [44, 0, 234]
+    },
+    {
+      "piece": "pillar",
+      "at": [76, 0, 234]
+    },
+    {
+      "piece": "pillar",
+      "at": [52, 0, 98]
+    },
+    {
+      "piece": "pillar",
+      "at": [68, 0, 98]
+    },
+    {
+      "piece": "pillar",
+      "at": [52, 0, 106]
+    },
+    {
+      "piece": "pillar",
+      "at": [68, 0, 106]
+    },
+    {
+      "piece": "pillar",
+      "at": [52, 0, 148]
+    },
+    {
+      "piece": "pillar",
+      "at": [68, 0, 148]
+    },
+    {
+      "piece": "pillar",
+      "at": [52, 0, 156]
+    },
+    {
+      "piece": "pillar",
+      "at": [68, 0, 156]
+    },
+    {
+      "piece": "pillar",
+      "at": [16, 0, 104]
+    },
+    {
+      "piece": "pillar",
+      "at": [28, 0, 112]
+    },
+    {
+      "piece": "pillar",
+      "at": [16, 0, 128]
+    },
+    {
+      "piece": "pillar",
+      "at": [34, 0, 124]
+    },
+    {
+      "piece": "pillar",
+      "at": [22, 0, 140]
+    },
+    {
+      "piece": "pillar",
+      "at": [36, 0, 148]
+    },
+    {
+      "piece": "platform",
+      "at": [70, 5, 238],
+      "scale": [1, 1, 0.25]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [60, 0, 12],
+      "yaw": 0,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "arrive-from-deepworks",
+      "at": [60, 0, 6],
+      "yaw": 0,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "breach-door",
+      "at": [60, 0, 1],
+      "tags": ["transition"]
+    },
+    {
+      "id": "knot-outer-ring",
+      "at": [60, 0, 14],
+      "tags": ["node", "ring"]
+    },
+    {
+      "id": "rune-band-south",
+      "at": [40, 0, 14],
+      "tags": ["lore", "rune-band"]
+    },
+    {
+      "id": "rune-band-east",
+      "at": [96, 0, 50],
+      "tags": ["lore", "rune-band"]
+    },
+    {
+      "id": "rune-band-north",
+      "at": [80, 0, 86],
+      "tags": ["lore", "rune-band"]
+    },
+    {
+      "id": "rune-band-west",
+      "at": [24, 0, 50],
+      "tags": ["lore", "rune-band"]
+    },
+    {
+      "id": "read-friend-note-outer-ring",
+      "at": [64, 0, 14],
+      "tags": ["readable", "note-friend-below-outer-ring"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the page pinned beneath the chalk arrow"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "read-friend-note-spiders",
+      "at": [24, 0, 76],
+      "tags": ["readable", "note-friend-below-spiders"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the note tucked into the ribcage"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "spider-nest-a",
+      "at": [24, 0, 84],
+      "tags": ["encounter-stub", "loom-spider", "spider-nest"]
+    },
+    {
+      "id": "spider-nest-b",
+      "at": [34, 0, 86],
+      "tags": ["encounter-stub", "loom-spider", "spider-nest"]
+    },
+    {
+      "id": "spider-nest-c",
+      "at": [22, 0, 68],
+      "tags": ["encounter-stub", "loom-spider", "spider-nest"]
+    },
+    {
+      "id": "scales-room",
+      "at": [60, 0, 30],
+      "tags": ["puzzle-stub:scales-room"]
+    },
+    {
+      "id": "scales-gate",
+      "at": [59, 0, 90],
+      "tags": ["puzzle-stub:scales-room", "route:outer-ring-ossuary"]
+    },
+    {
+      "id": "ring-vent",
+      "at": [95, 0, 94],
+      "tags": ["vent", "route:outer-ring-ossuary"]
+    },
+    {
+      "id": "ossuary-galleries",
+      "at": [60, 0, 100],
+      "tags": ["node", "ossuary"]
+    },
+    {
+      "id": "ossuary-view",
+      "at": [60, 0, 92],
+      "yaw": 0,
+      "tags": ["perf-view"]
+    },
+    {
+      "id": "read-friend-note-ossuary",
+      "at": [52, 0, 108],
+      "tags": ["readable", "note-friend-below-ossuary"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the note under the monk’s skull"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "forgotten-stub-a",
+      "at": [70, 0, 98],
+      "tags": ["encounter-stub", "forgotten"]
+    },
+    {
+      "id": "forgotten-stub-b",
+      "at": [100, 0, 130],
+      "tags": ["encounter-stub", "forgotten"]
+    },
+    {
+      "id": "dark-crossing",
+      "at": [60, -3, 126],
+      "tags": ["puzzle-stub:dark-crossing"]
+    },
+    {
+      "id": "garden-west-door",
+      "at": [42, 0, 102],
+      "tags": ["route:ossuary-hall"]
+    },
+    {
+      "id": "clatter-garden",
+      "at": [24, 0, 128],
+      "tags": ["encounter-stub", "npc-stub", "clatter"]
+    },
+    {
+      "id": "mushroom-bed-a",
+      "at": [16, 0, 116],
+      "tags": ["mushroom-garden"]
+    },
+    {
+      "id": "mushroom-bed-b",
+      "at": [30, 0, 134],
+      "tags": ["mushroom-garden"]
+    },
+    {
+      "id": "mushroom-bed-c",
+      "at": [14, 0, 148],
+      "tags": ["mushroom-garden"]
+    },
+    {
+      "id": "east-gallery",
+      "at": [100, 0, 138],
+      "tags": ["gallery"]
+    },
+    {
+      "id": "chapel-door",
+      "at": [59, 0, 162],
+      "tags": ["route:ossuary-chapel"]
+    },
+    {
+      "id": "bone-chute",
+      "at": [11, 0, 174],
+      "tags": ["vent", "route:ossuary-chapel"]
+    },
+    {
+      "id": "chapel-of-echoes",
+      "at": [60, 0, 200],
+      "tags": ["node", "chapel"]
+    },
+    {
+      "id": "chime-1",
+      "at": [50, 0, 232],
+      "tags": ["puzzle-stub:chimes", "chime"]
+    },
+    {
+      "id": "chime-2",
+      "at": [56, 0, 232],
+      "tags": ["puzzle-stub:chimes", "chime"]
+    },
+    {
+      "id": "chime-3",
+      "at": [64, 0, 232],
+      "tags": ["puzzle-stub:chimes", "chime"]
+    },
+    {
+      "id": "chime-4",
+      "at": [70, 0, 232],
+      "tags": ["puzzle-stub:chimes", "chime"]
+    },
+    {
+      "id": "chapel-portcullis",
+      "at": [59, 0, 242],
+      "tags": ["portcullis", "route:chapel-horns-hall"],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "counterweight-rope",
+      "at": [70, 5, 238],
+      "tags": ["rope", "counterweight"],
+      "rope": {
+        "length": 2,
+        "radius": 0.08,
+        "support": {
+          "resistances": {
+            "blunt": 1,
+            "force": 1,
+            "pierce": 0.3
+          }
+        }
+      },
+      "properties": {
+        "material": "rope",
+        "hp": 20
+      }
+    },
+    {
+      "id": "counterweight",
+      "at": [70, 2.75, 238],
+      "tags": ["prop", "counterweight"],
+      "prop": "anvil",
+      "suspendedFrom": "counterweight-rope"
+    },
+    {
+      "id": "chapel-vent-north",
+      "at": [21, 0, 246],
+      "tags": ["vent", "route:chapel-horns-hall"]
+    },
+    {
+      "id": "horns-hall-stub",
+      "at": [60, 0, 254],
+      "tags": ["transition-stub", "planned:mw-e26.10"]
+    },
+    {
+      "id": "read-friend-note-warden",
+      "at": [50, 0, 254],
+      "tags": ["readable", "note-friend-below-warden"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the note left on the stair to the Warden’s hall"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "bone-niche-1",
+      "at": [77, 0, 95],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-2",
+      "at": [77, 0, 99],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-3",
+      "at": [77, 0, 103],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-4",
+      "at": [77, 0, 107],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-5",
+      "at": [91, 0, 153],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-6",
+      "at": [97, 0, 153],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-7",
+      "at": [103, 0, 153],
+      "tags": ["bone-niche"]
+    },
+    {
+      "id": "bone-niche-8",
+      "at": [109, 0, 153],
+      "tags": ["bone-niche"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "knot-outer"
+    },
+    {
+      "graph": "chapel-portcullis"
+    }
+  ],
+  "light": {
+    "ambient": 0.25,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.4, -1, 0.3],
+        "level": 0.3,
+        "reach": 80
+      }
+    ]
+  },
+  "environment": {
+    "sky": "#14120F",
+    "fog": {
+      "color": "#201D19",
+      "near": 16,
+      "far": 95
+    }
+  },
+  "regions": [
+    {
+      "id": "knot-outer",
+      "min": [0, -8, -2],
+      "max": [124, 14, 262],
+      "tags": ["region", "knot"]
+    },
+    {
+      "id": "knot-outer-ring",
+      "min": [20, -1, 0],
+      "max": [100, 6, 90],
+      "tags": ["region", "ring"]
+    },
+    {
+      "id": "ossuary-galleries",
+      "min": [8, -6, 90],
+      "max": [118, 6, 162],
+      "tags": ["region", "ossuary"]
+    },
+    {
+      "id": "chapel-of-echoes",
+      "min": [28, -1, 162],
+      "max": [92, 12, 242],
+      "tags": ["region", "chapel"]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "breach-door",
+      "min": [56, -1, 0.25],
+      "max": [64, 3, 1.75],
+      "scene": "deepworks",
+      "spawn": "arrive-from-knot-outer"
+    }
+  ]
+}

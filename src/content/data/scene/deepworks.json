@@ -1474,7 +1474,13 @@
       "id": "breach-threshold",
       "at": [100, -12, 330],
       "yaw": 0,
-      "tags": ["transition-stub", "planned:mw-e26.9"]
+      "tags": ["transition"]
+    },
+    {
+      "id": "arrive-from-knot-outer",
+      "at": [100, -12, 326],
+      "yaw": 180,
+      "tags": ["arrival"]
     },
     {
       "id": "lower-deepworks",
@@ -1553,6 +1559,13 @@
       "min": [96, -1, 0.25],
       "max": [104, 3, 1.75],
       "scene": "briar-glen-green",
+      "spawn": "arrive-from-deepworks"
+    },
+    {
+      "id": "breach-door",
+      "min": [94, -13, 329.25],
+      "max": [106, -9, 330.75],
+      "scene": "knot-outer",
       "spawn": "arrive-from-deepworks"
     }
   ]

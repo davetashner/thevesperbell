@@ -534,6 +534,36 @@
       "note": "mw-e26.2 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
     },
     {
+      "id": "knot-outer-frame-p50-high",
+      "metric": "frameP50Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-outer",
+      "preset": "high",
+      "note": "mw-e26.9 AC-3. The Knot's outer half greybox (about 125 × 260 m: Outer Ring, Ossuary Galleries with the sunk Dark Crossing room and Clatter's garden, Chapel of Echoes) viewed from the south end of the Ossuary entry hall, facing north down the hall and over the pit (?spawn=ossuary-view). 1,800 frames after a 3 s warm-up, uncapped, 2560×1440 drawing buffer. Production build."
+    },
+    {
+      "id": "knot-outer-frame-p95-high",
+      "metric": "frameP95Ms",
+      "mode": "reference",
+      "max": 16.7,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-outer",
+      "preset": "high",
+      "note": "mw-e26.9 AC-3. 60 fps is a 16.7 ms frame interval. Same run as the p50 budget."
+    },
+    {
+      "id": "knot-outer-long-tasks-high",
+      "metric": "longTasksOver200ms",
+      "mode": "reference",
+      "max": 0,
+      "source": "docs/backlog-contract.md §1 Hardware baseline: steady 60 fps on the reference machine at a 1440p-equivalent render resolution",
+      "scene": "knot-outer",
+      "preset": "high",
+      "note": "mw-e26.9 AC-3. Same run as the frame budgets: every task of 200 ms or more in the sampling window counts, frame renders included."
+    },
+    {
       "id": "wendmouth-harbour-frame-p50-high",
       "metric": "frameP50Ms",
       "mode": "reference",

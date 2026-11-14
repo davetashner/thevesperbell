@@ -356,7 +356,7 @@
       "name": "The breach",
       "area": "deepworks",
       "epic": "e26",
-      "notes": "Where the mine opened into the Knot (bible 3.5, mw-e26.4). Built (mw-e26.2) as a rubble room ending at the breach-threshold marker; the Outer Ring beyond is mw-e26.9.",
+      "notes": "Where the mine opened into the Knot (bible 3.5, mw-e26.4). Built (mw-e26.2) as a rubble room ending at the breach-threshold marker; the breach-door transition into the Outer Ring is mw-e26.9.",
       "scene": "deepworks"
     },
     {
@@ -444,21 +444,24 @@
       "name": "The Outer Ring",
       "area": "knot",
       "epic": "e26",
-      "notes": "Hornfolk runes, loom spiders (bible 3.5, mw-e26.9)."
+      "notes": "Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). Built (mw-e26.9): the breach landing and a looping ring corridor round the Scales room, with rune-band and spider-nest markers; the Scales gate and a crawl vent lead north to the Ossuary.",
+      "scene": "knot-outer"
     },
     {
       "id": "ossuary-galleries",
       "name": "The Ossuary Galleries",
       "area": "knot",
       "epic": "e26",
-      "notes": "The Forgotten; Clatter (bible 3.5)."
+      "notes": "The Forgotten; Clatter (bible 3.5). Built (mw-e26.9): an entry hall with bone niches, the sunk Dark Crossing room, Clatter's mushroom garden and an east gallery.",
+      "scene": "knot-outer"
     },
     {
       "id": "chapel-of-echoes",
       "name": "The Chapel of Echoes",
       "area": "knot",
       "epic": "e26",
-      "notes": "Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14)."
+      "notes": "Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14). Built (mw-e26.9): a 9 m nave with colonnades, four chime markers and the counterweight-hung portcullis in the north doorway; the Chimes puzzle and the trap's story are mw-e26.14.",
+      "scene": "knot-outer"
     },
     {
       "id": "horns-hall",
@@ -1242,8 +1245,8 @@
       "from": "breach",
       "to": "knot-outer-ring",
       "kind": "door",
-      "bead": "mw-e26.9",
-      "notes": "Through the breach into the Knot."
+      "notes": "Through the breach into the Knot. Built (mw-e26.9): the deepworks/breach-door and knot-outer/breach-door transitions, both ways.",
+      "transitions": ["deepworks/breach-door", "knot-outer/breach-door"]
     },
     {
       "id": "outer-ring-ossuary",
@@ -1251,7 +1254,7 @@
       "to": "ossuary-galleries",
       "kind": "path",
       "bead": "mw-e26.9",
-      "notes": "Outer Ring to the Ossuary."
+      "notes": "Outer Ring to the Ossuary. Built (mw-e26.9), walked inside the knot-outer scene: the Scales gate doorway and a crawl vent."
     },
     {
       "id": "ossuary-chapel",
@@ -1259,7 +1262,7 @@
       "to": "chapel-of-echoes",
       "kind": "path",
       "bead": "mw-e26.9",
-      "notes": "Ossuary to the Chapel of Echoes."
+      "notes": "Ossuary to the Chapel of Echoes. Built (mw-e26.9), walked inside the knot-outer scene: a doorway from the hall beyond the pit and the bone chute from the garden."
     },
     {
       "id": "chapel-horns-hall",
