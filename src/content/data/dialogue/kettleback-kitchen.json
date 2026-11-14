@@ -600,6 +600,14 @@
               "kind": "setFact",
               "fact": "framed.crate-found",
               "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "rumor.corrected",
+              "data": {
+                "rumor": 3,
+                "debunker": "npc-kettleback"
+              }
             }
           ]
         },

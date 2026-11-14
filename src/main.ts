@@ -100,6 +100,7 @@ import { ContestController } from '@game/contest/controller';
 import { contestsIn, installContests } from '@game/contest/install';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
+import { rumoursOf, startRumourUi } from '@game/rumours/rumours';
 import {
   ContainerWatch,
   hasContainers,
@@ -2373,6 +2374,22 @@ function startRenderer(
         });
         afterStep.push(() => {
           reader.afterStep();
+        });
+        // Rumours (mw-e22.11): a teller's `rumor.told` records the rumour, its target becomes a lead,
+        // visiting the target resolves it. No UI opens; #app[data-rumours] (JSON: heard, leads,
+        // investigated, debunked) is the e2e's readout.
+        const rumourHero = player.entity;
+        const rumours = startRumourUi({
+          world,
+          rumours: rumoursOf(content),
+          quests: gameLogic.quests,
+          player: () => rumourHero,
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          rumours.afterStep();
         });
         // The epilogue slideshow (mw-e39.40): the ending card and the slides of the epilogue quest,
         // once the main quest resolves. #app[data-epilogue] (JSON: open, slide, preview, ended) is the
