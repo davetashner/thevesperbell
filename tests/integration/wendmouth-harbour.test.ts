@@ -156,7 +156,6 @@ describe('Wendmouth named places (mw-e40.1 AC-1)', () => {
       .filter((d) => d.door?.lock !== undefined)
       .map((d) => [d.id, d.door?.lock?.id]);
     expect(locked).toEqual([
-      ['door-exit-towpath', 'road-not-open'],
       ['door-strongroom', 'strongroom-locked'],
       ['door-bay-nine', 'bay-nine-seal'],
       ['door-silver-quay-gate', 'silver-quay-sealed'],
@@ -192,18 +191,18 @@ describe('Wendmouth is optional (mw-e40.1 AC-2)', () => {
     expect(world.mainQuest.filter((id) => wendmouth.has(id))).toEqual([]);
   });
 
-  it('AC-2: no edge of the main quest runs to a Wendmouth node: the river legs stay planned and no scene links here yet', () => {
+  it('AC-2: the barge and Kestrel Lock legs stay planned; the only scene link is the riverbank stopgap, and the main quest never uses it (mw-e40.26)', () => {
     const towpath = world?.edges.find((e) => e.id === 'towpath-lock-wharf');
     const barge = world?.edges.find((e) => e.id === 'barge-lock-wharf');
-    expect(towpath?.transitions).toEqual([]);
-    expect(barge?.transitions).toEqual([]);
-    expect(scene.transitions).toEqual([]);
-    for (const other of content.all('scene')) {
-      expect(
-        other.transitions.filter((t) => t.scene.id === 'wendmouth-harbour'),
-        other.id,
-      ).toEqual([]);
-    }
+    expect(towpath?.transitions ?? []).toEqual([]);
+    expect(barge?.transitions ?? []).toEqual([]);
+    expect(scene.transitions.map((t) => t.scene.id)).toEqual(['under-the-bridge']);
+    const linking = content
+      .all('scene')
+      .flatMap((other) =>
+        other.transitions.filter((t) => t.scene.id === 'wendmouth-harbour').map(() => other.id),
+      );
+    expect(linking).toEqual(['under-the-bridge']);
   });
 });
 
