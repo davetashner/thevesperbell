@@ -694,7 +694,9 @@
       "yaw": 180,
       "tags": ["npc", "council"],
       "creature": "npc-vane",
-      "leash": { "radius": 2 }
+      "leash": {
+        "radius": 2
+      }
     },
     {
       "id": "market-green",
@@ -720,6 +722,34 @@
       "id": "glen-well-rung",
       "at": [14.0, 0.5, 47.0],
       "tags": ["prop", "well-rung"]
+    },
+    {
+      "id": "read-ink-prints-well",
+      "at": [14.0, 0.0, 44.0],
+      "tags": ["readable", "note-ink-prints-well"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Look at the ink on the well coping"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "read-ink-prints-stacks",
+      "at": [-41.0, 0.0, 68.0],
+      "tags": ["readable", "note-ink-prints-stacks"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Look at the ink footprints by the Stacks door"
+          }
+        ],
+        "radius": 1
+      }
     },
     {
       "id": "stall-1",
@@ -854,7 +884,9 @@
       "yaw": 90,
       "tags": ["npc", "shopkeeper"],
       "creature": "npc-mirela",
-      "leash": { "radius": 1.5 }
+      "leash": {
+        "radius": 1.5
+      }
     },
     {
       "id": "stacks-lean",
@@ -899,7 +931,9 @@
       "yaw": 180,
       "tags": ["npc", "watch"],
       "creature": "npc-hale",
-      "leash": { "radius": 2 }
+      "leash": {
+        "radius": 2
+      }
     },
     {
       "id": "door-schoolhouse",
