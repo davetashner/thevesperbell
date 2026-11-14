@@ -409,6 +409,19 @@
           "onFail": "no-coin"
         },
         {
+          "id": "harbour-news",
+          "text": "Any news from down the river, at Wendmouth?",
+          "when": {
+            "kind": "not",
+            "condition": {
+              "kind": "fact",
+              "fact": "wendmouth.visited"
+            }
+          },
+          "once": true,
+          "next": "harbour-1"
+        },
+        {
           "id": "swap-rumour",
           "text": "I've heard something you haven't.",
           "next": "swap-1"
@@ -466,6 +479,144 @@
           "data": {
             "rumor": 8,
             "source": "npc-dot"
+          }
+        }
+      ],
+      "next": "rumour-choice"
+    },
+    {
+      "id": "harbour-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Barge folk say Vane's crates go into some bay nine down at Wendmouth and customs never cracks a seal. Funny, that.",
+      "next": "harbour-13-fx"
+    },
+    {
+      "id": "harbour-13-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 13,
+            "source": "npc-dot",
+            "secondHand": true
+          }
+        }
+      ],
+      "next": "harbour-2"
+    },
+    {
+      "id": "harbour-2",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "A bargeman told me the harbour inspector reads every book she confiscates. Every one. Even the ones with kissing.",
+      "next": "harbour-14-fx"
+    },
+    {
+      "id": "harbour-14-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 14,
+            "source": "npc-dot",
+            "secondHand": true
+          }
+        }
+      ],
+      "next": "harbour-3"
+    },
+    {
+      "id": "harbour-3",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Down at Wendmouth they say Nell's cellar goes further than her cellar. I never asked what that means.",
+      "next": "harbour-15-fx"
+    },
+    {
+      "id": "harbour-15-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 15,
+            "source": "npc-dot",
+            "secondHand": true
+          }
+        }
+      ],
+      "next": "harbour-4"
+    },
+    {
+      "id": "harbour-4",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "The bargemen say the river's been humming up by the Weeping Adit. Fish won't bite there.",
+      "next": "harbour-16-fx"
+    },
+    {
+      "id": "harbour-16-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 16,
+            "source": "npc-dot",
+            "secondHand": true
+          }
+        }
+      ],
+      "next": "harbour-5"
+    },
+    {
+      "id": "harbour-5",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Lock-keepers say the Gilded Tern pays double for crew who don't ask what's in the hold. Don't you go signing on.",
+      "next": "harbour-17-fx"
+    },
+    {
+      "id": "harbour-17-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 17,
+            "source": "npc-dot",
+            "secondHand": true
+          }
+        }
+      ],
+      "next": "harbour-6"
+    },
+    {
+      "id": "harbour-6",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Wendmouth lot swear there's a sea serpent under the breakwater. Big as a barge. Eyes like lanterns. I'd not go swimming.",
+      "next": "harbour-18-fx"
+    },
+    {
+      "id": "harbour-18-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "emit",
+          "event": "rumor.told",
+          "data": {
+            "rumor": 18,
+            "source": "npc-dot",
+            "secondHand": true
           }
         }
       ],

@@ -1885,6 +1885,134 @@
       "tags": ["lore", "customs"]
     },
     {
+      "id": "read-manifest-clerk-desk",
+      "at": [-21.0, 0.75, 58.5],
+      "tags": ["readable", "note-cargo-manifest"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the customs copy of the cargo manifest"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-manifest-crate-seal",
+      "at": [62.0, 1.0, 41.0],
+      "tags": ["readable", "note-cargo-manifest"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the manifest on the crate seal"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-manifest-quell-desk",
+      "at": [46.0, 0.75, 64.5],
+      "yaw": 180,
+      "tags": ["readable", "note-cargo-manifest-quell-copy"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the manifest in the drawer"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-foundry-invoice",
+      "at": [44.5, 0.75, 64.5],
+      "yaw": 180,
+      "tags": ["readable", "note-foundry-invoice"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the foundry invoice"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-sealed-letter-line",
+      "at": [62.0, 0.75, 40.5],
+      "tags": ["readable", "note-sealed-letter-line"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the line showing through the sealed letter"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-notice-stone-wharf",
+      "at": [-8.0, 1.25, 84.0],
+      "tags": ["readable", "note-lantern-court-notice"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the Lantern Court port notice"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-notice-customs-house",
+      "at": [-23.0, 1.25, 69.5],
+      "tags": ["readable", "note-lantern-court-notice"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the Lantern Court port notice"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-tidefair-board",
+      "at": [4.0, 1.25, 84.0],
+      "tags": ["readable", "note-tidefair-board"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the Tidefair board"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
+      "id": "read-impound-ledger",
+      "at": [-11.0, 0.75, 44.5],
+      "tags": ["readable", "note-impound-ledger"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the impound ledger"
+          }
+        ],
+        "radius": 0.6
+      }
+    },
+    {
       "id": "strongroom",
       "at": [-34.0, 0.0, 43.0],
       "tags": ["marker", "strongroom", "sealed"]
@@ -2101,7 +2229,16 @@
       "id": "toll-board",
       "at": [-79.0, 1.25, 12.5],
       "yaw": 180,
-      "tags": ["sign", "toll"]
+      "tags": ["sign", "toll", "readable", "inscription-kestrel-lock-toll-board"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the toll board"
+          }
+        ],
+        "radius": 1
+      }
     },
     {
       "id": "npc-mags",
