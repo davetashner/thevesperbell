@@ -111,6 +111,7 @@ describe('opening, first night, barge and ending text', () => {
     expect(all.map((n) => n.kind).sort()).toEqual([
       'arrival',
       'barge',
+      'class-beat',
       'ending',
       'epilogue',
       'first-night',
