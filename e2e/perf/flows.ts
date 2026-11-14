@@ -164,6 +164,9 @@ export async function measureFrontDoor(page: Page): Promise<number> {
   await page.locator('[data-screen="class-select"] [data-testid="class-confirm"]').click();
   const app = page.locator('#app');
   await expect(app).toHaveAttribute('data-player-class', 'knight', { timeout: 60_000 });
+  // The class arrival narration (mw-aw1y) opens after the class is applied; skip it.
+  await expect(page.locator('[data-screen="class-beat"]')).toBeVisible({ timeout: 60_000 });
+  await page.keyboard.press('Escape');
   await expect(page.locator('[data-screen]')).toHaveCount(0, { timeout: 60_000 });
   const frontDoor = await data<{ titleMs?: number; newGameMs?: number; playableMs?: number }>(
     page,

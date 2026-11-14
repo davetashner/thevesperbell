@@ -39,6 +39,12 @@ export type EpilogueEnd = 'finished' | 'skipped';
 export interface EpilogueSlideshowOptions {
   /** The slides in order, at least one. */
   readonly slides: readonly EpilogueSlideModel[];
+  /** `data-screen` of the window; the epilogue's by default (the class-arrival narration passes its own). */
+  readonly screenId?: string;
+  /** The window's accessible label; "Epilogue" by default. */
+  readonly label?: string;
+  /** What one slide is called in the counter: "Slide 2 of 5" by default, "Page 2 of 5" for narration. */
+  readonly unit?: string;
   /** A slide came up (index from 0), including the first. */
   readonly onSlide?: (slide: EpilogueSlideModel, index: number) => void;
   /** The slideshow ended, once. */
@@ -53,9 +59,9 @@ export interface EpilogueSlideshow {
   skip(): void;
 }
 
-/** "Slide 2 of 5". */
-export const slideLabel = (index: number, total: number): string =>
-  `Slide ${String(index + 1)} of ${String(total)}`;
+/** "Slide 2 of 5" (or "Page 2 of 5" for another unit). */
+export const slideLabel = (index: number, total: number, unit = 'Slide'): string =>
+  `${unit} ${String(index + 1)} of ${String(total)}`;
 
 /** Opens the slideshow on `ui`. */
 export function openEpilogueSlideshow(
@@ -110,7 +116,7 @@ export function openEpilogueSlideshow(
       body.replaceChildren(
         ...slide.text.split(/\n\s*\n/).map((paragraph) => h('p', { text: paragraph.trim() })),
       );
-      counter.textContent = slideLabel(index, slides.length);
+      counter.textContent = slideLabel(index, slides.length, options.unit);
       next.textContent = index === last ? EPILOGUE_TEXT.finish : EPILOGUE_TEXT.next;
       options.onSlide?.(slide, index);
     }
@@ -136,8 +142,8 @@ export function openEpilogueSlideshow(
   }
 
   const screen = ui.push({
-    id: EPILOGUE_SCREEN,
-    label: 'Epilogue',
+    id: options.screenId ?? EPILOGUE_SCREEN,
+    label: options.label ?? 'Epilogue',
     content,
     pausesSim: true,
     onIntent: (intent) => {
