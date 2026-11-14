@@ -9,5 +9,7 @@
     {
       "text": "Silver gallery 4: yield short again. The Measure will not be met by midwinter at this rate.\n\nHorn-coin, 12 pcs, to Mr. S— of the city. No questions. Below the Line, gallery 9: carvings. Men uneasy. Double wages.\n\nLamp oil, 40 flasks. Rope, 200 fathoms. Wages, paid. Rowan Tate and Harlan Burr both refused the lower shift; not asked a second time.\n\nFactor's letter received. Answered. Not answered well."
     }
-  ]
+  ],
+  "evidence": ["evidence.vane-ledger"],
+  "emits": ["vane-ledger-read"]
 }

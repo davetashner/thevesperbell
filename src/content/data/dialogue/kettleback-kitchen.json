@@ -594,7 +594,14 @@
             "op": "eq",
             "value": "crated"
           },
-          "next": "duggan-1"
+          "next": "duggan-1",
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "framed.crate-found",
+              "value": true
+            }
+          ]
         },
         {
           "id": "ask-trade",
@@ -832,14 +839,36 @@
           "id": "duggan-kit",
           "text": "I'll take his planting kit as proof.",
           "when": {
-            "kind": "not",
-            "condition": {
-              "kind": "fact",
-              "fact": "duggan.kit-taken"
-            }
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "duggan.kit-taken"
+                }
+              },
+              {
+                "kind": "factCmp",
+                "fact": "duggan.crate",
+                "op": "eq",
+                "value": "crated"
+              }
+            ]
           },
           "once": true,
           "next": "duggan-kit-1"
+        },
+        {
+          "id": "duggan-force",
+          "text": "Open the crate. Now. Or I open it myself.",
+          "when": {
+            "kind": "factCmp",
+            "fact": "duggan.crate",
+            "op": "eq",
+            "value": "crated"
+          },
+          "next": "duggan-force-1"
         },
         {
           "id": "duggan-back",
@@ -897,6 +926,18 @@
       "kind": "line",
       "speaker": "kettleback",
       "text": "Testify. Stand in a room full of humans and say it was Vane. Hm. I'd pay to see that. Fine. Out he goes. But if the town doesn't listen, sweetling, I'll know whose fault it was, and I'm very good at remembering faults.",
+      "next": "duggan-ok-fx"
+    },
+    {
+      "id": "duggan-ok-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "framed.method",
+          "value": "persuade"
+        }
+      ],
       "next": "duggan-free"
     },
     {
@@ -926,6 +967,11 @@
           "kind": "disposition",
           "npc": "npc-kettleback",
           "delta": 5
+        },
+        {
+          "kind": "setFact",
+          "fact": "framed.method",
+          "value": "trade"
         }
       ],
       "next": "duggan-free"
@@ -968,9 +1014,73 @@
           "kind": "setFact",
           "fact": "duggan.kit-taken",
           "value": true
+        },
+        {
+          "kind": "setFact",
+          "fact": "framed.method",
+          "value": "kit"
         }
       ],
       "next": "duggan-menu"
+    },
+    {
+      "id": "duggan-force-1",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Oh, sweetling. In my kitchen. With the young ones watching. I do admire the nerve and I'll remember the face.",
+      "next": "duggan-force-2"
+    },
+    {
+      "id": "duggan-force-2",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "It is not a fight, exactly. It is a great many small green people finding out they are not as brave as they thought, and one very large crate being dragged out of the camp by its handles.",
+      "next": "duggan-force-2-b"
+    },
+    {
+      "id": "duggan-force-2-b",
+      "kind": "line",
+      "speaker": "narrator",
+      "text": "Behind you Mother Kettleback is saying a long list of names, and one of them is yours.",
+      "next": "duggan-force-fx"
+    },
+    {
+      "id": "duggan-force-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "framed.method",
+          "value": "force"
+        },
+        {
+          "kind": "setFact",
+          "fact": "duggan.crate",
+          "value": "freed"
+        },
+        {
+          "kind": "setFact",
+          "fact": "goblins.standing",
+          "value": "hostile"
+        },
+        {
+          "kind": "disposition",
+          "npc": "npc-kettleback",
+          "delta": -10
+        },
+        {
+          "kind": "emit",
+          "event": "duggan.released"
+        }
+      ],
+      "next": "duggan-force-3"
+    },
+    {
+      "id": "duggan-force-3",
+      "kind": "line",
+      "speaker": "kettleback",
+      "text": "Out. Take your talking box and out. Don't come back to my kitchen until you can say sorry in a voice I believe.",
+      "next": "hub"
     },
     {
       "id": "trade-1",

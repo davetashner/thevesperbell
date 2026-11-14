@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "clatter-garden",
-  "notes": "Clatter (Brother Anselm Hobb, bible 5.9) in his mushroom garden among the Forgotten (the Ossuary, E26: unplaced for now; reachable in the debug conversation room). Courteous, apologetic, tends pale mushrooms like a garden; the bones 'have opinions'. Memory stages follow the numeric fact clatter.memories (0 to 3 pieces of The Name on the Bones recovered, written by the quest): every stage has its own greeting and its own set of remembered fragments (ask-memory). If the song swells before he is restored the quest sets clatter.song-swelled and drops clatter.memories to 0: he notices something is missing (lost-1) and the dialogue clears the flag. While clatter.hostile (the Forgotten's fighting reflex has him, until the player hums the hymn or lowers a weapon) he only apologises (barks). Once clatter.restored he asks to rest or to join; either is right (bible 6.1). Class branches: sorcerer reads his memories (a gamble: success skips a piece, failure costs one, once only), thief returns a thing he does not know he lost, knight stands guard (and gives the rites if he asks for rest), archer keeps watch. Not placed yet: the Ossuary scenes belong to E26.",
+  "notes": "Clatter (Brother Anselm Hobb, bible 5.9) in his mushroom garden among the Forgotten (the Ossuary, E26: unplaced for now; reachable in the debug conversation room). Courteous, apologetic, tends pale mushrooms like a garden; the bones 'have opinions'. Memory stages follow the numeric fact clatter.memories (0 to 3 pieces of The Name on the Bones recovered, written by the quest): every stage has its own greeting and its own set of remembered fragments (ask-memory). If the song swells before he is restored the quest sets clatter.song-swelled and drops clatter.memories to 0: he notices something is missing (lost-1) and the dialogue clears the flag. While clatter.hostile (the Forgotten's fighting reflex has him, until the player hums the hymn or lowers a weapon) he only apologises (barks). Once clatter.restored he asks to rest or to join; either is right (bible 6.1). Class branches: sorcerer reads his memories (a gamble: success skips a piece, failure costs one, once only), thief returns a thing he does not know he lost, knight stands guard (and gives the rites if he asks for rest), archer keeps watch. Not placed yet: the Ossuary scenes belong to E26. mw-e39.11 (The Name on the Bones): meeting him sets clatter.met (starts the quest). Three pieces are handed to him here, each its own hub option: the psalter (evidence.clatter-psalter), the blooming pear tree (bones.pear-bloomed, Juniper) and the letter from the Pell Bible (hollis.bible-lent); each sets its bones.*-given fact and moves clatter.memories up one through `bump`. When memories reach clatter.memories.max (3, or 2 after a failed reading), the name moment plays, and the quest sets clatter.restored. A failed sorcerer reading drops clatter.memories.max to 2 for good (read-lost) as well as costing the memory he held; a successful one sets clatter.read-success. The knight's rites set clatter.rites.",
   "speakers": [
     {
       "id": "clatter",
@@ -276,6 +276,18 @@
       "kind": "line",
       "speaker": "clatter",
       "text": "The goblins call me Clatter. I assume that's because of the clatter. I can't think what else it would be for.",
+      "next": "meet-fx"
+    },
+    {
+      "id": "meet-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.met",
+          "value": true
+        }
+      ],
       "next": "hub"
     },
     {
@@ -310,6 +322,72 @@
       "id": "hub",
       "kind": "choice",
       "options": [
+        {
+          "id": "give-psalter",
+          "text": "I found a psalter among the Forgotten. 'A. Hobb' on the flyleaf.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "evidence.clatter-psalter"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "bones.psalter-given"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "psalter-1"
+        },
+        {
+          "id": "give-pear",
+          "text": "The dead pear tree in the priory garden has bloomed.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "bones.pear-bloomed"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "bones.pear-given"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "pear-1"
+        },
+        {
+          "id": "give-letter",
+          "text": "I have a letter. A Brother Anselm, to his sister. From the Pell family Bible.",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "hollis.bible-lent"
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "bones.letter-given"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "letter-1"
+        },
         {
           "id": "ask-memory",
           "text": "What do you remember?",
@@ -664,9 +742,14 @@
           "kind": "setFact",
           "fact": "clatter.memories",
           "value": 1
+        },
+        {
+          "kind": "setFact",
+          "fact": "clatter.read-success",
+          "value": true
         }
       ],
-      "next": "hub"
+      "next": "bump-done"
     },
     {
       "id": "read-up-2",
@@ -676,9 +759,14 @@
           "kind": "setFact",
           "fact": "clatter.memories",
           "value": 2
+        },
+        {
+          "kind": "setFact",
+          "fact": "clatter.read-success",
+          "value": true
         }
       ],
-      "next": "hub"
+      "next": "bump-done"
     },
     {
       "id": "read-up-3",
@@ -688,16 +776,21 @@
           "kind": "setFact",
           "fact": "clatter.memories",
           "value": 3
+        },
+        {
+          "kind": "setFact",
+          "fact": "clatter.read-success",
+          "value": true
         }
       ],
-      "next": "hub"
+      "next": "bump-done"
     },
     {
       "id": "read-bad",
       "kind": "line",
       "speaker": "clatter",
       "text": "Ah. Ow. Not you, me. Something went, with a noise like a spoon in a drain. It's all right. It's quite all right. I'm sure it was a good one.",
-      "next": "read-down"
+      "next": "read-lost"
     },
     {
       "id": "read-down",
@@ -883,6 +976,18 @@
       "kind": "line",
       "speaker": "clatter",
       "text": "Thank you, Sir Knight. It's a very good voice for it. Rather a lot like a gate, actually.",
+      "next": "rest-knight-fx"
+    },
+    {
+      "id": "rest-knight-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.rites",
+          "value": true
+        }
+      ],
       "next": "rest-fx"
     },
     {
@@ -907,6 +1012,216 @@
         }
       ],
       "end": true
+    },
+    {
+      "id": "psalter-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Oh. Oh, that's. The gnaw is Mortimer's, no, that's not right, Mortimer's a cat, I don't. That's my hand. That's my writing. A. H. Hobb. His. 'Do not lend.' I wrote that. I wrote it for Corvin. He was very bad about giving things back.",
+      "next": "psalter-1b"
+    },
+    {
+      "id": "psalter-1b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Corvin. There's a Corvin. I had a friend and he was afraid of the quiet. Oh, dear. Thank you. I'd have been very upset to find that out later.",
+      "next": "psalter-fx"
+    },
+    {
+      "id": "psalter-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "bones.psalter-given",
+          "value": true
+        }
+      ],
+      "next": "bump"
+    },
+    {
+      "id": "pear-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Bloomed? Truly? The one by the wall, with the crooked branch like an elbow? Did it smell? Pears smell of... of rain and sugar and a little of the barn.",
+      "next": "pear-1b"
+    },
+    {
+      "id": "pear-1b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "I used to talk to it. Not to be silly. It's only that someone had to. It never answered, but it kept every word, I think, the way a tree keeps weather. Thank you. Thank you for the tree.",
+      "next": "pear-fx"
+    },
+    {
+      "id": "pear-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "bones.pear-given",
+          "value": true
+        }
+      ],
+      "next": "bump"
+    },
+    {
+      "id": "letter-1",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "A letter. To my sister? She had a... She laughed like a gate. 'Dear Amabel. I am well. The priory is cold, and I have found a man here who is afraid of silence, and I am teaching him to like gardens.' ...Oh. That's me. That's me, isn't it?",
+      "next": "letter-1b"
+    },
+    {
+      "id": "letter-1b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "'Tell Hollis's grandmother the pears are for her.' I know a Hollis. Hollis's gran, with the sharp elbows. We've the same elbows, her and I. Amabel. Amabel Hobb. Thank you for bringing her. I'm so sorry I forgot her.",
+      "next": "letter-fx"
+    },
+    {
+      "id": "letter-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "bones.letter-given",
+          "value": true
+        }
+      ],
+      "next": "bump"
+    },
+    {
+      "id": "bump",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 0
+          },
+          "next": "bump-0"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 1
+          },
+          "next": "bump-1"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "eq",
+            "value": 2
+          },
+          "next": "bump-2"
+        }
+      ],
+      "else": "bump-done"
+    },
+    {
+      "id": "bump-0",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 1
+        }
+      ],
+      "next": "bump-done"
+    },
+    {
+      "id": "bump-1",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 2
+        }
+      ],
+      "next": "bump-done"
+    },
+    {
+      "id": "bump-2",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories",
+          "value": 3
+        }
+      ],
+      "next": "bump-done"
+    },
+    {
+      "id": "bump-done",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "clatter.memories",
+            "op": "gte",
+            "value": 3
+          },
+          "next": "name-moment"
+        },
+        {
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "clatter.memories.max",
+                "op": "eq",
+                "value": 2
+              },
+              {
+                "kind": "factCmp",
+                "fact": "clatter.memories",
+                "op": "gte",
+                "value": 2
+              }
+            ]
+          },
+          "next": "name-moment"
+        }
+      ],
+      "else": "hub"
+    },
+    {
+      "id": "name-moment",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "...Anselm. Anselm Hobb. Brother Anselm Hobb, who tended the pears. Oh. Oh, it fits. It fits like a glove, if I had hands to... I have hands. Look! I have my name!",
+      "next": "name-moment-b"
+    },
+    {
+      "id": "name-moment-b",
+      "kind": "line",
+      "speaker": "clatter",
+      "text": "Sorry. Sorry. Give me a moment. I've a great deal to be sorry for and a great deal more to be glad of, and they've started in at once. Come and find me when I've sat down.",
+      "end": true
+    },
+    {
+      "id": "read-lost",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "clatter.memories.max",
+          "value": 2
+        }
+      ],
+      "next": "read-down"
     }
   ]
 }

@@ -444,6 +444,27 @@
           "onFail": "no-coin"
         },
         {
+          "id": "ask-mooring",
+          "text": "What do they say about the old watchtower up the Briarwood road?",
+          "once": true,
+          "effects": [
+            {
+              "kind": "setFact",
+              "fact": "watch.told",
+              "value": true
+            },
+            {
+              "kind": "emit",
+              "event": "rumor.told",
+              "data": {
+                "rumor": 2,
+                "source": "npc-dot"
+              }
+            }
+          ],
+          "next": "mooring-1"
+        },
+        {
           "id": "harbour-news",
           "text": "Any news from down the river, at Wendmouth?",
           "when": {
@@ -1190,6 +1211,20 @@
       "speaker": "dot",
       "text": "Said what, love? I've not heard a thing. I never do. It's a gift.",
       "next": "hub"
+    },
+    {
+      "id": "mooring-1",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "Mooring's Watch? Old Mooring never left his tower, love. Some say he's still up there, keeping watch. I say it's his armour, and it's very well brought up.",
+      "next": "mooring-1-b"
+    },
+    {
+      "id": "mooring-1-b",
+      "kind": "line",
+      "speaker": "dot",
+      "text": "It'll stand there till the wall falls over. Take the right word if you go, or a very good excuse.",
+      "next": "rumour-choice"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "vane-bounty",
-  "notes": "Harrow Vane (story bible 5.3), the mine owner: charming, generous in public, frightened of being the Vane who lost the warrant. He is hedged, not a villain: he pays the families of the missing and says so. Voice: long, reasonable sentences that never quite say the thing. OUTCOME TABLE (mw-e39.6 AC-2). The confrontation is the option `confront` (shown locked until the player holds proof). Facts: L = vane.ledger.obtained (his ledger of horn-coin sales), T = duggan.testimony (Duggan Marl will testify). Outcome options and the vane.fate they set: confront-expose = exposed, confront-confess = confessed, confront-bribe = bribed-player, confront-flee = fled. L=no,T=no: none (he denies; `confront` stays locked). L=yes,T=no: confesses (it is his own book), bribes. L=no,T=yes: bribes, flees (he hears Duggan has talked and has a coach waiting). L=yes,T=yes: exposed, confesses, bribes, flees. Exposing him needs both the ledger and the witness because neither alone would hold before the Captain and the council. Once vane.fate is set he only speaks the aftermath entry for it. The quest runtime (mw-e39.4) owns what else changes (bounty paid to the Pells, bell repair funded, Vane House shut). mw-e39.22 (Contraband Pages): ask-writ sells a council chair's writ for a hundred crowns (writ.source vane) while his fate is unexposed.",
+  "notes": "Harrow Vane (story bible 5.3), the mine owner: charming, generous in public, frightened of being the Vane who lost the warrant. He is hedged, not a villain: he pays the families of the missing and says so. Voice: long, reasonable sentences that never quite say the thing. OUTCOME TABLE (mw-e39.6 AC-2). The confrontation is the option `confront` (shown locked until the player holds proof). Facts: L = vane.ledger.obtained (his ledger of horn-coin sales), T = duggan.testimony (Duggan Marl will testify). Outcome options and the vane.fate they set: confront-expose = exposed, confront-confess = confessed, confront-bribe = bribed-player, confront-flee = fled. L=no,T=no: none (he denies; `confront` stays locked). L=yes,T=no: confesses (it is his own book), bribes. L=no,T=yes: bribes, flees (he hears Duggan has talked and has a coach waiting). L=yes,T=yes: exposed, confesses, bribes, flees. Exposing him needs both the ledger and the witness because neither alone would hold before the Captain and the council. Once vane.fate is set he only speaks the aftermath entry for it. The quest runtime (mw-e39.4) owns what else changes (bounty paid to the Pells, bell repair funded, Vane House shut). mw-e39.22 (Contraband Pages): ask-writ sells a council chair's writ for a hundred crowns (writ.source vane) while his fate is unexposed. mw-e39.11 (Framed in Brass): T also holds when the player took Duggan's planting kit (duggan.kit-taken): the hammer, punch and stamp are proof in their own right (bible 6.1 'leave him and take his planting kit as proof').",
   "speakers": [
     {
       "id": "vane",
@@ -263,8 +263,17 @@
                 "fact": "vane.ledger.obtained"
               },
               {
-                "kind": "fact",
-                "fact": "duggan.testimony"
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "duggan.testimony"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "duggan.kit-taken"
+                  }
+                ]
               }
             ]
           },
@@ -414,8 +423,17 @@
                 "fact": "vane.ledger.obtained"
               },
               {
-                "kind": "fact",
-                "fact": "duggan.testimony"
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "duggan.testimony"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "duggan.kit-taken"
+                  }
+                ]
               }
             ]
           },
@@ -441,8 +459,17 @@
                 "fact": "vane.ledger.obtained"
               },
               {
-                "kind": "fact",
-                "fact": "duggan.testimony"
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "duggan.testimony"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "duggan.kit-taken"
+                  }
+                ]
               }
             ]
           },
@@ -452,8 +479,17 @@
           "id": "confront-flee",
           "text": "Your foreman is talking, Vane. Duggan has told me everything.",
           "when": {
-            "kind": "fact",
-            "fact": "duggan.testimony"
+            "kind": "any",
+            "of": [
+              {
+                "kind": "fact",
+                "fact": "duggan.testimony"
+              },
+              {
+                "kind": "fact",
+                "fact": "duggan.kit-taken"
+              }
+            ]
           },
           "next": "flee-effects"
         },

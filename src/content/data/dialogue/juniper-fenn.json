@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "juniper-fenn",
-  "notes": "Juniper Fenn (bible 5.6), fletcher and herbalist, laconic, sunburnt, knows the Briarwood. Fears fire; the silence of the wolves frightens her more than howling. Secret: her sleep-draughts make the song easier to follow, and she has just worked it out (option ask-draughts). Class reactions per bible: archer peer, knight 'you'll clank', sorcerer trades herbs for Nature scraps, thief gets poisons only after a favour (the thief option checks disposition >= 10, which the draught talk can raise). Merchant greeting and farewell lines vary by class; the counter itself is the shop. mw-e39.10 (The Captain's Boots): ask-hale (she has seen the dust on her step, boots.noticed), bring-bellwort (two bellwort roots from her own counter become wakeful tea, juniper.tea-ready, handed to Hale in hale-watch) and ask-sleep-draught (the wrong draught: she warns if she has already confessed, then sells it, juniper.draught-sold).",
+  "notes": "Juniper Fenn (bible 5.6), fletcher and herbalist, laconic, sunburnt, knows the Briarwood. Fears fire; the silence of the wolves frightens her more than howling. Secret: her sleep-draughts make the song easier to follow, and she has just worked it out (option ask-draughts). Class reactions per bible: archer peer, knight 'you'll clank', sorcerer trades herbs for Nature scraps, thief gets poisons only after a favour (the thief option checks disposition >= 10, which the draught talk can raise). Merchant greeting and farewell lines vary by class; the counter itself is the shop. mw-e39.10 (The Captain's Boots): ask-hale (she has seen the dust on her step, boots.noticed), bring-bellwort (two bellwort roots from her own counter become wakeful tea, juniper.tea-ready, handed to Hale in hale-watch) and ask-sleep-draught (the wrong draught: she warns if she has already confessed, then sells it, juniper.draught-sold). mw-e39.11 (The Name on the Bones): once the player knows of Clatter's pear tree, ask-pear has her graft it so it blooms once (bones.pear-bloomed). The placed tree and its bloom are E29.",
   "speakers": [
     {
       "id": "juniper",
@@ -120,6 +120,37 @@
           "text": "Your sleep-draughts. Half the town buys them.",
           "once": true,
           "next": "draughts-1"
+        },
+        {
+          "id": "ask-pear",
+          "text": "There's a dead pear tree in the priory garden. Could it bloom, once?",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "fact",
+                    "fact": "clatter.met"
+                  },
+                  {
+                    "kind": "fact",
+                    "fact": "evidence.clatter-psalter"
+                  }
+                ]
+              },
+              {
+                "kind": "not",
+                "condition": {
+                  "kind": "fact",
+                  "fact": "bones.pear-bloomed"
+                }
+              }
+            ]
+          },
+          "once": true,
+          "next": "pear-1"
         },
         {
           "id": "trail-archer",
@@ -596,6 +627,36 @@
       "kind": "line",
       "speaker": "juniper",
       "text": "Good. I'm glad. Don't tell me I'm sensible.",
+      "next": "hub"
+    },
+    {
+      "id": "pear-1",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "Dead pear tree. Forty years, give or take. Roots are not dead, though. Wood remembers. Graft from a live pear, a cutting from the Hobb orchard down by the quay, and a night's patience.",
+      "next": "pear-2"
+    },
+    {
+      "id": "pear-2",
+      "kind": "line",
+      "speaker": "juniper",
+      "text": "One bloom. One night. Don't expect fruit. It's for somebody who needs to see it, isn't it? Go on. I'll do it at dusk.",
+      "next": "pear-fx"
+    },
+    {
+      "id": "pear-fx",
+      "kind": "effect",
+      "effects": [
+        {
+          "kind": "setFact",
+          "fact": "bones.pear-bloomed",
+          "value": true
+        },
+        {
+          "kind": "emit",
+          "event": "pear-tree-bloomed"
+        }
+      ],
       "next": "hub"
     }
   ]
