@@ -840,6 +840,15 @@ ${tokens}
 .vb-reader-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .vb-reader-hint { font-size: ${size(0.875)}; }
 .vb-reader-actions { flex-wrap: wrap; }
+.vb-screen[data-screen="epilogue"] { background: ${DIALOGUE_HIGH_CONTRAST_PLATE}; }
+.vb-panel.vb-epilogue { width: min(36em, 100%); text-align: center; background: transparent; }
+.vb-epilogue h1 { overflow-wrap: anywhere; margin: 0; }
+.vb-epilogue h1[hidden], .vb-epilogue-counter[hidden] { display: none; }
+.vb-epilogue-counter, .vb-epilogue-hint { margin: 0; color: var(--ui-color-text-muted); }
+.vb-epilogue-body { line-height: 1.6; font-size: ${size(1.25)}; }
+.vb-epilogue-body p { margin: 0; overflow-wrap: anywhere; }
+.vb-epilogue-hint { font-size: ${size(0.875)}; }
+.vb-epilogue-actions { flex-wrap: wrap; justify-content: center; }
 .vb-panel.vb-shop { width: min(40em, 100%); container-type: inline-size; }
 .vb-shop h1 { overflow-wrap: anywhere; margin: 0; }
 .vb-shop-header { display: flex; align-items: center; gap: var(--ui-space-3); }
