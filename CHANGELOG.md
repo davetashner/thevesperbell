@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The folded note from "a friend below" now waits on the floor of your room at the Sleeping Ox, and a second one is pinned by the Deepworks mine gate; reading either counts toward the main quest (mw-nro9).
 - Notes, notices and inscriptions placed in the world can now be read: Interact on one opens a reader window with its title and text (several pages turn with the arrow keys), Esc or Interact closes it, and the first read of a text records the evidence it proves so characters and quests can react to it (mw-kf4c).
 - Wendmouth's harbour texts now have places to be read (the customs house, bay nine, the Stone Wharf, Cray's desk and the Kestrel Lock toll board; the reader itself is still to come), Nell tells the rumour about her cellar, and Dot repeats the six harbour rumours second-hand until you have been to Wendmouth (mw-18w, mw-ily9).
 - Two Wendmouth side quests, "The Tidefair" (four contest events, a class-highlighted event for each of knight, archer, sorcerer and thief, win, cheat, throw the match or lose gracefully) and "Contraband Pages" (get Mirela's impounded books out of Inspector Cray's customs house by evidence, romance novel, Vane's writ, a forged seal, the strongroom or an inspector's coat), with new talk options for Oona, Nell, Cray, Mirela, Vane and Tereza (mw-e39.22).

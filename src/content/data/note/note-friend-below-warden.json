@@ -5,6 +5,7 @@
   "author": "A friend below",
   "notes": "Bible 4.1 beat 10 (the Warden): the abbot's version of Horn, true as far as it goes. Re-read: 'in the way', and how much he wants Horn moved.",
   "locations": ["place-knot"],
+  "emits": ["friend-note-found"],
   "pages": [
     {
       "text": "You will meet the Warden soon. He is very strong and very old, and he will not let you pass, for he does not know what you are. He will stand there until he is told otherwise, and no one has told him in a long time.\n\nI should not like you to be harmed by his sorrow. If it comes to it, remember that he is old, and that a kindness done quickly is still a kindness.\n\n— A friend below."

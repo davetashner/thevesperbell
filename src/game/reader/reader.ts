@@ -9,7 +9,8 @@
 //   save keeps it) writes the text's `evidence.*` facts and publishes two logic events a quest
 //   objective of kind `event` can bind with no new code: `readable.read` (data `text`, `kind`) for
 //   "any text", and an event named by the text id itself, e.g. `note-friend-below-door`, for "this
-//   text". Later reads open the window and change nothing.
+//   text". A text's optional `emits` (content) names further events published the same way, e.g.
+//   `friend-note-found` for the friend-below notes. Later reads open the window and change nothing.
 // - `startReaderUi` wires it into a running game and publishes `#app[data-reader]` (JSON: whether
 //   the reader is open, the text, and the texts read so far) for the e2e.
 
@@ -44,6 +45,7 @@ export interface ReaderText {
     readonly author?: string | undefined;
     readonly pages: readonly { readonly text: string }[];
     readonly evidence?: readonly string[] | undefined;
+    readonly emits?: readonly string[] | undefined;
   };
 }
 
@@ -126,6 +128,9 @@ export class ReaderController {
         data: { text: textId, kind: entry.kind },
       });
       world.events.emit(logicEmitted, { event: textId, data: { text: textId, kind: entry.kind } });
+      for (const event of text.emits ?? []) {
+        world.events.emit(logicEmitted, { event, data: { text: textId, kind: entry.kind } });
+      }
     }
     this.#report();
     return true;

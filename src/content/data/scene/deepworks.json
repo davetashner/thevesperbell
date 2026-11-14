@@ -1151,6 +1151,20 @@
       }
     },
     {
+      "id": "read-friend-note-gate",
+      "at": [104, 0, 66],
+      "tags": ["readable", "note-friend-below-deepworks"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the note pinned to the gate post"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
       "id": "mine-gate",
       "at": [100, 0, 70],
       "tags": ["node", "gate"]

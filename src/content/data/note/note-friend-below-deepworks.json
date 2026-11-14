@@ -5,6 +5,7 @@
   "author": "A friend below",
   "notes": "Act I-II (bible 4.1 beats 5-6): genuinely useful advice on getting in and on the goblins. Re-read: he knows the mine from below and has no wish for anyone to stay out.",
   "locations": ["place-deepworks"],
+  "emits": ["friend-note-found"],
   "pages": [
     {
       "text": "The gate is sealed, but a sealed gate is only a door that has not yet been asked properly. There are other ways in; I have heard the river is one.\n\nThe small folk in the upper galleries are afraid, not cruel. They do not sleep, so they will not understand you if you do. Be patient with them. They have seen what carries the sleepers away, and they will tell you if you are kind.\n\n— A friend below."

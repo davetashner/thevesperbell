@@ -118,7 +118,11 @@ describe('reader (mw-kf4c)', () => {
     const t = setup();
     t.read(t.spawn(['readable', 'note-friend-below-door']));
     expect(t.sim.facts.get(readFactKey('note-friend-below-door'))).toBe(true);
-    expect(t.emitted.map((e) => e.event)).toEqual([READABLE_READ_EVENT, 'note-friend-below-door']);
+    expect(t.emitted.map((e) => e.event)).toEqual([
+      READABLE_READ_EVENT,
+      'note-friend-below-door',
+      'friend-note-found',
+    ]);
   });
 
   it('AC-2: reading again opens the window but writes and emits nothing', () => {
@@ -192,5 +196,26 @@ describe('reader (mw-kf4c)', () => {
   it('AC-3: a new game still declares no value but player.class', () => {
     const t = setup();
     expect(Object.keys(t.sim.facts.snapshot())).toEqual([]);
+  });
+
+  it("mw-nro9 AC-1: the first read publishes the text's emits events after the two standard ones, later reads do not", () => {
+    const t = setup();
+    const spawn = t.spawn(['readable', 'note-friend-below-door']);
+    t.read(spawn);
+    expect(t.emitted.map((e) => e.event)).toEqual([
+      READABLE_READ_EVENT,
+      'note-friend-below-door',
+      'friend-note-found',
+    ]);
+    expect(t.emitted[2]?.data).toEqual({ text: 'note-friend-below-door', kind: 'note' });
+    t.reader.controller.close();
+    t.read(spawn);
+    expect(t.emitted).toHaveLength(3);
+  });
+
+  it('mw-nro9 AC-1: a text without emits publishes only the two standard events', () => {
+    const t = setup();
+    t.read(t.spawn(MANIFEST));
+    expect(t.emitted.map((e) => e.event)).toEqual([READABLE_READ_EVENT, 'note-cargo-manifest']);
   });
 });

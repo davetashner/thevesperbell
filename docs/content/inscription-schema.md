@@ -15,4 +15,5 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `pages` | list of object (at least 1) | required | The text, in page order; a note or inscription is usually one page. |
 | `pages[].text` | string | required | The page as the reader shows it; plain text, paragraphs split by a blank line. |
 | `evidence` | list of string (at least 1) | — | Evidence tags (mw-e39.23): the `evidence.*` facts that holding this text proves. Quest and dialogue conditions read the fact; the text names it so the two stay together. |
+| `emits` | list of string (at least 1) | — | Logic events (kebab-case ids) the reader publishes the first time the text is read, besides `readable.read` and the event named by the text id. A quest objective of kind `event` binds one of these. |
 | `damaged` | boolean | `false` | True exactly when the text carries `[illegible]` or `[missing]` markers. |
