@@ -38,6 +38,7 @@ Defaults: `DEFAULT_BINDINGS` and `DEFAULT_PAD_BINDINGS`.
 | Previous / next spell | (wheel)                       | [ and ]                  |
 | Spell wheel (hold) | Guide (Xbox) / PS button         | Z (hold)                 |
 | Inventory        | View                               | I                        |
+| Journal          | (pause menu: Journal)              | J                        |
 | Drop item        | (inventory screen)                 | G                        |
 | Throw item       | (inventory screen)                 | T                        |
 | Pause            | Menu                               | Esc, P                   |

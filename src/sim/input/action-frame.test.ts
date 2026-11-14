@@ -47,6 +47,7 @@ describe('action registry', () => {
       'spellNext',
       'spellWheel',
       'inventory',
+      'journal',
       'drop',
       'throw',
       'pause',

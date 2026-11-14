@@ -100,6 +100,7 @@ import { ContestController } from '@game/contest/controller';
 import { contestsIn, installContests } from '@game/contest/install';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
+import { buildJournal, JournalController, journalSources } from '@game/journal/journal';
 import {
   ContainerWatch,
   hasContainers,
@@ -724,6 +725,8 @@ function startRenderer(
   // The Inventory action (I, View) opens and closes the inventory screen (mw-e17.10), once the world
   // has one: seen in gameplay frames while it is closed, and in the frames drained while it pauses.
   let inventoryUi: InventoryUi | undefined;
+  // The journal (mw-e23.6): the Journal action (J) toggles it, and the pause menu opens it.
+  let journalUi: JournalController | undefined;
   // The container window and pickup toasts (mw-e18.4), once the player exists.
   let containerUi: ContainerUi | undefined;
   // The pause menu (mw-e01.3), once the world has a player: the Pause action (Esc, P, Menu) opens it
@@ -734,12 +737,14 @@ function startRenderer(
     sampleCommands: (tick) => {
       const frames = sampler.sampleCommands(tick);
       if (frames.some((frame) => frame.inventory.pressed)) inventoryUi?.toggle();
+      if (frames.some((frame) => frame.journal.pressed)) journalUi?.toggle();
       if (frames.some((frame) => frame.pause.pressed)) pauseUi?.pausePressed();
       return frames;
     },
     drain: () => {
       const frame = sampler.sample();
       if (frame.inventory.pressed) inventoryUi?.toggle();
+      if (frame.journal.pressed) journalUi?.toggle();
       pauseUi?.drained(frame.pause.pressed);
     },
   });
@@ -3215,9 +3220,32 @@ function startRenderer(
     let inPlay = false;
     if (player !== undefined && areaId !== undefined) {
       const hero = player.entity;
+      // The journal (mw-e23.6): only on the player's key or the pause menu, never by itself, so
+      // debug scene boots stay clear. #app[data-journal] (open or closed) is the e2e's readout.
+      const questRuntime = gameLogic.quests;
+      const journal =
+        questRuntime === undefined
+          ? undefined
+          : new JournalController({
+              ui,
+              canOpen: () => inPlay && playerInput.enabled && !isPlayerDead(world, hero),
+              keys: () => sampler.bindings.journal,
+              model: () =>
+                buildJournal(journalSources(content, { quests: questRuntime, facts: world.facts })),
+              publish: (state) => {
+                root.dataset['journal'] = state;
+              },
+            });
+      journalUi = journal;
+      globalThis.window.addEventListener('keydown', (event) => {
+        if (journal?.keydown(event) === true) event.preventDefault();
+      });
       const pause = new PauseController({
         ui,
         canPause: () => inPlay && playerInput.enabled && !isPlayerDead(world, hero),
+        openJournal: () => {
+          journal?.open(undefined, true);
+        },
         saveBlocked: () => safety.active()[0]?.reason ?? null,
         unsavedProgress: () => progress.unsaved,
         pauseKeys: () => sampler.bindings.pause,
