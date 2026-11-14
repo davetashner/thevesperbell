@@ -98,6 +98,7 @@ import type { DialogueDef } from '@content/types/dialogue';
 import { startShopUi } from '@game/shop/shop-window';
 import { ContestController } from '@game/contest/controller';
 import { contestsIn, installContests } from '@game/contest/install';
+import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
 import {
   ContainerWatch,
@@ -1382,6 +1383,8 @@ function startRenderer(
     let deathBeat: DeathBeat | undefined;
     // The slice-complete card (mw-e01.18), opened the frame after slice.complete turns true.
     let sliceCard: SliceCompleteController | undefined;
+    // The epilogue slideshow (mw-e39.40): plays when the epilogue quest starts; the console previews it.
+    let epilogueUi: EpilogueUi | undefined;
     let captureAfterRender: ((capture: Promise<CapturedThumbnail>) => void) | undefined;
     // A save's thumbnail (mw-e30.11): the next drawn frame, or the placeholder when no frame comes
     // (a hidden tab). Manual saves and autosaves both take one.
@@ -2371,6 +2374,24 @@ function startRenderer(
         afterStep.push(() => {
           reader.afterStep();
         });
+        // The epilogue slideshow (mw-e39.40): the ending card and the slides of the epilogue quest,
+        // once the main quest resolves. #app[data-epilogue] (JSON: open, slide, preview, ended) is the
+        // e2e's readout.
+        if (gameLogic.quests !== undefined) {
+          const epilogue = startEpilogueUi({
+            ui,
+            world,
+            quests: gameLogic.quests,
+            content,
+            publish: (key, value) => {
+              root.dataset[key] = value;
+            },
+          });
+          epilogueUi = epilogue;
+          afterStep.push(() => {
+            epilogue.afterStep();
+          });
+        }
       }
       // Class selection (mw-e19.5): the chosen class's capabilities, kit and stats go onto the player
       // once its inventory exists, and the player then moves on the class's controller tuning. The
@@ -3386,12 +3407,14 @@ function startRenderer(
         import('@tools/ai-debug/start'),
         import('@tools/field-debug/start'),
         import('@tools/world-state/start'),
+        import('@tools/epilogue/commands'),
       ]).then(
         ([
           { startDebugConsole, unboundDebugSpawns },
           { startAiDebug },
           { startFieldDebug },
           { startWorldState },
+          { registerEpilogueCommands },
         ]) => {
           const bookmarks = new Map(
             (scenes.current?.layout.spawns ?? []).map(
@@ -3491,6 +3514,12 @@ function startRenderer(
               }),
             publish: (json) => {
               root.dataset['fieldDebug'] = json;
+            },
+          });
+          // epilogue.preview <ending> (mw-e39.40): plays the slideshow of a headline ending.
+          registerEpilogueCommands(debugConsole.registry, {
+            preview: (ending) => {
+              epilogueUi?.controller.queuePreview(ending);
             },
           });
           // facts.* / deltas.list / state.* (mw-e27.6): inspect, edit, snapshot and diff the world's
