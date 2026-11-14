@@ -96,6 +96,7 @@ import {
 } from '@game/conversation/index';
 import type { DialogueDef } from '@content/types/dialogue';
 import { startShopUi } from '@game/shop/shop-window';
+import { startReaderUi } from '@game/reader/reader';
 import {
   ContainerWatch,
   hasContainers,
@@ -2318,6 +2319,21 @@ function startRenderer(
         });
         afterStep.push(() => {
           shop.afterStep();
+        });
+        // Reading (mw-kf4c): a spawn tagged `readable` plus a text id, read with Interact, opens the
+        // reader; the first read writes the text's evidence facts and publishes its logic events.
+        // #app[data-reader] (JSON: open, text, read) is the e2e's readout.
+        const reader = startReaderUi({
+          ui,
+          world,
+          content,
+          player: player.entity,
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          reader.afterStep();
         });
       }
       // Class selection (mw-e19.5): the chosen class's capabilities, kit and stats go onto the player

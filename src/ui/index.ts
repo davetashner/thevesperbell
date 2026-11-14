@@ -29,6 +29,7 @@ export * from './lock-marker';
 export * from './target-hud';
 export * from './pickup-toasts';
 export * from './quick-slots';
+export * from './reader-window';
 export * from './reticle';
 export * from './spell-hotbar';
 export * from './spell-wheel';

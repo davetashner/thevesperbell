@@ -804,6 +804,15 @@ ${tokens}
 .vb-container-status:empty { display: none; }
 .vb-container-hint { color: var(--ui-color-text-muted); font-size: ${size(0.875)}; }
 .vb-container-actions { flex-wrap: wrap; }
+.vb-panel.vb-reader { width: min(30em, 100%); }
+.vb-reader h1 { overflow-wrap: anywhere; margin: 0; }
+.vb-reader-byline, .vb-reader-page, .vb-reader-hint { margin: 0; color: var(--ui-color-text-muted); }
+.vb-reader-byline { font-style: italic; }
+.vb-reader-byline[hidden], .vb-reader-page[hidden], .vb-reader-actions[hidden] { display: none; }
+.vb-reader-body { max-height: 50vh; overflow-y: auto; line-height: 1.5; }
+.vb-reader-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vb-reader-hint { font-size: ${size(0.875)}; }
+.vb-reader-actions { flex-wrap: wrap; }
 .vb-panel.vb-shop { width: min(40em, 100%); container-type: inline-size; }
 .vb-shop h1 { overflow-wrap: anywhere; margin: 0; }
 .vb-shop-header { display: flex; align-items: center; gap: var(--ui-space-3); }

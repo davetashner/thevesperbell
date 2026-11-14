@@ -244,6 +244,15 @@
       "prop": "crate"
     },
     {
+      "id": "read-manifest",
+      "at": [2, 0.5, 1],
+      "tags": ["readable", "note-cargo-manifest"],
+      "interact": {
+        "affordances": [{ "verb": "read", "label": "Read the cargo manifest" }],
+        "radius": 0.6
+      }
+    },
+    {
       "id": "room-lever",
       "at": [0, 0, 1],
       "prop": "lever",
