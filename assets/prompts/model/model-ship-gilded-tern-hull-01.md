@@ -1,6 +1,6 @@
 # model-ship-gilded-tern-hull-01: the Gilded Tern — the hull
 
-**Status: generated v2, turntable awaiting owner approval** (2026-11-15). v1 was too short (about 2.65:1); the owner asked for a redo. Design approved on `prop-ship-gilded-tern-01` v3 (owner, 2026-11-15).
+**Status: owner-approved model** (v2 turntable approved 2026-11-15, "Yes hull v2 passes"); runtime file in place and dressed over the grey-box hull in `wendmouth-harbour` (dressing `tern-hull`). v1 was too short (about 2.65:1) and was redone. Design approved on `prop-ship-gilded-tern-01` v3 (owner, 2026-11-15).
 
 ## Single image (input to image-to-3D)
 
@@ -58,4 +58,10 @@ Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
 | turntable | v1 | rejected | owner | 2026-11-15 | "Let's redo the hull" (too short for the level's 4:1 hull) |
-| turntable | v2 | pending | owner | — | — |
+| turntable | v2 | approved | owner | 2026-11-15 | "Yes hull v2 passes" (session chat; `assets/approvals.json` does not exist yet) |
+
+## Runtime (v2)
+
+`npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-ship-gilded-tern-hull-01/v2.glb public/assets/model/model-ship-gilded-tern-hull-01.glb --texture-size 1024`
+→ 210 KB, one 1024² texture (a hero piece), meshopt-compressed (SHA-256 `9b54fcc8600cc90bdaf2253cc5956d44e62a453a2bfc9593feb495d10f1777fd`). In the harbour it is fitted into
+10.4 × 8.9 × 44 m (bowsprit included), turned 180° so the stern castle is north, its deck (59 % of its height) on y = 2.
