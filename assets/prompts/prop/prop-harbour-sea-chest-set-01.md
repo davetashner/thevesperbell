@@ -1,6 +1,6 @@
 # prop-harbour-sea-chest-set-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-15). Made from the owner's dock and ship reference photos.
+**Status: owner-approved concept** (2026-11-15, "They all look great!"). Made from the owner's dock and ship reference photos.
 
 ## 1. Asset
 
@@ -12,6 +12,7 @@
 | Template | `_templates/prop-sheet.md` v1 |
 | Tool | Higgsfield `gpt_image_2_6`, quality high, resolution 2k, aspect 3:2, account plan "plus" |
 | Higgsfield job | `0c21ccbd-a107-4ede-a238-4d2dd84bb916` |
+| Output | `assets/source/prop/prop-harbour-sea-chest-set-01/prop-harbour-sea-chest-set-01.png` (SHA-256 `b242ca7f0f503daf3746d974dd47c4ef27e4dc6775de47e8bae8ade97ac946eb`) |
 | Staging copy | `assets/_incoming/prop-harbour-sea-chest-set-01/v1.png` (gitignored) |
 
 ### Reference inputs
@@ -52,21 +53,21 @@ REFERENCE IMAGES: the attached photographs show real construction to borrow — 
 
 ## 5. Consistency checklist (Claude self-check of v1; owner confirms at the gate)
 
-Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approval pending.
+Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approved v1 on 2026-11-15.
 
 ## 6. Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-15 | "They all look great!" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 7. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-harbour-sea-chest-set-01/v1.png` | candidate — Lock tiers read: iron plates on 1–3, brass on 4, black-steel on 5; brass hasps/pull-ring show interactable wear; rope beckets tan. Stacked pair (#6) uses a brass plate on the upper chest. |
+| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-harbour-sea-chest-set-01/v1.png` | approved — Lock tiers read: iron plates on 1–3, brass on 4, black-steel on 5; brass hasps/pull-ring show interactable wear; rope beckets tan. Stacked pair (#6) uses a brass plate on the upper chest. |
 
-## 8. Provenance (copy into `assets/CREDITS.md` when approved)
+## 8. Provenance (recorded in `assets/CREDITS.md`)
 
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|

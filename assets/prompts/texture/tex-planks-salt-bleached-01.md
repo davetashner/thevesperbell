@@ -1,6 +1,6 @@
 # tex-planks-salt-bleached-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-15). Made from the owner's dock and ship reference photos.
+**Status: owner-approved concept** (2026-11-15, "They all look great!"). Made from the owner's dock and ship reference photos.
 
 ## 1. Asset
 
@@ -12,6 +12,7 @@
 | Template | `_templates/tileable-texture.md` v1 |
 | Tool | Higgsfield `gpt_image_2_6`, quality high, resolution 2k, aspect 1:1, account plan "plus" |
 | Higgsfield job | `26cf2a8e-e811-445a-8553-761b2f2a87cd` |
+| Output | `assets/source/texture/tex-planks-salt-bleached-01/tex-planks-salt-bleached-01.png` (SHA-256 `b0d651d810e8ac5b28f1a250ff9eb76da04d1e1a2cd4bf07046606eff20934d2`) |
 | Staging copy | `assets/_incoming/tex-planks-salt-bleached-01/v1.png` (gitignored) |
 
 ### Reference inputs
@@ -51,21 +52,21 @@ REFERENCE IMAGES: the attached photographs show real construction to borrow — 
 
 ## 5. Consistency checklist (Claude self-check of v1; owner confirms at the gate)
 
-Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approval pending.
+Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approved v1 on 2026-11-15.
 
 ## 6. Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-15 | "They all look great!" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 7. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-planks-salt-bleached-01/v1.png` | candidate — Tiles cleanly in a 2×2 check. A little warmer/browner than the target silver-grey; bolt heads evenly spread, no focal feature. |
+| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-planks-salt-bleached-01/v1.png` | approved — Tiles cleanly in a 2×2 check. A little warmer/browner than the target silver-grey; bolt heads evenly spread, no focal feature. |
 
-## 8. Provenance (copy into `assets/CREDITS.md` when approved)
+## 8. Provenance (recorded in `assets/CREDITS.md`)
 
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|

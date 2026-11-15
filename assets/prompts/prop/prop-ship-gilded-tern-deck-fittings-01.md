@@ -1,6 +1,6 @@
 # prop-ship-gilded-tern-deck-fittings-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-15). Made from the owner's dock and ship reference photos.
+**Status: owner-approved concept** (2026-11-15, "They all look great!"). Made from the owner's dock and ship reference photos.
 
 ## 1. Asset
 
@@ -12,6 +12,7 @@
 | Template | `_templates/prop-sheet.md` v1 |
 | Tool | Higgsfield `gpt_image_2_6`, quality high, resolution 2k, aspect 3:2, account plan "plus" |
 | Higgsfield job | `125575c8-8a9f-4120-9647-10dd60850eab` |
+| Output | `assets/source/prop/prop-ship-gilded-tern-deck-fittings-01/prop-ship-gilded-tern-deck-fittings-01.png` (SHA-256 `5efa4c4dc22b61d25abf752dd30be9ecea847e6e021bd6ceafab7c276bb4df11`) |
 | Staging copy | `assets/_incoming/prop-ship-gilded-tern-deck-fittings-01/v1.png` (gitignored) |
 
 ### Reference inputs
@@ -52,21 +53,21 @@ REFERENCE IMAGES: the attached photographs show real construction to borrow — 
 
 ## 5. Consistency checklist (Claude self-check of v1; owner confirms at the gate)
 
-Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approval pending.
+Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approved v1 on 2026-11-15.
 
 ## 6. Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-15 | "They all look great!" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 7. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-ship-gilded-tern-deck-fittings-01/v1.png` | candidate — Tiller, grating with brass rings, hutch with brass handle, pin-rail bulwark, lantern all good. #6 came out as three deadeyes with ratlines whose knots are pale-ish; acceptable but could be re-rolled for a clearer climbable cue. Scale shown as a figure plus a height bar. |
+| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-ship-gilded-tern-deck-fittings-01/v1.png` | approved — Tiller, grating with brass rings, hutch with brass handle, pin-rail bulwark, lantern all good. #6 came out as three deadeyes with ratlines whose knots are pale-ish; acceptable but could be re-rolled for a clearer climbable cue. Scale shown as a figure plus a height bar. |
 
-## 8. Provenance (copy into `assets/CREDITS.md` when approved)
+## 8. Provenance (recorded in `assets/CREDITS.md`)
 
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|

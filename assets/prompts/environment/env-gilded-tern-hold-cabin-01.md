@@ -1,6 +1,6 @@
 # env-gilded-tern-hold-cabin-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-15). Made from the owner's dock and ship reference photos.
+**Status: owner-approved concept** (2026-11-15, "They all look great!"). Made from the owner's dock and ship reference photos.
 
 ## 1. Asset
 
@@ -12,6 +12,7 @@
 | Template | `_templates/environment-concept.md` v1 |
 | Tool | Higgsfield `gpt_image_2_6`, quality high, resolution 2k, aspect 16:9, account plan "plus" |
 | Higgsfield job | `747ae738-6e44-4972-a567-f50d6b5993a6` |
+| Output | `assets/source/environment/env-gilded-tern-hold-cabin-01/env-gilded-tern-hold-cabin-01.png` (SHA-256 `9384172a636fc64121f436a92e41cde9ba2c8f95d2011af1653d2efb75fc9770`) |
 | Staging copy | `assets/_incoming/env-gilded-tern-hold-cabin-01/v1.png` (gitignored) |
 
 ### Reference inputs
@@ -55,21 +56,21 @@ REFERENCE IMAGES: the attached photographs show real construction to borrow — 
 
 ## 5. Consistency checklist (Claude self-check of v1; owner confirms at the gate)
 
-Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approval pending.
+Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approved v1 on 2026-11-15.
 
 ## 6. Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-15 | "They all look great!" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 7. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/env-gilded-tern-hold-cabin-01/v1.png` | candidate — Mast trunks with rope wraps, knees with brass bolts, curtained bunks, hung coils/net, grating light shaft, ladder, and the berth door with a dark keyhole plate. Corner shadows could be darker for hiding spots. |
+| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/env-gilded-tern-hold-cabin-01/v1.png` | approved — Mast trunks with rope wraps, knees with brass bolts, curtained bunks, hung coils/net, grating light shaft, ladder, and the berth door with a dark keyhole plate. Corner shadows could be darker for hiding spots. |
 
-## 8. Provenance (copy into `assets/CREDITS.md` when approved)
+## 8. Provenance (recorded in `assets/CREDITS.md`)
 
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|

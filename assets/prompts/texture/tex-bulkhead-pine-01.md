@@ -1,6 +1,6 @@
 # tex-bulkhead-pine-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-15). Made from the owner's dock and ship reference photos.
+**Status: owner-approved concept** (2026-11-15, "They all look great!"). Made from the owner's dock and ship reference photos.
 
 ## 1. Asset
 
@@ -12,6 +12,7 @@
 | Template | `_templates/tileable-texture.md` v1 |
 | Tool | Higgsfield `gpt_image_2_6`, quality high, resolution 2k, aspect 1:1, account plan "plus" |
 | Higgsfield job | `e5858355-4d43-4580-b857-e3f7f90b20ce` |
+| Output | `assets/source/texture/tex-bulkhead-pine-01/tex-bulkhead-pine-01.png` (SHA-256 `cfa6c37724f5ca8e67564e6fb492d56f2cd864ee397b54d793313e29daecd1fd`) |
 | Staging copy | `assets/_incoming/tex-bulkhead-pine-01/v1.png` (gitignored) |
 
 ### Reference inputs
@@ -52,21 +53,21 @@ REFERENCE IMAGES: the attached photographs show real construction to borrow — 
 
 ## 5. Consistency checklist (Claude self-check of v1; owner confirms at the gate)
 
-Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approval pending.
+Preamble verbatim, palette, no text/logos, lighting and shape language checked by Claude on v1; per-asset notes in §7. Owner approved v1 on 2026-11-15.
 
 ## 6. Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-15 | "They all look great!" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 7. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-bulkhead-pine-01/v1.png` | candidate — Tiles cleanly in a 2×2 check; boards and nail rows are regular. Rendered as four nail columns per tile (prompt asked for two) and the pine is more orange/saturated than the photo — may want a desaturation pass toward #C9A06A. |
+| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-bulkhead-pine-01/v1.png` | approved — Tiles cleanly in a 2×2 check; boards and nail rows are regular. Rendered as four nail columns per tile (prompt asked for two) and the pine is more orange/saturated than the photo — may want a desaturation pass toward #C9A06A. |
 
-## 8. Provenance (copy into `assets/CREDITS.md` when approved)
+## 8. Provenance (recorded in `assets/CREDITS.md`)
 
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|
