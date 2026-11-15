@@ -1,6 +1,6 @@
 # model-prop-cargo-net-load-01: cargo net load for the Wendmouth waterfront and the Gilded Tern
 
-**Status: generated v1, turntable awaiting owner approval** (2026-11-15). Design approved on the sheet `prop-harbour-rope-net-set-01` (owner, 2026-11-15, "They all look great!").
+**Status: owner-approved model** (turntable approved 2026-11-15, "They pass"); runtime file in place, not yet placed in a scene. Design approved on the sheet `prop-harbour-rope-net-set-01` (owner, 2026-11-15, "They all look great!").
 
 ## Single-prop image (input to image-to-3D)
 
@@ -29,10 +29,11 @@ SUBJECT: reproduce prop 8 from the attached approved prop sheet exactly — the 
 - Raw file: `assets/_incoming/model-prop-cargo-net-load-01/v1.glb` (SHA-256 `0b33bd3da40f32e4a514e1ffff6f8d66e3bd7e34ceb6bcedc87a151b865b9d9c`), turntable `assets/_incoming/model-prop-cargo-net-load-01/v1-turntable.png`
   (four views, three.js headless render on parchment).
 
-## Processing (after turntable approval)
+## Processing
 
-1. `gltf-transform optimize … --texture-size 512` → `public/assets/model/model-prop-cargo-net-load-01.glb` (the tool is not installed in the
-   repo; see the session notes).
+1. `npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-prop-cargo-net-load-01/v1.glb public/assets/model/model-prop-cargo-net-load-01.glb --texture-size 512`
+   → 79 KB, 2,788 triangles, one material, one 512² texture (meshopt-compressed; SHA-256 `c0d1d7fb9270c2d12707a4308ec40b90804da8412e6f1b96b00d04b62776ff41`).
+   Checked by loading it in three.js with the meshopt decoder and rendering the four views again.
 2. Load-time placement (scale to 1.6 m, facing) when the harbour props are wired.
 
 ## Approval gate(s)
@@ -40,10 +41,10 @@ SUBJECT: reproduce prop 8 from the attached approved prop sheet exactly — the 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
 | image (flat concept) | sheet v1 | approved | owner | 2026-11-15 | via `prop-harbour-rope-net-set-01` |
-| turntable | v1 | pending | owner | — | — |
+| turntable | v1 | approved | owner | 2026-11-15 | "They pass" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Licence
 
 Higgsfield Plus (Terms of Use §4.4: the user owns Outputs, commercial use and sublicensing allowed); Tripo's own
-terms confirmed by the owner on 2026-10-24 (mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added when the
-turntable is approved and the runtime file lands.
+terms confirmed by the owner on 2026-10-24 (mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added 2026-11-15
+(`placeholder: yes`, as for the chest, until `assets/approvals.json` exists).
