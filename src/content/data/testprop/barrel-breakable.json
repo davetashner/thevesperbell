@@ -1,0 +1,13 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "barrel-breakable",
+  "name": "Light barrel (breakable)",
+  "mass": 15,
+  "flammable": true,
+  "tags": ["harbour", "breakable", "liftable"],
+  "breaksInto": "plank",
+  "body": {
+    "size": [0.55, 0.75, 0.55],
+    "material": "wood"
+  }
+}

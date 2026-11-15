@@ -26,6 +26,14 @@ import { renderIntensity } from '../light/index.ts';
 import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
 import {
+  containerModelFor,
+  loadBodyDockModel,
+  loadFixedDockModel,
+  loadShipLantern,
+  PROP_MODELS,
+  SHIP_LANTERN_TAG,
+} from '../props/dock-props';
+import {
   CRATE_URL,
   IVY_TILE,
   IVY_URL,
@@ -601,11 +609,13 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       // A torch or a brazier (mw-546): its model takes the bracket's place once loaded (the bracket
       // stays if it never loads). The flame and light are the light rig's, at this spawn point.
       if (spawn.container !== undefined && spawn.prop === undefined) {
-        void loadChest().then(
+        // A dock chest (sea chest, ditty box, strongbox) by its tag; any other container is the slice chest.
+        const dockChest = containerModelFor(spawn.tags);
+        void (dockChest === undefined ? loadChest() : loadFixedDockModel(dockChest)).then(
           (model) => {
             mesh.visible = false;
             const chest = new Mesh(model.geometry, model.material);
-            chest.name = 'chest';
+            chest.name = dockChest?.model ?? 'chest';
             chest.castShadow = true;
             chest.receiveShadow = true;
             group.add(chest);
@@ -637,6 +647,25 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           },
         );
       }
+      // A fixed dock prop (a coil, a grating, the Tern's hutch and tiller) or the ship's lantern: its
+      // model takes the stand-in's place once loaded (the stand-in stays if it never loads).
+      const fixedDock = spawn.prop === undefined ? undefined : PROP_MODELS[spawn.prop];
+      const isShipLantern = spawn.prop === undefined && spawn.tags.includes(SHIP_LANTERN_TAG);
+      if (fixedDock !== undefined || isShipLantern) {
+        void (fixedDock === undefined ? loadShipLantern() : loadFixedDockModel(fixedDock)).then(
+          (model) => {
+            mesh.visible = false;
+            const piece = new Mesh(model.geometry, model.material);
+            piece.name = fixedDock?.model ?? SHIP_LANTERN_TAG;
+            piece.castShadow = true;
+            piece.receiveShadow = true;
+            group.add(piece);
+          },
+          (error: unknown) => {
+            console.warn(`The ${spawn.id} model did not load; keeping the stand-in.`, error);
+          },
+        );
+      }
       scene.add(group);
       return group;
     },
@@ -652,6 +681,23 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);
+      // A movable dock prop (a barrel, a keg, the hoist's crate): its model rides the body.
+      const dock = spawn.prop === undefined ? undefined : PROP_MODELS[spawn.prop];
+      if (dock !== undefined) {
+        void loadBodyDockModel(dock, size.y).then(
+          (model) => {
+            mesh.visible = false;
+            const piece = new Mesh(model.geometry, model.material);
+            piece.name = dock.model;
+            piece.castShadow = true;
+            piece.receiveShadow = true;
+            group.add(piece);
+          },
+          (error: unknown) => {
+            console.warn(`The ${spawn.id} model did not load; keeping the stand-in.`, error);
+          },
+        );
+      }
       scene.add(group);
       return group;
     },

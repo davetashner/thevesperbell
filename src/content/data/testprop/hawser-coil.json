@@ -1,0 +1,8 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "hawser-coil",
+  "name": "Coil of tarred hawser",
+  "mass": 30,
+  "flammable": true,
+  "tags": ["harbour", "dressing"]
+}

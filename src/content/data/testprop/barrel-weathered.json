@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "barrel-weathered",
+  "name": "Weathered barrel with a rope coil",
+  "mass": 55,
+  "flammable": true,
+  "tags": ["harbour"],
+  "body": {
+    "size": [0.6, 0.85, 0.6],
+    "material": "wood"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "undertow-strongbox",
+  "name": "Undertow smuggler strongbox lock",
+  "notes": "The smugglers' strongbox in the Undertow vaults (dock props, 2026-11-15; model-prop-strongbox-smuggler-01): black-steel, tier 3, a thief with good picks opens it.",
+  "tier": 3,
+  "pickTier": 3,
+  "hint": "Locked. Black steel, and the keyhole is greased."
+}

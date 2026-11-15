@@ -1523,6 +1523,18 @@
       "at": [-79.0, 0.0, 12.5],
       "scale": [1.0, 1.2, 0.5],
       "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [35.0, 2.0, 121.0],
+      "scale": [1.8, 1.6, 1.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [35.0, 2.0, 135.25],
+      "scale": [0.45, 1.0, 0.45],
+      "purpose": "blocking"
     }
   ],
   "spawns": [
@@ -2371,6 +2383,221 @@
         "liquid": "water",
         "depth": 3.5
       }
+    },
+    {
+      "id": "tern-hold-grating",
+      "at": [35.0, 2.0, 130.0],
+      "prop": "deck-grating",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-companion-hutch",
+      "at": [35.0, 2.0, 121.0],
+      "prop": "companion-hutch",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-tiller",
+      "at": [35.0, 2.0, 134.5],
+      "yaw": 180,
+      "prop": "tiller",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-pin-rail",
+      "at": [36.0, 2.75, 121.0],
+      "yaw": 90,
+      "prop": "pin-rail",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-deck-lantern",
+      "at": [35.0, 3.25, 120.25],
+      "yaw": 180,
+      "tags": ["ship-lantern", "ship"],
+      "lightSource": {
+        "variant": "lantern",
+        "infiniteFuel": true,
+        "tint": [1, 0.82, 0.45]
+      }
+    },
+    {
+      "id": "tern-cask",
+      "at": [33.5, 2.0, 126.0],
+      "prop": "cask-cradle",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-keg-a",
+      "at": [36.75, 2.0, 127.5],
+      "prop": "keg",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-keg-b",
+      "at": [36.75, 2.0, 128.25],
+      "prop": "keg",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-rope-coil",
+      "at": [33.5, 2.0, 131.5],
+      "prop": "rope-coil",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-hawser-coil",
+      "at": [36.5, 2.0, 117.5],
+      "prop": "hawser-coil",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-crew-chest",
+      "at": [36.5, 2.0, 132.5],
+      "yaw": 270,
+      "tags": ["sea-chest", "ship"],
+      "owner": "npc-hesketh",
+      "container": {
+        "contents": [
+          {
+            "item": "gold",
+            "count": 6
+          },
+          {
+            "item": "bread-loaf",
+            "count": 1
+          }
+        ],
+        "lock": "tern-crew-chest"
+      }
+    },
+    {
+      "id": "tern-hoist-rope",
+      "at": [35.0, 6.5, 108.0],
+      "tags": ["rope", "archer-route", "ship"],
+      "rope": {
+        "length": 2.5
+      },
+      "properties": {
+        "material": "rope"
+      }
+    },
+    {
+      "id": "tern-hoist-crate",
+      "at": [35.0, 3.25, 108.0],
+      "prop": "cargo-crate",
+      "tags": ["dock-prop", "ship", "archer-route"],
+      "suspendedFrom": "tern-hoist-rope"
+    },
+    {
+      "id": "ann-ditty-box",
+      "at": [-15.25, -2.0, 112.0],
+      "yaw": 90,
+      "tags": ["ditty-box", "barge"],
+      "owner": "npc-mags",
+      "container": {
+        "contents": [
+          {
+            "item": "gold",
+            "count": 12
+          }
+        ],
+        "lock": "patient-ann-ditty-box"
+      }
+    },
+    {
+      "id": "ann-keg",
+      "at": [-13.0, -2.0, 114.0],
+      "prop": "keg",
+      "tags": ["dock-prop", "barge"]
+    },
+    {
+      "id": "ann-rope-coil",
+      "at": [-14.0, -2.0, 104.5],
+      "prop": "rope-coil",
+      "tags": ["dock-prop", "barge"]
+    },
+    {
+      "id": "wharf-barrel-a",
+      "at": [16.0, 0.0, 96.0],
+      "prop": "barrel-weathered",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-barrel-b",
+      "at": [17.0, 0.0, 96.75],
+      "prop": "barrel-weathered",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-keg-a",
+      "at": [16.25, 0.0, 97.5],
+      "prop": "keg",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-rope-coil-a",
+      "at": [18.5, 0.0, 95.5],
+      "prop": "rope-coil",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-oil-barrel",
+      "at": [41.0, 0.0, 96.0],
+      "prop": "barrel-oil",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-light-barrel",
+      "at": [42.0, 0.0, 96.75],
+      "prop": "barrel-breakable",
+      "tags": ["dock-prop", "wharf"],
+      "breakable": {
+        "profile": "crate"
+      }
+    },
+    {
+      "id": "wharf-cask",
+      "at": [40.0, 0.0, 97.5],
+      "prop": "cask-cradle",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-hawser-coil",
+      "at": [-16.0, 0.0, 96.0],
+      "prop": "hawser-coil",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "undertow-strongbox",
+      "at": [82.0, -4.0, 34.0],
+      "yaw": 90,
+      "tags": ["strongbox", "undertow"],
+      "container": {
+        "contents": [
+          {
+            "item": "gold",
+            "count": 40
+          },
+          {
+            "item": "oil-flask",
+            "count": 2
+          }
+        ],
+        "lock": "undertow-strongbox"
+      }
+    },
+    {
+      "id": "undertow-oil-barrel-a",
+      "at": [80.0, -4.0, 38.0],
+      "prop": "barrel-oil",
+      "tags": ["dock-prop", "undertow"]
+    },
+    {
+      "id": "undertow-oil-barrel-b",
+      "at": [80.75, -4.0, 38.75],
+      "prop": "barrel-oil",
+      "tags": ["dock-prop", "undertow"]
     }
   ],
   "light": {

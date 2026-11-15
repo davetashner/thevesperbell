@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "tern-crew-chest",
+  "name": "Gilded Tern crew sea chest lock",
+  "notes": "A sailor's sea chest on the Gilded Tern's deck (dock props, 2026-11-15; model-prop-sea-chest-01): a plain iron lock, tier 1, a thief picks it (tool.lockpick). Owned by Captain Hesketh's crew, so opening it is theft.",
+  "tier": 1,
+  "pickTier": 1,
+  "hint": "Locked. A plain iron lock."
+}

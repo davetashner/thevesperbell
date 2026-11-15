@@ -1,0 +1,9 @@
+{
+  "$schema": "../lock.schema.json",
+  "id": "patient-ann-ditty-box",
+  "name": "Patient Ann ditty box lock",
+  "notes": "Mags Oakum's ditty box on the Patient Ann's deck (dock props, 2026-11-15; model-prop-ditty-box-01): a brass lock, tier 2, a thief picks it. Opening it is theft from Mags.",
+  "tier": 2,
+  "pickTier": 2,
+  "hint": "Locked. A brass lock, better than it needs to be."
+}
