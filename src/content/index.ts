@@ -459,6 +459,8 @@ export {
   type SurfaceTexture,
   sceneDressingSchema,
   type SceneDressingDef,
+  scenePaintSchema,
+  WALL_TEXTURES,
 } from './types/scene.ts';
 export {
   DAMAGE_TYPES,

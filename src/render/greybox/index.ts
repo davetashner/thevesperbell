@@ -24,7 +24,7 @@ import type {
 } from '@sim/index';
 import { renderIntensity } from '../light/index.ts';
 import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
-import { hiddenByDressing } from './dressing-hides';
+import { hiddenByDressing, paintFor } from './dressing-hides';
 import { loadDressing } from '../props/dressing';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
 import {
@@ -87,6 +87,8 @@ const CHAIN_COLOUR = 0x6b7078;
 /** Thinnest a rope is drawn, metres across, so a 0.05 m cord still reads from the camera. */
 const MIN_ROPE_WIDTH = 0.06;
 const MARKER_COLOUR = 0xe8c547;
+/** Liquid surfaces by liquid material (style bible §2.3: water #3F7FA0 clear, oil #3B2F1E glossy). */
+const LIQUID_COLOURS: Readonly<Record<string, number>> = { water: 0x3f7fa0, oil: 0x3b2f1e };
 /** Spawn tags whose marker keeps the facing cone: they stand on the ground (mw-ju8.42). */
 export const MARKER_CONE_TAGS: readonly string[] = ['arrival', 'player-start'];
 /** A sign board, metres (width, height, thickness), and its weathered-wood colour. */
@@ -427,6 +429,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       // Grey-box parts a dressing model replaces (a ship's hull over its blocking mass) are drawn in the
       // dressing's own group, hidden once its model has loaded (they stay if it never does).
       const dressingParts = new Map<number, Map<KitPurpose, BufferGeometry[]>>();
+      const paintedWalls = new Map<string, BufferGeometry[]>();
       for (const part of layout.parts) {
         // A breakable piece is drawn on its own (`piece`), so it can go when it breaks.
         if (layout.pieces[part.placement]?.breakable !== undefined) continue;
@@ -438,6 +441,19 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           list.push(partGeometry(part));
           byDressingPurpose.set(part.purpose, list);
           dressingParts.set(dressing, byDressingPurpose);
+          continue;
+        }
+        // A paint box lays a wall tileable on it in world units (a ship cabin as pine bulkhead).
+        const paint = paintFor(part, layout.paints);
+        const painting = paint === undefined ? undefined : SURFACE_TEXTURE_PAINTINGS[paint];
+        const paintedWall =
+          paint === undefined || painting === undefined
+            ? undefined
+            : worldUvPartGeometry(part, painting.tile);
+        if (paint !== undefined && paintedWall !== undefined) {
+          const list = paintedWalls.get(paint) ?? [];
+          list.push(paintedWall);
+          paintedWalls.set(paint, list);
           continue;
         }
         // The pillars and the ivy wear paintings (mw-va0), so they are drawn on their own, with UVs.
@@ -473,6 +489,20 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
             : gridMaterial(PURPOSE_COLOURS[purpose], { surface, load: stone() });
         const mesh = new Mesh(merged, material);
         mesh.name = purpose;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+      }
+      for (const [texture, geometries] of paintedWalls) {
+        const painting = SURFACE_TEXTURE_PAINTINGS[texture];
+        if (painting === undefined) continue;
+        const merged = mergeGeometries(geometries);
+        for (const geometry of geometries) geometry.dispose();
+        const mesh = new Mesh(
+          merged,
+          paintedMaterial(painting.url, PURPOSE_COLOURS.blocking, true),
+        );
+        mesh.name = `paint:${texture}`;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         group.add(mesh);
@@ -603,6 +633,27 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           new BoxGeometry(0.1, 0.35, 0.1).translate(0, -0.25, 0),
           new MeshStandardMaterial({ color: new Color(BRACKET_COLOUR), roughness: 0.8 }),
         );
+      } else if (
+        spawn.prop === undefined &&
+        spawn.liquid !== undefined &&
+        spawn.liquid.drain === undefined
+      ) {
+        // A standing liquid volume (a harbour pool, a cistern): its surface at its level, translucent
+        // so the bed and anything sunk in it still read. A volume that can drain keeps the marker,
+        // since a fixed surface would lie about its level once it falls.
+        const { size, depth, liquid } = spawn.liquid;
+        mesh = new Mesh(
+          new PlaneGeometry(size.x, size.z).rotateX(-Math.PI / 2),
+          new MeshStandardMaterial({
+            color: new Color(LIQUID_COLOURS[liquid] ?? LIQUID_COLOURS['water']),
+            transparent: true,
+            opacity: liquid === 'oil' ? 0.9 : 0.72,
+            depthWrite: false,
+            roughness: liquid === 'oil' ? 0.2 : 0.35,
+          }),
+        );
+        mesh.position.y = depth;
+        mesh.renderOrder = 1;
       } else if (spawn.prop === undefined && spawn.tags.includes('sign')) {
         // A sign (mw-ju8.42): a flat board at its own height, facing the way the spawn faces, not a
         // cone floating in the air.
@@ -641,8 +692,11 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
             ? 'rope'
             : spawn.tags.includes('sign')
               ? 'sign'
-              : 'marker');
-      mesh.castShadow = true;
+              : spawn.liquid !== undefined && spawn.liquid.drain === undefined
+                ? 'liquid'
+                : 'marker');
+      // A liquid surface takes the light but casts no shadow (it would shade its own bed).
+      mesh.castShadow = mesh.name !== 'liquid';
       mesh.receiveShadow = true;
       group.add(mesh);
       // A torch or a brazier (mw-546): its model takes the bracket's place once loaded (the bracket

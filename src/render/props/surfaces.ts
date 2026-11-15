@@ -39,6 +39,8 @@ export const SURFACE_TEXTURE_PAINTINGS: Readonly<
     tile: 2,
   },
   'tex-deck-planks-caulked-01': { url: '/assets/texture/tex-deck-planks-caulked-01.webp', tile: 2 },
+  // A wall tileable (content WALL_TEXTURES), laid by a scene's paint boxes: boards run horizontally.
+  'tex-bulkhead-pine-01': { url: '/assets/texture/tex-bulkhead-pine-01.webp', tile: 2 },
 };
 
 /** Metres one tile of the pillar stone covers: three to four block courses of about 0.3 m. */

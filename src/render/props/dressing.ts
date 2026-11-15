@@ -7,8 +7,12 @@
 //
 // Render-only (needs a GPU context to draw), so it is excluded from unit coverage; what it hides is
 // unit tested in src/render/greybox/dressing-hides.test.ts and the drawing by the harbour e2e spec.
+//
+// A dressing marked `fadesNearCamera` (rigging) turns see-through while the camera is inside its bounds:
+// the camera's collision sweep only knows physics colliders, and rigging has none, so a camera backed
+// into a mast's shrouds would otherwise fill the screen with them.
 
-import { Matrix4, Mesh } from 'three';
+import { Box3, Matrix4, Mesh } from 'three';
 import type { SceneDressing } from '@sim/index';
 import { readGlbMesh } from '../models/glb';
 
@@ -37,7 +41,30 @@ export async function loadDressing(d: SceneDressing): Promise<Mesh> {
   geometry.computeBoundingSphere();
   const mesh = new Mesh(geometry, material);
   mesh.name = `dressing:${d.id}`;
+  if (d.fadesNearCamera) fadeNearCamera(mesh);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   return mesh;
+}
+
+/** How see-through a fading dressing gets while the camera is inside it (1 = solid). */
+export const NEAR_CAMERA_OPACITY = 0.25;
+/** Opacity change per drawn frame, so the fade takes about a fifth of a second. */
+const FADE_STEP = 0.08;
+
+/** Makes `mesh` fade while the camera is inside its bounds (padded by half a metre). */
+function fadeNearCamera(mesh: Mesh): void {
+  const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  if (material === undefined) return;
+  material.transparent = true;
+  material.needsUpdate = true;
+  mesh.geometry.computeBoundingBox();
+  const bounds = (mesh.geometry.boundingBox ?? new Box3()).clone().expandByScalar(0.5);
+  mesh.onBeforeRender = (_renderer, _scene, camera) => {
+    const target = bounds.containsPoint(camera.position) ? NEAR_CAMERA_OPACITY : 1;
+    const step = Math.sign(target - material.opacity) * FADE_STEP;
+    material.opacity =
+      Math.abs(target - material.opacity) <= FADE_STEP ? target : material.opacity + step;
+    material.depthWrite = material.opacity >= 1;
+  };
 }

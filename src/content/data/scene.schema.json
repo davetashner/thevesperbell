@@ -3120,6 +3120,71 @@
         "additionalProperties": false
       }
     },
+    "paints": {
+      "default": [],
+      "description": "Boxes whose grey-box walls are drawn with a tiling texture (render only).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the paint box, unique in the scene, e.g. tern-cabin."
+          },
+          "min": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Lower corner, grid cells."
+          },
+          "max": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Upper corner, grid cells; above min on every axis."
+          },
+          "texture": {
+            "type": "string",
+            "enum": [
+              "tex-bulkhead-pine-01"
+            ],
+            "description": "The tileable, e.g. tex-bulkhead-pine-01."
+          }
+        },
+        "required": [
+          "id",
+          "min",
+          "max",
+          "texture"
+        ],
+        "additionalProperties": false
+      }
+    },
     "dressings": {
       "default": [],
       "description": "Approved 3D models drawn over the grey box (render only), e.g. a ship hull.",
@@ -3206,6 +3271,11 @@
               "box",
               "height"
             ]
+          },
+          "fadesNearCamera": {
+            "default": false,
+            "description": "See-through while the camera is inside its bounds (rigging the camera can back into); not for a hull the camera stands in.",
+            "type": "boolean"
           },
           "hides": {
             "description": "Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn.",

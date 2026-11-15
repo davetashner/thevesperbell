@@ -362,6 +362,22 @@ export interface SceneSurface {
   readonly texture: string | undefined;
 }
 
+/** A paint box as specified (render only; see content scenePaintSchema). */
+export interface ScenePaintSpec {
+  readonly id: string;
+  readonly min: Triple;
+  readonly max: Triple;
+  readonly texture: string;
+}
+
+/** A paint box as laid out: its corners in metres. Render only. */
+export interface ScenePaint {
+  readonly id: string;
+  readonly min: Vec3;
+  readonly max: Vec3;
+  readonly texture: string;
+}
+
 /** A dressing model as specified (render only; see content sceneDressingSchema). */
 export interface SceneDressingSpec {
   readonly id: string;
@@ -371,6 +387,7 @@ export interface SceneDressingSpec {
   readonly turn: SceneYaw;
   readonly size: Triple;
   readonly fit: 'box' | 'height';
+  readonly fadesNearCamera?: boolean | undefined;
   readonly hides?: { readonly min: Triple; readonly max: Triple } | undefined;
 }
 
@@ -383,6 +400,7 @@ export interface SceneDressing {
   readonly turn: SceneYaw;
   readonly size: Vec3;
   readonly fit: 'box' | 'height';
+  readonly fadesNearCamera: boolean;
   readonly hides: { readonly min: Vec3; readonly max: Vec3 } | undefined;
 }
 
@@ -568,6 +586,8 @@ export interface SceneSpec {
   readonly surfaces?: readonly SceneSurfaceSpec[] | undefined;
   /** Approved 3D models drawn over the grey box, render only. */
   readonly dressings?: readonly SceneDressingSpec[] | undefined;
+  /** Boxes whose grey-box walls are drawn with a tiling texture, render only. */
+  readonly paints?: readonly ScenePaintSpec[] | undefined;
 }
 
 /** Finds a kit piece by id (undefined when there is none). */
@@ -715,6 +735,8 @@ export interface SceneLayout {
   readonly surfaces: readonly SceneSurface[];
   /** Dressing models over the grey box (render only). */
   readonly dressings: readonly SceneDressing[];
+  /** Paint boxes for grey-box walls (render only). */
+  readonly paints: readonly ScenePaint[];
 }
 
 /** Thrown when a scene names a kit piece the lookup does not have. */
@@ -1246,6 +1268,16 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         }),
       ),
     ),
+    paints: Object.freeze(
+      (scene.paints ?? []).map((p) =>
+        Object.freeze({
+          id: p.id,
+          min: gridToWorld(p.min, scene.grid),
+          max: gridToWorld(p.max, scene.grid),
+          texture: p.texture,
+        }),
+      ),
+    ),
     dressings: Object.freeze(
       (scene.dressings ?? []).map((d) =>
         Object.freeze({
@@ -1256,6 +1288,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           turn: d.turn,
           size: vec(d.size[0], d.size[1], d.size[2]),
           fit: d.fit,
+          fadesNearCamera: d.fadesNearCamera ?? false,
           hides:
             d.hides === undefined
               ? undefined

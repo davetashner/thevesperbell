@@ -767,6 +767,7 @@ describe('scene schema (mw-e00.21)', () => {
       routes: [],
       regions: [],
       surfaces: [],
+      paints: [],
       dressings: [],
       transitions: [],
     });
@@ -775,7 +776,7 @@ describe('scene schema (mw-e00.21)', () => {
   it('a dressing model defaults to no yaw or turn and a box fit, and must name a model id with a positive size', () => {
     const hull = { id: 'hull', model: 'model-ship-test-01', at: [0, 0, 0], size: [10, 8, 40] };
     expect(sceneSchema.parse({ ...room, dressings: [hull] }).dressings).toEqual([
-      { ...hull, yaw: 0, turn: 0, fit: 'box' },
+      { ...hull, yaw: 0, turn: 0, fit: 'box', fadesNearCamera: false },
     ]);
     expect(problems({ ...room, dressings: [{ ...hull, model: 'ship.glb' }] })).toEqual([
       expect.stringMatching(/^dressings\.0\.model: /),

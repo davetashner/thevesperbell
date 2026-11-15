@@ -6,7 +6,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameContent } from '@content/index';
 import { layoutScene } from '@sim/index';
-import { hiddenByDressing } from '../../src/render/greybox/dressing-hides';
+import { hiddenByDressing, paintFor } from '../../src/render/greybox/dressing-hides';
+import { SURFACE_TEXTURE_PAINTINGS } from '../../src/render/props/surfaces';
+import { WALL_TEXTURES } from '@content/index';
 
 const content = loadGameContent();
 const scene = content.get('scene', 'wendmouth-harbour');
@@ -36,7 +38,7 @@ describe('Gilded Tern dressing', () => {
     expect(hidden.length).toBeGreaterThan(0);
     expect(hidden.some((p) => p.purpose === 'climbable')).toBe(false);
     // The crow's nest platform (top 12 m) and the cabin walls behind z 138 stay drawn.
-    expect(hidden.some((p) => p.max.y >= 11.9 && p.max.y <= 12.1 && p.min.x > 36)).toBe(false);
+    expect(hidden.some((p) => p.max.y >= 11.9 && p.max.y <= 12.1 && p.min.x > 35)).toBe(false);
     expect(hidden.some((p) => (p.min.z + p.max.z) / 2 > 138)).toBe(false);
   });
 
@@ -55,5 +57,19 @@ describe('Gilded Tern dressing', () => {
       );
       expect(post, id).toBeDefined();
     }
+  });
+
+  it('paints the stern cabin walls as pine bulkhead without changing what they are made of', () => {
+    for (const id of WALL_TEXTURES) {
+      expect(SURFACE_TEXTURE_PAINTINGS[id]?.url, id).toBe(`/assets/texture/${id}.webp`);
+      expect(existsSync(`public/assets/texture/${id}.webp`), `${id} runtime file`).toBe(true);
+    }
+    const cabin = layout.parts.filter((p) => paintFor(p, layout.paints) === 'tex-bulkhead-pine-01');
+    // Front wall and doorway, the berth bulkhead and doorway, both sides and the stern.
+    expect(cabin.length).toBeGreaterThanOrEqual(8);
+    const placements = scene.placements.filter(
+      (p) => p.at[2] >= 137.5 && p.at[0] >= 30 && p.at[0] <= 40,
+    );
+    expect(placements.every((p) => p.properties?.material === undefined)).toBe(true);
   });
 });

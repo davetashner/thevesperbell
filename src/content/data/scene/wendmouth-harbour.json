@@ -1479,8 +1479,8 @@
     },
     {
       "piece": "platform",
-      "at": [36.5, 2.0, 124.5],
-      "scale": [0.5, 10, 0.25],
+      "at": [37.75, 2, 124],
+      "scale": [0.25, 10, 0.5],
       "purpose": "climbable",
       "properties": {
         "climbable": "rough"
@@ -1488,8 +1488,8 @@
     },
     {
       "piece": "platform",
-      "at": [36.75, 11.75, 124.5],
-      "scale": [1.25, 0.25, 1.0],
+      "at": [36.5, 11.75, 124],
+      "scale": [0.5, 0.25, 0.75],
       "purpose": "blocking"
     },
     {
@@ -2251,13 +2251,13 @@
     },
     {
       "id": "tern-rigging-foot",
-      "at": [36.5, 2.0, 123.5],
-      "yaw": 180,
+      "at": [37, 2, 124],
+      "yaw": 90,
       "tags": ["climb-route", "ship"]
     },
     {
       "id": "tern-crows-nest",
-      "at": [37.0, 12.0, 124.5],
+      "at": [36.5, 12, 124],
       "tags": ["marker", "ship", "thief-route"]
     },
     {
@@ -2780,7 +2780,8 @@
       "at": [35, 2, 112],
       "turn": 90,
       "size": [1, 14, 1],
-      "fit": "height"
+      "fit": "height",
+      "fadesNearCamera": true
     },
     {
       "id": "tern-mainmast",
@@ -2788,7 +2789,8 @@
       "at": [35, 2, 124],
       "turn": 90,
       "size": [1, 14, 1],
-      "fit": "height"
+      "fit": "height",
+      "fadesNearCamera": true
     },
     {
       "id": "tern-mizzenmast",
@@ -2796,7 +2798,8 @@
       "at": [35, 2, 136],
       "turn": 90,
       "size": [1, 13, 1],
-      "fit": "height"
+      "fit": "height",
+      "fadesNearCamera": true
     },
     {
       "id": "tern-figurehead",
@@ -2837,6 +2840,14 @@
       "turn": 270,
       "size": [1, 1.1, 1],
       "fit": "height"
+    }
+  ],
+  "paints": [
+    {
+      "id": "tern-cabin",
+      "min": [30.5, 1.5, 137.5],
+      "max": [39.5, 6, 146.5],
+      "texture": "tex-bulkhead-pine-01"
     }
   ]
 }

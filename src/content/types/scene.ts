@@ -1056,6 +1056,26 @@ export const sceneRegionSchema = z
     path: ['max'],
   });
 
+/** Painted wall tileables a scene's `paints` boxes may lay on grey-box walls (render only). */
+export const WALL_TEXTURES = ['tex-bulkhead-pine-01'] as const;
+
+/**
+ * A paint box (render only): grey-box blocking parts whose centre lies inside are drawn with a tiling
+ * texture in world units (e.g. a ship cabin's walls as pine bulkhead), keeping their material, colliders
+ * and gameplay. Use it rather than a wood material when the walls must not burn away.
+ */
+export const scenePaintSchema = z
+  .strictObject({
+    id: contentId.describe('Name of the paint box, unique in the scene, e.g. tern-cabin.'),
+    min: vec3Schema.describe('Lower corner, grid cells.'),
+    max: vec3Schema.describe('Upper corner, grid cells; above min on every axis.'),
+    texture: z.enum(WALL_TEXTURES).describe('The tileable, e.g. tex-bulkhead-pine-01.'),
+  })
+  .refine(({ min, max }) => max[0] > min[0] && max[1] > min[1] && max[2] > min[2], {
+    message: 'max must be above min on every axis',
+    path: ['max'],
+  });
+
 /**
  * A dressing model (render only): an approved 3D model drawn over the grey box, such as a ship's hull
  * over the blocking mass that stands for it. It is fitted into `size` metres after its turns, its base
@@ -1084,6 +1104,12 @@ export const sceneDressingSchema = z.strictObject({
     .enum(['box', 'height'])
     .default('box')
     .describe('box: stretched to fill size on every axis; height: scaled evenly to size y.'),
+  fadesNearCamera: z
+    .boolean()
+    .default(false)
+    .describe(
+      'See-through while the camera is inside its bounds (rigging the camera can back into); not for a hull the camera stands in.',
+    ),
   hides: z
     .strictObject({ min: vec3Schema, max: vec3Schema })
     .optional()
@@ -1224,6 +1250,10 @@ export const sceneSchema = z
       .array(sceneSurfaceSchema)
       .default([])
       .describe('Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4).'),
+    paints: z
+      .array(scenePaintSchema)
+      .default([])
+      .describe('Boxes whose grey-box walls are drawn with a tiling texture (render only).'),
     dressings: z
       .array(sceneDressingSchema)
       .default([])
