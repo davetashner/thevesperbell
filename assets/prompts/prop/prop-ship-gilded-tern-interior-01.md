@@ -1,6 +1,6 @@
 # prop-ship-gilded-tern-interior-01
 
-**Status: generated v3 (defences, watertight lading port), flat concept awaiting owner approval** (2026-11-15). Bead plan: `e37-asset-ship-gilded-tern-concept-prompts` (plan/assets-harbor.json).
+**Status: owner-approved concept v3** (2026-11-15, "Approved, go ahead with the 3D models") (2026-11-15). Bead plan: `e37-asset-ship-gilded-tern-concept-prompts` (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -12,7 +12,8 @@
 | Target model ids | `model-ship-gilded-tern-interior-01` |
 | Template | `_templates/prop-sheet.md` v1 |
 | Tool | Higgsfield `gpt_image_2_6`, quality high, 2k, 3:2, plan plus, 2026-11-15, job `fcb85285-5ce7-40fa-bc71-c2bce85f53e9` |
-| Staging copy | `assets/_incoming/prop-ship-gilded-tern-interior-01/v1.png` (gitignored) |
+| Output | `assets/source/prop/prop-ship-gilded-tern-interior-01/prop-ship-gilded-tern-interior-01.png` (v3, SHA-256 `d6f061c7f11a55644d50842632b27eb5b5ace035583384eb82c34e88928acd56`) |
+| Staging copies | `assets/_incoming/prop-ship-gilded-tern-interior-01/v1.png`, `v2.png`, `v3.png` (gitignored) |
 
 ### Reference inputs
 
@@ -59,7 +60,7 @@ REFERENCE IMAGES: the attached photographs show real rigging, masts, deck furnit
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v3 | approved | owner | 2026-11-15 | "Approved, go ahead with the 3D models" (session chat; `assets/approvals.json` does not exist yet) |
 | turntable (per model) | — | — | owner | — | — |
 
 ## 6. Iteration log
