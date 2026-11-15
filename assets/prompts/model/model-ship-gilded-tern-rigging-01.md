@@ -1,6 +1,6 @@
 # model-ship-gilded-tern-rigging-01: the Gilded Tern — one mast module
 
-**Status: generated v1, turntable awaiting owner approval** (2026-11-15). Design approved on `prop-ship-gilded-tern-01` v3 (owner, 2026-11-15).
+**Status: owner-approved model** (turntable approved 2026-11-15, "They look good"); runtime file in place, not yet placed in the scene. Design approved on `prop-ship-gilded-tern-01` v3 (owner, 2026-11-15).
 
 ## Single image (input to image-to-3D)
 
@@ -30,9 +30,10 @@ SUBJECT: reproduce one mast module from the attached approved design sheet (view
 
 One mast module, used at the mast steps (pillars at z 124 and 136, plus the foremast); the crow's nest about 10 m above the deck. Budget: modular ship pieces ≤ 5 k triangles each, one material (style bible §13.2, §5.6).
 
-## Processing (after turntable approval)
+## Processing
 
-1. `npx @gltf-transform/cli@4.5.1 optimize … --texture-size 512` (1024 for the hull, a hero piece) → `public/assets/model/model-ship-gilded-tern-rigging-01.glb`.
+1. `npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-ship-gilded-tern-rigging-01/v1.glb public/assets/model/model-ship-gilded-tern-rigging-01.glb --texture-size 512`
+   → 93 KB, one 512² texture, meshopt-compressed (SHA-256 `de5dfc244c841a199c2133885989ecd0eca2e877e87a51ee33f6c5b36825bdf1`).
 2. Placement and scale in the harbour scene with the Gilded Tern integration.
 
 ## Approval gate(s)
@@ -40,8 +41,8 @@ One mast module, used at the mast steps (pillars at z 124 and 136, plus the fore
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
 | image (flat concept) | sheet v3 | approved | owner | 2026-11-15 | via `prop-ship-gilded-tern-01` |
-| turntable | v1 | pending | owner | — | — |
+| turntable | v1 | approved | owner | 2026-11-15 | "They look good" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Licence
 
-Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added on approval.
+Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added 2026-11-15 (`placeholder: yes` until `assets/approvals.json` exists).
