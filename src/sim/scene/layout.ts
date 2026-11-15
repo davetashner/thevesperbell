@@ -362,6 +362,30 @@ export interface SceneSurface {
   readonly texture: string | undefined;
 }
 
+/** A dressing model as specified (render only; see content sceneDressingSchema). */
+export interface SceneDressingSpec {
+  readonly id: string;
+  readonly model: string;
+  readonly at: Triple;
+  readonly yaw: SceneYaw;
+  readonly turn: SceneYaw;
+  readonly size: Triple;
+  readonly fit: 'box' | 'height';
+  readonly hides?: { readonly min: Triple; readonly max: Triple } | undefined;
+}
+
+/** A dressing model as laid out: its base point and hide box in metres. Render only. */
+export interface SceneDressing {
+  readonly id: string;
+  readonly model: string;
+  readonly at: Vec3;
+  readonly yaw: SceneYaw;
+  readonly turn: SceneYaw;
+  readonly size: Vec3;
+  readonly fit: 'box' | 'height';
+  readonly hides: { readonly min: Vec3; readonly max: Vec3 } | undefined;
+}
+
 /** A tagged box as laid out: its corners in metres (water: wading and swimming, mw-e02.14). */
 export interface SceneRegion {
   readonly id: string;
@@ -542,6 +566,8 @@ export interface SceneSpec {
   readonly regions?: readonly SceneRegionSpec[] | undefined;
   /** Boxes tagged with a footstep surface (mw-e09.4). */
   readonly surfaces?: readonly SceneSurfaceSpec[] | undefined;
+  /** Approved 3D models drawn over the grey box, render only. */
+  readonly dressings?: readonly SceneDressingSpec[] | undefined;
 }
 
 /** Finds a kit piece by id (undefined when there is none). */
@@ -687,6 +713,8 @@ export interface SceneLayout {
   readonly regions: readonly SceneRegion[];
   /** Its footstep surface boxes, in scene order, in metres (mw-e09.4). */
   readonly surfaces: readonly SceneSurface[];
+  /** Dressing models over the grey box (render only). */
+  readonly dressings: readonly SceneDressing[];
 }
 
 /** Thrown when a scene names a kit piece the lookup does not have. */
@@ -1215,6 +1243,26 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           surface: r.surface,
           priority: r.priority,
           texture: r.texture,
+        }),
+      ),
+    ),
+    dressings: Object.freeze(
+      (scene.dressings ?? []).map((d) =>
+        Object.freeze({
+          id: d.id,
+          model: d.model,
+          at: gridToWorld(d.at, scene.grid),
+          yaw: d.yaw,
+          turn: d.turn,
+          size: vec(d.size[0], d.size[1], d.size[2]),
+          fit: d.fit,
+          hides:
+            d.hides === undefined
+              ? undefined
+              : Object.freeze({
+                  min: gridToWorld(d.hides.min, scene.grid),
+                  max: gridToWorld(d.hides.max, scene.grid),
+                }),
         }),
       ),
     ),

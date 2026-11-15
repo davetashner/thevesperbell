@@ -24,6 +24,8 @@ import type {
 } from '@sim/index';
 import { renderIntensity } from '../light/index.ts';
 import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
+import { hiddenByDressing } from './dressing-hides';
+import { loadDressing } from '../props/dressing';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
 import {
   containerModelFor,
@@ -422,9 +424,22 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       group.name = `scene:${layout.id}`;
       const byPurpose = new Map<KitPurpose, BufferGeometry[]>();
       const paintedParts = new Map<PaintedKind, BufferGeometry[]>();
+      // Grey-box parts a dressing model replaces (a ship's hull over its blocking mass) are drawn in the
+      // dressing's own group, hidden once its model has loaded (they stay if it never does).
+      const dressingParts = new Map<number, Map<KitPurpose, BufferGeometry[]>>();
       for (const part of layout.parts) {
         // A breakable piece is drawn on its own (`piece`), so it can go when it breaks.
         if (layout.pieces[part.placement]?.breakable !== undefined) continue;
+        const dressing = layout.dressings.findIndex((d) => hiddenByDressing(part, [d]));
+        if (dressing >= 0) {
+          const byDressingPurpose =
+            dressingParts.get(dressing) ?? new Map<KitPurpose, BufferGeometry[]>();
+          const list = byDressingPurpose.get(part.purpose) ?? [];
+          list.push(partGeometry(part));
+          byDressingPurpose.set(part.purpose, list);
+          dressingParts.set(dressing, byDressingPurpose);
+          continue;
+        }
         // The pillars and the ivy wear paintings (mw-va0), so they are drawn on their own, with UVs.
         const kind = paintedKind(part, layout.pieces[part.placement]?.properties);
         const geometry =
@@ -462,6 +477,30 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         mesh.receiveShadow = true;
         group.add(mesh);
       }
+      layout.dressings.forEach((dressing, index) => {
+        const replaced = new Group();
+        replaced.name = `dressing-greybox:${dressing.id}`;
+        for (const [purpose, geometries] of dressingParts.get(index) ??
+          new Map<KitPurpose, BufferGeometry[]>()) {
+          const merged = mergeGeometries(geometries);
+          for (const geometry of geometries) geometry.dispose();
+          const mesh = new Mesh(merged, gridMaterial(PURPOSE_COLOURS[purpose]));
+          mesh.name = purpose;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          replaced.add(mesh);
+        }
+        group.add(replaced);
+        void loadDressing(dressing).then(
+          (mesh) => {
+            replaced.visible = false;
+            group.add(mesh);
+          },
+          (error: unknown) => {
+            console.warn(`The ${dressing.id} dressing did not load; keeping the grey box.`, error);
+          },
+        );
+      });
       // Tagged surface regions (mw-1jm): a flat patch of the surface's colour on the floor it covers.
       const patches = surfacePatches(layout.parts, layout.surfaces);
       // A region with a painted texture lays it in world units (one tile = `tile` metres), so the

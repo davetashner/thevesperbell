@@ -767,8 +767,22 @@ describe('scene schema (mw-e00.21)', () => {
       routes: [],
       regions: [],
       surfaces: [],
+      dressings: [],
       transitions: [],
     });
+  });
+
+  it('a dressing model defaults to no yaw or turn and a box fit, and must name a model id with a positive size', () => {
+    const hull = { id: 'hull', model: 'model-ship-test-01', at: [0, 0, 0], size: [10, 8, 40] };
+    expect(sceneSchema.parse({ ...room, dressings: [hull] }).dressings).toEqual([
+      { ...hull, yaw: 0, turn: 0, fit: 'box' },
+    ]);
+    expect(problems({ ...room, dressings: [{ ...hull, model: 'ship.glb' }] })).toEqual([
+      expect.stringMatching(/^dressings\.0\.model: /),
+    ]);
+    expect(problems({ ...room, dressings: [{ ...hull, size: [10, 0, 40] }] })).toEqual([
+      expect.stringMatching(/^dressings\.0\.size\.1: Too small/),
+    ]);
   });
 
   it('AC-3: rejects positions off the snap grid, yaws that are not quarter turns and bad scales', () => {

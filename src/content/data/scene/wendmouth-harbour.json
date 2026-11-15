@@ -1535,6 +1535,30 @@
       "at": [35, 2, 135],
       "scale": [0.15, 0.85, 0.15],
       "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [31.5, 2, 116],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [38.5, 2, 116],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [31.5, 2, 130],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [38.5, 2, 130],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
     }
   ],
   "spawns": [
@@ -2735,6 +2759,84 @@
       "max": [-40, 6.5, 51],
       "surface": "wood",
       "texture": "tex-planks-salt-bleached-01"
+    }
+  ],
+  "dressings": [
+    {
+      "id": "tern-hull",
+      "model": "model-ship-gilded-tern-hull-01",
+      "at": [35, -3.25, 124],
+      "turn": 180,
+      "size": [10.4, 8.9, 44],
+      "fit": "box",
+      "hides": {
+        "min": [29.5, -6.5, 105.5],
+        "max": [40.5, 10, 137.5]
+      }
+    },
+    {
+      "id": "tern-foremast",
+      "model": "model-ship-gilded-tern-rigging-01",
+      "at": [35, 2, 112],
+      "turn": 90,
+      "size": [1, 14, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-mainmast",
+      "model": "model-ship-gilded-tern-rigging-01",
+      "at": [35, 2, 124],
+      "turn": 90,
+      "size": [1, 14, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-mizzenmast",
+      "model": "model-ship-gilded-tern-rigging-01",
+      "at": [35, 2, 136],
+      "turn": 90,
+      "size": [1, 13, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-figurehead",
+      "model": "model-prop-tern-figurehead-01",
+      "at": [35, 0.5, 104.25],
+      "turn": 0,
+      "size": [1, 1.8, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-port-fore",
+      "model": "model-prop-springald-swivel-01",
+      "at": [31.5, 2, 116],
+      "turn": 90,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-starboard-fore",
+      "model": "model-prop-springald-swivel-01",
+      "at": [38.5, 2, 116],
+      "turn": 270,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-port-aft",
+      "model": "model-prop-springald-swivel-01",
+      "at": [31.5, 2, 130],
+      "turn": 90,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-starboard-aft",
+      "model": "model-prop-springald-swivel-01",
+      "at": [38.5, 2, 130],
+      "turn": 270,
+      "size": [1, 1.1, 1],
+      "fit": "height"
     }
   ]
 }

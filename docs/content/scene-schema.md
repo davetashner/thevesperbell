@@ -386,6 +386,17 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `surfaces[].surface` | `"stone"` \| `"wood"` \| `"wood-hollow"` \| `"dirt"` \| `"grass"` \| `"gravel"` \| `"mud"` \| `"water-shallow"` \| `"snow-ice"` \| `"metal-grate"` \| `"straw"` \| `"carpet"` \| `"bone-litter"` \| `"leaves"` \| `"glass-shards"` | required | The footstep surface (audio bible §7.3) of everything inside, e.g. carpet. |
 | `surfaces[].priority` | integer | `0` | Where boxes overlap, the higher priority wins; the first listed wins a tie. |
 | `surfaces[].texture` | `"tex-planks-salt-bleached-01"` \| `"tex-deck-planks-caulked-01"` | — | Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01. |
+| `dressings` | list of object | `[]` | Approved 3D models drawn over the grey box (render only), e.g. a ship hull. |
+| `dressings[].id` | id | required | Name of the dressing, unique in the scene, e.g. tern-hull. |
+| `dressings[].model` | string | required | Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01. |
+| `dressings[].at` | list of any (at least 3) | required | Middle of the base of the fitted model, grid cells. |
+| `dressings[].yaw` | `0` \| `90` \| `180` \| `270` | `0` | Rotation about +y in degrees: 0, 90, 180 or 270. |
+| `dressings[].turn` | `0` \| `90` \| `180` \| `270` | `0` | Turn of the model in its own frame before the yaw (degrees), to line up its axes. |
+| `dressings[].size` | list of any (at least 3) | required | Box (x, y, z metres, after the turns) the model is fitted into. |
+| `dressings[].fit` | `"box"` \| `"height"` | `"box"` | box: stretched to fill size on every axis; height: scaled evenly to size y. |
+| `dressings[].hides` | object | — | Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn. |
+| `dressings[].hides.min` | list of any (at least 3) | required |  |
+| `dressings[].hides.max` | list of any (at least 3) | required |  |
 | `transitions` | list of object | — | Volumes that lead to another scene, and where the player arrives (mw-e01.11). |
 | `transitions[].id` | id | required | Name of the transition, unique in the scene, e.g. north-gate. |
 | `transitions[].min` | list of any (at least 3) | required | Lower corner of the volume, grid cells. |

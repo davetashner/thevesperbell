@@ -1057,6 +1057,43 @@ export const sceneRegionSchema = z
   });
 
 /**
+ * A dressing model (render only): an approved 3D model drawn over the grey box, such as a ship's hull
+ * over the blocking mass that stands for it. It is fitted into `size` metres after its turns, its base
+ * on `at`. Colliders, navigation and gameplay stay the grey box's: a dressing only changes the look,
+ * and `hides` is a box whose grey-box blocking and walkable parts it replaces on screen (climbables,
+ * interactives and hazards always stay visible, so a dressing never hides an affordance).
+ */
+export const sceneDressingSchema = z.strictObject({
+  id: contentId.describe('Name of the dressing, unique in the scene, e.g. tern-hull.'),
+  model: z
+    .string()
+    .regex(/^model-[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .describe(
+      'Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01.',
+    ),
+  at: gridPosition.describe('Middle of the base of the fitted model, grid cells.'),
+  yaw,
+  turn: z
+    .literal(SCENE_YAWS)
+    .default(0)
+    .describe('Turn of the model in its own frame before the yaw (degrees), to line up its axes.'),
+  size: z
+    .tuple([z.number().positive(), z.number().positive(), z.number().positive()])
+    .describe('Box (x, y, z metres, after the turns) the model is fitted into.'),
+  fit: z
+    .enum(['box', 'height'])
+    .default('box')
+    .describe('box: stretched to fill size on every axis; height: scaled evenly to size y.'),
+  hides: z
+    .strictObject({ min: vec3Schema, max: vec3Schema })
+    .optional()
+    .describe(
+      'Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn.',
+    ),
+});
+export type SceneDressingDef = z.output<typeof sceneDressingSchema>;
+
+/**
  * Painted floor textures a surface region may lay over the floors it covers (render-only; the greybox
  * draws the region's flat colour without one). Each id is a tileable in public/assets/texture.
  */
@@ -1187,6 +1224,10 @@ export const sceneSchema = z
       .array(sceneSurfaceSchema)
       .default([])
       .describe('Boxes tagged with a footstep surface, e.g. carpet on a wooden floor (mw-e09.4).'),
+    dressings: z
+      .array(sceneDressingSchema)
+      .default([])
+      .describe('Approved 3D models drawn over the grey box (render only), e.g. a ship hull.'),
     transitions: z
       .array(sceneTransitionSchema)
       .default([])

@@ -3120,6 +3120,148 @@
         "additionalProperties": false
       }
     },
+    "dressings": {
+      "default": [],
+      "description": "Approved 3D models drawn over the grey box (render only), e.g. a ship hull.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the dressing, unique in the scene, e.g. tern-hull."
+          },
+          "model": {
+            "type": "string",
+            "pattern": "^model-[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01."
+          },
+          "at": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Middle of the base of the fitted model, grid cells."
+          },
+          "yaw": {
+            "default": 0,
+            "description": "Rotation about +y in degrees: 0, 90, 180 or 270.",
+            "type": "number",
+            "enum": [
+              0,
+              90,
+              180,
+              270
+            ]
+          },
+          "turn": {
+            "default": 0,
+            "description": "Turn of the model in its own frame before the yaw (degrees), to line up its axes.",
+            "type": "number",
+            "enum": [
+              0,
+              90,
+              180,
+              270
+            ]
+          },
+          "size": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Box (x, y, z metres, after the turns) the model is fitted into."
+          },
+          "fit": {
+            "default": "box",
+            "description": "box: stretched to fill size on every axis; height: scaled evenly to size y.",
+            "type": "string",
+            "enum": [
+              "box",
+              "height"
+            ]
+          },
+          "hides": {
+            "description": "Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn.",
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "max": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "min",
+              "max"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "model",
+          "at",
+          "size"
+        ],
+        "additionalProperties": false
+      }
+    },
     "transitions": {
       "description": "Volumes that lead to another scene, and where the player arrives (mw-e01.11).",
       "type": "array",

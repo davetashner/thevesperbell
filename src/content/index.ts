@@ -457,6 +457,8 @@ export {
   type SceneYaw,
   SURFACE_TEXTURES,
   type SurfaceTexture,
+  sceneDressingSchema,
+  type SceneDressingDef,
 } from './types/scene.ts';
 export {
   DAMAGE_TYPES,
