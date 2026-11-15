@@ -1,6 +1,6 @@
 # model-ship-gilded-tern-hull-01: the Gilded Tern — the hull
 
-**Status: generated v1, turntable awaiting owner approval** (2026-11-15). Design approved on `prop-ship-gilded-tern-01` v3 (owner, 2026-11-15).
+**Status: generated v2, turntable awaiting owner approval** (2026-11-15). v1 was too short (about 2.65:1); the owner asked for a redo. Design approved on `prop-ship-gilded-tern-01` v3 (owner, 2026-11-15).
 
 ## Single image (input to image-to-3D)
 
@@ -45,3 +45,17 @@ The hull, deck at y = 2 over the 10 m × 40 m blocking platform (x 30–40, z 10
 ## Licence
 
 Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added on approval.
+
+## v2 (redo at the level's proportions, 2026-11-15)
+
+- Single image `prop-ship-gilded-tern-hull-01` v2: Higgsfield `gpt_image_2_6`, high, 2k, 21:9, job `9a419ba8-fc5a-41e6-ae2c-b0ec5cc54ef2`,
+  references the approved v3 sheet and the v1 hull image; the prompt asks for a hull exactly four times as long as wide,
+  seen side-on across the frame (`assets/_incoming/prop-ship-gilded-tern-hull-01/v2.png`).
+- Tripo H3.1 via Higgsfield, job `070ff2f5-24f9-4b74-8203-6f5119d50bcd`, `face_limit` 5000, texture on, PBR off, auto_size on.
+- Raw result: 4,714 triangles, 1 material, one 2048² texture, bounds 1.49 × 1.2 × 5.64 (about 3.8:1).
+- Raw file `assets/_incoming/model-ship-gilded-tern-hull-01/v2.glb` (SHA-256 `f996f770dd6f83dc0b4063490d97cf20594be421d5f88c7ffec27a3ea71fea72`), turntable `v2-turntable.png`.
+
+| Gate | Version | Decision | Approver | Date | Note |
+|---|---|---|---|---|---|
+| turntable | v1 | rejected | owner | 2026-11-15 | "Let's redo the hull" (too short for the level's 4:1 hull) |
+| turntable | v2 | pending | owner | — | — |
