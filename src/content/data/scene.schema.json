@@ -3101,6 +3101,14 @@
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
+          },
+          "texture": {
+            "description": "Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01.",
+            "type": "string",
+            "enum": [
+              "tex-planks-salt-bleached-01",
+              "tex-deck-planks-caulked-01"
+            ]
           }
         },
         "required": [

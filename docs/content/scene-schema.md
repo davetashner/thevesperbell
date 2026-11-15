@@ -385,6 +385,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `surfaces[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
 | `surfaces[].surface` | `"stone"` \| `"wood"` \| `"wood-hollow"` \| `"dirt"` \| `"grass"` \| `"gravel"` \| `"mud"` \| `"water-shallow"` \| `"snow-ice"` \| `"metal-grate"` \| `"straw"` \| `"carpet"` \| `"bone-litter"` \| `"leaves"` \| `"glass-shards"` | required | The footstep surface (audio bible §7.3) of everything inside, e.g. carpet. |
 | `surfaces[].priority` | integer | `0` | Where boxes overlap, the higher priority wins; the first listed wins a tie. |
+| `surfaces[].texture` | `"tex-planks-salt-bleached-01"` \| `"tex-deck-planks-caulked-01"` | — | Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01. |
 | `transitions` | list of object | — | Volumes that lead to another scene, and where the player arrives (mw-e01.11). |
 | `transitions[].id` | id | required | Name of the transition, unique in the scene, e.g. north-gate. |
 | `transitions[].min` | list of any (at least 3) | required | Lower corner of the volume, grid cells. |

@@ -455,6 +455,8 @@ export {
   type SceneBackdropDef,
   type SceneWaypointDef,
   type SceneYaw,
+  SURFACE_TEXTURES,
+  type SurfaceTexture,
 } from './types/scene.ts';
 export {
   DAMAGE_TYPES,

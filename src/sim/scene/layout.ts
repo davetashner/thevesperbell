@@ -347,6 +347,8 @@ export interface SceneSurfaceSpec {
   readonly max: Triple;
   readonly surface: string;
   readonly priority: number;
+  /** Render only: a painted floor tileable (content SURFACE_TEXTURES). */
+  readonly texture?: string | undefined;
 }
 
 /** A surface region as laid out: its corners in metres (read by `surfaceAt`, src/sim/surfaces). */
@@ -356,6 +358,8 @@ export interface SceneSurface {
   readonly max: Vec3;
   readonly surface: string;
   readonly priority: number;
+  /** Render only: a painted floor tileable, or undefined for the flat greybox colour. */
+  readonly texture: string | undefined;
 }
 
 /** A tagged box as laid out: its corners in metres (water: wading and swimming, mw-e02.14). */
@@ -1210,6 +1214,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           max: gridToWorld(r.max, scene.grid),
           surface: r.surface,
           priority: r.priority,
+          texture: r.texture,
         }),
       ),
     ),

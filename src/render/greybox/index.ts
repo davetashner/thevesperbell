@@ -32,6 +32,7 @@ import {
   paintedMaterial,
   PILLAR_TILE,
   PILLAR_URL,
+  SURFACE_TEXTURE_PAINTINGS,
   worldUvPartGeometry,
 } from '../props/surfaces';
 import {
@@ -455,21 +456,44 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       }
       // Tagged surface regions (mw-1jm): a flat patch of the surface's colour on the floor it covers.
       const patches = surfacePatches(layout.parts, layout.surfaces);
+      // A region with a painted texture lays it in world units (one tile = `tile` metres), so the
+      // boards line up across neighbouring patches; the rest keep their flat colour.
       const bySurface = new Map<string, BufferGeometry[]>();
       for (const patch of patches) {
         const plane = new PlaneGeometry(patch.maxX - patch.minX, patch.maxZ - patch.minZ);
         plane.rotateX(-Math.PI / 2);
         plane.translate((patch.minX + patch.maxX) / 2, patch.y, (patch.minZ + patch.maxZ) / 2);
-        const list = bySurface.get(patch.surface) ?? [];
+        const painting =
+          patch.texture === undefined ? undefined : SURFACE_TEXTURE_PAINTINGS[patch.texture];
+        if (painting !== undefined) {
+          const position = plane.getAttribute('position');
+          const uv = plane.getAttribute('uv');
+          for (let i = 0; i < uv.count; i++) {
+            uv.setXY(i, position.getX(i) / painting.tile, -position.getZ(i) / painting.tile);
+          }
+          uv.needsUpdate = true;
+        }
+        const key =
+          painting === undefined || patch.texture === undefined
+            ? patch.surface
+            : `${patch.surface}|${patch.texture}`;
+        const list = bySurface.get(key) ?? [];
         list.push(plane);
-        bySurface.set(patch.surface, list);
+        bySurface.set(key, list);
       }
-      for (const [surface, geometries] of bySurface) {
+      for (const [key, geometries] of bySurface) {
         const merged = mergeGeometries(geometries);
         for (const geometry of geometries) geometry.dispose();
+        const [surface = key, texture] = key.split('|');
         const colour = SURFACE_COLOURS[surface as keyof typeof SURFACE_COLOURS];
-        const mesh = new Mesh(merged, gridMaterial(colour));
-        mesh.name = `surface:${surface}`;
+        const painting = texture === undefined ? undefined : SURFACE_TEXTURE_PAINTINGS[texture];
+        const material =
+          painting === undefined
+            ? gridMaterial(colour)
+            : paintedMaterial(painting.url, colour, true);
+        const mesh = new Mesh(merged, material);
+        mesh.name =
+          painting === undefined ? `surface:${surface}` : `surface:${key.replace('|', ':')}`;
         mesh.receiveShadow = true;
         group.add(mesh);
       }

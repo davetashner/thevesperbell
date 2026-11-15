@@ -72,3 +72,13 @@ Preamble verbatim, palette, no text/logos, lighting and shape language checked b
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|
 | `tex-bulkhead-pine-01` | generated:higgsfield/gpt_image_2_6 | Higgsfield plus (quality high, 2k) | 2026-11-15 | GEN-OWNED — Higgsfield Terms of Use §4.4 (see the door-wood-01 row in CREDITS.md). https://higgsfield.ai/terms-of-use-agreement | this file |
+
+## 9. Runtime file and integration (2026-11-15)
+
+| Field | Value |
+|---|---|
+| Runtime file | `public/assets/texture/tex-bulkhead-pine-01.webp` — 1024², WebP quality 88 (SHA-256 `0dd0b6cb91aa09b2dc892bbe78cde47e7e6f584546daa5d35baa29c3945bc871`) |
+| Seam repair | Cross-board axis y (boards run horizontally): cropped from one real board gap to the next so the wrap lands on a gap. Along-board axis: overlap blend (the extra band past the tile faded into the start). Edge discontinuity checked equal to the interior and a 2×2 tile checked by eye. |
+| Format | WebP until the KTX2 import pipeline (`mw-e37.8`) exists, as with `tex-glenstone-quay-wendmouth-probe-01`. |
+| Tile | one tile = 2 m × 2 m, laid in world units; boards run along world z. |
+| Where it is used | Not wired yet: it is a wall texture and the Tern interior is a later E40 bead. The runtime file is ready for it. |

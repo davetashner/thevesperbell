@@ -72,3 +72,13 @@ Preamble verbatim, palette, no text/logos, lighting and shape language checked b
 | Asset id | Tool / model | Tier | Date | Licence / terms | Prompt file |
 |---|---|---|---|---|---|
 | `tex-deck-planks-caulked-01` | generated:higgsfield/gpt_image_2_6 | Higgsfield plus (quality high, 2k) | 2026-11-15 | GEN-OWNED — Higgsfield Terms of Use §4.4 (see the door-wood-01 row in CREDITS.md). https://higgsfield.ai/terms-of-use-agreement | this file |
+
+## 9. Runtime file and integration (2026-11-15)
+
+| Field | Value |
+|---|---|
+| Runtime file | `public/assets/texture/tex-deck-planks-caulked-01.webp` — 1024², WebP quality 88 (SHA-256 `c48cc1880ae616cb37a99899506f531f524fd8ed483690dd02472a2b832232e3`) |
+| Seam repair | Cross-board axis x (boards run vertically): cropped from one real board gap to the next so the wrap lands on a gap. Along-board axis: overlap blend (the extra band past the tile faded into the start). Edge discontinuity checked equal to the interior and a 2×2 tile checked by eye. |
+| Format | WebP until the KTX2 import pipeline (`mw-e37.8`) exists, as with `tex-glenstone-quay-wendmouth-probe-01`. |
+| Tile | one tile = 2 m × 2 m, laid in world units; boards run along world z. |
+| Where it is used | Wendmouth Harbour surface regions `tern-deck` (the Gilded Tern hull top) and `patient-ann-deck` (`src/content/data/scene/wendmouth-harbour.json`). |

@@ -3,9 +3,11 @@
 // region never changes the sound of ground that looks like something else. Also: a material that names a
 // footstep surface agrees with that surface's table offset, so one floor has one number.
 
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { loadGameContent } from '@content/index';
+import { loadGameContent, SURFACE_TEXTURES } from '@content/index';
 import { layoutScene } from '@sim/index';
+import { SURFACE_TEXTURE_PAINTINGS } from '../../src/render/props/surfaces';
 import { surfacePatches } from '../../src/render/greybox/surface-patches';
 
 const content = loadGameContent();
@@ -18,6 +20,7 @@ describe('tagged surface regions (mw-1jm)', () => {
       'marsh-store',
       'sleeping-ox',
       'under-the-bridge',
+      'wendmouth-harbour',
     ]);
   });
 
@@ -45,6 +48,26 @@ describe('tagged surface regions (mw-1jm)', () => {
       }
     });
   }
+
+  it('every painted floor texture has a runtime file and a renderer entry, and the harbour decks use them', () => {
+    for (const id of SURFACE_TEXTURES) {
+      const painting = SURFACE_TEXTURE_PAINTINGS[id];
+      const url = painting?.url ?? '';
+      expect(url, id).toBe(`/assets/texture/${id}.webp`);
+      expect(existsSync(`public${url}`), `${id} runtime file`).toBe(true);
+      expect(existsSync(`assets/source/texture/${id}/${id}.png`), `${id} source`).toBe(true);
+    }
+    const harbour = layoutScene(content.get('scene', 'wendmouth-harbour'), (id) =>
+      content.get('kit', id),
+    );
+    const textured = Object.fromEntries(harbour.surfaces.map((r) => [r.id, r.texture]));
+    expect(textured).toMatchObject({
+      'tern-deck': 'tex-deck-planks-caulked-01',
+      'patient-ann-deck': 'tex-deck-planks-caulked-01',
+      'tern-gangway': 'tex-planks-salt-bleached-01',
+      'loft-bridge-west': 'tex-planks-salt-bleached-01',
+    });
+  });
 
   it('a material that names a footstep surface has that surface’s table offset', () => {
     const offsets = new Map<string, number>(table.surfaces.map((row) => [row.id, row.offsetDb]));

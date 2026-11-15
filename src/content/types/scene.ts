@@ -1057,6 +1057,16 @@ export const sceneRegionSchema = z
   });
 
 /**
+ * Painted floor textures a surface region may lay over the floors it covers (render-only; the greybox
+ * draws the region's flat colour without one). Each id is a tileable in public/assets/texture.
+ */
+export const SURFACE_TEXTURES = [
+  'tex-planks-salt-bleached-01',
+  'tex-deck-planks-caulked-01',
+] as const;
+export type SurfaceTexture = (typeof SURFACE_TEXTURES)[number];
+
+/**
  * A box of the scene tagged with an acoustic surface (mw-e09.4): a carpet on a wooden floor, a gravel
  * path, a creaky bridge. `surfaceAt` (src/sim/surfaces) reads the highest `priority` box holding a
  * position, whatever collider is underfoot; the first listed wins a tie. The box must reach the
@@ -1074,6 +1084,12 @@ export const sceneSurfaceSchema = z
       .int()
       .default(0)
       .describe('Where boxes overlap, the higher priority wins; the first listed wins a tie.'),
+    texture: z
+      .enum(SURFACE_TEXTURES)
+      .optional()
+      .describe(
+        'Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01.',
+      ),
   })
   .refine(({ min, max }) => max[0] > min[0] && max[1] > min[1] && max[2] > min[2], {
     message: 'max must be above min on every axis',

@@ -2465,5 +2465,49 @@
       "scene": "under-the-bridge",
       "spawn": "arrive-from-wendmouth-harbour"
     }
+  ],
+  "surfaces": [
+    {
+      "id": "tern-gangway",
+      "min": [34, -0.5, 100],
+      "max": [36, 2.5, 104],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "tern-deck",
+      "min": [32, 1.5, 104],
+      "max": [38, 2.5, 137],
+      "surface": "wood",
+      "texture": "tex-deck-planks-caulked-01"
+    },
+    {
+      "id": "patient-ann-deck",
+      "min": [-16, -2.5, 102],
+      "max": [-12, -1.5, 116],
+      "surface": "wood",
+      "texture": "tex-deck-planks-caulked-01"
+    },
+    {
+      "id": "loft-bridge-west",
+      "min": [-82, 3.5, 49],
+      "max": [-78, 4.5, 51],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "loft-bridge-east",
+      "min": [-64, 3.5, 49],
+      "max": [-60, 4.5, 51],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "loft-stair-customs",
+      "min": [-46, 3.5, 49],
+      "max": [-40, 6.5, 51],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    }
   ]
 }

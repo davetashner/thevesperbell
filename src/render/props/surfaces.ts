@@ -26,6 +26,21 @@ export const PILLAR_URL = '/assets/surface/pillar-glenstone-01.webp';
 export const IVY_URL = '/assets/surface/ivy-stone-01.webp';
 export const CRATE_URL = '/assets/surface/crate-01.webp';
 
+/**
+ * The painted floor tileables a scene's surface region may name (content SURFACE_TEXTURES): where the
+ * runtime file is, how many metres one tile covers, and the region's colour until it loads. Boards run
+ * along the texture's v axis, which the floor patch maps to world z.
+ */
+export const SURFACE_TEXTURE_PAINTINGS: Readonly<
+  Record<string, { readonly url: string; readonly tile: number }>
+> = {
+  'tex-planks-salt-bleached-01': {
+    url: '/assets/texture/tex-planks-salt-bleached-01.webp',
+    tile: 2,
+  },
+  'tex-deck-planks-caulked-01': { url: '/assets/texture/tex-deck-planks-caulked-01.webp', tile: 2 },
+};
+
 /** Metres one tile of the pillar stone covers: three to four block courses of about 0.3 m. */
 export const PILLAR_TILE = 1.2;
 /** Metres one tile of the ivy covers: about a hand-span per leaf. */
