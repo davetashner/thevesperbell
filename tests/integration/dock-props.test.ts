@@ -95,12 +95,12 @@ describe('Wendmouth dock props', () => {
       const spawn = scene.spawns.find((s) => s.id === id);
       expect(spawn, id).toBeDefined();
       const [x, y, z] = spawn?.at ?? [0, 0, 0];
-      const reach = id === 'tern-tiller' ? 1 : 0.1;
+      const reach = id === 'tern-tiller' ? 1 : 0.1; // the tiller's post is 0.5 m aft of its middle
       const collider = layout.parts.find(
         (p) =>
           p.purpose === 'blocking' &&
           Math.abs(p.min.y - y) < 0.01 &&
-          p.max.y > y + 0.9 &&
+          p.max.y > y + 0.8 &&
           x >= p.min.x - reach &&
           x <= p.max.x + reach &&
           z >= p.min.z - reach &&

@@ -25,10 +25,12 @@ Owner photos are used only as references for form and construction; they are nev
 
 ## 2. Fit to the level
 
-The grey-box Tern in `wendmouth-harbour` is a 20 m × 5 m hull (x 32.5–37.5, z 116–136) with its deck at y = 2, bow to the
-south by the gangway and the stern cabin and locked berth to the north (spawns `door-tern-cabin`, `door-tern-berth`). The
-rigging climb starts at `tern-rigging-foot` (7.5 m aft of the bow) and reaches the crow's nest about 10 m above the deck.
-Models built from this sheet must match those positions; the hull is about four times as long as wide.
+The grey-box Tern in `wendmouth-harbour` is a hull platform 10 m wide and 40 m long (x 30–40, z 106–146; bulwarks at
+x 31 and 39) with its deck at y = 2, bow to the south by the gangway (z 106) and the stern cabin (doorway z 138) and the
+locked berth (z 142–146) to the north. Masts stand at z 124 and 136 (x 35); the rigging climb starts at
+`tern-rigging-foot` (z 123.5) and reaches the crow's nest about 10 m above the deck. Models built from this sheet must
+match those positions; the hull is about four times as long as wide. (Corrected 2026-11-15: an earlier note gave 20 × 5 m,
+misreading the platform piece's 2 m base.)
 
 ## 3. Filled prompt (preamble verbatim from docs/art/style-bible.md §14, add-on from §14.1)
 
