@@ -276,6 +276,16 @@
           "next": "passage-1"
         },
         {
+          "id": "ask-aboard",
+          "text": "I've had a look round your deck.",
+          "when": {
+            "kind": "fact",
+            "fact": "tern.boarded"
+          },
+          "once": true,
+          "next": "aboard-1"
+        },
+        {
           "id": "marine-knight",
           "text": "A marine's berth, then.",
           "when": {
@@ -321,6 +331,13 @@
           "next": "farewell"
         }
       ]
+    },
+    {
+      "id": "aboard-1",
+      "kind": "line",
+      "speaker": "hesketh",
+      "text": "Then you have seen her at her best, which is at anchor. She sails when the cargo is ready and the tide is willing, and not a minute before. Mind the rigging; it is cheaper than a surgeon.",
+      "next": "hub"
     },
     {
       "id": "farewell",
@@ -378,6 +395,16 @@
       "kind": "effect",
       "effects": [
         {
+          "kind": "giveItem",
+          "item": "tern-gangway-pass",
+          "count": 1
+        },
+        {
+          "kind": "setFact",
+          "fact": "hesketh.gangway-open",
+          "value": true
+        },
+        {
           "kind": "setFact",
           "fact": "hesketh.crew-hired",
           "value": true
@@ -401,20 +428,25 @@
       "id": "sign-1",
       "kind": "line",
       "speaker": "hesketh",
-      "text": "Done. Report at dawn, bring your own boots. Keep the crew ranks clean and your questions few. The Tern will remember you, and so will I.",
+      "text": "Done. Report at dawn, bring your own boots. Take this tally to the gangway; the crew know it, and they will let a hand aboard. Keep the crew ranks clean and your questions few. The Tern will remember you, and so will I.",
       "next": "hub"
     },
     {
       "id": "passage-1",
       "kind": "line",
       "speaker": "hesketh",
-      "text": "Tereza sent you? Then you are no stranger. The debt of honour is a bore, and you are its price. Aboard, and be quick. The gangway is open.",
+      "text": "Tereza sent you? Then you are no stranger. The debt of honour is a bore, and you are its price. Aboard, and be quick. Take this tally to the gangway; the crew will let you up.",
       "next": "passage-fx"
     },
     {
       "id": "passage-fx",
       "kind": "effect",
       "effects": [
+        {
+          "kind": "giveItem",
+          "item": "tern-gangway-pass",
+          "count": 1
+        },
         {
           "kind": "setFact",
           "fact": "hesketh.gangway-open",
