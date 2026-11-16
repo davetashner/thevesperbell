@@ -42,6 +42,7 @@
   },
   "presentation": {
     "mesh": "npc-nell",
+    "portrait": "portrait-npc-nell-gull-keeper",
     "sfx": "placeholder"
   }
 }

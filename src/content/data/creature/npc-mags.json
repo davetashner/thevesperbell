@@ -39,6 +39,7 @@
   },
   "presentation": {
     "mesh": "npc-mags",
+    "portrait": "portrait-npc-mags-bargewoman",
     "sfx": "placeholder"
   }
 }

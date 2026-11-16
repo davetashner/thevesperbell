@@ -233,6 +233,30 @@ describe('mw-ju8.16: the merchant name in the header', () => {
     expect(find('.vb-shop-name').textContent).toBe('Ottilie Marsh');
   });
 
+  it('mw-e37.433: a merchant whose NPC creature has a portrait shows it; one without keeps the initial', () => {
+    const withArt = {
+      all: (type: string) =>
+        type === 'item'
+          ? [book]
+          : type === 'merchant'
+            ? [merchantWith({ displayName: 'Ottilie Marsh' })]
+            : [
+                {
+                  id: 'npc-named-keeper',
+                  presentation: { portrait: 'portrait-npc-ottilie-marsh-01' },
+                },
+              ],
+    } as unknown as GameContent;
+    const t = setup(withArt);
+    t.talk(t.counter(['merchant:named']));
+    const frame = find('[data-testid="shop-portrait"]');
+    expect(frame.dataset['portrait']).toBe('portrait-npc-ottilie-marsh-01');
+    expect(frame.style.backgroundImage).toContain(
+      '/assets/portrait/portrait-npc-ottilie-marsh-01.webp',
+    );
+    expect(frame.textContent).toBe('');
+  });
+
   it('AC-1: without a displayName the header falls back to the readable NPC id', () => {
     open(merchantWith({}));
     expect(find('.vb-shop-name').textContent).toBe('Npc named keeper');

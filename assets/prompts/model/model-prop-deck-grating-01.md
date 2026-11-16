@@ -35,6 +35,7 @@ SUBJECT: reproduce prop 2 from the attached approved prop sheet exactly — the 
    → 54 KB, 1,306 triangles, one material, one 512² texture (meshopt-compressed; SHA-256 `a993eb76494204b12b998d31958f4e93f57c09929964e24b55486b8062d9c85e`).
    Checked by loading it in three.js with the meshopt decoder and rendering the four views again.
 2. Load-time placement (scale to 0.3 m, facing) when the harbour props are wired.
+3. Not used at runtime (mw-e40.27): the slats came out as blobs, so the hatch is built from boxes (`src/render/props/deck-grating.ts`). The file stays for the record.
 
 ## Approval gate(s)
 

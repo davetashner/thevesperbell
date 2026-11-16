@@ -39,6 +39,7 @@
   },
   "presentation": {
     "mesh": "npc-quell",
+    "portrait": "portrait-npc-jasper-shipping-agent",
     "sfx": "placeholder"
   }
 }

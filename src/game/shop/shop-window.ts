@@ -59,6 +59,7 @@ import {
 } from '@ui/index';
 import { itemLabel } from '../classes';
 import { logicEmitted } from '../logic/host';
+import { npcPortrait } from '../portraits';
 import { ICON_KIND, itemName } from '../items/inventory-screen';
 
 /** The content the shop reads. */
@@ -232,10 +233,12 @@ export class ShopViews {
     const merchant = this.#merchants.get(merchantId);
     if (merchant === undefined) throw new RangeError(`merchant "${merchantId}" is not defined`);
     const state = this.#shops.stateOf(world, merchantId);
+    const portrait = npcPortrait(this.#content.all('creature'), merchant.npcId);
     return {
       merchant: {
         name: merchant.displayName ?? itemLabel(merchant.npcId),
         greeting: greetingFor(merchant),
+        ...(portrait !== undefined && { portrait }),
       },
       crowns: crownsOf(world, player),
       merchantCrowns: state.gold,

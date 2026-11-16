@@ -1,0 +1,51 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "wendmouth-tern",
+  "name": "Gilded Tern boarding",
+  "notes": "The first time the player steps onto the Gilded Tern's deck (scene wendmouth-harbour, mw-e40.28) the latch writes tern.boarded = true and keeps it. The deck volume covers the ship's main deck (x 31-39, z 104-146 at y 2.5), above the gangway gate; the gate opens only to Hesketh's tern-gangway-pass token. tern.sailed stays Act III (mw-e39.39).",
+  "nodes": [
+    {
+      "id": "deck",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": {
+          "x": 35,
+          "y": 3.5,
+          "z": 125
+        },
+        "halfExtents": {
+          "x": 4,
+          "y": 1.5,
+          "z": 21
+        }
+      },
+      "filter": [
+        {
+          "test": "tag",
+          "tag": "player"
+        }
+      ]
+    },
+    {
+      "id": "boarded",
+      "kind": "latch"
+    },
+    {
+      "id": "boarded-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "tern.boarded"
+    }
+  ],
+  "wires": [
+    {
+      "from": "deck.enter",
+      "to": "boarded.set"
+    },
+    {
+      "from": "boarded",
+      "to": "boarded-fact"
+    }
+  ]
+}

@@ -15,6 +15,7 @@
 import { Box3, Matrix4, Mesh } from 'three';
 import type { SceneDressing } from '@sim/index';
 import { readGlbMesh } from '../models/glb';
+import { MODEL_STRIPS, stripTriangles } from './model-strips';
 
 const turnMatrix = (degrees: number): Matrix4 =>
   new Matrix4().makeRotationY((degrees * Math.PI) / 180);
@@ -22,7 +23,10 @@ const turnMatrix = (degrees: number): Matrix4 =>
 /** A mesh of dressing `d`, fitted and placed in world space. */
 export async function loadDressing(d: SceneDressing): Promise<Mesh> {
   const url = `/assets/model/${d.model}.glb`;
-  const { geometry, material } = await readGlbMesh(url);
+  const model = await readGlbMesh(url);
+  const strips = MODEL_STRIPS[d.model];
+  const geometry = strips === undefined ? model.geometry : stripTriangles(model.geometry, strips);
+  const material = model.material;
   geometry.applyMatrix4(turnMatrix(d.turn + d.yaw));
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
@@ -53,7 +57,7 @@ export const NEAR_CAMERA_OPACITY = 0.25;
 const FADE_STEP = 0.08;
 
 /** Makes `mesh` fade while the camera is inside its bounds (padded by half a metre). */
-function fadeNearCamera(mesh: Mesh): void {
+export function fadeNearCamera(mesh: Mesh): void {
   const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
   if (material === undefined) return;
   material.transparent = true;

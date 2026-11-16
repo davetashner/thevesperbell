@@ -881,7 +881,7 @@ ${tokens}
   height: 5.5em;
   border: 3px double var(--ui-color-border);
   border-radius: var(--ui-radius);
-  background: var(--ui-color-panel-raised);
+  background: var(--ui-color-panel-raised) center / cover no-repeat;
   font-family: var(--ui-font-heading);
   font-size: ${size(1.75)};
   color: var(--ui-color-text-muted);
@@ -1107,6 +1107,18 @@ ${tokens}
   left: 50%;
   transform: translateX(-50%);
   background: var(--vb-dialogue-muted);
+}
+.vb-dialogue-portrait[data-art]:not([data-art='']) {
+  width: 6.5em;
+  height: 6.5em;
+  background-color: transparent;
+  background-size: cover;
+  background-position: center;
+}
+.vb-dialogue-portrait[data-art]:not([data-art=''])::before,
+.vb-dialogue-portrait[data-art]:not([data-art=''])::after { display: none; }
+@media (max-width: 30em) {
+  .vb-dialogue-portrait[data-art]:not([data-art='']) { width: 4.5em; height: 4.5em; }
 }
 .vb-dialogue-portrait::before { top: 18%; width: 34%; height: 34%; border-radius: 50%; }
 .vb-dialogue-portrait::after { top: 58%; width: 72%; height: 70%; border-radius: 50% 50% 0 0; }

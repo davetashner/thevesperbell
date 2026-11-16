@@ -15,6 +15,7 @@
 // the drawing by the Playwright harbour spec.
 
 import { placeGeometry, readGlbMesh, type GlbModel, type Placement } from '../models/glb';
+import { buildDeckGrating } from './deck-grating';
 
 /** Where model `id` is served from. */
 export const modelUrl = (id: string): string => `/assets/model/${id}.glb`;
@@ -36,6 +37,8 @@ export interface DockModel {
    * crate): its height, with the body at its foot.
    */
   readonly overall?: number;
+  /** Drawn from boxes in code instead of the model (the grating: its model came out blobby). */
+  readonly procedural?: 'deck-grating';
 }
 
 /** Testprop id → its dock model. */
@@ -48,7 +51,12 @@ export const PROP_MODELS: Readonly<Record<string, DockModel>> = {
   'cargo-crate': { model: 'model-prop-cargo-net-load-01', rotateDeg: AS_IS, overall: 1.6 },
   'rope-coil': { model: 'model-prop-rope-coil-01', rotateDeg: AS_IS, height: 0.25 },
   'hawser-coil': { model: 'model-prop-hawser-coil-01', rotateDeg: AS_IS, height: 0.45 },
-  'deck-grating': { model: 'model-prop-deck-grating-01', rotateDeg: AS_IS, height: 0.3 },
+  'deck-grating': {
+    model: 'model-prop-deck-grating-01',
+    rotateDeg: AS_IS,
+    height: 0.3,
+    procedural: 'deck-grating',
+  },
   'companion-hutch': { model: 'model-prop-companion-hutch-01', rotateDeg: FRONT_X, height: 1.6 },
   tiller: { model: 'model-prop-tiller-01', rotateDeg: FRONT_X, height: 0.9 },
   'pin-rail': { model: 'model-prop-pin-rail-01', rotateDeg: FRONT_X, height: 0.6, mounted: true },
@@ -110,6 +118,11 @@ function load(key: string, dock: DockModel, placement: Placement): Promise<GlbMo
   const cached = loading.get(key);
   if (cached !== undefined) return cached;
   const url = modelUrl(dock.model);
+  if (dock.procedural === 'deck-grating') {
+    const built = Promise.resolve(buildDeckGrating());
+    loading.set(key, built);
+    return built;
+  }
   const pending = readGlbMesh(url)
     .then((model) => {
       placeGeometry(model.geometry, placement, url);

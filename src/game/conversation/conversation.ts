@@ -81,6 +81,8 @@ export interface ConversationOptions {
   readonly dialogueOf: (creature: string) => string | undefined;
   /** Who a speaker id of a dialogue is, for the box ("Ottilie Marsh"); default: the id. */
   readonly speakerName?: (dialogue: string, speaker: string) => string;
+  /** The portrait asset id of a speaker of a dialogue, when it has art; default: none (silhouette). */
+  readonly speakerPortrait?: (dialogue: string, speaker: string) => string | undefined;
   /** Metres the player may be from the NPC; default `TALK_RANGE_M`. */
   readonly maxDistance?: number;
   /** The line being typed out (the box's reveal): Enter finishes it before it continues. */
@@ -150,7 +152,12 @@ export class Conversations {
   #outcome: DialogueBoxOutcome | undefined;
   /** Where in the history the check just chosen belongs (after the choice, before the answer). */
   #checkAt = 0;
-  #lastLine = { speaker: '', text: '', portrait: '' };
+  #lastLine: { speaker: string; text: string; portrait: string; art: string | undefined } = {
+    speaker: '',
+    text: '',
+    portrait: '',
+    art: undefined,
+  };
   #divide = false;
 
   constructor(options: ConversationOptions) {
@@ -497,7 +504,12 @@ export class Conversations {
     const speaker = this.#speakerName(view);
     this.#opening(speaker);
     this.#push({ kind: 'line', speaker, text: view.text });
-    this.#lastLine = { speaker, text: view.text, portrait: view.speaker };
+    this.#lastLine = {
+      speaker,
+      text: view.text,
+      portrait: view.speaker,
+      art: this.#options.speakerPortrait?.(view.dialogue, view.speaker),
+    };
   }
 
   /** The first entry of a conversation starts with a divider naming who it is with. */
@@ -563,6 +575,7 @@ export class Conversations {
     return {
       speaker: readout.kind === 'line' ? readout.speaker : last.speaker,
       portrait: readout.kind === 'line' && view?.kind === 'line' ? view.speaker : last.portrait,
+      ...(last.art !== undefined && { portraitArt: last.art }),
       text: readout.kind === 'line' ? readout.text : last.text,
       lineKey: this.#seq,
       choices,
