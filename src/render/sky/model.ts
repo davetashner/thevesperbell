@@ -20,6 +20,8 @@ export interface SkyDomeSettings {
   readonly wind: number;
   /** Fixes the star field and cloud shapes, so a scene's sky is the same every time. */
   readonly seed: number;
+  /** Minute shown by a scene without a day and night look. */
+  readonly minute: number;
 }
 
 /** Everything the dome shader needs at one minute. */

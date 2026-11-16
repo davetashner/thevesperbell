@@ -379,6 +379,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `environment.dome.clouds` | number 0–1 | `0.35` | Cloud cover, 0 clear to 1 overcast. |
 | `environment.dome.wind` | number 0–360 | `60` | Bearing the clouds drift towards, degrees clockwise from north (+z). |
 | `environment.dome.seed` | integer ≥ 0 | `1` | Fixes the star field and cloud shapes. |
+| `environment.dome.minute` | integer 0–1439 | `720` | Minute of the day the dome shows in a scene without a day and night look (light.timeOfDay); scenes with one follow the game clock. |
 | `regions` | list of object | `[]` | Tagged boxes, e.g. a river (mw-ju8.1); data only until a system reads them. |
 | `regions[].id` | id | required | Name of the region, unique in the scene, e.g. river. |
 | `regions[].min` | list of any (at least 3) | required | Lower corner, grid cells. |

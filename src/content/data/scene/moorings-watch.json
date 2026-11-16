@@ -1335,7 +1335,11 @@
       }
     }
   ],
-  "signals": [{ "graph": "moorings-watch-areas" }],
+  "signals": [
+    {
+      "graph": "moorings-watch-areas"
+    }
+  ],
   "light": {
     "ambient": 0.4,
     "directional": [
@@ -1353,6 +1357,13 @@
       "color": "#B4C3CE",
       "near": 40,
       "far": 190
+    },
+    "dome": {
+      "stars": 0.6,
+      "clouds": 0.5,
+      "wind": 80,
+      "seed": 6,
+      "minute": 960
     }
   },
   "regions": [

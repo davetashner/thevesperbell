@@ -12,7 +12,7 @@ import {
   type SkyDomeSettings,
 } from './model';
 
-const DOME: SkyDomeSettings = { stars: 0.8, clouds: 0.4, wind: 90, seed: 7 };
+const DOME: SkyDomeSettings = { stars: 0.8, clouds: 0.4, wind: 90, seed: 7, minute: 720 };
 const close = (a: readonly number[], b: readonly number[]): void => {
   a.forEach((v, i) => {
     expect(v).toBeCloseTo(b[i] ?? NaN, 5);

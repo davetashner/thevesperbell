@@ -43,8 +43,6 @@ export const BACKDROP_DEV_ROOT = '/assets/_incoming/';
 
 /** Sky colour a dome paints from when the scene names none (style bible `sky`). */
 const DEFAULT_SKY = '#8FA8C8';
-/** The minute a dome shows until the game clock sets it. */
-const NOON = 720;
 
 export interface EnvironmentView {
   /** The backdrop card once its image has loaded (undefined: none, still loading, or missing). */
@@ -78,14 +76,14 @@ export function applyEnvironment(
   if (environment.fog !== undefined) {
     scene.fog = new Fog(environment.fog.color, environment.fog.near, environment.fog.far);
   }
-  // The procedural dome (scenes that ask for one) paints over the flat sky colour; it starts at noon
-  // and follows the game clock once the caller sets it.
+  // The procedural dome (scenes that ask for one) paints over the flat sky colour; it starts at the
+  // scene's dome minute and follows the game clock once the caller sets it (day and night scenes).
   let dome: SkyDomeView | undefined;
   const settings = environment.dome;
   const baseSky = environment.sky ?? DEFAULT_SKY;
   if (settings !== undefined) {
     dome = createSkyDome();
-    dome.update(skyAt(settings, baseSky, NOON));
+    dome.update(skyAt(settings, baseSky, settings.minute));
     scene.add(dome.mesh);
   }
   let card: Mesh | undefined;

@@ -2989,6 +2989,13 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            },
+            "minute": {
+              "default": 720,
+              "description": "Minute of the day the dome shows in a scene without a day and night look (light.timeOfDay); scenes with one follow the game clock.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1439
             }
           },
           "additionalProperties": false

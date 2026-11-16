@@ -732,7 +732,9 @@
       "id": "pear-tree-bloom",
       "at": [20, 0, 72],
       "tags": ["pear-tree", "bloom", "vfx-stub:pear-bloom"],
-      "spawnIf": { "fact": "bones.pear-bloomed" }
+      "spawnIf": {
+        "fact": "bones.pear-bloomed"
+      }
     },
     {
       "id": "priory-choir",
@@ -748,7 +750,9 @@
       "id": "choir-altar-psalter",
       "at": [60, 0, 111],
       "tags": ["altar", "psalter-offering"],
-      "spawnIf": { "fact": "bones.psalter-given" }
+      "spawnIf": {
+        "fact": "bones.psalter-given"
+      }
     },
     {
       "id": "monk-statue-a",
@@ -952,6 +956,13 @@
       "color": "#B4C3CE",
       "near": 40,
       "far": 190
+    },
+    "dome": {
+      "stars": 0.5,
+      "clouds": 0.45,
+      "wind": 40,
+      "seed": 11,
+      "minute": 700
     }
   },
   "regions": [

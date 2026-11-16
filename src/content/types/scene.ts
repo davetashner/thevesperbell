@@ -1059,6 +1059,14 @@ export const sceneEnvironmentSchema = z.strictObject({
         .default(60)
         .describe('Bearing the clouds drift towards, degrees clockwise from north (+z).'),
       seed: z.int().min(0).default(1).describe('Fixes the star field and cloud shapes.'),
+      minute: z
+        .int()
+        .min(0)
+        .max(1439)
+        .default(720)
+        .describe(
+          'Minute of the day the dome shows in a scene without a day and night look (light.timeOfDay); scenes with one follow the game clock.',
+        ),
     })
     .optional()
     .describe(

@@ -117,13 +117,14 @@ const fragmentShader = /* glsl */ `
     col += vec3(0.5, 0.48, 0.62) * pow(max(moonDot, 0.0), 40.0) * 0.15 * uNight;
 
     // Clouds: fbm on a plane overhead, drifting with the wind; stepped into soft value bands for a
-    // painted look, thinning towards the horizon so the backdrop reads.
+    // painted look (a light touch: hard bands read as contour lines up close), thinning towards the
+    // horizon so the backdrop reads.
     if (uClouds > 0.001 && up > 0.0) {
       vec2 uv = dir.xz / (up + 0.18) * 2.6 + uWind * uTime * 0.01 + uSeed * 3.7;
       float n = fbm(uv);
       float edge = 0.66 - 0.4 * uClouds;
-      float c = smoothstep(edge - 0.02, edge + 0.22, n);
-      c = floor(c * 4.0 + 0.5) / 4.0 * 0.85 + c * 0.15;
+      float c = smoothstep(edge - 0.06, edge + 0.32, n);
+      c = mix(c, floor(c * 3.0 + 0.5) / 3.0, 0.3); // a hint of painted value bands, soft edges
       float lit = 0.75 + 0.25 * fbm(uv * 1.7 + uSunDir.xz);
       vec3 cloud = uCloudColour * lit + uSunColour * pow(max(sunDot, 0.0), 6.0) * 0.25 * (1.0 - uNight);
       col = mix(col, cloud, c * 0.9 * smoothstep(0.0, 0.18, up));
