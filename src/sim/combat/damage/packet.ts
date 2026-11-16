@@ -70,6 +70,8 @@ export const DAMAGE_TAGS = Object.freeze({
    * carried by the shield bash's hits (e04.14, the shield rule).
    */
   guardCrush: 'guard-crush',
+  /** A blow struck in a first-blood duel: harmless, and no grudge (src/sim/duel, mw-e39.35). */
+  duel: 'duel',
 } as const);
 
 /** A hit as its source describes it; see `DamagePacket` for the fields. */

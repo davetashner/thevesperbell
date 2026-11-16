@@ -1,0 +1,14 @@
+{
+  "$schema": "../attack.schema.json",
+  "id": "tereza-sabre-cut",
+  "notes": "Tereza Maelo's quick sabre cut (mw-e39.35, mw-e40.11): a short, parryable swing from 0-1.6 m, every 1.5 s at most, so a duel is a run of fast readable cuts to parry. Placeholder: it borrows the Forgotten's slash move and telegraph until her own sabre animations land (mw-e37.234); the move data already passes the readability rule.",
+  "kind": "melee",
+  "move": "forgotten-slash-1",
+  "telegraph": "forgotten-windup",
+  "range": {
+    "min": 0,
+    "max": 1.5
+  },
+  "cooldown": 1.5,
+  "weight": 2
+}

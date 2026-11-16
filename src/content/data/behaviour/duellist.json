@@ -1,0 +1,166 @@
+{
+  "$schema": "../behaviour.schema.json",
+  "id": "duellist",
+  "notes": "Tereza Maelo's duel stance (mw-e39.35, mw-e40.11): swapped in for her counter-minding profile while a first-blood duel runs (src/sim/duel) and swapped back at the first hit. At rest she stands at her post; the moment she sees the player she is in Combat, pressing in with her quick sabre cut or lunging at a player who hangs back (her attacks' own ranges, cooldowns and weights), circling at her preferred range while they cool down. She never gives up on a target she can see; if the player slips away for a while she stands down. The duel's damage rule makes every hit between the two harmless, so nothing here has to hold back.",
+  "tuning": {
+    "combatLostS": 8,
+    "preferredRange": 2.0,
+    "leashSearchS": 2,
+    "searchingTimeoutS": 6
+  },
+  "thinkHz": 10,
+  "inertia": 0.1,
+  "initial": "unaware",
+  "states": {
+    "unaware": {
+      "transitions": [
+        {
+          "to": "combat",
+          "when": {
+            "input": "targetVisible",
+            "gte": 1
+          }
+        }
+      ],
+      "activities": ["home", "stand"]
+    },
+    "searching": {
+      "timeoutS": {
+        "tuning": "searchingTimeoutS"
+      },
+      "onTimeout": "unaware",
+      "postAlert": true,
+      "transitions": [
+        {
+          "to": "combat",
+          "when": {
+            "input": "targetVisible",
+            "gte": 1
+          }
+        }
+      ],
+      "activities": ["search", "scan"]
+    },
+    "combat": {
+      "transitions": [
+        {
+          "to": "searching",
+          "when": {
+            "input": "targetLostS",
+            "gte": {
+              "tuning": "combatLostS"
+            }
+          }
+        }
+      ],
+      "activities": ["press", "circle"]
+    }
+  },
+  "activities": {
+    "home": {
+      "weight": 2,
+      "considerations": [
+        {
+          "input": "fromPost",
+          "curve": {
+            "kind": "step",
+            "at": 0.5,
+            "below": 0,
+            "above": 1
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "move-to",
+          "target": "post",
+          "within": 0.5,
+          "gait": "run"
+        }
+      ]
+    },
+    "stand": {
+      "steps": [
+        {
+          "do": "wait",
+          "seconds": 1
+        }
+      ]
+    },
+    "press": {
+      "interruptible": false,
+      "considerations": [
+        {
+          "input": "attackToken",
+          "curve": {
+            "kind": "step",
+            "at": 1,
+            "below": 0,
+            "above": 1
+          }
+        },
+        {
+          "input": "targetUnreachableS",
+          "curve": {
+            "kind": "step",
+            "at": 8,
+            "below": 1,
+            "above": 0
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "strike",
+          "gait": "run",
+          "giveUpS": 8
+        }
+      ]
+    },
+    "circle": {
+      "weight": 0.5,
+      "considerations": [
+        {
+          "input": "targetUnreachableS",
+          "curve": {
+            "kind": "step",
+            "at": 8,
+            "below": 1,
+            "above": 0
+          }
+        }
+      ],
+      "steps": [
+        {
+          "do": "circle",
+          "range": {
+            "tuning": "preferredRange"
+          },
+          "seconds": 2
+        }
+      ]
+    },
+    "search": {
+      "steps": [
+        {
+          "do": "move-to",
+          "target": "lkp",
+          "within": 1
+        },
+        {
+          "do": "look-around",
+          "seconds": 4
+        }
+      ]
+    },
+    "scan": {
+      "weight": 0.5,
+      "steps": [
+        {
+          "do": "look-around",
+          "seconds": 4
+        }
+      ]
+    }
+  }
+}
