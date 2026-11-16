@@ -3361,6 +3361,14 @@
                 "items": false,
                 "minItems": 3,
                 "maxItems": 3
+              },
+              "climbables": {
+                "description": "Also leave out climbable parts inside the box (the dressing draws its own ladder or rope); false by default.",
+                "type": "boolean"
+              },
+              "inside": {
+                "description": "Draw the left-out blocking and walkable parts again while the camera is inside the box (a hold seen from within); false by default.",
+                "type": "boolean"
               }
             },
             "required": [

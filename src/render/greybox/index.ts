@@ -24,7 +24,7 @@ import type {
 } from '@sim/index';
 import { renderIntensity } from '../light/index.ts';
 import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
-import { hiddenByDressing, paintFor } from './dressing-hides';
+import { hiddenByDressing, paintFor, revealedFrom } from './dressing-hides';
 import { loadDressing } from '../props/dressing';
 import { loadRigging } from '../props/tern-rigging';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
@@ -450,6 +450,9 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       // Grey-box parts a dressing model replaces (a ship's hull over its blocking mass) are drawn in the
       // dressing's own group, hidden once its model has loaded (they stay if it never does).
       const dressingParts = new Map<number, Map<KitPurpose, BufferGeometry[]>>();
+      // Parts a dressing hides but shows again from inside (`hides.inside`: a hold seen from within).
+      // They are drawn the ordinary way (painted walls, floor patches) in a group of their own.
+      const interiorParts = new Map<number, ScenePart[]>();
       const paintedWalls = new Map<string, BufferGeometry[]>();
       const crateParts: BufferGeometry[] = [];
       for (const part of layout.parts) {
@@ -457,6 +460,10 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         if (layout.pieces[part.placement]?.breakable !== undefined) continue;
         const dressing = layout.dressings.findIndex((d) => hiddenByDressing(part, [d]));
         if (dressing >= 0) {
+          if (layout.dressings[dressing]?.hides?.inside === true && part.purpose !== 'climbable') {
+            interiorParts.set(dressing, [...(interiorParts.get(dressing) ?? []), part]);
+            continue;
+          }
           const byDressingPurpose =
             dressingParts.get(dressing) ?? new Map<KitPurpose, BufferGeometry[]>();
           const list = byDressingPurpose.get(part.purpose) ?? [];
@@ -547,6 +554,10 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       layout.dressings.forEach((dressing, index) => {
         const replaced = new Group();
         replaced.name = `dressing-greybox:${dressing.id}`;
+        // Climbables the dressing hides are left out for good once it loads (it draws its own ladder);
+        // the rest may come back while the camera is inside the box (`hides.inside`).
+        const climbs = new Group();
+        climbs.name = `dressing-greybox-climbs:${dressing.id}`;
         for (const [purpose, geometries] of dressingParts.get(index) ??
           new Map<KitPurpose, BufferGeometry[]>()) {
           const merged = mergeGeometries(geometries);
@@ -555,12 +566,30 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           mesh.name = purpose;
           mesh.castShadow = true;
           mesh.receiveShadow = true;
-          replaced.add(mesh);
+          (purpose === 'climbable' ? climbs : replaced).add(mesh);
         }
-        group.add(replaced);
+        group.add(replaced, climbs);
+        const interiorList = interiorParts.get(index);
+        const interior =
+          interiorList === undefined
+            ? undefined
+            : this.staticGeometry({ ...layout, parts: interiorList, dressings: [] });
+        if (interior !== undefined) group.add(interior);
         void loadDressing(dressing).then(
           (mesh) => {
             replaced.visible = false;
+            climbs.visible = false;
+            if (interior !== undefined) {
+              interior.visible = false;
+              const before = mesh.onBeforeRender.bind(mesh);
+              mesh.onBeforeRender = (renderer, scene, camera, geometry, material, g) => {
+                before(renderer, scene, camera, geometry, material, g);
+                // Only the player's view decides (the sun's shadow camera is orthographic).
+                if ('isPerspectiveCamera' in camera) {
+                  interior.visible = revealedFrom(camera.position, dressing);
+                }
+              };
+            }
             group.add(mesh);
           },
           (error: unknown) => {
@@ -569,7 +598,13 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         );
       });
       // Tagged surface regions (mw-1jm): a flat patch of the surface's colour on the floor it covers.
-      const patches = surfacePatches(layout.parts, layout.surfaces);
+      // A part drawn in an interior group (the hold) gets its patch there, not here: out here its flat
+      // plank floor would hang out past the hull model as a thin plate.
+      const drawnInside = new Set<ScenePart>([...interiorParts.values()].flat());
+      const patches = surfacePatches(
+        layout.parts.filter((part) => !drawnInside.has(part)),
+        layout.surfaces,
+      );
       // A region with a painted texture lays it in world units (one tile = `tile` metres), so the
       // boards line up across neighbouring patches; the rest keep their flat colour.
       const bySurface = new Map<string, BufferGeometry[]>();

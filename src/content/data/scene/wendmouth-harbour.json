@@ -1451,7 +1451,7 @@
       "piece": "platform",
       "at": [35, -6, 126],
       "purpose": "blocking",
-      "scale": [5, 4.5, 20]
+      "scale": [5, 4.25, 20]
     },
     {
       "piece": "platform",
@@ -3334,7 +3334,7 @@
     {
       "id": "tern-deck",
       "min": [31, 1.5, 104],
-      "max": [39, 2.5, 146],
+      "max": [39, 2.5, 144.5],
       "surface": "wood",
       "texture": "tex-deck-planks-caulked-01"
     },
@@ -3417,7 +3417,7 @@
     },
     {
       "id": "tern-hold-floor",
-      "min": [31.5, -1.7, 108],
+      "min": [31.5, -1.6, 108],
       "max": [38.5, -1.5, 144],
       "surface": "wood",
       "texture": "tex-deck-planks-caulked-01"
@@ -3432,8 +3432,10 @@
       "size": [10.4, 8.9, 44],
       "fit": "box",
       "hides": {
-        "min": [29.5, -6.5, 105.5],
-        "max": [40.5, -1.7, 146]
+        "min": [29.5, -1.65, 105.5],
+        "max": [40.5, 1.6, 147],
+        "climbables": true,
+        "inside": true
       }
     },
     {
@@ -3456,7 +3458,12 @@
       "turn": 90,
       "size": [1, 14, 1],
       "fit": "height",
-      "fadesNearCamera": true
+      "fadesNearCamera": true,
+      "hides": {
+        "min": [37.25, 2, 123],
+        "max": [38.25, 12.5, 125],
+        "climbables": true
+      }
     },
     {
       "id": "tern-mizzenmast",
@@ -3465,15 +3472,24 @@
       "turn": 90,
       "size": [1, 13, 1],
       "fit": "height",
-      "fadesNearCamera": true
+      "fadesNearCamera": true,
+      "hides": {
+        "min": [30.5, 2.5, 137.5],
+        "max": [39.5, 5.5, 147]
+      }
     },
     {
       "id": "tern-figurehead",
       "model": "model-prop-tern-figurehead-01",
-      "at": [35, 0.5, 104.25],
+      "at": [35, 0.5, 105.5],
       "turn": 0,
       "size": [1, 1.8, 1],
-      "fit": "height"
+      "fit": "height",
+      "hides": {
+        "min": [29.5, -6.5, 105.5],
+        "max": [40.5, -1.65, 146],
+        "climbables": true
+      }
     },
     {
       "id": "tern-springald-port-fore",

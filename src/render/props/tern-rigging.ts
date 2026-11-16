@@ -1,4 +1,4 @@
-// The Gilded Tern's rope (render only): shrouds with ratline rungs from each mast's fighting top down
+// The Gilded Tern's rope and ladders (render only): shrouds with ratline rungs from each mast's fighting top down
 // to deadeyes on the bulwarks, stays between the mast heads, and a rope ladder up the climbable board
 // on the mainmast. The generated mast module only supplies the mast, yards, sails and top (its rope is
 // cut away, model-strips.ts); everything here is thin tubes (rope.ts) so it reads as rope.
@@ -42,6 +42,67 @@ export const LADDER_DZ = 0.25;
 const LADDER_HALF_WIDTH = 0.3;
 export const LADDER_TOP = 11.8;
 const LADDER_RUNG_GAP = 0.5;
+
+/** The dressing the boarding ladder on its port side and the ladder up out of its hold hang from. */
+export const HULL_DRESSING = 'tern-hull';
+/**
+ * The hull ladder's offsets from the hull's base point: on the port side, level with the main hatch, its
+ * rails 0.3 m either side of the grey-box ladder it replaces (x -5.25, z -6 from the hull's middle), and the
+ * hold ladder under the main hatch (x 0, z +5.25). Checked against the scene in tests/integration/tern-dressing.test.ts.
+ */
+export const HULL_LADDER_DX = -5.25;
+export const HULL_LADDER_DZ = -6;
+export const HOLD_LADDER_DZ = 5.25;
+/** Where those ladders end: the pool floor and the hold floor below, a hand above the bulwark and the deck. */
+export const HULL_LADDER_FOOT = -6;
+export const HULL_LADDER_TOP = 3.2;
+export const HOLD_LADDER_FOOT = -1.5;
+export const HOLD_LADDER_TOP = 3;
+const RUNG_GAP = 0.5;
+const RAIL_HALF_WIDTH = 0.3;
+
+/**
+ * A ladder of two tarred rails and hemp rungs, standing at (`x`, `z`) from `foot` to `top`; its rails
+ * are spread along `across` (the axis the ladder is wide on).
+ */
+export function ladder(
+  x: number,
+  z: number,
+  foot: number,
+  top: number,
+  across: 'x' | 'z',
+): Segment[] {
+  const dx = across === 'x' ? RAIL_HALF_WIDTH : 0;
+  const dz = across === 'z' ? RAIL_HALF_WIDTH : 0;
+  const left: readonly [Point, Point] = [
+    [x - dx, foot, z - dz],
+    [x - dx, top, z - dz],
+  ];
+  const right: readonly [Point, Point] = [
+    [x + dx, foot, z + dz],
+    [x + dx, top, z + dz],
+  ];
+  const rungs = Math.floor((top - foot) / RUNG_GAP);
+  return [
+    { a: left[0], b: left[1], radius: SHROUD_RADIUS, colour: TARRED },
+    { a: right[0], b: right[1], radius: SHROUD_RADIUS, colour: TARRED },
+    ...ratlines(left, right, rungs, 0.5 / rungs, RATLINE_RADIUS, HEMP),
+  ];
+}
+
+/** The hull's two ladders: the boarding ladder down to the pool and the one up out of the hold. */
+export function hullLadders(hull: SceneDressing): Segment[] {
+  return [
+    ...ladder(
+      hull.at.x + HULL_LADDER_DX,
+      hull.at.z + HULL_LADDER_DZ,
+      HULL_LADDER_FOOT,
+      HULL_LADDER_TOP,
+      'z',
+    ),
+    ...ladder(hull.at.x, hull.at.z + HOLD_LADDER_DZ, HOLD_LADDER_FOOT, HOLD_LADDER_TOP, 'x'),
+  ];
+}
 
 /** The shrouds and ratlines of the mast standing at `at`, `height` metres tall. */
 export function shrouds(at: Point, height: number): Segment[] {
@@ -114,15 +175,22 @@ export function mastRope(mast: SceneDressing, forward: SceneDressing | undefined
 /** The rope meshes for the scene's rigged masts (one per mast), each fading like its mast does. */
 export function loadRigging(dressings: readonly SceneDressing[]): Mesh[] {
   const masts = dressings.filter((d) => d.model === RIGGED_MODEL).sort((a, b) => a.at.z - b.at.z);
-  return masts.map((mast, i) => {
+  const rope = (name: string, segments: readonly Segment[]): Mesh => {
     const mesh = new Mesh(
-      ropeGeometry(mastRope(mast, masts[i - 1])),
+      ropeGeometry(segments),
       new MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }),
     );
-    mesh.name = `rigging:${mast.id}`;
+    mesh.name = `rigging:${name}`;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
+    return mesh;
+  };
+  const meshes = masts.map((mast, i) => {
+    const mesh = rope(mast.id, mastRope(mast, masts[i - 1]));
     if (mast.fadesNearCamera) fadeNearCamera(mesh);
     return mesh;
   });
+  const hull = dressings.find((d) => d.id === HULL_DRESSING);
+  if (hull !== undefined) meshes.push(rope(`${hull.id}-ladders`, hullLadders(hull)));
+  return meshes;
 }

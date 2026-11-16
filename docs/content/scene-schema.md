@@ -409,6 +409,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `dressings[].hides` | object | — | Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn. |
 | `dressings[].hides.min` | list of any (at least 3) | required |  |
 | `dressings[].hides.max` | list of any (at least 3) | required |  |
+| `dressings[].hides.climbables` | boolean | — | Also leave out climbable parts inside the box (the dressing draws its own ladder or rope); false by default. |
+| `dressings[].hides.inside` | boolean | — | Draw the left-out blocking and walkable parts again while the camera is inside the box (a hold seen from within); false by default. |
 | `transitions` | list of object | — | Volumes that lead to another scene, and where the player arrives (mw-e01.11). |
 | `transitions[].id` | id | required | Name of the transition, unique in the scene, e.g. north-gate. |
 | `transitions[].min` | list of any (at least 3) | required | Lower corner of the volume, grid cells. |

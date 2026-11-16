@@ -1118,8 +1118,9 @@ export const scenePaintSchema = z
  * A dressing model (render only): an approved 3D model drawn over the grey box, such as a ship's hull
  * over the blocking mass that stands for it. It is fitted into `size` metres after its turns, its base
  * on `at`. Colliders, navigation and gameplay stay the grey box's: a dressing only changes the look,
- * and `hides` is a box whose grey-box blocking and walkable parts it replaces on screen (climbables,
- * interactives and hazards always stay visible, so a dressing never hides an affordance).
+ * and `hides` is a box whose grey-box blocking and walkable parts it replaces on screen (climbables
+ * only with `hides.climbables`, when the dressing draws the ladder itself; interactives and hazards
+ * always stay visible, so a dressing never hides an affordance it does not redraw).
  */
 export const sceneDressingSchema = z.strictObject({
   id: contentId.describe('Name of the dressing, unique in the scene, e.g. tern-hull.'),
@@ -1149,7 +1150,22 @@ export const sceneDressingSchema = z.strictObject({
       'See-through while the camera is inside its bounds (rigging the camera can back into); not for a hull the camera stands in.',
     ),
   hides: z
-    .strictObject({ min: vec3Schema, max: vec3Schema })
+    .strictObject({
+      min: vec3Schema,
+      max: vec3Schema,
+      climbables: z
+        .boolean()
+        .optional()
+        .describe(
+          'Also leave out climbable parts inside the box (the dressing draws its own ladder or rope); false by default.',
+        ),
+      inside: z
+        .boolean()
+        .optional()
+        .describe(
+          'Draw the left-out blocking and walkable parts again while the camera is inside the box (a hold seen from within); false by default.',
+        ),
+    })
     .optional()
     .describe(
       'Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn.',

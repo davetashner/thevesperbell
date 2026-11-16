@@ -4,9 +4,15 @@ import {
   CHAIN_PLATE_X,
   CHAIN_PLATE_Y,
   CLIMB_MAST,
+  HOLD_LADDER_FOOT,
+  HOLD_LADDER_TOP,
+  HULL_LADDER_FOOT,
+  HULL_LADDER_TOP,
   LADDER_TOP,
   RIGGED_MODEL,
   climbLadder,
+  hullLadders,
+  ladder,
   loadRigging,
   mastRope,
   shrouds,
@@ -24,6 +30,12 @@ const mast = (id: string, z: number, fades = true): SceneDressing => ({
   fadesNearCamera: fades,
   hides: undefined,
 });
+const hull: SceneDressing = {
+  ...mast('tern-hull', 124),
+  model: 'model-ship-gilded-tern-hull-01',
+  at: { x: 35, y: -3.25, z: 124 },
+  fadesNearCamera: false,
+};
 
 describe('Gilded Tern rigging (render only)', () => {
   it('a mast has three shrouds a side, each ending in a deadeye on the bulwark', () => {
@@ -80,12 +92,46 @@ describe('Gilded Tern rigging (render only)', () => {
     const meshes = loadRigging([
       mast('tern-mizzenmast', 136, false),
       mast('tern-foremast', 112),
-      { ...mast('tern-hull', 124), model: 'model-ship-gilded-tern-hull-01' },
+      hull,
     ]);
-    expect(meshes.map((m) => m.name)).toEqual(['rigging:tern-foremast', 'rigging:tern-mizzenmast']);
+    expect(meshes.map((m) => m.name)).toEqual([
+      'rigging:tern-foremast',
+      'rigging:tern-mizzenmast',
+      'rigging:tern-hull-ladders',
+    ]);
     // The foremast fades (its mesh has a fade hook of its own), the mizzenmast here does not.
     expect(Object.hasOwn(meshes[0] ?? {}, 'onBeforeRender')).toBe(true);
     expect(Object.hasOwn(meshes[1] ?? {}, 'onBeforeRender')).toBe(false);
     expect(meshes[0]?.geometry.getAttribute('color')).toBeDefined();
+  });
+
+  it('hangs a ladder of two rails and hemp rungs, wide along the axis it is asked for', () => {
+    const across = (axis: 'x' | 'z') => ladder(10, 20, 0, 3, axis);
+    for (const axis of ['x', 'z'] as const) {
+      const segments = across(axis);
+      const rails = segments.filter((s) => s.radius === 0.07);
+      expect(rails).toHaveLength(2);
+      expect(rails[0]?.a[1]).toBe(0);
+      expect(rails[0]?.b[1]).toBe(3);
+      expect(segments).toHaveLength(2 + 6);
+    }
+    const [west, east] = across('x').filter((s) => s.radius === 0.07);
+    expect([west?.a[0], east?.a[0], west?.a[2]]).toEqual([9.7, 10.3, 20]);
+    const [north, south] = across('z').filter((s) => s.radius === 0.07);
+    expect([north?.a[2], south?.a[2], north?.a[0]]).toEqual([19.7, 20.3, 10]);
+  });
+
+  it('the hull carries a boarding ladder down to the pool and a ladder up out of the hold', () => {
+    const segments = hullLadders(hull);
+    const rails = segments.filter((s) => s.radius === 0.07);
+    expect(rails).toHaveLength(4);
+    expect(rails.map((r) => [r.a[1], r.b[1]])).toEqual([
+      [HULL_LADDER_FOOT, HULL_LADDER_TOP],
+      [HULL_LADDER_FOOT, HULL_LADDER_TOP],
+      [HOLD_LADDER_FOOT, HOLD_LADDER_TOP],
+      [HOLD_LADDER_FOOT, HOLD_LADDER_TOP],
+    ]);
+    expect(rails[0]?.a[0]).toBeCloseTo(29.75);
+    expect(rails[2]?.a[2]).toBeCloseTo(129.25);
   });
 });

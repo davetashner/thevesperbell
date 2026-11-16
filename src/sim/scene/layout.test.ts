@@ -676,7 +676,7 @@ describe('scene layout (mw-e00.21)', () => {
           size: [3, 4, 5],
           fit: 'box',
           fadesNearCamera: true,
-          hides: { min: [0, 0, 0], max: [1, 2, 3] },
+          hides: { min: [0, 0, 0], max: [1, 2, 3], climbables: true, inside: true },
         },
         {
           id: 'mast',
@@ -686,6 +686,16 @@ describe('scene layout (mw-e00.21)', () => {
           turn: 0,
           size: [1, 6, 1],
           fit: 'height',
+        },
+        {
+          id: 'rail',
+          model: 'model-rail',
+          at: [0, 0, 0],
+          yaw: 0,
+          turn: 0,
+          size: [1, 1, 1],
+          fit: 'height',
+          hides: { min: [0, 0, 0], max: [1, 1, 1] },
         },
       ],
     };
@@ -702,8 +712,14 @@ describe('scene layout (mw-e00.21)', () => {
       at: { x: 2, y: 0, z: 4 },
       size: { x: 3, y: 4, z: 5 },
       fadesNearCamera: true,
-      hides: { min: { x: 0, y: 0, z: 0 }, max: { x: 2, y: 4, z: 6 } },
+      hides: {
+        min: { x: 0, y: 0, z: 0 },
+        max: { x: 2, y: 4, z: 6 },
+        climbables: true,
+        inside: true,
+      },
     });
+    expect(dressings[2]?.hides).toMatchObject({ climbables: false, inside: false });
     expect(dressings[1]).toMatchObject({
       at: { x: 0, y: 2, z: 0 },
       fadesNearCamera: false,
