@@ -28,6 +28,51 @@ describe('ActionSampler with a gamepad (mw-e02.9)', () => {
     expect(sampler.isBound('PadMenu')).toBe(true);
   });
 
+  it('AC-1: LT plus a D-pad direction presses its quick slot; LT keeps blocking and the D-pad does not cast', () => {
+    const sampler = new ActionSampler();
+    sampler.gamepad(pad({ pressed: ['PadLT'] }));
+    expect(sampler.sample().secondaryAttack.held).toBe(true);
+    const directions = [
+      ['PadUp', 'quickSlot1', 'cast'],
+      ['PadRight', 'quickSlot2', 'ability2'],
+      ['PadDown', 'quickSlot3', 'cancelCast'],
+      ['PadLeft', 'quickSlot4', 'ability4'],
+    ] as const;
+    for (const [dpad, slot, plain] of directions) {
+      sampler.gamepad(pad({ pressed: ['PadLT', dpad] }));
+      const down = sampler.sample();
+      expect(down[slot]).toEqual(button(true, true, false));
+      expect(down[plain]).toEqual(UP);
+      expect(down.secondaryAttack).toEqual(button(false, true, false));
+      sampler.gamepad(pad({ pressed: ['PadLT'] }));
+      expect(sampler.sample()[slot]).toEqual(button(false, false, true));
+    }
+  });
+
+  it('the D-pad alone still casts and uses no quick slot', () => {
+    const sampler = new ActionSampler();
+    sampler.gamepad(pad({ pressed: ['PadUp'] }));
+    const frame = sampler.sample();
+    expect(frame.cast.pressed).toBe(true);
+    expect(frame.quickSlot1).toEqual(UP);
+  });
+
+  it('keyboard focus loss does not drop a held pad chord, and a rebound chord lets go', () => {
+    const sampler = new ActionSampler();
+    sampler.gamepad(pad({ pressed: ['PadLT', 'PadUp'] }));
+    sampler.sample();
+    sampler.releaseAll();
+    sampler.gamepad(pad({ pressed: ['PadLT', 'PadUp'] }));
+    expect(sampler.sample().quickSlot1.held).toBe(true);
+    const moved = rebind(sampler.padBindings, 'quickSlot1', 'PadLT+PadRS');
+    if (!moved.ok) throw new Error('conflict');
+    sampler.setPadBindings(moved.bindings);
+    sampler.gamepad(pad({ pressed: ['PadLT', 'PadUp'] }));
+    const frame = sampler.sample();
+    expect(frame.quickSlot1.held).toBe(false);
+    expect(frame.cast.held).toBe(true);
+  });
+
   it('mw-e04.39 maps the shoulder combat cluster and R3 crouch', () => {
     const sampler = new ActionSampler();
     sampler.gamepad(pad({ pressed: ['PadRB', 'PadLB', 'PadLT', 'PadRT', 'PadRS'] }));

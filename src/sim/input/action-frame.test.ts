@@ -50,6 +50,10 @@ describe('action registry', () => {
       'journal',
       'drop',
       'throw',
+      'quickSlot1',
+      'quickSlot2',
+      'quickSlot3',
+      'quickSlot4',
       'pause',
     ]);
     expect(ACTIONS.move.kind).toBe('vector');

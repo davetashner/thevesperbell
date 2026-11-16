@@ -28,6 +28,42 @@ function rebound(
   return result.bindings;
 }
 
+describe('quick slot bindings (mw-e17.17)', () => {
+  it('AC-2: the default keyboard and pad bindings give the four quick slots their own codes, with no conflicts in the gameplay context', () => {
+    const slots = ['quickSlot1', 'quickSlot2', 'quickSlot3', 'quickSlot4'] as const;
+    expect(slots.map((a) => DEFAULT_BINDINGS[a])).toEqual([['F1'], ['F2'], ['F3'], ['F4']]);
+    expect(slots.map((a) => DEFAULT_PAD_BINDINGS[a])).toEqual([
+      ['PadLT+PadUp'],
+      ['PadLT+PadRight'],
+      ['PadLT+PadDown'],
+      ['PadLT+PadLeft'],
+    ]);
+    expect(findConflicts(DEFAULT_BINDINGS)).toEqual([]);
+    expect(findConflicts(DEFAULT_PAD_BINDINGS)).toEqual([]);
+  });
+
+  it('remapping a quick slot onto a taken key reports the conflict; a free key rebinds', () => {
+    const clash = rebind(DEFAULT_BINDINGS, 'quickSlot1', 'KeyE');
+    expect(clash).toMatchObject({ ok: false, conflict: { actions: ['quickSlot1', 'interact'] } });
+    expect(rebind(DEFAULT_BINDINGS, 'quickSlot1', 'F5').ok).toBe(true);
+    expect(rebind(DEFAULT_BINDINGS, 'ability1', 'F2')).toMatchObject({
+      ok: false,
+      conflict: { actions: ['ability1', 'quickSlot2'] },
+    });
+  });
+
+  it('pad chords survive a save and load; a malformed chord falls back to the defaults', () => {
+    const data = serializeBindings(DEFAULT_BINDINGS, DEFAULT_PAD_BINDINGS);
+    expect(deserializeBindings(data).gamepad.quickSlot1).toEqual(['PadLT+PadUp']);
+    const bad = deserializeBindings({
+      ...data,
+      gamepad: { ...data.gamepad, quickSlot1: ['PadLT+PadLT'] },
+    });
+    expect(bad.gamepad.quickSlot1).toEqual(['PadLT+PadUp']);
+    expect(bad.issues).toEqual(['gamepad quickSlot1: invalid codes; using defaults']);
+  });
+});
+
 describe('default bindings', () => {
   it('bind every action, within the slot limit, with no conflicts', () => {
     for (const action of BINDABLE_ACTIONS) {

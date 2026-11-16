@@ -92,8 +92,8 @@ export function prepareConsumables(
 
 /**
  * Installs consumables in `world` (after world items: thrown consumables spawn as world items) and
- * gives `player` quick slots when there is one. Nothing binds buttons to the slots yet: the
- * quick-slot command uses them (see docs/design/controls.md).
+ * gives `player` quick slots when there is one. The quick-slot buttons (F1-F4, LT + D-pad; mw-e17.17)
+ * and the quick-slot command both use them (see docs/design/controls.md).
  */
 export function startConsumables<T>(
   world: World<T>,

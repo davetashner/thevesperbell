@@ -3,7 +3,7 @@
 // keyboard + mouse. Plain text for now; mw-e37.133 swaps in the approved glyph art by the same keys.
 
 import type { BindableAction, Bindings, InputCode } from './bindings';
-import { isPadCode, type InputDevice, type PadCode } from './gamepad';
+import { isPadCode, isPadChord, padChordParts, type InputDevice, type PadCode } from './gamepad';
 
 /** Xbox labels for the standard-mapping buttons. */
 export const XBOX_GLYPHS: Readonly<Record<PadCode, string>> = Object.freeze({
@@ -49,6 +49,10 @@ const NAMED_KEYS: Readonly<Record<string, string>> = {
  */
 export function codeLabel(code: InputCode): string {
   if (isPadCode(code)) return XBOX_GLYPHS[code];
+  if (isPadChord(code))
+    return padChordParts(code)
+      .map((part) => XBOX_GLYPHS[part])
+      .join(' + ');
   const named = NAMED_KEYS[code];
   if (named !== undefined) return named;
   const letter = /^(?:Key|Digit)(.)$/.exec(code);

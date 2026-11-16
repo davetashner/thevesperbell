@@ -36,7 +36,10 @@ import {
   DEFAULT_GAMEPAD_SETTINGS,
   IDLE_PAD,
   isPadCode,
+  isPadChord,
+  isPadInputCode,
   magnitude,
+  padChordParts,
   mergeMove,
   PAD_BUTTONS,
   radialDeadzone,
@@ -334,7 +337,7 @@ export class ActionSampler {
       } else if (event.type === 'up') goUp(event.code);
       else {
         if (event.type === 'releaseAll') {
-          for (const code of [...this.#held]) if (!isPadCode(code)) goUp(code);
+          for (const code of [...this.#held]) if (!isPadInputCode(code)) goUp(code);
         }
         for (const action of [...this.#latched]) unlatch(action);
       }
@@ -377,9 +380,24 @@ export class ActionSampler {
       const [latch] = sprintCodes;
       if (this.#sprintLatched && latch !== undefined) wanted.add(latch);
     }
+    // Chords (`PadLT+PadUp`): while every part is down the chord is held and its pressed button
+    // does not reach its own binding, so the modifier (the first part) keeps doing its own thing
+    // (LT holds the shield up) and the D-pad press only uses the quick slot.
+    const bound = new Set(BINDABLE_ACTIONS.flatMap((a) => this.#padBindings[a]).filter(isPadChord));
+    const chorded = [...bound].filter((chord) =>
+      padChordParts(chord).every((part) => wanted.has(part)),
+    );
+    for (const chord of chorded) {
+      for (const part of padChordParts(chord).slice(1)) wanted.delete(part);
+    }
     for (const code of PAD_BUTTONS) {
       if (wanted.has(code)) goDown(code);
       else goUp(code);
+    }
+    // A chord no longer bound still lets go of what it held.
+    for (const chord of new Set([...bound, ...this.#held].filter(isPadChord))) {
+      if (chorded.includes(chord)) goDown(chord);
+      else goUp(chord);
     }
     // Jumping or engaging sprint exits the crouch stance. Keyboard actions count too because both
     // devices merge into this frame; a held keyboard crouch still wins through its own binding.
