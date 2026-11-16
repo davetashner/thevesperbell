@@ -661,6 +661,58 @@ describe('scene layout (mw-e00.21)', () => {
     expect(layoutScene(TEST_SCENE, testKit).surfaces).toEqual([]);
   });
 
+  it('lays out render-only paint boxes and dressing models in metres', () => {
+    const scene: SceneSpec = {
+      ...TEST_SCENE,
+      grid: 2,
+      paints: [{ id: 'cabin', min: [0, 0, 0], max: [1, 1, 1], texture: 'tex-bulkhead-pine-01' }],
+      dressings: [
+        {
+          id: 'hull',
+          model: 'model-hull',
+          at: [1, 0, 2],
+          yaw: 90,
+          turn: 180,
+          size: [3, 4, 5],
+          fit: 'box',
+          fadesNearCamera: true,
+          hides: { min: [0, 0, 0], max: [1, 2, 3] },
+        },
+        {
+          id: 'mast',
+          model: 'model-mast',
+          at: [0, 1, 0],
+          yaw: 0,
+          turn: 0,
+          size: [1, 6, 1],
+          fit: 'height',
+        },
+      ],
+    };
+    const { paints, dressings } = layoutScene(scene, testKit);
+    expect(paints).toEqual([
+      {
+        id: 'cabin',
+        min: { x: 0, y: 0, z: 0 },
+        max: { x: 2, y: 2, z: 2 },
+        texture: 'tex-bulkhead-pine-01',
+      },
+    ]);
+    expect(dressings[0]).toMatchObject({
+      at: { x: 2, y: 0, z: 4 },
+      size: { x: 3, y: 4, z: 5 },
+      fadesNearCamera: true,
+      hides: { min: { x: 0, y: 0, z: 0 }, max: { x: 2, y: 4, z: 6 } },
+    });
+    expect(dressings[1]).toMatchObject({
+      at: { x: 0, y: 2, z: 0 },
+      fadesNearCamera: false,
+      hides: undefined,
+    });
+    const plain = layoutScene(TEST_SCENE, testKit);
+    expect([plain.paints, plain.dressings]).toEqual([[], []]);
+  });
+
   it('is deterministic and frozen', () => {
     const a = layoutScene(TEST_SCENE, testKit);
     expect(layoutScene(TEST_SCENE, testKit)).toEqual(a);
