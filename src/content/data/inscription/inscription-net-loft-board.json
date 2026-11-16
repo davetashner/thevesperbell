@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-net-loft-board",
+  "title": "Net Loft Board",
+  "notes": "mw-e40.32: a place sign in Wendmouth Harbour (bible 3.6); in-world voice, no modern wording.",
+  "locations": ["place-net-lofts"],
+  "pages": [
+    {
+      "text": "NET LOFTS\nMending, tarring and drying, by the fathom.\nThe roofs are for the gulls and the nets. Climb at your own risk."
+    }
+  ]
+}

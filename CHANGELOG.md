@@ -13,6 +13,8 @@ check enforces this).
 
 ### Added
 
+- Wendmouth Harbour comes alive on the waterfront: treadwheel cranes on the wharf piers, net-loft sheds and gull hoards on the rooftops, the Tidefair's gull boom, wooden gull targets, striped markers and bunting, bunting across the breakwater walk, five readable place signs (the Drowned Gull, Customs House, Tidemarket, net lofts, breakwater) and painted stone and plank walls on the buildings and block yards.
+
 - You can board the Gilded Tern: Captain Hesketh hands over a brass gangway token, on Tereza's word or when you sign on as crew, and it opens the gangway gate to the deck.
 - Characters now show their painted face in the dialogue box (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh and Ottilie), and Ottilie's portrait fills the shop window's frame; narrators, the player and anyone without art keep the silhouette.
 - Wendmouth Harbour is dressed: the Gilded Tern (hull, masts and rigging, figurehead, springalds, pine stern cabin), barrels, chests, the hoist crate and deck fittings on the docks, painted stone quays and breakwater, harbour water, and tin (loud) and tar (quiet) net-loft roofs.
