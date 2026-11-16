@@ -23,6 +23,16 @@ Consistency is defined **once** in the bibles and enforced by **templates**:
 
 The owner does **no 3D work, no image editing and no audio editing.**
 
+### Standing pre-approval (owner, 2026-11-16)
+
+> "Yes I pre approve any assets to keep the development moving forward."
+
+From 2026-11-16 the owner pre-approves every asset Claude produces, so the gates above no longer wait on
+the owner. Claude still runs every gate itself (style-bible checklist, turntable, seam and in-game checks)
+and records it: the approval row names `owner (standing pre-approval 2026-11-16)` with Claude's check notes,
+and the review sheet is still shown to the owner, who may reject any asset afterwards. Music takes are
+unchanged (picking the take in Suno is the owner's). The owner can withdraw this at any time.
+
 ## Lifecycle
 
 ```

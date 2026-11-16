@@ -5,6 +5,9 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { loadGameContent } from '@content/index';
+import { layoutScene } from '@sim/index';
+import { hiddenByDressing } from '../../src/render/greybox/dressing-hides';
 
 const MODELS = [
   'model-prop-bay-door-seal-01',
@@ -17,6 +20,18 @@ const MODELS = [
   'model-prop-sea-door-01',
 ] as const;
 const credits = readFileSync('assets/CREDITS.md', 'utf8');
+const content = loadGameContent();
+const harbour = layoutScene(content.get('scene', 'wendmouth-harbour'), (id) =>
+  content.get('kit', id),
+);
+/** Placed in the harbour now; the doors wait for the door system and the relic crate for the heist. */
+const PLACED = [
+  'model-prop-cargo-scale-01',
+  'model-prop-shelf-cray-01',
+  'model-prop-ballast-crate-01',
+  'model-prop-figurehead-serpent-01',
+  'model-prop-sea-door-01',
+] as const;
 
 describe('harbour story-prop models', () => {
   it('every model is shipped, credited and owner-approved', () => {
@@ -35,5 +50,38 @@ describe('harbour story-prop models', () => {
     const relic = readFileSync('assets/prompts/model/model-prop-relic-crate-01.md', 'utf8');
     const ballast = readFileSync('assets/prompts/model/model-prop-ballast-crate-01.md', 'utf8');
     for (const text of [relic, ballast]) expect(text).toContain('prop-harbour-story-set-01');
+  });
+
+  it('the placed story props stand on colliders, so nothing that looks solid can be walked through', () => {
+    for (const model of PLACED) {
+      const dressing = harbour.dressings.find((d) => d.model === model);
+      expect(dressing, model).toBeDefined();
+      const { x, y, z } = dressing?.at ?? { x: 0, y: 0, z: 0 };
+      const collider = harbour.parts.find(
+        (p) =>
+          p.purpose === 'blocking' &&
+          Math.abs(p.min.y - y) < 0.01 &&
+          x >= p.min.x &&
+          x <= p.max.x &&
+          z >= p.min.z &&
+          z <= p.max.z,
+      );
+      expect(collider, `${model} collider`).toBeDefined();
+      // The collider box is not drawn over the model.
+      expect(
+        collider !== undefined && hiddenByDressing(collider, harbour.dressings),
+        `${model} hides its collider`,
+      ).toBe(true);
+    }
+  });
+
+  it('the sunken figurehead breaks the surface (the serpent of the rumour) and the sea-door sits at the tide line', () => {
+    const water = -2.5;
+    const head = harbour.dressings.find((d) => d.model === 'model-prop-figurehead-serpent-01');
+    expect(head?.at.y ?? 0).toBeLessThan(water);
+    expect((head?.at.y ?? 0) + (head?.size.y ?? 0)).toBeGreaterThan(water);
+    const door = harbour.dressings.find((d) => d.model === 'model-prop-sea-door-01');
+    expect(door?.at.y ?? 0).toBeLessThan(water);
+    expect((door?.at.y ?? 0) + (door?.size.y ?? 0)).toBeGreaterThan(water);
   });
 });
