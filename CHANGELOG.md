@@ -553,6 +553,7 @@ check enforces this).
 
 ### Fixed
 
+- The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).
 - The new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
 - People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).
 - Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).
