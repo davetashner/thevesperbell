@@ -8,11 +8,11 @@
 | Category | portrait |
 | Template | `_templates/npc-portrait.md` v1 |
 | Consuming bead(s) | `e37-asset-portraits-harbour-cast-integrate` (dialogue UI); `e37-asset-npcs-harbour-named-*` (the turnaround must match it) |
-| Tool | Higgsfield `gpt_image_2_6`, quality high, 1k, 1:1, plan plus, 2026-11-16, job `30ebf741-009e-417d-84ec-d6c66096d47f` |
+| Tool | Higgsfield `gpt_image_2_6`, quality high, 1k, 1:1, plan plus, 2026-11-16, v1 job `30ebf741-009e-417d-84ec-d6c66096d47f` |
 | Anchor / reference inputs | approved `portrait-npc-ottilie-marsh-01` (Higgsfield media `d53fd904-e034-4dae-b03c-8870d60dfb4d`) |
-| Staging copy | `assets/_incoming/portrait-npc-tereza-merchant/v1.png` (gitignored) |
+| Staging copy | `assets/_incoming/portrait-npc-tereza-merchant/v1.png`, `v2.png` (gitignored) |
 
-## Filled prompt (preamble verbatim from docs/art/style-bible.md §14, add-on from §14.1)
+## Filled prompt v2 (preamble verbatim from docs/art/style-bible.md §14, add-on from §14.1)
 
 ```text
 STYLE: Stylized hand-painted fantasy art for "The Vesper Bell", a 3D third-person action RPG. Chunky low-poly forms with soft bevelled edges and slightly exaggerated, heavy proportions, painted with broad confident brush strokes and gentle colour gradients instead of fine photographic detail. Mood: souls-like weight and ancient mystery, but warm and hopeful — golden hearth light pushing back cool violet-blue shadow. Palette: deep ink-violet shadows (#1E1B2E, never pure black), moss green (#2F4A3A), weathered stone (#8C8A80), bark brown (#5A3E2B), parchment cream (#EFE2C4) and hearth amber (#E8A24A); strong saturated colour only for magic, fire and points of interest. Clear, readable silhouettes: one big shape, a few medium shapes, small detail used sparingly. Soft warm key light from the upper left with a cool fill and a gentle rim light. No photorealism, no photo textures, no text, letters or numbers, no logos, no watermark, no signature, no modern objects, no gore.
@@ -20,8 +20,9 @@ STYLE: Stylized hand-painted fantasy art for "The Vesper Bell", a 3D third-perso
 Head-and-shoulders character portrait, three-quarter view, expressive but natural face, painted, soft warm key light and cool rim, simple softly blurred background in the location's colours, bust framing with space above the head.
 
 SUBJECT: Tereza Maelo, import merchant from the Saltmarch Isles and retired duellist: an elegant woman in her forties in a Saltmarch-cut coat with crescent-curved lapels and wave-scalloped hems in lacquer red #8E2B2B and black, mother-of-pearl buttons, a sea-glass #7FC4B8 earring; her scarred, capable hands rest on the gull-wing curve of a sabre hilt wrapped in knotted cord; dark hair in a low knot, a cool appraising half-smile. Foreign at a glance: curves and crescents, not the squared local kit. BACKGROUND: softly blurred covered market with hanging silks, turquoise #2E9AA0 and coral #D9674E awnings.
+FACE (must be distinctive): an angular face with warm deep brown skin, a strong aquiline nose, high cheekbones, heavy-lidded dark eyes, a thin pale duelling scar across one cheekbone, a cool closed-lipped half-smile; black hair with one silver streak in a low knot. Elegant and dangerous, from the Saltmarch Isles over the sea.
 Wendmouth palette: salt-grey glenstone #9C9788, harbour stone #7E8584, tarred plank #2F2A28, sea grey-green #5E7A7A, sail canvas #E6D9BC, net tan #B08A58; shopfront pops turquoise #2E9AA0, sunflower #E8B83A, coral #D9674E.
-REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait from this game: match its brushwork, framing, head size, lighting and level of finish exactly.
+REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait from this game: match ONLY its brushwork, framing, lighting and level of finish. Do NOT copy her face, face shape, nose, cheeks, blush or smile: this is a different person whose face must look clearly unlike hers.
 ```
 
 ## Output spec
@@ -38,4 +39,5 @@ REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait 
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-tereza-merchant/v1.png` | candidate — crescent lapels and scalloped hems in lacquer red, pearl buttons, sea-glass earring, scarred hands on a gull-wing hilt |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-tereza-merchant/v1.png` | superseded (owner: the women's faces were too similar) — crescent lapels and scalloped hems in lacquer red, pearl buttons, sea-glass earring, scarred hands on a gull-wing hilt |
+| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `617ac1dd-3540-46c3-8006-a98b1e21e19e` | `assets/_incoming/portrait-npc-tereza-merchant/v2.png` | candidate — angular, deep brown skin, aquiline nose, cheek scar, silver streak |
