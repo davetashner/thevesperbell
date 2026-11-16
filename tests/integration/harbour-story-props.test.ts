@@ -84,4 +84,29 @@ describe('harbour story-prop models', () => {
     expect(door?.at.y ?? 0).toBeLessThan(water);
     expect((door?.at.y ?? 0) + (door?.size.y ?? 0)).toBeGreaterThan(water);
   });
+
+  it('the generated waterfront props are shipped and credited, and the rejected drying net is not', () => {
+    for (const id of [
+      'model-prop-wharf-crane-01',
+      'model-prop-crate-stack-01',
+      'model-prop-tidefair-marker-01',
+      'model-prop-notice-lantern-court-01',
+      'model-prop-rowing-boat-01',
+      'model-prop-cargo-net-01',
+      'model-prop-net-loft-01',
+      'model-prop-plank-bridge-01',
+      'model-prop-gull-hoard-nest-01',
+      'model-prop-smuggler-crate-01',
+      'model-prop-lantern-hook-01',
+      'model-prop-fence-counter-01',
+      'model-prop-tidefair-boom-01',
+      'model-prop-wooden-gull-target-01',
+      'model-prop-bunting-01',
+    ]) {
+      expect(existsSync(`public/assets/model/${id}.glb`), `${id} runtime file`).toBe(true);
+      expect(statSync(`public/assets/model/${id}.glb`).size, `${id} size`).toBeLessThan(256 * 1024);
+      expect(credits, `${id} CREDITS row`).toContain(`| ${id} | model |`);
+    }
+    expect(existsSync('public/assets/model/model-prop-drying-net-01.glb')).toBe(false);
+  });
 });
