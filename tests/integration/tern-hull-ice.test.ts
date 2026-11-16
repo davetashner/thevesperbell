@@ -120,7 +120,7 @@ function run(sweepCold: boolean) {
 describe('walking the frozen pool to the Gilded Tern hull ladder (mw-e40.14 AC-1)', () => {
   it('AC-1: the ladder spans the ice, and the ice-walk marker is at its foot', () => {
     expect(ladder.at[1]).toBeLessThanOrEqual(FLOOR);
-    expect(ladder.at[1] + (ladder.scale?.[1] ?? 0)).toBeGreaterThanOrEqual(2);
+    expect(ladder.at[1] + ladder.scale[1]).toBeGreaterThanOrEqual(2);
     expect(Math.abs(iceWalk.at[2] - LADDER_Z)).toBeLessThan(1);
     expect(HULL_FACE_X - iceWalk.at[0]).toBeLessThan(2);
   });

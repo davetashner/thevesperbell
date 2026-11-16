@@ -355,7 +355,7 @@ describe('The Gilded Tern hull ladder and hold (mw-e40.14 AC-1, mw-e40.29)', () 
       (p) => p.properties?.climbable === 'ladder' && p.at[0] === 29.75,
     );
     expect(ladder?.at[1]).toBe(-6);
-    expect((ladder?.at[1] ?? 0) + (ladder?.scale?.[1] ?? 0)).toBeGreaterThanOrEqual(2);
+    expect((ladder?.at[1] ?? 0) + (ladder?.scale[1] ?? 0)).toBeGreaterThanOrEqual(2);
     expect(ladder?.at[2]).toBe(spawnOf('pool-ice-walk').at[2]);
   });
 
