@@ -4,18 +4,11 @@
 // Chromium with the project's own three.js (meshopt-compressed runtime files load too), writes
 // <out dir>/<model>.png, and prints and saves <out dir>/stats.json with each model's triangles,
 // materials, texture sizes and bounds (m) for its prompt file and the §13.2 budget check.
-import { createServer } from 'node:http';
+import { createServer, type Server } from 'node:http';
 import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { withPage } from './chromium.ts';
-
-const [outDir, ...models] = process.argv.slice(2);
-if (outDir === undefined || models.length === 0) {
-  console.error('usage: turntable-cli.ts <out dir> <model.glb> [<model.glb> …]');
-  process.exit(2);
-}
-mkdirSync(outDir, { recursive: true });
 
 const THREE_ROOT = resolve('node_modules/three');
 const VIEW = 480;
@@ -63,45 +56,71 @@ window.ready = true;
 const TYPES: Readonly<Record<string, string>> = {
   '.js': 'text/javascript',
   '.glb': 'model/gltf-binary',
-  '.wasm': 'application/wasm',
 };
-// Serves the page, three.js from node_modules and the models by index.
-const server = createServer((req, res) => {
-  const url = decodeURIComponent((req.url ?? '/').split('?')[0] ?? '/');
-  let file: string | undefined;
-  if (url === '/') {
-    res.writeHead(200, { 'content-type': 'text/html' }).end(PAGE);
-    return;
-  }
-  if (url.startsWith('/three/')) file = join(THREE_ROOT, url.slice('/three/'.length));
-  else if (url.startsWith('/model/')) file = resolve(models[Number(url.slice('/model/'.length))] ?? '');
-  if (file === undefined || !existsSync(file)) {
-    res.writeHead(404).end();
-    return;
-  }
-  res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
-  res.end(readFileSync(file));
-});
-await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
-const { port } = server.address() as AddressInfo;
 
-const stats: Record<string, unknown> = {};
-try {
-  await withPage(async (page) => {
-    await page.setViewportSize({ width: VIEW * 4, height: VIEW });
-    await page.goto(`http://127.0.0.1:${String(port)}/`);
-    await page.waitForFunction(() => (window as unknown as { ready?: boolean }).ready === true);
-    for (const [index, model] of models.entries()) {
-      const id = basename(model, '.glb');
-      stats[id] = await page.evaluate(
-        (url) => (window as unknown as { render: (u: string) => Promise<unknown> }).render(url),
-        `/model/${String(index)}`,
-      );
-      await page.screenshot({ path: join(outDir, `${id}.png`) });
-      console.log(id, JSON.stringify(stats[id]));
+/** An HTTP server for the page, three.js from node_modules and `models` by index (/model/<i>). */
+export function turntableServer(models: readonly string[]): Server {
+  return createServer((req, res) => {
+    const url = decodeURIComponent(String(req.url).replace(/\?.*$/, ''));
+    if (url === '/') {
+      res.writeHead(200, { 'content-type': 'text/html' }).end(PAGE);
+      return;
     }
+    let file: string | undefined;
+    if (url.startsWith('/three/')) file = join(THREE_ROOT, url.slice('/three/'.length));
+    else if (url.startsWith('/model/')) file = models[Number(url.slice('/model/'.length))];
+    if (file === undefined || !existsSync(file)) {
+      res.writeHead(404).end();
+      return;
+    }
+    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    res.end(readFileSync(file));
   });
-} finally {
-  server.close();
 }
-writeFileSync(join(outDir, 'stats.json'), `${JSON.stringify(stats, null, 1)}\n`);
+
+/** The slice of a Playwright page the turntable uses (a stand-in in tests). */
+export interface TurntablePage {
+  setViewportSize(size: { width: number; height: number }): Promise<void>;
+  goto(url: string): Promise<unknown>;
+  waitForFunction(expression: string): Promise<unknown>;
+  evaluate<R>(expression: string): Promise<R>;
+  screenshot(options: { path: string }): Promise<unknown>;
+}
+
+/** Runs the CLI; returns the exit code. */
+export async function main(
+  argv: readonly string[],
+  open: <T>(fn: (page: TurntablePage) => Promise<T>) => Promise<T> = withPage,
+): Promise<number> {
+  const [outDir, ...models] = argv;
+  if (outDir === undefined || models.length === 0) {
+    console.error('usage: turntable-cli.ts <out dir> <model.glb> [<model.glb> …]');
+    return 2;
+  }
+  mkdirSync(outDir, { recursive: true });
+  const server = turntableServer(models.map((m) => resolve(m)));
+  await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
+  const { port } = server.address() as AddressInfo;
+  const stats: Record<string, unknown> = {};
+  try {
+    await open(async (page) => {
+      await page.setViewportSize({ width: VIEW * 4, height: VIEW });
+      await page.goto(`http://127.0.0.1:${String(port)}/`);
+      await page.waitForFunction('window.ready === true');
+      for (const [index, model] of models.entries()) {
+        const id = basename(model, '.glb');
+        stats[id] = await page.evaluate(`window.render('/model/${String(index)}')`);
+        await page.screenshot({ path: join(outDir, `${id}.png`) });
+        console.log(id, JSON.stringify(stats[id]));
+      }
+    });
+  } finally {
+    server.close();
+  }
+  writeFileSync(join(outDir, 'stats.json'), `${JSON.stringify(stats, null, 1)}\n`);
+  return 0;
+}
+
+if (process.argv[1]?.endsWith('turntable-cli.ts') === true) {
+  process.exitCode = await main(process.argv.slice(2));
+}
