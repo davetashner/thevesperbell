@@ -1,6 +1,6 @@
 # portrait-npc-cray-inspector: Dialogue portrait of Inspector Prudence Cray, Lantern Court customs.
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
+**Status: owner-approved concept** (v2, approved 2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
 
 | Field | Value |
 |---|---|
@@ -33,11 +33,15 @@ REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v2 | approved | owner | 2026-11-16 | v2 approved: "Yes much better" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
 | 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-cray-inspector/v1.png` | superseded (owner: the women's faces were too similar) — spectacles, high white collar, ink coat, lantern-in-ring badge, ledger, Lantern Court flag; softer and warmer than "starched" |
-| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `f3bf5606-d0dc-476a-b019-31728acc9ed6` | `assets/_incoming/portrait-npc-cray-inspector/v2.png` | candidate — long narrow pale face, arched brows, prim unsmiling mouth, grey-streaked black bun |
+| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `f3bf5606-d0dc-476a-b019-31728acc9ed6` | `assets/_incoming/portrait-npc-cray-inspector/v2.png` | approved — long narrow pale face, arched brows, prim unsmiling mouth, grey-streaked black bun |
+
+## Output
+
+`assets/source/portrait/portrait-npc-cray-inspector/portrait-npc-cray-inspector.png` (v2, 1024², SHA-256 `9779107487b50c798deb308042e0d179deac89983d3891ae7eebc62faf116c09`). Runtime 512²/256² copies are made by `e37-asset-portraits-harbour-cast-integrate`.

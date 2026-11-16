@@ -1,6 +1,6 @@
 # portrait-npc-mags-bargewoman: Dialogue portrait of Mags Oakum, skipper of the Patient Ann.
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
+**Status: owner-approved concept** (v2, approved 2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
 
 | Field | Value |
 |---|---|
@@ -33,11 +33,15 @@ REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v2 | approved | owner | 2026-11-16 | v2 approved: "Yes much better" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
 | 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-mags-bargewoman/v1.png` | superseded (owner: the women's faces were too similar) — pipe with smoke, hawser forearms, ochre shirt, rope coil; river behind |
-| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `d0e44827-30d9-48b7-b43d-9454eed0307d` | `assets/_incoming/portrait-npc-mags-bargewoman/v2.png` | candidate — square jaw, sun-browned and squinting, unsmiling round the pipe |
+| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `d0e44827-30d9-48b7-b43d-9454eed0307d` | `assets/_incoming/portrait-npc-mags-bargewoman/v2.png` | approved — square jaw, sun-browned and squinting, unsmiling round the pipe |
+
+## Output
+
+`assets/source/portrait/portrait-npc-mags-bargewoman/portrait-npc-mags-bargewoman.png` (v2, 1024², SHA-256 `d911827c2259522c04baea92d1c882d1434a6d139197b8c1c16688bf3917928b`). Runtime 512²/256² copies are made by `e37-asset-portraits-harbour-cast-integrate`.

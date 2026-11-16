@@ -1,6 +1,6 @@
 # portrait-npc-agent-veiled: Dialogue portrait of "Mr. S—'s agent", the veiled passenger (no face).
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
+**Status: owner-approved concept** (v1, approved 2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
 
 | Field | Value |
 |---|---|
@@ -32,10 +32,14 @@ REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | approved with the set (the owner asked only for the women to be redone) (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-agent-veiled/v1.png` | candidate — hood and veil, no face or skin, gloved hand on a cane, berth lantern |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-agent-veiled/v1.png` | approved — hood and veil, no face or skin, gloved hand on a cane, berth lantern |
+
+## Output
+
+`assets/source/portrait/portrait-npc-agent-veiled/portrait-npc-agent-veiled.png` (v1, 1024², SHA-256 `b2b63e02278a11d74b5c79d967ea14407ed2cf12f3e3dcdb0d7b3428b0f0206b`). Runtime 512²/256² copies are made by `e37-asset-portraits-harbour-cast-integrate`.

@@ -1,6 +1,6 @@
 # portrait-npc-oona-dockhand: Dialogue portrait of Big Oona, dockhand and arm-wrestling champion.
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
+**Status: owner-approved concept** (v2, approved 2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
 
 | Field | Value |
 |---|---|
@@ -33,11 +33,15 @@ REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v2 | approved | owner | 2026-11-16 | v2 approved: "Yes much better" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
 | 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-oona-dockhand/v1.png` | superseded (owner: the women's faces were too similar) — knit cap, freckles, broken nose, huge arms, tarred smock, cargo hook |
-| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `57eb192e-c08e-4be1-9cc8-ebfacfb6a31c` | `assets/_incoming/portrait-npc-oona-dockhand/v2.png` | candidate — round freckled moon face, ginger hair, gap-toothed laugh, boxer's nose |
+| 2 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | added a FACE line (distinct face shape, nose, skin, expression); the reference now lends only brushwork and lighting, never Ottilie's face. Job `57eb192e-c08e-4be1-9cc8-ebfacfb6a31c` | `assets/_incoming/portrait-npc-oona-dockhand/v2.png` | approved — round freckled moon face, ginger hair, gap-toothed laugh, boxer's nose |
+
+## Output
+
+`assets/source/portrait/portrait-npc-oona-dockhand/portrait-npc-oona-dockhand.png` (v2, 1024², SHA-256 `d408cdd5e4778d96fa8bba251ded97bbb3fde10cb65c1fe5620587e644099e18`). Runtime 512²/256² copies are made by `e37-asset-portraits-harbour-cast-integrate`.

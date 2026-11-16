@@ -1,6 +1,6 @@
 # portrait-npc-reed-lock-keeper: Dialogue portrait of Old Reed, keeper of Kestrel Lock.
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
+**Status: owner-approved concept** (v1, approved 2026-11-16). From `e37-asset-portraits-harbour-cast-prompts` (plan/assets-harbor.json). Canon: story bible §5.13/§5.14, style bible §5.4 silhouette hooks.
 
 | Field | Value |
 |---|---|
@@ -32,10 +32,14 @@ REFERENCE IMAGE: the attached painted portrait is an approved dialogue portrait 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | approved with the set (the owner asked only for the women to be redone) (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-reed-lock-keeper/v1.png` | candidate — flat cap, mug of tea, red lock gates; the windlass key on its cord reads like a cross pendant |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 1k) / plus | initial | `assets/_incoming/portrait-npc-reed-lock-keeper/v1.png` | approved — flat cap, mug of tea, red lock gates; the windlass key on its cord reads like a cross pendant |
+
+## Output
+
+`assets/source/portrait/portrait-npc-reed-lock-keeper/portrait-npc-reed-lock-keeper.png` (v1, 1024², SHA-256 `bdcc67e0c2206daeac7f751a3d2937bc66bcef9bec0aa1388f2fa79a440766e7`). Runtime 512²/256² copies are made by `e37-asset-portraits-harbour-cast-integrate`.
