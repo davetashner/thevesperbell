@@ -204,4 +204,5 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `audio.death` | string | — | Played where it dies; its idle loop stops at the same time. |
 | `presentation` | object | `{}` | Render and audio bindings. |
 | `presentation.mesh` | id | `"placeholder-capsule"` | Mesh id; grey-box capsule default. |
+| `presentation.portrait` | id | — | Dialogue portrait asset id (mw-e37.433): public/assets/portrait/<id>.webp fills the dialogue box and the shop window; absent = the generic silhouette. |
 | `presentation.sfx` | id | `"placeholder"` | SFX set id. |

@@ -21,6 +21,7 @@
 // column is a fixed-width, right-aligned, tabular-figure column so prices line up at any size.
 
 import { button } from './components/controls';
+import { portraitCssUrl } from './portrait-art';
 import { h } from './components/dom';
 import { attachTooltip, confirmDialog, UI_INTENT_GLYPHS } from './components/overlays';
 import { tabs, type Tabs } from './components/tabs';
@@ -91,7 +92,7 @@ export interface ShopModel {
   readonly merchant: {
     readonly name: string;
     readonly greeting: string;
-    /** Portrait asset id; the frame carries it as `data-portrait` until the art is integrated. */
+    /** Portrait asset id: the frame carries it as `data-portrait` and paints its art (mw-e37.433). */
     readonly portrait?: string;
   };
   /** The player's crowns. */
@@ -383,8 +384,11 @@ export function openShopWindow(ui: UiRoot, options: ShopWindowOptions): ShopWind
     const hadFocus = focusKey !== undefined || content.contains(active);
     title.textContent = model.merchant.name;
     greeting.textContent = model.merchant.greeting;
-    portrait.dataset['portrait'] = model.merchant.portrait ?? '';
-    portrait.textContent = model.merchant.name.charAt(0).toUpperCase();
+    const art = model.merchant.portrait ?? '';
+    portrait.dataset['portrait'] = art;
+    portrait.style.backgroundImage = art === '' ? '' : portraitCssUrl(art);
+    // The initial stands in until the character has a face.
+    portrait.textContent = art === '' ? model.merchant.name.charAt(0).toUpperCase() : '';
     crowns.textContent = `${SHOP_TEXT.crowns}: ${crownsText(model.crowns)}`;
     till.textContent =
       model.merchantCrowns === undefined

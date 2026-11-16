@@ -2,7 +2,8 @@
 // Interact prompt: it shows a view model the game derives from the dialogue runtime
 // (src/game/conversation) and writes the DOM only when a shown value changes.
 //
-// - Speaker name and a portrait slot (a generic silhouette until the art lands, mw-e37.137).
+// - Speaker name and a portrait slot (the character's painted face when it has one, mw-e37.433,
+//   else a generic silhouette).
 // - The line reveals at the reveal speed setting (or whole, when instant); Enter skips the reveal.
 //   The words not yet shown are transparent, not absent, so the line never reflows as it types and a
 //   screen reader reads it whole. A separate live region announces each line once.
@@ -15,6 +16,7 @@
 
 import { h } from './components/dom';
 import { WriteCache, type HudWidget } from './hud';
+import { portraitCssUrl } from './portrait-art';
 
 export const REVEAL_SPEEDS = ['instant', 'slow', 'normal', 'fast'] as const;
 export type RevealSpeed = (typeof REVEAL_SPEEDS)[number];
@@ -78,8 +80,10 @@ export interface DialogueBoxLabels {
 export interface DialogueBoxModel {
   /** Who speaks (the last speaker while options are on offer). */
   readonly speaker: string;
-  /** Which portrait; the slot shows a silhouette whatever it is. */
+  /** Which speaker; stamped on the slot as `data-portrait`. */
   readonly portrait: string;
+  /** Portrait asset id painted in the slot (mw-e37.433); absent = the generic silhouette. */
+  readonly portraitArt?: string;
   /** The line (the last one while options are on offer). */
   readonly text: string;
   /** Changes with every new line, so the reveal restarts. */
@@ -242,6 +246,10 @@ export class DialogueBox implements HudWidget<DialogueBoxModel | null> {
     });
     c.set('portrait', model.portrait, (v) => {
       this.#portrait.dataset['portrait'] = v;
+    });
+    c.set('portraitArt', model.portraitArt ?? '', (v) => {
+      this.#portrait.dataset['art'] = v;
+      this.#portrait.style.backgroundImage = v === '' ? '' : portraitCssUrl(v);
     });
     if (model.lineKey !== this.#key) {
       this.#key = model.lineKey;

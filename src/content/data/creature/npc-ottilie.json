@@ -27,5 +27,9 @@
     "poiseBreak": "sfx-human-stagger",
     "death": "sfx-human-death"
   },
-  "presentation": { "mesh": "npc-ottilie", "sfx": "placeholder" }
+  "presentation": {
+    "mesh": "npc-ottilie",
+    "portrait": "portrait-npc-ottilie-marsh-01",
+    "sfx": "placeholder"
+  }
 }

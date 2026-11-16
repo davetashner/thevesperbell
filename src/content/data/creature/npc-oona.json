@@ -39,6 +39,7 @@
   },
   "presentation": {
     "mesh": "npc-oona",
+    "portrait": "portrait-npc-oona-dockhand",
     "sfx": "placeholder"
   }
 }

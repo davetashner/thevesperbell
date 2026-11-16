@@ -39,6 +39,7 @@
   },
   "presentation": {
     "mesh": "npc-reed",
+    "portrait": "portrait-npc-reed-lock-keeper",
     "sfx": "placeholder"
   }
 }
