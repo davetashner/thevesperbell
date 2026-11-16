@@ -1,6 +1,6 @@
 # model-prop-ballast-crate-01
 
-**Status: generated v1, turntable awaiting owner approval** (2026-11-16). Design approved on `prop-harbour-story-set-01` (owner, 2026-11-16, "They look great").
+**Status: owner-approved model** (turntable approved 2026-11-16, "Approved"); runtime file in place, not yet placed in the scene. Design approved on `prop-harbour-story-set-01` (owner, 2026-11-16, "They look great").
 
 ## Single image (input to image-to-3D)
 
@@ -20,13 +20,19 @@ No prompt: a crop of the approved sheet.
 
 The ballast twin, opened. The first job (`96dbf618-4188-4e6f-91e1-09df63d8b7ef`) failed at the provider; this is the retry. Budget: medium 400–2 k tris, one prop atlas, one material per set (style bible §13.2); decimated at processing.
 
+## Processing
+
+1. `npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-prop-ballast-crate-01/v1.glb public/assets/model/model-prop-ballast-crate-01.glb --texture-size 512`
+   → 84 KB, one 512² texture, meshopt-compressed (SHA-256 `d92e7aacd5d17d2818748c9ba5106a3e29006fbfe0417db44a9c32ba7a2fdbf7`).
+2. Placement waits for the interior beads (Bonded Warehouse, Customs House, breakwater).
+
 ## Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
 | image (flat concept) | sheet v1 | approved | owner | 2026-11-16 | via `prop-harbour-story-set-01` |
-| turntable | v1 | pending | owner | — | — |
+| turntable | v1 | approved | owner | 2026-11-16 | "Approved" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Licence
 
-Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row on approval.
+Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added 2026-11-16 (`placeholder: yes` until `assets/approvals.json` exists).

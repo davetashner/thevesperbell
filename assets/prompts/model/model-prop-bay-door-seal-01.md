@@ -1,6 +1,6 @@
 # model-prop-bay-door-seal-01
 
-**Status: generated v1, turntable awaiting owner approval** (2026-11-16). Design approved on `prop-harbour-story-set-01` (owner, 2026-11-16, "They look great").
+**Status: owner-approved model** (turntable approved 2026-11-16, "Approved"); runtime file in place, not yet placed in the scene. Design approved on `prop-harbour-story-set-01` (owner, 2026-11-16, "They look great").
 
 ## Single image (input to image-to-3D)
 
@@ -20,13 +20,19 @@ No prompt: a crop of the approved sheet.
 
 Bay nine's plank door with the customs seal; the broken and re-sealed states are swaps of the seal and cord, to be cut from this model or modelled as small seal pieces at integration. Budget: medium 400–2 k (≤ 5 k raw) tris, one prop atlas, one material per set (style bible §13.2); decimated at processing.
 
+## Processing
+
+1. `npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-prop-bay-door-seal-01/v1.glb public/assets/model/model-prop-bay-door-seal-01.glb --texture-size 512`
+   → 83 KB, one 512² texture, meshopt-compressed (SHA-256 `4fa4122010a11cecc65e2aef2a6e7f56a2cc07537ffd99790b0de1096cc1d3c7`).
+2. Placement waits for the interior beads (Bonded Warehouse, Customs House, breakwater).
+
 ## Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
 | image (flat concept) | sheet v1 | approved | owner | 2026-11-16 | via `prop-harbour-story-set-01` |
-| turntable | v1 | pending | owner | — | — |
+| turntable | v1 | approved | owner | 2026-11-16 | "Approved" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Licence
 
-Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row on approval.
+Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-prop-chest-wooden-01`. CREDITS row added 2026-11-16 (`placeholder: yes` until `assets/approvals.json` exists).
