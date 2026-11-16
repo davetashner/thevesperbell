@@ -2932,6 +2932,9 @@
     },
     {
       "graph": "wendmouth-harbour-areas"
+    },
+    {
+      "graph": "wendmouth-tern"
     }
   ],
   "transitions": [

@@ -66,6 +66,18 @@ beforeEach(() => {
 });
 
 describe('dialogue box (mw-e22.10)', () => {
+  it('mw-e37.433: paints the speaker portrait art when there is one and drops it when there is not', () => {
+    const box = new DialogueBox();
+    box.update(model({ portraitArt: 'portrait-npc-mags-bargewoman' }));
+    expect(part(box, 'portrait').dataset['art']).toBe('portrait-npc-mags-bargewoman');
+    expect(part(box, 'portrait').style.backgroundImage).toContain(
+      '/assets/portrait/portrait-npc-mags-bargewoman.webp',
+    );
+    box.update(model({ lineKey: 2 }));
+    expect(part(box, 'portrait').dataset['art']).toBe('');
+    expect(part(box, 'portrait').style.backgroundImage).toBe('');
+  });
+
   it('is hidden until a conversation runs, then shows the speaker, portrait slot, line and hint', () => {
     const box = new DialogueBox();
     expect(box.element.dataset['testid']).toBe('dialogue-box');

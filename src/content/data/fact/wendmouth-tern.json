@@ -1,0 +1,15 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "wendmouth-tern",
+  "name": "Gilded Tern boarding facts",
+  "notes": "mw-e40.28: the player has boarded the Gilded Tern through Hesketh's gangway gate.",
+  "facts": [
+    {
+      "key": "tern.boarded",
+      "type": "bool",
+      "default": false,
+      "description": "The player has stepped onto the Gilded Tern's deck. Written by the wendmouth-tern signal graph; read by Hesketh's after-boarding line.",
+      "owner": "scene"
+    }
+  ]
+}

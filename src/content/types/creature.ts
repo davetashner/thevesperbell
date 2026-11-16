@@ -267,6 +267,11 @@ export const creatureSchema = z.strictObject({
   presentation: z
     .strictObject({
       mesh: contentId.default('placeholder-capsule').describe('Mesh id; grey-box capsule default.'),
+      portrait: contentId
+        .optional()
+        .describe(
+          'Dialogue portrait asset id (mw-e37.433): public/assets/portrait/<id>.webp fills the dialogue box and the shop window; absent = the generic silhouette.',
+        ),
       sfx: contentId.default('placeholder').describe('SFX set id.'),
     })
     .prefault({})
