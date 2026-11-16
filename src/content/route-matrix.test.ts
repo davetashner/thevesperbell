@@ -93,6 +93,15 @@ describe('docs/design/route-matrix.json', () => {
       expect(ids, id).toContain(id);
   });
 
+  it('mw-e40.14 AC-4 (mw-e40.29): boarding the Gilded Tern declares four class routes, the gangway token and the hull ladder swim and ice walk', () => {
+    const tern = matrix.obstacles.find((o) => o.id === 'gilded-tern');
+    expect(tern === undefined ? [] : classRoutes(tern)).toHaveLength(4);
+    const hows = (tern?.routes ?? []).map((r) => r.how);
+    expect(hows.some((h) => h.includes('crew token at the gangway'))).toBe(true);
+    expect(hows.some((h) => h.includes('hull ladder (pool-ice-walk)'))).toBe(true);
+    expect(hows.some((h) => h.includes('hull ladder (tern-hull-ladder-foot)'))).toBe(true);
+  });
+
   it('AC-1: lists the six mine entries including the Weeping Adit, each carried by a route', () => {
     expect(matrix.mineEntries).toHaveLength(6);
     expect(matrix.mineEntries.map((e) => e.id)).toContain('weeping-adit');

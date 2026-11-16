@@ -1,0 +1,42 @@
+{
+  "$schema": "../merchant.schema.json",
+  "id": "tereza-arms-stall",
+  "hours": { "open": 7, "close": 19 },
+  "notes": "Tereza Maelo's arms stall, the Tidemarket, Wendmouth (story bible §5.13; mw-e40.31, part of mw-e40.10): the best steel in the region from a retired duellist who pretends not to miss using it. A tempered knife, staves, bucklers and a kite shield, a brigandine and a stamina tonic (spears, maces and halberds stay out of the shops until the economy pass, tests/integration/shop-row-content.test.ts). Her dialogue opens the window (`tereza.shop-requested`). Prices sit at the economy doc's default band: markup 1.3 (band 1.1-1.5) and buy rate 0.4 (band 0.3-0.6); weapons and shields are her specialties (bonus at the default 1.2). The under-the-counter tier (a fine longsword, a kettle helm, tempered mail) is hidden until the player has beaten her in a duel or an honest Tidefair winner has earned her regard (`tereza.under-counter`, `tidefair.regarded`; AC-3 of mw-e40.10), and appears at the next restock. 500 gold in the till, refilling 100 a day. Item values are catalogue placeholders the balance pass will move. Still to do under mw-e40.10: the Saltmarch stock (curved sabres, harpoon-spears, lacquered shields, sharkskin brigandine) waits on the approved item art, and the exotic arrows, spice stall and the foreign book cart are their own content.",
+  "npcId": "npc-tereza",
+  "displayName": "Tereza Maelo",
+  "shopName": "Tereza Maelo's arms stall",
+  "personalityTags": ["shrewd", "friendly"],
+  "specialties": ["weapon", "shield"],
+  "buysCategories": ["weapon", "armor", "shield", "ammo"],
+  "stock": [
+    { "item": "short-sword", "count": 2 },
+    { "item": "tempered-hunting-knife", "count": 1 },
+    { "item": "walking-staff", "count": 2, "restock": { "everyHours": 72, "amount": 1 } },
+    { "item": "yew-staff", "count": 1 },
+    { "item": "small-buckler", "count": 2 },
+    { "item": "reinforced-buckler", "count": 1 },
+    { "item": "kite-shield", "count": 1 },
+    { "item": "brigandine", "count": 1 },
+    { "item": "stamina-tonic", "count": 3, "restock": { "everyHours": 48, "amount": 1 } },
+    {
+      "item": "longsword",
+      "count": 1,
+      "when": { "any": [{ "fact": "tereza.under-counter" }, { "fact": "tidefair.regarded" }] }
+    },
+    {
+      "item": "kettle-helm",
+      "count": 1,
+      "when": { "any": [{ "fact": "tereza.under-counter" }, { "fact": "tidefair.regarded" }] }
+    },
+    {
+      "item": "tempered-mail-hauberk",
+      "count": 1,
+      "when": { "any": [{ "fact": "tereza.under-counter" }, { "fact": "tidefair.regarded" }] }
+    }
+  ],
+  "goldReserve": 500,
+  "goldRestockPerDay": 100,
+  "markup": 1.3,
+  "buyRate": 0.4
+}

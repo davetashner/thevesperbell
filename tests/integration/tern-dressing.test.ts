@@ -42,7 +42,8 @@ describe('Gilded Tern dressing', () => {
     expect(hidden.some((p) => p.purpose === 'climbable')).toBe(false);
     // The crow's nest platform (top 12 m) and the cabin walls behind z 138 stay drawn.
     expect(hidden.some((p) => p.max.y >= 11.9 && p.max.y <= 12.1 && p.min.x > 35)).toBe(false);
-    expect(hidden.some((p) => (p.min.z + p.max.z) / 2 > 138)).toBe(false);
+    // (The hull's own end wall, below the deck, is hidden: it is the shell the hold is built inside.)
+    expect(hidden.some((p) => p.min.y >= 2 && (p.min.z + p.max.z) / 2 > 138)).toBe(false);
   });
 
   it('draws the mainmast’s rope ladder against the climbable board, and cuts only models the scene dresses', () => {

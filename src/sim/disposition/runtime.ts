@@ -24,6 +24,7 @@
 
 import type { GameEntry } from '@content/index';
 import { DamageApplied } from '../combat/damage/events';
+import { DAMAGE_TAGS } from '../combat/damage/packet';
 import { defineComponent, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { World } from '../core/world';
@@ -447,9 +448,11 @@ export class Dispositions {
     const offTheft = events.on(CrimeTheft, (theft) => {
       this.crimeTheft(theft);
     });
-    const offHit = events.on(DamageApplied, ({ target, packet }) => {
+    const offHit = events.on(DamageApplied, ({ target, packet, tags }) => {
       const attacker = packet.instigator;
       if (attacker === null || attacker === target) return;
+      // A blow in a first-blood duel is a game, not an assault (src/sim/duel).
+      if (tags.includes(DAMAGE_TAGS.duel)) return;
       if (factionOf(this.#world, attacker) !== PLAYER_FACTION) return;
       if (factionOf(this.#world, target) === undefined) return;
       this.trigger(target, ATTACKED);
