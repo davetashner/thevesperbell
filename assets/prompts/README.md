@@ -33,6 +33,22 @@ and records it: the approval row names `owner (standing pre-approval 2026-11-16)
 and the review sheet is still shown to the owner, who may reject any asset afterwards. Music takes are
 unchanged (picking the take in Suno is the owner's). The owner can withdraw this at any time.
 
+## Tooling (Claude-run, headless Chromium)
+
+The steps between a generated file and a runtime file are repo scripts, so every batch is processed the
+same way. Image decisions live in `scripts/assets/pixels.ts` (unit tested); the CLIs read and write files
+through Playwright's Chromium (no image library needed).
+
+| Step | Command | What it does |
+|---|---|---|
+| Texture → runtime | `pnpm asset:texture <src> public/assets/texture/<id>.webp [--mode both\|x\|alpha] [--size WxH] [--preview check.jpg]` | Overlap-blends the edges so it tiles (both ways, or left to right for trims); `alpha` first crops a cut-out (a net) to whole pattern repeats; resizes and writes WebP; the preview repeats the tile to check the seams. |
+| Sheet → image-to-3D input | `pnpm asset:crop <sheet> <out.png> --box x0,y0,x1,y1 [--keep-all]` | Crops one prop or character, keeps only the largest shape (blanking neighbours that crept in), erases thin scale lines, pads square on the sheet's parchment. Check the result by eye before spending credits. |
+| Turntable gate | `pnpm asset:turntable <out dir> <model.glb>…` | Renders each GLB from four sides on parchment and writes `stats.json` (triangles, materials, texture sizes, bounds) for the prompt file and the §13.2 budget check. |
+
+Generation itself (Higgsfield `gpt_image_2_6`, Tripo through Higgsfield) runs in Claude's session through
+the Higgsfield tools; meshes are optimised with `npx @gltf-transform/cli@4.5.1 optimize … --compress
+meshopt --texture-compress webp --texture-size 512`.
+
 ## Lifecycle
 
 ```
