@@ -554,6 +554,7 @@ check enforces this).
 
 ### Fixed
 
+- The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).
 - The dialogue box, its history and the screen-reader announcements now label an NPC's lines with their name ("Mags") instead of the dialogue's internal speaker id ("mags"); the narrator and you keep your labels (mw-2ute).
 - The new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
 - People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).

@@ -35,6 +35,7 @@ One mast module, used at the mast steps (pillars at z 124 and 136, plus the fore
 1. `npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-ship-gilded-tern-rigging-01/v1.glb public/assets/model/model-ship-gilded-tern-rigging-01.glb --texture-size 512`
    → 93 KB, one 512² texture, meshopt-compressed (SHA-256 `de5dfc244c841a199c2133885989ecd0eca2e877e87a51ee33f6c5b36825bdf1`).
 2. Placement and scale in the harbour scene with the Gilded Tern integration.
+3. Runtime clean-up (mw-e40.27): Tripo cannot make thin rope, so the shrouds, ratlines and chain-plate lumps are cut from the loaded mesh (`src/render/props/model-strips.ts`) and drawn again from tubes (`src/render/props/tern-rigging.ts`). The mast, yards, furled sails and fighting top are used as shipped.
 
 ## Approval gate(s)
 

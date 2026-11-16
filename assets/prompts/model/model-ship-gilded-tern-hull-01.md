@@ -34,6 +34,7 @@ The hull, deck at y = 2 over the 10 m × 40 m blocking platform (x 30–40, z 10
 
 1. `npx @gltf-transform/cli@4.5.1 optimize … --texture-size 512` (1024 for the hull, a hero piece) → `public/assets/model/model-ship-gilded-tern-hull-01.glb`.
 2. Placement and scale in the harbour scene with the Gilded Tern integration.
+3. Runtime clean-up (mw-e40.27): the deck fittings along the middle of the deck (three hatches, mast-step rings, hutch stowage) are cut from the loaded mesh (`src/render/props/model-strips.ts`); the harbour's own props stand there instead. The rolled boarding nets on the bulwarks are still the model's own.
 
 ## Approval gate(s)
 
