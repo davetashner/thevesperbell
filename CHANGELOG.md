@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Characters now show their painted face in the dialogue box (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh and Ottilie), and Ottilie's portrait fills the shop window's frame; narrators, the player and anyone without art keep the silhouette.
 - Wendmouth Harbour is dressed: the Gilded Tern (hull, masts and rigging, figurehead, springalds, pine stern cabin), barrels, chests, the hoist crate and deck fittings on the docks, painted stone quays and breakwater, harbour water, and tin (loud) and tar (quiet) net-loft roofs.
 - The named harbour cast (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh) appear in the harbour as their own characters instead of capsules, and the customs scale, Cray's shelf, a ballast crate, the sunken serpent figurehead and the smugglers' sea-door are in place.
 - A procedural sky in every open-air scene: a gradient that follows the time of day, the sun and moon on the game clock, stars at night and drifting painted clouds.
@@ -554,6 +555,7 @@ check enforces this).
 ### Fixed
 
 - The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).
+- The dialogue box, its history and the screen-reader announcements now label an NPC's lines with their name ("Mags") instead of the dialogue's internal speaker id ("mags"); the narrator and you keep your labels (mw-2ute).
 - The new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
 - People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).
 - Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).
