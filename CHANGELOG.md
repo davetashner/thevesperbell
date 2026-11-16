@@ -558,6 +558,10 @@ check enforces this).
   idle, walks, runs and sprints with its speed, crouches, jumps, falls, lands and rolls, following
   exactly what the game's movement is doing.
 
+### Changed
+
+- Wendmouth harbour: the blue cargo blocks on the wharf now read as painted crates with ropes and kegs on top, and each net loft has a framed door, an awning, shuttered windows, a stone plinth and a corner of crates and barrels (mw-e40.34).
+
 ### Fixed
 
 - The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).

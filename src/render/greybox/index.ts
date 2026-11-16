@@ -245,6 +245,24 @@ export function paintedKind(
   return undefined;
 }
 
+/**
+ * True for a placed crate (the kit's 1 m cube, purpose interactive): it is drawn with the crate painting
+ * on every face instead of the flat interactive blue, so a stack of cargo reads as cargo. Its collider,
+ * purpose and gameplay are unchanged; the painting is the cue that it is a movable-looking block.
+ */
+export function isPaintedCrate(part: Pick<ScenePart, 'piece' | 'purpose' | 'shape'>): boolean {
+  return part.piece === 'crate' && part.purpose === 'interactive' && part.shape !== 'wedge';
+}
+
+/** A crate part's box, placed in world space, keeping the per-face UVs the crate painting needs. */
+function crateGeometry(part: ScenePart): BufferGeometry {
+  const box = new BoxGeometry(part.size.x, part.size.y, part.size.z);
+  const geometry = box.toNonIndexed();
+  box.dispose();
+  geometry.applyMatrix4(partMatrix(part));
+  return geometry;
+}
+
 const paintedMaterialCache = new Map<PaintedKind, MeshStandardMaterial>();
 
 /** The shared tiling material of a painted kind. */
@@ -433,6 +451,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       // dressing's own group, hidden once its model has loaded (they stay if it never does).
       const dressingParts = new Map<number, Map<KitPurpose, BufferGeometry[]>>();
       const paintedWalls = new Map<string, BufferGeometry[]>();
+      const crateParts: BufferGeometry[] = [];
       for (const part of layout.parts) {
         // A breakable piece is drawn on its own (`piece`), so it can go when it breaks.
         if (layout.pieces[part.placement]?.breakable !== undefined) continue;
@@ -459,6 +478,10 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           paintedWalls.set(paint, list);
           continue;
         }
+        if (isPaintedCrate(part)) {
+          crateParts.push(crateGeometry(part));
+          continue;
+        }
         // The pillars and the ivy wear paintings (mw-va0), so they are drawn on their own, with UVs.
         const kind = paintedKind(part, layout.pieces[part.placement]?.properties);
         const geometry =
@@ -472,6 +495,15 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         const list = byPurpose.get(part.purpose) ?? [];
         list.push(partGeometry(part));
         byPurpose.set(part.purpose, list);
+      }
+      if (crateParts.length > 0) {
+        const merged = mergeGeometries(crateParts);
+        for (const geometry of crateParts) geometry.dispose();
+        const mesh = new Mesh(merged, crateFaces());
+        mesh.name = 'crate';
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
       }
       for (const [kind, geometries] of paintedParts) {
         const merged = mergeGeometries(geometries);

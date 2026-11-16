@@ -1804,6 +1804,180 @@
       "at": [72.5, 0, 102.25],
       "scale": [0.25, 1.75, 0.25],
       "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [-89, 3.0, 43.75],
+      "scale": [1.75, 0.1333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-89, 3.25, 43.5],
+      "scale": [1.75, 0.05, 4.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-90.0, 0, 43.75],
+      "scale": [0.25, 1.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-88.0, 0, 43.75],
+      "scale": [0.25, 1.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-93.5, 1.25, 43.75],
+      "scale": [0.6, 0.4333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-84.5, 1.25, 43.75],
+      "scale": [0.6, 0.4333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-93.5, 0, 43.75],
+      "scale": [3.0, 0.1667, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-84.5, 0, 43.75],
+      "scale": [3.0, 0.1667, 1.5]
+    },
+    {
+      "piece": "platform",
+      "at": [-91.0, 0.0, 42.75],
+      "scale": [0.35, 0.8, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-87.0, 0.0, 42.75],
+      "scale": [0.275, 0.6, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-86.0, 0.0, 43.0],
+      "scale": [0.31, 0.85, 0.31],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [-71, 3.0, 43.75],
+      "scale": [1.75, 0.1333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-71, 3.25, 43.5],
+      "scale": [1.75, 0.05, 4.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-72.0, 0, 43.75],
+      "scale": [0.25, 1.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-70.0, 0, 43.75],
+      "scale": [0.25, 1.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-75.5, 1.25, 43.75],
+      "scale": [0.6, 0.4333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-66.5, 1.25, 43.75],
+      "scale": [0.6, 0.4333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-75.5, 0, 43.75],
+      "scale": [3.0, 0.1667, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-66.5, 0, 43.75],
+      "scale": [3.0, 0.1667, 1.5]
+    },
+    {
+      "piece": "platform",
+      "at": [-73.0, 0.0, 42.75],
+      "scale": [0.35, 0.8, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-69.0, 0.0, 42.75],
+      "scale": [0.275, 0.6, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-68.0, 0.0, 43.0],
+      "scale": [0.31, 0.85, 0.31],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [-53, 3.0, 43.75],
+      "scale": [1.75, 0.1333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-53, 3.25, 43.5],
+      "scale": [1.75, 0.05, 4.0]
+    },
+    {
+      "piece": "wall",
+      "at": [-54.0, 0, 43.75],
+      "scale": [0.25, 1.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-52.0, 0, 43.75],
+      "scale": [0.25, 1.0, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-57.5, 1.25, 43.75],
+      "scale": [0.6, 0.4333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-48.5, 1.25, 43.75],
+      "scale": [0.6, 0.4333, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-57.5, 0, 43.75],
+      "scale": [3.0, 0.1667, 1.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-48.5, 0, 43.75],
+      "scale": [3.0, 0.1667, 1.5]
+    },
+    {
+      "piece": "platform",
+      "at": [-55.0, 0.0, 42.75],
+      "scale": [0.35, 0.8, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-51.0, 0.0, 42.75],
+      "scale": [0.275, 0.6, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-50.0, 0.0, 43.0],
+      "scale": [0.31, 0.85, 0.31],
+      "purpose": "blocking"
     }
   ],
   "spawns": [
@@ -3601,9 +3775,249 @@
         "min": [71.25, 0.1, 111.75],
         "max": [80.75, 2.25, 112.25]
       }
+    },
+    {
+      "id": "net-loft-west-crate-stack",
+      "model": "model-prop-crate-stack-01",
+      "at": [-91.0, 0, 42.75],
+      "turn": 90,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-91.4, 0.1, 42.3],
+        "max": [-90.6, 0.8, 43.2]
+      }
+    },
+    {
+      "id": "net-loft-west-keg",
+      "model": "model-prop-keg-01",
+      "at": [-87.0, 0, 42.75],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height",
+      "hides": {
+        "min": [-87.325, 0.1, 42.45],
+        "max": [-86.675, 0.6, 43.05]
+      }
+    },
+    {
+      "id": "net-loft-west-barrel",
+      "model": "model-prop-barrel-weathered-01",
+      "at": [-86.0, 0, 43.0],
+      "turn": 90,
+      "size": [0.62, 0.85, 0.62],
+      "fit": "height",
+      "hides": {
+        "min": [-86.36, 0.1, 42.64],
+        "max": [-85.64, 0.85, 43.36]
+      }
+    },
+    {
+      "id": "net-loft-west-rope-coil",
+      "model": "model-prop-rope-coil-01",
+      "at": [-91.0, 0.75, 42.75],
+      "turn": 0,
+      "size": [0.6, 0.25, 0.6],
+      "fit": "box"
+    },
+    {
+      "id": "net-loft-middle-crate-stack",
+      "model": "model-prop-crate-stack-01",
+      "at": [-73.0, 0, 42.75],
+      "turn": 90,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-73.4, 0.1, 42.3],
+        "max": [-72.6, 0.8, 43.2]
+      }
+    },
+    {
+      "id": "net-loft-middle-keg",
+      "model": "model-prop-keg-01",
+      "at": [-69.0, 0, 42.75],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height",
+      "hides": {
+        "min": [-69.325, 0.1, 42.45],
+        "max": [-68.675, 0.6, 43.05]
+      }
+    },
+    {
+      "id": "net-loft-middle-barrel",
+      "model": "model-prop-barrel-weathered-01",
+      "at": [-68.0, 0, 43.0],
+      "turn": 90,
+      "size": [0.62, 0.85, 0.62],
+      "fit": "height",
+      "hides": {
+        "min": [-68.36, 0.1, 42.64],
+        "max": [-67.64, 0.85, 43.36]
+      }
+    },
+    {
+      "id": "net-loft-middle-rope-coil",
+      "model": "model-prop-rope-coil-01",
+      "at": [-73.0, 0.75, 42.75],
+      "turn": 0,
+      "size": [0.6, 0.25, 0.6],
+      "fit": "box"
+    },
+    {
+      "id": "net-loft-east-crate-stack",
+      "model": "model-prop-crate-stack-01",
+      "at": [-55.0, 0, 42.75],
+      "turn": 90,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-55.4, 0.1, 42.3],
+        "max": [-54.6, 0.8, 43.2]
+      }
+    },
+    {
+      "id": "net-loft-east-keg",
+      "model": "model-prop-keg-01",
+      "at": [-51.0, 0, 42.75],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height",
+      "hides": {
+        "min": [-51.325, 0.1, 42.45],
+        "max": [-50.675, 0.6, 43.05]
+      }
+    },
+    {
+      "id": "net-loft-east-barrel",
+      "model": "model-prop-barrel-weathered-01",
+      "at": [-50.0, 0, 43.0],
+      "turn": 90,
+      "size": [0.62, 0.85, 0.62],
+      "fit": "height",
+      "hides": {
+        "min": [-50.36, 0.1, 42.64],
+        "max": [-49.64, 0.85, 43.36]
+      }
+    },
+    {
+      "id": "net-loft-east-rope-coil",
+      "model": "model-prop-rope-coil-01",
+      "at": [-55.0, 0.75, 42.75],
+      "turn": 0,
+      "size": [0.6, 0.25, 0.6],
+      "fit": "box"
+    },
+    {
+      "id": "wharf-crate-coil-1",
+      "model": "model-prop-rope-coil-01",
+      "at": [6.0, 1.0, 90.0],
+      "turn": 0,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
+    },
+    {
+      "id": "wharf-crate-keg-2",
+      "model": "model-prop-keg-01",
+      "at": [8.0, 1.0, 90.5],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height"
+    },
+    {
+      "id": "wharf-crate-coil-3",
+      "model": "model-prop-rope-coil-01",
+      "at": [7.0, 1.0, 91.5],
+      "turn": 180,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
+    },
+    {
+      "id": "wharf-crate-keg-4",
+      "model": "model-prop-keg-01",
+      "at": [36.0, 1.0, 78.0],
+      "turn": 270,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height"
+    },
+    {
+      "id": "wharf-crate-coil-5",
+      "model": "model-prop-rope-coil-01",
+      "at": [38.0, 1.0, 78.5],
+      "turn": 0,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
+    },
+    {
+      "id": "wharf-crate-keg-6",
+      "model": "model-prop-keg-01",
+      "at": [-30.0, 1.0, 92.0],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height"
+    },
+    {
+      "id": "wharf-crate-coil-7",
+      "model": "model-prop-rope-coil-01",
+      "at": [-28.5, 1.0, 92.5],
+      "turn": 180,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
+    },
+    {
+      "id": "wharf-crate-keg-8",
+      "model": "model-prop-keg-01",
+      "at": [-8.0, 1.0, 80.0],
+      "turn": 270,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height"
+    },
+    {
+      "id": "wharf-crate-coil-9",
+      "model": "model-prop-rope-coil-01",
+      "at": [14.0, 1.0, 82.0],
+      "turn": 0,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
     }
   ],
   "paints": [
+    {
+      "id": "net-loft-west-plinth",
+      "min": [-96.5, 0, 43.5],
+      "max": [-81.5, 0.6, 43.95],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "net-loft-west-trim",
+      "min": [-96.5, 0.6, 43.0],
+      "max": [-81.5, 3.6, 43.95],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "net-loft-middle-plinth",
+      "min": [-78.5, 0, 43.5],
+      "max": [-63.5, 0.6, 43.95],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "net-loft-middle-trim",
+      "min": [-78.5, 0.6, 43.0],
+      "max": [-63.5, 3.6, 43.95],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "net-loft-east-plinth",
+      "min": [-60.5, 0, 43.5],
+      "max": [-45.5, 0.6, 43.95],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "net-loft-east-trim",
+      "min": [-60.5, 0.6, 43.0],
+      "max": [-45.5, 3.6, 43.95],
+      "texture": "tex-bulkhead-pine-01"
+    },
     {
       "id": "tern-cabin",
       "min": [30.5, 1.5, 137.5],
