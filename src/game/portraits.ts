@@ -25,6 +25,7 @@ export interface PortraitDialogue {
   readonly speakers: readonly {
     readonly id: string;
     readonly npc?: { readonly id: string } | undefined;
+    readonly name?: string | undefined;
   }[];
 }
 
@@ -39,4 +40,26 @@ export function speakerPortraitResolver(
 ): (dialogue: string, speaker: string) => string | undefined {
   return (dialogue, speaker) =>
     npcPortrait(creatures, dialogueOf(dialogue)?.speakers.find((s) => s.id === speaker)?.npc?.id);
+}
+
+/** "npc-mags" → "Mags", "npc-townsfolk-miner" → "Townsfolk miner": an NPC creature id made readable. */
+export function npcLabel(npc: string): string {
+  const words = npc.replace(/^npc-/, '').replaceAll('-', ' ');
+  return `${words.charAt(0).toUpperCase()}${words.slice(1)}`;
+}
+
+/**
+ * Resolves a dialogue's speaker id to the name the dialogue box, history and screen-reader
+ * announcements show (mw-2ute): the speaker's own `name`, else the NPC creature it names made
+ * readable ("mags" → npc-mags → "Mags"). Creatures carry no display name, so the readable id is
+ * the short form. The narrator, the player and unknown speakers keep their id.
+ */
+export function speakerNameResolver(
+  dialogueOf: (dialogue: string) => PortraitDialogue | undefined,
+): (dialogue: string, speaker: string) => string {
+  return (dialogue, speaker) => {
+    const found = dialogueOf(dialogue)?.speakers.find((s) => s.id === speaker);
+    if (found?.name !== undefined) return found.name;
+    return found?.npc === undefined ? speaker : npcLabel(found.npc.id);
+  };
 }

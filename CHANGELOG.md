@@ -554,6 +554,7 @@ check enforces this).
 
 ### Fixed
 
+- The dialogue box, its history and the screen-reader announcements now label an NPC's lines with their name ("Mags") instead of the dialogue's internal speaker id ("mags"); the narrator and you keep your labels (mw-2ute).
 - The new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
 - People standing on a raised or sunken floor, like Mags on the barge landing in Wendmouth, now get a Talk prompt: the reach check no longer ends inside the floor under their feet (mw-j6el).
 - Talking to someone now frees the mouse and holds the game's controls: with a conversation open, clicking a reply works without first freeing the cursor, and pressing A on a controller or clicking a reply no longer swings your weapon, interacts or jumps as well; everything works as before when you say goodbye (mw-e22.19).

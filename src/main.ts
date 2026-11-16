@@ -94,7 +94,7 @@ import {
   DIALOGUE_VETO_ID,
   npcResolver,
 } from '@game/conversation/index';
-import { speakerPortraitResolver } from '@game/portraits';
+import { speakerNameResolver, speakerPortraitResolver } from '@game/portraits';
 import type { DialogueDef } from '@content/types/dialogue';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
@@ -2742,8 +2742,7 @@ function startRenderer(
           player: player.entity,
           runtime,
           dialogueOf: (creature) => dialogueOfCreature.get(creature),
-          speakerName: (dialogue, speaker) =>
-            dialogues.get(dialogue)?.speakers.find((s) => s.id === speaker)?.name ?? speaker,
+          speakerName: speakerNameResolver((dialogue) => dialogues.get(dialogue)),
           speakerPortrait: speakerPortraitResolver(
             (dialogue) => dialogues.get(dialogue),
             content.all('creature'),
