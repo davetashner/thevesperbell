@@ -18,6 +18,8 @@
 // Playwright scene smoke (e2e/scenes.spec.ts) and the perf notes in docs/design/valley-spike.md.
 
 import type { SceneBackdropDef, SceneEnvironmentDef } from '@content/index';
+import { skyAt } from '../sky/model';
+import { createSkyDome, type SkyDomeView } from '../sky';
 import {
   Color,
   CylinderGeometry,
@@ -39,10 +41,20 @@ export const BACKDROP_SKIRT_DEPTH = 400;
 /** Where dev serves the unapproved backdrop images from (Vite serves the project root). */
 export const BACKDROP_DEV_ROOT = '/assets/_incoming/';
 
+/** Sky colour a dome paints from when the scene names none (style bible `sky`). */
+const DEFAULT_SKY = '#8FA8C8';
+/** The minute a dome shows until the game clock sets it. */
+const NOON = 720;
+
 export interface EnvironmentView {
   /** The backdrop card once its image has loaded (undefined: none, still loading, or missing). */
   backdrop(): Mesh | undefined;
-  /** Removes the fog and backdrop and frees their GPU resources. */
+  /**
+   * Shows the procedural sky dome (when the scene has one) at game `minute` for the blended sky colour
+   * `sky` (#RRGGBB; undefined keeps the scene's own). No-op without a dome.
+   */
+  setSky(sky: string | undefined, minute: number): void;
+  /** Removes the fog, backdrop and sky dome and frees their GPU resources. */
   dispose(): void;
 }
 
@@ -59,10 +71,22 @@ export function applyEnvironment(
   environment: SceneEnvironmentDef | undefined,
   options: EnvironmentOptions,
 ): EnvironmentView {
-  if (environment === undefined) return { backdrop: () => undefined, dispose: () => undefined };
+  if (environment === undefined) {
+    return { backdrop: () => undefined, setSky: () => undefined, dispose: () => undefined };
+  }
   if (environment.sky !== undefined) scene.background = new Color(environment.sky);
   if (environment.fog !== undefined) {
     scene.fog = new Fog(environment.fog.color, environment.fog.near, environment.fog.far);
+  }
+  // The procedural dome (scenes that ask for one) paints over the flat sky colour; it starts at noon
+  // and follows the game clock once the caller sets it.
+  let dome: SkyDomeView | undefined;
+  const settings = environment.dome;
+  const baseSky = environment.sky ?? DEFAULT_SKY;
+  if (settings !== undefined) {
+    dome = createSkyDome();
+    dome.update(skyAt(settings, baseSky, NOON));
+    scene.add(dome.mesh);
   }
   let card: Mesh | undefined;
   let cancelled = false;
@@ -93,9 +117,15 @@ export function applyEnvironment(
   }
   return {
     backdrop: () => card,
+    setSky(sky, minute) {
+      if (dome === undefined || settings === undefined) return;
+      dome.update(skyAt(settings, sky ?? baseSky, minute));
+    },
     dispose() {
       cancelled = true;
       scene.fog = null;
+      dome?.dispose();
+      dome = undefined;
       if (card !== undefined) {
         scene.remove(card);
         card.geometry.dispose();

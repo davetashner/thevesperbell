@@ -327,7 +327,7 @@ import { installRepopulationOnRest, repopulateOnArrival } from '@game/creatures/
 import { AnimationDriver, simAnimReader } from '@game/animation/index';
 import { pickVariant, randomSalt, variantFromSearch } from '@render/creatures/variant';
 import { createHitVolumeOverlay } from '@render/debug/hit-volumes';
-import { applyEnvironment } from '@render/environment/index';
+import { applyEnvironment, type EnvironmentView } from '@render/environment/index';
 import { applyLook, lookAt, type TimeOfDayLook } from '@game/light/time-of-day';
 import { Color, type Object3D } from 'three';
 import { createGreyboxView } from '@render/greybox/index';
@@ -1314,6 +1314,7 @@ function startRenderer(
     let shownEnvironment: unknown;
     let shownMinute = -1;
     let sceneLook: TimeOfDayLook | undefined;
+    let environmentView: EnvironmentView | undefined;
     let sceneTints: ReadonlyMap<EntityId, Tint> = new Map();
     let publishedLights = '';
     let publishedLightProbe = '';
@@ -1331,6 +1332,8 @@ function startRenderer(
           const look = lookAt(sceneLook, minute);
           greybox.setEnvironment(applyLook(field.environment, look));
           if (look.sky !== undefined) view.scene.background = new Color(look.sky);
+          // The procedural sky dome (mw sky pipeline) follows the same clock and blended sky colour.
+          environmentView?.setSky(look.sky, minute);
         }
       }
       const chosen = selectLights(field.lights(), camera.position, lightRig.caps);
@@ -1750,7 +1753,10 @@ function startRenderer(
       if (transit !== undefined) applyCarriedWorld(world, transit.carry, carryOptions);
       // Sky, fog and the painted backdrop of outdoor scenes (mw-ju8.1). The unapproved backdrop images
       // are not in production builds, so only dev loads them.
-      applyEnvironment(view.scene, scene.environment, { load: import.meta.env.DEV });
+      environmentView?.dispose();
+      environmentView = applyEnvironment(view.scene, scene.environment, {
+        load: import.meta.env.DEV,
+      });
       // A scene's music plays from the first gesture on (mw-0j5) and follows the creatures' alert
       // states, crossfading layers on bar lines (mw-e28.11). The volume sliders are bound once, with
       // the engine.

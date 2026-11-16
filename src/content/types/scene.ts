@@ -1038,6 +1038,32 @@ export const sceneEnvironmentSchema = z.strictObject({
     .optional()
     .describe('Distance fog that blends the level into the backdrop.'),
   backdrop: sceneBackdropSchema.optional().describe('Painted backdrop layer behind the level.'),
+  dome: z
+    .strictObject({
+      stars: z
+        .number()
+        .min(0)
+        .max(1)
+        .default(0.6)
+        .describe('How many stars show at full night, 0–1.'),
+      clouds: z
+        .number()
+        .min(0)
+        .max(1)
+        .default(0.35)
+        .describe('Cloud cover, 0 clear to 1 overcast.'),
+      wind: z
+        .number()
+        .min(0)
+        .max(360)
+        .default(60)
+        .describe('Bearing the clouds drift towards, degrees clockwise from north (+z).'),
+      seed: z.int().min(0).default(1).describe('Fixes the star field and cloud shapes.'),
+    })
+    .optional()
+    .describe(
+      'Procedural sky dome (render only): a gradient from the sky colour, the sun and moon on the game clock, stars at night and drifting clouds.',
+    ),
 });
 
 /**

@@ -374,6 +374,11 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `environment.backdrop.radius` | number 20–190 | `150` | Distance from the camera, m; must stay inside the camera far plane. |
 | `environment.backdrop.centreY` | number | `25` | Height of the image centre above the camera plane, m. |
 | `environment.backdrop.follow` | number 0–1 | `1` | Share of the camera movement the card follows: 1 never parallaxes, 0 stays put. |
+| `environment.dome` | object | — | Procedural sky dome (render only): a gradient from the sky colour, the sun and moon on the game clock, stars at night and drifting clouds. |
+| `environment.dome.stars` | number 0–1 | `0.6` | How many stars show at full night, 0–1. |
+| `environment.dome.clouds` | number 0–1 | `0.35` | Cloud cover, 0 clear to 1 overcast. |
+| `environment.dome.wind` | number 0–360 | `60` | Bearing the clouds drift towards, degrees clockwise from north (+z). |
+| `environment.dome.seed` | integer ≥ 0 | `1` | Fixes the star field and cloud shapes. |
 | `regions` | list of object | `[]` | Tagged boxes, e.g. a river (mw-ju8.1); data only until a system reads them. |
 | `regions[].id` | id | required | Name of the region, unique in the scene, e.g. river. |
 | `regions[].min` | list of any (at least 3) | required | Lower corner, grid cells. |

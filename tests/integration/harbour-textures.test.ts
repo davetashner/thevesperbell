@@ -93,4 +93,13 @@ describe('Wendmouth harbour tileables', () => {
     const db = (id: string) => table.find((t) => t.id === id)?.offsetDb ?? 0;
     expect(db('metal-grate') - db('wood')).toBeGreaterThanOrEqual(6);
   });
+
+  it('the harbour has a procedural sky dome: stars at night and broken cloud, on a fixed seed', () => {
+    const dome = scene.environment?.dome;
+    expect(dome).toBeDefined();
+    expect(dome?.stars).toBeGreaterThan(0);
+    expect(dome?.clouds).toBeGreaterThan(0);
+    expect(dome?.clouds).toBeLessThan(1);
+    expect(Number.isInteger(dome?.seed)).toBe(true);
+  });
 });

@@ -2717,6 +2717,12 @@
       "color": "#C5D3DC",
       "near": 80,
       "far": 260
+    },
+    "dome": {
+      "stars": 0.7,
+      "clouds": 0.4,
+      "wind": 60,
+      "seed": 4
     }
   },
   "regions": [

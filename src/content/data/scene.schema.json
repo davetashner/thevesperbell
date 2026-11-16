@@ -2957,6 +2957,41 @@
             "image"
           ],
           "additionalProperties": false
+        },
+        "dome": {
+          "description": "Procedural sky dome (render only): a gradient from the sky colour, the sun and moon on the game clock, stars at night and drifting clouds.",
+          "type": "object",
+          "properties": {
+            "stars": {
+              "default": 0.6,
+              "description": "How many stars show at full night, 0–1.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "clouds": {
+              "default": 0.35,
+              "description": "Cloud cover, 0 clear to 1 overcast.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "wind": {
+              "default": 60,
+              "description": "Bearing the clouds drift towards, degrees clockwise from north (+z).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 360
+            },
+            "seed": {
+              "default": 1,
+              "description": "Fixes the star field and cloud shapes.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
