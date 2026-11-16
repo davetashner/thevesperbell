@@ -1091,7 +1091,11 @@ export const sceneRegionSchema = z
   });
 
 /** Painted wall tileables a scene's `paints` boxes may lay on grey-box walls (render only). */
-export const WALL_TEXTURES = ['tex-bulkhead-pine-01', 'tex-stone-breakwater-01'] as const;
+export const WALL_TEXTURES = [
+  'tex-bulkhead-pine-01',
+  'tex-stone-breakwater-01',
+  'tex-planks-salt-bleached-01',
+] as const;
 
 /**
  * A paint box (render only): grey-box blocking parts whose centre lies inside are drawn with a tiling
