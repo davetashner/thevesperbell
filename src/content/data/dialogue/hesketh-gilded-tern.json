@@ -135,6 +135,16 @@
       "kind": "effect",
       "effects": [
         {
+          "kind": "giveItem",
+          "item": "tern-gangway-pass",
+          "count": 1
+        },
+        {
+          "kind": "setFact",
+          "fact": "hesketh.gangway-open",
+          "value": true
+        },
+        {
           "kind": "setFact",
           "fact": "hesketh.shanghaied",
           "value": false
@@ -185,6 +195,16 @@
       "id": "argue-win",
       "kind": "effect",
       "effects": [
+        {
+          "kind": "giveItem",
+          "item": "tern-gangway-pass",
+          "count": 1
+        },
+        {
+          "kind": "setFact",
+          "fact": "hesketh.gangway-open",
+          "value": true
+        },
         {
           "kind": "setFact",
           "fact": "hesketh.shanghaied",

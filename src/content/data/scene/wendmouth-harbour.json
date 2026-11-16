@@ -2320,6 +2320,20 @@
       "tags": ["contest", "tavern"]
     },
     {
+      "id": "crew-dice-table",
+      "at": [84.5, 0.0, 149.0],
+      "tags": ["contest", "tavern", "contest:drowned-gull-crew-dice"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "use",
+            "label": "Sit at the crew's table"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
       "id": "dice-table",
       "at": [84.5, 0.0, 145.0],
       "tags": ["contest", "tavern", "contest:drowned-gull-dice"],
@@ -2407,6 +2421,12 @@
       "id": "tern-hull-ladder-top",
       "at": [31.5, 2, 118],
       "yaw": 90,
+      "tags": ["marker", "ship"]
+    },
+    {
+      "id": "tern-captain-post",
+      "at": [35, 2, 124.5],
+      "yaw": 180,
       "tags": ["marker", "ship"]
     },
     {
