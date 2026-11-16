@@ -10,35 +10,53 @@
 import { writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { decodeImage, encodeImage, withPage } from './chromium.ts';
-import { crop, isolateFigure, padSquare, removeThinVerticalLines } from './pixels.ts';
+import { crop, isolateFigure, padSquare, removeThinVerticalLines, type Rgba } from './pixels.ts';
 
-const { values, positionals } = parseArgs({
-  allowPositionals: true,
-  options: {
-    box: { type: 'string' },
-    'keep-all': { type: 'boolean', default: false },
-    margin: { type: 'string', default: '40' },
-  },
-});
-const [source, target] = positionals;
-const box = values.box?.split(',').map(Number);
-if (source === undefined || target === undefined || box?.length !== 4) {
-  console.error('usage: crop-cli.ts <sheet> <out.png> --box x0,y0,x1,y1 [--keep-all] [--margin N]');
-  process.exit(2);
-}
-const [x0, y0, x1, y1] = box as [number, number, number, number];
+const USAGE = 'usage: crop-cli.ts <sheet> <out.png> --box x0,y0,x1,y1 [--keep-all] [--margin N]';
 
-await withPage(async (page) => {
-  const sheet = await decodeImage(page, source);
-  let figure = crop(sheet, x0, y0, x1, y1);
-  if (!values['keep-all']) figure = isolateFigure(removeThinVerticalLines(figure));
+/** The image-to-3D input cut from `sheet`: crop, clean (unless `keepAll`), pad square. */
+export function cutFigure(
+  sheet: Rgba,
+  box: readonly [number, number, number, number],
+  keepAll: boolean,
+  margin: number,
+): Rgba {
+  let figure = crop(sheet, ...box);
+  if (!keepAll) figure = isolateFigure(removeThinVerticalLines(figure));
   // Pad with the crop's top-left pixel: the sheet's own parchment there.
-  const background: [number, number, number] = [
-    figure.data[0] ?? 239,
-    figure.data[1] ?? 226,
-    figure.data[2] ?? 196,
-  ];
-  const padded = padSquare(figure, Number(values.margin), background);
-  writeFileSync(target, await encodeImage(page, padded, target));
-  console.log(`${target}: ${String(padded.width)}×${String(padded.height)} from ${source} box ${String(values.box)}`);
-});
+  return padSquare(figure, margin, Array.from(figure.data.subarray(0, 3)) as [number, number, number]);
+}
+
+/** Runs the CLI; returns the exit code. */
+export async function main(argv: readonly string[]): Promise<number> {
+  const { values, positionals } = parseArgs({
+    args: [...argv],
+    allowPositionals: true,
+    options: {
+      box: { type: 'string' },
+      'keep-all': { type: 'boolean', default: false },
+      margin: { type: 'string', default: '40' },
+    },
+  });
+  const [source, target] = positionals;
+  const box = values.box?.split(',').map(Number);
+  if (source === undefined || target === undefined || box?.length !== 4) {
+    console.error(USAGE);
+    return 2;
+  }
+  await withPage(async (page) => {
+    const padded = cutFigure(
+      await decodeImage(page, source),
+      box as [number, number, number, number],
+      values['keep-all'],
+      Number(values.margin),
+    );
+    writeFileSync(target, await encodeImage(page, padded, target));
+    console.log(`${target}: ${String(padded.width)}×${String(padded.height)} from ${source}`);
+  });
+  return 0;
+}
+
+if (process.argv[1]?.endsWith('crop-cli.ts') === true) {
+  process.exitCode = await main(process.argv.slice(2));
+}
