@@ -283,24 +283,24 @@
     {
       "piece": "platform",
       "at": [22.0, 0.0, 94.0],
-      "scale": [2.0, 1.5, 2.0],
+      "scale": [4.5, 1.5, 3.5],
       "purpose": "blocking"
     },
     {
       "piece": "pillar",
       "at": [22.0, 1.5, 94.0],
-      "scale": [1, 3.0, 1]
+      "scale": [2.5, 1.0, 2.0]
     },
     {
       "piece": "platform",
       "at": [46.0, 0.0, 94.0],
-      "scale": [2.0, 1.5, 2.0],
+      "scale": [4.5, 1.5, 3.5],
       "purpose": "blocking"
     },
     {
       "piece": "pillar",
       "at": [46.0, 1.5, 94.0],
-      "scale": [1, 3.0, 1]
+      "scale": [2.5, 1.0, 2.0]
     },
     {
       "piece": "platform",
@@ -1696,6 +1696,114 @@
       "at": [82.5, -4, 120],
       "scale": [0.6, 3, 1.25],
       "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-91.5, 4, 53.5],
+      "scale": [3.25, 4, 4.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-71, 4, 53.5],
+      "scale": [3.25, 4, 4.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-53, 4, 53.5],
+      "scale": [3.25, 4, 4.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-94.75, 4, 46],
+      "scale": [0.75, 0.8, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-48, 4, 46],
+      "scale": [0.75, 0.8, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-30, 6, 59],
+      "scale": [0.75, 0.8, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [19, 0, 80],
+      "scale": [0.3, 1.2, 0.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [22, 0, 82],
+      "scale": [0.3, 1.2, 0.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [25, 0, 80],
+      "scale": [0.3, 1.2, 0.3],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [1, 0, 80],
+      "scale": [0.5, 2.5, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [1, 0, 96],
+      "scale": [0.5, 2.5, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [19, 0, 89],
+      "scale": [0.5, 2.5, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [5.75, 0, 76],
+      "scale": [0.4, 1.9, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [13.25, 0, 76],
+      "scale": [0.4, 1.9, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [71.5, 0, 112],
+      "scale": [0.4, 2.35, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [80.5, 0, 112],
+      "scale": [0.4, 2.35, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [14, 0, 84],
+      "scale": [0.6, 3, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [72.5, 0, 102.25],
+      "scale": [0.25, 1.75, 0.25],
+      "purpose": "blocking"
     }
   ],
   "spawns": [
@@ -2862,6 +2970,81 @@
       "at": [80.75, -4.0, 38.75],
       "prop": "barrel-oil",
       "tags": ["dock-prop", "undertow"]
+    },
+    {
+      "id": "sign-drowned-gull",
+      "at": [71.5, 1.5, 127.25],
+      "yaw": 0,
+      "tags": ["sign", "readable", "inscription-drowned-gull-sign"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the sign over the Drowned Gull"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "sign-customs-house",
+      "at": [-31, 1.5, 70.75],
+      "yaw": 180,
+      "tags": ["sign", "readable", "inscription-customs-house-lintel"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the board at the Customs House"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "sign-tidemarket",
+      "at": [10.75, 1.5, 70.75],
+      "yaw": 180,
+      "tags": ["sign", "readable", "inscription-tidemarket-board"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the Tidemarket board"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "sign-net-lofts",
+      "at": [-71, 1.5, 56.75],
+      "yaw": 180,
+      "tags": ["sign", "readable", "inscription-net-loft-board"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the net loft board"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "sign-breakwater",
+      "at": [72.5, 1.5, 102.75],
+      "yaw": 180,
+      "tags": ["sign", "readable", "inscription-breakwater-post"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the breakwater notice"
+          }
+        ],
+        "radius": 1
+      }
     }
   ],
   "light": {
@@ -3214,6 +3397,210 @@
         "min": [82.25, -4, 118.5],
         "max": [83, -1, 121.5]
       }
+    },
+    {
+      "id": "wharf-crane-a",
+      "model": "model-prop-wharf-crane-01",
+      "at": [22, 0, 94],
+      "turn": 270,
+      "size": [4.5, 3.2, 3.5],
+      "fit": "box",
+      "hides": {
+        "min": [19.5, 0, 92],
+        "max": [24.5, 6, 96]
+      }
+    },
+    {
+      "id": "wharf-crane-b",
+      "model": "model-prop-wharf-crane-01",
+      "at": [46, 0, 94],
+      "turn": 270,
+      "size": [4.5, 3.2, 3.5],
+      "fit": "box",
+      "hides": {
+        "min": [43.5, 0, 92],
+        "max": [48.5, 6, 96]
+      }
+    },
+    {
+      "id": "net-loft-shed-west",
+      "model": "model-prop-net-loft-01",
+      "at": [-91.5, 4, 53.5],
+      "turn": 90,
+      "size": [3.25, 4, 4.25],
+      "fit": "box",
+      "hides": {
+        "min": [-93.12, 4.1, 51.38],
+        "max": [-89.88, 7.9, 55.62]
+      }
+    },
+    {
+      "id": "net-loft-shed-middle",
+      "model": "model-prop-net-loft-01",
+      "at": [-71, 4, 53.5],
+      "turn": 90,
+      "size": [3.25, 4, 4.25],
+      "fit": "box",
+      "hides": {
+        "min": [-72.62, 4.1, 51.38],
+        "max": [-69.38, 7.9, 55.62]
+      }
+    },
+    {
+      "id": "net-loft-shed-east",
+      "model": "model-prop-net-loft-01",
+      "at": [-53, 4, 53.5],
+      "turn": 90,
+      "size": [3.25, 4, 4.25],
+      "fit": "box",
+      "hides": {
+        "min": [-54.62, 4.1, 51.38],
+        "max": [-51.38, 7.9, 55.62]
+      }
+    },
+    {
+      "id": "gull-hoard-roof-west",
+      "model": "model-prop-gull-hoard-nest-01",
+      "at": [-94.75, 4, 46],
+      "turn": 0,
+      "size": [0.8, 1, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-95.12, 4.1, 45.62],
+        "max": [-94.38, 4.7, 46.38]
+      }
+    },
+    {
+      "id": "gull-hoard-roof-east",
+      "model": "model-prop-gull-hoard-nest-01",
+      "at": [-48, 4, 46],
+      "turn": 0,
+      "size": [0.8, 1, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-48.38, 4.1, 45.62],
+        "max": [-47.62, 4.7, 46.38]
+      }
+    },
+    {
+      "id": "gull-hoard-customs-roof",
+      "model": "model-prop-gull-hoard-nest-01",
+      "at": [-30, 6, 59],
+      "turn": 0,
+      "size": [0.8, 1, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-30.38, 6.1, 58.62],
+        "max": [-29.62, 6.7, 59.38]
+      }
+    },
+    {
+      "id": "tidefair-boom",
+      "model": "model-prop-tidefair-boom-01",
+      "at": [14, 0, 84],
+      "turn": 0,
+      "size": [1.2, 3, 3],
+      "fit": "box",
+      "hides": {
+        "min": [13.6, 0.1, 83.6],
+        "max": [14.4, 2.9, 84.4]
+      }
+    },
+    {
+      "id": "gull-target-a",
+      "model": "model-prop-wooden-gull-target-01",
+      "at": [19, 0, 80],
+      "turn": 270,
+      "size": [0.35, 1.2, 1.0],
+      "fit": "height",
+      "hides": {
+        "min": [18.85, 0.1, 79.85],
+        "max": [19.15, 1.1, 80.15]
+      }
+    },
+    {
+      "id": "gull-target-b",
+      "model": "model-prop-wooden-gull-target-01",
+      "at": [22, 0, 82],
+      "turn": 270,
+      "size": [0.35, 1.2, 1.0],
+      "fit": "height",
+      "hides": {
+        "min": [21.85, 0.1, 81.85],
+        "max": [22.15, 1.1, 82.15]
+      }
+    },
+    {
+      "id": "gull-target-c",
+      "model": "model-prop-wooden-gull-target-01",
+      "at": [25, 0, 80],
+      "turn": 270,
+      "size": [0.35, 1.2, 1.0],
+      "fit": "height",
+      "hides": {
+        "min": [24.85, 0.1, 79.85],
+        "max": [25.15, 1.1, 80.15]
+      }
+    },
+    {
+      "id": "tidefair-marker-a",
+      "model": "model-prop-tidefair-marker-01",
+      "at": [1, 0, 80],
+      "turn": 0,
+      "size": [1.0, 2.5, 1.25],
+      "fit": "height",
+      "hides": {
+        "min": [0.75, 0.1, 79.75],
+        "max": [1.25, 2.4, 80.25]
+      }
+    },
+    {
+      "id": "tidefair-marker-b",
+      "model": "model-prop-tidefair-marker-01",
+      "at": [1, 0, 96],
+      "turn": 0,
+      "size": [1.0, 2.5, 1.25],
+      "fit": "height",
+      "hides": {
+        "min": [0.75, 0.1, 95.75],
+        "max": [1.25, 2.4, 96.25]
+      }
+    },
+    {
+      "id": "tidefair-marker-c",
+      "model": "model-prop-tidefair-marker-01",
+      "at": [19, 0, 89],
+      "turn": 0,
+      "size": [1.0, 2.5, 1.25],
+      "fit": "height",
+      "hides": {
+        "min": [18.75, 0.1, 88.75],
+        "max": [19.25, 2.4, 89.25]
+      }
+    },
+    {
+      "id": "bunting-tidefair",
+      "model": "model-prop-bunting-01",
+      "at": [9.5, 0, 76],
+      "turn": 90,
+      "size": [7.3, 1.9, 1.2],
+      "fit": "height",
+      "hides": {
+        "min": [5.5, 0.1, 75.75],
+        "max": [13.5, 1.8, 76.25]
+      }
+    },
+    {
+      "id": "bunting-breakwater",
+      "model": "model-prop-bunting-01",
+      "at": [76, 0, 112],
+      "turn": 90,
+      "size": [9, 2.35, 1.5],
+      "fit": "height",
+      "hides": {
+        "min": [71.25, 0.1, 111.75],
+        "max": [80.75, 2.25, 112.25]
+      }
     }
   ],
   "paints": [
@@ -3252,6 +3639,66 @@
       "min": [99.5, -6.5, 100],
       "max": [100.5, 0.5, 160],
       "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "customs-house-walls",
+      "min": [-41, 1.2, 35],
+      "max": [-5, 8, 71],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "tidemarket-walls",
+      "min": [-3, 1.2, 37],
+      "max": [31, 6, 65],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "warehouse-walls",
+      "min": [33, 1.2, 35],
+      "max": [67, 8, 71],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "silver-quay-walls",
+      "min": [80, 1.2, 75],
+      "max": [100, 6, 97],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "block-yard-east",
+      "min": [49, 0, 78],
+      "max": [69, 2, 92],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "block-yard-west",
+      "min": [-75, 0, 20],
+      "max": [-55, 2, 26],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "net-loft-west-walls",
+      "min": [-97, 1.2, 43],
+      "max": [-81, 6, 57],
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "net-loft-middle-walls",
+      "min": [-79, 1.2, 43],
+      "max": [-63, 6, 57],
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "net-loft-east-walls",
+      "min": [-61, 1.2, 43],
+      "max": [-45, 6, 57],
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "drowned-gull-walls",
+      "min": [61, 1.2, 127],
+      "max": [91, 6, 159],
+      "texture": "tex-planks-salt-bleached-01"
     },
     {
       "id": "tern-hold",

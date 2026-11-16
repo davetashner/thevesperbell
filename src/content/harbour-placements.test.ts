@@ -44,6 +44,11 @@ const PLACED: Record<string, readonly string[]> = {
   'note-tidefair-board': ['read-tidefair-board'],
   'note-impound-ledger': ['read-impound-ledger'],
   'inscription-kestrel-lock-toll-board': ['toll-board'],
+  'inscription-drowned-gull-sign': ['sign-drowned-gull'],
+  'inscription-customs-house-lintel': ['sign-customs-house'],
+  'inscription-tidemarket-board': ['sign-tidemarket'],
+  'inscription-net-loft-board': ['sign-net-lofts'],
+  'inscription-breakwater-post': ['sign-breakwater'],
 };
 
 describe('mw-18w: harbour texts are placed in Wendmouth', () => {

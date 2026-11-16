@@ -396,7 +396,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `paints[].id` | id | required | Name of the paint box, unique in the scene, e.g. tern-cabin. |
 | `paints[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
 | `paints[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
-| `paints[].texture` | `"tex-bulkhead-pine-01"` \| `"tex-stone-breakwater-01"` | required | The tileable, e.g. tex-bulkhead-pine-01. |
+| `paints[].texture` | `"tex-bulkhead-pine-01"` \| `"tex-stone-breakwater-01"` \| `"tex-planks-salt-bleached-01"` | required | The tileable, e.g. tex-bulkhead-pine-01. |
 | `dressings` | list of object | `[]` | Approved 3D models drawn over the grey box (render only), e.g. a ship hull. |
 | `dressings[].id` | id | required | Name of the dressing, unique in the scene, e.g. tern-hull. |
 | `dressings[].model` | string | required | Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01. |
