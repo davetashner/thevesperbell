@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { paintedKind, stoneFor } from './index';
+import { isPaintedCrate, paintedKind, stoneFor } from './index';
 
 describe('paintedKind (mw-va0)', () => {
   it('paints a kit pillar as stone, whatever its properties', () => {
@@ -40,5 +40,16 @@ describe('stoneFor (mw-7w0)', () => {
     expect(stoneFor('slice', 'interactive')).toBeUndefined();
     expect(stoneFor('mechanism-room', 'walkable')).toBeUndefined();
     expect(stoneFor('kit-gallery', 'blocking')).toBeUndefined();
+  });
+});
+
+describe('isPaintedCrate (mw-e40.34)', () => {
+  it('AC-1: a placed interactive crate wears the crate painting, not the interactive blue', () => {
+    expect(isPaintedCrate({ piece: 'crate', purpose: 'interactive', shape: 'box' })).toBe(true);
+  });
+
+  it('AC-2: other pieces, and a crate re-purposed to another role, keep their purpose colour', () => {
+    expect(isPaintedCrate({ piece: 'wall', purpose: 'interactive', shape: 'box' })).toBe(false);
+    expect(isPaintedCrate({ piece: 'crate', purpose: 'blocking', shape: 'box' })).toBe(false);
   });
 });

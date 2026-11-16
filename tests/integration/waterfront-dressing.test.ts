@@ -133,4 +133,70 @@ describe('Wendmouth waterfront dressing', () => {
     expect(painted('tex-planks-salt-bleached-01', -71, 56)).toBe(true); // a net loft
     expect(painted('tex-planks-salt-bleached-01', 69, 128)).toBe(true); // the Drowned Gull
   });
+
+  // mw-e40.34: the grey boxes that were left (blue cargo blocks, plain net-loft ground floors).
+  it('AC-1: every interactive cargo block keeps its collider, its purpose and its sight, and wears a prop', () => {
+    const crates = layout.parts.filter((p) => p.piece === 'crate');
+    expect(crates).toHaveLength(10);
+    for (const c of crates) {
+      expect(c.purpose).toBe('interactive');
+      // No dressing hides an affordance: the block stays drawn, painted as a crate by the renderer.
+      expect(hiddenByDressing(c, layout.dressings)).toBe(false);
+    }
+    const stacked = layout.dressings.filter((d) => d.id.startsWith('wharf-crate-'));
+    expect(stacked).toHaveLength(9);
+    for (const d of stacked) {
+      const under = crates.find(
+        (c) => Math.abs(c.center.x - d.at.x) < 0.01 && Math.abs(c.center.z - d.at.z) < 0.01,
+      );
+      expect(under, d.id).toBeDefined();
+      expect(d.at.y).toBeCloseTo(under?.max.y ?? -1, 5);
+    }
+  });
+
+  it('AC-2: each net loft front has a door frame, awning, shuttered windows, a stone plinth and a cargo corner', () => {
+    for (const n of ['west', 'middle', 'east']) {
+      const ids = layout.dressings
+        .filter((d) => d.id.startsWith(`net-loft-${n}-`))
+        .map((d) => d.id);
+      for (const what of ['crate-stack', 'keg', 'barrel', 'rope-coil']) {
+        expect(ids, `${n} ${what}`).toContain(`net-loft-${n}-${what}`);
+      }
+      expect(
+        layout.paints.some(
+          (p) => p.id === `net-loft-${n}-trim` && p.texture === 'tex-bulkhead-pine-01',
+        ),
+      ).toBe(true);
+      expect(
+        layout.paints.some(
+          (p) => p.id === `net-loft-${n}-plinth` && p.texture === 'tex-stone-breakwater-01',
+        ),
+      ).toBe(true);
+    }
+    const painted = (texture: string, x: number, y: number, z: number) =>
+      layout.parts.some(
+        (p) =>
+          paintFor(p, layout.paints) === texture &&
+          x >= p.min.x &&
+          x <= p.max.x &&
+          y >= p.min.y &&
+          y <= p.max.y &&
+          z >= p.min.z &&
+          z <= p.max.z,
+      );
+    expect(painted('tex-bulkhead-pine-01', -89, 3.1, 43.75)).toBe(true); // the lintel board
+    expect(painted('tex-bulkhead-pine-01', -88, 1.5, 43.75)).toBe(true); // a door jamb
+    expect(painted('tex-bulkhead-pine-01', -93.5, 1.8, 43.75)).toBe(true); // a shuttered window
+    expect(painted('tex-stone-breakwater-01', -93, 0.25, 43.75)).toBe(true); // the plinth
+  });
+
+  it('AC-3: the loft roofs keep the loud tin and quiet tar thief-route rule', () => {
+    const roofs = Object.fromEntries(
+      scene.surfaces.filter((s) => s.id.startsWith('loft-roof-')).map((s) => [s.id, s]),
+    );
+    expect(roofs['loft-roof-west']?.surface).toBe('wood');
+    expect(roofs['loft-roof-middle']?.surface).toBe('wood');
+    expect(roofs['loft-roof-east']?.surface).toBe('metal-grate');
+    expect(roofs['loft-roof-east']?.texture).toBe('tex-roof-tin-harbour-01');
+  });
 });
