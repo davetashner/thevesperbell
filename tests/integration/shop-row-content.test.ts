@@ -30,6 +30,7 @@ const NOT_FOR_SALE = new Set([
   'rusted-gallery-key',
   'testbed-closet-key',
   'valley-chest-key',
+  'tern-gangway-pass', // mw-e40.28: Hesketh's gangway token, given by dialogue only
   'miners-tally-stick',
   'bent-pick-head',
   'rusted-lamp-hook',
