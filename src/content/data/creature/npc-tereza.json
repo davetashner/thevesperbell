@@ -11,7 +11,7 @@
   },
   "senses": "humanoid",
   "locomotion": "humanoid",
-  "attacks": [],
+  "attacks": ["tereza-sabre-cut", "tereza-sabre-lunge"],
   "faction": "townsfolk",
   "disposition": {
     "towardPlayer": "neutral",

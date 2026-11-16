@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Tereza Maelo's first-blood duel runs: accept her challenge and she draws a sabre, the first hit either side lands ends the bout with nobody hurt (and no grudge), and her dialogue then records who won; a win unlocks her debt-of-honour vouch for the Gilded Tern. Her arms stall also opens from her dialogue, selling blades, bucklers, a kite shield and a brigandine, with a finer tier under the counter once you have beaten her (mw-e40.31).
 - Wendmouth Harbour is dressed: the Gilded Tern (hull, masts and rigging, figurehead, springalds, pine stern cabin), barrels, chests, the hoist crate and deck fittings on the docks, painted stone quays and breakwater, harbour water, and tin (loud) and tar (quiet) net-loft roofs.
 - The named harbour cast (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh) appear in the harbour as their own characters instead of capsules, and the customs scale, Cray's shelf, a ballast crate, the sunken serpent figurehead and the smugglers' sea-door are in place.
 - A procedural sky in every open-air scene: a gradient that follows the time of day, the sun and moon on the game clock, stars at night and drifting painted clouds.

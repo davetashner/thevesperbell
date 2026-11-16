@@ -2372,7 +2372,7 @@
       "tags": ["npc", "shop"],
       "creature": "npc-tereza",
       "leash": {
-        "radius": 1.5
+        "radius": 6
       }
     },
     {

@@ -1,0 +1,14 @@
+{
+  "$schema": "../attack.schema.json",
+  "id": "tereza-sabre-lunge",
+  "notes": "Tereza Maelo's sabre lunge (mw-e39.35, mw-e40.11): the duellist's answer to a player who backs off, from 1.6-2.8 m, every 4 s at most. Placeholder: it borrows the Forgotten's lunging thrust and its own telegraph cue until her sabre animations land (mw-e37.234).",
+  "kind": "melee",
+  "move": "forgotten-lunging-thrust",
+  "telegraph": "forgotten-lunge",
+  "range": {
+    "min": 1.6,
+    "max": 2.8
+  },
+  "cooldown": 4,
+  "weight": 1
+}

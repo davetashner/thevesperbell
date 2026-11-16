@@ -97,6 +97,7 @@ import {
 import type { DialogueDef } from '@content/types/dialogue';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
+import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
 import { ContestController } from '@game/contest/controller';
 import { contestsIn, installContests } from '@game/contest/install';
 import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
@@ -420,6 +421,7 @@ import {
   npcBand,
   climbRefused,
   DamageApplied,
+  FirstBloodDuels,
   Died,
   hashWorld,
   type ActionFrame,
@@ -2358,6 +2360,21 @@ function startRenderer(
         });
         afterStep.push(() => {
           shop.afterStep();
+        });
+        // First-blood duels (mw-e39.35): Tereza's dialogue asks for one, the first hit either side lands
+        // ends it (nobody is hurt), and the result facts her dialogue reads are written.
+        const duelUi = startDuelUi({
+          ui,
+          world,
+          player: player.entity,
+          duels: new FirstBloodDuels(world, combat.damage, DUEL_BEHAVIOUR),
+          host: gameLogic.host,
+          toast: (text) => {
+            shop.toast(text);
+          },
+        });
+        afterStep.push(() => {
+          duelUi.afterStep();
         });
         // The contest screens (mw-opf6): the entry window, the play panel and the play keys (F plays,
         // H cheats at dice, N walks away). #app[data-contest] is the e2e's readout.
