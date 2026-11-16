@@ -12,6 +12,7 @@ import {
   Color,
   Matrix4,
   MeshStandardMaterial,
+  PlaneGeometry,
   Quaternion,
   RepeatWrapping,
   SRGBColorSpace,
@@ -41,7 +42,54 @@ export const SURFACE_TEXTURE_PAINTINGS: Readonly<
   'tex-deck-planks-caulked-01': { url: '/assets/texture/tex-deck-planks-caulked-01.webp', tile: 2 },
   // A wall tileable (content WALL_TEXTURES), laid by a scene's paint boxes: boards run horizontally.
   'tex-bulkhead-pine-01': { url: '/assets/texture/tex-bulkhead-pine-01.webp', tile: 2 },
+  // Wendmouth's quay and breakwater stone, on floors and (by paint boxes) walls: courses of ~0.65 m.
+  'tex-stone-breakwater-01': { url: '/assets/texture/tex-stone-breakwater-01.webp', tile: 4 },
+  // The net-loft roofs: loud tin sheets (metal-grate underfoot) and quiet tar felt on battens (wood).
+  'tex-roof-tin-harbour-01': { url: '/assets/texture/tex-roof-tin-harbour-01.webp', tile: 3 },
+  'tex-roof-tar-harbour-01': { url: '/assets/texture/tex-roof-tar-harbour-01.webp', tile: 3 },
 };
+
+/**
+ * The painted water a standing liquid wears, by spawn tag (render only); a liquid without one keeps its
+ * flat colour. One tile covers `tile` metres, laid in world units so neighbouring pools meet seamlessly.
+ */
+export const LIQUID_TEXTURE_PAINTINGS: Readonly<
+  Record<string, { readonly url: string; readonly tile: number }>
+> = {
+  'harbour-water': { url: '/assets/texture/tex-water-harbour-grey-01.webp', tile: 8 },
+};
+
+/** The liquid painting for a spawn's tags, if one names it. */
+export function liquidPaintingFor(
+  tags: readonly string[],
+): { readonly url: string; readonly tile: number } | undefined {
+  for (const tag of tags) {
+    const painting = LIQUID_TEXTURE_PAINTINGS[tag];
+    if (painting !== undefined) return painting;
+  }
+  return undefined;
+}
+
+/**
+ * A flat liquid surface `sizeX` × `sizeZ` metres, centred on (`centreX`, `centreZ`) in the world, lying
+ * in the xz plane with UVs in world units (one unit per `tile` metres).
+ */
+export function worldUvLiquidPlane(
+  sizeX: number,
+  sizeZ: number,
+  centreX: number,
+  centreZ: number,
+  tile: number,
+): BufferGeometry {
+  const geometry = new PlaneGeometry(sizeX, sizeZ).rotateX(-Math.PI / 2);
+  const position = geometry.getAttribute('position');
+  const uv = geometry.getAttribute('uv');
+  for (let i = 0; i < position.count; i++) {
+    uv.setXY(i, (position.getX(i) + centreX) / tile, -(position.getZ(i) + centreZ) / tile);
+  }
+  uv.needsUpdate = true;
+  return geometry;
+}
 
 /** Metres one tile of the pillar stone covers: three to four block courses of about 0.3 m. */
 export const PILLAR_TILE = 1.2;

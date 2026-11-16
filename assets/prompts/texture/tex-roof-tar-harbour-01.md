@@ -1,6 +1,6 @@
 # tex-roof-tar-harbour-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-15). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved image** (v1, approved 2026-11-16). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -37,10 +37,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game textures and 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They pass" (with the tin/tar roof assignment) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-roof-tar-harbour-01/v1.png` | candidate — tiles cleanly in a 2×2 check |
+| 1 | 2026-11-15 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-roof-tar-harbour-01/v1.png` | kept — approved |
+
+## 6. Runtime
+
+`public/assets/texture/tex-roof-tar-harbour-01.webp`: 1024² WebP, both axes overlap-blended (10%) for a seamless tile, sha256 `63e80b1dbb3342ce4e7ce089f8210e208783952f2c434c2d8c06c8655fb5491f`. Source PNG `assets/source/texture/tex-roof-tar-harbour-01/tex-roof-tar-harbour-01.png`.

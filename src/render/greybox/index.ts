@@ -39,10 +39,12 @@ import {
   CRATE_URL,
   IVY_TILE,
   IVY_URL,
+  liquidPaintingFor,
   paintedMaterial,
   PILLAR_TILE,
   PILLAR_URL,
   SURFACE_TEXTURE_PAINTINGS,
+  worldUvLiquidPlane,
   worldUvPartGeometry,
 } from '../props/surfaces';
 import {
@@ -641,16 +643,23 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         // A standing liquid volume (a harbour pool, a cistern): its surface at its level, translucent
         // so the bed and anything sunk in it still read. A volume that can drain keeps the marker,
         // since a fixed surface would lie about its level once it falls.
+        // A tagged liquid (the harbour's water) wears its painting, laid in world units.
         const { size, depth, liquid } = spawn.liquid;
+        const colour = LIQUID_COLOURS[liquid] ?? LIQUID_COLOURS['water'] ?? 0x3f7fa0;
+        const painting = liquidPaintingFor(spawn.tags);
+        const material =
+          painting === undefined
+            ? new MeshStandardMaterial({ color: new Color(colour) })
+            : paintedMaterial(painting.url, colour, true);
+        material.transparent = true;
+        material.opacity = liquid === 'oil' ? 0.9 : painting === undefined ? 0.72 : 0.85;
+        material.depthWrite = false;
+        material.roughness = liquid === 'oil' ? 0.2 : 0.35;
         mesh = new Mesh(
-          new PlaneGeometry(size.x, size.z).rotateX(-Math.PI / 2),
-          new MeshStandardMaterial({
-            color: new Color(LIQUID_COLOURS[liquid] ?? LIQUID_COLOURS['water']),
-            transparent: true,
-            opacity: liquid === 'oil' ? 0.9 : 0.72,
-            depthWrite: false,
-            roughness: liquid === 'oil' ? 0.2 : 0.35,
-          }),
+          painting === undefined
+            ? new PlaneGeometry(size.x, size.z).rotateX(-Math.PI / 2)
+            : worldUvLiquidPlane(size.x, size.z, spawn.position.x, spawn.position.z, painting.tile),
+          material,
         );
         mesh.position.y = depth;
         mesh.renderOrder = 1;

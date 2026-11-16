@@ -3107,7 +3107,10 @@
             "type": "string",
             "enum": [
               "tex-planks-salt-bleached-01",
-              "tex-deck-planks-caulked-01"
+              "tex-deck-planks-caulked-01",
+              "tex-stone-breakwater-01",
+              "tex-roof-tin-harbour-01",
+              "tex-roof-tar-harbour-01"
             ]
           }
         },
@@ -3171,7 +3174,8 @@
           "texture": {
             "type": "string",
             "enum": [
-              "tex-bulkhead-pine-01"
+              "tex-bulkhead-pine-01",
+              "tex-stone-breakwater-01"
             ],
             "description": "The tileable, e.g. tex-bulkhead-pine-01."
           }

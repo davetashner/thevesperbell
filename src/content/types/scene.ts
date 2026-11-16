@@ -1057,7 +1057,7 @@ export const sceneRegionSchema = z
   });
 
 /** Painted wall tileables a scene's `paints` boxes may lay on grey-box walls (render only). */
-export const WALL_TEXTURES = ['tex-bulkhead-pine-01'] as const;
+export const WALL_TEXTURES = ['tex-bulkhead-pine-01', 'tex-stone-breakwater-01'] as const;
 
 /**
  * A paint box (render only): grey-box blocking parts whose centre lies inside are drawn with a tiling
@@ -1126,6 +1126,9 @@ export type SceneDressingDef = z.output<typeof sceneDressingSchema>;
 export const SURFACE_TEXTURES = [
   'tex-planks-salt-bleached-01',
   'tex-deck-planks-caulked-01',
+  'tex-stone-breakwater-01',
+  'tex-roof-tin-harbour-01',
+  'tex-roof-tar-harbour-01',
 ] as const;
 export type SurfaceTexture = (typeof SURFACE_TEXTURES)[number];
 

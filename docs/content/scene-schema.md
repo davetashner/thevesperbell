@@ -385,12 +385,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `surfaces[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
 | `surfaces[].surface` | `"stone"` \| `"wood"` \| `"wood-hollow"` \| `"dirt"` \| `"grass"` \| `"gravel"` \| `"mud"` \| `"water-shallow"` \| `"snow-ice"` \| `"metal-grate"` \| `"straw"` \| `"carpet"` \| `"bone-litter"` \| `"leaves"` \| `"glass-shards"` | required | The footstep surface (audio bible §7.3) of everything inside, e.g. carpet. |
 | `surfaces[].priority` | integer | `0` | Where boxes overlap, the higher priority wins; the first listed wins a tie. |
-| `surfaces[].texture` | `"tex-planks-salt-bleached-01"` \| `"tex-deck-planks-caulked-01"` | — | Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01. |
+| `surfaces[].texture` | `"tex-planks-salt-bleached-01"` \| `"tex-deck-planks-caulked-01"` \| `"tex-stone-breakwater-01"` \| `"tex-roof-tin-harbour-01"` \| `"tex-roof-tar-harbour-01"` | — | Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01. |
 | `paints` | list of object | `[]` | Boxes whose grey-box walls are drawn with a tiling texture (render only). |
 | `paints[].id` | id | required | Name of the paint box, unique in the scene, e.g. tern-cabin. |
 | `paints[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
 | `paints[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
-| `paints[].texture` | `"tex-bulkhead-pine-01"` | required | The tileable, e.g. tex-bulkhead-pine-01. |
+| `paints[].texture` | `"tex-bulkhead-pine-01"` \| `"tex-stone-breakwater-01"` | required | The tileable, e.g. tex-bulkhead-pine-01. |
 | `dressings` | list of object | `[]` | Approved 3D models drawn over the grey box (render only), e.g. a ship hull. |
 | `dressings[].id` | id | required | Name of the dressing, unique in the scene, e.g. tern-hull. |
 | `dressings[].model` | string | required | Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01. |
