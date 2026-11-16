@@ -8,7 +8,7 @@
 // Playwright testbed player e2e (e2e/testbed-player.spec.ts).
 
 import { createGreyboxRig, type GreyboxRig, type Rig } from '../animation/index';
-import { createKnightRig, type KnightAssets } from './knight-model';
+import { createKnightRig, KNIGHT_WRIST, knightHandShare, type KnightAssets } from './knight-model';
 
 /** The player body's tint (the old capsule's parchment). */
 export const PLAYER_BODY_COLOUR = 0xd8d2c4;
@@ -24,7 +24,9 @@ export function createPlayerBody(rig: Rig, model?: Promise<KnightAssets>): Greyb
   let drop = 0;
   void model?.then(
     (loaded) => {
-      knight = createKnightRig(rig, loaded);
+      knight = createKnightRig(rig, loaded, {
+        wrist: { pivot: KNIGHT_WRIST, hand: knightHandShare },
+      });
       knight.lower(drop);
       boxes.root.add(knight.root);
       for (const child of boxes.root.children) {

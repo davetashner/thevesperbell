@@ -4,24 +4,24 @@
   "rig": "greybox-humanoid",
   "loop": true,
   "duration": 2,
-  "notes": "The knight's sword at the low-ready while standing (mw-a6t): the right elbow bent and the hand held out from the hip, the blade pointing out and away at a low angle instead of hanging straight down. Same length as anim-humanoid-idle, so its blend shares the phase of the base layer's. Arms hang down, so a positive x swings them forward and a positive z swings the right arm out. The sword bone is untracked in every move's clip, so a move eases it back to the grip.",
+  "notes": "The knight's sword at the low-ready while standing (mw-a6t): the right elbow bent and the hand held out from the hip, the blade pointing out and away at a low angle instead of hanging straight down. Same length as anim-humanoid-idle, so its blend shares the phase of the base layer's. Arms hang down, so a positive x swings them forward and a positive z swings the right arm out. The wrist (the sword bone, which carries the hand with it) turns against the arm's swing, so the blade stays low and forward while the arm sways. The sword bone is untracked in every move's clip, so a move eases it back to the grip.",
   "tracks": {
     "upper-arm-r": [
       {
         "t": 0,
-        "rot": [-4.0, 0, 16.0]
+        "rot": [-28.0, 0, 14.0]
       }
     ],
     "forearm-r": [
       {
         "t": 0,
-        "rot": [50.0, 0, 0]
+        "rot": [32.0, 0, 0]
       }
     ],
     "sword": [
       {
         "t": 0,
-        "rot": [-30.0, 0.0, 45.0]
+        "rot": [70.0, 0.0, 28.0]
       }
     ]
   }
