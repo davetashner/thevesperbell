@@ -1,6 +1,6 @@
 # tex-sailcloth-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved image** (v1, approved 2026-11-16, "They look great"). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -38,10 +38,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game textures and 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They look great" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-sailcloth-01/v1.png` | candidate — calm canvas panels with patches; the patches repeat visibly at 2×2 |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-sailcloth-01/v1.png` | approved — calm canvas panels with patches; the patches repeat visibly at 2×2 |
+
+## 6. Files
+
+Source `assets/source/texture/tex-sailcloth-01/tex-sailcloth-01.png` (sha256 `e429af783e8caea7707322d0a3f04007853d4d0ccb9b4d769ded1131223206e9`). Runtime `public/assets/texture/tex-sailcloth-01.webp`: 1024² WebP, both axes overlap-blended (10%). sha256 `30acaed1dc308c13614db3944aa5acd28ab34605959ab2ea52cf7194477e9cf0`.

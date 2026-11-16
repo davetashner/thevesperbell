@@ -1,6 +1,6 @@
 # tex-trim-wendmouth-shopfront-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved image** (v1, approved 2026-11-16, "They look great"). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -37,10 +37,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game textures and 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They look great" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-trim-wendmouth-shopfront-01/v1.png` | candidate — five bands, no lettering; turquoise/sunflower/coral flaked paint |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-trim-wendmouth-shopfront-01/v1.png` | approved — five bands, no lettering; turquoise/sunflower/coral flaked paint |
+
+## 6. Files
+
+Source `assets/source/texture/tex-trim-wendmouth-shopfront-01/tex-trim-wendmouth-shopfront-01.png` (sha256 `3fa44fc7dcedf4861a05447886ab63fd430fa31c9eac4396d99ee286bb771bac`). Runtime `public/assets/texture/tex-trim-wendmouth-shopfront-01.webp`: 1024×256 WebP trim, left-right overlap-blended (1/12); squashed from the 3:1 generate. sha256 `a6f0b7e08fbb1aedcc0790b34d5d12987e5d7c0277713e0f8c5c050d41779300`.

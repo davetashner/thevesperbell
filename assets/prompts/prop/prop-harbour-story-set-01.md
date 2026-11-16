@@ -1,6 +1,6 @@
 # prop-harbour-story-set-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From the `e37-asset-props-harbour-story-concept-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved concept** (v1, approved 2026-11-16, "They look great"). From the `e37-asset-props-harbour-story-concept-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -37,10 +37,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game style anchors
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They look great" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-harbour-story-set-01/v1.png` | candidate — three seal states read apart by shape (taut cord / loose halves on the floor / re-tied knot over the old wax); crates identical outside; black-steel strongroom lock; romances behind ledgers. Scale figure is a full character, not an outline. |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-harbour-story-set-01/v1.png` | approved — three seal states read apart by shape (taut cord / loose halves on the floor / re-tied knot over the old wax); crates identical outside; black-steel strongroom lock; romances behind ledgers. Scale figure is a full character, not an outline. |
+
+## 6. Files
+
+Source `assets/source/prop/prop-harbour-story-set-01/prop-harbour-story-set-01.png` (sha256 `51327ce80b154571d87923812fe997634f911a10b294bff2ee1ca6b9dea77548`).

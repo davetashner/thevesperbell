@@ -1,6 +1,6 @@
 # tex-rope-hawser-trim-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved image** (v1, approved 2026-11-16, "They look great"). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -37,10 +37,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game textures and 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They look great" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-rope-hawser-trim-01/v1.png` | candidate — four bands read clearly; climbable wraps pale, cut-point band red-cream |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-rope-hawser-trim-01/v1.png` | approved — four bands read clearly; climbable wraps pale, cut-point band red-cream |
+
+## 6. Files
+
+Source `assets/source/texture/tex-rope-hawser-trim-01/tex-rope-hawser-trim-01.png` (sha256 `f4448d903b110142060e15a6523bdb1dddbe844aa266add0600abd19f81feda6`). Runtime `public/assets/texture/tex-rope-hawser-trim-01.webp`: 1024×256 WebP trim, left-right overlap-blended (1/12); squashed from the 3:1 generate. sha256 `c9783b52c38531dc2d3b939807cdf18e023f69ddb8424dd088e8b891641fd957`.

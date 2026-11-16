@@ -1,6 +1,6 @@
 # tex-net-cargo-alpha-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved image** (v1, approved 2026-11-16, "They look great"). From the `e37-asset-tex-harbour-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -36,10 +36,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game textures and 
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They look great" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-net-cargo-alpha-01/v1.png` | candidate — true alpha; taut square mesh with pale knots; one doubled line at the tile seam to remove in seam repair |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/tex-net-cargo-alpha-01/v1.png` | approved — true alpha; taut square mesh with pale knots; one doubled line at the tile seam to remove in seam repair |
+
+## 6. Files
+
+Source `assets/source/texture/tex-net-cargo-alpha-01/tex-net-cargo-alpha-01.png` (sha256 `8e58acdb7e8075dee7ba3dbdfba411288f022ccb2b11570675c1a7f5f441ce3c`). Runtime `public/assets/texture/tex-net-cargo-alpha-01.webp`: 1024² RGBA WebP: cropped to three whole mesh periods (ropes on the same pitch across the seam), then a 24 px overlap blend; alpha kept for cut-out. sha256 `2ae276f1bc58c64e6a169f169200f23e951d560bf9d9a56dfad005b1bc9ca286`.

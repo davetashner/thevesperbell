@@ -39,6 +39,21 @@ describe('Wendmouth harbour tileables', () => {
     expect(LIQUID_TEXTURE_PAINTINGS['harbour-water']?.url).toBe(`/assets/texture/${WATER}.webp`);
   });
 
+  it('the trims, the cargo-net alpha and the sailcloth are shipped, credited and approved', () => {
+    for (const id of [
+      'tex-rope-hawser-trim-01',
+      'tex-net-cargo-alpha-01',
+      'tex-sailcloth-01',
+      'tex-trim-wendmouth-shopfront-01',
+    ]) {
+      expect(existsSync(`public/assets/texture/${id}.webp`), `${id} runtime file`).toBe(true);
+      expect(credits, `${id} CREDITS row`).toContain(`| \`${id}\` | texture |`);
+      expect(readFileSync(`assets/prompts/texture/${id}.md`, 'utf8')).toContain(
+        '**Status: owner-approved',
+      );
+    }
+  });
+
   it('the Stone Wharf, the stair landing, the breakwater and the Undertow tunnel are stone underfoot', () => {
     for (const id of ['stone-wharf', 'great-stair-landing', 'breakwater-walk', 'undertow-tunnel']) {
       const region = layout.surfaces.find((s) => s.id === id);

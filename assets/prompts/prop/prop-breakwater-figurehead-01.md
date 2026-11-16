@@ -1,6 +1,6 @@
 # prop-breakwater-figurehead-01
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From the `e37-asset-props-harbour-story-concept-prompts` set (plan/assets-harbor.json).
+**Status: owner-approved concept** (v1, approved 2026-11-16, "They look great"). From the `e37-asset-props-harbour-story-concept-prompts` set (plan/assets-harbor.json).
 
 ## 1. Asset
 
@@ -36,10 +36,14 @@ REFERENCE IMAGES: the attached painted images are approved in-game style anchors
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image | v1 | pending | owner | — | — |
+| image | v1 | approved | owner | 2026-11-16 | "They look great" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## 5. Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-breakwater-figurehead-01/v1.png` | candidate — serpent head with amber lantern eyes, barnacles and weed, iron bolts; sea-door with tide line, ring handle and iron lock plate. Scale figure is a full character. |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/prop-breakwater-figurehead-01/v1.png` | approved — serpent head with amber lantern eyes, barnacles and weed, iron bolts; sea-door with tide line, ring handle and iron lock plate. Scale figure is a full character. |
+
+## 6. Files
+
+Source `assets/source/prop/prop-breakwater-figurehead-01/prop-breakwater-figurehead-01.png` (sha256 `ffdd209f2a11e231959837c6a0e9c5cf7675bb5d9d4468f587e7a56cae3dcf0f`).
