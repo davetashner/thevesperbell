@@ -41,6 +41,7 @@ Defaults: `DEFAULT_BINDINGS` and `DEFAULT_PAD_BINDINGS`.
 | Journal          | (pause menu: Journal)              | J                        |
 | Drop item        | (inventory screen)                 | G                        |
 | Throw item       | (inventory screen)                 | T                        |
+| Quick slots 1-4  | Hold LT/L2, press D-pad Up / Right / Down / Left | F1, F2, F3, F4 |
 | Pause            | Menu                               | Esc, P                   |
 
 B is the souls-like dodge button (mw-e04.8). The shoulder controls form the combat cluster selected
@@ -116,7 +117,7 @@ row; `[` / `]` step to the previous / next filled slot and the wheel reaches eve
 numpad. When the class kits (mw-e02.3) free the number row for casters the defaults can move; all
 the actions (`spellSlot1`-`spellSlot8`, `spellPrev`, `spellNext`, `spellWheel`) are remappable. The
 quick slots (consumables) stay a separate strip below the hotbar: spells and consumables never share
-a slot, and assigning the quick slots' own keys remains mw-e17.17.
+a slot, and their own keys (F1-F4) are under Quick slots below.
 
 *Quick-select wheel.* Hold Z (the Guide button on the pad: every other pad button is taken). While it
 is held, mouse look (or the right stick) moves a pointer instead of turning the view, the slot it
@@ -145,11 +146,22 @@ first, and only with nothing open does Esc pause. In the menu, P or Menu resumes
 Resume. Up and down (arrows, d-pad, left stick) move between the options and Enter or A picks one.
 After resuming, click the game to take the mouse again; the pad plays at once.
 
-**Quick slots.** Four quick slots use consumables without a menu (mw-e17.6): drink a draught, throw
-an oil flask. They have no default buttons yet; assigning controls for them remains mw-e17.17. The inventory screen
-assigns items to them (pick an item, Assign to quick slot), and the strip at the bottom of the screen
-shows them. Until the bindings land, the sim's `useQuickSlotCommand` uses a slot, and so does the
-debug console's `quickslot <1–4>`.
+**Quick slots.** Four quick slots use consumables without a menu (mw-e17.6, mw-e17.17): drink a
+draught, throw an oil flask. F1-F4 use slots 1-4 on the keyboard; on the pad hold LT/L2 and press the
+D-pad (Up, Right, Down, Left for slots 1-4). The inventory screen assigns items to them (pick an item,
+Assign to quick slot), and the strip at the bottom of the screen shows them. The sim's
+`useQuickSlotCommand` and the debug console's `quickslot <1-4>` use a slot too. The actions
+(`quickSlot1`-`quickSlot4`) are remappable like the rest.
+
+*Decision: quick slots take F1-F4 and an LT + D-pad chord.* The number row and numpad are the class
+abilities and spell slots, and Ctrl+number would switch browser tabs, so the keyboard takes F1-F4; the
+game stops the browser's own help (F1) and find (F3) while it has the mouse. Every pad button is taken,
+so the pad uses a chord: hold LT/L2 (the shield, a hold, so it does nothing by itself) and press a D-pad
+direction. While the chord is held the D-pad press goes to the quick slot only, never to cast or the
+abilities, the way holding LT turns RB into a shield bash. A chord is a pad code of two buttons
+(`PadLT+PadUp`, the held modifier first); it never conflicts with the plain `PadUp`, and remapping and
+saves treat it like any other code. Using a slot while the shield is up is deliberate: a draught is
+drunk behind the shield.
 
 **Slow walk.** The quietest way to move (mw-e02.10): hold X to walk at 1.2 m/s, or push the left
 stick 30% or less. It works standing or crouched. Sprint while crouched stands you up (not under a

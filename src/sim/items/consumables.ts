@@ -34,6 +34,7 @@ import { STAMINA_QUANTA_PER_POINT, StaminaComponent } from '../combat/stamina';
 import { defineComponent, type ComponentType, type EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
 import type { System, World } from '../core/world';
+import { actionFrameOf, type ActionButton } from '../input/action-frame';
 import { equipmentOf, type EquippedRef } from '../inventory/equipment';
 import { inventoryOf, type ItemInstance, type ItemInstanceFlags } from '../inventory/inventory';
 import type { WorldPropertyInit } from '../properties/components';
@@ -623,9 +624,24 @@ export class Consumables {
 export interface ConsumablesInstallOptions<TInput> {
   /** This tick's quick-slot uses: `{ actor, slot }` pairs; defaults to the tick's quick-slot commands. */
   readonly input?: (inputs: readonly TInput[]) => readonly UseQuickSlotCommand[];
+  /**
+   * This tick's quick-slot buttons for `actor`, one per slot (`quickSlot1` … `quickSlot4`, mw-e17.17):
+   * a press uses that slot. Defaults to the tick's ActionFrame's.
+   */
+  readonly buttons?: (inputs: readonly TInput[], actor: EntityId) => QuickSlotButtons | undefined;
 }
 
-/** Uses the quick slots this tick's commands ask for, in command order. */
+/** The quick-slot buttons of one actor this tick: an ActionFrame satisfies it. */
+export type QuickSlotButtons = Readonly<
+  Partial<Record<'quickSlot1' | 'quickSlot2' | 'quickSlot3' | 'quickSlot4', ActionButton>>
+>;
+
+const QUICK_SLOT_BUTTONS = ['quickSlot1', 'quickSlot2', 'quickSlot3', 'quickSlot4'] as const;
+
+/**
+ * Uses the quick slots this tick's commands ask for, in command order, then the slots whose buttons
+ * were pressed (mw-e17.17), in slot order.
+ */
 export function consumablesSystem<TInput>(
   consumables: Consumables,
   options: ConsumablesInstallOptions<TInput> = {},
@@ -633,6 +649,9 @@ export function consumablesSystem<TInput>(
   const inputOf =
     options.input ??
     ((inputs: readonly TInput[]) => (inputs as readonly unknown[]).filter(isUseQuickSlotCommand));
+  const buttonsOf =
+    options.buttons ??
+    ((inputs: readonly TInput[]): QuickSlotButtons | undefined => actionFrameOf(inputs));
   return {
     name: 'consumables',
     run({ world, inputs }) {
@@ -640,6 +659,12 @@ export function consumablesSystem<TInput>(
       for (const { actor, slot } of inputOf(inputs)) {
         if (quickSlotsOf(sim, actor) !== undefined) consumables.useSlot(sim, actor, slot);
       }
+      world.query(QuickSlotsComponent).forEach((actor) => {
+        const buttons = buttonsOf(inputs, actor);
+        QUICK_SLOT_BUTTONS.forEach((name, slot) => {
+          if (buttons?.[name]?.pressed === true) consumables.useSlot(sim, actor, slot);
+        });
+      });
     },
   };
 }

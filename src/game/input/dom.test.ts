@@ -53,6 +53,18 @@ describe('attachDomInput', () => {
     expect(b.sampler.sample()).toEqual(IDLE_ACTION_FRAME);
   });
 
+  it('AC-1: F1-F4 use the quick slots and the browser keeps none of them (help, find)', () => {
+    const b = fakeBrowser();
+    b.input.requestPointerLock();
+    const slots = ['quickSlot1', 'quickSlot2', 'quickSlot3', 'quickSlot4'] as const;
+    ['F1', 'F2', 'F3', 'F4'].forEach((code, i) => {
+      expect(b.key('keydown', code).defaultPrevented).toBe(true);
+      expect(b.sampler.sample()[slots[i] ?? 'quickSlot1'].pressed).toBe(true);
+      b.key('keyup', code);
+      b.sampler.sample();
+    });
+  });
+
   it('feeds keys, mouse buttons and movement to the sampler while locked', () => {
     const b = fakeBrowser();
     b.input.requestPointerLock();

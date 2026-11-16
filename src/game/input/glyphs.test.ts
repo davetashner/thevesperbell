@@ -46,5 +46,8 @@ describe('input glyphs (mw-e02.9)', () => {
     expect(codeLabel('AltLeft')).toBe('Alt');
     expect(codeLabel('Mouse4')).toBe('Mouse 5');
     expect(codeLabel('F5')).toBe('F5');
+    expect(codeLabel('PadLT+PadUp')).toBe('LT + D-pad Up');
+    expect(inputGlyph('quickSlot3', 'gamepad', defaults)).toBe('LT + D-pad Down');
+    expect(inputGlyph('quickSlot3', 'keyboardMouse', defaults)).toBe('F3');
   });
 });

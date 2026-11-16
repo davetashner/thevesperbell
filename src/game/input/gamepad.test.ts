@@ -3,7 +3,10 @@ import { actionVector } from '@sim/index';
 import {
   choosePad,
   DEFAULT_GAMEPAD_SETTINGS,
+  isPadChord,
   isPadCode,
+  isPadInputCode,
+  padChordParts,
   magnitude,
   mergeMove,
   PAD_BUTTONS,
@@ -72,6 +75,14 @@ describe('readPad (standard mapping)', () => {
     expect(PAD_BUTTONS[12]).toBe('PadUp');
     expect(isPadCode('PadLS')).toBe(true);
     expect(isPadCode('KeyW')).toBe(false);
+    expect(isPadChord('PadLT+PadUp')).toBe(true);
+    expect(isPadChord('PadLT+PadLT')).toBe(false);
+    expect(isPadChord('PadLT')).toBe(false);
+    expect(isPadChord('PadLT+KeyW')).toBe(false);
+    expect(isPadInputCode('PadA')).toBe(true);
+    expect(isPadInputCode('PadLT+PadUp')).toBe(true);
+    expect(isPadInputCode('F1')).toBe(false);
+    expect(padChordParts('PadLT+PadUp')).toEqual(['PadLT', 'PadUp']);
   });
 
   it('reads buttons down, sticks with y up, and triggers past the threshold only', () => {

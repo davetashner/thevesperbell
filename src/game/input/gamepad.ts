@@ -40,6 +40,22 @@ export function isPadCode(code: string): code is PadCode {
   return (PAD_BUTTONS as readonly string[]).includes(code);
 }
 
+/** A chord: a held modifier and a pressed button, `PadLT+PadUp` (the modifier first). */
+export function isPadChord(code: string): boolean {
+  const parts = code.split('+');
+  return parts.length === 2 && parts.every(isPadCode) && parts[0] !== parts[1];
+}
+
+/** The pad buttons a chord code names: the modifier, then the button. */
+export function padChordParts(code: string): readonly PadCode[] {
+  return code.split('+').filter(isPadCode);
+}
+
+/** Whether `code` is a pad button or a chord of two. */
+export function isPadInputCode(code: string): boolean {
+  return isPadCode(code) || isPadChord(code);
+}
+
 /** The analog triggers (standard buttons 6 and 7): pressed past a threshold, not at first touch. */
 const TRIGGERS: ReadonlySet<number> = new Set([6, 7]);
 

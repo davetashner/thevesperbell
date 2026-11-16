@@ -60,6 +60,11 @@ export const ACTIONS = {
   // The selected item (mw-e17.7): drop its stack in front of you, or throw one along your look.
   drop: { kind: 'button', label: 'Drop item', context: 'gameplay' },
   throw: { kind: 'button', label: 'Throw item', context: 'gameplay' },
+  // The four consumable quick slots (mw-e17.6, mw-e17.17): a press uses the slot's item.
+  quickSlot1: { kind: 'button', label: 'Quick slot 1', context: 'gameplay' },
+  quickSlot2: { kind: 'button', label: 'Quick slot 2', context: 'gameplay' },
+  quickSlot3: { kind: 'button', label: 'Quick slot 3', context: 'gameplay' },
+  quickSlot4: { kind: 'button', label: 'Quick slot 4', context: 'gameplay' },
   pause: { kind: 'button', label: 'Pause', context: 'global' },
 } as const satisfies Record<string, ActionDef>;
 

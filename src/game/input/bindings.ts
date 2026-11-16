@@ -8,7 +8,7 @@
 // way back in.
 
 import { ACTIONS, BUTTON_ACTIONS, type ActionContext, type ButtonAction } from '@sim/index';
-import { isPadCode } from './gamepad';
+import { isPadInputCode } from './gamepad';
 
 /** The four directions of the move vector, bound like buttons. */
 export const MOVE_DIRECTIONS = ['moveForward', 'moveBack', 'moveLeft', 'moveRight'] as const;
@@ -106,6 +106,12 @@ export const DEFAULT_BINDINGS: Bindings = freezeBindings({
   journal: ['KeyJ'],
   drop: ['KeyG'],
   throw: ['KeyT'],
+  // Quick slots (mw-e17.17): the number row and numpad are taken, so F1-F4. The input adapter stops
+  // the browser's own F-key actions (help, find) while the game has focus.
+  quickSlot1: ['F1'],
+  quickSlot2: ['F2'],
+  quickSlot3: ['F3'],
+  quickSlot4: ['F4'],
   pause: ['Escape', 'KeyP'],
 });
 
@@ -154,6 +160,11 @@ export const DEFAULT_PAD_BINDINGS: Bindings = freezeBindings({
   journal: [],
   drop: [],
   throw: [],
+  // Quick slots (mw-e17.17): hold LT (the shield) and press a D-pad direction, a chord code.
+  quickSlot1: ['PadLT+PadUp'],
+  quickSlot2: ['PadLT+PadRight'],
+  quickSlot3: ['PadLT+PadDown'],
+  quickSlot4: ['PadLT+PadLeft'],
   pause: ['PadMenu'],
 });
 
@@ -295,7 +306,8 @@ function validCodes(value: unknown, pad: boolean): value is InputCode[] {
     Array.isArray(value) &&
     value.length <= MAX_SLOTS &&
     value.every(
-      (code) => typeof code === 'string' && (pad ? isPadCode(code) : isKeyboardMouseCode(code)),
+      (code) =>
+        typeof code === 'string' && (pad ? isPadInputCode(code) : isKeyboardMouseCode(code)),
     ) &&
     new Set(value).size === value.length
   );

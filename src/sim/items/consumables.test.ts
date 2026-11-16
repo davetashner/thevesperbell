@@ -17,6 +17,7 @@ import { RapierPhysics } from '../physics/rapier';
 import { PlayerLook } from '../player/player';
 import { readProperty, registerWorldProperties } from '../properties/components';
 import type { Vec3 } from '../stimulus/shapes';
+import { actionFrame, actionButton, type ButtonAction } from '../input/action-frame';
 import { installStimuli } from '../stimulus/stimulus';
 import {
   addQuickSlots,
@@ -548,6 +549,46 @@ describe('consumables (mw-e17.6)', () => {
     const stranger = s.world.spawn();
     s.world.step([useQuickSlotCommand(stranger, 0)]);
     expect(s.refused).toEqual([]);
+  });
+
+  it('AC-1: pressing the quick slot 1 binding uses quick slot 1 (item.used with slot 0)', () => {
+    const s = setup();
+    const [id] = s.give('healing-draught', 2);
+    s.consumables.assign(s.sim, s.actor, 0, id ?? -1);
+    const press = (action: ButtonAction, pressed: boolean) =>
+      actionFrame({
+        move: { x: 0, y: 0 },
+        look: { x: 0, y: 0 },
+        buttons: (a) => actionButton(a === action && pressed, a === action && pressed, false),
+      });
+    s.world.step([press('quickSlot2', true)]); // an empty slot refuses, quietly
+    expect(s.used).toEqual([]);
+    s.world.step([press('quickSlot1', false)]);
+    expect(s.used).toEqual([]);
+    s.world.step([press('quickSlot1', true)]);
+    expect(s.used.map((e) => e.slot)).toEqual([0]);
+  });
+
+  it('a custom buttons option feeds the quick-slot buttons', () => {
+    const world = new World<{ readonly press: number }>({ seed: 1 });
+    const sim = world as unknown as World<never>;
+    const consumables = new Consumables(DEFS);
+    const actor = world.spawn();
+    addInventory(sim, actor);
+    addQuickSlots(sim, actor);
+    const added = consumables.items.inventory.add(sim, actor, 'healing-draught', 2);
+    consumables.assign(sim, actor, 3, added.ok ? first(added.instanceIds) : -1);
+    installConsumables(world, consumables, {
+      buttons: (inputs) => ({
+        quickSlot4: actionButton(
+          inputs.some(({ press }) => press === 4),
+          false,
+          false,
+        ),
+      }),
+    });
+    world.step([{ press: 4 }]);
+    expect(consumables.items.inventory.count(sim, actor)).toBe(1);
   });
 
   it('a custom input feeds the quick-slot system', () => {

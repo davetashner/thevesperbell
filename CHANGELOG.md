@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Your four consumable quick slots now have buttons: F1-F4 on the keyboard, or hold LT and press the D-pad (Up, Right, Down, Left) on a controller. Each can be remapped. [mw-e17.17]
 - The knight now holds his sword the way a hand really holds one: the fist closed around the grip with the elbow bent and the hand low by his hip, the blade pointing forward and a little out and down, instead of hanging straight down or sticking out as an extension of his arm; the wrist bends with the fist, and attacks, blocks and dodges start from and return to this stance (mw-a6t).
 - The Wendmouth dock is now played end to end in a real browser by a test: sign on with Hesketh, open the gangway, walk aboard, climb into the Gilded Tern's hold and back out, and Tereza's route to the same token.
 - A third way aboard the Gilded Tern: lose the high-stakes dice at the Tern crew's table in the Drowned Gull and you are shanghaied. You wake in the Tern's hold six hours later, and Captain Hesketh waits on deck to settle your articles and hand you the gangway token. Ordinary dice losses never do this. [mw-e40.30]
