@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Characters now show their painted face in the dialogue box (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh and Ottilie), and Ottilie's portrait fills the shop window's frame; narrators, the player and anyone without art keep the silhouette.
 - Wendmouth Harbour is dressed: the Gilded Tern (hull, masts and rigging, figurehead, springalds, pine stern cabin), barrels, chests, the hoist crate and deck fittings on the docks, painted stone quays and breakwater, harbour water, and tin (loud) and tar (quiet) net-loft roofs.
 - The named harbour cast (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh) appear in the harbour as their own characters instead of capsules, and the customs scale, Cray's shelf, a ballast crate, the sunken serpent figurehead and the smugglers' sea-door are in place.
 - A procedural sky in every open-air scene: a gradient that follows the time of day, the sun and moon on the game clock, stars at night and drifting painted clouds.

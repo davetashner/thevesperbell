@@ -42,6 +42,7 @@
   },
   "presentation": {
     "mesh": "npc-cray",
+    "portrait": "portrait-npc-cray-inspector",
     "sfx": "placeholder"
   }
 }
