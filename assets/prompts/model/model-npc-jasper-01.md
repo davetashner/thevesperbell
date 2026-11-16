@@ -1,6 +1,6 @@
 # model-npc-jasper-01: Jasper Quell's body (creature `npc-quell`)
 
-**Status: generated v1, turntable awaiting owner approval** (2026-11-16). Design approved on `char-npc-jasper-01` (owner, 2026-11-16).
+**Status: owner-approved model** (turntable approved 2026-11-16, "They look good"); in the harbour scene. Design approved on `char-npc-jasper-01` (owner, 2026-11-16).
 
 ## Single image (input to image-to-3D)
 
@@ -20,13 +20,19 @@ No prompt: a crop of the approved sheet. Same method as the Briar Glen townsfolk
 
 Key NPC body for `npc-quell`: 4–7 k triangles, one material (style bible §13.2). Swapped in for the capsule through `NPC_MODEL_URLS` in `src/render/creatures/npc-model.ts`, scaled to the creature's height. Static, like the Briar Glen bodies.
 
+## Processing
+
+`npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-npc-jasper-01/v1.glb public/assets/model/model-npc-jasper-01.glb --compress meshopt --texture-compress webp --texture-size 512` → 69 KB, one 512² texture (SHA-256 `450fad570406c0a13359f996f13408de8b62a1c49bbbe76c5335e827a38ec3fd`).
+
+Height: scaled to the creature's size class like every NPC, so Nell is not yet tiny nor Oona huge in game (owner left it as is, 2026-11-16).
+
 ## Approval gate(s)
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
 | image (flat concept) | v1 | approved | owner | 2026-11-16 | via `char-npc-jasper-01` |
-| turntable | v1 | pending | owner | — | — |
+| turntable | v1 | approved | owner | 2026-11-16 | "They look good" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Licence
 
-Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-npc-bodies-01`. CREDITS row on approval.
+Higgsfield Plus (Terms of Use §4.4) and Tripo's terms (owner-confirmed 2026-10-24, mw-uuk), as for `model-npc-bodies-01`. CREDITS row added 2026-11-16 (`placeholder: yes` until `assets/approvals.json` exists).
