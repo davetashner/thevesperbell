@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- A third way aboard the Gilded Tern: lose the high-stakes dice at the Tern crew's table in the Drowned Gull and you are shanghaied. You wake in the Tern's hold six hours later, and Captain Hesketh waits on deck to settle your articles and hand you the gangway token. Ordinary dice losses never do this. [mw-e40.30]
 - Wendmouth Harbour comes alive on the waterfront: treadwheel cranes on the wharf piers, net-loft sheds and gull hoards on the rooftops, the Tidefair's gull boom, wooden gull targets, striped markers and bunting, bunting across the breakwater walk, five readable place signs (the Drowned Gull, Customs House, Tidemarket, net lofts, breakwater) and painted stone and plank walls on the buildings and block yards.
 - The Gilded Tern has a hull ladder off the pool (swim, or walk the frozen pool, to it) and a walkable hold under the deck hatch, reached by a ladder, where the shanghai wake will place you. [mw-e40.29]
 - Tereza Maelo's first-blood duel runs: accept her challenge and she draws a sabre, the first hit either side lands ends the bout with nobody hurt (and no grudge), and her dialogue then records who won; a win unlocks her debt-of-honour vouch for the Gilded Tern. Her arms stall also opens from her dialogue, selling blades, bucklers, a kite shield and a brigandine, with a finer tier under the counter once you have beaten her (mw-e40.31).

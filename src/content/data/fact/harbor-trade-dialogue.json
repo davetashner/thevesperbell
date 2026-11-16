@@ -206,7 +206,7 @@
       "key": "hesketh.shanghaied",
       "type": "bool",
       "default": false,
-      "description": "The player lost the Drowned Gull drinking contest and woke in the Gilded Tern's hold (bible 4.5). Written by the contest system; hesketh-gilded-tern plays the scene and clears it.",
+      "description": "The player lost the Drowned Gull crew table (contest drowned-gull-crew-dice) and woke in the Gilded Tern's hold (bible 4.5). Written by the contest system; src/game/shanghai wakes the player and seats Hesketh on deck, and hesketh-gilded-tern plays the scene and clears it.",
       "owner": "contest"
     },
     {

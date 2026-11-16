@@ -827,6 +827,14 @@
         },
         {
           "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Lose the high-stakes crew table at the Drowned Gull and be shanghaied: you wake in the Tern's hold, climb the ladder and settle your articles with Captain Hesketh, who hands over the gangway token.",
+          "source": "mw-e40.30; \u00a74.5",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
           "kind": "fallback",
           "capabilities": [],
           "how": "Swim out from a quay ladder and climb the hull ladder (tern-hull-ladder-foot): slow, cold and seen from the wharf.",
