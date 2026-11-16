@@ -1,6 +1,6 @@
 # char-npc-cray-01: Turnaround reference for cray inspector (the input to `model-npc-cray-01`).
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-cray-inspector`.
+**Status: owner-approved concept** (v1, approved 2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-cray-inspector`.
 
 | Field | Value |
 |---|---|
@@ -32,10 +32,14 @@ Key NPC: 4–7 k triangles, LOD1 50 %, T1–T2 atlas, 1 material, ≤ 65 bones o
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-16 | "They look good, I don't mind the key" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-cray-01/v1.png` | candidate — starched collar, long ink coat with badge, spectacles, ledger at the hip |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-cray-01/v1.png` | approved — starched collar, long ink coat with badge, spectacles, ledger at the hip |
+
+## Output
+
+`assets/source/character/char-npc-cray-01/char-npc-cray-01.png` (v1, 2048×1360, SHA-256 `b893f5c442550309e41be25af9a2d6eebbac4e0875e0b2922e2d4edeb5e39d4b`).

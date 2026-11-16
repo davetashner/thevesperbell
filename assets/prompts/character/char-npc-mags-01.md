@@ -1,6 +1,6 @@
 # char-npc-mags-01: Turnaround reference for mags bargewoman (the input to `model-npc-mags-01`).
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-mags-bargewoman`.
+**Status: owner-approved concept** (v1, approved 2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-mags-bargewoman`.
 
 | Field | Value |
 |---|---|
@@ -32,10 +32,14 @@ Key NPC: 4–7 k triangles, LOD1 50 %, T1–T2 atlas, 1 material, ≤ 65 bones o
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-16 | "They look good, I don't mind the key" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-mags-01/v1.png` | candidate — pipe, hat, rope coil, rolled sleeves and sea boots in all four views |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-mags-01/v1.png` | approved — pipe, hat, rope coil, rolled sleeves and sea boots in all four views |
+
+## Output
+
+`assets/source/character/char-npc-mags-01/char-npc-mags-01.png` (v1, 2048×1360, SHA-256 `4f0b1199ef97614fce0d2896e7bf1b84dab9e519cd4d265e748f562a6177733f`).

@@ -1,6 +1,6 @@
 # char-npc-reed-01: Turnaround reference for reed lock keeper (the input to `model-npc-reed-01`).
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-reed-lock-keeper`.
+**Status: owner-approved concept** (v1, approved 2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-reed-lock-keeper`.
 
 | Field | Value |
 |---|---|
@@ -32,10 +32,14 @@ Key NPC: 4–7 k triangles, LOD1 50 %, T1–T2 atlas, 1 material, ≤ 65 bones o
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-16 | "They look good, I don't mind the key" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-reed-01/v1.png` | candidate — flat cap, mug of tea, moss waistcoat; the windlass key on the belt still reads as a cross |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-reed-01/v1.png` | approved — flat cap, mug of tea, moss waistcoat; the windlass key on the belt still reads as a cross |
+
+## Output
+
+`assets/source/character/char-npc-reed-01/char-npc-reed-01.png` (v1, 2048×1360, SHA-256 `cc2a621123e37b85a9f4ca0adb37cd11c9710f7fa4d995ffedc57a1ca0e70327`).

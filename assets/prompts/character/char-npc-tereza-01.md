@@ -1,6 +1,6 @@
 # char-npc-tereza-01: Turnaround reference for tereza merchant (the input to `model-npc-tereza-01`).
 
-**Status: generated v1, awaiting owner approval** (2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-tereza-merchant`.
+**Status: owner-approved concept** (v1, approved 2026-11-16). From `e37-asset-npcs-harbour-named-concept-prompts` (plan/assets-harbor.json). Must match the approved portrait `portrait-npc-tereza-merchant`.
 
 | Field | Value |
 |---|---|
@@ -32,10 +32,14 @@ Key NPC: 4–7 k triangles, LOD1 50 %, T1–T2 atlas, 1 material, ≤ 65 bones o
 
 | Gate | Version | Decision | Approver | Date | Note |
 |---|---|---|---|---|---|
-| image (flat concept) | v1 | pending | owner | — | — |
+| image (flat concept) | v1 | approved | owner | 2026-11-16 | "They look good, I don't mind the key" (session chat; `assets/approvals.json` does not exist yet) |
 
 ## Iteration log
 
 | # | Date | Tool / model / tier | Prompt change | Result | Keep? |
 |---|---|---|---|---|---|
-| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-tereza-01/v1.png` | candidate — crescent lapels, scalloped hems, sash, sabre in a hip socket; reads foreign |
+| 1 | 2026-11-16 | Higgsfield / gpt_image_2_6 (high, 2k) / plus | initial | `assets/_incoming/char-npc-tereza-01/v1.png` | approved — crescent lapels, scalloped hems, sash, sabre in a hip socket; reads foreign |
+
+## Output
+
+`assets/source/character/char-npc-tereza-01/char-npc-tereza-01.png` (v1, 2048×1360, SHA-256 `4702cceac43158df4fc9de3dae5eac873b774d6fb70e9136d6c5e6af1e371d50`).
