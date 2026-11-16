@@ -1,0 +1,8 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "tiller",
+  "name": "Tiller and rudder head",
+  "mass": 120,
+  "flammable": true,
+  "tags": ["harbour", "ship", "dressing"]
+}

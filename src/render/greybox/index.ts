@@ -24,14 +24,27 @@ import type {
 } from '@sim/index';
 import { renderIntensity } from '../light/index.ts';
 import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
+import { hiddenByDressing, paintFor } from './dressing-hides';
+import { loadDressing } from '../props/dressing';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
+import {
+  containerModelFor,
+  loadBodyDockModel,
+  loadFixedDockModel,
+  loadShipLantern,
+  PROP_MODELS,
+  SHIP_LANTERN_TAG,
+} from '../props/dock-props';
 import {
   CRATE_URL,
   IVY_TILE,
   IVY_URL,
+  liquidPaintingFor,
   paintedMaterial,
   PILLAR_TILE,
   PILLAR_URL,
+  SURFACE_TEXTURE_PAINTINGS,
+  worldUvLiquidPlane,
   worldUvPartGeometry,
 } from '../props/surfaces';
 import {
@@ -76,6 +89,8 @@ const CHAIN_COLOUR = 0x6b7078;
 /** Thinnest a rope is drawn, metres across, so a 0.05 m cord still reads from the camera. */
 const MIN_ROPE_WIDTH = 0.06;
 const MARKER_COLOUR = 0xe8c547;
+/** Liquid surfaces by liquid material (style bible §2.3: water #3F7FA0 clear, oil #3B2F1E glossy). */
+const LIQUID_COLOURS: Readonly<Record<string, number>> = { water: 0x3f7fa0, oil: 0x3b2f1e };
 /** Spawn tags whose marker keeps the facing cone: they stand on the ground (mw-ju8.42). */
 export const MARKER_CONE_TAGS: readonly string[] = ['arrival', 'player-start'];
 /** A sign board, metres (width, height, thickness), and its weathered-wood colour. */
@@ -413,9 +428,36 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       group.name = `scene:${layout.id}`;
       const byPurpose = new Map<KitPurpose, BufferGeometry[]>();
       const paintedParts = new Map<PaintedKind, BufferGeometry[]>();
+      // Grey-box parts a dressing model replaces (a ship's hull over its blocking mass) are drawn in the
+      // dressing's own group, hidden once its model has loaded (they stay if it never does).
+      const dressingParts = new Map<number, Map<KitPurpose, BufferGeometry[]>>();
+      const paintedWalls = new Map<string, BufferGeometry[]>();
       for (const part of layout.parts) {
         // A breakable piece is drawn on its own (`piece`), so it can go when it breaks.
         if (layout.pieces[part.placement]?.breakable !== undefined) continue;
+        const dressing = layout.dressings.findIndex((d) => hiddenByDressing(part, [d]));
+        if (dressing >= 0) {
+          const byDressingPurpose =
+            dressingParts.get(dressing) ?? new Map<KitPurpose, BufferGeometry[]>();
+          const list = byDressingPurpose.get(part.purpose) ?? [];
+          list.push(partGeometry(part));
+          byDressingPurpose.set(part.purpose, list);
+          dressingParts.set(dressing, byDressingPurpose);
+          continue;
+        }
+        // A paint box lays a wall tileable on it in world units (a ship cabin as pine bulkhead).
+        const paint = paintFor(part, layout.paints);
+        const painting = paint === undefined ? undefined : SURFACE_TEXTURE_PAINTINGS[paint];
+        const paintedWall =
+          paint === undefined || painting === undefined
+            ? undefined
+            : worldUvPartGeometry(part, painting.tile);
+        if (paint !== undefined && paintedWall !== undefined) {
+          const list = paintedWalls.get(paint) ?? [];
+          list.push(paintedWall);
+          paintedWalls.set(paint, list);
+          continue;
+        }
         // The pillars and the ivy wear paintings (mw-va0), so they are drawn on their own, with UVs.
         const kind = paintedKind(part, layout.pieces[part.placement]?.properties);
         const geometry =
@@ -453,23 +495,84 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         mesh.receiveShadow = true;
         group.add(mesh);
       }
+      for (const [texture, geometries] of paintedWalls) {
+        const painting = SURFACE_TEXTURE_PAINTINGS[texture];
+        if (painting === undefined) continue;
+        const merged = mergeGeometries(geometries);
+        for (const geometry of geometries) geometry.dispose();
+        const mesh = new Mesh(
+          merged,
+          paintedMaterial(painting.url, PURPOSE_COLOURS.blocking, true),
+        );
+        mesh.name = `paint:${texture}`;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+      }
+      layout.dressings.forEach((dressing, index) => {
+        const replaced = new Group();
+        replaced.name = `dressing-greybox:${dressing.id}`;
+        for (const [purpose, geometries] of dressingParts.get(index) ??
+          new Map<KitPurpose, BufferGeometry[]>()) {
+          const merged = mergeGeometries(geometries);
+          for (const geometry of geometries) geometry.dispose();
+          const mesh = new Mesh(merged, gridMaterial(PURPOSE_COLOURS[purpose]));
+          mesh.name = purpose;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          replaced.add(mesh);
+        }
+        group.add(replaced);
+        void loadDressing(dressing).then(
+          (mesh) => {
+            replaced.visible = false;
+            group.add(mesh);
+          },
+          (error: unknown) => {
+            console.warn(`The ${dressing.id} dressing did not load; keeping the grey box.`, error);
+          },
+        );
+      });
       // Tagged surface regions (mw-1jm): a flat patch of the surface's colour on the floor it covers.
       const patches = surfacePatches(layout.parts, layout.surfaces);
+      // A region with a painted texture lays it in world units (one tile = `tile` metres), so the
+      // boards line up across neighbouring patches; the rest keep their flat colour.
       const bySurface = new Map<string, BufferGeometry[]>();
       for (const patch of patches) {
         const plane = new PlaneGeometry(patch.maxX - patch.minX, patch.maxZ - patch.minZ);
         plane.rotateX(-Math.PI / 2);
         plane.translate((patch.minX + patch.maxX) / 2, patch.y, (patch.minZ + patch.maxZ) / 2);
-        const list = bySurface.get(patch.surface) ?? [];
+        const painting =
+          patch.texture === undefined ? undefined : SURFACE_TEXTURE_PAINTINGS[patch.texture];
+        if (painting !== undefined) {
+          const position = plane.getAttribute('position');
+          const uv = plane.getAttribute('uv');
+          for (let i = 0; i < uv.count; i++) {
+            uv.setXY(i, position.getX(i) / painting.tile, -position.getZ(i) / painting.tile);
+          }
+          uv.needsUpdate = true;
+        }
+        const key =
+          painting === undefined || patch.texture === undefined
+            ? patch.surface
+            : `${patch.surface}|${patch.texture}`;
+        const list = bySurface.get(key) ?? [];
         list.push(plane);
-        bySurface.set(patch.surface, list);
+        bySurface.set(key, list);
       }
-      for (const [surface, geometries] of bySurface) {
+      for (const [key, geometries] of bySurface) {
         const merged = mergeGeometries(geometries);
         for (const geometry of geometries) geometry.dispose();
+        const [surface = key, texture] = key.split('|');
         const colour = SURFACE_COLOURS[surface as keyof typeof SURFACE_COLOURS];
-        const mesh = new Mesh(merged, gridMaterial(colour));
-        mesh.name = `surface:${surface}`;
+        const painting = texture === undefined ? undefined : SURFACE_TEXTURE_PAINTINGS[texture];
+        const material =
+          painting === undefined
+            ? gridMaterial(colour)
+            : paintedMaterial(painting.url, colour, true);
+        const mesh = new Mesh(merged, material);
+        mesh.name =
+          painting === undefined ? `surface:${surface}` : `surface:${key.replace('|', ':')}`;
         mesh.receiveShadow = true;
         group.add(mesh);
       }
@@ -532,6 +635,34 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           new BoxGeometry(0.1, 0.35, 0.1).translate(0, -0.25, 0),
           new MeshStandardMaterial({ color: new Color(BRACKET_COLOUR), roughness: 0.8 }),
         );
+      } else if (
+        spawn.prop === undefined &&
+        spawn.liquid !== undefined &&
+        spawn.liquid.drain === undefined
+      ) {
+        // A standing liquid volume (a harbour pool, a cistern): its surface at its level, translucent
+        // so the bed and anything sunk in it still read. A volume that can drain keeps the marker,
+        // since a fixed surface would lie about its level once it falls.
+        // A tagged liquid (the harbour's water) wears its painting, laid in world units.
+        const { size, depth, liquid } = spawn.liquid;
+        const colour = LIQUID_COLOURS[liquid] ?? LIQUID_COLOURS['water'] ?? 0x3f7fa0;
+        const painting = liquidPaintingFor(spawn.tags);
+        const material =
+          painting === undefined
+            ? new MeshStandardMaterial({ color: new Color(colour) })
+            : paintedMaterial(painting.url, colour, true);
+        material.transparent = true;
+        material.opacity = liquid === 'oil' ? 0.9 : painting === undefined ? 0.72 : 0.85;
+        material.depthWrite = false;
+        material.roughness = liquid === 'oil' ? 0.2 : 0.35;
+        mesh = new Mesh(
+          painting === undefined
+            ? new PlaneGeometry(size.x, size.z).rotateX(-Math.PI / 2)
+            : worldUvLiquidPlane(size.x, size.z, spawn.position.x, spawn.position.z, painting.tile),
+          material,
+        );
+        mesh.position.y = depth;
+        mesh.renderOrder = 1;
       } else if (spawn.prop === undefined && spawn.tags.includes('sign')) {
         // A sign (mw-ju8.42): a flat board at its own height, facing the way the spawn faces, not a
         // cone floating in the air.
@@ -570,18 +701,23 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
             ? 'rope'
             : spawn.tags.includes('sign')
               ? 'sign'
-              : 'marker');
-      mesh.castShadow = true;
+              : spawn.liquid !== undefined && spawn.liquid.drain === undefined
+                ? 'liquid'
+                : 'marker');
+      // A liquid surface takes the light but casts no shadow (it would shade its own bed).
+      mesh.castShadow = mesh.name !== 'liquid';
       mesh.receiveShadow = true;
       group.add(mesh);
       // A torch or a brazier (mw-546): its model takes the bracket's place once loaded (the bracket
       // stays if it never loads). The flame and light are the light rig's, at this spawn point.
       if (spawn.container !== undefined && spawn.prop === undefined) {
-        void loadChest().then(
+        // A dock chest (sea chest, ditty box, strongbox) by its tag; any other container is the slice chest.
+        const dockChest = containerModelFor(spawn.tags);
+        void (dockChest === undefined ? loadChest() : loadFixedDockModel(dockChest)).then(
           (model) => {
             mesh.visible = false;
             const chest = new Mesh(model.geometry, model.material);
-            chest.name = 'chest';
+            chest.name = dockChest?.model ?? 'chest';
             chest.castShadow = true;
             chest.receiveShadow = true;
             group.add(chest);
@@ -613,6 +749,25 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           },
         );
       }
+      // A fixed dock prop (a coil, a grating, the Tern's hutch and tiller) or the ship's lantern: its
+      // model takes the stand-in's place once loaded (the stand-in stays if it never loads).
+      const fixedDock = spawn.prop === undefined ? undefined : PROP_MODELS[spawn.prop];
+      const isShipLantern = spawn.prop === undefined && spawn.tags.includes(SHIP_LANTERN_TAG);
+      if (fixedDock !== undefined || isShipLantern) {
+        void (fixedDock === undefined ? loadShipLantern() : loadFixedDockModel(fixedDock)).then(
+          (model) => {
+            mesh.visible = false;
+            const piece = new Mesh(model.geometry, model.material);
+            piece.name = fixedDock?.model ?? SHIP_LANTERN_TAG;
+            piece.castShadow = true;
+            piece.receiveShadow = true;
+            group.add(piece);
+          },
+          (error: unknown) => {
+            console.warn(`The ${spawn.id} model did not load; keeping the stand-in.`, error);
+          },
+        );
+      }
       scene.add(group);
       return group;
     },
@@ -628,6 +783,23 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);
+      // A movable dock prop (a barrel, a keg, the hoist's crate): its model rides the body.
+      const dock = spawn.prop === undefined ? undefined : PROP_MODELS[spawn.prop];
+      if (dock !== undefined) {
+        void loadBodyDockModel(dock, size.y).then(
+          (model) => {
+            mesh.visible = false;
+            const piece = new Mesh(model.geometry, model.material);
+            piece.name = dock.model;
+            piece.castShadow = true;
+            piece.receiveShadow = true;
+            group.add(piece);
+          },
+          (error: unknown) => {
+            console.warn(`The ${spawn.id} model did not load; keeping the stand-in.`, error);
+          },
+        );
+      }
       scene.add(group);
       return group;
     },

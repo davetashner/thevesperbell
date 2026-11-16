@@ -38,7 +38,7 @@
     "death": "sfx-human-death"
   },
   "presentation": {
-    "mesh": "placeholder-capsule",
+    "mesh": "npc-mags",
     "sfx": "placeholder"
   }
 }

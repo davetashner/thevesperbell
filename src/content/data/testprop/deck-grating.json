@@ -1,0 +1,8 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "deck-grating",
+  "name": "Deck grating",
+  "mass": 40,
+  "flammable": true,
+  "tags": ["harbour", "ship", "dressing"]
+}

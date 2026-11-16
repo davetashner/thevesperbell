@@ -13,6 +13,9 @@ check enforces this).
 
 ### Added
 
+- Wendmouth Harbour is dressed: the Gilded Tern (hull, masts and rigging, figurehead, springalds, pine stern cabin), barrels, chests, the hoist crate and deck fittings on the docks, painted stone quays and breakwater, harbour water, and tin (loud) and tar (quiet) net-loft roofs.
+- The named harbour cast (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh) appear in the harbour as their own characters instead of capsules, and the customs scale, Cray's shelf, a ballast crate, the sunken serpent figurehead and the smugglers' sea-door are in place.
+- A procedural sky in every open-air scene: a gradient that follows the time of day, the sun and moon on the game clock, stars at night and drifting painted clouds.
 - The journal now lists the rumours you have heard, flags new entries with a toast and an unread mark on its tab, and a Quest tracker (Settings, Gameplay) pins the quest you are following to the corner of the screen.
 - Rumours about the Briarwood, the Standing Horn, Mooring's Watch, the Glen Well, the Lamplit Stacks, the Weeping Adit and the Breakwater now resolve when you walk into those places, and the sea-serpent and Old Mooring rumours are put right by seeing the breakwater or the watch for yourself (mw-nh24). The Millweir stays a lead.
 - A journal screen (J, or Journal in the pause menu) lists your active, completed and failed quests with their objectives, your heard rumours and your notes, and opens with your class's first entry in place of the generic arrival text (mw-e23.6, mw-1myt).

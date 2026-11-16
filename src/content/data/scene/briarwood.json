@@ -1546,7 +1546,11 @@
       "tags": ["transition"]
     }
   ],
-  "signals": [{ "graph": "briarwood-areas" }],
+  "signals": [
+    {
+      "graph": "briarwood-areas"
+    }
+  ],
   "light": {
     "ambient": 0.38,
     "directional": [
@@ -1564,6 +1568,13 @@
       "color": "#A7B8B0",
       "near": 20,
       "far": 130
+    },
+    "dome": {
+      "stars": 0.5,
+      "clouds": 0.6,
+      "wind": 30,
+      "seed": 5,
+      "minute": 900
     }
   },
   "regions": [

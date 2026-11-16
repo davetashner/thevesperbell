@@ -41,7 +41,7 @@
     "death": "sfx-human-death"
   },
   "presentation": {
-    "mesh": "placeholder-capsule",
+    "mesh": "npc-tereza",
     "sfx": "placeholder"
   }
 }

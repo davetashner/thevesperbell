@@ -1,0 +1,8 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "rope-coil",
+  "name": "Coil of hemp rope",
+  "mass": 8,
+  "flammable": true,
+  "tags": ["harbour", "dressing"]
+}

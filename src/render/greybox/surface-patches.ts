@@ -1,7 +1,9 @@
 // Greybox look of tagged surface regions (mw-1jm): a flat coloured patch laid on the walkable floor
 // inside each region, so a player can tell a carpet from boards from shingle by eye and choose a path by
 // how it will sound. The patches are exactly where `surfaceAt` answers with the region: the part of a
-// flat walkable piece whose top lies in the region's height range. Pure geometry; no three.js here.
+// flat walkable piece whose top lies in the region's height range. A region with a painted `texture`
+// (a ship's deck, a plank walk) also lays it on the tops of blocking masses in that range, because a
+// hull or a jetty stands as one blocking box that people walk on. Pure geometry; no three.js here.
 
 import type { FootstepSurface } from '@content/index';
 import type { ScenePart, SceneSurface } from '@sim/index';
@@ -34,6 +36,8 @@ export const PATCH_RANK_LIFT = 0.004;
 export interface SurfacePatch {
   readonly region: string;
   readonly surface: string;
+  /** The region's painted tileable, or undefined for the flat greybox colour. */
+  readonly texture: string | undefined;
   readonly minX: number;
   readonly maxX: number;
   readonly minZ: number;
@@ -54,7 +58,11 @@ export function surfacePatches(
   const patches: SurfacePatch[] = [];
   ranked.forEach(({ region }, rank) => {
     for (const part of parts) {
-      if (part.purpose !== 'walkable' || part.shape !== 'box') continue;
+      if (part.shape !== 'box') continue;
+      const walkedOn =
+        part.purpose === 'walkable' ||
+        (region.texture !== undefined && part.purpose === 'blocking');
+      if (!walkedOn) continue;
       const top = part.max.y;
       if (top < region.min.y || top > region.max.y) continue;
       const minX = Math.max(part.min.x, region.min.x);
@@ -65,6 +73,7 @@ export function surfacePatches(
       patches.push({
         region: region.id,
         surface: region.surface,
+        texture: region.texture,
         minX,
         maxX,
         minZ,

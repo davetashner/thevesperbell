@@ -1479,8 +1479,8 @@
     },
     {
       "piece": "platform",
-      "at": [36.5, 2.0, 124.5],
-      "scale": [0.5, 10, 0.25],
+      "at": [37.75, 2, 124],
+      "scale": [0.25, 10, 0.5],
       "purpose": "climbable",
       "properties": {
         "climbable": "rough"
@@ -1488,8 +1488,8 @@
     },
     {
       "piece": "platform",
-      "at": [36.75, 11.75, 124.5],
-      "scale": [1.25, 0.25, 1.0],
+      "at": [36.5, 11.75, 124],
+      "scale": [0.5, 0.25, 0.75],
       "purpose": "blocking"
     },
     {
@@ -1522,6 +1522,72 @@
       "piece": "platform",
       "at": [-79.0, 0.0, 12.5],
       "scale": [1.0, 1.2, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [35.0, 2.0, 121.0],
+      "scale": [0.45, 1.25, 0.65],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [35, 2, 135],
+      "scale": [0.15, 0.85, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [31.5, 2, 116],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [38.5, 2, 116],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [31.5, 2, 130],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [38.5, 2, 130],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-23, 0.5, 57.5],
+      "scale": [0.2, 1.4, 0.2],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [-11, 0, 49.25],
+      "scale": [0.9, 2.2, 0.45],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.5, 0, 39],
+      "scale": [0.45, 0.7, 0.45],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [60, -6, 118],
+      "scale": [0.4, 4.25, 0.4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [82.5, -4, 120],
+      "scale": [0.6, 3, 1.25],
       "purpose": "blocking"
     }
   ],
@@ -2215,13 +2281,13 @@
     },
     {
       "id": "tern-rigging-foot",
-      "at": [36.5, 2.0, 123.5],
-      "yaw": 180,
+      "at": [37, 2, 124],
+      "yaw": 90,
       "tags": ["climb-route", "ship"]
     },
     {
       "id": "tern-crows-nest",
-      "at": [37.0, 12.0, 124.5],
+      "at": [36.5, 12, 124],
       "tags": ["marker", "ship", "thief-route"]
     },
     {
@@ -2335,7 +2401,7 @@
     {
       "id": "harbour-pool-a",
       "at": [-23.75, -6.0, 130.0],
-      "tags": ["pool", "standing-water"],
+      "tags": ["pool", "standing-water", "harbour-water"],
       "liquid": {
         "size": [32.5, 3.5, 60],
         "liquid": "water",
@@ -2345,7 +2411,7 @@
     {
       "id": "harbour-pool-b",
       "at": [8.75, -6.0, 130.0],
-      "tags": ["pool", "standing-water"],
+      "tags": ["pool", "standing-water", "harbour-water"],
       "liquid": {
         "size": [32.5, 3.5, 60],
         "liquid": "water",
@@ -2355,7 +2421,7 @@
     {
       "id": "harbour-pool-c",
       "at": [47.5, -6.0, 130.0],
-      "tags": ["pool", "standing-water"],
+      "tags": ["pool", "standing-water", "harbour-water"],
       "liquid": {
         "size": [45, 3.5, 60],
         "liquid": "water",
@@ -2365,12 +2431,227 @@
     {
       "id": "open-sea",
       "at": [91.0, -6.0, 130.0],
-      "tags": ["pool", "standing-water", "sea"],
+      "tags": ["pool", "standing-water", "sea", "harbour-water"],
       "liquid": {
         "size": [18, 3.5, 60],
         "liquid": "water",
         "depth": 3.5
       }
+    },
+    {
+      "id": "tern-hold-grating",
+      "at": [35.0, 2.0, 130.0],
+      "prop": "deck-grating",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-companion-hutch",
+      "at": [35.0, 2.0, 121.0],
+      "prop": "companion-hutch",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-tiller",
+      "at": [35.0, 2.0, 134.5],
+      "yaw": 180,
+      "prop": "tiller",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-pin-rail",
+      "at": [35.75, 2.75, 121],
+      "yaw": 90,
+      "prop": "pin-rail",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-deck-lantern",
+      "at": [35, 3, 120],
+      "yaw": 180,
+      "tags": ["ship-lantern", "ship"],
+      "lightSource": {
+        "variant": "lantern",
+        "infiniteFuel": true,
+        "tint": [1, 0.82, 0.45]
+      }
+    },
+    {
+      "id": "tern-cask",
+      "at": [33.5, 2.0, 126.0],
+      "prop": "cask-cradle",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-keg-a",
+      "at": [36.75, 2.0, 127.5],
+      "prop": "keg",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-keg-b",
+      "at": [36.75, 2.0, 128.25],
+      "prop": "keg",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-rope-coil",
+      "at": [33.5, 2.0, 131.5],
+      "prop": "rope-coil",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-hawser-coil",
+      "at": [36.5, 2.0, 117.5],
+      "prop": "hawser-coil",
+      "tags": ["dock-prop", "ship"]
+    },
+    {
+      "id": "tern-crew-chest",
+      "at": [36.5, 2.0, 132.5],
+      "yaw": 270,
+      "tags": ["sea-chest", "ship"],
+      "owner": "npc-hesketh",
+      "container": {
+        "contents": [
+          {
+            "item": "gold",
+            "count": 6
+          },
+          {
+            "item": "bread-loaf",
+            "count": 1
+          }
+        ],
+        "lock": "tern-crew-chest"
+      }
+    },
+    {
+      "id": "tern-hoist-rope",
+      "at": [35.0, 6.5, 108.0],
+      "tags": ["rope", "archer-route", "ship"],
+      "rope": {
+        "length": 2.5
+      },
+      "properties": {
+        "material": "rope"
+      }
+    },
+    {
+      "id": "tern-hoist-crate",
+      "at": [35.0, 3.25, 108.0],
+      "prop": "cargo-crate",
+      "tags": ["dock-prop", "ship", "archer-route"],
+      "suspendedFrom": "tern-hoist-rope"
+    },
+    {
+      "id": "ann-ditty-box",
+      "at": [-15.25, -2.0, 112.0],
+      "yaw": 90,
+      "tags": ["ditty-box", "barge"],
+      "owner": "npc-mags",
+      "container": {
+        "contents": [
+          {
+            "item": "gold",
+            "count": 12
+          }
+        ],
+        "lock": "patient-ann-ditty-box"
+      }
+    },
+    {
+      "id": "ann-keg",
+      "at": [-13.0, -2.0, 114.0],
+      "prop": "keg",
+      "tags": ["dock-prop", "barge"]
+    },
+    {
+      "id": "ann-rope-coil",
+      "at": [-14.0, -2.0, 104.5],
+      "prop": "rope-coil",
+      "tags": ["dock-prop", "barge"]
+    },
+    {
+      "id": "wharf-barrel-a",
+      "at": [16.0, 0.0, 96.0],
+      "prop": "barrel-weathered",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-barrel-b",
+      "at": [17.0, 0.0, 96.75],
+      "prop": "barrel-weathered",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-keg-a",
+      "at": [16.25, 0.0, 97.5],
+      "prop": "keg",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-rope-coil-a",
+      "at": [18.5, 0.0, 95.5],
+      "prop": "rope-coil",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-oil-barrel",
+      "at": [41.0, 0.0, 96.0],
+      "prop": "barrel-oil",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-light-barrel",
+      "at": [42.0, 0.0, 96.75],
+      "prop": "barrel-breakable",
+      "tags": ["dock-prop", "wharf"],
+      "breakable": {
+        "profile": "crate"
+      }
+    },
+    {
+      "id": "wharf-cask",
+      "at": [40.0, 0.0, 97.5],
+      "prop": "cask-cradle",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "wharf-hawser-coil",
+      "at": [-16.0, 0.0, 96.0],
+      "prop": "hawser-coil",
+      "tags": ["dock-prop", "wharf"]
+    },
+    {
+      "id": "undertow-strongbox",
+      "at": [82.0, -4.0, 34.0],
+      "yaw": 90,
+      "tags": ["strongbox", "undertow"],
+      "container": {
+        "contents": [
+          {
+            "item": "gold",
+            "count": 40
+          },
+          {
+            "item": "oil-flask",
+            "count": 2
+          }
+        ],
+        "lock": "undertow-strongbox"
+      }
+    },
+    {
+      "id": "undertow-oil-barrel-a",
+      "at": [80.0, -4.0, 38.0],
+      "prop": "barrel-oil",
+      "tags": ["dock-prop", "undertow"]
+    },
+    {
+      "id": "undertow-oil-barrel-b",
+      "at": [80.75, -4.0, 38.75],
+      "prop": "barrel-oil",
+      "tags": ["dock-prop", "undertow"]
     }
   ],
   "light": {
@@ -2436,6 +2717,12 @@
       "color": "#C5D3DC",
       "near": 80,
       "far": 260
+    },
+    "dome": {
+      "stars": 0.7,
+      "clouds": 0.4,
+      "wind": 60,
+      "seed": 4
     }
   },
   "regions": [
@@ -2464,6 +2751,283 @@
       "max": [-83.5, 3, 1.5],
       "scene": "under-the-bridge",
       "spawn": "arrive-from-wendmouth-harbour"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "tern-gangway",
+      "min": [34, -0.5, 100],
+      "max": [36, 2.5, 104],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "tern-deck",
+      "min": [31, 1.5, 104],
+      "max": [39, 2.5, 146],
+      "surface": "wood",
+      "texture": "tex-deck-planks-caulked-01"
+    },
+    {
+      "id": "patient-ann-deck",
+      "min": [-16, -2.5, 102],
+      "max": [-12, -1.5, 116],
+      "surface": "wood",
+      "texture": "tex-deck-planks-caulked-01"
+    },
+    {
+      "id": "loft-bridge-west",
+      "min": [-82, 3.5, 49],
+      "max": [-78, 4.5, 51],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "loft-bridge-east",
+      "min": [-64, 3.5, 49],
+      "max": [-60, 4.5, 51],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "loft-stair-customs",
+      "min": [-46, 3.5, 49],
+      "max": [-40, 6.5, 51],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "stone-wharf",
+      "min": [-100, -0.5, 72],
+      "max": [100, 0.5, 100],
+      "surface": "stone",
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "great-stair-landing",
+      "min": [-12, -2.5, 100],
+      "max": [12, -1.5, 112],
+      "surface": "stone",
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "breakwater-walk",
+      "min": [70, -0.5, 100],
+      "max": [82, 0.5, 128],
+      "surface": "stone",
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "undertow-tunnel",
+      "min": [70, -4.5, 48],
+      "max": [82, -3.5, 133],
+      "surface": "stone",
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "loft-roof-west",
+      "min": [-96, 3.5, 44],
+      "max": [-82, 4.5, 56],
+      "surface": "wood",
+      "texture": "tex-roof-tar-harbour-01"
+    },
+    {
+      "id": "loft-roof-middle",
+      "min": [-78, 3.5, 44],
+      "max": [-64, 4.5, 56],
+      "surface": "wood",
+      "texture": "tex-roof-tar-harbour-01"
+    },
+    {
+      "id": "loft-roof-east",
+      "min": [-60, 3.5, 44],
+      "max": [-46, 4.5, 56],
+      "surface": "metal-grate",
+      "texture": "tex-roof-tin-harbour-01"
+    }
+  ],
+  "dressings": [
+    {
+      "id": "tern-hull",
+      "model": "model-ship-gilded-tern-hull-01",
+      "at": [35, -3.25, 124],
+      "turn": 180,
+      "size": [10.4, 8.9, 44],
+      "fit": "box",
+      "hides": {
+        "min": [29.5, -6.5, 105.5],
+        "max": [40.5, 10, 137.5]
+      }
+    },
+    {
+      "id": "tern-foremast",
+      "model": "model-ship-gilded-tern-rigging-01",
+      "at": [35, 2, 112],
+      "turn": 90,
+      "size": [1, 14, 1],
+      "fit": "height",
+      "fadesNearCamera": true
+    },
+    {
+      "id": "tern-mainmast",
+      "model": "model-ship-gilded-tern-rigging-01",
+      "at": [35, 2, 124],
+      "turn": 90,
+      "size": [1, 14, 1],
+      "fit": "height",
+      "fadesNearCamera": true
+    },
+    {
+      "id": "tern-mizzenmast",
+      "model": "model-ship-gilded-tern-rigging-01",
+      "at": [35, 2, 136],
+      "turn": 90,
+      "size": [1, 13, 1],
+      "fit": "height",
+      "fadesNearCamera": true
+    },
+    {
+      "id": "tern-figurehead",
+      "model": "model-prop-tern-figurehead-01",
+      "at": [35, 0.5, 104.25],
+      "turn": 0,
+      "size": [1, 1.8, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-port-fore",
+      "model": "model-prop-springald-swivel-01",
+      "at": [31.5, 2, 116],
+      "turn": 90,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-starboard-fore",
+      "model": "model-prop-springald-swivel-01",
+      "at": [38.5, 2, 116],
+      "turn": 270,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-port-aft",
+      "model": "model-prop-springald-swivel-01",
+      "at": [31.5, 2, 130],
+      "turn": 90,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "tern-springald-starboard-aft",
+      "model": "model-prop-springald-swivel-01",
+      "at": [38.5, 2, 130],
+      "turn": 270,
+      "size": [1, 1.1, 1],
+      "fit": "height"
+    },
+    {
+      "id": "customs-scale-model",
+      "model": "model-prop-cargo-scale-01",
+      "at": [-23, 0.5, 57.5],
+      "yaw": 0,
+      "turn": 270,
+      "size": [1.5, 1.9, 1.5],
+      "fit": "height",
+      "hides": {
+        "min": [-23.5, 0.75, 57],
+        "max": [-22.5, 2.25, 58]
+      }
+    },
+    {
+      "id": "cray-shelf-model",
+      "model": "model-prop-shelf-cray-01",
+      "at": [-11, 0, 49.25],
+      "yaw": 0,
+      "turn": 90,
+      "size": [1.8, 2.2, 1],
+      "fit": "height",
+      "hides": {
+        "min": [-12, 0, 48.5],
+        "max": [-10, 2.5, 49.75]
+      }
+    },
+    {
+      "id": "ballast-crate-bay-two",
+      "model": "model-prop-ballast-crate-01",
+      "at": [41.5, 0, 39],
+      "yaw": 0,
+      "turn": 270,
+      "size": [1, 0.95, 1],
+      "fit": "height",
+      "hides": {
+        "min": [41, 0, 38.5],
+        "max": [42, 1, 39.5]
+      }
+    },
+    {
+      "id": "sunken-figurehead-model",
+      "model": "model-prop-figurehead-serpent-01",
+      "at": [60, -6, 118],
+      "yaw": 0,
+      "turn": 90,
+      "size": [2, 4.5, 2],
+      "fit": "height",
+      "hides": {
+        "min": [59.5, -6, 117.5],
+        "max": [60.5, -1.5, 118.5]
+      }
+    },
+    {
+      "id": "sea-door-model",
+      "model": "model-prop-sea-door-01",
+      "at": [82.5, -4, 120],
+      "yaw": 0,
+      "turn": 0,
+      "size": [1.2, 3, 3],
+      "fit": "height",
+      "hides": {
+        "min": [82.25, -4, 118.5],
+        "max": [83, -1, 121.5]
+      }
+    }
+  ],
+  "paints": [
+    {
+      "id": "tern-cabin",
+      "min": [30.5, 1.5, 137.5],
+      "max": [39.5, 6, 146.5],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "quay-face",
+      "min": [-100, -6.5, 99.5],
+      "max": [100, 0.5, 100.5],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "pool-west-wall",
+      "min": [-40.5, -6.5, 100],
+      "max": [-39.5, 0.5, 160],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "breakwater",
+      "min": [69.5, -6.5, 100],
+      "max": [82.5, 0.5, 160.5],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "sea-wall-north",
+      "min": [-40, -6.5, 159.5],
+      "max": [100.5, 0.5, 160.5],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "sea-wall-east",
+      "min": [99.5, -6.5, 100],
+      "max": [100.5, 0.5, 160],
+      "texture": "tex-stone-breakwater-01"
     }
   ]
 }

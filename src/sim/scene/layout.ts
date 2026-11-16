@@ -347,6 +347,8 @@ export interface SceneSurfaceSpec {
   readonly max: Triple;
   readonly surface: string;
   readonly priority: number;
+  /** Render only: a painted floor tileable (content SURFACE_TEXTURES). */
+  readonly texture?: string | undefined;
 }
 
 /** A surface region as laid out: its corners in metres (read by `surfaceAt`, src/sim/surfaces). */
@@ -356,6 +358,50 @@ export interface SceneSurface {
   readonly max: Vec3;
   readonly surface: string;
   readonly priority: number;
+  /** Render only: a painted floor tileable, or undefined for the flat greybox colour. */
+  readonly texture: string | undefined;
+}
+
+/** A paint box as specified (render only; see content scenePaintSchema). */
+export interface ScenePaintSpec {
+  readonly id: string;
+  readonly min: Triple;
+  readonly max: Triple;
+  readonly texture: string;
+}
+
+/** A paint box as laid out: its corners in metres. Render only. */
+export interface ScenePaint {
+  readonly id: string;
+  readonly min: Vec3;
+  readonly max: Vec3;
+  readonly texture: string;
+}
+
+/** A dressing model as specified (render only; see content sceneDressingSchema). */
+export interface SceneDressingSpec {
+  readonly id: string;
+  readonly model: string;
+  readonly at: Triple;
+  readonly yaw: SceneYaw;
+  readonly turn: SceneYaw;
+  readonly size: Triple;
+  readonly fit: 'box' | 'height';
+  readonly fadesNearCamera?: boolean | undefined;
+  readonly hides?: { readonly min: Triple; readonly max: Triple } | undefined;
+}
+
+/** A dressing model as laid out: its base point and hide box in metres. Render only. */
+export interface SceneDressing {
+  readonly id: string;
+  readonly model: string;
+  readonly at: Vec3;
+  readonly yaw: SceneYaw;
+  readonly turn: SceneYaw;
+  readonly size: Vec3;
+  readonly fit: 'box' | 'height';
+  readonly fadesNearCamera: boolean;
+  readonly hides: { readonly min: Vec3; readonly max: Vec3 } | undefined;
 }
 
 /** A tagged box as laid out: its corners in metres (water: wading and swimming, mw-e02.14). */
@@ -538,6 +584,10 @@ export interface SceneSpec {
   readonly regions?: readonly SceneRegionSpec[] | undefined;
   /** Boxes tagged with a footstep surface (mw-e09.4). */
   readonly surfaces?: readonly SceneSurfaceSpec[] | undefined;
+  /** Approved 3D models drawn over the grey box, render only. */
+  readonly dressings?: readonly SceneDressingSpec[] | undefined;
+  /** Boxes whose grey-box walls are drawn with a tiling texture, render only. */
+  readonly paints?: readonly ScenePaintSpec[] | undefined;
 }
 
 /** Finds a kit piece by id (undefined when there is none). */
@@ -683,6 +733,10 @@ export interface SceneLayout {
   readonly regions: readonly SceneRegion[];
   /** Its footstep surface boxes, in scene order, in metres (mw-e09.4). */
   readonly surfaces: readonly SceneSurface[];
+  /** Dressing models over the grey box (render only). */
+  readonly dressings: readonly SceneDressing[];
+  /** Paint boxes for grey-box walls (render only). */
+  readonly paints: readonly ScenePaint[];
 }
 
 /** Thrown when a scene names a kit piece the lookup does not have. */
@@ -1210,6 +1264,38 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           max: gridToWorld(r.max, scene.grid),
           surface: r.surface,
           priority: r.priority,
+          texture: r.texture,
+        }),
+      ),
+    ),
+    paints: Object.freeze(
+      (scene.paints ?? []).map((p) =>
+        Object.freeze({
+          id: p.id,
+          min: gridToWorld(p.min, scene.grid),
+          max: gridToWorld(p.max, scene.grid),
+          texture: p.texture,
+        }),
+      ),
+    ),
+    dressings: Object.freeze(
+      (scene.dressings ?? []).map((d) =>
+        Object.freeze({
+          id: d.id,
+          model: d.model,
+          at: gridToWorld(d.at, scene.grid),
+          yaw: d.yaw,
+          turn: d.turn,
+          size: vec(d.size[0], d.size[1], d.size[2]),
+          fit: d.fit,
+          fadesNearCamera: d.fadesNearCamera ?? false,
+          hides:
+            d.hides === undefined
+              ? undefined
+              : Object.freeze({
+                  min: gridToWorld(d.hides.min, scene.grid),
+                  max: gridToWorld(d.hides.max, scene.grid),
+                }),
         }),
       ),
     ),

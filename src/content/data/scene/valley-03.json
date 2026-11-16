@@ -225,7 +225,9 @@
       "at": [-5.5, 0.0, 12.0],
       "yaw": 90,
       "creature": "forgotten-miner",
-      "repopulate": { "afterDays": 1 },
+      "repopulate": {
+        "afterDays": 1
+      },
       "leash": {
         "radius": 18
       },
@@ -236,7 +238,9 @@
       "at": [-3.5, 0.0, 14.0],
       "yaw": 90,
       "creature": "forgotten-shield-bearer",
-      "repopulate": { "afterDays": 1 },
+      "repopulate": {
+        "afterDays": 1
+      },
       "leash": {
         "radius": 15
       },
@@ -247,7 +251,9 @@
       "at": [-6.5, 0.0, 16.0],
       "yaw": 90,
       "creature": "forgotten-archer",
-      "repopulate": { "afterDays": 1 },
+      "repopulate": {
+        "afterDays": 1
+      },
       "leash": {
         "radius": 15
       },
@@ -258,7 +264,9 @@
       "at": [6.0, 0.0, 18.5],
       "yaw": 270,
       "creature": "forgotten-miner",
-      "repopulate": { "afterDays": 1 },
+      "repopulate": {
+        "afterDays": 1
+      },
       "leash": {
         "radius": 18
       },
@@ -269,7 +277,9 @@
       "at": [7.25, 0.0, 22.0],
       "yaw": 270,
       "creature": "forgotten-archer",
-      "repopulate": { "afterDays": 1 },
+      "repopulate": {
+        "afterDays": 1
+      },
       "leash": {
         "radius": 15
       },
@@ -280,7 +290,9 @@
       "at": [5.0, 0.0, 21.0],
       "yaw": 270,
       "creature": "forgotten-shield-bearer",
-      "repopulate": { "afterDays": 1 },
+      "repopulate": {
+        "afterDays": 1
+      },
       "leash": {
         "radius": 15
       },
@@ -301,14 +313,21 @@
       "id": "valley-03-plateau-pot",
       "at": [-4.5, 0, 12.5],
       "prop": "clay-pot",
-      "properties": { "liftable": true, "fragile": 15 },
-      "breakable": { "profile": "pottery" }
+      "properties": {
+        "liftable": true,
+        "fragile": 15
+      },
+      "breakable": {
+        "profile": "pottery"
+      }
     },
     {
       "id": "valley-03-barrel",
       "at": [1.0, 0, 6.0],
       "prop": "barrel",
-      "properties": { "liftable": true }
+      "properties": {
+        "liftable": true
+      }
     }
   ],
   "light": {
@@ -336,6 +355,13 @@
       "radius": 150,
       "centreY": 24,
       "follow": 1
+    },
+    "dome": {
+      "stars": 0.5,
+      "clouds": 0.35,
+      "wind": 60,
+      "seed": 9,
+      "minute": 1100
     }
   },
   "regions": [
