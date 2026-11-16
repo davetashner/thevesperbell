@@ -76,8 +76,17 @@ function changes(w: World<never>, type = DispositionChanged): DispositionChange[
   return seen;
 }
 
-function hit(s: Setup, instigator: EntityId | null, target: EntityId): void {
-  s.w.events.emit(DamageApplied, { target, packet: { instigator } } as unknown as DamageResult);
+function hit(
+  s: Setup,
+  instigator: EntityId | null,
+  target: EntityId,
+  tags: readonly string[] = [],
+): void {
+  s.w.events.emit(DamageApplied, {
+    target,
+    tags,
+    packet: { instigator },
+  } as unknown as DamageResult);
   s.w.step();
 }
 
@@ -119,6 +128,16 @@ describe('disposition toward the player', () => {
     hit(s, s.player, e);
     expect(s.d.get(e)).toBe(-40);
     expect(s.d.stance(e)).toBe('wary');
+  });
+
+  it('a blow in a first-blood duel is no attack (mw-e39.35)', () => {
+    const s = setup();
+    s.d.listen();
+    const e = creature(s);
+    hit(s, s.player, e, ['duel']);
+    expect(s.d.get(e)).toBe(30);
+    hit(s, s.player, e, ['critical']);
+    expect(s.d.get(e)).toBe(-10);
   });
 
   it('AC-1: only the player hitting a creature counts as an attack', () => {

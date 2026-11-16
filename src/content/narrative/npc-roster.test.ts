@@ -15,12 +15,13 @@ describe('npc roster (mw-e39.28)', () => {
     expect(missing).toEqual([]);
   });
 
-  it('AC-2: every npc-* creature is an npc that makes no attacks', () => {
+  it('AC-2: every npc-* creature is an npc that makes no attacks, except a duellist (mw-e39.35)', () => {
     const npcs = content.all('creature').filter((c) => c.id.startsWith('npc-'));
     expect(npcs.length).toBeGreaterThanOrEqual(glossary.characters.length);
     for (const c of npcs) {
       expect(c.tags, c.id).toContain('npc');
-      expect(c.attacks, c.id).toEqual([]);
+      if (c.tags.includes('duellist')) expect(c.attacks, c.id).not.toEqual([]);
+      else expect(c.attacks, c.id).toEqual([]);
     }
   });
 });

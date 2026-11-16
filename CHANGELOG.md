@@ -14,6 +14,7 @@ check enforces this).
 ### Added
 
 - The Gilded Tern has a hull ladder off the pool (swim, or walk the frozen pool, to it) and a walkable hold under the deck hatch, reached by a ladder, where the shanghai wake will place you. [mw-e40.29]
+- Tereza Maelo's first-blood duel runs: accept her challenge and she draws a sabre, the first hit either side lands ends the bout with nobody hurt (and no grudge), and her dialogue then records who won; a win unlocks her debt-of-honour vouch for the Gilded Tern. Her arms stall also opens from her dialogue, selling blades, bucklers, a kite shield and a brigandine, with a finer tier under the counter once you have beaten her (mw-e40.31).
 - You can board the Gilded Tern: Captain Hesketh hands over a brass gangway token, on Tereza's word or when you sign on as crew, and it opens the gangway gate to the deck.
 - Characters now show their painted face in the dialogue box (Mags, Nell, Cray, Tereza, Quell, Oona, Old Reed, Hesketh and Ottilie), and Ottilie's portrait fills the shop window's frame; narrators, the player and anyone without art keep the silhouette.
 - Wendmouth Harbour is dressed: the Gilded Tern (hull, masts and rigging, figurehead, springalds, pine stern cabin), barrels, chests, the hoist crate and deck fittings on the docks, painted stone quays and breakwater, harbour water, and tin (loud) and tar (quiet) net-loft roofs.
