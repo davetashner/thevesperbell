@@ -100,6 +100,7 @@ import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
 import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
 import { ContestController } from '@game/contest/controller';
+import { startShanghaiUi } from '@game/shanghai/shanghai';
 import { contestsIn, installContests } from '@game/contest/install';
 import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
@@ -407,6 +408,7 @@ import {
   sceneAuthoredEntities,
   sceneDormantEntities,
   SceneSpawnComponent,
+  teleportCommand,
   SpilledComponent,
   testPropSpawners,
   tuneCommand,
@@ -2376,6 +2378,22 @@ function startRenderer(
         });
         afterStep.push(() => {
           duelUi.afterStep();
+        });
+        // The shanghai loop (mw-e40.30): losing the Drowned Gull crew table wakes the player in the
+        // Gilded Tern's hold, and Hesketh waits on deck while he is on the player's articles.
+        const shanghaiUi = startShanghaiUi({
+          ui,
+          world,
+          player: player.entity,
+          teleport: (entity, to) => {
+            commands.push(teleportCommand(entity, to));
+          },
+          toast: (text) => {
+            shop.toast(text);
+          },
+        });
+        afterStep.push(() => {
+          shanghaiUi.afterStep();
         });
         // The contest screens (mw-opf6): the entry window, the play panel and the play keys (F plays,
         // H cheats at dice, N walks away). #app[data-contest] is the e2e's readout.

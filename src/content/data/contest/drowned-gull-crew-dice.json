@@ -1,0 +1,44 @@
+{
+  "$schema": "../contest.schema.json",
+  "id": "drowned-gull-crew-dice",
+  "name": "The Tern crew's table",
+  "notes": "mw-e40.30 (bible 4.5, 5.14). The high-stakes game at the Drowned Gull: dice against the Gilded Tern's bosun for a purse, first to 5. Win and the purse is yours; lose, and the cup you were handed was drugged and a shilling bought your name on Hesketh's articles (hesketh.shanghaied; src/game/shanghai wakes you in the Tern's hold, and hesketh-gilded-tern plays the scene). The ordinary Gull dice (drowned-gull-dice) never does this. PLACEHOLDER TUNING for the owner: fee, the bosun's pace (a round every 100 ticks, spread 1), the purse. The loaded die is the cheat; Nell watches the table.",
+  "entry": {
+    "fee": 3
+  },
+  "participants": [
+    {
+      "id": "tern-bosun",
+      "name": "The Tern's bosun",
+      "pace": { "everyTicks": 100, "points": 1, "spread": 1 }
+    }
+  ],
+  "scoring": [{ "event": "dice.round-won", "where": {}, "points": 1 }],
+  "finish": { "firstTo": 5 },
+  "win": {
+    "placement": 1,
+    "effects": [{ "kind": "gold", "delta": 20 }]
+  },
+  "lose": {
+    "effects": [
+      { "kind": "setFact", "fact": "hesketh.shanghaied", "value": true },
+      { "kind": "disposition", "npc": "npc-nell", "delta": -1 }
+    ]
+  },
+  "cheats": [
+    {
+      "id": "loaded-die",
+      "event": "dice.loaded",
+      "where": {},
+      "observedBy": ["npc-nell"],
+      "bonusPoints": 1,
+      "detected": {
+        "disqualify": true,
+        "effects": [{ "kind": "disposition", "npc": "npc-nell", "delta": -2 }]
+      },
+      "undetected": {
+        "effects": [{ "kind": "disposition", "npc": "npc-nell", "delta": -1 }]
+      }
+    }
+  ]
+}
