@@ -205,6 +205,74 @@
     },
     {
       "piece": "platform",
+      "at": [29.75, -6, 118],
+      "yaw": 90,
+      "purpose": "climbable",
+      "properties": { "climbable": "ladder" },
+      "scale": [0.5, 8, 0.25]
+    },
+    {
+      "piece": "platform",
+      "at": [35, -1.5, 129.25],
+      "purpose": "climbable",
+      "properties": { "climbable": "ladder" },
+      "scale": [0.5, 3.5, 0.25]
+    },
+    { "piece": "crate", "at": [38.5, -1.5, 118.5], "yaw": 0 },
+    { "piece": "crate", "at": [38.5, -1.5, 120], "yaw": 0 },
+    { "piece": "crate", "at": [38.5, -0.5, 119.25], "yaw": 90 },
+    { "piece": "crate", "at": [32, -1.5, 136], "yaw": 0 },
+    {
+      "piece": "platform",
+      "at": [31, -1.5, 126],
+      "scale": [0.1, 2.75, 20],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [39, -1.5, 126],
+      "scale": [0.1, 2.75, 20],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [35, -1.5, 107],
+      "scale": [4, 2.75, 0.1],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [35, -1.5, 145],
+      "scale": [4, 2.75, 0.1],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [35, -1.75, 126],
+      "scale": [4, 0.25, 20],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [35, 1.25, 118],
+      "scale": [4, 0.25, 11],
+      "purpose": "interactive"
+    },
+    { "piece": "platform", "at": [35, 1.25, 138], "scale": [4, 0.25, 7], "purpose": "interactive" },
+    {
+      "piece": "platform",
+      "at": [32.5, 1.25, 130],
+      "scale": [1.5, 0.25, 1],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [37.5, 1.25, 130],
+      "scale": [1.5, 0.25, 1],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
       "at": [22.0, 0.0, 94.0],
       "scale": [2.0, 1.5, 2.0],
       "purpose": "blocking"
@@ -1394,18 +1462,27 @@
       "piece": "floor",
       "at": [35.0, 2.0, 105.0]
     },
+    { "piece": "platform", "at": [35, -6, 126], "purpose": "blocking", "scale": [5, 4.5, 20] },
     {
       "piece": "platform",
-      "at": [35.0, -6.0, 126.0],
-      "scale": [5, 8, 20],
-      "purpose": "blocking"
+      "at": [30.5, -1.5, 126],
+      "purpose": "blocking",
+      "scale": [0.5, 3.5, 20]
     },
     {
-      "piece": "wall",
-      "at": [31.0, 2.0, 126.0],
-      "yaw": 90,
-      "scale": [20.0, 0.4, 1]
+      "piece": "platform",
+      "at": [39.5, -1.5, 126],
+      "purpose": "blocking",
+      "scale": [0.5, 3.5, 20]
     },
+    { "piece": "platform", "at": [35, -1.5, 106.5], "purpose": "blocking", "scale": [4, 3.5, 0.5] },
+    { "piece": "platform", "at": [35, -1.5, 145.5], "purpose": "blocking", "scale": [4, 3.5, 0.5] },
+    { "piece": "platform", "at": [35, 1.5, 118], "purpose": "blocking", "scale": [4, 0.5, 11] },
+    { "piece": "platform", "at": [35, 1.5, 138], "purpose": "blocking", "scale": [4, 0.5, 7] },
+    { "piece": "platform", "at": [32.5, 1.5, 130], "purpose": "blocking", "scale": [1.5, 0.5, 1] },
+    { "piece": "platform", "at": [37.5, 1.5, 130], "purpose": "blocking", "scale": [1.5, 0.5, 1] },
+    { "piece": "wall", "at": [31, 2, 111.5], "yaw": 90, "scale": [5.5, 0.4, 1] },
+    { "piece": "wall", "at": [31, 2, 132.5], "yaw": 90, "scale": [13.5, 0.4, 1] },
     {
       "piece": "wall",
       "at": [39.0, 2.0, 126.0],
@@ -1932,7 +2009,7 @@
     },
     {
       "id": "pool-ice-walk",
-      "at": [30.0, -2.5, 118.0],
+      "at": [28.5, -2.5, 118.0],
       "tags": ["marker", "sorcerer-route", "gilded-tern-route"]
     },
     {
@@ -2291,6 +2368,50 @@
       "tags": ["marker", "ship", "thief-route"]
     },
     {
+      "id": "tern-hull-ladder-foot",
+      "at": [28.5, -6, 118],
+      "yaw": 270,
+      "tags": ["marker", "ship", "gilded-tern-route", "swim-route", "sorcerer-route"]
+    },
+    { "id": "tern-hull-ladder-top", "at": [31.5, 2, 118], "yaw": 90, "tags": ["marker", "ship"] },
+    {
+      "id": "tern-hold-wake",
+      "at": [33, -1.5, 122],
+      "yaw": 90,
+      "tags": ["entry", "ship", "hold", "wake"]
+    },
+    {
+      "id": "tern-hold-ladder-foot",
+      "at": [35, -1.5, 130.5],
+      "yaw": 180,
+      "tags": ["marker", "ship", "hold"]
+    },
+    { "id": "tern-deck-hatch-edge", "at": [35, 2, 127.5], "yaw": 0, "tags": ["marker", "ship"] },
+    {
+      "id": "tern-hold-keg-a",
+      "at": [31.5, -1.5, 109],
+      "prop": "keg",
+      "tags": ["dock-prop", "ship", "hold"]
+    },
+    {
+      "id": "tern-hold-keg-b",
+      "at": [32.5, -1.5, 109],
+      "prop": "keg",
+      "tags": ["dock-prop", "ship", "hold"]
+    },
+    {
+      "id": "tern-hold-barrel",
+      "at": [38.25, -1.5, 112],
+      "prop": "barrel-weathered",
+      "tags": ["dock-prop", "ship", "hold"]
+    },
+    {
+      "id": "tern-hold-cask",
+      "at": [37.5, -1.5, 140],
+      "prop": "cask-cradle",
+      "tags": ["dock-prop", "ship", "hold"]
+    },
+    {
       "id": "tern-hold-hatch",
       "at": [35.0, 2.0, 130.0],
       "tags": ["marker", "ship"]
@@ -2440,7 +2561,7 @@
     },
     {
       "id": "tern-hold-grating",
-      "at": [35.0, 2.0, 130.0],
+      "at": [37.5, 2.0, 130.5],
       "prop": "deck-grating",
       "tags": ["dock-prop", "ship"]
     },
@@ -2856,7 +2977,7 @@
       "fit": "box",
       "hides": {
         "min": [29.5, -6.5, 105.5],
-        "max": [40.5, 10, 137.5]
+        "max": [40.5, 3, 146]
       }
     },
     {
