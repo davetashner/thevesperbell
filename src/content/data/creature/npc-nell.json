@@ -41,7 +41,8 @@
     "death": "sfx-human-death"
   },
   "presentation": {
-    "mesh": "placeholder-capsule",
+    "mesh": "npc-nell",
+    "portrait": "portrait-npc-nell-gull-keeper",
     "sfx": "placeholder"
   }
 }

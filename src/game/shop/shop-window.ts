@@ -58,6 +58,8 @@ import {
   type UiRoot,
 } from '@ui/index';
 import { itemLabel } from '../classes';
+import { logicEmitted } from '../logic/host';
+import { npcPortrait } from '../portraits';
 import { ICON_KIND, itemName } from '../items/inventory-screen';
 
 /** The content the shop reads. */
@@ -67,6 +69,14 @@ export type ShopContent = Pick<GameContent, 'all'>;
 export const MERCHANT_TAG = 'merchant:';
 /** Prefix of the dev tag that tops the player up to this many crowns on first opening. */
 export const DEV_CROWNS_TAG = 'dev-crowns:';
+
+/**
+ * Dialogue `emit` events that ask for a shop (the effect carries no merchant id), event to merchant
+ * id: the counter is behind a conversation, so the window opens once the conversation has closed.
+ */
+export const SHOP_REQUESTS: Readonly<Record<string, string>> = Object.freeze({
+  'tereza.shop-requested': 'tereza-arms-stall',
+});
 
 /** What the shop reads of a merchant entry. */
 interface MerchantEntry {
@@ -223,10 +233,12 @@ export class ShopViews {
     const merchant = this.#merchants.get(merchantId);
     if (merchant === undefined) throw new RangeError(`merchant "${merchantId}" is not defined`);
     const state = this.#shops.stateOf(world, merchantId);
+    const portrait = npcPortrait(this.#content.all('creature'), merchant.npcId);
     return {
       merchant: {
         name: merchant.displayName ?? itemLabel(merchant.npcId),
         greeting: greetingFor(merchant),
+        ...(portrait !== undefined && { portrait }),
       },
       crowns: crownsOf(world, player),
       merchantCrowns: state.gold,
@@ -464,6 +476,9 @@ export class ShopController {
   readonly #off: () => void;
   readonly #granted = new Set<string>();
   #pending: { merchantId: string; devCrowns: number | undefined } | undefined;
+  /** A shop a dialogue asked for, opened when no screen is. */
+  #requested: string | undefined;
+  readonly #offRequests: () => void;
   #session: { readonly merchantId: string; readonly window: ShopWindow } | undefined;
   #shown = '';
 
@@ -481,6 +496,10 @@ export class ShopController {
       const devCrowns =
         crowns === undefined ? undefined : Number(crowns.slice(DEV_CROWNS_TAG.length));
       this.#pending = { merchantId, devCrowns: Number.isFinite(devCrowns) ? devCrowns : undefined };
+    });
+    this.#offRequests = world.events.on(logicEmitted, ({ event }) => {
+      const merchantId = SHOP_REQUESTS[event];
+      if (merchantId !== undefined) this.#requested = merchantId;
     });
   }
 
@@ -526,6 +545,11 @@ export class ShopController {
     const pending = this.#pending;
     this.#pending = undefined;
     if (pending !== undefined) this.open(pending.merchantId, pending.devCrowns);
+    const requested = this.#requested;
+    if (requested !== undefined && this.#options.ui.top === undefined) {
+      this.#requested = undefined;
+      this.open(requested);
+    }
     this.#refresh();
   }
 
@@ -535,6 +559,7 @@ export class ShopController {
 
   dispose(): void {
     this.#off();
+    this.#offRequests();
     this.close();
   }
 

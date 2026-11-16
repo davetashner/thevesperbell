@@ -13,6 +13,7 @@ const region = (id: string, surface: string, priority = 0, extra: Partial<SceneS
   id,
   surface,
   priority,
+  texture: undefined,
   min: { x: 2, y: -0.5, z: 2 },
   max: { x: 12, y: 1, z: 6 },
   ...extra,
@@ -47,6 +48,27 @@ describe('surface patches (mw-1jm)', () => {
     // A tie goes to the first listed, which is drawn last.
     const tie = surfacePatches([floor], [region('a', 'wood'), region('b', 'mud')]);
     expect(tie.map((p) => p.region)).toEqual(['b', 'a']);
+  });
+
+  it('a painted region also lays its texture on the top of a blocking mass (a ship hull); a plain one does not', () => {
+    const hull = { ...floor, purpose: 'blocking' as const };
+    const plain = region('deck', 'wood');
+    const painted = region('deck', 'wood', 0, { texture: 'tex-deck-planks-caulked-01' });
+    expect(surfacePatches([hull], [plain])).toEqual([]);
+    expect(surfacePatches([hull], [painted])).toEqual([
+      {
+        region: 'deck',
+        surface: 'wood',
+        texture: 'tex-deck-planks-caulked-01',
+        minX: 2,
+        maxX: 10,
+        minZ: 2,
+        maxZ: 6,
+        y: PATCH_LIFT,
+      },
+    ]);
+    // Climbable faces and other purposes are never painted as floors.
+    expect(surfacePatches([{ ...floor, purpose: 'climbable' as const }], [painted])).toEqual([]);
   });
 
   it('every surface has a colour of its own, none the plain floor’s', () => {

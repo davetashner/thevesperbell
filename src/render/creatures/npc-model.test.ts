@@ -36,7 +36,7 @@ function glbJson(path: string): GlbJson {
 describe('NPC models', () => {
   it('AC-1: every NPC mesh id that names a model has a file of at most 6k triangles and one texture', () => {
     const meshes = npcMeshes().filter((mesh) => mesh !== 'placeholder-capsule');
-    expect(meshes.length).toBe(10);
+    expect(meshes.length).toBe(18);
     for (const mesh of meshes) {
       const url = npcModelUrl(mesh);
       expect(url, mesh).toBeDefined();
@@ -52,7 +52,7 @@ describe('NPC models', () => {
 
   it('AC-1: the watchmen share one model', () => {
     expect(NPC_MODEL_URLS['npc-watchman']).toBeDefined();
-    expect(Object.values(NPC_MODEL_URLS).length).toBe(9);
+    expect(Object.values(NPC_MODEL_URLS).length).toBe(17);
   });
 
   it('AC-1: Hollis, Juniper and Oswin each have their own model, and no modelled NPC is a capsule', () => {
@@ -62,6 +62,22 @@ describe('NPC models', () => {
     // The glossary roster (mw-e39.28) adds greybox NPCs that stay capsules until their models land.
     const modelled = [...Object.keys(NPC_MODEL_URLS), 'npc-watchman-day', 'npc-watchman-night'];
     expect(npcMeshes(modelled)).not.toContain('placeholder-capsule');
+  });
+
+  it('the named harbour cast each wear their own model (Jasper Quell is npc-quell)', () => {
+    for (const [id, file] of [
+      ['npc-mags', 'mags'],
+      ['npc-nell', 'nell'],
+      ['npc-cray', 'cray'],
+      ['npc-tereza', 'tereza'],
+      ['npc-quell', 'jasper'],
+      ['npc-oona', 'oona'],
+      ['npc-reed', 'reed'],
+      ['npc-hesketh', 'hesketh'],
+    ] as const) {
+      expect(npcModelUrl(id), id).toBe(`/assets/model/model-npc-${file}-01.glb`);
+      expect(npcMeshes([id]), id).toEqual([id]);
+    }
   });
 
   it('AC-2: a mesh id with no model, or no mesh id, stays a capsule', () => {

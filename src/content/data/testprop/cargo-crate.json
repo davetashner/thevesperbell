@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "cargo-crate",
+  "name": "Netted cargo crate",
+  "mass": 60,
+  "flammable": true,
+  "tags": ["harbour", "hanging"],
+  "body": {
+    "size": [0.8, 0.8, 0.8],
+    "material": "wood"
+  }
+}

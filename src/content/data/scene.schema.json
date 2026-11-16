@@ -2957,6 +2957,48 @@
             "image"
           ],
           "additionalProperties": false
+        },
+        "dome": {
+          "description": "Procedural sky dome (render only): a gradient from the sky colour, the sun and moon on the game clock, stars at night and drifting clouds.",
+          "type": "object",
+          "properties": {
+            "stars": {
+              "default": 0.6,
+              "description": "How many stars show at full night, 0–1.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "clouds": {
+              "default": 0.35,
+              "description": "Cloud cover, 0 clear to 1 overcast.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "wind": {
+              "default": 60,
+              "description": "Bearing the clouds drift towards, degrees clockwise from north (+z).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 360
+            },
+            "seed": {
+              "default": 1,
+              "description": "Fixes the star field and cloud shapes.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "minute": {
+              "default": 720,
+              "description": "Minute of the day the dome shows in a scene without a day and night look (light.timeOfDay); scenes with one follow the game clock.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1439
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -3101,6 +3143,17 @@
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
+          },
+          "texture": {
+            "description": "Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01.",
+            "type": "string",
+            "enum": [
+              "tex-planks-salt-bleached-01",
+              "tex-deck-planks-caulked-01",
+              "tex-stone-breakwater-01",
+              "tex-roof-tin-harbour-01",
+              "tex-roof-tar-harbour-01"
+            ]
           }
         },
         "required": [
@@ -3108,6 +3161,220 @@
           "min",
           "max",
           "surface"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "paints": {
+      "default": [],
+      "description": "Boxes whose grey-box walls are drawn with a tiling texture (render only).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the paint box, unique in the scene, e.g. tern-cabin."
+          },
+          "min": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Lower corner, grid cells."
+          },
+          "max": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Upper corner, grid cells; above min on every axis."
+          },
+          "texture": {
+            "type": "string",
+            "enum": [
+              "tex-bulkhead-pine-01",
+              "tex-stone-breakwater-01",
+              "tex-planks-salt-bleached-01"
+            ],
+            "description": "The tileable, e.g. tex-bulkhead-pine-01."
+          }
+        },
+        "required": [
+          "id",
+          "min",
+          "max",
+          "texture"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "dressings": {
+      "default": [],
+      "description": "Approved 3D models drawn over the grey box (render only), e.g. a ship hull.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Name of the dressing, unique in the scene, e.g. tern-hull."
+          },
+          "model": {
+            "type": "string",
+            "pattern": "^model-[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01."
+          },
+          "at": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Middle of the base of the fitted model, grid cells."
+          },
+          "yaw": {
+            "default": 0,
+            "description": "Rotation about +y in degrees: 0, 90, 180 or 270.",
+            "type": "number",
+            "enum": [
+              0,
+              90,
+              180,
+              270
+            ]
+          },
+          "turn": {
+            "default": 0,
+            "description": "Turn of the model in its own frame before the yaw (degrees), to line up its axes.",
+            "type": "number",
+            "enum": [
+              0,
+              90,
+              180,
+              270
+            ]
+          },
+          "size": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Box (x, y, z metres, after the turns) the model is fitted into."
+          },
+          "fit": {
+            "default": "box",
+            "description": "box: stretched to fill size on every axis; height: scaled evenly to size y.",
+            "type": "string",
+            "enum": [
+              "box",
+              "height"
+            ]
+          },
+          "fadesNearCamera": {
+            "default": false,
+            "description": "See-through while the camera is inside its bounds (rigging the camera can back into); not for a hull the camera stands in.",
+            "type": "boolean"
+          },
+          "hides": {
+            "description": "Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn.",
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "max": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "min",
+              "max"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "model",
+          "at",
+          "size"
         ],
         "additionalProperties": false
       }

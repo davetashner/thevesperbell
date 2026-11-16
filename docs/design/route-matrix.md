@@ -221,9 +221,12 @@ Sails when Act III begins; the locked berth of Mr. S—'s agent. Node `gilded-te
 | --- | --- | --- | --- | --- |
 | knight | `technique.shoulder-barge` | Brawl up the gangway and burst the berth door. | proposal | proposal |
 | archer | `arrow.severing-shot` | Cut the cargo net as the crate is hoisted so it drops into the harbour. | §4.3 archer | canon |
-| sorcerer | needs `spell.frostglass` (mw-e08) | Freeze the harbour pool and walk to the Tern. | §4.3 sorcerer | canon |
+| sorcerer | needs `spell.frostglass` (mw-e08) | Freeze the harbour pool, walk the ice to the hull ladder (`pool-ice-walk`) and climb to the deck. | §4.3 sorcerer | canon |
 | thief | `verb.climb.rough`, `tool.lockpick` | Climb the rigging and pick the passenger berth lock. | §3.6; §4.3 thief | canon |
 | any | none (social) | Bribe a lighter-man to row you out; stowaway among the cargo. | proposal | proposal |
+| any | none (item) | Show Captain Hesketh's crew token at the gangway gate and walk up the gangway. | mw-e40.28 | canon |
+| any | none (social) | Lose the high-stakes crew table at the Drowned Gull and be shanghaied: you wake in the Tern's hold, climb the ladder and settle your articles with Captain Hesketh, who hands over the gangway token. | mw-e40.30; §4.5 | canon |
+| any | none (fallback) | Swim out from a quay ladder and climb the hull ladder (`tern-hull-ladder-foot`): slow, cold and seen from the wharf. | mw-e40.29 | proposal |
 
 ### `undertow`: The Undertow
 

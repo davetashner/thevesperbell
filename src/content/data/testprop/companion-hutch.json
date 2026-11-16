@@ -1,0 +1,8 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "companion-hutch",
+  "name": "Companionway hutch",
+  "mass": 200,
+  "flammable": true,
+  "tags": ["harbour", "ship", "dressing"]
+}

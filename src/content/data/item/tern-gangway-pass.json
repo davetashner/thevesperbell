@@ -1,0 +1,16 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "tern-gangway-pass",
+  "category": "key",
+  "name": "Hesketh's gangway token",
+  "description": "A brass tally stamped with a tern in flight, worn smooth by a hundred thumbs. Show it to the crew at the gangway and the rope comes down.",
+  "notes": "Opens the tern-gangway gate (mw-e40.28). Captain Hesketh hands it over on either route aboard: Tereza's vouch or the crew deal (hesketh-gilded-tern). Reusable, so it stays on the keyring. Placeholder text until e39-item-creature-text.",
+  "icon": "icon-item-iron-key-01",
+  "value": 0,
+  "worldProperties": {
+    "material": "iron"
+  },
+  "key": {
+    "opens": ["tern-gangway"]
+  }
+}

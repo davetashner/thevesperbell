@@ -380,8 +380,18 @@
       "id": "brand-forge-counter",
       "at": [4.25, 0.0, 16.0],
       "tags": ["counter", "shop", "merchant:brand-forge", "dev-crowns:400"],
-      "interact": { "affordances": [{ "verb": "talk", "label": "Trade" }], "radius": 1.5 },
-      "presence": { "hours": [6, 20] }
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Trade"
+          }
+        ],
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [6, 20]
+      }
     },
     {
       "id": "npc-oswin",
@@ -389,8 +399,12 @@
       "tags": ["shopkeeper", "schedule:oswin"],
       "yaw": 270,
       "creature": "npc-oswin",
-      "leash": { "radius": 2 },
-      "presence": { "hours": [6, 20] }
+      "leash": {
+        "radius": 2
+      },
+      "presence": {
+        "hours": [6, 20]
+      }
     },
     {
       "id": "sign-brand-forge",
@@ -411,8 +425,18 @@
       "id": "fenn-fletchery-simples-counter",
       "at": [4.25, 0.0, 24.0],
       "tags": ["counter", "shop", "merchant:fenn-fletchery-simples", "dev-crowns:400"],
-      "interact": { "affordances": [{ "verb": "talk", "label": "Trade" }], "radius": 1.5 },
-      "presence": { "hours": [6, 19] }
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Trade"
+          }
+        ],
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [6, 19]
+      }
     },
     {
       "id": "npc-juniper",
@@ -420,8 +444,12 @@
       "tags": ["shopkeeper", "schedule:juniper"],
       "yaw": 270,
       "creature": "npc-juniper",
-      "leash": { "radius": 2 },
-      "presence": { "hours": [6, 19] }
+      "leash": {
+        "radius": 2
+      },
+      "presence": {
+        "hours": [6, 19]
+      }
     },
     {
       "id": "sign-fenn-fletchery-simples",
@@ -442,8 +470,18 @@
       "id": "pell-bakery-counter",
       "at": [4.25, 0.0, 32.0],
       "tags": ["counter", "shop", "merchant:pell-bakery", "dev-crowns:400"],
-      "interact": { "affordances": [{ "verb": "talk", "label": "Trade" }], "radius": 1.5 },
-      "presence": { "hours": [5, 19] }
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Trade"
+          }
+        ],
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [5, 19]
+      }
     },
     {
       "id": "npc-hollis",
@@ -451,8 +489,12 @@
       "tags": ["shopkeeper", "schedule:hollis"],
       "yaw": 270,
       "creature": "npc-hollis",
-      "leash": { "radius": 2 },
-      "presence": { "hours": [5, 19] }
+      "leash": {
+        "radius": 2
+      },
+      "presence": {
+        "hours": [5, 19]
+      }
     },
     {
       "id": "npc-tansy",
@@ -460,7 +502,9 @@
       "tags": ["child"],
       "yaw": 270,
       "creature": "npc-tansy",
-      "spawnIf": { "fact": "tansy.saved" },
+      "spawnIf": {
+        "fact": "tansy.saved"
+      },
       "leash": {
         "radius": 2
       }
@@ -821,8 +865,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-1", "activity:errands"],
       "yaw": 0,
       "creature": "npc-townsfolk-carter",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [8, 11] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [8, 11]
+      }
     },
     {
       "id": "townsfolk-2-morning",
@@ -830,8 +878,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-2", "activity:errands"],
       "yaw": 0,
       "creature": "npc-townsfolk-weaver",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [8, 11] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [8, 11]
+      }
     },
     {
       "id": "townsfolk-3-morning",
@@ -839,8 +891,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-3", "activity:errands"],
       "yaw": 0,
       "creature": "npc-townsfolk-miner",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [8, 11] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [8, 11]
+      }
     },
     {
       "id": "townsfolk-4-morning",
@@ -848,8 +904,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-4", "activity:errands"],
       "yaw": 0,
       "creature": "npc-townsfolk-neighbour",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [8, 11] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [8, 11]
+      }
     },
     {
       "id": "townsfolk-8-evening",
@@ -857,8 +917,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-8", "activity:stroll"],
       "yaw": 0,
       "creature": "npc-townsfolk-neighbour",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [17, 21] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [17, 21]
+      }
     },
     {
       "id": "townsfolk-9-evening",
@@ -866,8 +930,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-9", "activity:stroll"],
       "yaw": 0,
       "creature": "npc-townsfolk-carter",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [17, 21] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [17, 21]
+      }
     },
     {
       "id": "townsfolk-10-evening",
@@ -875,8 +943,12 @@
       "tags": ["townsfolk", "schedule:townsfolk-10", "activity:stroll"],
       "yaw": 0,
       "creature": "npc-townsfolk-weaver",
-      "leash": { "radius": 1.5 },
-      "presence": { "hours": [17, 21] }
+      "leash": {
+        "radius": 1.5
+      },
+      "presence": {
+        "hours": [17, 21]
+      }
     }
   ],
   "light": {
@@ -937,7 +1009,13 @@
     }
   },
   "environment": {
-    "sky": "#1E1B2E"
+    "sky": "#1E1B2E",
+    "dome": {
+      "stars": 0.7,
+      "clouds": 0.3,
+      "wind": 60,
+      "seed": 3
+    }
   },
   "signals": [
     {

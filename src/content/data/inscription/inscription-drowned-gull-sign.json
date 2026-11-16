@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-drowned-gull-sign",
+  "title": "The Drowned Gull",
+  "notes": "mw-e40.32: a place sign in Wendmouth Harbour (bible 3.6); in-world voice, no modern wording.",
+  "locations": ["place-drowned-gull"],
+  "pages": [
+    {
+      "text": "THE DROWNED GULL\nNell Gannet, keeper.\nAle, dice and the arm-wrestling table. Questions after the second jug.\nMind the cellar stair; the tide does not."
+    }
+  ]
+}

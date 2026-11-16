@@ -1,0 +1,8 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "pin-rail",
+  "name": "Pin rail with coils",
+  "mass": 10,
+  "flammable": true,
+  "tags": ["harbour", "ship", "dressing"]
+}

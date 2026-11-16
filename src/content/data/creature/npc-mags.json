@@ -38,7 +38,8 @@
     "death": "sfx-human-death"
   },
   "presentation": {
-    "mesh": "placeholder-capsule",
+    "mesh": "npc-mags",
+    "portrait": "portrait-npc-mags-bargewoman",
     "sfx": "placeholder"
   }
 }

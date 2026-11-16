@@ -38,7 +38,8 @@
     "death": "sfx-human-death"
   },
   "presentation": {
-    "mesh": "placeholder-capsule",
+    "mesh": "npc-reed",
+    "portrait": "portrait-npc-reed-lock-keeper",
     "sfx": "placeholder"
   }
 }

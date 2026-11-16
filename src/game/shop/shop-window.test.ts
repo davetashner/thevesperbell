@@ -35,8 +35,10 @@ import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { UiRoot } from '@ui/index';
 import { find, rectFromData } from '@ui/testing/layout';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { logicEmitted } from '../logic/host';
 import {
   breakdownLines,
+  SHOP_REQUESTS,
   readingOf,
   failureText,
   greetingFor,
@@ -229,6 +231,30 @@ describe('mw-ju8.16: the merchant name in the header', () => {
   it('AC-1: a merchant with a displayName shows it in the header', () => {
     open(merchantWith({ displayName: 'Ottilie Marsh' }));
     expect(find('.vb-shop-name').textContent).toBe('Ottilie Marsh');
+  });
+
+  it('mw-e37.433: a merchant whose NPC creature has a portrait shows it; one without keeps the initial', () => {
+    const withArt = {
+      all: (type: string) =>
+        type === 'item'
+          ? [book]
+          : type === 'merchant'
+            ? [merchantWith({ displayName: 'Ottilie Marsh' })]
+            : [
+                {
+                  id: 'npc-named-keeper',
+                  presentation: { portrait: 'portrait-npc-ottilie-marsh-01' },
+                },
+              ],
+    } as unknown as GameContent;
+    const t = setup(withArt);
+    t.talk(t.counter(['merchant:named']));
+    const frame = find('[data-testid="shop-portrait"]');
+    expect(frame.dataset['portrait']).toBe('portrait-npc-ottilie-marsh-01');
+    expect(frame.style.backgroundImage).toContain(
+      '/assets/portrait/portrait-npc-ottilie-marsh-01.webp',
+    );
+    expect(frame.textContent).toBe('');
   });
 
   it('AC-1: without a displayName the header falls back to the readable NPC id', () => {
@@ -1031,5 +1057,51 @@ describe('the shop UI toast (mw-opf6)', () => {
     const t = setup();
     t.shop.toast('A word from the contest.');
     expect(document.querySelector('.vb-toast')?.textContent).toBe('A word from the contest.');
+  });
+});
+
+describe('a dialogue asks for a shop (mw-e40.31)', () => {
+  const ask = (t: ReturnType<typeof setup>, event = 'tereza.shop-requested'): void => {
+    t.sim.events.emit(logicEmitted, { event, data: {} });
+    t.world.step([]);
+    t.shop.afterStep();
+  };
+
+  it('AC-1: the request opens the merchant once, after the step that carried it', () => {
+    const t = setup();
+    expect(SHOP_REQUESTS['tereza.shop-requested']).toBe('tereza-arms-stall');
+    ask(t);
+    expect(t.shop.controller.isOpen).toBe(true);
+    expect(t.published.at(-1)).toContain('tereza-arms-stall');
+    t.shop.controller.close();
+    t.shop.afterStep();
+    expect(t.shop.controller.isOpen).toBe(false);
+  });
+
+  it('AC-1: other events ask for nothing', () => {
+    const t = setup();
+    ask(t, 'rumor.told');
+    expect(t.shop.controller.isOpen).toBe(false);
+  });
+
+  it('AC-1: it waits while another screen is open, and opens when that closes', () => {
+    const t = setup();
+    const other = t.ui.push({
+      id: 'other',
+      label: 'Other',
+      content: document.createElement('div'),
+    });
+    ask(t);
+    expect(t.shop.controller.isOpen).toBe(false);
+    other.close();
+    t.shop.afterStep();
+    expect(t.shop.controller.isOpen).toBe(true);
+  });
+
+  it('AC-1: a disposed controller no longer hears requests', () => {
+    const t = setup();
+    t.shop.controller.dispose();
+    ask(t);
+    expect(t.shop.controller.isOpen).toBe(false);
   });
 });

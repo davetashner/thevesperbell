@@ -1,0 +1,12 @@
+{
+  "$schema": "../inscription.schema.json",
+  "id": "inscription-customs-house-lintel",
+  "title": "Customs House Board",
+  "notes": "mw-e40.32: a place sign in Wendmouth Harbour (bible 3.6); in-world voice, no modern wording.",
+  "locations": ["place-customs-house"],
+  "pages": [
+    {
+      "text": "CUSTOMS HOUSE OF WENDMOUTH\nBy warrant of the Lantern Court.\nAll cargo to be weighed, sealed and entered before landing.\nThe scale is honest. The clerks are another matter."
+    }
+  ]
+}

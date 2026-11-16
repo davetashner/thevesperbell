@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "barrel-oil",
+  "name": "Oil barrel",
+  "mass": 70,
+  "flammable": true,
+  "tags": ["harbour", "oil"],
+  "body": {
+    "size": [0.6, 0.85, 0.6],
+    "material": "wood"
+  }
+}

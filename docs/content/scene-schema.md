@@ -374,6 +374,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `environment.backdrop.radius` | number 20–190 | `150` | Distance from the camera, m; must stay inside the camera far plane. |
 | `environment.backdrop.centreY` | number | `25` | Height of the image centre above the camera plane, m. |
 | `environment.backdrop.follow` | number 0–1 | `1` | Share of the camera movement the card follows: 1 never parallaxes, 0 stays put. |
+| `environment.dome` | object | — | Procedural sky dome (render only): a gradient from the sky colour, the sun and moon on the game clock, stars at night and drifting clouds. |
+| `environment.dome.stars` | number 0–1 | `0.6` | How many stars show at full night, 0–1. |
+| `environment.dome.clouds` | number 0–1 | `0.35` | Cloud cover, 0 clear to 1 overcast. |
+| `environment.dome.wind` | number 0–360 | `60` | Bearing the clouds drift towards, degrees clockwise from north (+z). |
+| `environment.dome.seed` | integer ≥ 0 | `1` | Fixes the star field and cloud shapes. |
+| `environment.dome.minute` | integer 0–1439 | `720` | Minute of the day the dome shows in a scene without a day and night look (light.timeOfDay); scenes with one follow the game clock. |
 | `regions` | list of object | `[]` | Tagged boxes, e.g. a river (mw-ju8.1); data only until a system reads them. |
 | `regions[].id` | id | required | Name of the region, unique in the scene, e.g. river. |
 | `regions[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
@@ -385,6 +391,24 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `surfaces[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
 | `surfaces[].surface` | `"stone"` \| `"wood"` \| `"wood-hollow"` \| `"dirt"` \| `"grass"` \| `"gravel"` \| `"mud"` \| `"water-shallow"` \| `"snow-ice"` \| `"metal-grate"` \| `"straw"` \| `"carpet"` \| `"bone-litter"` \| `"leaves"` \| `"glass-shards"` | required | The footstep surface (audio bible §7.3) of everything inside, e.g. carpet. |
 | `surfaces[].priority` | integer | `0` | Where boxes overlap, the higher priority wins; the first listed wins a tie. |
+| `surfaces[].texture` | `"tex-planks-salt-bleached-01"` \| `"tex-deck-planks-caulked-01"` \| `"tex-stone-breakwater-01"` \| `"tex-roof-tin-harbour-01"` \| `"tex-roof-tar-harbour-01"` | — | Render only: a tileable painted over the floors inside (and the tops of blocking masses such as a ship hull), e.g. tex-deck-planks-caulked-01. |
+| `paints` | list of object | `[]` | Boxes whose grey-box walls are drawn with a tiling texture (render only). |
+| `paints[].id` | id | required | Name of the paint box, unique in the scene, e.g. tern-cabin. |
+| `paints[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
+| `paints[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
+| `paints[].texture` | `"tex-bulkhead-pine-01"` \| `"tex-stone-breakwater-01"` \| `"tex-planks-salt-bleached-01"` | required | The tileable, e.g. tex-bulkhead-pine-01. |
+| `dressings` | list of object | `[]` | Approved 3D models drawn over the grey box (render only), e.g. a ship hull. |
+| `dressings[].id` | id | required | Name of the dressing, unique in the scene, e.g. tern-hull. |
+| `dressings[].model` | string | required | Runtime model id: public/assets/model/<id>.glb, e.g. model-ship-gilded-tern-hull-01. |
+| `dressings[].at` | list of any (at least 3) | required | Middle of the base of the fitted model, grid cells. |
+| `dressings[].yaw` | `0` \| `90` \| `180` \| `270` | `0` | Rotation about +y in degrees: 0, 90, 180 or 270. |
+| `dressings[].turn` | `0` \| `90` \| `180` \| `270` | `0` | Turn of the model in its own frame before the yaw (degrees), to line up its axes. |
+| `dressings[].size` | list of any (at least 3) | required | Box (x, y, z metres, after the turns) the model is fitted into. |
+| `dressings[].fit` | `"box"` \| `"height"` | `"box"` | box: stretched to fill size on every axis; height: scaled evenly to size y. |
+| `dressings[].fadesNearCamera` | boolean | `false` | See-through while the camera is inside its bounds (rigging the camera can back into); not for a hull the camera stands in. |
+| `dressings[].hides` | object | — | Grid box: grey-box blocking and walkable parts whose centre lies inside are not drawn. |
+| `dressings[].hides.min` | list of any (at least 3) | required |  |
+| `dressings[].hides.max` | list of any (at least 3) | required |  |
 | `transitions` | list of object | — | Volumes that lead to another scene, and where the player arrives (mw-e01.11). |
 | `transitions[].id` | id | required | Name of the transition, unique in the scene, e.g. north-gate. |
 | `transitions[].min` | list of any (at least 3) | required | Lower corner of the volume, grid cells. |

@@ -94,10 +94,13 @@ import {
   DIALOGUE_VETO_ID,
   npcResolver,
 } from '@game/conversation/index';
+import { speakerNameResolver, speakerPortraitResolver } from '@game/portraits';
 import type { DialogueDef } from '@content/types/dialogue';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
+import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
 import { ContestController } from '@game/contest/controller';
+import { startShanghaiUi } from '@game/shanghai/shanghai';
 import { contestsIn, installContests } from '@game/contest/install';
 import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
@@ -327,7 +330,7 @@ import { installRepopulationOnRest, repopulateOnArrival } from '@game/creatures/
 import { AnimationDriver, simAnimReader } from '@game/animation/index';
 import { pickVariant, randomSalt, variantFromSearch } from '@render/creatures/variant';
 import { createHitVolumeOverlay } from '@render/debug/hit-volumes';
-import { applyEnvironment } from '@render/environment/index';
+import { applyEnvironment, type EnvironmentView } from '@render/environment/index';
 import { applyLook, lookAt, type TimeOfDayLook } from '@game/light/time-of-day';
 import { Color, type Object3D } from 'three';
 import { createGreyboxView } from '@render/greybox/index';
@@ -405,6 +408,7 @@ import {
   sceneAuthoredEntities,
   sceneDormantEntities,
   SceneSpawnComponent,
+  teleportCommand,
   SpilledComponent,
   testPropSpawners,
   tuneCommand,
@@ -420,6 +424,7 @@ import {
   npcBand,
   climbRefused,
   DamageApplied,
+  FirstBloodDuels,
   Died,
   hashWorld,
   type ActionFrame,
@@ -1314,6 +1319,7 @@ function startRenderer(
     let shownEnvironment: unknown;
     let shownMinute = -1;
     let sceneLook: TimeOfDayLook | undefined;
+    let environmentView: EnvironmentView | undefined;
     let sceneTints: ReadonlyMap<EntityId, Tint> = new Map();
     let publishedLights = '';
     let publishedLightProbe = '';
@@ -1331,6 +1337,8 @@ function startRenderer(
           const look = lookAt(sceneLook, minute);
           greybox.setEnvironment(applyLook(field.environment, look));
           if (look.sky !== undefined) view.scene.background = new Color(look.sky);
+          // The procedural sky dome (mw sky pipeline) follows the same clock and blended sky colour.
+          environmentView?.setSky(look.sky, minute);
         }
       }
       const chosen = selectLights(field.lights(), camera.position, lightRig.caps);
@@ -1750,7 +1758,10 @@ function startRenderer(
       if (transit !== undefined) applyCarriedWorld(world, transit.carry, carryOptions);
       // Sky, fog and the painted backdrop of outdoor scenes (mw-ju8.1). The unapproved backdrop images
       // are not in production builds, so only dev loads them.
-      applyEnvironment(view.scene, scene.environment, { load: import.meta.env.DEV });
+      environmentView?.dispose();
+      environmentView = applyEnvironment(view.scene, scene.environment, {
+        load: import.meta.env.DEV,
+      });
       // A scene's music plays from the first gesture on (mw-0j5) and follows the creatures' alert
       // states, crossfading layers on bar lines (mw-e28.11). The volume sliders are bound once, with
       // the engine.
@@ -2353,6 +2364,37 @@ function startRenderer(
         afterStep.push(() => {
           shop.afterStep();
         });
+        // First-blood duels (mw-e39.35): Tereza's dialogue asks for one, the first hit either side lands
+        // ends it (nobody is hurt), and the result facts her dialogue reads are written.
+        const duelUi = startDuelUi({
+          ui,
+          world,
+          player: player.entity,
+          duels: new FirstBloodDuels(world, combat.damage, DUEL_BEHAVIOUR),
+          host: gameLogic.host,
+          toast: (text) => {
+            shop.toast(text);
+          },
+        });
+        afterStep.push(() => {
+          duelUi.afterStep();
+        });
+        // The shanghai loop (mw-e40.30): losing the Drowned Gull crew table wakes the player in the
+        // Gilded Tern's hold, and Hesketh waits on deck while he is on the player's articles.
+        const shanghaiUi = startShanghaiUi({
+          ui,
+          world,
+          player: player.entity,
+          teleport: (entity, to) => {
+            commands.push(teleportCommand(entity, to));
+          },
+          toast: (text) => {
+            shop.toast(text);
+          },
+        });
+        afterStep.push(() => {
+          shanghaiUi.afterStep();
+        });
         // The contest screens (mw-opf6): the entry window, the play panel and the play keys (F plays,
         // H cheats at dice, N walks away). #app[data-contest] is the e2e's readout.
         const contestUi = new ContestController({
@@ -2735,8 +2777,11 @@ function startRenderer(
           player: player.entity,
           runtime,
           dialogueOf: (creature) => dialogueOfCreature.get(creature),
-          speakerName: (dialogue, speaker) =>
-            dialogues.get(dialogue)?.speakers.find((s) => s.id === speaker)?.name ?? speaker,
+          speakerName: speakerNameResolver((dialogue) => dialogues.get(dialogue)),
+          speakerPortrait: speakerPortraitResolver(
+            (dialogue) => dialogues.get(dialogue),
+            content.all('creature'),
+          ),
           show: (model) => {
             dialogueBox.update(model);
           },

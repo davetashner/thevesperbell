@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "cask-cradle",
+  "name": "Cask on a cradle",
+  "mass": 140,
+  "flammable": true,
+  "tags": ["harbour"],
+  "body": {
+    "size": [0.8, 0.8, 0.95],
+    "material": "wood"
+  }
+}

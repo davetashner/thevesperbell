@@ -1,4 +1,4 @@
-// The Briar Glen townsfolk's placeholder bodies (mw-ju8.34): one Tripo image-to-3D model per NPC (the
+// The Briar Glen townsfolk's and the Wendmouth harbour cast's placeholder bodies (mw-ju8.34): one Tripo image-to-3D model per NPC (the
 // two Watch guards share one), keyed on the creature's `presentation.mesh` so the capsule stays the
 // fallback for any mesh id without a model here. Each is loaded once and shared by every creature
 // wearing it. Creatures face +z (see index.ts) and the mesh arrives facing +x, so the body is turned
@@ -19,6 +19,15 @@ export const NPC_MODEL_URLS: Readonly<Record<string, string>> = {
   'npc-garrick': '/assets/model/model-npc-garrick-01.glb',
   'npc-rooke': '/assets/model/model-npc-rooke-01.glb',
   'npc-quillon': '/assets/model/model-npc-quillon-01.glb',
+  // The named Wendmouth harbour cast (owner-approved 2026-11-16); Jasper Quell's creature is npc-quell.
+  'npc-mags': '/assets/model/model-npc-mags-01.glb',
+  'npc-nell': '/assets/model/model-npc-nell-01.glb',
+  'npc-cray': '/assets/model/model-npc-cray-01.glb',
+  'npc-tereza': '/assets/model/model-npc-tereza-01.glb',
+  'npc-quell': '/assets/model/model-npc-jasper-01.glb',
+  'npc-oona': '/assets/model/model-npc-oona-01.glb',
+  'npc-reed': '/assets/model/model-npc-reed-01.glb',
+  'npc-hesketh': '/assets/model/model-npc-hesketh-01.glb',
   // Day and night watchmen are one model for now.
   'npc-watchman': '/assets/model/model-npc-watchman-01.glb',
 };

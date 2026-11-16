@@ -775,7 +775,7 @@
           "classes": ["sorcerer"],
           "kind": "capability",
           "capabilities": [],
-          "how": "Freeze the harbour pool and walk to the Tern.",
+          "how": "Freeze the harbour pool, walk the ice to the hull ladder (pool-ice-walk) and climb to the deck.",
           "source": "\u00a74.3 sorcerer",
           "status": "canon",
           "needs": [
@@ -815,6 +815,30 @@
           "capabilities": [],
           "how": "Bribe a lighter-man to row you out; stowaway among the cargo.",
           "source": "proposal",
+          "status": "proposal"
+        },
+        {
+          "classes": ["any"],
+          "kind": "item",
+          "capabilities": [],
+          "how": "Show Captain Hesketh's crew token at the gangway gate and walk up the gangway.",
+          "source": "mw-e40.28",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
+          "kind": "social",
+          "capabilities": [],
+          "how": "Lose the high-stakes crew table at the Drowned Gull and be shanghaied: you wake in the Tern's hold, climb the ladder and settle your articles with Captain Hesketh, who hands over the gangway token.",
+          "source": "mw-e40.30; \u00a74.5",
+          "status": "canon"
+        },
+        {
+          "classes": ["any"],
+          "kind": "fallback",
+          "capabilities": [],
+          "how": "Swim out from a quay ladder and climb the hull ladder (tern-hull-ladder-foot): slow, cold and seen from the wharf.",
+          "source": "mw-e40.29",
           "status": "proposal"
         }
       ],
