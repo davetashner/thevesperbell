@@ -147,7 +147,7 @@ describe('Wendmouth named places (mw-e40.1 AC-1)', () => {
     for (const w of water) expect(w.liquid?.liquid.id).toBe('water');
     expect(scene.spawns.filter((s) => s.tags.includes('ladder'))).toHaveLength(4);
     const ladders = scene.placements.filter((p) => p.properties?.climbable === 'ladder');
-    expect(ladders).toHaveLength(4);
+    expect(ladders).toHaveLength(6); // four quay ladders, the Tern's hull ladder and its hold ladder
   });
 
   it('AC-1: the doors that stay shut are real locked doors, the open buildings have none', () => {
@@ -333,6 +333,57 @@ describe('the harbour on foot (mw-e40.1 AC-3)', () => {
     const up = route(roughClimber, 'tern-rigging-foot', 'tern-crows-nest', open);
     expect(up.status).toBe('found');
     expect(climbs(pointsOf(up))).toHaveLength(1);
+  });
+});
+
+describe('The Gilded Tern hull ladder and hold (mw-e40.14 AC-1, mw-e40.29)', () => {
+  const deckZ = (points: readonly NavPathPoint[]) => points[points.length - 1]?.y;
+
+  it('AC-1: a player in the pool climbs (the frozen pool is walked to the same ladder in tern-hull-ice.test.ts) the hull ladder to the deck on the navmesh', () => {
+    const start = spawnOf('tern-hull-ladder-foot');
+    expect(start.at[1]).toBeLessThan(-2.5);
+    const up = route(humanoid, 'tern-hull-ladder-foot', 'tern-hull-ladder-top', open);
+    expect(up.status).toBe('found');
+    expect(climbs(pointsOf(up)).length).toBeGreaterThan(0);
+    expect(deckZ(pointsOf(up))).toBeCloseTo(2, 0);
+    const aft = route(humanoid, 'tern-hull-ladder-foot', 'tern-berth', open);
+    expect(aft.status).toBe('found');
+  });
+
+  it('AC-1: the ladder is a climbable placement on the pool side of the hull, level with the ice-walk marker', () => {
+    const ladder = scene.placements.find(
+      (p) => p.properties?.climbable === 'ladder' && p.at[0] === 29.75,
+    );
+    expect(ladder?.at[1]).toBe(-6);
+    expect((ladder?.at[1] ?? 0) + (ladder?.scale[1] ?? 0)).toBeGreaterThanOrEqual(2);
+    expect(ladder?.at[2]).toBe(spawnOf('pool-ice-walk').at[2]);
+  });
+
+  it('the deck drops down the hatch into the hold and the hold climbs back out', () => {
+    const down = route(humanoid, 'tern-deck-hatch-edge', 'tern-hold-wake', open);
+    expect(down.status).toBe('found');
+    expect(climbs(pointsOf(down)).length).toBeGreaterThan(0);
+    const back = route(humanoid, 'tern-hold-wake', 'tern-deck-hatch-edge', open);
+    expect(back.status).toBe('found');
+    expect(climbs(pointsOf(back)).length).toBeGreaterThan(0);
+  });
+
+  it('the shanghai wake spot tern-hold-wake sits in the hold, below the deck and above the water', () => {
+    const [x, y, z] = spawnOf('tern-hold-wake').at;
+    expect(x).toBeGreaterThan(31);
+    expect(x).toBeLessThan(39);
+    expect(z).toBeGreaterThan(107);
+    expect(z).toBeLessThan(145);
+    expect(y).toBeLessThan(1.5);
+    expect(y).toBeGreaterThan(-2.5);
+    expect(spawnOf('tern-hold-wake').tags).toContain('entry');
+  });
+
+  it('the hold is walkable on foot from the wake spot to the ladder foot, and shut off from the deck without the ladder', () => {
+    expect(route(walker, 'tern-hold-wake', 'tern-hold-ladder-foot', open).status).toBe('found');
+    expect(route(walker, 'tern-hold-wake', 'tern-deck-hatch-edge', open).status).toBe(
+      'unreachable',
+    );
   });
 });
 
