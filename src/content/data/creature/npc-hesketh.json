@@ -39,6 +39,7 @@
   },
   "presentation": {
     "mesh": "npc-hesketh",
+    "portrait": "portrait-npc-hesketh-captain",
     "sfx": "placeholder"
   }
 }

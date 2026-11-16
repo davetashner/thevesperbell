@@ -42,6 +42,7 @@
   },
   "presentation": {
     "mesh": "npc-tereza",
+    "portrait": "portrait-npc-tereza-merchant",
     "sfx": "placeholder"
   }
 }

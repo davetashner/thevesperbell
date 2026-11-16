@@ -26,6 +26,7 @@ import { renderIntensity } from '../light/index.ts';
 import { SURFACE_COLOURS, surfacePatches } from './surface-patches';
 import { hiddenByDressing, paintFor } from './dressing-hides';
 import { loadDressing } from '../props/dressing';
+import { loadRigging } from '../props/tern-rigging';
 import { loadBrazier, loadChest, loadTorch } from '../props/set-pieces';
 import {
   containerModelFor,
@@ -509,6 +510,8 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         mesh.receiveShadow = true;
         group.add(mesh);
       }
+      // Rope the models cannot draw (shrouds, ratlines, stays, the climb ladder) is built from tubes.
+      for (const rope of loadRigging(layout.dressings)) group.add(rope);
       layout.dressings.forEach((dressing, index) => {
         const replaced = new Group();
         replaced.name = `dressing-greybox:${dressing.id}`;

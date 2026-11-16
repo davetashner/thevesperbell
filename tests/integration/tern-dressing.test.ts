@@ -7,6 +7,9 @@ import { describe, expect, it } from 'vitest';
 import { loadGameContent } from '@content/index';
 import { layoutScene } from '@sim/index';
 import { hiddenByDressing, paintFor } from '../../src/render/greybox/dressing-hides';
+import { MODEL_STRIPS } from '../../src/render/props/model-strips';
+import { PROP_MODELS } from '../../src/render/props/dock-props';
+import { CLIMB_MAST, LADDER_DX, LADDER_DZ, LADDER_TOP } from '../../src/render/props/tern-rigging';
 import { SURFACE_TEXTURE_PAINTINGS } from '../../src/render/props/surfaces';
 import { WALL_TEXTURES } from '@content/index';
 
@@ -40,6 +43,29 @@ describe('Gilded Tern dressing', () => {
     // The crow's nest platform (top 12 m) and the cabin walls behind z 138 stay drawn.
     expect(hidden.some((p) => p.max.y >= 11.9 && p.max.y <= 12.1 && p.min.x > 35)).toBe(false);
     expect(hidden.some((p) => (p.min.z + p.max.z) / 2 > 138)).toBe(false);
+  });
+
+  it('draws the mainmast’s rope ladder against the climbable board, and cuts only models the scene dresses', () => {
+    const mast = layout.dressings.find((d) => d.id === CLIMB_MAST);
+    expect(mast).toBeDefined();
+    const x = (mast?.at.x ?? 0) + LADDER_DX;
+    const z = (mast?.at.z ?? 0) + LADDER_DZ;
+    const board = layout.parts.find(
+      (p) =>
+        p.purpose === 'climbable' &&
+        Math.abs(p.max.x - x) < 0.1 &&
+        p.min.z <= z &&
+        p.max.z >= z &&
+        p.max.y >= LADDER_TOP,
+    );
+    expect(board).toBeDefined();
+    expect(board?.min.y).toBeCloseTo(mast?.at.y ?? 0, 5);
+    const dressed = new Set(layout.dressings.map((d) => d.model));
+    for (const model of Object.keys(MODEL_STRIPS)) expect(dressed.has(model), model).toBe(true);
+  });
+
+  it('the hold grating is drawn from boxes, so its blobby model stays unused', () => {
+    expect(PROP_MODELS['deck-grating']?.procedural).toBe('deck-grating');
   });
 
   it('every springald stands on a collider', () => {

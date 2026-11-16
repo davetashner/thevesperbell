@@ -1,0 +1,91 @@
+import { describe, expect, it } from 'vitest';
+import type { SceneDressing } from '@sim/index';
+import {
+  CHAIN_PLATE_X,
+  CHAIN_PLATE_Y,
+  CLIMB_MAST,
+  LADDER_TOP,
+  RIGGED_MODEL,
+  climbLadder,
+  loadRigging,
+  mastRope,
+  shrouds,
+  stay,
+} from './tern-rigging';
+
+const mast = (id: string, z: number, fades = true): SceneDressing => ({
+  id,
+  model: RIGGED_MODEL,
+  at: { x: 35, y: 2, z },
+  yaw: 0,
+  turn: 90,
+  size: { x: 1, y: 14, z: 1 },
+  fit: 'height',
+  fadesNearCamera: fades,
+  hides: undefined,
+});
+
+describe('Gilded Tern rigging (render only)', () => {
+  it('a mast has three shrouds a side, each ending in a deadeye on the bulwark', () => {
+    const segments = shrouds([35, 2, 124], 14);
+    const deadeyes = segments.filter((s) => s.radius > 0.1);
+    expect(deadeyes).toHaveLength(6);
+    for (const d of deadeyes) {
+      expect(Math.abs(d.a[0] - 35)).toBeCloseTo(CHAIN_PLATE_X);
+      expect(d.a[1]).toBeCloseTo(CHAIN_PLATE_Y);
+    }
+  });
+
+  it('the ratlines are evenly spaced: nine rungs between each pair of shrouds, both sides', () => {
+    const rungs = shrouds([35, 2, 124], 14).filter((s) => s.radius === 0.05);
+    expect(rungs).toHaveLength(9 * 2 * 2);
+    const heights = rungs.slice(0, 9).map((r) => r.a[1]);
+    const gaps = heights.slice(1).map((h, i) => h - (heights[i] ?? 0));
+    for (const gap of gaps) expect(gap).toBeCloseTo(gaps[0] ?? 0, 5);
+  });
+
+  it('shrouds start above the deck and below the mast head', () => {
+    for (const s of shrouds([35, 2, 124], 14)) {
+      expect(s.a[1]).toBeGreaterThanOrEqual(CHAIN_PLATE_Y);
+      expect(s.a[1]).toBeLessThan(2 + 14);
+    }
+  });
+
+  it('a stay runs from the aft mast head to the foremast', () => {
+    const s = stay([35, 2, 136], 13, [35, 2, 124], 14);
+    expect(s.a[2]).toBe(136);
+    expect(s.b[2]).toBe(124);
+    expect(s.a[1]).toBeGreaterThan(s.b[1] - 3);
+  });
+
+  it('the climb ladder rises from the deck to the crow’s nest beside the board', () => {
+    const segments = climbLadder([35, 2, 124]);
+    const rails = segments.filter((s) => s.radius === 0.07);
+    expect(rails).toHaveLength(2);
+    expect(rails[0]?.b[1]).toBe(LADDER_TOP);
+    expect(segments.length).toBeGreaterThan(10);
+    expect(rails[0]?.a[0]).toBeCloseTo(38.05);
+  });
+
+  it('only the mainmast carries the ladder, and only a mast with one before it has a stay', () => {
+    const plain = mastRope(mast('tern-foremast', 112), undefined);
+    const main = mastRope(mast(CLIMB_MAST, 124), mast('tern-foremast', 112));
+    expect(plain).toHaveLength(shrouds([35, 2, 112], 14).length);
+    expect(main.length).toBe(
+      shrouds([35, 2, 124], 14).length + 1 + climbLadder([35, 2, 124]).length,
+    );
+  });
+
+  it('draws one rope mesh a mast, fading only where its mast does', () => {
+    const meshes = loadRigging([
+      mast('tern-mizzenmast', 136, false),
+      mast('tern-foremast', 112),
+      { ...mast('tern-hull', 124), model: 'model-ship-gilded-tern-hull-01' },
+    ]);
+    expect(meshes.map((m) => m.name)).toEqual(['rigging:tern-foremast', 'rigging:tern-mizzenmast']);
+    // The foremast fades (its mesh has a fade hook of its own), the mizzenmast here does not.
+    expect(Object.hasOwn(meshes[0] ?? {}, 'onBeforeRender')).toBe(true);
+    expect(Object.hasOwn(meshes[1] ?? {}, 'onBeforeRender')).toBe(false);
+    expect(meshes[0]?.geometry.getAttribute('color')).toBeDefined();
+  });
+});

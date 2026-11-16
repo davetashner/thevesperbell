@@ -395,6 +395,17 @@ describe('speaker names', () => {
   });
 });
 
+describe('speaker portraits (mw-e37.433)', () => {
+  it('the box gets the portrait the game resolves for the speaker, none when it has no art', () => {
+    const withArt = setup({ speakerPortrait: (dialogue, speaker) => `art-${dialogue}-${speaker}` });
+    withArt.talk(withArt.villager);
+    expect(withArt.shown.at(-1)).toMatchObject({ portraitArt: 'art-chat-npc' });
+    const without = setup();
+    without.talk(without.villager);
+    expect(without.shown.at(-1)).not.toHaveProperty('portraitArt');
+  });
+});
+
 describe('keys', () => {
   it('take nothing without a conversation', () => {
     const { conversations } = setup();

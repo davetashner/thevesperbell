@@ -1391,6 +1391,11 @@
           "type": "string",
           "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
+        "portrait": {
+          "description": "Dialogue portrait asset id (mw-e37.433): public/assets/portrait/<id>.webp fills the dialogue box and the shop window; absent = the generic silhouette.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
         "sfx": {
           "default": "placeholder",
           "description": "SFX set id.",
