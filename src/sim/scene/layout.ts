@@ -388,7 +388,14 @@ export interface SceneDressingSpec {
   readonly size: Triple;
   readonly fit: 'box' | 'height';
   readonly fadesNearCamera?: boolean | undefined;
-  readonly hides?: { readonly min: Triple; readonly max: Triple } | undefined;
+  readonly hides?:
+    | {
+        readonly min: Triple;
+        readonly max: Triple;
+        readonly climbables?: boolean | undefined;
+        readonly inside?: boolean | undefined;
+      }
+    | undefined;
 }
 
 /** A dressing model as laid out: its base point and hide box in metres. Render only. */
@@ -401,7 +408,14 @@ export interface SceneDressing {
   readonly size: Vec3;
   readonly fit: 'box' | 'height';
   readonly fadesNearCamera: boolean;
-  readonly hides: { readonly min: Vec3; readonly max: Vec3 } | undefined;
+  readonly hides:
+    | {
+        readonly min: Vec3;
+        readonly max: Vec3;
+        readonly climbables: boolean;
+        readonly inside: boolean;
+      }
+    | undefined;
 }
 
 /** A tagged box as laid out: its corners in metres (water: wading and swimming, mw-e02.14). */
@@ -1295,6 +1309,8 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
               : Object.freeze({
                   min: gridToWorld(d.hides.min, scene.grid),
                   max: gridToWorld(d.hides.max, scene.grid),
+                  climbables: d.hides.climbables ?? false,
+                  inside: d.hides.inside ?? false,
                 }),
         }),
       ),

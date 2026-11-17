@@ -566,6 +566,7 @@ check enforces this).
 
 ### Fixed
 
+- The Gilded Tern no longer looks like a boat inside a crate: the plank-textured box around the hull, the block over the stern, the green climb pillars and the plates sticking out past the bow and stern are gone, so you see only the ship. The boarding ladder down to the pool and the ladder out of the hold are now real ladders, the figurehead sits against the bow, and the hold still looks enclosed from inside. [mw-e40.36]
 - The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).
 - The dialogue box, its history and the screen-reader announcements now label an NPC's lines with their name ("Mags") instead of the dialogue's internal speaker id ("mags"); the narrator and you keep your labels (mw-2ute).
 - The new-game narration and the epilogue now sit on a readable parchment card over a dark backdrop, instead of dark text drawn straight on the game (mw-jxew).
