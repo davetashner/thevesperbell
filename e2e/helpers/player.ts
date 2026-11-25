@@ -109,6 +109,18 @@ export async function runConsole(page: Page, line: string): Promise<void> {
       new Promise<void>((resolve, reject) => {
         const app = document.querySelector<HTMLElement>('#app');
         const started = performance.now();
+        // A line that crosses an area swaps the scene in place and ends the old session's animation
+        // frames with it (mw-ju8.28), so the waits below would never run: the crossing itself
+        // ends the line.
+        if (app !== null) {
+          const crossing = new MutationObserver(() => {
+            if (app.dataset['transit']?.includes('"leaving"') === true) {
+              crossing.disconnect();
+              resolve();
+            }
+          });
+          crossing.observe(app, { attributes: true, attributeFilter: ['data-transit'] });
+        }
         const until = (done: () => boolean, then: () => void, what: string): void => {
           const check = (): void => {
             if (done()) then();

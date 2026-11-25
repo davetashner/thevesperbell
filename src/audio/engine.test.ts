@@ -130,6 +130,18 @@ describe('AudioEngine lifecycle', () => {
     expect(engine.stats()).toMatchObject({ state: 'running', voices: 1, pending: 0 });
   });
 
+  it('AC-1: dispose closes the context and drops what is queued', () => {
+    const { engine, ctx, createContext } = setup({ state: 'suspended' });
+    engine.play('sfx-ui-click');
+    engine.dispose();
+    expect(ctx.closeCalls).toBe(1);
+    expect(engine.stats().pending).toBe(0);
+    expect(engine.context).toBeUndefined();
+    engine.dispose(); // twice is harmless: there is no context to close
+    expect(ctx.closeCalls).toBe(1);
+    expect(createContext).toHaveBeenCalledTimes(1);
+  });
+
   it('does not resume a context that is already running', async () => {
     const { engine, ctx } = setup();
     await engine.unlock();
