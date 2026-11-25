@@ -343,8 +343,11 @@ describe('the mine road leg of the town (mw-e26.2)', () => {
     expect(scene.spawns.find((s) => s.id === 'arrive-from-briar-glen-green')).toBeDefined();
   });
 
-  it('the Miners’ Bridge edge and the in-scene mine road edge stay planned (mw-e25.23)', () => {
-    expect(world?.edges.find((e) => e.id === 'miners-bridge')?.transitions ?? []).toEqual([]);
+  it('the Miners’ Bridge edge is built by the Miners’ Stair; the in-scene mine road edge stays planned (mw-e25.23)', () => {
+    expect(world?.edges.find((e) => e.id === 'miners-bridge')?.transitions).toEqual([
+      'briar-glen-lane/miners-stair',
+      'deepworks/miners-track-gate',
+    ]);
     expect(world?.edges.find((e) => e.id === 'mine-road-gate')?.bead).toBe('mw-e25.23');
   });
 
