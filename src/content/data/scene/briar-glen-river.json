@@ -1533,6 +1533,226 @@
       "turn": 270,
       "size": [4.5, 3.2, 3.5],
       "fit": "box"
+    },
+    {
+      "id": "patient-ann-hull",
+      "model": "model-prop-stone-barge-01",
+      "at": [69.0, -1.25, 2.5],
+      "turn": 0,
+      "size": [14, 2.5, 5],
+      "fit": "box",
+      "hides": {
+        "min": [61.5, -1.5, -0.25],
+        "max": [76.5, 0.5, 5.5]
+      }
+    },
+    {
+      "id": "quay-bollard-0",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [32.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [31.75, 0, -0.75],
+        "max": [32.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-1",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [40.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [39.75, 0, -0.75],
+        "max": [40.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-2",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [48.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [47.75, 0, -0.75],
+        "max": [48.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-3",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [56.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [55.75, 0, -0.75],
+        "max": [56.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-4",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [64.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [63.75, 0, -0.75],
+        "max": [64.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-5",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [72.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [71.75, 0, -0.75],
+        "max": [72.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-6",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [80.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [79.75, 0, -0.75],
+        "max": [80.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-7",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [88.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [87.75, 0, -0.75],
+        "max": [88.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-8",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [96.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [95.75, 0, -0.75],
+        "max": [96.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "glenstone-cradle-1",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [34.0, 0.0, -4.5],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [32.4, 0, -5.25],
+        "max": [35.6, 2.25, -3.75]
+      }
+    },
+    {
+      "id": "glenstone-cradle-2",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [40.5, 0.0, -4.5],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [38.9, 0, -5.25],
+        "max": [42.1, 2.25, -3.75]
+      }
+    },
+    {
+      "id": "glenstone-cradle-3",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [47.0, 0.0, -4.5],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [45.4, 0, -5.25],
+        "max": [48.6, 2.25, -3.75]
+      }
+    },
+    {
+      "id": "glenstone-cradle-4",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [34.0, 0.0, -9.0],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [32.4, 0, -9.75],
+        "max": [35.6, 2.25, -8.25]
+      }
+    },
+    {
+      "id": "glenstone-cradle-5",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [40.5, 0.0, -9.0],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [38.9, 0, -9.75],
+        "max": [42.1, 2.25, -8.25]
+      }
+    },
+    {
+      "id": "glenstone-cradle-6",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [47.0, 0.0, -9.0],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [45.4, 0, -9.75],
+        "max": [48.6, 2.25, -8.25]
+      }
+    },
+    {
+      "id": "quay-toll-shed",
+      "model": "model-prop-quay-toll-shed-01",
+      "at": [96.0, 0.0, -9.0],
+      "turn": 0,
+      "size": [10, 3.5, 6],
+      "fit": "box",
+      "hides": {
+        "min": [90.75, 0, -12.25],
+        "max": [101.25, 3.25, -5.75]
+      }
+    },
+    {
+      "id": "weir-sluice-gate",
+      "model": "model-prop-weir-sluice-gate-01",
+      "at": [147.75, -0.25, 15.5],
+      "turn": 90,
+      "size": [0.8, 4.5, 5],
+      "fit": "box"
+    },
+    {
+      "id": "weir-keystone",
+      "model": "model-prop-weir-keystone-01",
+      "at": [149.0, 4.25, 15.5],
+      "turn": 0,
+      "size": [2, 1.2, 2],
+      "fit": "box"
     }
   ],
   "transitions": [
