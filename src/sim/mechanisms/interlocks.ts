@@ -33,6 +33,8 @@ export function makeInterlock(
   volume: EntityId,
   window: { readonly minDepth?: number | undefined; readonly maxDepth?: number | undefined } = {},
 ): void {
+  // Registered on first use, so a world with no interlocks keeps the state hash it always had.
+  if (!world.isRegistered(InterlockComponent)) world.register(InterlockComponent);
   world.add(door, InterlockComponent, {
     volume,
     minDepth: window.minDepth ?? 0,
@@ -42,6 +44,7 @@ export function makeInterlock(
 
 /** Whether `door`'s interlock lets it move now (true when it has none, or its volume is gone). */
 export function interlockAllows(world: World<never>, door: EntityId): boolean {
+  if (!world.isRegistered(InterlockComponent)) return true;
   const lock = world.get(door, InterlockComponent);
   if (lock === undefined) return true;
   const volume = world.get(lock.volume, LiquidVolumeComponent);
@@ -56,6 +59,7 @@ export function interlocksSystem<TInput>(): System<TInput> {
     name: 'door-interlocks',
     run: ({ world: w }) => {
       const world: World<never> = w;
+      if (!world.isRegistered(InterlockComponent)) return;
       for (const entity of [...world.query(InterlockComponent).ids()]) {
         const door = world.get(entity, DoorComponent);
         if (door === undefined) continue;

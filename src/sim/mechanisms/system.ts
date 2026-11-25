@@ -111,7 +111,7 @@ import {
 import type { StaticOccluders } from '../light/occluders';
 import { ChargeReceiverComponent, resetChargeReceiver } from './charge-receivers';
 import { lightReceiversSystem, resetLightReceiver } from './receivers';
-import { InterlockComponent, interlocksSystem } from './interlocks';
+import { interlocksSystem } from './interlocks';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
 export const SLAM_SPEED = 4;
@@ -848,7 +848,6 @@ export function installMechanisms<TInput>(
     OpticComponent,
     LightReceiverComponent,
     ChargeReceiverComponent,
-    InterlockComponent,
   );
   const occluders = options.occluders as Partial<StaticOccluders> | undefined;
   const tracer =

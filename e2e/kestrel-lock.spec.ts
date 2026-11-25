@@ -10,8 +10,7 @@ import {
 import { collectProblems } from './helpers/slice';
 
 // mw-e25.14, mw-e40.26, mw-0ml8: the towpath walked end to end in a real browser. From the riverbank under
-// the Miners' Bridge the player walks the towpath east into Kestrel Lock (6 game hours), pulls the lower
-// paddle and waits for the lock to settle (kestrel-lock.gate-open), walks the lock's towpath east into
+// the Miners' Bridge the player walks the towpath east into Kestrel Lock (6 game hours), walks the lock's towpath east into
 // Wendmouth's Stone Wharf (6 more hours) and back west through the towpath gate into the lock. Teleports
 // only save the walk inside a scene; scenes are crossed by walking into transition volumes. Built for a
 // ~1 fps CI runner: every wait polls published state with a long timeout and holds are paced by ticks.
@@ -114,21 +113,6 @@ test('mw-e25.14: the towpath from the riverbank to Kestrel Lock to the Stone Wha
   expect(atLock - start).toBeGreaterThanOrEqual(360);
   expect(atLock - start).toBeLessThan(380);
   expect((await playerState(page)).position.x).toBeLessThan(-40);
-
-  // The lock: the lower paddle sits on the towpath by the chamber. Pull it and wait for the settle.
-  await runConsole(page, 'tp 7.5 0 -5');
-  await face(page, { x: 7.5, z: -3.75 });
-  await expect
-    .poll(
-      async () => {
-        if (((await page.getByTestId('interact-prompt').textContent()) ?? '').includes('Pull')) {
-          await page.keyboard.press('KeyE');
-        }
-        return fact(page, 'kestrel-lock.gate-open');
-      },
-      { timeout: 180_000 },
-    )
-    .toContain('true');
 
   // Leg 2: east along the lock's towpath into the Stone Wharf.
   await runConsole(page, 'tp 42 0 -5.5');

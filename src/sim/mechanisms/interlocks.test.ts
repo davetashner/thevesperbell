@@ -198,6 +198,16 @@ describe('door interlocks (mw-e25.14)', () => {
     });
   });
 
+  it('costs a world with no interlocks nothing: no component registered, every door allowed', () => {
+    const bare = installMechanisms(new World<never>({ seed: 1 }));
+    expect(bare).toBeTypeOf('function');
+    const world = new World<never>({ seed: 1 });
+    installMechanisms(world);
+    world.step();
+    expect(world.isRegistered(InterlockComponent)).toBe(false);
+    expect(interlockAllows(world, world.spawn())).toBe(true);
+  });
+
   it('a fill-keyed receiver on a volume with no sluice changes nothing', () => {
     const { world, made, entity } = setup();
     setLever(world, at(made.graphs, 0), 'head', true);
