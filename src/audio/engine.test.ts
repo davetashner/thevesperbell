@@ -142,6 +142,18 @@ describe('AudioEngine lifecycle', () => {
     expect(createContext).toHaveBeenCalledTimes(1);
   });
 
+  it('AC-1: dispose swallows a context that refuses to close', async () => {
+    const { engine, ctx } = setup({ state: 'suspended' });
+    engine.play('sfx-ui-click');
+    const refused = Promise.reject(new Error('already closed'));
+    ctx.close = () => refused;
+    expect(() => {
+      engine.dispose();
+    }).not.toThrow();
+    await expect(refused).rejects.toThrow('already closed');
+    expect(engine.context).toBeUndefined();
+  });
+
   it('does not resume a context that is already running', async () => {
     const { engine, ctx } = setup();
     await engine.unlock();
