@@ -500,14 +500,16 @@
       "name": "Briar Glen Quay",
       "area": "river",
       "epic": "e25",
-      "notes": "Barge landing and slipway (bible 3.5, mw-e25.11)."
+      "notes": "Barge landing and slipway (bible 3.5, mw-e25.11). Built: Briar Glen Quay in the river scene briar-glen-river (moored Patient Ann, block stacks, crane, toll shed).",
+      "scene": "briar-glen-river"
     },
     {
       "id": "millweir",
       "name": "The Millweir",
       "area": "river",
       "epic": "e25",
-      "notes": "Weir below town with its sluice walk (bible 3.1, mw-e25.12)."
+      "notes": "Weir below town with its sluice walk (bible 3.1, mw-e25.12). Built in the river scene briar-glen-river: sluice wheel, drained mill pond, catwalk with a gap.",
+      "scene": "briar-glen-river"
     },
     {
       "id": "weeping-adit-mouth",
@@ -1034,7 +1036,8 @@
       "to": "briar-glen-quay",
       "kind": "path",
       "bead": "mw-e25.24",
-      "notes": "The riverbank path continues downriver to the quay."
+      "notes": "The riverbank path continues downriver to the quay.",
+      "transitions": ["under-the-bridge/riverbank-down", "briar-glen-river/path-up"]
     },
     {
       "id": "quay-adit-mouth",
@@ -1064,7 +1067,8 @@
         "fact": "world.stone-stair.lowered"
       },
       "bead": "mw-e25.11",
-      "notes": "The Stone Stair: from the cutting hall down to the quay, one-way until lowered from above."
+      "notes": "The Stone Stair: from the cutting hall down to the quay, one-way until lowered from above. Built: the slide is the quay-gate at the stair foot; the way back up is a rough-stone climb (climbers only) to a ledge.",
+      "transitions": ["deepworks/quay-gate", "briar-glen-river/stone-stair-climb"]
     },
     {
       "id": "quay-millweir",
@@ -1072,7 +1076,7 @@
       "to": "millweir",
       "kind": "path",
       "bead": "mw-e25.24",
-      "notes": "Towpath downriver to the weir (always open)."
+      "notes": "Towpath downriver to the weir (always open): the walk inside the briar-glen-river scene, no transition volume."
     },
     {
       "id": "sluice-walk",
@@ -1085,7 +1089,8 @@
       "routes": ["arrow.rope", "spell.mage-hand"],
       "classesHint": ["archer", "sorcerer"],
       "bead": "mw-e25.12",
-      "notes": "The sluice walk across the weir: an archer ropes the rail, a sorcerer lifts the sluice with Mage Hand."
+      "notes": "The sluice walk across the weir: an archer ropes the rail, a sorcerer lifts the sluice with Mage Hand.",
+      "transitions": ["briar-glen-river/far-bank-gate", "briarwood/millweir-gate"]
     },
     {
       "id": "millweir-kestrel-lock",
@@ -1301,7 +1306,9 @@
       "from": "horns-hall",
       "to": "the-cradle",
       "kind": "secret",
-      "unlock": { "fact": "world.hornfolk-seal.dispelled" },
+      "unlock": {
+        "fact": "world.hornfolk-seal.dispelled"
+      },
       "routes": ["spell.mage-hand"],
       "classesHint": ["sorcerer"],
       "bead": "mw-e26.10",

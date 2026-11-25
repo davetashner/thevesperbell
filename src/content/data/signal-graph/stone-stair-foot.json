@@ -1,0 +1,29 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "stone-stair-foot",
+  "name": "Stone Stair foot",
+  "notes": "The foot of the Stone Stair on Briar Glen Quay (scene briar-glen-river, mw-e25.11). The first time the player lands there after sliding down from the Deepworks' cutting hall, the latch writes world.stone-stair.lowered = true and keeps it, so the world map's one-way edge stays open for good.",
+  "nodes": [
+    {
+      "id": "stair-foot",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": { "x": 22, "y": 1, "z": -8.5 },
+        "halfExtents": { "x": 4, "y": 1.5, "z": 2.5 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    { "id": "landed", "kind": "latch" },
+    {
+      "id": "lowered-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "world.stone-stair.lowered"
+    }
+  ],
+  "wires": [
+    { "from": "stair-foot.enter", "to": "landed.set" },
+    { "from": "landed", "to": "lowered-fact" }
+  ]
+}

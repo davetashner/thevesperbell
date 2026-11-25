@@ -93,8 +93,8 @@ flowchart LR
     the_cradle["The Cradle"]:::built
   end
   subgraph river["The River Wend"]
-    briar_glen_quay["Briar Glen Quay"]
-    millweir["The Millweir"]
+    briar_glen_quay["Briar Glen Quay"]:::built
+    millweir["The Millweir"]:::built
     weeping_adit_mouth["The Weeping Adit (river mouth)"]
     kestrel_lock["Kestrel Lock"]:::built
     lockkeepers_cottage["The lock-keeper's cottage"]
@@ -308,8 +308,8 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `the-fold` | The Fold | knot | e26 | `knot-inner` | Sealed sleepers' vault; wake-up point (bible 3.5). Built (mw-e26.10): a dead-end vault of six moss-bed markers and the chalk tallies behind one doorway (fold-door, left open until mw-e26.16 stages the reveal), with the fold-wake marker. |
 | `sounding-shaft-foot` | The Sounding Shaft's foot | knot | e26 | `knot-inner` | Foot of the shaft to the belfry (bible 3.5, mw-e26.18). Built (mw-e26.10): a 20 x 24 m room north of the Cradle with the shaft's mouth marker; the climb is mw-e26.18. |
 | `the-cradle` | The Cradle | knot | e26 | `knot-inner` | Heart of the Knot (bible 3.5, 4.1 beat 12). Built (mw-e26.10): a 48 m chamber ringed by sixteen pillars with eight carved faces turned inward, the abbot's stage at the centre (mw-e26.17), the last friend-below note, a door to the Shaft's foot and a secret east doorway. |
-| `briar-glen-quay` | Briar Glen Quay | river | e25 | planned | Barge landing and slipway (bible 3.5, mw-e25.11). |
-| `millweir` | The Millweir | river | e25 | planned | Weir below town with its sluice walk (bible 3.1, mw-e25.12). |
+| `briar-glen-quay` | Briar Glen Quay | river | e25 | `briar-glen-river` | Barge landing and slipway (bible 3.5, mw-e25.11). Built: Briar Glen Quay in the river scene briar-glen-river (moored Patient Ann, block stacks, crane, toll shed). |
+| `millweir` | The Millweir | river | e25 | `briar-glen-river` | Weir below town with its sluice walk (bible 3.1, mw-e25.12). Built in the river scene briar-glen-river: sluice wheel, drained mill pond, catwalk with a gap. |
 | `weeping-adit-mouth` | The Weeping Adit (river mouth) | river | e25 | planned | Where the Wend springs from the hill, a flooded drainage tunnel (bible 3.1, mw-e25.13). |
 | `kestrel-lock` | Kestrel Lock | river | e25 | `kestrel-lock` | Lock on the towpath and barge route (bible 3.1, mw-e25.14): two gates, paddles that move the chamber's standing water between two levels, Old Reed and his cottage. |
 | `lockkeepers-cottage` | The lock-keeper's cottage | river | e25 | planned | Across the lock gates (bible 3.5). |
@@ -375,12 +375,12 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `silver-lower` | `silver-galleries` | `lower-deepworks` | path |  |  | planned: mw-e26.2 |
 | `silver-vane-gallery` | `silver-galleries` | `vane-sealed-gallery` | door |  |  | planned: mw-e26.4 |
 | `vane-gallery-breach` | `vane-sealed-gallery` | `breach` | door |  |  | planned: mw-e26.4 |
-| `under-the-bridge-quay` | `under-the-bridge` | `briar-glen-quay` | path |  |  | planned: mw-e25.24 |
+| `under-the-bridge-quay` | `under-the-bridge` | `briar-glen-quay` | path |  |  | `under-the-bridge/riverbank-down`, `briar-glen-river/path-up` |
 | `quay-adit-mouth` | `briar-glen-quay` | `weeping-adit-mouth` | path |  |  | planned: mw-e25.13 |
 | `weeping-adit` | `weeping-adit-mouth` | `lower-deepworks` | shortcut | `{"fact":"world.weeping-adit.passage-open"}` |  | planned: mw-e25.13 |
-| `stone-stair` | `rootcellar-camp` | `briar-glen-quay` | one-way | `{"fact":"world.stone-stair.lowered"}` |  | planned: mw-e25.11 |
-| `quay-millweir` | `briar-glen-quay` | `millweir` | path |  |  | planned: mw-e25.24 |
-| `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | planned: mw-e25.12 |
+| `stone-stair` | `rootcellar-camp` | `briar-glen-quay` | one-way | `{"fact":"world.stone-stair.lowered"}` |  | `deepworks/quay-gate`, `briar-glen-river/stone-stair-climb` |
+| `quay-millweir` | `briar-glen-quay` | `millweir` | path |  |  | none (the walk inside the briar-glen-river scene) |
+| `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | `briar-glen-river/far-bank-gate`, `briarwood/millweir-gate` |
 | `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | planned: mw-e25.24 |
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | `kestrel-lock/towpath-down`, `wendmouth-harbour/towpath-gate` |
 | `riverbank-lock-link` | `under-the-bridge` | `kestrel-lock` | path |  |  | `under-the-bridge/towpath-down`, `kestrel-lock/towpath-up` |
