@@ -7,6 +7,9 @@ import {
   areaTransition,
   InventoryComponent,
   inventoryOf,
+  DEFAULT_CLOCK_CONFIG,
+  gameClockOf,
+  installGameClock,
   PlayerClassComponent,
   registerPersistence,
   World,
@@ -134,5 +137,68 @@ describe('transit carry (mw-e01.11)', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('boom'));
     // Idle afterStep with nothing pending.
     controller.afterStep();
+  });
+
+  describe('a leg that takes game time (mw-e25.14)', () => {
+    const cross = (world: World<never>, player: number, advanceMinutes?: number) => {
+      const stored = new Map<string, string>();
+      const controller = new TransitionController({
+        world,
+        player,
+        registry,
+        areaName: () => 'Kestrel Lock',
+        session: {
+          getItem: (key) => stored.get(key) ?? null,
+          setItem: (key, value) => void stored.set(key, value),
+          removeItem: (key) => void stored.delete(key),
+        },
+        now: () => 0,
+        navigate: vi.fn(),
+        search: () => '',
+        overlayParent: {} as HTMLElement,
+      });
+      world.events.emit(areaTransition, {
+        tick: 0,
+        from: 'under-the-bridge',
+        transition: 'towpath-down',
+        scene: 'kestrel-lock',
+        spawn: 'arrive-from-upriver',
+        follow: false,
+        ...(advanceMinutes !== undefined && { advanceMinutes }),
+        entity: player,
+      });
+      world.step();
+      controller.afterStep();
+      return { controller, stored };
+    };
+
+    it('AC-1: crossing a towpath transition advances the clock by exactly 6 hours via advanceTime', () => {
+      const world = newWorld();
+      const player = world.spawn();
+      const clock = installGameClock(world, DEFAULT_CLOCK_CONFIG);
+      const before = clock.total();
+      const { controller, stored } = cross(world, player, 360);
+      expect(controller.leaving).toBe(true);
+      // One world step ran in the helper: at most a few ticks on top of the 360 minutes.
+      expect(clock.total() - before).toBe(360);
+      // The carry was made after the jump, so the facts that cross already say how late it is.
+      const carried = JSON.parse([...stored.values()][0] ?? '{}') as {
+        carry: { sections: Record<string, unknown> };
+      };
+      expect(JSON.stringify(carried.carry.sections)).toContain('time.minute');
+    });
+
+    it('a transition with no advance leaves the clock alone, and a world with no clock still crosses', () => {
+      const world = newWorld();
+      const player = world.spawn();
+      const clock = installGameClock(world, DEFAULT_CLOCK_CONFIG);
+      const before = clock.total();
+      cross(world, player);
+      expect(clock.total()).toBe(before);
+      expect(gameClockOf(world)).toBe(clock);
+      const bare = newWorld();
+      const walker = bare.spawn();
+      expect(cross(bare, walker, 360).controller.leaving).toBe(true);
+    });
   });
 });

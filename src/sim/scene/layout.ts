@@ -101,6 +101,14 @@ export interface SceneDoorSpec {
   readonly state?: 'closed' | 'open' | 'jammed' | undefined;
   readonly hinge?: DoorHinge | undefined;
   readonly swing?: DoorSwing | undefined;
+  readonly interlock?: SceneDoorInterlock | undefined;
+}
+
+/** A door held shut while a liquid volume stands outside a depth window (mw-e25.14). */
+export interface SceneDoorInterlock {
+  readonly volume: string;
+  readonly minDepth?: number | undefined;
+  readonly maxDepth?: number | undefined;
 }
 
 /** A door as laid out: plain ids. */
@@ -111,6 +119,7 @@ export interface SceneDoor {
   readonly state?: 'closed' | 'open' | 'jammed';
   readonly hinge?: DoorHinge;
   readonly swing?: DoorSwing;
+  readonly interlock?: SceneDoorInterlock;
 }
 
 /** A switch spawn (mw-e03.18). */
@@ -145,6 +154,7 @@ export interface SceneLiquidSpec {
   readonly liquid: { readonly id: string };
   readonly depth: number;
   readonly drain?: { readonly rate: number; readonly open: boolean } | undefined;
+  readonly fill?: { readonly rate: number; readonly open: boolean } | undefined;
 }
 
 /** A beam emitter spawn (mw-e03.17). */
@@ -317,6 +327,7 @@ export interface SceneTransitionSpec {
   readonly scene: { readonly id: string };
   readonly spawn: string;
   readonly follow: boolean;
+  readonly advanceMinutes?: number | undefined;
 }
 
 /** A way into another scene as laid out: its volume in metres and where it leads. */
@@ -330,6 +341,8 @@ export interface SceneTransition {
   readonly spawn: string;
   /** Companions flagged to follow travel through it. */
   readonly follow: boolean;
+  /** Game minutes the clock advances by as the player crosses it; absent: none. */
+  readonly advanceMinutes?: number;
 }
 
 /** A tagged box as written in data (mw-ju8.1): a river, a pool. */
@@ -711,6 +724,7 @@ export interface SceneSpawnPlacement {
     readonly liquid: string;
     readonly depth: number;
     readonly drain?: { readonly rate: number; readonly open: boolean };
+    readonly fill?: { readonly rate: number; readonly open: boolean };
   };
   /** Its light source data, when it is one (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec;
@@ -944,6 +958,7 @@ function doorOf(spec: SceneDoorSpec): SceneDoor {
     ...(spec.state !== undefined && { state: spec.state }),
     ...(spec.hinge !== undefined && { hinge: spec.hinge }),
     ...(spec.swing !== undefined && { swing: spec.swing }),
+    ...(spec.interlock !== undefined && { interlock: Object.freeze({ ...spec.interlock }) }),
   });
 }
 
@@ -996,6 +1011,9 @@ function liquidOf(spec: SceneLiquidSpec): NonNullable<SceneSpawnPlacement['liqui
     depth: spec.depth,
     ...(spec.drain !== undefined && {
       drain: Object.freeze({ rate: spec.drain.rate, open: spec.drain.open }),
+    }),
+    ...(spec.fill !== undefined && {
+      fill: Object.freeze({ rate: spec.fill.rate, open: spec.fill.open }),
     }),
   });
 }
@@ -1324,6 +1342,7 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
           scene: t.scene.id,
           spawn: t.spawn,
           follow: t.follow,
+          ...(t.advanceMinutes !== undefined && { advanceMinutes: t.advanceMinutes }),
         }),
       ),
     ),

@@ -1,0 +1,719 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "kestrel-lock",
+  "name": "Kestrel Lock",
+  "description": "Bead mw-e25.14: Kestrel Lock, the halfway landmark on the always-open towpath from Briar Glen to Wendmouth (bible 3.1, 3.6), in grey box from the e00 kit and approved models only. The towpath runs 96 m along the north bank (x -48..48; upriver is west, downriver east; the river is z -3..3). Each end is the transition to the next stretch of towpath and advances the world clock by exactly 6 game hours (advanceMinutes 360): towpath-up leads to under-the-bridge (arrive-from-kestrel-lock there; arrive-from-under-the-bridge-upriver here, the spawn the quay scene will take over, mw-e25.24) and towpath-down to the Wendmouth Stone Wharf (arrive-from-wendmouth-harbour here arrives from Wendmouth; mw-e40.26). The lock chamber is 18 x 6 m between two gates, each a lock-gate door with a beam walk over it. The chamber is a liquid volume (chamber-water) that starts full, level with the upper pound (surface -0.5 m); the lower pound stands 2.25 m lower. The upper paddle lever opens the head sluice (a fill) and the lower paddle lever opens the tail drain; the chamber moves to the other level in about 19 s (it can never fill past the upper pound's level: its brim is that level). Each gate carries an interlock on the chamber's depth: the upper gate moves only while the chamber is full (depth >= 2.2 m), the lower only while it is drained (depth <= 0.15 m); against unequal levels a gate jams and strains (mechanismJammed) and nothing changes. Ladders climb out of the water. kestrel-lock-gates writes kestrel-lock.gate-open 20 s after the tail paddle opens. South of the lock a landing (where the barge will moor, mw-4l3z) is reached by either beam walk. Old Reed (npc-reed) stands at the toll board by his cottage (mw-vau: he lives at the lock, so he has left the harbour); the cottage (x 2..16, z -20..-8) has a wooden door, a hearth, a table and a cot, and the cot is a rest point: the reed-cot counter (merchant kestrel-lock-cot) sells a night's rest for 8 crowns. Reach it with ?scene=kestrel-lock.",
+  "grid": 1,
+  "camera": {
+    "position": [-14, 16, -24],
+    "target": [2, -1, -3]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0.0, 0.0, -5.5],
+      "scale": [48, 1, 2.5]
+    },
+    {
+      "piece": "floor",
+      "at": [0.0, -2.75, 0.0],
+      "scale": [9, 1, 3]
+    },
+    {
+      "piece": "floor",
+      "at": [-28.5, -3.5, 0.0],
+      "scale": [19.5, 1, 3]
+    },
+    {
+      "piece": "floor",
+      "at": [28.5, -3.5, 0.0],
+      "scale": [19.5, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, -3.5, -3.0],
+      "scale": [9, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-28.5, -3.5, -3.0],
+      "scale": [19.5, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28.5, -3.5, -3.0],
+      "scale": [19.5, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, -3.5, 3.0],
+      "scale": [9, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-28.5, -3.5, 3.0],
+      "scale": [19.5, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [28.5, -3.5, 3.0],
+      "scale": [19.5, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-48.0, -3.5, 0.0],
+      "yaw": 90,
+      "scale": [3, 1.2, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [48.0, -3.5, 0.0],
+      "yaw": 90,
+      "scale": [3, 1.2, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [6.0, 0.0, 6.0],
+      "scale": [18, 1, 3]
+    },
+    {
+      "piece": "wall",
+      "at": [6.0, 0.0, 9.0],
+      "scale": [18, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-12.0, 0.0, 6.0],
+      "yaw": 90,
+      "scale": [3, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [24.0, 0.0, 6.0],
+      "yaw": 90,
+      "scale": [3, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-23.0, 0.0, -8.0],
+      "scale": [25, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [32.0, 0.0, -8.0],
+      "scale": [16, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-48.0, 0.0, -5.5],
+      "yaw": 90,
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [48.0, 0.0, -5.5],
+      "yaw": 90,
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-9.0, 0.0, 0.0],
+      "scale": [0.75, 1, 3]
+    },
+    {
+      "piece": "floor",
+      "at": [9.0, 0.0, 0.0],
+      "scale": [0.75, 1, 3]
+    },
+    {
+      "piece": "platform",
+      "at": [-5.0, -3.5, -2.75],
+      "scale": [0.5, 3.5, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [5.0, -3.5, -2.75],
+      "scale": [0.5, 3.5, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [-20.0, -3.5, -2.75],
+      "scale": [0.5, 3.5, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [20.0, -3.5, -2.75],
+      "scale": [0.5, 3.5, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [14.0, -3.5, 2.75],
+      "scale": [0.5, 3.5, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "floor",
+      "at": [9.0, 0.0, -14.0],
+      "scale": [7, 1, 6]
+    },
+    {
+      "piece": "wall",
+      "at": [5.0, 0.0, -8.0],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [9.0, 0.0, -8.0]
+    },
+    {
+      "piece": "wall",
+      "at": [13.0, 0.0, -8.0],
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [9.0, 0.0, -20.0],
+      "scale": [7, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [2.0, 0.0, -14.0],
+      "yaw": 90,
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [16.0, 0.0, -14.0],
+      "yaw": 90,
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [9.0, 0.0, -14.0],
+      "scale": [0.9, 0.75, 0.5]
+    },
+    {
+      "piece": "platform",
+      "at": [3.0, 0.0, -17.5],
+      "scale": [0.5, 0.45, 1.1]
+    },
+    {
+      "piece": "crate",
+      "at": [13.5, 0.0, -6.5],
+      "scale": [0.7, 0.8, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [14.75, 0.0, -6.5],
+      "scale": [0.55, 0.6, 0.5]
+    },
+    {
+      "piece": "crate",
+      "at": [-14.0, 0.0, -6.5],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "crate",
+      "at": [-13.0, 0.0, -6.75],
+      "scale": [0.55, 0.6, 0.5]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "ladder-w-5",
+      "at": [-5.0, -3.5, -2.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "ladder-e-5",
+      "at": [5.0, -3.5, -2.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "ladder-w-20",
+      "at": [-20.0, -3.5, -2.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "ladder-e-20",
+      "at": [20.0, -3.5, -2.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "ladder-e-14",
+      "at": [14.0, -3.5, 2.0],
+      "tags": ["ladder"]
+    },
+    {
+      "id": "player-start",
+      "at": [-12.0, 0.0, -5.5],
+      "yaw": 90,
+      "tags": ["player-start"]
+    },
+    {
+      "id": "arrive-from-under-the-bridge-upriver",
+      "at": [-44.0, 0.0, -5.5],
+      "yaw": 90,
+      "tags": ["arrival", "towpath"]
+    },
+    {
+      "id": "arrive-from-wendmouth-harbour",
+      "at": [44.0, 0.0, -5.5],
+      "yaw": 270,
+      "tags": ["arrival", "towpath"]
+    },
+    {
+      "id": "kestrel-lock",
+      "at": [0.0, 0.0, -5.5],
+      "tags": ["node", "region"]
+    },
+    {
+      "id": "barge-landing",
+      "at": [12.0, 0.0, 6.0],
+      "tags": ["marker", "landing"]
+    },
+    {
+      "id": "sign-towpath-upriver",
+      "at": [-45.0, 1.25, -3.5],
+      "tags": ["sign", "path"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the towpath upriver, to Briar Glen"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "sign-towpath-downriver",
+      "at": [45.0, 1.25, -3.5],
+      "tags": ["sign", "path"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the towpath downriver, to Wendmouth"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "toll-board",
+      "at": [13.0, 1.25, -7.5],
+      "yaw": 0,
+      "tags": ["sign", "toll", "readable", "inscription-kestrel-lock-toll-board"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the toll board"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "npc-reed",
+      "at": [11.5, 0.0, -6.25],
+      "yaw": 0,
+      "tags": ["npc", "toll"],
+      "creature": "npc-reed",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "upper-paddle-lever",
+      "at": [-7.5, 0.0, -3.75],
+      "tags": ["paddle", "upper"],
+      "prop": "lever",
+      "properties": {
+        "remoteActuatable": true
+      },
+      "switch": {
+        "kind": "lever"
+      }
+    },
+    {
+      "id": "lower-paddle-lever",
+      "at": [7.5, 0.0, -3.75],
+      "tags": ["paddle", "lower"],
+      "prop": "lever",
+      "properties": {
+        "remoteActuatable": true
+      },
+      "switch": {
+        "kind": "lever"
+      }
+    },
+    {
+      "id": "upper-lock-gate",
+      "at": [-9.0, -3.5, 0.0],
+      "yaw": 90,
+      "tags": ["gate", "upper"],
+      "door": {
+        "profile": "lock-gate",
+        "hinge": "left",
+        "swing": "back",
+        "interlock": {
+          "volume": "chamber-water",
+          "minDepth": 2.2
+        }
+      }
+    },
+    {
+      "id": "lower-lock-gate",
+      "at": [9.0, -3.5, 0.0],
+      "yaw": 90,
+      "tags": ["gate", "lower"],
+      "door": {
+        "profile": "lock-gate",
+        "hinge": "left",
+        "swing": "forward",
+        "interlock": {
+          "volume": "chamber-water",
+          "maxDepth": 0.15
+        }
+      }
+    },
+    {
+      "id": "cottage-door",
+      "at": [9.0, 0.0, -8.0],
+      "yaw": 0,
+      "tags": ["door"],
+      "door": {
+        "profile": "wooden-door",
+        "swing": "back"
+      }
+    },
+    {
+      "id": "upper-pound",
+      "at": [-28.5, -3.5, 0.0],
+      "tags": ["pool", "standing-water", "pound"],
+      "liquid": {
+        "size": [39, 3.3, 6],
+        "liquid": "water",
+        "depth": 3.0
+      }
+    },
+    {
+      "id": "lower-pound",
+      "at": [28.5, -3.5, 0.0],
+      "tags": ["pool", "standing-water", "pound"],
+      "liquid": {
+        "size": [39, 3.3, 6],
+        "liquid": "water",
+        "depth": 0.75
+      }
+    },
+    {
+      "id": "chamber-water",
+      "at": [0.0, -2.75, 0.0],
+      "tags": ["pool", "standing-water", "lock-chamber"],
+      "liquid": {
+        "size": [18, 2.25, 6],
+        "liquid": "water",
+        "depth": 2.25,
+        "drain": {
+          "rate": 0.12
+        },
+        "fill": {
+          "rate": 0.12
+        }
+      }
+    },
+    {
+      "id": "keeper-cot",
+      "at": [3.0, 0.5, -17.5],
+      "tags": ["bed", "furniture", "rest-point"]
+    },
+    {
+      "id": "reed-cot",
+      "at": [5.0, 0.0, -17.25],
+      "tags": ["counter", "shop", "rest-point", "merchant:kestrel-lock-cot", "dev-crowns:30"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "talk",
+            "label": "Rest on the keeper's cot"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "keeper-fire",
+      "at": [14.5, 0.5, -17.5],
+      "tags": ["brazier", "hearth"],
+      "lightSource": {
+        "variant": "brazier",
+        "infiniteFuel": true
+      }
+    },
+    {
+      "id": "keeper-table",
+      "at": [9.0, 0.75, -14.0],
+      "tags": ["table", "furniture"]
+    },
+    {
+      "id": "towpath-lantern-west",
+      "at": [-30.0, 2.5, -3.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "towpath-lantern-lock",
+      "at": [0.0, 2.5, -3.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "towpath-lantern-east",
+      "at": [30.0, 2.5, -3.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "cottage-lantern",
+      "at": [9.0, 2.5, -7.5],
+      "tags": ["lantern"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.32,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [0.3, -1, 0.4],
+        "level": 0.3,
+        "reach": 90
+      }
+    ],
+    "timeOfDay": {
+      "keyframes": [
+        {
+          "minute": 0,
+          "ambient": 0.12,
+          "directional": 0.08,
+          "sky": "#0B0F1E"
+        },
+        {
+          "minute": 300,
+          "ambient": 0.14,
+          "directional": 0.08,
+          "sky": "#17203A"
+        },
+        {
+          "minute": 390,
+          "ambient": 0.32,
+          "directional": 0.22,
+          "sky": "#8A8FA8"
+        },
+        {
+          "minute": 480,
+          "ambient": 0.6,
+          "directional": 0.6,
+          "sky": "#A9C7DC"
+        },
+        {
+          "minute": 1020,
+          "ambient": 0.6,
+          "directional": 0.6,
+          "sky": "#A9C7DC"
+        },
+        {
+          "minute": 1110,
+          "ambient": 0.34,
+          "directional": 0.28,
+          "sky": "#D08A60"
+        },
+        {
+          "minute": 1260,
+          "ambient": 0.16,
+          "directional": 0.1,
+          "sky": "#10142A"
+        }
+      ]
+    }
+  },
+  "environment": {
+    "sky": "#A9C7DC",
+    "fog": {
+      "color": "#C5D3DC",
+      "near": 60,
+      "far": 200
+    },
+    "dome": {
+      "stars": 0.7,
+      "clouds": 0.5,
+      "wind": 40,
+      "seed": 9
+    }
+  },
+  "regions": [
+    {
+      "id": "kestrel-lock",
+      "min": [-48, -4, -9],
+      "max": [48, 12, 9],
+      "tags": ["region", "lock"]
+    }
+  ],
+  "signals": [
+    {
+      "graph": "kestrel-lock-gates"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "towpath-up",
+      "min": [-47.5, -1, -8],
+      "max": [-46.5, 3, -3],
+      "scene": "under-the-bridge",
+      "spawn": "arrive-from-kestrel-lock",
+      "advanceMinutes": 360
+    },
+    {
+      "id": "towpath-down",
+      "min": [46.5, -1, -8],
+      "max": [47.5, 3, -3],
+      "scene": "wendmouth-harbour",
+      "spawn": "arrive-from-kestrel-lock",
+      "advanceMinutes": 360
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "towpath",
+      "min": [-48, -0.5, -8],
+      "max": [48, 1, -3],
+      "surface": "gravel"
+    },
+    {
+      "id": "south-landing",
+      "min": [-12, -0.5, 3],
+      "max": [24, 1, 9],
+      "surface": "gravel"
+    },
+    {
+      "id": "lock-bed",
+      "min": [-9, -3.5, -3],
+      "max": [9, -2.5, 3],
+      "surface": "stone"
+    },
+    {
+      "id": "beam-upper",
+      "min": [-9.5, -0.5, -3],
+      "max": [-8.5, 1, 3],
+      "surface": "wood"
+    },
+    {
+      "id": "beam-lower",
+      "min": [8.5, -0.5, -3],
+      "max": [9.5, 1, 3],
+      "surface": "wood"
+    },
+    {
+      "id": "cottage-floor",
+      "min": [2, -0.5, -20],
+      "max": [16, 1, -8],
+      "surface": "wood"
+    }
+  ],
+  "dressings": [
+    {
+      "id": "lockside-crate-stack",
+      "model": "model-prop-crate-stack-01",
+      "at": [13.5, 0.0, -6.5],
+      "turn": 90,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [13.15, 0.1, -6.9],
+        "max": [13.85, 0.8, -6.1]
+      }
+    },
+    {
+      "id": "lockside-keg",
+      "model": "model-prop-keg-01",
+      "at": [14.75, 0.0, -6.5],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height",
+      "hides": {
+        "min": [14.424999999999999, 0.1, -6.85],
+        "max": [14.975, 0.6, -6.35]
+      }
+    },
+    {
+      "id": "upriver-crate-stack",
+      "model": "model-prop-crate-stack-01",
+      "at": [-14.0, 0.0, -6.5],
+      "turn": 90,
+      "size": [0.8, 0.8, 0.8],
+      "fit": "height",
+      "hides": {
+        "min": [-14.4, 0.1, -6.9],
+        "max": [-13.6, 0.8, -6.1]
+      }
+    },
+    {
+      "id": "upriver-keg",
+      "model": "model-prop-keg-01",
+      "at": [-13.0, 0.0, -6.75],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height",
+      "hides": {
+        "min": [-13.275, 0.1, -7.05],
+        "max": [-12.725, 0.6, -6.55]
+      }
+    },
+    {
+      "id": "beam-rope-coil",
+      "model": "model-prop-rope-coil-01",
+      "at": [-9.0, 0.0, -2.25],
+      "turn": 0,
+      "size": [0.6, 0.25, 0.6],
+      "fit": "box"
+    }
+  ]
+}

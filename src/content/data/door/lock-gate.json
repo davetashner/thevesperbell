@@ -1,0 +1,12 @@
+{
+  "$schema": "../door.schema.json",
+  "id": "lock-gate",
+  "name": "Lock gate (Kestrel Lock)",
+  "notes": "One leaf of oak and iron that shuts a canal lock's 6 m channel, 3.3 m tall so its top stays a hand below the lock beam walk (mw-e25.14). It swings on its hinge over 8 seconds, slow because it pushes water, and is worked by hand from the beam walk. It carries no lock: the water is the lock. A scene ties it to the chamber's liquid volume with `door.interlock`, so it jams while the levels differ and a player who tries it hears and sees it strain. Water, light and sound pass a lock gate's seams, so it blocks none of them.",
+  "kind": "hinged",
+  "size": [6, 3.3, 0.3],
+  "seconds": 8,
+  "material": "iron",
+  "blocks": { "light": false, "gas": false, "sound": false },
+  "loudness": 60
+}

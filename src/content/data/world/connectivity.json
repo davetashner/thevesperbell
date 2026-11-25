@@ -522,7 +522,8 @@
       "area": "river",
       "epic": "e25",
       "optional": true,
-      "notes": "Lock on the towpath and barge route (bible 3.1, mw-e25.14)."
+      "scene": "kestrel-lock",
+      "notes": "Lock on the towpath and barge route (bible 3.1, mw-e25.14): two gates, paddles that move the chamber's standing water between two levels, Old Reed and his cottage."
     },
     {
       "id": "lockkeepers-cottage",
@@ -1099,16 +1100,17 @@
       "from": "kestrel-lock",
       "to": "stone-wharf",
       "kind": "path",
+      "transitions": ["kestrel-lock/towpath-down", "wendmouth-harbour/towpath-gate"],
       "bead": "mw-e40.26",
-      "notes": "Towpath on to Wendmouth (always open; bible 3.6)."
+      "notes": "Towpath on to Wendmouth (always open; bible 3.6). The walk takes 6 game hours each way."
     },
     {
-      "id": "riverbank-wharf-link",
+      "id": "riverbank-lock-link",
       "from": "under-the-bridge",
-      "to": "stone-wharf",
+      "to": "kestrel-lock",
       "kind": "path",
-      "transitions": ["under-the-bridge/towpath-down", "wendmouth-harbour/towpath-gate"],
-      "notes": "Stopgap (mw-e40.26): the towpath downriver from the riverbank runs straight to the Stone Wharf until Briar Glen Quay, the Millweir and Kestrel Lock are built; then it is replaced by under-the-bridge-quay, quay-millweir, millweir-kestrel-lock and towpath-lock-wharf. Wendmouth is optional: the main quest never uses it."
+      "transitions": ["under-the-bridge/towpath-down", "kestrel-lock/towpath-up"],
+      "notes": "Stand-in (mw-0ml8) for the upriver end of the towpath: the riverbank's east path runs straight to Kestrel Lock, 6 game hours, until Briar Glen Quay and the Millweir are built (mw-e25.24); then it is replaced by under-the-bridge-quay, quay-millweir and millweir-kestrel-lock, and the lock's arrive-from-under-the-bridge-upriver spawn is retargeted. Wendmouth is optional: the main quest never uses it."
     },
     {
       "id": "barge-quay-lock",

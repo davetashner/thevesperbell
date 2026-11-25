@@ -110,6 +110,24 @@ export const sceneDoorSchema = z.strictObject({
     .enum(SCENE_DOOR_STATES)
     .default('closed')
     .describe('How it starts: closed, open or jammed.'),
+  interlock: z
+    .strictObject({
+      volume: z.string().min(1).describe('Spawn id of the liquid volume the door answers to.'),
+      minDepth: z
+        .number()
+        .min(0)
+        .optional()
+        .describe('Shallowest the liquid may stand for the door to move, metres; default 0.'),
+      maxDepth: z
+        .number()
+        .positive()
+        .optional()
+        .describe('Deepest the liquid may stand for the door to move, metres; default no limit.'),
+    })
+    .optional()
+    .describe(
+      'The door holds shut (jammed, with a strain cue) while that volume stands outside the depth window (the gates of a lock, mw-e25.14).',
+    ),
   hinge: z
     .enum(['left', 'right'])
     .default('left')
@@ -402,6 +420,15 @@ export const sceneLiquidSchema = z.strictObject({
     })
     .optional()
     .describe('A drain, opened and closed by a signal or code (the valve of a basin).'),
+  fill: z
+    .strictObject({
+      rate: z.number().positive().describe('Level rise while open, m/s, until the brim.'),
+      open: z.boolean().default(false).describe('Starts open.'),
+    })
+    .optional()
+    .describe(
+      'A sluice that tops the volume up with its own liquid, opened and closed by a signal bound with the key `fill` (the head sluice of a lock).',
+    ),
 });
 
 /**
@@ -1236,6 +1263,14 @@ export const sceneTransitionSchema = z
       .boolean()
       .default(false)
       .describe('Companions flagged to follow travel with the player through it (none exist yet).'),
+    advanceMinutes: z
+      .int()
+      .positive()
+      .max(1440)
+      .optional()
+      .describe(
+        'Game minutes the world clock advances by (advanceTime, reason travel) as the player crosses it: a leg of a long walk (the towpath, mw-e25.14).',
+      ),
   })
   .refine(({ min, max }) => max[0] > min[0] && max[1] > min[1] && max[2] > min[2], {
     message: 'max must be above min on every axis',

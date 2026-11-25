@@ -43,7 +43,6 @@ const PLACED: Record<string, readonly string[]> = {
   'note-lantern-court-notice': ['read-notice-stone-wharf', 'read-notice-customs-house'],
   'note-tidefair-board': ['read-tidefair-board'],
   'note-impound-ledger': ['read-impound-ledger'],
-  'inscription-kestrel-lock-toll-board': ['toll-board'],
   'inscription-drowned-gull-sign': ['sign-drowned-gull'],
   'inscription-customs-house-lintel': ['sign-customs-house'],
   'inscription-tidemarket-board': ['sign-tidemarket'],

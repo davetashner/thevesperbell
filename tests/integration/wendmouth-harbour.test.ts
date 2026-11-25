@@ -191,18 +191,21 @@ describe('Wendmouth is optional (mw-e40.1 AC-2)', () => {
     expect(world.mainQuest.filter((id) => wendmouth.has(id))).toEqual([]);
   });
 
-  it('AC-2: the barge and Kestrel Lock legs stay planned; the only scene link is the riverbank stopgap, and the main quest never uses it (mw-e40.26)', () => {
+  it('AC-2: the barge leg stays planned; the only scene link is the towpath from Kestrel Lock, and the main quest never uses it (mw-e40.26)', () => {
     const towpath = world?.edges.find((e) => e.id === 'towpath-lock-wharf');
     const barge = world?.edges.find((e) => e.id === 'barge-lock-wharf');
-    expect(towpath?.transitions ?? []).toEqual([]);
+    expect(towpath?.transitions).toEqual([
+      'kestrel-lock/towpath-down',
+      'wendmouth-harbour/towpath-gate',
+    ]);
     expect(barge?.transitions ?? []).toEqual([]);
-    expect(scene.transitions.map((t) => t.scene.id)).toEqual(['under-the-bridge']);
+    expect(scene.transitions.map((t) => t.scene.id)).toEqual(['kestrel-lock']);
     const linking = content
       .all('scene')
       .flatMap((other) =>
         other.transitions.filter((t) => t.scene.id === 'wendmouth-harbour').map(() => other.id),
       );
-    expect(linking).toEqual(['under-the-bridge']);
+    expect(linking).toEqual(['kestrel-lock']);
   });
 });
 
@@ -392,14 +395,13 @@ describe('Wendmouth’s people (mw-e40.1, with the dialogues of mw-e19 harbour f
     ['npc-mags', 'barge-berth'],
     ['npc-nell', 'gull-bar'],
     ['npc-oona', 'arm-wrestling-table'],
-    ['npc-reed', 'towpath-arrival'],
     ['npc-cray', 'customs-office'],
     ['npc-tereza', 'arms-stall'],
     ['npc-quell', 'manifest-desk'],
     ['npc-hesketh', 'tern-gangway'],
   ] as const;
 
-  it('all eight dialogue NPCs stand in the harbour as their creatures, each with a dialogue', () => {
+  it('all seven dialogue NPCs stand in the harbour (Old Reed keeps Kestrel Lock, mw-vau) as their creatures, each with a dialogue', () => {
     for (const [id, place] of PEOPLE) {
       const spawn = spawnOf(id);
       expect(spawn.creature?.id, id).toBe(id);

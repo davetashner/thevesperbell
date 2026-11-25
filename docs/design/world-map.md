@@ -96,7 +96,7 @@ flowchart LR
     briar_glen_quay["Briar Glen Quay"]
     millweir["The Millweir"]
     weeping_adit_mouth["The Weeping Adit (river mouth)"]
-    kestrel_lock["Kestrel Lock"]
+    kestrel_lock["Kestrel Lock"]:::built
     lockkeepers_cottage["The lock-keeper's cottage"]
   end
   subgraph wendmouth["Wendmouth (optional)"]
@@ -166,7 +166,7 @@ flowchart LR
   millweir -.-|shortcut archer/sorcerer| millweir_far_bank
   millweir --- kestrel_lock
   kestrel_lock --- stone_wharf
-  under_the_bridge --- stone_wharf
+  under_the_bridge --- kestrel_lock
   briar_glen_quay ---|barge| kestrel_lock
   kestrel_lock ---|barge| stone_wharf
   kestrel_lock -.-|shortcut| lockkeepers_cottage
@@ -225,7 +225,7 @@ Land loops: forest ↔ watchtower ↔ priory; watchtower supply tunnel ↔ upper
 
 ## The barge and towpath to Wendmouth
 
-Briar Glen Quay → Millweir → Kestrel Lock → Stone Wharf is the **towpath** (`quay-millweir`, `millweir-kestrel-lock`, `towpath-lock-wharf`): foot, always open, a day's walk. The **barge** (`barge-quay-lock`, `barge-lock-wharf`, `travel: barge`, `time: dawn, day`) is Mags Oakum's ride, a narrated journey or fast travel in the mornings only ("not with whatever's singing up there"). Wendmouth and Kestrel Lock are `optional`: the validator computes the main-quest critical path (waypoints in `mainQuest`, bible §4.1) over edges every class can take, on foot, avoiding optional nodes, and fails if it cannot (AC-5). Today's critical path is `bridge-post → mine gate → winch house → … → the Cradle → Sounding Shaft → belfry → Market Green`.
+Briar Glen Quay → Millweir → Kestrel Lock → Stone Wharf is the **towpath** (`quay-millweir`, `millweir-kestrel-lock`, `towpath-lock-wharf`): foot, always open, a day's walk: each leg is a transition with `advanceMinutes: 360`, so crossing it advances the world clock by exactly 6 game hours (`advanceTime`, reason `travel`; the game clock doc, mw-e27.12). Kestrel Lock is built (mw-e25.14): the towpath reaches it from under the bridge by the stand-in edge `riverbank-lock-link` (mw-0ml8; the quay and the Millweir will take over that end, mw-e25.24, retargeting the lock's `arrive-from-upriver` spawn) and leaves it for the Stone Wharf by `towpath-lock-wharf`. The **barge** (`barge-quay-lock`, `barge-lock-wharf`, `travel: barge`, `time: dawn, day`) is Mags Oakum's ride, a narrated journey or fast travel in the mornings only ("not with whatever's singing up there"). Wendmouth and Kestrel Lock are `optional`: the validator computes the main-quest critical path (waypoints in `mainQuest`, bible §4.1) over edges every class can take, on foot, avoiding optional nodes, and fails if it cannot (AC-5). Today's critical path is `bridge-post → mine gate → winch house → … → the Cradle → Sounding Shaft → belfry → Market Green`.
 
 ## Ability-gated shortcuts per class
 
@@ -311,7 +311,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `briar-glen-quay` | Briar Glen Quay | river | e25 | planned | Barge landing and slipway (bible 3.5, mw-e25.11). |
 | `millweir` | The Millweir | river | e25 | planned | Weir below town with its sluice walk (bible 3.1, mw-e25.12). |
 | `weeping-adit-mouth` | The Weeping Adit (river mouth) | river | e25 | planned | Where the Wend springs from the hill, a flooded drainage tunnel (bible 3.1, mw-e25.13). |
-| `kestrel-lock` | Kestrel Lock | river | e25 | planned | Lock on the towpath and barge route (bible 3.1, mw-e25.14). |
+| `kestrel-lock` | Kestrel Lock | river | e25 | `kestrel-lock` | Lock on the towpath and barge route (bible 3.1, mw-e25.14): two gates, paddles that move the chamber's standing water between two levels, Old Reed and his cottage. |
 | `lockkeepers-cottage` | The lock-keeper's cottage | river | e25 | planned | Across the lock gates (bible 3.5). |
 | `stone-wharf` | The Stone Wharf | wendmouth | e40 | `wendmouth-harbour` | Barge landing and hub of the harbour (bible 3.6, mw-e40.2). Built (mw-e40.1): the open flagstone quay (player-start, Tidefair ground, crane piers, block yards, the sealed Silver Quay gate at its east end) with the Great Stair down to the barge berth. |
 | `tidemarket` | The Tidemarket | wendmouth | e40 | `wendmouth-harbour` | Covered import market (bible 3.6). Built (mw-e40.1): a covered hall open to the wharf, stalls, the arms stall and the book cart as markers; content is mw-e40.10. |
@@ -382,8 +382,8 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `quay-millweir` | `briar-glen-quay` | `millweir` | path |  |  | planned: mw-e25.24 |
 | `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | planned: mw-e25.12 |
 | `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | planned: mw-e25.24 |
-| `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | planned: mw-e40.26 |
-| `riverbank-wharf-link` | `under-the-bridge` | `stone-wharf` | path |  |  | `under-the-bridge/towpath-down`, `wendmouth-harbour/towpath-gate` |
+| `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | `kestrel-lock/towpath-down`, `wendmouth-harbour/towpath-gate` |
+| `riverbank-lock-link` | `under-the-bridge` | `kestrel-lock` | path |  |  | `under-the-bridge/towpath-down`, `kestrel-lock/towpath-up` |
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
@@ -444,7 +444,8 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
-| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-wharf-link) |
+| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-lock-link) |
+| `kestrel-lock` | `kestrel-lock` | `kestrel-lock/towpath-up` (riverbank-lock-link), `kestrel-lock/towpath-down` (towpath-lock-wharf); its lock chamber, cottage and landing are walked inside the scene |
 | `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
 | `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings), `briarwood/ridge-gate` (moorings-priory-ridge); its other trails are walked inside the scene |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
@@ -482,7 +483,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `knot-inner` | `the-fold` | none (a marker spawn in the vault; the hall's west doorway leads in, inside the scene) |
 | `knot-inner` | `the-cradle` | none (a marker spawn at the south entrance; the corridor from the hall and the secret east doorway lead in, inside the scene) |
 | `knot-inner` | `sounding-shaft-foot` | none (a marker spawn in the shaft room; the Cradle's north doorway leads in, inside the scene) |
-| `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; the towpath gate in the south wall is the `wendmouth-harbour/towpath-gate` transition, the stopgap riverbank-wharf-link from under-the-bridge, mw-e40.26; the barge berth is where the barge will arrive, mw-e25.15) |
+| `wendmouth-harbour` | `stone-wharf` | none (a marker spawn; the wharf is walked inside the scene; the towpath gate in the south wall is the `wendmouth-harbour/towpath-gate` transition up the towpath to Kestrel Lock (towpath-lock-wharf, mw-e40.26); the barge berth is where the barge will arrive, mw-e25.15) |
 | `wendmouth-harbour` | `tidemarket` | none (a marker spawn; walked inside the scene) |
 | `wendmouth-harbour` | `customs-house` | none (a marker spawn; walked inside the scene) |
 | `wendmouth-harbour` | `bonded-warehouse` | none (a marker spawn; walked inside the scene) |
@@ -547,7 +548,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 
 New beads from this map: mw-e25.22 (Briarwood link), mw-e25.23 (Miners' Bridge to the mine gate), mw-e25.24 (riverbank to the quay and towpath), mw-e25.25 (forest loop), mw-e40.26 (towpath and barge to Wendmouth).
 
-Shortcut facts: `pnpm world:validate` warns (AC-2) for each shortcut fact no placed content writes yet. Today that is every shortcut: the `world.*` facts have no writer yet, and `kestrel-lock.gate-open` is written by the `kestrel-lock-gates` graph, which no scene places yet. The warning list is the to-do list for the level beads named in each fact's description, and the warnings disappear as they place the graph, puzzle or interaction that writes the fact.
+Shortcut facts: `pnpm world:validate` warns (AC-2) for each shortcut fact no placed content writes yet. Today that is every shortcut but one: the `world.*` facts have no writer yet. `kestrel-lock.gate-open` is written by the `kestrel-lock-gates` graph, which the Kestrel Lock scene places (mw-e25.14); `lock-gate-crossing` stays a planned edge until the cottage gets its own scene. The warning list is the to-do list for the level beads named in each fact's description, and the warnings disappear as they place the graph, puzzle or interaction that writes the fact.
 
 ## Open questions (canon gaps for the owner)
 
