@@ -309,3 +309,19 @@ describe('the lock chamber (mw-e25.14 AC-2, AC-3)', () => {
     },
   );
 });
+
+describe('the lock’s approved prop models (mw-e25.14)', () => {
+  it('the toll board, paddle gears, bollards and coping stack are drawn from shipped models', async () => {
+    const { existsSync } = await import('node:fs');
+    const models = lock.dressings.map((d) => d.model);
+    for (const id of [
+      'model-prop-lock-toll-board-01',
+      'model-prop-lock-paddle-gear-01',
+      'model-prop-mooring-bollard-01',
+      'model-prop-lock-coping-stack-01',
+    ]) {
+      expect(models, id).toContain(id);
+      expect(existsSync(`public/assets/model/${id}.glb`), id).toBe(true);
+    }
+  });
+});

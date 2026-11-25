@@ -714,6 +714,54 @@
       "turn": 0,
       "size": [0.6, 0.25, 0.6],
       "fit": "box"
+    },
+    {
+      "id": "lock-toll-board-model",
+      "model": "model-prop-lock-toll-board-01",
+      "at": [13, 0, -7.5],
+      "turn": 0,
+      "size": [0.9, 1.8, 1.5],
+      "fit": "box"
+    },
+    {
+      "id": "upper-paddle-gear",
+      "model": "model-prop-lock-paddle-gear-01",
+      "at": [-7.5, 0, -3.75],
+      "turn": 0,
+      "size": [0.6, 1.1, 1.0],
+      "fit": "box"
+    },
+    {
+      "id": "lower-paddle-gear",
+      "model": "model-prop-lock-paddle-gear-01",
+      "at": [7.5, 0, -3.75],
+      "turn": 0,
+      "size": [0.6, 1.1, 1.0],
+      "fit": "box"
+    },
+    {
+      "id": "landing-bollard-west",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [14, 0, 6.5],
+      "turn": 0,
+      "size": [0.5, 0.5, 0.5],
+      "fit": "box"
+    },
+    {
+      "id": "landing-bollard-east",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [18, 0, 6.5],
+      "turn": 0,
+      "size": [0.5, 0.5, 0.5],
+      "fit": "box"
+    },
+    {
+      "id": "lock-coping-stack",
+      "model": "model-prop-lock-coping-stack-01",
+      "at": [-3, 0, 6.5],
+      "turn": 0,
+      "size": [0.65, 1.0, 0.85],
+      "fit": "box"
     }
   ]
 }
