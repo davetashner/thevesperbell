@@ -93,6 +93,8 @@ export interface AudioContextLike {
   readonly destination: AudioNodeLike;
   readonly listener: AudioListenerLike;
   resume(): Promise<void>;
+  /** Releases the context's audio hardware; a real context has it, a fake need not. */
+  close?(): Promise<void>;
   createGain(): GainNodeLike;
   createDynamicsCompressor(): DynamicsCompressorNodeLike;
   createBiquadFilter(): BiquadFilterNodeLike;
