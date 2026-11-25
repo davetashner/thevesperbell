@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "briar-glen-lane",
   "name": "Briar Glen: the shop lane",
-  "description": "Bead mw-ju8.5: a greybox cobbled lane, about 40 m long and 16 m wide, built from the e00 kit only. It runs north from the town end of the Miners' Bridge (the bridge-town-end marker; the bridge-gate transition just south of it leads back to valley-03). Marsh's General Store is the first building past the bridge, on the west side: its front door (marsh-store-door) is a transition into the shop (mw-e01.11). Arrival spawns arrive-from-valley-03, arrive-from-marsh-store and arrive-from-sleeping-ox are where the player stands when coming from those scenes; the Sleeping Ox stands further up the west side (mw-ju8.22): a facade with a doorway, a hanging sign stand-in (sign-sleeping-ox; the art, a peaceful ox asleep under a moon, comes later), a lantern and the sleeping-ox-door transition into the inn, with arrive-from-sleeping-ox just outside it. On the east side three open-fronted shops stand side by side, each with a six metre counter and its keeper behind it: Brand's Forge (Oswin Brand; anvil, forge fire, weapon rack, quench barrel), Fenn's Fletchery & Simples (Juniper Fenn; bow rack, herb bench, arrow barrel) and Pell's Bakery (Hollis Pell; bread shelf, oven, flour sacks). Each counter is a spawn tagged merchant:<id> with the Trade verb and dev-crowns:400 so the dev scene can trade. The Bridge Watch post stands at the bridge end (mw-ju8.12): two pillars with the guard-post, a banner (watch-banner), a lamp (watch-lamp) and a brazier on a crate (watch-brazier), with two day guards and one night guard (npc-watchman-day/-night, faction bridge-watch) standing just inside the lane. The Bridgeward College (mw-ju8.13) stands at the far end of the west side: its front door (bridgeward-college-door) is a transition into the college, arriving back at arrive-from-bridgeward-college. Props are kit stand-ins with named marker spawns so art can dress them later; street and shop lanterns are warm. Reach it with ?scene=briar-glen-lane. The riverbank path (mw-ju8.14): a gap in the east wall just past the Bridge Watch post (z 5.5 to 9) opens on a short lit alley whose end is the riverbank-path transition down to under-the-bridge (arrive-from-under-the-bridge brings the player back). The Bridge Watch keep shifts by the game clock (docs/design/bridge-watch.md): the day guards stand dawn to dusk, the night guard dusk to dawn. Bead mw-ju8.42: the gap reads at a glance: two blue pillars frame it, a green path runs from the lane into the alley, a signpost (sign-riverbank-path, facing the bridge end, and sign-riverbank-path-lane, facing the lane) stands at the mouth, and the alley is lit by a lantern and a brazier (riverbank-brazier). Bead mw-e25.22: the lane's north end wall opens on a 6 x 6 m woodside path (z 40 to 46); its end is the woodside-path transition into the Briarwood (arrive-from-briar-glen-lane), and arrive-from-briarwood brings the player back in facing the lane. Bead mw-e24.2: the woodside pocket's east wall opens on a 2 m stub (z 41.5 to 44.5) whose end is the green-gate transition into Market Green (briar-glen-green; arrive-from-briar-glen-green brings the player back in facing west). Far to the north-east a 40 m tower block (vane-house-silhouette) stands outside the lane's walls so Vane House, the tallest thing in Briar Glen, can be seen from the lane too.",
+  "description": "Bead mw-ju8.5: a greybox cobbled lane, about 40 m long and 16 m wide, built from the e00 kit only. It runs north from the town end of the Miners' Bridge (the bridge-town-end marker; the bridge-gate transition just south of it leads back to valley-03). Marsh's General Store is the first building past the bridge, on the west side: its front door (marsh-store-door) is a transition into the shop (mw-e01.11). Arrival spawns arrive-from-valley-03, arrive-from-marsh-store and arrive-from-sleeping-ox are where the player stands when coming from those scenes; the Sleeping Ox stands further up the west side (mw-ju8.22): a facade with a doorway, a hanging sign stand-in (sign-sleeping-ox; the art, a peaceful ox asleep under a moon, comes later), a lantern and the sleeping-ox-door transition into the inn, with arrive-from-sleeping-ox just outside it. On the east side three open-fronted shops stand side by side, each with a six metre counter and its keeper behind it: Brand's Forge (Oswin Brand; anvil, forge fire, weapon rack, quench barrel), Fenn's Fletchery & Simples (Juniper Fenn; bow rack, herb bench, arrow barrel) and Pell's Bakery (Hollis Pell; bread shelf, oven, flour sacks). Each counter is a spawn tagged merchant:<id> with the Trade verb and dev-crowns:400 so the dev scene can trade. The Bridge Watch post stands at the bridge end (mw-ju8.12): two pillars with the guard-post, a banner (watch-banner), a lamp (watch-lamp) and a brazier on a crate (watch-brazier), with two day guards and one night guard (npc-watchman-day/-night, faction bridge-watch) standing just inside the lane. The Bridgeward College (mw-ju8.13) stands at the far end of the west side: its front door (bridgeward-college-door) is a transition into the college, arriving back at arrive-from-bridgeward-college. Props are kit stand-ins with named marker spawns so art can dress them later; street and shop lanterns are warm. Reach it with ?scene=briar-glen-lane. The riverbank path (mw-ju8.14): a gap in the east wall just past the Bridge Watch post (z 5.5 to 9) opens on a short lit alley whose end is the riverbank-path transition down to under-the-bridge (arrive-from-under-the-bridge brings the player back). The Bridge Watch keep shifts by the game clock (docs/design/bridge-watch.md): the day guards stand dawn to dusk, the night guard dusk to dawn. Bead mw-ju8.42: the gap reads at a glance: two blue pillars frame it, a green path runs from the lane into the alley, a signpost (sign-riverbank-path, facing the bridge end, and sign-riverbank-path-lane, facing the lane) stands at the mouth, and the alley is lit by a lantern and a brazier (riverbank-brazier). Bead mw-e25.22: the lane's north end wall opens on a 6 x 6 m woodside path (z 40 to 46); its end is the woodside-path transition into the Briarwood (arrive-from-briar-glen-lane), and arrive-from-briarwood brings the player back in facing the lane. Bead mw-e24.2: the woodside pocket's east wall opens on a 2 m stub (z 41.5 to 44.5) whose end is the green-gate transition into Market Green (briar-glen-green; arrive-from-briar-glen-green brings the player back in facing west). Far to the north-east a 40 m tower block (vane-house-silhouette) stands outside the lane's walls so Vane House, the tallest thing in Briar Glen, can be seen from the lane too. Bead mw-e25.23: the west wall opens beside the Bridge Watch post (z 3 to 7) on the Miners' Stair, a worn stone stair of two flights that drops 2 m off the bridge's town abutment, between two blue pillars with a waymarker (sign-miners-stair, sign-miners-stair-lane) and a lantern, onto the old miners' track; the track's end is the miners-stair transition to the Deepworks mine-gate forecourt (arrive-from-briar-glen-lane), and arrive-from-deepworks brings the player back at the stair's foot facing east.",
   "grid": 1,
   "camera": {
     "position": [-12, 16, 4],
@@ -153,9 +153,9 @@
     },
     {
       "piece": "wall",
-      "at": [-7.0, 0.0, 4.0],
+      "at": [-7.0, 0.0, 1.5],
       "yaw": 90,
-      "scale": [4, 1, 1]
+      "scale": [1.5, 1, 1]
     },
     {
       "piece": "doorway",
@@ -373,6 +373,66 @@
       "piece": "crate",
       "at": [-5.5, 0.0, 2.25],
       "scale": [0.6, 0.6, 0.6]
+    },
+    {
+      "piece": "wall",
+      "at": [-7.0, 0.0, 7.5],
+      "yaw": 90,
+      "scale": [0.5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-8.0, 0.0, 5.0],
+      "scale": [1, 1, 2]
+    },
+    {
+      "piece": "stairs",
+      "at": [-10.0, -1.0, 5.0],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [-12.0, -2.0, 5.0],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-16.0, -2.0, 5.0],
+      "scale": [3, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [-13.0, -2.0, 3.0],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-13.0, -2.0, 7.0],
+      "scale": [6, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-19.0, -2.0, 5.0],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "pillar",
+      "at": [-7.0, 0.0, 3.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "pillar",
+      "at": [-7.0, 0.0, 7.0],
+      "purpose": "interactive"
+    },
+    {
+      "piece": "platform",
+      "at": [-6.5, 0.0, 3.0],
+      "scale": [0.05, 1.4, 0.05],
+      "purpose": "blocking"
     }
   ],
   "spawns": [
@@ -949,6 +1009,48 @@
       "presence": {
         "hours": [17, 21]
       }
+    },
+    {
+      "id": "miners-stair",
+      "at": [-18.5, -2.0, 5.0],
+      "tags": ["transition"]
+    },
+    {
+      "id": "arrive-from-deepworks",
+      "at": [-16.5, -2.0, 5.0],
+      "yaw": 90,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "lantern-miners-stair",
+      "at": [-8.5, 2.5, 5.0],
+      "tags": ["lantern", "street"],
+      "lightSource": {
+        "variant": "lantern",
+        "infiniteFuel": true,
+        "tint": [1, 0.82, 0.45]
+      }
+    },
+    {
+      "id": "lantern-miners-stair-foot",
+      "at": [-17.5, 1.0, 3.5],
+      "tags": ["lantern", "street"],
+      "lightSource": {
+        "variant": "lantern",
+        "infiniteFuel": true,
+        "tint": [1, 0.82, 0.45]
+      }
+    },
+    {
+      "id": "sign-miners-stair",
+      "at": [-6.0, 1.5, 3.5],
+      "tags": ["sign", "path"]
+    },
+    {
+      "id": "sign-miners-stair-lane",
+      "at": [-6.0, 1.5, 3.5],
+      "yaw": 90,
+      "tags": ["sign", "path"]
     }
   ],
   "light": {
@@ -1070,6 +1172,13 @@
       "min": [4.0, -1, 41.9],
       "max": [4.9, 3, 44.1],
       "scene": "briar-glen-green",
+      "spawn": "arrive-from-briar-glen-lane"
+    },
+    {
+      "id": "miners-stair",
+      "min": [-18.8, -3, 3.25],
+      "max": [-18, 1, 6.75],
+      "scene": "deepworks",
       "spawn": "arrive-from-briar-glen-lane"
     }
   ]

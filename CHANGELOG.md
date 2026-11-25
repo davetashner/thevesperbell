@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The Miners' Bridge now leads somewhere: a worn stone stair beside the Bridge Watch post drops off the bridge's town end onto the old miners' track, which runs to the boarded mine gate, and back up again. [mw-e25.23]
 - Your four consumable quick slots now have buttons: F1-F4 on the keyboard, or hold LT and press the D-pad (Up, Right, Down, Left) on a controller. Each can be remapped. [mw-e17.17]
 - The knight now holds his sword the way a hand really holds one: the fist closed around the grip with the elbow bent and the hand low by his hip, the blade pointing forward and a little out and down, instead of hanging straight down or sticking out as an extension of his arm; the wrist bends with the fist, and attacks, blocks and dodges start from and return to this stance (mw-a6t).
 - The Wendmouth dock is now played end to end in a real browser by a test: sign on with Hesketh, open the gangway, walk aboard, climb into the Gilded Tern's hold and back out, and Tereza's route to the same token.

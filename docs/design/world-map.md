@@ -367,7 +367,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `courtyard-tower` | `moorings-courtyard` | `moorings-tower` | door |  |  | planned: mw-e25.6 |
 | `courtyard-supply-tunnel` | `moorings-courtyard` | `supply-tunnel` | door |  |  | planned: mw-e25.6 |
 | `supply-tunnel-collapse` | `supply-tunnel` | `old-galleries` | shortcut | `{"fact":"world.supply-tunnel.cleared"}` | `technique.shoulder-barge`, `spell.firebolt` | planned: mw-e25.9 |
-| `miners-bridge` | `bridge-post` | `mine-gate` | path |  |  | planned: mw-e25.23 |
+| `miners-bridge` | `bridge-post` | `mine-gate` | path |  |  | `briar-glen-lane/miners-stair`, `deepworks/miners-track-gate` |
 | `mine-gate-winch` | `mine-gate` | `winch-house` | door | `{"fact":"deepworks.gate-open"}` | `technique.shoulder-barge`, `arrow.pinning-shot`, `spell.mage-hand`, `tool.lockpick` | planned: mw-e25.10 |
 | `winch-galleries` | `winch-house` | `old-galleries` | path |  |  | planned: mw-e26.2 |
 | `galleries-rootcellar` | `old-galleries` | `rootcellar-camp` | path |  |  | planned: mw-e26.2 |

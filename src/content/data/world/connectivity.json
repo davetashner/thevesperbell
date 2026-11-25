@@ -958,7 +958,8 @@
       "to": "mine-gate",
       "kind": "path",
       "bead": "mw-e25.23",
-      "notes": "Across the Miners' Bridge to the Deepworks gate (bible 3.5)."
+      "notes": "The Miners' Stair drops off the bridge's town abutment beside the Bridge Watch post onto the old miners' track along the bank to the boarded gate (bible 3.5, mw-e25.23): briar-glen-lane/miners-stair leads down, deepworks/miners-track-gate back up.",
+      "transitions": ["briar-glen-lane/miners-stair", "deepworks/miners-track-gate"]
     },
     {
       "id": "mine-gate-winch",
