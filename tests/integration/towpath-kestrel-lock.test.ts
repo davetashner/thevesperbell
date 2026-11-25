@@ -242,11 +242,11 @@ describe('the lock chamber (mw-e25.14 AC-2, AC-3)', () => {
       expect(g.depth()).toBeCloseTo(2.25, 3);
       expect(g.status('lower-lock-gate')).toBe('jammed');
       g.pull('lower-paddle-lever');
-      g.steps(60 * 30);
+      g.steps(60 * 20);
       expect(g.depth()).toBeLessThanOrEqual(0.15);
       expect(g.status('lower-lock-gate')).toBe('closed');
       g.operate('lower-lock-gate', 'open');
-      g.steps(60 * 9);
+      g.steps(510);
       expect(g.status('lower-lock-gate')).toBe('open');
       expect(g.status('upper-lock-gate')).toBe('jammed');
     },
@@ -259,15 +259,15 @@ describe('the lock chamber (mw-e25.14 AC-2, AC-3)', () => {
       const g = lockWorld();
       g.steps(5);
       g.pull('lower-paddle-lever');
-      g.steps(60 * 30);
+      g.steps(60 * 20);
       expect(g.depth()).toBeLessThanOrEqual(0.15);
       g.pull('lower-paddle-lever'); // tail shut
       g.pull('upper-paddle-lever'); // head sluice open
-      g.steps(60 * 30);
+      g.steps(60 * 20);
       expect(g.depth()).toBeGreaterThanOrEqual(2.2);
       expect(g.status('upper-lock-gate')).toBe('closed');
       g.operate('upper-lock-gate', 'open');
-      g.steps(60 * 9);
+      g.steps(510);
       expect(g.status('upper-lock-gate')).toBe('open');
       expect(g.status('lower-lock-gate')).toBe('jammed');
     },
@@ -281,16 +281,16 @@ describe('the lock chamber (mw-e25.14 AC-2, AC-3)', () => {
       g.steps(5);
       const before = g.depth();
       g.operate('lower-lock-gate', 'open');
-      g.steps(60 * 9);
+      g.steps(30);
       expect(g.jams.filter((j) => j.entity === g.id('lower-lock-gate'))).not.toHaveLength(0);
       expect(g.status('lower-lock-gate')).toBe('jammed');
       expect(g.depth()).toBeCloseTo(before, 5);
       // And the other way round once drained.
       g.pull('lower-paddle-lever');
-      g.steps(60 * 30);
+      g.steps(60 * 20);
       g.jams.length = 0;
       g.operate('upper-lock-gate', 'open');
-      g.steps(60 * 9);
+      g.steps(30);
       expect(g.jams.filter((j) => j.entity === g.id('upper-lock-gate'))).not.toHaveLength(0);
       expect(g.status('upper-lock-gate')).toBe('jammed');
     },
