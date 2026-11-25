@@ -1027,8 +1027,7 @@
       "tags": ["lantern", "street"],
       "lightSource": {
         "variant": "lantern",
-        "infiniteFuel": true,
-        "tint": [1, 0.82, 0.45]
+        "infiniteFuel": true
       }
     },
     {
@@ -1037,8 +1036,7 @@
       "tags": ["lantern", "street"],
       "lightSource": {
         "variant": "lantern",
-        "infiniteFuel": true,
-        "tint": [1, 0.82, 0.45]
+        "infiniteFuel": true
       }
     },
     {
