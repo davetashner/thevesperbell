@@ -80,13 +80,37 @@ Node 24 (`.node-version`, engine-strict) and pnpm via corepack. See README Quick
 
 ```bash
 pnpm install
-pnpm lint && pnpm typecheck && pnpm test   # quality gates
+pnpm lint && pnpm typecheck && pnpm test   # quality gates (full: night mode or CI; see Laptop load)
+pnpm lint:changed                         # day mode: lint only files changed vs origin/main
 pnpm test:coverage                        # coverage/ (json-summary + lcov)
 pnpm e2e                                  # Playwright smoke vs production build
 pnpm bench                                # sim perf budgets (vitest benchmarks)
 pnpm perf                                 # perf budget suite, CI mode (README: Perf budgets)
 pnpm build                                # dist/
 ```
+
+## Laptop load (day vs night)
+
+The repo is developed on the owner's laptop (10 cores), which they use during the day. Type-aware lint, coverage, Playwright and perf runs are heavy; five agents running them at once pushed load to ~28 and turned a lint into a 45-minute crawl (2026-11-25). Check the local hour with `date +%H` before starting heavy work and dispatching workers.
+
+**Day mode, 07:00-01:00 local (default):**
+
+- **At most 2 implementation workers** (subagents or worktree sessions) at a time, plus the lead. Read-only research agents don't count.
+- **Scoped commands only.** Don't run the full suites locally; push and let CI run them:
+  - lint: `pnpm lint:changed` (only files changed against `origin/main`), not `pnpm lint`
+  - types: one `pnpm typecheck` before pushing
+  - tests: `pnpm vitest run <the test files you touched>`, not `pnpm test` / `pnpm test:coverage`
+  - e2e: `E2E_PORT=<free port> pnpm e2e <the specs you touched>`, never the whole suite
+  - no `pnpm perf`, `pnpm bench`, `pnpm content:coverage` or repeated `pnpm build`; CI runs them
+  - `pnpm world:validate`, `pnpm nav:check` and `pnpm nav:bake` for the scenes you changed are light and fine
+- **One heavy command at a time per agent.** Start anything that may take over ~2 minutes with `run_in_background` and wait for its notification.
+- **Never re-run a command that timed out or was moved to the background**: it is still running. Wait for it, or stop it (TaskStop on your own task) before starting another.
+- **Check load first.** If the 1-minute load (`sysctl -n vm.loadavg`) is above the core count (`sysctl -n hw.ncpu`), wait (a Monitor until-loop) instead of adding a heavy command.
+- Stop dev servers and Playwright servers you started once you're done with them.
+
+**Night mode, 01:00-07:00 local:** up to 5 implementation workers, and the full local gates (`pnpm lint`, `pnpm test:coverage`, `pnpm content:coverage`, the e2e suite) are fine. The one-heavy-command and no-duplicate-rerun rules still apply.
+
+**Leads:** put the current mode's rules in every worker brief. A worker that runs past 07:00 switches to day mode for its remaining commands.
 
 ## Architecture Overview
 
