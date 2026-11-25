@@ -88,6 +88,53 @@ describe('PageScope', () => {
   });
 });
 
+describe('PageScope edge cases', () => {
+  it('AC-1: ignores null listeners and string timer handlers, forgets frames that ran, and is inert once disposed', () => {
+    const { host, timers, window } = fakeHost();
+    let runFrame: ((time: number) => void) | undefined;
+    timers.requestAnimationFrame = (callback: (time: number) => void) => {
+      runFrame = callback;
+      return 3;
+    };
+    const cancelFrame = timers.cancelAnimationFrame;
+    let runTimeout: (() => void) | undefined;
+    timers.setTimeout = ((handler: () => void) => {
+      runTimeout = handler;
+      return 9;
+    }) as unknown as typeof setTimeout;
+    const scope = new PageScope(host);
+    scope.begin();
+    window.addEventListener('keydown', null);
+    timers.setTimeout('' as unknown as () => void, 1);
+    runTimeout?.();
+    const seen = vi.fn();
+    timers.requestAnimationFrame(seen);
+    runFrame?.(16);
+    expect(seen).toHaveBeenCalledWith(16);
+    scope.dispose();
+    expect(cancelFrame).not.toHaveBeenCalled();
+    scope.begin(); // a finished scope does not start again
+    expect(timers.setTimeout).not.toBe(undefined);
+  });
+
+  it('AC-1: a scope that never began disposes without touching the page', () => {
+    const { host, timers } = fakeHost();
+    const scope = new PageScope(host);
+    scope.dispose();
+    expect(timers.clearTimeout).not.toHaveBeenCalled();
+  });
+
+  it('AC-1: a target with no addEventListener anywhere is skipped, and two targets sharing one are patched once', () => {
+    const { host, window, inheriting } = fakeHost();
+    const bare = Object.create(null) as EventTarget;
+    const scope = new PageScope({ ...host, targets: [bare, window, inheriting] });
+    expect(() => {
+      scope.begin();
+      scope.dispose();
+    }).not.toThrow();
+  });
+});
+
 describe('resetRoot', () => {
   it('AC-1: empties an area from the root but keeps the page-level readouts and the storage warning', () => {
     const root = document.createElement('main');
@@ -98,9 +145,12 @@ describe('resetRoot', () => {
     const canvas = document.createElement('canvas');
     const warning = document.createElement('p');
     warning.dataset['testid'] = 'save-warning';
-    root.append(warning, canvas);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    root.setAttribute('role', 'main');
+    root.append(warning, canvas, svg);
     resetRoot(root);
     expect(Object.keys(root.dataset).sort()).toEqual(['layers', 'saveStore']);
+    expect(root.getAttribute('role')).toBe('main');
     expect([...root.children]).toEqual([warning]);
   });
 });

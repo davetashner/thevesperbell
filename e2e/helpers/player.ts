@@ -196,9 +196,22 @@ export async function holdKey(
         };
         const start = read().tick;
         let releasedAt: number | undefined;
+        let last = read();
+        // Walking into an area crossing swaps the scene in place and ends this session's animation
+        // frames (mw-ju8.28): the crossing ends the hold, with the last state seen.
+        if (app !== null) {
+          const crossing = new MutationObserver(() => {
+            if (app.dataset['transit']?.includes('"leaving"') === true) {
+              crossing.disconnect();
+              resolve(last);
+            }
+          });
+          crossing.observe(app, { attributes: true, attributeFilter: ['data-transit'] });
+        }
         send('keydown');
         const watch = () => {
           const state = read();
+          last = state;
           if (releasedAt === undefined && state.tick - start >= hold) {
             send('keyup');
             releasedAt = state.tick;
