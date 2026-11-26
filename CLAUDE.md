@@ -121,7 +121,7 @@ One session is the lead (named in the `HANDOFF: thevesperbell` bead, mw-77x); on
 - **One merge at a time.** Before each merge, check `gh pr view <n> --json mergeStateStatus`. If the branch is `BEHIND`, merge main into it and wait for CI again. Conflicts are usually in `e2e/shards.json`, `CHANGELOG.md`, `connectivity.json`, scene lists and perf budgets; keep both sides.
 - **Wait, don't poll.** Run `gh pr checks <n> --watch` with `run_in_background` and act on the notification.
 - **Beads export.** After a merge, close its beads, then fold a fresh `bd export -o .beads/issues.jsonl` into the next PR the lead merges. Workers never touch the export.
-- **Worker briefs** name the files each concurrent worker owns, so the others stay out of them. Workers may push and open PRs, but they never merge or close beads.
+- **Worker briefs** name the files each concurrent worker owns, so the others stay out of them. Workers may push and open PRs, but they never merge or close beads. Briefs also remind workers of the CHANGELOG rule: CI's `changelog` check fails any PR that touches `src/{game,ui,render,audio,sim,content}/` or `src/main.ts` without a one-line player-facing note under Unreleased, or the `no-changelog` label.
 - **Dependabot PRs** are the lead's to triage. Merge main into the branch first, because stale shard weights make e2e shards time out. A typescript-eslint minor release can add rules to `strictTypeChecked`: fix the code, or turn a rule off in `eslint.config.js` with a comment saying why. Push the fix to the dependabot branch.
 
 ## Architecture Overview
