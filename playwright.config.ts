@@ -9,6 +9,10 @@ export default defineConfig({
   testDir: 'e2e',
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
+  // CI's e2e shards set E2E_GLOBAL_TIMEOUT_MS a few minutes under the job timeout, so an overrunning
+  // shard stops itself and still writes and uploads its report and traces, naming the slow spec,
+  // instead of the job being cancelled with nothing to show (mw-e41.26). 0 = no limit.
+  globalTimeout: Number(process.env['E2E_GLOBAL_TIMEOUT_MS'] ?? 0),
   // CI also writes a JSON report: per-spec durations feed e2e/shards.json (mw-e41.1) and the flake
   // report (mw-e41.7); it is uploaded on every run.
   reporter: process.env['CI']
