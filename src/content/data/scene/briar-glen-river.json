@@ -1,0 +1,1781 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "briar-glen-river",
+  "name": "Briar Glen Quay and the Millweir",
+  "description": "Bead mw-e25.11, mw-e25.12, mw-e25.24: the river below Briar Glen as one walkable grey-box scene, about 220 x 60 m. From under the Miners' Bridge (path-up leads back, arrive-from-under-the-bridge arrives) the lit riverbank path runs east, downriver. Briar Glen Quay (x 30..100, bollards, six glenstone block stacks on timber cradles, a crane, the toll shed with its notice) fronts the quay basin, standing water you can swim, freeze into walkable ice or climb out of by two ladders; Mags Oakum's stone barge Patient Ann lies moored against the quay (static placeholder hull and barge-berth, the barge ride is mw-e25.15). Further east the Millweir: a sill and the mill pond (standing water, drained by the sluice wheel into a low state that exposes a stepping-stone path across), a tall weir wall and the sluice walk, a catwalk hung on the downstream face with a 2.4 m gap mid-walk (jump, plank, Blink or rope anchor; a fall drops into the lower pool and never hurts, ladders lead out). The far end of the walk and the pond's far landing are the Briarwood far bank: reaching it by any route writes world.millweir.sluice-walk-open (graph millweir-walk), and the doorway in the far bank's south wall (far-bank-gate) leads on into the Briarwood (arrive-from-briarwood arrives). The towpath goes on east to a wall and the sign for Kestrel Lock: arrive-from-kestrel-lock and the towpath-exit stub (planned mw-e25.14, no transition yet). The Stone Stair slide from the Deepworks' cutting hall arrives at arrive-from-deepworks. Reach it with ?scene=briar-glen-river.",
+  "grid": 1,
+  "camera": {
+    "position": [-30, 40, -45],
+    "target": [60, 0, 5]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [110.0, 0.0, -7.0],
+      "scale": [110, 1, 7]
+    },
+    {
+      "piece": "platform",
+      "at": [110.0, -3.25, -0.25],
+      "scale": [110, 3.25, 0.125],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [110.0, 0.0, -14.0],
+      "scale": [110, 0.45, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, 0.0, -11.0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [0.0, 0.0, -7.0],
+      "yaw": 90
+    },
+    {
+      "piece": "wall",
+      "at": [0.0, 0.0, -3.0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [-3.0, 0.0, -7.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3.0, 0.0, -8.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-3.0, 0.0, -6.0],
+      "scale": [1.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-6.0, 0.0, -7.0],
+      "yaw": 90,
+      "scale": [1, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [220.0, 0.0, -7.0],
+      "yaw": 90,
+      "scale": [7, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [52.0, -3.25, 15.0],
+      "scale": [52, 1, 15]
+    },
+    {
+      "piece": "platform",
+      "at": [106.0, -3.25, 15.0],
+      "scale": [2, 2.25, 15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [128.0, -1.0, 15.0],
+      "scale": [20, 1, 15]
+    },
+    {
+      "piece": "platform",
+      "at": [149.0, -3.25, 15.0],
+      "scale": [1, 7.5, 15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [175.0, -3.25, 15.0],
+      "scale": [25, 1, 15]
+    },
+    {
+      "piece": "platform",
+      "at": [0.0, -3.25, 15.0],
+      "scale": [0.125, 6.25, 15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [200.0, -3.25, 15.0],
+      "scale": [0.125, 6.25, 15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [150.0, 0.0, 37.0],
+      "scale": [50, 1, 7]
+    },
+    {
+      "piece": "platform",
+      "at": [111.0, -3.25, 30.25],
+      "scale": [11, 3.25, 0.125],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [165.0, -3.25, 30.25],
+      "scale": [35, 3.25, 0.125],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [52.0, -3.25, 30.25],
+      "scale": [52, 6.25, 0.125],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [118.0, 0.0, 44.0],
+      "scale": [18, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [137.0, 0.0, 44.0]
+    },
+    {
+      "piece": "wall",
+      "at": [169.0, 0.0, 44.0],
+      "scale": [31, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [100.0, 0.0, 37.0],
+      "yaw": 90,
+      "scale": [7, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [200.0, 0.0, 37.0],
+      "yaw": 90,
+      "scale": [7, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [126.0, -1.0, 1.0],
+      "yaw": 180,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [126.0, -1.0, 29.0],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 3.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [128.5, -1.0, 5.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 7.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [128.5, -1.0, 9.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 11.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [128.5, -1.0, 13.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 15.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [128.5, -1.0, 17.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 19.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [128.5, -1.0, 21.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 23.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [128.5, -1.0, 25.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [127.5, -1.0, 27.5],
+      "scale": [0.6, 0.5, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "stairs",
+      "at": [150.75, 0.0, -3.0],
+      "scale": [0.75, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [150.75, 1.0, -1.0],
+      "scale": [0.75, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [150.75, 2.0, 7.0],
+      "scale": [0.75, 1, 7]
+    },
+    {
+      "piece": "floor",
+      "at": [150.75, 2.0, 23.25],
+      "scale": [0.75, 1, 6.75]
+    },
+    {
+      "piece": "stairs",
+      "at": [150.75, 1.0, 31.0],
+      "yaw": 180,
+      "scale": [0.75, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [150.75, 0.0, 33.0],
+      "yaw": 180,
+      "scale": [0.75, 1, 1]
+    },
+    {
+      "piece": "platform",
+      "at": [44.0, -3.25, 0.25],
+      "scale": [0.5, 3.2, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [88.0, -3.25, 0.25],
+      "scale": [0.5, 3.2, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [162.0, -3.25, 0.25],
+      "scale": [0.5, 3.2, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [162.0, -3.25, 29.75],
+      "scale": [0.5, 3.2, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "platform",
+      "at": [34.0, 0.0, -4.5],
+      "scale": [1.5, 0.3, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [33.25, 0.25, -4.5],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [34.75, 0.25, -4.5],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [34.0, 1.25, -4.5],
+      "scale": [0.7, 0.9, 0.55],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [40.5, 0.0, -4.5],
+      "scale": [1.5, 0.3, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [39.75, 0.25, -4.5],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.25, 0.25, -4.5],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [40.5, 1.25, -4.5],
+      "scale": [0.7, 0.9, 0.55],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [47.0, 0.0, -4.5],
+      "scale": [1.5, 0.3, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [46.25, 0.25, -4.5],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [47.75, 0.25, -4.5],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [47.0, 1.25, -4.5],
+      "scale": [0.7, 0.9, 0.55],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [34.0, 0.0, -9.0],
+      "scale": [1.5, 0.3, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [33.25, 0.25, -9.0],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [34.75, 0.25, -9.0],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [34.0, 1.25, -9.0],
+      "scale": [0.7, 0.9, 0.55],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [40.5, 0.0, -9.0],
+      "scale": [1.5, 0.3, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [39.75, 0.25, -9.0],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [41.25, 0.25, -9.0],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [40.5, 1.25, -9.0],
+      "scale": [0.7, 0.9, 0.55],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [47.0, 0.0, -9.0],
+      "scale": [1.5, 0.3, 0.7],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [46.25, 0.25, -9.0],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [47.75, 0.25, -9.0],
+      "scale": [0.65, 1.0, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [47.0, 1.25, -9.0],
+      "scale": [0.7, 0.9, 0.55],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [69.0, -1.25, 2.5],
+      "scale": [7, 1.5, 2.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [66.5, 0.25, 2.5],
+      "scale": [0.7, 0.9, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [69.5, 0.25, 2.5],
+      "scale": [0.7, 0.9, 0.6],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [32.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [40.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [48.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [56.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [64.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [72.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [80.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [88.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [96.0, 0.0, -0.5],
+      "scale": [0.15, 0.55, 0.15],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [84.0, 0.0, -3.5],
+      "scale": [1.2, 0.5, 1.0],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "wall",
+      "at": [93.0, 0.0, -6.0],
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "doorway",
+      "at": [96.0, 0.0, -6.0]
+    },
+    {
+      "piece": "wall",
+      "at": [99.5, 0.0, -6.0],
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [91.0, 0.0, -9.0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [101.0, 0.0, -9.0],
+      "yaw": 90,
+      "scale": [3, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [96.0, 0.0, -12.0],
+      "scale": [5, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [96.0, 3.0, -9.0],
+      "scale": [5, 1, 3]
+    },
+    {
+      "piece": "platform",
+      "at": [18.0, 0.0, -9.75],
+      "scale": [3, 6, 0.2],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "rough"
+      }
+    },
+    {
+      "piece": "floor",
+      "at": [18.0, 6.0, -12.0],
+      "scale": [4, 1, 2]
+    },
+    {
+      "piece": "wall",
+      "at": [14.0, 6.0, -12.0],
+      "yaw": 90,
+      "scale": [2, 0.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [22.0, 6.0, -12.0],
+      "yaw": 90,
+      "scale": [2, 0.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [18.0, 6.0, -14.0],
+      "scale": [4, 0.5, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "ladder-quay-west",
+      "at": [44.0, 0.0, 0.75],
+      "tags": ["ladder", "marker"]
+    },
+    {
+      "id": "ladder-quay-east",
+      "at": [88.0, 0.0, 0.75],
+      "tags": ["ladder", "marker"]
+    },
+    {
+      "id": "ladder-pool-north",
+      "at": [162.0, 0.0, 0.75],
+      "tags": ["ladder", "marker"]
+    },
+    {
+      "id": "ladder-pool-south",
+      "at": [162.0, 0.0, 29.25],
+      "tags": ["ladder", "marker"]
+    },
+    {
+      "id": "glenstone-stack-1",
+      "at": [34.0, 2.25, -4.5],
+      "tags": ["block-stack", "glenstone", "prop"]
+    },
+    {
+      "id": "glenstone-stack-2",
+      "at": [40.5, 2.25, -4.5],
+      "tags": ["block-stack", "glenstone", "prop"]
+    },
+    {
+      "id": "glenstone-stack-3",
+      "at": [47.0, 2.25, -4.5],
+      "tags": ["block-stack", "glenstone", "prop"]
+    },
+    {
+      "id": "glenstone-stack-4",
+      "at": [34.0, 2.25, -9.0],
+      "tags": ["block-stack", "glenstone", "prop"]
+    },
+    {
+      "id": "glenstone-stack-5",
+      "at": [40.5, 2.25, -9.0],
+      "tags": ["block-stack", "glenstone", "prop"]
+    },
+    {
+      "id": "glenstone-stack-6",
+      "at": [47.0, 2.25, -9.0],
+      "tags": ["block-stack", "glenstone", "prop"]
+    },
+    {
+      "id": "patient-ann",
+      "at": [68.0, 0.25, 2.5],
+      "tags": ["landmark", "barge"]
+    },
+    {
+      "id": "barge-berth",
+      "at": [63.5, 0.25, 2.5],
+      "yaw": 90,
+      "tags": ["marker", "barge-departure"]
+    },
+    {
+      "id": "ann-hawser-coil",
+      "at": [74.5, 0.25, 1.0],
+      "tags": ["dock-prop", "barge"],
+      "prop": "hawser-coil"
+    },
+    {
+      "id": "ann-tiller",
+      "at": [75.25, 0.25, 2.5],
+      "tags": ["dock-prop", "barge"],
+      "prop": "tiller"
+    },
+    {
+      "id": "ann-gangplank",
+      "at": [68.0, 0.0, -0.5],
+      "tags": ["marker", "gangway"]
+    },
+    {
+      "id": "bollard-0",
+      "at": [32.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-1",
+      "at": [40.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-2",
+      "at": [48.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-3",
+      "at": [56.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-4",
+      "at": [64.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-5",
+      "at": [72.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-6",
+      "at": [80.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-7",
+      "at": [88.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "bollard-8",
+      "at": [96.0, 0.5, -0.5],
+      "tags": ["bollard", "prop", "mooring"]
+    },
+    {
+      "id": "quay-crane",
+      "at": [84.0, 0.5, -3.5],
+      "tags": ["crane", "landmark"]
+    },
+    {
+      "id": "toll-shed",
+      "at": [96.0, 0.0, -9.0],
+      "tags": ["toll-shed", "landmark"]
+    },
+    {
+      "id": "toll-counter",
+      "at": [96.0, 0.0, -10.5],
+      "tags": ["counter", "prop", "toll"]
+    },
+    {
+      "id": "read-toll-notice",
+      "at": [96.0, 1.25, -5.5],
+      "yaw": 180,
+      "tags": ["readable", "note-lantern-court-notice"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the Lantern Court toll notice"
+          }
+        ],
+        "radius": 0.8
+      }
+    },
+    {
+      "id": "arrive-from-deepworks",
+      "at": [24.0, 0.0, -8.5],
+      "yaw": 180,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "stone-stair-foot",
+      "at": [20.0, 0.0, -8.5],
+      "tags": ["node", "stone-stair"]
+    },
+    {
+      "id": "stone-stair-climb",
+      "at": [18.0, 6.0, -12.5],
+      "tags": ["transition", "climb-route"]
+    },
+    {
+      "id": "player-start",
+      "at": [4.0, 0.0, -7.0],
+      "tags": ["player-start", "entrance"]
+    },
+    {
+      "id": "arrive-from-under-the-bridge",
+      "at": [4.0, 0.0, -7.0],
+      "yaw": 90,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "arrive-from-briarwood",
+      "at": [137.0, 0.0, 41.0],
+      "yaw": 180,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "arrive-from-kestrel-lock",
+      "at": [214.0, 0.0, -7.0],
+      "yaw": 270,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "path-up",
+      "at": [-0.5, 0.0, -7.0],
+      "tags": ["transition"]
+    },
+    {
+      "id": "far-bank-gate",
+      "at": [137.0, 0.0, 43.5],
+      "tags": ["transition"]
+    },
+    {
+      "id": "towpath-exit",
+      "at": [218.0, 0.0, -7.0],
+      "tags": ["exit-stub", "planned:mw-e25.14"]
+    },
+    {
+      "id": "briar-glen-quay",
+      "at": [62.0, 0.0, -6.0],
+      "tags": ["node", "marker"]
+    },
+    {
+      "id": "millweir",
+      "at": [146.0, 0.0, -7.0],
+      "tags": ["node", "marker"]
+    },
+    {
+      "id": "millweir-pond",
+      "at": [128.0, 0.0, -6.0],
+      "tags": ["marker"]
+    },
+    {
+      "id": "sluice-gate",
+      "at": [149.0, 1.5, 15.5],
+      "tags": ["sluice", "landmark"]
+    },
+    {
+      "id": "sluice-wheel",
+      "at": [151.0, 2.0, 2.0],
+      "tags": ["sluice", "wheel"],
+      "properties": {
+        "remoteActuatable": true
+      },
+      "switch": {
+        "kind": "wheel",
+        "positions": 2
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "use",
+            "label": "Turn the sluice wheel"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "sluice-walk-gap",
+      "at": [150.75, 2.0, 15.25],
+      "tags": ["marker", "gap", "plank-site"]
+    },
+    {
+      "id": "far-landing",
+      "at": [137.0, 0.0, 32.0],
+      "tags": ["marker", "far-bank"]
+    },
+    {
+      "id": "sign-towpath",
+      "at": [208.0, 1.25, -5.5],
+      "yaw": 180,
+      "tags": ["sign", "path"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the towpath on to Kestrel Lock and Wendmouth"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "sign-sluice-walk",
+      "at": [148.5, 1.25, -5.0],
+      "yaw": 180,
+      "tags": ["sign", "path"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "read",
+            "label": "Read the signpost: the sluice walk, to the Briarwood far bank"
+          }
+        ],
+        "radius": 1
+      }
+    },
+    {
+      "id": "quay-basin",
+      "at": [52.0, -3.25, 15.0],
+      "tags": ["pool", "standing-water", "river-water", "basin"],
+      "liquid": {
+        "size": [104, 3.0, 30],
+        "liquid": "water",
+        "depth": 3.0
+      }
+    },
+    {
+      "id": "mill-pond",
+      "at": [128.0, -1.0, 15.0],
+      "tags": ["pool", "standing-water", "river-water", "mill-pond"],
+      "liquid": {
+        "size": [40, 0.75, 30],
+        "liquid": "water",
+        "depth": 0.75,
+        "drain": {
+          "rate": 0.07,
+          "open": false
+        }
+      }
+    },
+    {
+      "id": "lower-pool",
+      "at": [175.0, -3.25, 15.0],
+      "tags": ["pool", "standing-water", "river-water"],
+      "liquid": {
+        "size": [50, 2.0, 30],
+        "liquid": "water",
+        "depth": 2.0
+      }
+    },
+    {
+      "id": "lamp-0",
+      "at": [8.0, 1.75, -5.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-1",
+      "at": [30.0, 1.75, -2.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-2",
+      "at": [60.0, 1.75, -5.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-3",
+      "at": [90.0, 1.75, -2.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-4",
+      "at": [130.0, 1.75, -3.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-5",
+      "at": [150.25, 2.0, 3.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-6",
+      "at": [150.25, 2.0, 26.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    },
+    {
+      "id": "lamp-7",
+      "at": [190.0, 1.75, -3.0],
+      "tags": ["lantern", "lamp"],
+      "properties": {
+        "flammable": true,
+        "burning": true,
+        "fuel": 28800
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.32,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [0.5, -0.7, 0.3],
+        "level": 0.3,
+        "reach": 120
+      }
+    ],
+    "timeOfDay": {
+      "keyframes": [
+        {
+          "minute": 0,
+          "ambient": 0.12,
+          "directional": 0.08,
+          "sky": "#0B0F1E"
+        },
+        {
+          "minute": 300,
+          "ambient": 0.14,
+          "directional": 0.08,
+          "sky": "#17203A"
+        },
+        {
+          "minute": 390,
+          "ambient": 0.32,
+          "directional": 0.22,
+          "sky": "#8A8FA8"
+        },
+        {
+          "minute": 480,
+          "ambient": 0.6,
+          "directional": 0.6,
+          "sky": "#A9C7DC"
+        },
+        {
+          "minute": 1020,
+          "ambient": 0.55,
+          "directional": 0.55,
+          "sky": "#A9C7DC"
+        },
+        {
+          "minute": 1110,
+          "ambient": 0.36,
+          "directional": 0.3,
+          "sky": "#D08A60"
+        },
+        {
+          "minute": 1260,
+          "ambient": 0.16,
+          "directional": 0.1,
+          "sky": "#10142A"
+        }
+      ]
+    }
+  },
+  "signals": [
+    {
+      "graph": "millweir-walk"
+    },
+    {
+      "graph": "stone-stair-foot"
+    }
+  ],
+  "environment": {
+    "sky": "#A9C7DC",
+    "fog": {
+      "color": "#B9C8CC",
+      "near": 70,
+      "far": 240
+    },
+    "dome": {
+      "stars": 0.6,
+      "clouds": 0.45,
+      "wind": 80,
+      "seed": 11
+    }
+  },
+  "regions": [
+    {
+      "id": "briar-glen-river",
+      "min": [-8, -4, -16],
+      "max": [222, 40, 46],
+      "tags": ["region", "river"]
+    },
+    {
+      "id": "quay-basin",
+      "min": [0, -3.25, 0],
+      "max": [104, -0.25, 30],
+      "tags": ["water", "river"]
+    },
+    {
+      "id": "lower-pool",
+      "min": [150, -3.25, 0],
+      "max": [200, -1.25, 30],
+      "tags": ["water", "river"]
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "sluice-walk",
+      "min": [150, 1.8, 0],
+      "max": [151.5, 2.2, 14.0],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "sluice-walk-far",
+      "min": [150, 1.8, 16.5],
+      "max": [151.5, 2.2, 30],
+      "surface": "wood",
+      "texture": "tex-planks-salt-bleached-01"
+    },
+    {
+      "id": "patient-ann-deck",
+      "min": [62, 0.1, 0],
+      "max": [76, 0.5, 5],
+      "surface": "wood",
+      "texture": "tex-deck-planks-caulked-01"
+    },
+    {
+      "id": "toll-shed-roof",
+      "min": [90.8, 2.8, -12.2],
+      "max": [101.2, 3.2, -5.8],
+      "surface": "wood",
+      "texture": "tex-roof-tin-harbour-01"
+    },
+    {
+      "id": "quay-stones",
+      "min": [0, -0.5, -14],
+      "max": [220, 0.5, 0],
+      "surface": "stone"
+    },
+    {
+      "id": "far-bank-gravel",
+      "min": [100, -0.5, 30],
+      "max": [200, 0.5, 44],
+      "surface": "gravel"
+    }
+  ],
+  "paints": [
+    {
+      "id": "quay-face",
+      "min": [0, -3.25, -0.3],
+      "max": [220, 0, 0.0],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "south-face-west",
+      "min": [100, -3.25, 29.8],
+      "max": [122, 0, 30.0],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "south-face-east",
+      "min": [130, -3.25, 29.8],
+      "max": [200, 0, 30.0],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-0",
+      "min": [126.5, -1.0, 2.8],
+      "max": [128.5, -0.45, 4.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-1",
+      "min": [127.5, -1.0, 4.8],
+      "max": [129.5, -0.45, 6.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-2",
+      "min": [126.5, -1.0, 6.8],
+      "max": [128.5, -0.45, 8.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-3",
+      "min": [127.5, -1.0, 8.8],
+      "max": [129.5, -0.45, 10.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-4",
+      "min": [126.5, -1.0, 10.8],
+      "max": [128.5, -0.45, 12.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-5",
+      "min": [127.5, -1.0, 12.8],
+      "max": [129.5, -0.45, 14.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-6",
+      "min": [126.5, -1.0, 14.8],
+      "max": [128.5, -0.45, 16.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-7",
+      "min": [127.5, -1.0, 16.8],
+      "max": [129.5, -0.45, 18.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-8",
+      "min": [126.5, -1.0, 18.8],
+      "max": [128.5, -0.45, 20.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-9",
+      "min": [127.5, -1.0, 20.8],
+      "max": [129.5, -0.45, 22.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-10",
+      "min": [126.5, -1.0, 22.8],
+      "max": [128.5, -0.45, 24.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-11",
+      "min": [127.5, -1.0, 24.8],
+      "max": [129.5, -0.45, 26.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "stone-12",
+      "min": [126.5, -1.0, 26.8],
+      "max": [128.5, -0.45, 28.2],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "sluice-gate-board",
+      "min": [147.85, -0.25, 13.0],
+      "max": [148.0, 4.0, 18.0],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "weir-wall-west",
+      "min": [147.9, -3.25, 0.0],
+      "max": [148.0, 4.25, 12.9],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "weir-wall-west-2",
+      "min": [147.9, -3.25, 18.1],
+      "max": [148.0, 4.25, 30.0],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "weir-wall-east",
+      "min": [150.0, -3.25, 0.0],
+      "max": [150.1, 2.0, 30.0],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "cradle-1",
+      "min": [32.45, 0, -5.25],
+      "max": [35.55, 0.32, -3.75],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "blocks-1",
+      "min": [32.6, 0.3, -5.15],
+      "max": [35.4, 2.2, -3.85],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "cradle-2",
+      "min": [38.95, 0, -5.25],
+      "max": [42.05, 0.32, -3.75],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "blocks-2",
+      "min": [39.1, 0.3, -5.15],
+      "max": [41.9, 2.2, -3.85],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "cradle-3",
+      "min": [45.45, 0, -5.25],
+      "max": [48.55, 0.32, -3.75],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "blocks-3",
+      "min": [45.6, 0.3, -5.15],
+      "max": [48.4, 2.2, -3.85],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "cradle-4",
+      "min": [32.45, 0, -9.75],
+      "max": [35.55, 0.32, -8.25],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "blocks-4",
+      "min": [32.6, 0.3, -9.65],
+      "max": [35.4, 2.2, -8.35],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "cradle-5",
+      "min": [38.95, 0, -9.75],
+      "max": [42.05, 0.32, -8.25],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "blocks-5",
+      "min": [39.1, 0.3, -9.65],
+      "max": [41.9, 2.2, -8.35],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "cradle-6",
+      "min": [45.45, 0, -9.75],
+      "max": [48.55, 0.32, -8.25],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "blocks-6",
+      "min": [45.6, 0.3, -9.65],
+      "max": [48.4, 2.2, -8.35],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "patient-ann-hull",
+      "min": [61.9, -1.3, -0.05],
+      "max": [76.1, 0.35, 5.1],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "ann-cargo",
+      "min": [65.0, 0.3, 1.3],
+      "max": [71.0, 1.25, 3.7],
+      "texture": "tex-stone-breakwater-01"
+    },
+    {
+      "id": "bollard-0",
+      "min": [31.68, 0, -1.02],
+      "max": [32.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-1",
+      "min": [39.68, 0, -1.02],
+      "max": [40.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-2",
+      "min": [47.68, 0, -1.02],
+      "max": [48.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-3",
+      "min": [55.68, 0, -1.02],
+      "max": [56.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-4",
+      "min": [63.68, 0, -1.02],
+      "max": [64.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-5",
+      "min": [71.68, 0, -1.02],
+      "max": [72.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-6",
+      "min": [79.68, 0, -1.02],
+      "max": [80.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-7",
+      "min": [87.68, 0, -1.02],
+      "max": [88.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "bollard-8",
+      "min": [95.68, 0, -1.02],
+      "max": [96.32, 0.6, -0.28],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "toll-shed-front",
+      "min": [91, 0, -6.2],
+      "max": [101, 3.0, -5.85],
+      "texture": "tex-bulkhead-pine-01"
+    },
+    {
+      "id": "stone-stair-wall",
+      "min": [14.9, 0, -10.1],
+      "max": [21.1, 6.0, -9.7],
+      "texture": "tex-stone-breakwater-01"
+    }
+  ],
+  "dressings": [
+    {
+      "id": "ann-keg",
+      "model": "model-prop-keg-01",
+      "at": [73.0, 0.25, 4.0],
+      "turn": 90,
+      "size": [0.55, 0.6, 0.5],
+      "fit": "height"
+    },
+    {
+      "id": "ann-rope-coil",
+      "model": "model-prop-rope-coil-01",
+      "at": [64.25, 0.25, 4.25],
+      "turn": 0,
+      "size": [0.6, 0.25, 0.6],
+      "fit": "box"
+    },
+    {
+      "id": "quay-crate-0",
+      "model": "model-prop-crate-stack-01",
+      "at": [52.5, 0.0, -2.5],
+      "turn": 0,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height"
+    },
+    {
+      "id": "quay-crate-1",
+      "model": "model-prop-crate-stack-01",
+      "at": [57.0, 0.0, -3.0],
+      "turn": 90,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height"
+    },
+    {
+      "id": "quay-crate-2",
+      "model": "model-prop-crate-stack-01",
+      "at": [78.0, 0.0, -4.25],
+      "turn": 180,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height"
+    },
+    {
+      "id": "quay-crate-3",
+      "model": "model-prop-crate-stack-01",
+      "at": [80.0, 0.0, -5.5],
+      "turn": 270,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height"
+    },
+    {
+      "id": "quay-crate-4",
+      "model": "model-prop-crate-stack-01",
+      "at": [98.0, 0.0, -2.5],
+      "turn": 0,
+      "size": [0.7, 0.8, 0.8],
+      "fit": "height"
+    },
+    {
+      "id": "quay-cask-0",
+      "model": "model-prop-barrel-weathered-01",
+      "at": [53.5, 0.0, -3.25],
+      "turn": 90,
+      "size": [0.62, 0.85, 0.62],
+      "fit": "height"
+    },
+    {
+      "id": "quay-cask-1",
+      "model": "model-prop-barrel-weathered-01",
+      "at": [79.0, 0.0, -2.5],
+      "turn": 90,
+      "size": [0.62, 0.85, 0.62],
+      "fit": "height"
+    },
+    {
+      "id": "quay-cask-2",
+      "model": "model-prop-barrel-weathered-01",
+      "at": [82.0, 0.0, -3.25],
+      "turn": 90,
+      "size": [0.62, 0.85, 0.62],
+      "fit": "height"
+    },
+    {
+      "id": "quay-hawser-0",
+      "model": "model-prop-rope-coil-01",
+      "at": [55.0, 0.0, -2.0],
+      "turn": 0,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
+    },
+    {
+      "id": "quay-hawser-1",
+      "model": "model-prop-rope-coil-01",
+      "at": [96.0, 0.0, -1.75],
+      "turn": 0,
+      "size": [0.9, 0.3, 0.9],
+      "fit": "box"
+    },
+    {
+      "id": "quay-ballast-crate",
+      "model": "model-prop-ballast-crate-01",
+      "at": [100.5, 0.0, -2.0],
+      "turn": 270,
+      "size": [1, 0.95, 1],
+      "fit": "height"
+    },
+    {
+      "id": "quay-crane",
+      "model": "model-prop-wharf-crane-01",
+      "at": [84.0, 0.5, -3.5],
+      "turn": 270,
+      "size": [4.5, 3.2, 3.5],
+      "fit": "box"
+    },
+    {
+      "id": "patient-ann-hull",
+      "model": "model-prop-stone-barge-01",
+      "at": [69.0, -1.25, 2.5],
+      "turn": 0,
+      "size": [14, 2.5, 5],
+      "fit": "box",
+      "hides": {
+        "min": [61.5, -1.5, -0.25],
+        "max": [76.5, 0.5, 5.5]
+      }
+    },
+    {
+      "id": "quay-bollard-0",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [32.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [31.75, 0, -0.75],
+        "max": [32.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-1",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [40.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [39.75, 0, -0.75],
+        "max": [40.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-2",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [48.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [47.75, 0, -0.75],
+        "max": [48.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-3",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [56.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [55.75, 0, -0.75],
+        "max": [56.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-4",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [64.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [63.75, 0, -0.75],
+        "max": [64.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-5",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [72.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [71.75, 0, -0.75],
+        "max": [72.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-6",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [80.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [79.75, 0, -0.75],
+        "max": [80.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-7",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [88.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [87.75, 0, -0.75],
+        "max": [88.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "quay-bollard-8",
+      "model": "model-prop-mooring-bollard-01",
+      "at": [96.0, 0.0, -0.5],
+      "turn": 0,
+      "size": [0.6, 0.6, 0.6],
+      "fit": "height",
+      "hides": {
+        "min": [95.75, 0, -0.75],
+        "max": [96.25, 0.6, -0.25]
+      }
+    },
+    {
+      "id": "glenstone-cradle-1",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [34.0, 0.0, -4.5],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [32.4, 0, -5.25],
+        "max": [35.6, 2.25, -3.75]
+      }
+    },
+    {
+      "id": "glenstone-cradle-2",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [40.5, 0.0, -4.5],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [38.9, 0, -5.25],
+        "max": [42.1, 2.25, -3.75]
+      }
+    },
+    {
+      "id": "glenstone-cradle-3",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [47.0, 0.0, -4.5],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [45.4, 0, -5.25],
+        "max": [48.6, 2.25, -3.75]
+      }
+    },
+    {
+      "id": "glenstone-cradle-4",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [34.0, 0.0, -9.0],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [32.4, 0, -9.75],
+        "max": [35.6, 2.25, -8.25]
+      }
+    },
+    {
+      "id": "glenstone-cradle-5",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [40.5, 0.0, -9.0],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [38.9, 0, -9.75],
+        "max": [42.1, 2.25, -8.25]
+      }
+    },
+    {
+      "id": "glenstone-cradle-6",
+      "model": "model-prop-glenstone-cradle-01",
+      "at": [47.0, 0.0, -9.0],
+      "turn": 0,
+      "size": [3.2, 2.25, 1.5],
+      "fit": "box",
+      "hides": {
+        "min": [45.4, 0, -9.75],
+        "max": [48.6, 2.25, -8.25]
+      }
+    },
+    {
+      "id": "quay-toll-shed",
+      "model": "model-prop-quay-toll-shed-01",
+      "at": [96.0, 0.0, -9.0],
+      "turn": 0,
+      "size": [10, 3.5, 6],
+      "fit": "box",
+      "hides": {
+        "min": [90.75, 0, -12.25],
+        "max": [101.25, 3.25, -5.75]
+      }
+    },
+    {
+      "id": "weir-sluice-gate",
+      "model": "model-prop-weir-sluice-gate-01",
+      "at": [147.75, -0.25, 15.5],
+      "turn": 90,
+      "size": [0.8, 4.5, 5],
+      "fit": "box"
+    },
+    {
+      "id": "weir-keystone",
+      "model": "model-prop-weir-keystone-01",
+      "at": [149.0, 4.25, 15.5],
+      "turn": 0,
+      "size": [2, 1.2, 2],
+      "fit": "box"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "path-up",
+      "min": [-5.5, -1, -8],
+      "max": [-4.5, 3, -6],
+      "scene": "under-the-bridge",
+      "spawn": "arrive-from-briar-glen-river"
+    },
+    {
+      "id": "stone-stair-climb",
+      "min": [16, 5, -13.6],
+      "max": [20, 9, -12.6],
+      "scene": "deepworks",
+      "spawn": "arrive-from-briar-glen-river"
+    },
+    {
+      "id": "far-bank-gate",
+      "min": [136, -1, 43.4],
+      "max": [138, 3, 44.6],
+      "scene": "briarwood",
+      "spawn": "arrive-from-briar-glen-river"
+    }
+  ]
+}

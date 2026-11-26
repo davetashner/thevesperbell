@@ -691,9 +691,15 @@
     },
     {
       "piece": "wall",
-      "at": [190, -6, 220.0],
+      "at": [190, -6, 214.5],
       "yaw": 90,
-      "scale": [8.0, 1.5, 1]
+      "scale": [2.5, 1.5, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [190, -6, 225.5],
+      "yaw": 90,
+      "scale": [2.5, 1.5, 1]
     },
     {
       "piece": "floor",
@@ -1444,9 +1450,9 @@
       "tags": ["node", "stone-stair"]
     },
     {
-      "id": "quay-gate-stub",
+      "id": "quay-gate",
       "at": [188, -6, 220],
-      "tags": ["transition-stub", "planned:mw-e25.11"]
+      "tags": ["transition", "stone-stair"]
     },
     {
       "id": "silver-galleries",
@@ -1578,6 +1584,12 @@
         ],
         "radius": 1
       }
+    },
+    {
+      "id": "arrive-from-briar-glen-river",
+      "at": [158, 0, 220],
+      "yaw": 270,
+      "tags": ["arrival"]
     }
   ],
   "signals": [
@@ -1650,6 +1662,13 @@
       "min": [31.2, -1, 60.25],
       "max": [33.0, 3, 63.75],
       "scene": "briar-glen-lane",
+      "spawn": "arrive-from-deepworks"
+    },
+    {
+      "id": "quay-gate",
+      "min": [188.4, -7, 217],
+      "max": [189.8, -3, 223],
+      "scene": "briar-glen-river",
       "spawn": "arrive-from-deepworks"
     }
   ]

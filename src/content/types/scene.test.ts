@@ -1003,6 +1003,7 @@ describe('scene content', () => {
       'brazier-hall',
       'briar-glen-green',
       'briar-glen-lane',
+      'briar-glen-river',
       'briarwood',
       'bridgeward-college',
       'chandelier-room',

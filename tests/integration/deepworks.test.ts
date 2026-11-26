@@ -216,7 +216,7 @@ describe('the Deepworks on foot (mw-e26.2)', () => {
       'rootcellar-camp',
       'camp-fire',
       'stone-stair-head',
-      'quay-gate-stub',
+      'quay-gate',
       'silver-landing',
       'silver-galleries',
       'cage-landing',
