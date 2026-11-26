@@ -112,9 +112,22 @@ The repo is developed on the owner's laptop (10 cores), which they use during th
 
 **Leads:** put the current mode's rules in every worker brief. A worker that runs past 07:00 switches to day mode for its remaining commands.
 
+## Lead and merging
+
+One session is the lead (named in the `HANDOFF: thevesperbell` bead, mw-77x); only the lead merges and republishes the beads export. The owner's standing agreement: merge once CI is green, without asking.
+
+- **Review before merge.** A worker's report says what it meant to do. Read the PR diff (`gh pr diff <n>`) before merging, and spot-check any risky claim: shared state, three.js internals, anything that loosens a test.
+- **One merge at a time.** Before each merge, check `gh pr view <n> --json mergeStateStatus`. If the branch is `BEHIND`, merge main into it and wait for CI again. Conflicts are usually in `e2e/shards.json`, `CHANGELOG.md`, `connectivity.json`, scene lists and perf budgets; keep both sides.
+- **Wait, don't poll.** Run `gh pr checks <n> --watch` with `run_in_background` and act on the notification.
+- **Beads export.** After a merge, close its beads, then fold a fresh `bd export -o .beads/issues.jsonl` into the next PR the lead merges. Workers never touch the export.
+- **Worker briefs** name the files each concurrent worker owns, so the others stay out of them. Workers may push and open PRs, but they never merge or close beads.
+- **Dependabot PRs** are the lead's to triage. Merge main into the branch first, because stale shard weights make e2e shards time out. A typescript-eslint minor release can add rules to `strictTypeChecked`: fix the code, or turn a rule off in `eslint.config.js` with a comment saying why. Push the fix to the dependabot branch.
+
 ## Architecture Overview
 
 Deterministic, engine-agnostic game rules in `src/sim` (100% coverage, no DOM/renderer/wall clock/Math.random); data-driven content in `src/content`; renderer/audio/UI glue in `src/game`, `src/render`, `src/audio`, `src/ui`. World interactions are property-based (flammable, wet, conductive…) via a single stimulus API — never pairwise scripted. See contract §2.
+
+Area crossings swap the scene in place (`swapArea` in `src/main.ts`). The canvas and WebGLRenderer (`createGlSurface`, `src/render/bootstrap`) live for the whole page; each area brings its own scene, camera and physics. Area code must not assume it has a fresh canvas or renderer. Add canvas listeners through the session's `PageScope` (`watch(canvas)`), so the swap removes them. Never call `forceContextLoss` or replace the canvas. A swap frees GPU uploads through `surface.releaseUploads()`. Audio still restarts per area (mw-ju8.47).
 
 ## Assets
 
