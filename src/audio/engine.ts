@@ -4,7 +4,8 @@
 // budget. Presentation only: it reacts to calls from src/game and never writes sim state. Every host
 // dependency (context, fetch, clock, logger) is injected so the logic runs in Node against the fake
 // in fake-context.ts; browser.ts wires the real ones.
-import { BufferCache, DEFAULT_CACHE_BYTES, type LoadedSound } from './buffer-cache.ts';
+import type { BufferCache, LoadedSound } from './buffer-cache.ts';
+import { AudioPage } from './page.ts';
 import {
   applyDuckStage,
   applyMono,
@@ -123,6 +124,12 @@ export interface AudioEngineOptions {
   readonly registry: SoundRegistry;
   /** Creates the context; called once, on first use (not at construction). */
   readonly createContext: () => AudioContextLike;
+  /**
+   * The page's context and buffer cache (mw-ju8.47). When given, the engine uses them and `dispose`
+   * leaves them running, taking down only its own nodes; when omitted the engine owns a private
+   * page and closes its context on dispose.
+   */
+  readonly page?: AudioPage;
   /** Fetches a file's bytes; rejects on HTTP or network failure. */
   readonly fetchBytes: (url: string) => Promise<ArrayBuffer>;
   /** URL of an asset file for this session's format (or its `.json` loop sidecar). */
@@ -213,7 +220,11 @@ export class AudioEngine {
   readonly #roundRobin = new Map<string, number>();
   readonly #voices = new Set<Voice>();
   /** Assets used by looping cues: their loaders also fetch the loop sidecar. */
-  readonly #loopAssets = new Set<string>();
+  readonly #loopAssets: Set<string>;
+  readonly #page: AudioPage;
+  readonly #ownsPage: boolean;
+  readonly #music = new Map<AudioBufferSourceNodeLike, GainNodeLike>();
+  #disposed = false;
   #pending: Request[] = [];
   #rt: Runtime | undefined;
   #beep: AudioBufferLike | undefined;
@@ -227,6 +238,12 @@ export class AudioEngine {
 
   constructor(options: AudioEngineOptions) {
     this.#opts = options;
+    this.#ownsPage = options.page === undefined;
+    this.#page =
+      options.page ??
+      new AudioPage({ createContext: options.createContext, cacheBytes: options.cacheBytes });
+    this.#loopAssets = this.#page.loopAssets;
+    this.#page.attach((ctx, id) => this.#fetchAndDecode(ctx, id));
     this.#quality = options.quality ?? 'high';
     this.#maxVoices = MAX_VOICES[this.#quality];
     this.#warn =
@@ -251,6 +268,7 @@ export class AudioEngine {
    * and resumes it; queued sounds younger than 2 s then play.
    */
   async unlock(): Promise<void> {
+    if (this.#disposed) return;
     const rt = this.#runtime();
     if (rt.ctx.state !== 'running') await rt.ctx.resume();
     this.#pump(rt);
@@ -271,7 +289,7 @@ export class AudioEngine {
    */
   play(cueId: string, options: PlayOptions = {}): SoundHandle | null {
     const def = this.#lookup(cueId);
-    if (!def) return null;
+    if (!def || this.#disposed) return null;
     if (this.#failedCues.has(cueId) && !this.#opts.dev) return null;
     const handle = new Handle(cueId, options.volume ?? 1, this);
     const request: Request = {
@@ -286,11 +304,11 @@ export class AudioEngine {
     this.#load(request.assetId, def).then(
       (sound) => {
         request.sound = sound;
-        this.#pump(rt);
+        if (!this.#disposed) this.#pump(rt);
       },
       () => {
         request.failed = true;
-        this.#pump(rt);
+        if (!this.#disposed) this.#pump(rt);
       },
     );
     return handle;
@@ -303,7 +321,7 @@ export class AudioEngine {
    */
   loadTrack(cueId: string): Promise<MusicTrack> {
     const def = this.#lookup(cueId);
-    if (!def) return Promise.reject(new Error(`unknown cue "${cueId}"`));
+    if (!def || this.#disposed) return Promise.reject(new Error(`unknown cue "${cueId}"`));
     const asset = def.variants[0];
     if (def.loop) this.#loopAssets.add(asset);
     return this.#runtime().cache.request(asset);
@@ -315,7 +333,7 @@ export class AudioEngine {
    */
   startTrack(cueId: string, track: MusicTrack, options: StartTrackOptions = {}): MusicVoice | null {
     const def = this.#lookup(cueId);
-    if (!def) return null;
+    if (!def || this.#disposed) return null;
     const { ctx, graph } = this.#runtime();
     const startTime = options.when ?? ctx.currentTime;
     const source = ctx.createBufferSource();
@@ -332,7 +350,9 @@ export class AudioEngine {
     gain.gain.value = (options.volume ?? 1) * trim;
     source.connect(gain);
     gain.connect(graph.buses[def.bus]);
+    this.#music.set(source, gain);
     source.onended = () => {
+      this.#music.delete(source);
       source.disconnect();
       gain.disconnect();
       options.onEnded?.();
@@ -430,14 +450,41 @@ export class AudioEngine {
     };
   }
 
-  /** Ends the engine's session (an area swap, mw-ju8.28): drops what is queued and closes the context. */
+  /**
+   * Ends the engine's session (an area swap, mw-ju8.28): drops what is queued, silences and
+   * disconnects its voices, music and bus graph. A page-level context (mw-ju8.47) is left running
+   * with its decoded buffers; an engine with a private one closes it.
+   */
   dispose(): void {
+    if (this.#disposed) return;
+    this.#disposed = true;
     this.#pending = [];
-    this.#voices.clear();
-    const ctx = this.#rt?.ctx;
+    const rt = this.#rt;
     this.#rt = undefined;
-    // Closing a context silences every voice on it and frees the audio device.
-    void ctx?.close?.().catch(() => undefined);
+    const voices = [...this.#voices];
+    this.#voices.clear();
+    for (const voice of voices) {
+      voice.handle.state = 'stopped';
+      stopAndDisconnect(voice.source, voice.gain, voice.panner);
+    }
+    for (const [source, gain] of [...this.#music]) {
+      source.onended = null;
+      try {
+        source.stop();
+      } catch {
+        // Already ended.
+      }
+      source.disconnect();
+      gain.disconnect();
+    }
+    this.#music.clear();
+    if (!rt) return;
+    if (this.#ownsPage) {
+      // Closing a context silences every voice on it and frees the audio device.
+      void rt.ctx.close?.().catch(() => undefined);
+      return;
+    }
+    disconnectGraph(rt.graph);
   }
 
   /** @internal Called by handles. */
@@ -458,10 +505,7 @@ export class AudioEngine {
 
   #runtime(): Runtime {
     if (!this.#rt) {
-      const ctx = this.#opts.createContext();
-      const cache = new BufferCache(this.#opts.cacheBytes ?? DEFAULT_CACHE_BYTES, (id) =>
-        this.#fetchAndDecode(ctx, id),
-      );
+      const { ctx, cache } = this.#page.runtime();
       const graph = buildBusGraph(ctx);
       // Mixer settings given before the first sound apply here, before anything can play.
       for (const [bus, gain] of this.#busGains) graph.buses[bus].gain.value = gain;
@@ -669,6 +713,32 @@ export class AudioEngine {
       voice.source.stop();
     }
   }
+}
+
+function stopAndDisconnect(
+  source: AudioBufferSourceNodeLike,
+  ...nodes: readonly ({ disconnect(): void } | undefined)[]
+): void {
+  source.onended = null;
+  try {
+    source.stop();
+  } catch {
+    // Already ended.
+  }
+  source.disconnect();
+  for (const node of nodes) node?.disconnect();
+}
+
+/** Disconnects every node of a bus graph, so a session's graph does not outlive it on a shared context. */
+function disconnectGraph(graph: BusGraph): void {
+  for (const bus of Object.values(graph.buses)) bus.disconnect();
+  for (const stage of Object.values(graph.stages)) {
+    stage.snapshot.disconnect();
+    stage.duck.disconnect();
+    stage.filter.disconnect();
+  }
+  graph.night.disconnect();
+  graph.limiter.disconnect();
 }
 
 /** Placeholder beep for dev builds: 120 ms of 880 Hz at the context rate. */

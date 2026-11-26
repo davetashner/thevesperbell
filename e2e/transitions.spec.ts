@@ -52,6 +52,23 @@ test('AC-1: crossing valley-01’s north gate arrives in valley-02 at its named 
   test.setTimeout(120_000);
   const problems = collectProblems(page);
   await stubPointerLock(page);
+  // Counts the page's AudioContexts and closes (mw-ju8.47 AC-3): a swap must not make or close one.
+  await page.addInitScript(() => {
+    const counts = { created: 0, closed: 0 };
+    (window as unknown as Record<string, unknown>)['__audioContexts'] = counts;
+    const Original = window.AudioContext;
+    const close = Original.prototype.close;
+    Original.prototype.close = function (this: AudioContext) {
+      counts.closed += 1;
+      return close.call(this);
+    };
+    window.AudioContext = class extends Original {
+      constructor(options?: AudioContextOptions) {
+        super(options);
+        counts.created += 1;
+      }
+    };
+  });
   await page.goto('/?scene=valley-01&debug=1');
   await ready(page, 'valley-01');
   // A marker only this page load can hold: a crossing swaps the area in place (mw-ju8.28).
@@ -74,6 +91,17 @@ test('AC-1: crossing valley-01’s north gate arrives in valley-02 at its named 
     await page.evaluate(() => (window as unknown as Record<string, unknown>)['__sameDocument']),
   ).toBe(true);
   const arrived = await playerState(page);
+  // AC-3 (mw-ju8.47): the swap closed no AudioContext and made at most the page's one.
+  expect(
+    await page.evaluate(() => (window as unknown as Record<string, unknown>)['__audioContexts']),
+  ).toEqual({ created: expect.any(Number), closed: 0 });
+  expect(
+    await page.evaluate(
+      () =>
+        ((window as unknown as Record<string, unknown>)['__audioContexts'] as { created: number })
+          .created,
+    ),
+  ).toBeLessThanOrEqual(1);
   // AC-1 (mw-ju8.44): the canvas (and with it the WebGL context and pointer lock) survived the
   // swap. Headless Chromium has no real pointer lock, so the lock is the spec's stub, which holds
   // the element it was granted to; that it still names the live, marked canvas shows the swap did

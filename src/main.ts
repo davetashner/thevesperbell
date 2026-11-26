@@ -3,6 +3,7 @@ import {
   CaptionTracker,
   MixController,
   createBrowserAudioEngine,
+  createBrowserAudioPage,
   documentVisibility,
   gameSoundRegistry,
   installGestureUnlock,
@@ -553,6 +554,9 @@ function gameContent(): Promise<GameContent> {
 // The canvas and renderer of the page, made by the first area session and kept by every one after
 // it (mw-ju8.44); only a page reload ends them.
 let glSurface: GlSurface | undefined;
+// The AudioContext and decoded-buffer cache of the page (mw-ju8.47): each area session's engine
+// builds on them and takes down only its own nodes, so audio keeps running across a swap.
+let audioPage: ReturnType<typeof createBrowserAudioPage> | undefined;
 
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
@@ -1289,8 +1293,10 @@ function startRenderer(
     // Positional sounds follow their entity; the listener follows the camera each frame. The e2e
     // reads the context state and the latest cues from #app[data-audio].
     const sounds = gameSoundRegistry();
+    audioPage ??= createBrowserAudioPage();
     const audio = createBrowserAudioEngine({
       registry: sounds,
+      page: audioPage,
       dev: import.meta.env.DEV,
       entityPosition: soundPositions(world, [
         readPhysicsObjectTransform,
