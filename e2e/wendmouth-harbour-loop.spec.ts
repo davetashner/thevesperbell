@@ -200,7 +200,12 @@ test('mw-e40.35: sign on with Hesketh, open the gangway, walk aboard, climb into
   // south edge catches the player, who comes down to the hold floor (y -1.5).
   await standAt(page, [35, 2.05, 132.2], { x: 35, z: 128 });
   await expect
-    .poll(async () => (await holdKey(page, W, 4, 1)).position.y, { ...POLL, intervals: [100] })
+    // 120 s: the descent takes many short holds, and a ~1 fps CI runner fits too few into 30 s
+    // (it stopped at the same y on every retry: out of wall time, not stuck).
+    .poll(async () => (await holdKey(page, W, 4, 1)).position.y, {
+      timeout: 120_000,
+      intervals: [100],
+    })
     .toBeLessThan(-1.2);
   const hold = await playerState(page);
   expect(hold.position.x).toBeGreaterThan(31.5);
