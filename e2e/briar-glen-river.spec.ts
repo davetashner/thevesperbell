@@ -65,9 +65,14 @@ test('mw-e25.24: from under the bridge down the riverbank to the quay, the Millw
   expect(arrival.x).toBeLessThan(8);
   expect(arrival.z).toBeLessThan(0);
 
-  // 2. Walk the quay path east, downriver, on the keys.
+  // 2. Walk the quay path east, downriver, on the keys. W goes where the camera looks, and the
+  //    camera has not settled after the arrival (slow frames), so face east before every hold.
   await expect
-    .poll(async () => (await holdKey(page, W, 40, 4)).position.x, POLL)
+    .poll(async () => {
+      const here = (await playerState(page)).position;
+      await turnTo(page, { x: here.x + 50, z: here.z });
+      return (await holdKey(page, W, 40, 4)).position.x;
+    }, POLL)
     .toBeGreaterThan(14);
 
   // 3. The quay: Patient Ann lies against it and the basin is water.
