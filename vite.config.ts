@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { relative } from 'node:path';
+import { relative, resolve } from 'node:path';
 import wasm from 'vite-plugin-wasm';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
@@ -81,8 +81,15 @@ export default defineConfig({
   server: {
     watch: {
       // Agent worktrees and test/coverage output live inside the repo; watching them makes every
-      // parallel coverage run reload the dev page thousands of times (mw-d8h).
-      ignored: ['**/.claude/**', '**/coverage/**', '**/test-results/**', '**/playwright-report/**'],
+      // parallel coverage run reload the dev page thousands of times (mw-d8h). Only this checkout's
+      // own .claude/ is ignored: a dev server started inside a worktree lives under some .claude/,
+      // and a `**/.claude/**` glob left it watching nothing (stale code, no HMR).
+      ignored: [
+        `${resolve(import.meta.dirname, '.claude')}/**`,
+        '**/coverage/**',
+        '**/test-results/**',
+        '**/playwright-report/**',
+      ],
     },
   },
   build: {
