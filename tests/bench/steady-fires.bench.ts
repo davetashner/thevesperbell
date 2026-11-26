@@ -1,9 +1,9 @@
 // mw-e32.20: steady decorative fires (lanterns, braziers) must stay cheap. Ten fires, each holding
 // its flame cells at 600 °C and puffing smoke every tick as the fire rule does, run to a steady
-// state; the bench then times one tick (hold + stepField). Measured 2026-11-26: ~3.1 ms for ten
-// fires (the heat of each held flame spreads over ~38 chunks and never goes exactly stationary, so
-// it cannot be skipped without changing results; see mw-e32.20). The assertion is a regression
-// guard at that level, not the target: the AC-1 target needs a behaviour-changing decision.
+// state; the bench then times one tick (hold + stepField). Measured 2026-11-26 (laptop, noisy): ~3.1 ms
+// for ten fires before the convergence hysteresis, 14-25% less with it (302 of 385 chunks stepped
+// per tick): each held flame spreads heat over ~38 chunks that never go exactly stationary. The
+// assertion is a regression guard, not the AC-1 target.
 import { describe, expect, test } from 'vitest';
 import { ElementField, cellsInSphere, holdAtLeast, stepField } from '@sim/index';
 
