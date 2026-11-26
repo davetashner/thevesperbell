@@ -9,7 +9,7 @@
 
 /** The parts of the page a scope watches; the browser's own, or a fake in a test. */
 export interface ScopeHost {
-  readonly targets: readonly EventTarget[];
+  readonly targets: EventTarget[];
   readonly timers: {
     setTimeout: typeof setTimeout;
     clearTimeout: typeof clearTimeout;
@@ -132,6 +132,14 @@ export class PageScope {
     this.original = bound;
   }
 
+  /**
+   * Also takes down the listeners the session adds to `target` (a canvas that outlives the session).
+   * Its `addEventListener` must come from the same prototype as a watched target's, as an element's does.
+   */
+  watch(target: EventTarget): void {
+    if (!this.host.targets.includes(target)) this.host.targets.push(target);
+  }
+
   /** Runs `dispose` when the scope ends (last registered, first run). */
   onDispose(dispose: () => void): void {
     this.disposers.push(dispose);
@@ -179,11 +187,14 @@ const PAGE_ATTRIBUTES: ReadonlySet<string> = new Set([
   'data-save-store',
 ]);
 
+const KEPT_CHILDREN: ReadonlySet<string> = new Set(['save-warning', 'game-canvas']);
+
 /** Empties the root of one area's DOM and readouts, keeping the page's own (the storage warning). */
 export function resetRoot(root: HTMLElement): void {
   for (const child of [...root.children]) {
-    if (!(child instanceof HTMLElement) || child.dataset['testid'] !== 'save-warning')
-      child.remove();
+    // The save warning is the page's; the canvas outlives the area (pointer lock lives on it).
+    const kept = child instanceof HTMLElement && KEPT_CHILDREN.has(child.dataset['testid'] ?? '');
+    if (!kept) child.remove();
   }
   for (const attribute of [...root.attributes]) {
     const name = attribute.name;
