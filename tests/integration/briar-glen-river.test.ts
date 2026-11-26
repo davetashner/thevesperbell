@@ -114,9 +114,10 @@ describe('the riverbank to the quay and the Millweir (mw-e25.24)', () => {
     expect(route(walker, 'arrive-from-kestrel-lock', 'briar-glen-quay').status).toBe('found');
   });
 
-  it('AC-1: the stopgap towpath to the Stone Wharf stays on the bank', () => {
-    expect(bank.transitions.find((t) => t.id === 'towpath-down')?.scene.id).toBe(
-      'wendmouth-harbour',
+  it('AC-1: the towpath downriver to Kestrel Lock stays on the bank beside the riverbank path', () => {
+    expect(bank.transitions.find((t) => t.id === 'towpath-down')?.scene.id).toBe('kestrel-lock');
+    expect(bank.transitions.find((t) => t.id === 'riverbank-down')?.scene.id).toBe(
+      'briar-glen-river',
     );
   });
 
