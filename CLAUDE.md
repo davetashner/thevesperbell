@@ -70,6 +70,7 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 1. Pick work from `bd ready`; claim it (`bd update <id> --claim`).
 2. Create a worktree from latest main: `git fetch origin main && git worktree add .claude/worktrees/<branch> -b <branch> origin/main`.
 3. Implement with tests that name the ACs (`it('AC-2: ...')`). Coverage rules in the contract §3 are enforced by CI; never lower coverage.
+   - Changing a content type in `src/content/types` means regenerating its schema and docs: `pnpm content:schemas && pnpm content:docs`, and commit the output. CI's content-docs test fails otherwise (PR #509).
    - e2e specs must not wait on long stretches of sim time: the frame loop runs at most 5 sim ticks per frame, so a 20 s settle can take minutes on a slow CI runner (PR #509). Cover long sim processes in integration tests; in e2e, assert the player's action and its immediate effect.
 4. Commit with sign-off (`git commit -s`), reference the bead ID in the message.
 5. Open a PR to `main` with one `Closes mw-…` line per completed bead. Squash merge only.
