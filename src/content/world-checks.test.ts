@@ -65,11 +65,17 @@ describe('world map load checks', () => {
     expect(check('marsh-door', { transitions: ['no-slash'] })[0]!.message).toContain(
       'no scene has',
     );
-    // A built transition on an edge whose ends are not built yet.
-    const planned = real.edges.find((e) =>
-      [e.from, e.to].every((end) => real.nodes.find((n) => n.id === end)?.scene === undefined),
-    )!;
-    expect(check(planned.id, { transitions: ['valley-01/north-gate'] })[0]!.message).toContain(
+    // A built transition on an edge whose ends are not built yet. The shipped map may have no such
+    // edge left, so unbuild both ends of a real one.
+    const edge = real.edges.find((e) => e.id === 'marsh-door')!;
+    const unbuilt = new Set([edge.from, edge.to]);
+    const nodes = real.nodes.map((n) => (unbuilt.has(n.id) ? { ...n, scene: undefined } : n));
+    const edges = real.edges.map((e) =>
+      e.id === edge.id ? { ...e, transitions: ['valley-01/north-gate'] } : e,
+    );
+    const world = { ...real, nodes, edges };
+    const issues = checkWorld([...others, { type: 'world', file: 'w', value: world }]);
+    expect(issues.map((i) => i.message).join('\n')).toContain(
       'whose scenes are unbuilt and unbuilt',
     );
   });

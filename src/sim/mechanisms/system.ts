@@ -46,7 +46,7 @@ import {
 } from '../interaction/system';
 import type { AffordanceSpec } from '../interaction/affordance';
 import { LiquidVolumeComponent } from '../liquids/components';
-import { setDrainOpen } from '../liquids/volumes';
+import { setDrainOpen, setFillOpen } from '../liquids/volumes';
 import { noiseEmitted } from '../noise/events';
 import { bodyMaterialOf, PhysicsColliderComponent, rigidBodiesOf } from '../physics/objects';
 import type { ColliderHandle, StaticColliderSink } from '../physics/static-colliders';
@@ -111,6 +111,7 @@ import {
 import type { StaticOccluders } from '../light/occluders';
 import { ChargeReceiverComponent, resetChargeReceiver } from './charge-receivers';
 import { lightReceiversSystem, resetLightReceiver } from './receivers';
+import { interlocksSystem } from './interlocks';
 
 /** How much faster than by hand a kicked door swings open (mw-e04.18). */
 export const SLAM_SPEED = 4;
@@ -863,6 +864,7 @@ export function installMechanisms<TInput>(
   world.addSystem(lightReceiversSystem(tracer));
   world.addSystem(supportsSystem());
   world.addSystem(ropesSystem());
+  world.addSystem(interlocksSystem());
   // A door that goes (broken, burnt away, unloaded) takes its collider, occluder and seal with it.
   world.onRemove(DoorComponent, (_entity, door) => {
     removeFrom(rules.colliders, door.collider);
@@ -909,7 +911,7 @@ export function installMechanisms<TInput>(
           moveDoor(w, target, verb === 'open' || door.target === 0 ? 1 : 0, actor);
       }
     }),
-    world.events.on(signalReceived, ({ receiver, entity, value, graph }) => {
+    world.events.on(signalReceived, ({ receiver, entity, value, graph, key }) => {
       if ((receiver !== 'door' && receiver !== 'mechanism') || entity === null) return;
       if (w.has(entity, PlateComponent)) {
         // A signal on resets a plate (a latching one's way off); off does nothing.
@@ -923,9 +925,11 @@ export function installMechanisms<TInput>(
         if (value) resetImpactSwitch(w, entity, graph);
       } else if (w.isRegistered(LiquidVolumeComponent) && w.has(entity, LiquidVolumeComponent)) {
         // A valve: on opens the volume's drain, off closes it (a volume with no drain ignores it).
-        if (w.get(entity, LiquidVolumeComponent)?.drain !== undefined) {
-          setDrainOpen(w, entity, value);
-        }
+        // A receiver keyed `fill` works the volume's sluice the same way (the head paddle of a lock).
+        const volume = w.get(entity, LiquidVolumeComponent);
+        if (key === 'fill') {
+          if (volume?.fill !== undefined) setFillOpen(w, entity, value);
+        } else if (volume?.drain !== undefined) setDrainOpen(w, entity, value);
       } else if (w.has(entity, DoorComponent)) moveDoor(w, entity, value ? 1 : 0, graph);
       else setSwitch(w, entity, value ? 1 : 0, graph);
     }),

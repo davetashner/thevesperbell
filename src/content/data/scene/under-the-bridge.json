@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "under-the-bridge",
   "name": "Under the Miners' Bridge",
-  "description": "Bead mw-ju8.14: the riverbank under the Miners' Bridge in grey box, built from the e00 kit only. A 14 x 8 m shingle bank between two bridge piers (bridge-pier-west/east; the arch itself is art to come), reached by a short walled path from briar-glen-lane's riverbank-path transition (path-up leads back, arrive-from-briar-glen-lane arrives). Idris Quillon (npc-quillon), the robed teacher the Lantern Court has struck off, waits here between dusk and dawn only: his creature spawn and his lesson table (quillon-lessons, merchant bridge-sorcerer) carry presence {dusk, night}, so by day the bank is empty and the table does not answer. He sells the Ember lesson through the shop screen's Services tab. dev-crowns:600 tops the player up on first opening so the dev scene can pay. A shuttered blue lantern and a brazier mark the spot. A short walled path through a doorway in the east wall is the towpath downriver: its end is the towpath-down transition to Wendmouth's Stone Wharf (mw-e40.26; a stopgap for the riverbank path to Briar Glen Quay, the Millweir and Kestrel Lock, mw-e25.24; arrive-from-wendmouth-harbour arrives). Reach it with ?scene=under-the-bridge.",
+  "description": "Bead mw-ju8.14: the riverbank under the Miners' Bridge in grey box, built from the e00 kit only. A 14 x 8 m shingle bank between two bridge piers (bridge-pier-west/east; the arch itself is art to come), reached by a short walled path from briar-glen-lane's riverbank-path transition (path-up leads back, arrive-from-briar-glen-lane arrives). Idris Quillon (npc-quillon), the robed teacher the Lantern Court has struck off, waits here between dusk and dawn only: his creature spawn and his lesson table (quillon-lessons, merchant bridge-sorcerer) carry presence {dusk, night}, so by day the bank is empty and the table does not answer. He sells the Ember lesson through the shop screen's Services tab. dev-crowns:600 tops the player up on first opening so the dev scene can pay. A shuttered blue lantern and a brazier mark the spot. A short walled path through a doorway in the east wall is an old towpath stub that now ends in a wall and a signpost (the direct towpath to Kestrel Lock was retired, mw-e25.31: the way downriver passes the quay and the Millweir). The path through a gap in the low river wall is the riverbank path downriver to Briar Glen Quay and the Millweir (mw-e25.24): its end is the riverbank-down transition to the river scene briar-glen-river (arrive-from-briar-glen-river arrives). Reach it with ?scene=under-the-bridge.",
   "grid": 1,
   "camera": {
     "position": [-12, 12, -12],
@@ -48,8 +48,13 @@
     },
     {
       "piece": "wall",
-      "at": [0, 0, 4],
-      "scale": [7, 0.35, 1]
+      "at": [-5.25, 0, 4],
+      "scale": [1.75, 0.35, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [2.75, 0, 4],
+      "scale": [4.25, 0.35, 1]
     },
     {
       "piece": "wall",
@@ -109,13 +114,35 @@
     },
     {
       "piece": "crate",
-      "at": [-2.5, 0, 2.75],
+      "at": [-1, 0, 3.25],
       "scale": [0.7, 0.6, 0.7]
     },
     {
       "piece": "crate",
       "at": [3, 0, 2.5],
       "scale": [0.8, 0.8, 0.8]
+    },
+    {
+      "piece": "floor",
+      "at": [-2.5, 0, 6.5],
+      "scale": [1, 1, 2.5]
+    },
+    {
+      "piece": "wall",
+      "at": [-3.5, 0, 6.5],
+      "yaw": 90,
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-1.5, 0, 6.5],
+      "yaw": 90,
+      "scale": [2.5, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-2.5, 0, 9],
+      "scale": [1, 1, 1]
     }
   ],
   "spawns": [
@@ -131,21 +158,29 @@
       "tags": ["arrival"]
     },
     {
-      "id": "arrive-from-wendmouth-harbour",
-      "at": [10.5, 0, 0],
-      "yaw": 270,
-      "tags": ["arrival"]
-    },
-    {
       "id": "sign-wendmouth-path",
       "at": [8.5, 1.25, -0.75],
       "tags": ["sign", "path"],
       "interact": {
         "affordances": [
-          { "verb": "read", "label": "Read the signpost: the towpath downriver, to Wendmouth" }
+          {
+            "verb": "read",
+            "label": "Read the signpost: the towpath ends here; downriver is by the path through the low wall, to the quay and the Millweir"
+          }
         ],
         "radius": 1
       }
+    },
+    {
+      "id": "arrive-from-briar-glen-river",
+      "at": [-2.5, 0, 6.25],
+      "yaw": 180,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "riverbank-down",
+      "at": [-2.5, 0, 8.25],
+      "tags": ["transition"]
     },
     {
       "id": "bridge-pier-west",
@@ -191,7 +226,10 @@
       "id": "quillon-brazier",
       "at": [1.75, 0.5, 1.0],
       "tags": ["brazier", "hearth"],
-      "lightSource": { "variant": "brazier", "infiniteFuel": true }
+      "lightSource": {
+        "variant": "brazier",
+        "infiniteFuel": true
+      }
     },
     {
       "id": "quillon-lantern",
@@ -251,10 +289,10 @@
       "spawn": "arrive-from-under-the-bridge"
     },
     {
-      "id": "towpath-down",
-      "min": [12.3, -1, -1],
-      "max": [13.3, 3, 1],
-      "scene": "wendmouth-harbour",
+      "id": "riverbank-down",
+      "min": [-3.3, -1, 7.8],
+      "max": [-1.7, 3, 8.8],
+      "scene": "briar-glen-river",
       "spawn": "arrive-from-under-the-bridge"
     }
   ]

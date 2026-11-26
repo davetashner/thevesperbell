@@ -162,6 +162,8 @@ describe('fact checks', () => {
       'slice.complete',
       'tern.boarded',
       'wendmouth.visited',
+      'world.millweir.sluice-walk-open',
+      'world.stone-stair.lowered',
     ]);
   });
 

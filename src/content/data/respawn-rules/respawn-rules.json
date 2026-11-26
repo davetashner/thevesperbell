@@ -83,6 +83,14 @@
       "priority": 0,
       "destination": { "scene": "wendmouth-harbour", "spawn": "player-start" },
       "mode": "reload"
+    },
+    {
+      "id": "briar-glen-river-reload",
+      "notes": "Death on the river below Briar Glen (mw-e25.11, mw-e25.12): the region is the whole scene; the death screen offers Load last save, and with no save the player restarts at the head of the riverbank path.",
+      "region": "briar-glen-river",
+      "priority": 0,
+      "destination": { "scene": "briar-glen-river", "spawn": "player-start" },
+      "mode": "reload"
     }
   ]
 }

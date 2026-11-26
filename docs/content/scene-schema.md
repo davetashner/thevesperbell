@@ -205,6 +205,10 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].door.lock` | ref → lock | — | The lock it carries: what keys, picks and spells get past. |
 | `spawns[].door.locked` | boolean | — | Starts locked; defaults to true when it has a lock (needs one). |
 | `spawns[].door.state` | `"closed"` \| `"open"` \| `"jammed"` | `"closed"` | How it starts: closed, open or jammed. |
+| `spawns[].door.interlock` | object | — | The door holds shut (jammed, with a strain cue) while that volume stands outside the depth window (the gates of a lock, mw-e25.14). |
+| `spawns[].door.interlock.volume` | string | required | Spawn id of the liquid volume the door answers to. |
+| `spawns[].door.interlock.minDepth` | number ≥ 0 | — | Shallowest the liquid may stand for the door to move, metres; default 0. |
+| `spawns[].door.interlock.maxDepth` | number > 0 | — | Deepest the liquid may stand for the door to move, metres; default no limit. |
 | `spawns[].door.hinge` | `"left"` \| `"right"` | `"left"` | Hinged and trapdoor: the side the hinge is on (−x or +x before yaw); sliding: the side it slides to. |
 | `spawns[].door.swing` | `"forward"` \| `"back"` | `"forward"` | Hinged: swings towards +z (forward) or −z (back) before yaw. |
 | `spawns[].switch` | object | — | Makes the spawned entity a lever, button, crank or wheel (mw-e03.18). |
@@ -289,6 +293,9 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].liquid.drain` | object | — | A drain, opened and closed by a signal or code (the valve of a basin). |
 | `spawns[].liquid.drain.rate` | number > 0 | required | Level fall while open, m/s. |
 | `spawns[].liquid.drain.open` | boolean | `false` | Starts open. |
+| `spawns[].liquid.fill` | object | — | A sluice that tops the volume up with its own liquid, opened and closed by a signal bound with the key `fill` (the head sluice of a lock). |
+| `spawns[].liquid.fill.rate` | number > 0 | required | Level rise while open, m/s, until the brim. |
+| `spawns[].liquid.fill.open` | boolean | `false` | Starts open. |
 | `spawns[].container` | object | — | Makes the spawned entity a lootable container: loot table, contents and lock (mw-e18.3). |
 | `spawns[].container.loot` | ref → loot-table | — | Loot table rolled into it the first time it is opened (once; saves keep the result). |
 | `spawns[].container.contents` | list of object | — | What it holds from the start, before any roll. |
@@ -418,6 +425,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `transitions[].scene` | ref → scene | required | The scene it leads to. |
 | `transitions[].spawn` | id | required | The spawn of that scene the player arrives at; its yaw is the way the player faces. |
 | `transitions[].follow` | boolean | `false` | Companions flagged to follow travel with the player through it (none exist yet). |
+| `transitions[].advanceMinutes` | integer > 0 ≤ 1440 | — | Game minutes the world clock advances by (advanceTime, reason travel) as the player crosses it: a leg of a long walk (the towpath, mw-e25.14). |
 | `ambience` | list of object | — | Ambience zones placed over regions of the scene or all of it (mw-e28.13). |
 | `ambience[].zone` | ref → ambience | required | The ambience zone that plays here. |
 | `ambience[].region` | id | — | Id of one of the scene’s regions; leave out to cover the whole scene. |

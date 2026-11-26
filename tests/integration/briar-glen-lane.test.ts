@@ -104,6 +104,7 @@ describe('the Briar Glen shop lane, headless (mw-ju8.5)', () => {
       ['riverbank-path', 'under-the-bridge'],
       ['woodside-path', 'briarwood'],
       ['green-gate', 'briar-glen-green'],
+      ['miners-stair', 'deepworks'],
     ]);
     expect(bridge.position.z).toBeLessThan(t.marker('marsh-store-door').position.z);
     const door = t.marker('marsh-store-door');
@@ -291,7 +292,7 @@ describe('the riverbank path is readable (mw-ju8.42)', () => {
     expect(way).toBeDefined();
     // The gap in the east wall: x 9, z 5.5 to 9, its middle.
     const gap = { x: 9, z: 7.25 };
-    const signs = scene.spawns.filter((s) => s.tags.includes('sign') && s.tags.includes('path'));
+    const signs = scene.spawns.filter((s) => s.id.startsWith('sign-riverbank-path'));
     expect(signs.length).toBeGreaterThan(0);
     for (const sign of signs) {
       expect(Math.hypot(sign.at[0] - gap.x, sign.at[2] - gap.z)).toBeLessThan(2);

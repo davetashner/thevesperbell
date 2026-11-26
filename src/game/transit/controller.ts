@@ -12,7 +12,13 @@
 // Nothing here moves the player or touches a scene: the scene loader and the player start do that,
 // from the spawn the hand-off names.
 
-import { areaTransition, type AreaTransition, type EntityId, type World } from '@sim/index';
+import {
+  areaTransition,
+  gameClockOf,
+  type AreaTransition,
+  type EntityId,
+  type World,
+} from '@sim/index';
 import { showAreaLoadingAfter, type AreaLoading, type AreaLoadingOptions } from '@ui/area-loading';
 import type { SaveRegistry } from '../save/format';
 import { captureCarry } from './carry';
@@ -84,6 +90,11 @@ export class TransitionController {
     const { options } = this;
     let transit: Transit;
     try {
+      // A leg of a long walk (the towpath) takes game time: advance the clock before the carry is
+      // captured, so the facts that cross the reload already say how late it is.
+      if (crossing.advanceMinutes !== undefined && crossing.advanceMinutes > 0) {
+        gameClockOf(options.world)?.advanceTime(crossing.advanceMinutes, 'travel');
+      }
       transit = {
         from: crossing.from,
         to: crossing.scene,

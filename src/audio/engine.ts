@@ -430,6 +430,16 @@ export class AudioEngine {
     };
   }
 
+  /** Ends the engine's session (an area swap, mw-ju8.28): drops what is queued and closes the context. */
+  dispose(): void {
+    this.#pending = [];
+    this.#voices.clear();
+    const ctx = this.#rt?.ctx;
+    this.#rt = undefined;
+    // Closing a context silences every voice on it and frees the audio device.
+    void ctx?.close?.().catch(() => undefined);
+  }
+
   /** @internal Called by handles. */
   stopHandle(handle: Handle, fadeSeconds: number): void {
     if (handle.state === 'stopped') return;

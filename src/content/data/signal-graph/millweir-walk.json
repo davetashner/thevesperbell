@@ -1,0 +1,32 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "millweir-walk",
+  "name": "Millweir sluice walk",
+  "notes": "The Millweir in the scene briar-glen-river (mw-e25.12). The sluice wheel opens the drain of the mill pond (the pond falls to its low state and the stepping-stone path across it stands clear); turning it back shuts the drain. The far-bank volume is the Briarwood far bank: the first time the player stands on it, by the walk, the stones or the water, the latch writes world.millweir.sluice-walk-open = true and keeps it, so the world map's shortcut stays open for good.",
+  "nodes": [
+    { "id": "sluice-wheel", "kind": "lever", "entity": "sluice-wheel" },
+    { "id": "drain", "kind": "receiver", "receiver": "mechanism", "entity": "mill-pond" },
+    {
+      "id": "far-bank",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": { "x": 139, "y": 1.5, "z": 31.5 },
+        "halfExtents": { "x": 31, "y": 3, "z": 1.5 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    { "id": "crossed", "kind": "latch" },
+    {
+      "id": "walk-open-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "world.millweir.sluice-walk-open"
+    }
+  ],
+  "wires": [
+    { "from": "sluice-wheel", "to": "drain" },
+    { "from": "far-bank.enter", "to": "crossed.set" },
+    { "from": "crossed", "to": "walk-open-fact" }
+  ]
+}

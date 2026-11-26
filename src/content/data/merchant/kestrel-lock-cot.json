@@ -1,0 +1,27 @@
+{
+  "$schema": "../merchant.schema.json",
+  "id": "kestrel-lock-cot",
+  "notes": "The cot by the fire in the lock-keeper's cottage at Kestrel Lock (story bible 5.14, mw-e25.14). Old Reed (npc-reed) lets a walker sleep a night on his cot for 8 crowns, the bottom of the economy doc's inn-bed band (8-15) and cheaper than the Sleeping Ox (12). It is mainly a rest point: Reed keeps a little bread and cheese for walkers and buys food back. Resting passes the clock to morning, fully restores health, stamina and mana and autosaves, the same service the inn's room has.",
+  "npcId": "npc-reed",
+  "displayName": "Old Reed",
+  "shopName": "The keeper's cot",
+  "personalityTags": ["gossipy", "gruff"],
+  "specialties": ["consumable"],
+  "buysCategories": ["consumable"],
+  "stock": [
+    { "item": "bread-loaf", "count": 4, "restock": { "everyHours": 24, "amount": 2 } },
+    { "item": "hard-cheese-wedge", "count": 3, "restock": { "everyHours": 24, "amount": 1 } }
+  ],
+  "services": [
+    {
+      "id": "cot-by-the-fire",
+      "name": "A cot by the keeper's fire",
+      "price": 8,
+      "kind": "rest"
+    }
+  ],
+  "goldReserve": 20,
+  "goldRestockPerDay": 2,
+  "markup": 1.3,
+  "buyRate": 0.4
+}

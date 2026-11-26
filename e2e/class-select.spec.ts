@@ -115,6 +115,9 @@ const REASON = 'Not playable in this build yet';
 test('AC-3: selecting Sorcerer and entering the testbed gives the sorcerer kit in the HUD', async ({
   page,
 }) => {
+  // Sixteen steps and an axe scan. On a starved CI shard each key press or evaluation takes 0.5-3 s
+  // and the scan ~9 s (CI traces of mw-e41.23), so the default 30 s ran out with the game working.
+  test.setTimeout(120_000);
   const problems = collectProblems(page);
   await page.goto('/?scene=testbed&newgame&allclasses');
   const app = page.locator('#app');

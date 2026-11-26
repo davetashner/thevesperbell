@@ -238,6 +238,7 @@ export class FakeAudioContext implements AudioContextLike {
   readonly compressors: FakeCompressor[] = [];
   readonly biquads: FakeBiquad[] = [];
   resumeCalls = 0;
+  closeCalls = 0;
   readonly #decode: (data: ArrayBuffer) => AudioBufferLike;
 
   constructor(options: FakeContextOptions = {}) {
@@ -251,6 +252,12 @@ export class FakeAudioContext implements AudioContextLike {
   resume(): Promise<void> {
     this.resumeCalls++;
     this.state = 'running';
+    return Promise.resolve();
+  }
+
+  close(): Promise<void> {
+    this.closeCalls++;
+    this.state = 'closed';
     return Promise.resolve();
   }
 

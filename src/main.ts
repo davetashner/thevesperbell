@@ -72,6 +72,7 @@ import {
   watchPresence,
   type GameCreatures,
 } from '@game/creatures/index';
+import { browserScopeHost, PageScope, resetRoot } from '@game/page-scope';
 import { startRopes } from '@game/climb/ropes';
 import { bindBreakLeftovers, BreakWatch, hasBreakables } from '@game/breakables/index';
 import {
@@ -538,6 +539,17 @@ type GameCommand =
 // import away, so none of them reaches any chunk (mw-e32.18). `dev` is undefined there.
 const dev = __DEBUG_CONSOLE__ ? await import('@tools/dev-kit') : undefined;
 
+// Declared before the boot below runs: startRenderer reads it during module evaluation, and a
+// `let` used before its line throws (a dev build is unbundled, so it did; mw-ju8.28 follow-up).
+// Content is parsed once per page: an in-place area swap (mw-ju8.28) boots the next area from it.
+let contentLoad: Promise<GameContent> | undefined;
+function gameContent(): Promise<GameContent> {
+  contentLoad ??= __DEBUG_CONSOLE__
+    ? import('@content/dev-content').then(({ loadDevContent }) => loadDevContent())
+    : Promise.resolve(loadGameContent());
+  return contentLoad;
+}
+
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
   app.dataset['layers'] = [...layers, 'tools'].join(' ');
@@ -549,6 +561,25 @@ if (app) {
   });
   app.dataset['settingsStore'] = settings.persistent ? 'local' : 'memory';
   startRenderer(app, startSaves(app), settings);
+}
+
+/** The settings store for one area session: its subscriptions end with the session. */
+function scopedSettings(store: SettingsStore, scope: PageScope): SettingsStore {
+  return new Proxy(store, {
+    get(target, property) {
+      const value: unknown = Reflect.get(target, property, target);
+      if (typeof value !== 'function') return value;
+      if (property !== 'on' && property !== 'onChange') {
+        return (...args: unknown[]) => (value as (...a: unknown[]) => unknown).apply(target, args);
+      }
+      const subscribe = value as (...args: unknown[]) => () => void;
+      return (...args: unknown[]) => {
+        const off = subscribe.apply(target, args);
+        scope.onDispose(off);
+        return off;
+      };
+    },
+  });
 }
 
 // Opens save storage (mw-e30.2). If the browser blocks IndexedDB the game runs on in-memory saves,
@@ -575,10 +606,33 @@ async function startSaves(root: HTMLElement): Promise<OpenedSaveStore> {
 function startRenderer(
   root: HTMLElement,
   saves: Promise<OpenedSaveStore>,
-  settings: SettingsStore,
+  pageSettings: SettingsStore,
 ): void {
+  // One area session (mw-ju8.28): everything it registers on the page is taken down again by
+  // `scope.dispose()` when a crossing swaps the scene in place; the settings store, save store and
+  // content cache outlive it.
+  const scope = new PageScope(browserScopeHost());
+  scope.begin();
+  const settings = scopedSettings(pageSettings, scope);
+  // An area crossing swaps the scene in place (mw-ju8.28): the hand-off is already in session
+  // storage, so the next session boots exactly as a reloaded page would, from the URL it names. It
+  // runs after the frame that asked, never inside it; if the swap fails the page reloads instead.
+  const swapArea = (search: string): void => {
+    queueMicrotask(() => {
+      try {
+        scope.dispose();
+        resetRoot(root);
+        history.replaceState(history.state, '', `${location.pathname}?${search}${location.hash}`);
+        startRenderer(root, saves, pageSettings);
+      } catch (error) {
+        console.warn(`in-place area swap failed, reloading: ${String(error)}`);
+        location.search = search;
+      }
+    });
+  };
   const missing = missingFeatures(globalThis);
   if (missing.length > 0) {
+    scope.dispose();
     showUnsupported(root, missing);
     return;
   }
@@ -596,10 +650,14 @@ function startRenderer(
     });
   } catch {
     // The context can still fail to create (blocklisted GPU, hardware acceleration off).
+    scope.dispose();
     showUnsupported(root, ['webgl2']);
     return;
   }
   const { camera } = view;
+  scope.onDispose(() => {
+    view.dispose();
+  });
 
   // ?perf (mw-e00.21 AC-6): times each whole frame callback (sim steps + render submission) and the
   // interval between frames, then logs percentiles once. See src/tools/perf/frame-probe.ts.
@@ -878,6 +936,9 @@ function startRenderer(
   // world starts once the physics module has loaded; the dynamic import keeps Rapier and its WASM
   // out of the initial bundle.
   const startWorld = (physics: RapierPhysics, content: GameContent): void => {
+    scope.onDispose(() => {
+      physics.dispose();
+    });
     const world = registerSceneComponents(new World<GameCommand>({ seed: BOOT_SEED, physics }));
     // The fact registry (mw-e27.2) on the world's facts: typed declarations, and the former keys
     // that let a save's renamed facts load under their current keys (mw-e27.4).
@@ -1226,6 +1287,9 @@ function startRenderer(
         readDummyTransform, // any placed entity: the dummies and the player
         readSceneTransform,
       ]),
+    });
+    scope.onDispose(() => {
+      audio.dispose();
     });
     installGestureUnlock(document, audio);
     // The saved mix applies now, before the context exists and so before the first sound (mw-e28.5).
@@ -1702,6 +1766,9 @@ function startRenderer(
         captureAfterRender = undefined;
         capture?.(captureCanvasThumbnail(view.canvas));
       },
+    });
+    scope.onDispose(() => {
+      loop.stop();
     });
 
     // The scene loader fills the world from content (mw-e00.21); static colliders go into the
@@ -3293,8 +3360,9 @@ function startRenderer(
         areaName: (id) => content.get('scene', id).name,
         session: transitStore,
         now: () => Date.now(),
+        // In place (mw-ju8.28): no page reload; the next session boots from the same hand-off.
         navigate: (search) => {
-          location.search = search;
+          swapArea(search);
         },
         search: () => location.search,
         overlayParent: root,
@@ -3721,6 +3789,10 @@ function startRenderer(
     }
     // Debug attribute (mw-e03.35 AC-4): colliders registered in the physics world.
     root.dataset['colliders'] = String(physics.count());
+    // Debug attribute (mw-e32.12): the renderer's live GPU resources, so a test can see repeated
+    // in-place area swaps (mw-ju8.28) not growing them.
+    const { geometries, textures } = view.renderer.info.memory;
+    root.dataset['rendererMemory'] = JSON.stringify({ geometries, textures });
     // Debug attribute (mw-e03.39): the physics objects the scene spawned.
     root.dataset['physicsObjects'] = String(world.query(PhysicsObjectComponent).ids().length);
     writeCameraData();
@@ -3755,9 +3827,7 @@ function startRenderer(
   // Debug builds (the console built in) add the frozen fixture creatures and the dev-only scenes
   // that place them (mw-e12.4); a release build loads only the game's content and never downloads
   // them.
-  const content: Promise<GameContent> = __DEBUG_CONSOLE__
-    ? import('@content/dev-content').then(({ loadDevContent }) => loadDevContent())
-    : Promise.resolve(loadGameContent());
+  const content = gameContent();
   void bootPhysics(
     () => import('@dimforge/rapier3d-deterministic'),
     (state) => {
@@ -3775,6 +3845,8 @@ function startRenderer(
     root.dataset['physicsVersion'] = boot.module.version();
     status.remove();
     return content.then((loaded) => {
+      // A crossing swapped the area before physics and content were ready: nothing to start.
+      if (scope.disposed) return;
       startWorld(boot.physics, loaded);
     });
   });

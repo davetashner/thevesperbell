@@ -13,6 +13,11 @@ check enforces this).
 
 ### Added
 
+- The river is one walk: from the Millweir's east end the towpath leads on to Kestrel Lock (six hours pass) and from there to the Stone Wharf. The old direct path from under the bridge to the lock is gone: the way downriver now passes the quay and the Millweir. [mw-e25.31, mw-e25.24]
+- The Miners' Bridge now leads somewhere: a worn stone stair beside the Bridge Watch post drops off the bridge's town end onto the old miners' track, which runs to the boarded mine gate, and back up again. [mw-e25.23]
+- Walking from one area into the next no longer reloads the page: the new area swaps in place, carrying what you hold and arriving at the same spawn, in a fraction of the old wait. [mw-ju8.28]
+- Kestrel Lock, the halfway landmark on the towpath: a lock chamber whose water the two paddle levers raise and lower, gates that strain until the levels match, Old Reed's cottage with a cot to rest on, and towpath legs to the riverbank and the Wendmouth Stone Wharf that each take six game hours. Old Reed and the toll board now stand at the lock instead of the harbour. [mw-e25.14]
+- The river below Briar Glen is walkable: a path through the wall under the Miners' Bridge leads down to Briar Glen Quay (Mags Oakum's barge Patient Ann moored at it, stacked glenstone blocks, a crane, a toll shed), on along the towpath to the Millweir, where a sluice wheel drains the mill pond to expose a stepping-stone path and a catwalk with a gap crosses the weir to the Briarwood far bank. The Deepworks' cutting hall now slides down to the quay, and only climbers can get back up. [mw-e25.11, mw-e25.12, mw-e25.24]
 - Your four consumable quick slots now have buttons: F1-F4 on the keyboard, or hold LT and press the D-pad (Up, Right, Down, Left) on a controller. Each can be remapped. [mw-e17.17]
 - The knight now holds his sword the way a hand really holds one: the fist closed around the grip with the elbow bent and the hand low by his hip, the blade pointing forward and a little out and down, instead of hanging straight down or sticking out as an extension of his arm; the wrist bends with the fist, and attacks, blocks and dodges start from and return to this stance (mw-a6t).
 - The Wendmouth dock is now played end to end in a real browser by a test: sign on with Hesketh, open the gangway, walk aboard, climb into the Gilded Tern's hold and back out, and Tereza's route to the same token.
@@ -566,6 +571,7 @@ check enforces this).
 
 ### Fixed
 
+- The development build starts again: since areas began swapping in place it stopped on its title screen with a script error, and a dev server run from an agent worktree now picks up code changes. [mw-ju8.46]
 - The Gilded Tern no longer looks like a boat inside a crate: the plank-textured box around the hull, the block over the stern, the green climb pillars and the plates sticking out past the bow and stern are gone, so you see only the ship. The boarding ladder down to the pool and the ladder out of the hold are now real ladders, the figurehead sits against the bow, and the hold still looks enclosed from inside. [mw-e40.36]
 - The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).
 - The dialogue box, its history and the screen-reader announcements now label an NPC's lines with their name ("Mags") instead of the dialogue's internal speaker id ("mags"); the narrator and you keep your labels (mw-2ute).

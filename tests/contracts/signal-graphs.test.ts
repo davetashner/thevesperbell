@@ -184,23 +184,23 @@ describeContent('signal-graph', 'compiles and runs in the sim with matching port
 });
 
 describe('shipped mechanisms work as their notes describe', () => {
-  it('Kestrel Lock: the gate opens 3 s after both paddles are raised', ({ task }) => {
+  it('Kestrel Lock: each paddle works its sluice, and the lock settles 20 s after the tail opens', ({
+    task,
+  }) => {
     markExercised(task, 'signal-graph', 'kestrel-lock-gates');
     const w = world();
     const { graph } = place(w, catalogue.get('signal-graph', 'kestrel-lock-gates'));
     const seen = receipts(w);
     setLever(w, graph, 'upper-paddle', true);
     run(w, 40);
-    expect(seen).toEqual([]);
+    expect(seen.map((r) => [r.node, r.value])).toEqual([['head-sluice', true]]);
+    expect(seen[0]?.key).toBe('fill');
     setLever(w, graph, 'lower-paddle', true);
-    run(w, 3 * HZ);
-    expect(seen).toEqual([]);
+    run(w, 20 * HZ);
+    expect(seen.map((r) => r.node)).toEqual(['head-sluice', 'tail-drain']);
     w.step();
-    expect(seen.map((r) => [r.node, r.value])).toEqual([
-      ['gate-open-fact', true],
-      ['lock-gate', true],
-    ]);
-    expect(seen[0]?.key).toBe('kestrel-lock.gate-open');
+    expect(seen.map((r) => [r.node, r.value]).slice(2)).toEqual([['gate-open-fact', true]]);
+    expect(seen[2]?.key).toBe('kestrel-lock.gate-open');
   });
 
   it('Chapel of Echoes: cutting or burning the rope drops the portcullis for good', ({ task }) => {

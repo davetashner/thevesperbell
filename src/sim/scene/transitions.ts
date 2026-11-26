@@ -27,6 +27,8 @@ export interface AreaTransition {
   readonly spawn: string;
   /** Companions flagged to follow travel with the player. */
   readonly follow: boolean;
+  /** Game minutes the clock advances by as the player crosses it (0: none; mw-e25.14). */
+  readonly advanceMinutes?: number | undefined;
   readonly entity: EntityId;
   /** The volume walked into, metres (carried objects are set down outside it, mw-e17.14). */
   readonly volume?: { readonly min: Vec3; readonly max: Vec3 };
@@ -76,6 +78,7 @@ export function installSceneTransitions<TInput>(
           scene: t.scene,
           spawn: t.spawn,
           follow: t.follow,
+          advanceMinutes: t.advanceMinutes,
           entity: player,
           volume: { min: t.min, max: t.max },
         });
