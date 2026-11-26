@@ -35,6 +35,12 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      // New in typescript-eslint 8.73 strictTypeChecked. It flags every class downcast, which is
+      // how three.js narrows its scene graph (Object3D -> Mesh, Camera -> PerspectiveCamera), and
+      // every structural test fake. The cast is a deliberate, reviewed choice in each case here.
+      '@typescript-eslint/no-unsafe-class-instance-assignment': 'off',
+    },
   },
   {
     files: ['**/*.js', '**/*.mjs'],
