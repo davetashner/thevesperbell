@@ -1012,6 +1012,7 @@ describe('scene content', () => {
       'deepworks',
       'frozen-channel',
       'hiding-room',
+      'kestrel-lock',
       'kit-gallery',
       'knot-inner',
       'knot-outer',

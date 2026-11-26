@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "under-the-bridge",
   "name": "Under the Miners' Bridge",
-  "description": "Bead mw-ju8.14: the riverbank under the Miners' Bridge in grey box, built from the e00 kit only. A 14 x 8 m shingle bank between two bridge piers (bridge-pier-west/east; the arch itself is art to come), reached by a short walled path from briar-glen-lane's riverbank-path transition (path-up leads back, arrive-from-briar-glen-lane arrives). Idris Quillon (npc-quillon), the robed teacher the Lantern Court has struck off, waits here between dusk and dawn only: his creature spawn and his lesson table (quillon-lessons, merchant bridge-sorcerer) carry presence {dusk, night}, so by day the bank is empty and the table does not answer. He sells the Ember lesson through the shop screen's Services tab. dev-crowns:600 tops the player up on first opening so the dev scene can pay. A shuttered blue lantern and a brazier mark the spot. A short walled path through a doorway in the east wall is the towpath downriver: its end is the towpath-down transition to Wendmouth's Stone Wharf (mw-e40.26; a stopgap for the riverbank path to Briar Glen Quay, the Millweir and Kestrel Lock, mw-e25.24; arrive-from-wendmouth-harbour arrives). Reach it with ?scene=under-the-bridge.",
+  "description": "Bead mw-ju8.14: the riverbank under the Miners' Bridge in grey box, built from the e00 kit only. A 14 x 8 m shingle bank between two bridge piers (bridge-pier-west/east; the arch itself is art to come), reached by a short walled path from briar-glen-lane's riverbank-path transition (path-up leads back, arrive-from-briar-glen-lane arrives). Idris Quillon (npc-quillon), the robed teacher the Lantern Court has struck off, waits here between dusk and dawn only: his creature spawn and his lesson table (quillon-lessons, merchant bridge-sorcerer) carry presence {dusk, night}, so by day the bank is empty and the table does not answer. He sells the Ember lesson through the shop screen's Services tab. dev-crowns:600 tops the player up on first opening so the dev scene can pay. A shuttered blue lantern and a brazier mark the spot. A short walled path through a doorway in the east wall is the towpath downriver: its end is the towpath-down transition to Kestrel Lock (mw-e25.14, mw-0ml8; it advances the world clock by 6 game hours; a stand-in for the riverbank path to Briar Glen Quay and the Millweir, mw-e25.24; arrive-from-kestrel-lock arrives). Reach it with ?scene=under-the-bridge.",
   "grid": 1,
   "camera": {
     "position": [-12, 12, -12],
@@ -131,7 +131,7 @@
       "tags": ["arrival"]
     },
     {
-      "id": "arrive-from-wendmouth-harbour",
+      "id": "arrive-from-kestrel-lock",
       "at": [10.5, 0, 0],
       "yaw": 270,
       "tags": ["arrival"]
@@ -254,8 +254,9 @@
       "id": "towpath-down",
       "min": [12.3, -1, -1],
       "max": [13.3, 3, 1],
-      "scene": "wendmouth-harbour",
-      "spawn": "arrive-from-under-the-bridge"
+      "scene": "kestrel-lock",
+      "spawn": "arrive-from-under-the-bridge-upriver",
+      "advanceMinutes": 360
     }
   ]
 }

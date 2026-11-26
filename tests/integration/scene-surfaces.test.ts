@@ -17,6 +17,7 @@ const scenes = content.all('scene').filter((s) => s.surfaces.length > 0);
 describe('tagged surface regions (mw-1jm)', () => {
   it('some scenes are tagged, and the slice is not', () => {
     expect(scenes.map((s) => s.id).sort()).toEqual([
+      'kestrel-lock',
       'marsh-store',
       'sleeping-ox',
       'under-the-bridge',

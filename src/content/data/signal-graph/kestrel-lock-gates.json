@@ -1,14 +1,20 @@
 {
   "$schema": "../signal-graph.schema.json",
   "id": "kestrel-lock-gates",
-  "name": "Kestrel Lock gates",
-  "notes": "Old Reed's lock on the Wend. The lower lock gate only swings once both paddle levers are raised, and then only after the water levels settle (3 s), so a player who pulls one lever and waits learns the lock needs both. Opening it records a world fact the toll and barge quests read.",
+  "name": "Kestrel Lock paddles",
+  "notes": "Old Reed's lock on the Wend (mw-e25.14). Two paddle levers work the chamber's standing water: the upper paddle opens the head sluice (a fill key on the chamber volume) and the lower paddle opens the tail drain, so the chamber rises to the upper pound's level or falls to the lower pound's. The gates are not wired here: each gate door carries an interlock on the chamber's depth, so a gate swings only when the chamber matches the water on its side and strains against it otherwise. The lower paddle also starts levels-settle (20 s, a little longer than the 19 s the drain takes), after which the world fact kestrel-lock.gate-open is written for the toll and barge quests.",
   "nodes": [
     { "id": "upper-paddle", "kind": "lever", "entity": "upper-paddle-lever" },
     { "id": "lower-paddle", "kind": "lever", "entity": "lower-paddle-lever" },
-    { "id": "paddles-up", "kind": "and" },
-    { "id": "levels-settle", "kind": "delay", "seconds": 3 },
-    { "id": "lock-gate", "kind": "receiver", "receiver": "door", "entity": "lower-lock-gate" },
+    {
+      "id": "head-sluice",
+      "kind": "receiver",
+      "receiver": "mechanism",
+      "entity": "chamber-water",
+      "key": "fill"
+    },
+    { "id": "tail-drain", "kind": "receiver", "receiver": "mechanism", "entity": "chamber-water" },
+    { "id": "levels-settle", "kind": "delay", "seconds": 20 },
     {
       "id": "gate-open-fact",
       "kind": "receiver",
@@ -17,10 +23,9 @@
     }
   ],
   "wires": [
-    { "from": "upper-paddle", "to": "paddles-up" },
-    { "from": "lower-paddle", "to": "paddles-up" },
-    { "from": "paddles-up", "to": "levels-settle" },
-    { "from": "levels-settle", "to": "lock-gate" },
+    { "from": "upper-paddle", "to": "head-sluice" },
+    { "from": "lower-paddle", "to": "tail-drain" },
+    { "from": "lower-paddle", "to": "levels-settle" },
     { "from": "levels-settle", "to": "gate-open-fact" }
   ]
 }

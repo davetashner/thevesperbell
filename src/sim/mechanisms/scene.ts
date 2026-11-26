@@ -30,6 +30,7 @@ import { makePlate, syncPlateNodes } from './plates';
 import { makeBeamEmitter, makeLightReceiver, makeOptic } from '../light/beams';
 import { syncLightReceiverNodes } from './receivers';
 import { makeDoor, makeSwitch, refreshAffordances, syncSwitchNodes } from './system';
+import { makeInterlock } from './interlocks';
 
 /** What `addSceneMechanisms` reads: profiles, locks and graphs by id. */
 export interface SceneMechanismsOptions {
@@ -153,6 +154,7 @@ export function addSceneMechanisms<T>(
         max: { x: x + hx, y: y + liquid.size.y, z: z + hz },
         layers: [{ liquid: liquid.liquid, depth: liquid.depth }],
         ...(liquid.drain !== undefined && { drain: liquid.drain }),
+        ...(liquid.fill !== undefined && { fill: { ...liquid.fill, liquid: liquid.liquid } }),
       });
     }
     const { rope } = spawn;
@@ -260,6 +262,15 @@ export function addSceneMechanisms<T>(
       `spawn "${spawn.id}" hangs from "${spawn.suspendedFrom}", which the scene does not have`,
     );
     suspendFrom(sim, entity, rope);
+  }
+  for (const { entity, spawn } of loaded.spawns) {
+    const interlock = spawn.door?.interlock;
+    if (interlock === undefined) continue;
+    const volume = need(
+      bySpawn.get(interlock.volume),
+      `door "${spawn.id}" answers to "${interlock.volume}", which the scene does not have`,
+    );
+    makeInterlock(sim, entity, volume, interlock);
   }
   for (const members of spans.values()) linkSpan(sim, members);
   const graphs = loaded.layout.signals.map((signal, index) => {

@@ -1392,6 +1392,31 @@
                   "jammed"
                 ]
               },
+              "interlock": {
+                "description": "The door holds shut (jammed, with a strain cue) while that volume stands outside the depth window (the gates of a lock, mw-e25.14).",
+                "type": "object",
+                "properties": {
+                  "volume": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Spawn id of the liquid volume the door answers to."
+                  },
+                  "minDepth": {
+                    "description": "Shallowest the liquid may stand for the door to move, metres; default 0.",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "maxDepth": {
+                    "description": "Deepest the liquid may stand for the door to move, metres; default no limit.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "volume"
+                ],
+                "additionalProperties": false
+              },
               "hinge": {
                 "default": "left",
                 "description": "Hinged and trapdoor: the side the hinge is on (−x or +x before yaw); sliding: the side it slides to.",
@@ -2109,6 +2134,26 @@
                     "type": "number",
                     "exclusiveMinimum": 0,
                     "description": "Level fall while open, m/s."
+                  },
+                  "open": {
+                    "default": false,
+                    "description": "Starts open.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "rate"
+                ],
+                "additionalProperties": false
+              },
+              "fill": {
+                "description": "A sluice that tops the volume up with its own liquid, opened and closed by a signal bound with the key `fill` (the head sluice of a lock).",
+                "type": "object",
+                "properties": {
+                  "rate": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "Level rise while open, m/s, until the brim."
                   },
                   "open": {
                     "default": false,
@@ -3449,6 +3494,12 @@
             "default": false,
             "description": "Companions flagged to follow travel with the player through it (none exist yet).",
             "type": "boolean"
+          },
+          "advanceMinutes": {
+            "description": "Game minutes the world clock advances by (advanceTime, reason travel) as the player crosses it: a leg of a long walk (the towpath, mw-e25.14).",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 1440
           }
         },
         "required": [

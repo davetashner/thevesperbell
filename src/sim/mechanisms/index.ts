@@ -4,6 +4,7 @@ export * from './components';
 export * from './events';
 export * from './geometry';
 export * from './impacts';
+export * from './interlocks';
 export * from './ropes';
 export * from './supports';
 export * from './keys';
