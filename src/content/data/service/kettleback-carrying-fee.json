@@ -1,0 +1,8 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "kettleback-carrying-fee",
+  "notes": "Mother Kettleback's fee for carrying a caught walker back to the surface (kettleback-kitchen, option cap-pay): a pure gold sink, 15 crowns, as the dialogue always charged. Moved from a hand-written gold effect to the service schema (mw-e20.9).",
+  "providerNpcId": "npc-kettleback",
+  "name": "Carrying fee",
+  "price": 15
+}

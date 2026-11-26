@@ -813,3 +813,8 @@ export {
   type WorldMap,
   type WorldMapInput,
 } from './types/world.ts';
+export {
+  serviceSchema,
+  type ServiceDef,
+  type ServiceDefInput,
+} from './types/service.ts';

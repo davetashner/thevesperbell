@@ -97,6 +97,9 @@ import {
 } from '@game/conversation/index';
 import { speakerNameResolver, speakerPortraitResolver } from '@game/portraits';
 import type { DialogueDef } from '@content/types/dialogue';
+import { dialogueLogicRegistry } from '@sim/logic/dialogue-kinds';
+import { createServiceCatalog, SERVICES_SERVICE } from '@sim/services';
+import type { ServiceDef } from '@content/types/service';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
 import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
@@ -962,6 +965,12 @@ function startRenderer(
       capabilities,
       quests: questsOf(content),
       disposition: { dispositions, resolve: npcResolver(world) },
+      services: {
+        [SERVICES_SERVICE]: createServiceCatalog(
+          content.all('service') as unknown as ServiceDef[],
+          dialogueLogicRegistry(),
+        ),
+      },
     });
     root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
     // The knight's sword and shield (mw-e04.6): moves, socket tracks, the wood shield and the
