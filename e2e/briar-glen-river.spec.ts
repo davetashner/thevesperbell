@@ -13,15 +13,15 @@ import { collectProblems, W } from './helpers/slice';
 // walled riverbank path under the Miners' Bridge the player walks down into the river scene (the
 // quay loads), follows the lit towpath east to the Millweir, reaches the far bank and walks on into
 // the Briarwood. Keys only for the transitions; teleports only to skip the long towpath. Built for a
-// ~1 fps CI runner: every wait polls published state with a 30 s timeout.
-
-const POLL = { timeout: 30_000 };
+// ~1 fps CI runner (up to 5 sim ticks a frame): every wait polls published state with a 120 s
+// timeout, since one poll can need minutes of wall time there; the test's own budget is 600 s.
+const POLL = { timeout: 120_000 };
 
 async function scene(page: Page): Promise<string | null> {
   return page.locator('#app').getAttribute('data-scene');
 }
 
-/** Holds forward; the page reloads into the next scene when a gate is crossed, ending the hold. */
+/** Holds forward; crossing a gate swaps the scene in place, which ends the hold. */
 async function walkThrough(page: Page, ticks: number): Promise<void> {
   try {
     await holdKey(page, W, ticks, 2);
@@ -55,7 +55,7 @@ test('mw-e25.24: from under the bridge down the riverbank to the quay, the Millw
   await standAt(page, [-2.5, 0, 5], { x: -2.5, z: 9 });
   await expect
     .poll(async () => {
-      await walkThrough(page, 24);
+      await walkThrough(page, 120);
       return scene(page);
     }, POLL)
     .toBe('briar-glen-river');
@@ -82,7 +82,7 @@ test('mw-e25.24: from under the bridge down the riverbank to the quay, the Millw
   await expect(app).toHaveAttribute('data-facts', /"world\.millweir\.sluice-walk-open":true/, POLL);
   await expect
     .poll(async () => {
-      await walkThrough(page, 30);
+      await walkThrough(page, 120);
       return scene(page);
     }, POLL)
     .toBe('briarwood');
