@@ -1098,7 +1098,8 @@
       "to": "kestrel-lock",
       "kind": "path",
       "bead": "mw-e25.24",
-      "notes": "Towpath on to Kestrel Lock (always open)."
+      "notes": "Towpath on to Kestrel Lock (always open). The walk takes 6 game hours each way.",
+      "transitions": ["briar-glen-river/towpath-gate", "kestrel-lock/towpath-up"]
     },
     {
       "id": "towpath-lock-wharf",
@@ -1108,14 +1109,6 @@
       "transitions": ["kestrel-lock/towpath-down", "wendmouth-harbour/towpath-gate"],
       "bead": "mw-e40.26",
       "notes": "Towpath on to Wendmouth (always open; bible 3.6). The walk takes 6 game hours each way."
-    },
-    {
-      "id": "riverbank-lock-link",
-      "from": "under-the-bridge",
-      "to": "kestrel-lock",
-      "kind": "path",
-      "transitions": ["under-the-bridge/towpath-down", "kestrel-lock/towpath-up"],
-      "notes": "Stand-in (mw-0ml8) for the upriver end of the towpath: the riverbank's east path runs straight to Kestrel Lock, 6 game hours, until Briar Glen Quay and the Millweir are built (mw-e25.24); then it is replaced by under-the-bridge-quay, quay-millweir and millweir-kestrel-lock, and the lock's arrive-from-under-the-bridge-upriver spawn is retargeted. Wendmouth is optional: the main quest never uses it."
     },
     {
       "id": "barge-quay-lock",

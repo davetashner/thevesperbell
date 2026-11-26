@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "kestrel-lock",
   "name": "Kestrel Lock",
-  "description": "Bead mw-e25.14: Kestrel Lock, the halfway landmark on the always-open towpath from Briar Glen to Wendmouth (bible 3.1, 3.6), in grey box from the e00 kit and approved models only. The towpath runs 96 m along the north bank (x -48..48; upriver is west, downriver east; the river is z -3..3). Each end is the transition to the next stretch of towpath and advances the world clock by exactly 6 game hours (advanceMinutes 360): towpath-up leads to under-the-bridge (arrive-from-kestrel-lock there; arrive-from-under-the-bridge-upriver here, the spawn the quay scene will take over, mw-e25.24) and towpath-down to the Wendmouth Stone Wharf (arrive-from-wendmouth-harbour here arrives from Wendmouth; mw-e40.26). The lock chamber is 18 x 6 m between two gates, each a lock-gate door with a beam walk over it. The chamber is a liquid volume (chamber-water) that starts full, level with the upper pound (surface -0.5 m); the lower pound stands 2.25 m lower. The upper paddle lever opens the head sluice (a fill) and the lower paddle lever opens the tail drain; the chamber moves to the other level in about 19 s (it can never fill past the upper pound's level: its brim is that level). Each gate carries an interlock on the chamber's depth: the upper gate moves only while the chamber is full (depth >= 2.2 m), the lower only while it is drained (depth <= 0.15 m); against unequal levels a gate jams and strains (mechanismJammed) and nothing changes. Ladders climb out of the water. kestrel-lock-gates writes kestrel-lock.gate-open 20 s after the tail paddle opens. South of the lock a landing (where the barge will moor, mw-4l3z) is reached by either beam walk. Old Reed (npc-reed) stands at the toll board by his cottage (mw-vau: he lives at the lock, so he has left the harbour); the cottage (x 2..16, z -20..-8) has a wooden door, a hearth, a table and a cot, and the cot is a rest point: the reed-cot counter (merchant kestrel-lock-cot) sells a night's rest for 8 crowns. Reach it with ?scene=kestrel-lock.",
+  "description": "Bead mw-e25.14: Kestrel Lock, the halfway landmark on the always-open towpath from Briar Glen to Wendmouth (bible 3.1, 3.6), in grey box from the e00 kit and approved models only. The towpath runs 96 m along the north bank (x -48..48; upriver is west, downriver east; the river is z -3..3). Each end is the transition to the next stretch of towpath and advances the world clock by exactly 6 game hours (advanceMinutes 360): towpath-up leads to under-the-bridge (arrive-from-kestrel-lock there; arrive-from-briar-glen-river here, the spawn the quay scene will take over, mw-e25.24) and towpath-down to the Wendmouth Stone Wharf (arrive-from-wendmouth-harbour here arrives from Wendmouth; mw-e40.26). The lock chamber is 18 x 6 m between two gates, each a lock-gate door with a beam walk over it. The chamber is a liquid volume (chamber-water) that starts full, level with the upper pound (surface -0.5 m); the lower pound stands 2.25 m lower. The upper paddle lever opens the head sluice (a fill) and the lower paddle lever opens the tail drain; the chamber moves to the other level in about 19 s (it can never fill past the upper pound's level: its brim is that level). Each gate carries an interlock on the chamber's depth: the upper gate moves only while the chamber is full (depth >= 2.2 m), the lower only while it is drained (depth <= 0.15 m); against unequal levels a gate jams and strains (mechanismJammed) and nothing changes. Ladders climb out of the water. kestrel-lock-gates writes kestrel-lock.gate-open 20 s after the tail paddle opens. South of the lock a landing (where the barge will moor, mw-4l3z) is reached by either beam walk. Old Reed (npc-reed) stands at the toll board by his cottage (mw-vau: he lives at the lock, so he has left the harbour); the cottage (x 2..16, z -20..-8) has a wooden door, a hearth, a table and a cot, and the cot is a rest point: the reed-cot counter (merchant kestrel-lock-cot) sells a night's rest for 8 crowns. Reach it with ?scene=kestrel-lock.",
   "grid": 1,
   "camera": {
     "position": [-14, 16, -24],
@@ -270,7 +270,7 @@
       "tags": ["player-start"]
     },
     {
-      "id": "arrive-from-under-the-bridge-upriver",
+      "id": "arrive-from-briar-glen-river",
       "at": [-44.0, 0.0, -5.5],
       "yaw": 90,
       "tags": ["arrival", "towpath"]
@@ -607,7 +607,7 @@
       "id": "towpath-up",
       "min": [-47.5, -1, -8],
       "max": [-46.5, 3, -3],
-      "scene": "under-the-bridge",
+      "scene": "briar-glen-river",
       "spawn": "arrive-from-kestrel-lock",
       "advanceMinutes": 360
     },

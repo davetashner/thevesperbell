@@ -225,7 +225,7 @@ Land loops: forest ↔ watchtower ↔ priory; watchtower supply tunnel ↔ upper
 
 ## The barge and towpath to Wendmouth
 
-Briar Glen Quay → Millweir → Kestrel Lock → Stone Wharf is the **towpath** (`quay-millweir`, `millweir-kestrel-lock`, `towpath-lock-wharf`): foot, always open, a day's walk: each leg is a transition with `advanceMinutes: 360`, so crossing it advances the world clock by exactly 6 game hours (`advanceTime`, reason `travel`; the game clock doc, mw-e27.12). Kestrel Lock is built (mw-e25.14): the towpath reaches it from under the bridge by the stand-in edge `riverbank-lock-link` (mw-0ml8; the quay and the Millweir will take over that end, mw-e25.24, retargeting the lock's `arrive-from-upriver` spawn) and leaves it for the Stone Wharf by `towpath-lock-wharf`. The **barge** (`barge-quay-lock`, `barge-lock-wharf`, `travel: barge`, `time: dawn, day`) is Mags Oakum's ride, a narrated journey or fast travel in the mornings only ("not with whatever's singing up there"). Wendmouth and Kestrel Lock are `optional`: the validator computes the main-quest critical path (waypoints in `mainQuest`, bible §4.1) over edges every class can take, on foot, avoiding optional nodes, and fails if it cannot (AC-5). Today's critical path is `bridge-post → mine gate → winch house → … → the Cradle → Sounding Shaft → belfry → Market Green`.
+Briar Glen Quay → Millweir → Kestrel Lock → Stone Wharf is the **towpath** (`quay-millweir`, `millweir-kestrel-lock`, `towpath-lock-wharf`): foot, always open, a day's walk: each leg is a transition with `advanceMinutes: 360`, so crossing it advances the world clock by exactly 6 game hours (`advanceTime`, reason `travel`; the game clock doc, mw-e27.12). Kestrel Lock is built (mw-e25.14): the towpath reaches it from the Millweir by `millweir-kestrel-lock` (mw-e25.31: the towpath-gate at the east end of the river scene, arriving at the lock's `arrive-from-briar-glen-river`) and leaves it for the Stone Wharf by `towpath-lock-wharf`. The old direct riverbank-to-lock stand-in (`riverbank-lock-link`) is retired: the only way downriver on foot passes the quay and the Millweir. The **barge** (`barge-quay-lock`, `barge-lock-wharf`, `travel: barge`, `time: dawn, day`) is Mags Oakum's ride, a narrated journey or fast travel in the mornings only ("not with whatever's singing up there"). Wendmouth and Kestrel Lock are `optional`: the validator computes the main-quest critical path (waypoints in `mainQuest`, bible §4.1) over edges every class can take, on foot, avoiding optional nodes, and fails if it cannot (AC-5). Today's critical path is `bridge-post → mine gate → winch house → … → the Cradle → Sounding Shaft → belfry → Market Green`.
 
 ## Ability-gated shortcuts per class
 
@@ -381,9 +381,8 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `stone-stair` | `rootcellar-camp` | `briar-glen-quay` | one-way | `{"fact":"world.stone-stair.lowered"}` |  | `deepworks/quay-gate`, `briar-glen-river/stone-stair-climb` |
 | `quay-millweir` | `briar-glen-quay` | `millweir` | path |  |  | none (the walk inside the briar-glen-river scene) |
 | `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | `briar-glen-river/far-bank-gate`, `briarwood/millweir-gate` |
-| `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | planned: mw-e25.24 |
+| `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | `briar-glen-river/towpath-gate`, `kestrel-lock/towpath-up` |
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | `kestrel-lock/towpath-down`, `wendmouth-harbour/towpath-gate` |
-| `riverbank-lock-link` | `under-the-bridge` | `kestrel-lock` | path |  |  | `under-the-bridge/towpath-down`, `kestrel-lock/towpath-up` |
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
@@ -444,10 +443,10 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
-| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-lock-link), `under-the-bridge/riverbank-down` (under-the-bridge-quay) |
-| `kestrel-lock` | `kestrel-lock` | `kestrel-lock/towpath-up` (riverbank-lock-link), `kestrel-lock/towpath-down` (towpath-lock-wharf); its lock chamber, cottage and landing are walked inside the scene |
+| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/riverbank-down` (under-the-bridge-quay) |
+| `kestrel-lock` | `kestrel-lock` | `kestrel-lock/towpath-up` (millweir-kestrel-lock), `kestrel-lock/towpath-down` (towpath-lock-wharf); its lock chamber, cottage and landing are walked inside the scene |
 | `briar-glen-river` | `briar-glen-quay` | `briar-glen-river/path-up` (under-the-bridge-quay), `briar-glen-river/stone-stair-climb` (stone-stair); the moored *Patient Ann*, block stacks and toll shed are on the quay |
-| `briar-glen-river` | `millweir` | `briar-glen-river/far-bank-gate` (sluice-walk); the sluice wheel drains the mill pond, the quay walk reaches it inside the scene, and the towpath-exit stub waits for millweir-kestrel-lock (mw-e25.31) |
+| `briar-glen-river` | `millweir` | `briar-glen-river/far-bank-gate` (sluice-walk); the sluice wheel drains the mill pond, the quay walk reaches it inside the scene, and `briar-glen-river/towpath-gate` (millweir-kestrel-lock) leads on to Kestrel Lock |
 | `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
 | `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings), `briarwood/ridge-gate` (moorings-priory-ridge); its other trails are walked inside the scene |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |

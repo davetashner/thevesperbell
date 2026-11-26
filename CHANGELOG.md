@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The river is one walk: from the Millweir's east end the towpath leads on to Kestrel Lock (six hours pass) and from there to the Stone Wharf. The old direct path from under the bridge to the lock is gone: the way downriver now passes the quay and the Millweir. [mw-e25.31, mw-e25.24]
 - The Miners' Bridge now leads somewhere: a worn stone stair beside the Bridge Watch post drops off the bridge's town end onto the old miners' track, which runs to the boarded mine gate, and back up again. [mw-e25.23]
 - Walking from one area into the next no longer reloads the page: the new area swaps in place, carrying what you hold and arriving at the same spawn, in a fraction of the old wait. [mw-ju8.28]
 - Kestrel Lock, the halfway landmark on the towpath: a lock chamber whose water the two paddle levers raise and lower, gates that strain until the levels match, Old Reed's cottage with a cot to rest on, and towpath legs to the riverbank and the Wendmouth Stone Wharf that each take six game hours. Old Reed and the toll board now stand at the lock instead of the harbour. [mw-e25.14]

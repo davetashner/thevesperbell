@@ -9,8 +9,8 @@ import {
 } from './helpers/player';
 import { collectProblems } from './helpers/slice';
 
-// mw-e25.14, mw-e40.26, mw-0ml8: the towpath walked end to end in a real browser. From the riverbank under
-// the Miners' Bridge the player walks the towpath east into Kestrel Lock (6 game hours), walks the lock's towpath east into
+// mw-e25.14, mw-e40.26, mw-e25.31: the towpath walked end to end in a real browser. From the east end of
+// the Millweir's river scene the player walks the towpath gate into Kestrel Lock (6 game hours), walks the lock's towpath east into
 // Wendmouth's Stone Wharf (6 more hours) and back west through the towpath gate into the lock. Teleports
 // only save the walk inside a scene; scenes are crossed by walking into transition volumes. Built for a
 // ~1 fps CI runner: every wait polls published state with a long timeout and holds are paced by ticks.
@@ -89,24 +89,24 @@ async function walkThrough(
   await ready(page, scene);
 }
 
-test('mw-e25.14: the towpath from the riverbank to Kestrel Lock to the Stone Wharf and back, 6 game hours a leg', async ({
+test('mw-e25.14, mw-e25.31 AC-1: the towpath from the Millweir to Kestrel Lock to the Stone Wharf and back, 6 game hours a leg', async ({
   page,
 }) => {
   test.setTimeout(600_000);
   const problems = collectProblems(page);
   await stubPointerLock(page);
   await recordConsole(page);
-  await page.goto('/?scene=under-the-bridge&debug=1');
+  await page.goto('/?scene=briar-glen-river&debug=1');
   const app = page.locator('#app');
-  await ready(page, 'under-the-bridge');
+  await ready(page, 'briar-glen-river');
   const start = await gameMinutes(page);
 
-  // Leg 1: the riverbank's east path into Kestrel Lock.
-  await runConsole(page, 'tp 10.5 0 0');
-  await walkThrough(page, { x: 40, z: 0 }, 'kestrel-lock');
+  // Leg 1: the Millweir's towpath east, through the towpath gate, into Kestrel Lock.
+  await runConsole(page, 'tp 210 0 -7');
+  await walkThrough(page, { x: 260, z: -7 }, 'kestrel-lock');
   await expect(app).toHaveAttribute(
     'data-transit',
-    /"kind":"arrived".*"to":"kestrel-lock".*"spawn":"arrive-from-under-the-bridge-upriver"/,
+    /"kind":"arrived".*"to":"kestrel-lock".*"spawn":"arrive-from-briar-glen-river"/,
     POLL,
   );
   const atLock = await gameMinutes(page);
