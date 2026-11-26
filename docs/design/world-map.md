@@ -379,7 +379,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `quay-adit-mouth` | `briar-glen-quay` | `weeping-adit-mouth` | path |  |  | planned: mw-e25.13 |
 | `weeping-adit` | `weeping-adit-mouth` | `lower-deepworks` | shortcut | `{"fact":"world.weeping-adit.passage-open"}` |  | planned: mw-e25.13 |
 | `stone-stair` | `rootcellar-camp` | `briar-glen-quay` | one-way | `{"fact":"world.stone-stair.lowered"}` |  | `deepworks/quay-gate`, `briar-glen-river/stone-stair-climb` |
-| `quay-millweir` | `briar-glen-quay` | `millweir` | path |  |  | none (the walk inside the briar-glen-river scene) |
+| `quay-millweir` | `briar-glen-quay` | `millweir` | path |  |  | planned: mw-e25.24 (no transition: built as the walk inside the briar-glen-river scene) |
 | `sluice-walk` | `millweir` | `millweir-far-bank` | shortcut | `{"fact":"world.millweir.sluice-walk-open"}` | `arrow.rope`, `spell.mage-hand` | `briar-glen-river/far-bank-gate`, `briarwood/millweir-gate` |
 | `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | `briar-glen-river/towpath-gate`, `kestrel-lock/towpath-up` |
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | `kestrel-lock/towpath-down`, `wendmouth-harbour/towpath-gate` |
