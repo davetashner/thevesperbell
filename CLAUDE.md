@@ -101,6 +101,7 @@ The repo is developed on the owner's laptop (10 cores), which they use during th
 - **Scoped commands only.** Don't run the full suites locally; push and let CI run them:
   - lint: `pnpm lint:changed` (only files changed against `origin/main`), not `pnpm lint`
   - types: one `pnpm typecheck` before pushing
+  - formatting: `pnpm format:check` before pushing (cheap; CI's lint job runs it and `lint:changed` does not)
   - tests: `pnpm vitest run <the test files you touched>`, not `pnpm test` / `pnpm test:coverage`
   - e2e: `E2E_PORT=<free port> pnpm e2e <the specs you touched>`, never the whole suite
   - no `pnpm perf`, `pnpm bench`, `pnpm content:coverage` or repeated `pnpm build`; CI runs them
