@@ -53,6 +53,7 @@ const [worldMap] = content.all('world');
 const river = content.get('scene', 'briar-glen-river');
 const bank = content.get('scene', 'under-the-bridge');
 const briarwood = content.get('scene', 'briarwood');
+const lock = content.get('scene', 'kestrel-lock');
 const deepworks = content.get('scene', 'deepworks');
 const query = new NavMeshQuery(new NavMesh(content.get('navmesh', 'briar-glen-river')));
 
@@ -97,31 +98,35 @@ describe('the riverbank to the quay and the Millweir (mw-e25.24)', () => {
       'barge-berth',
       'sluice-wheel',
       'millweir',
-      'towpath-exit',
+      'towpath-gate',
     ]) {
       expect(route(walker, 'arrive-from-under-the-bridge', id).status, id).toBe('found');
     }
   });
 
-  it('AC-1: the towpath ends at the Kestrel Lock stub: an arrival and an exit marker, no transition yet', () => {
+  it('AC-1: the towpath ends at the towpath gate to Kestrel Lock (6 game hours) and arrives back at arrive-from-kestrel-lock', () => {
+    leadsTo(river, 'towpath-gate', lock, 'arrive-from-briar-glen-river');
+    expect(river.transitions.find((t) => t.id === 'towpath-gate')?.advanceMinutes).toBe(360);
     expect(river.spawns.find((s) => s.id === 'arrive-from-kestrel-lock')).toBeDefined();
-    expect(river.spawns.find((s) => s.id === 'towpath-exit')?.tags).toContain('exit-stub');
+    expect(river.spawns.find((s) => s.id === 'towpath-exit')).toBeUndefined();
     expect(river.transitions.map((t) => t.id).sort()).toEqual([
       'far-bank-gate',
       'path-up',
       'stone-stair-climb',
+      'towpath-gate',
     ]);
     expect(route(walker, 'arrive-from-kestrel-lock', 'briar-glen-quay').status).toBe('found');
   });
 
-  it('AC-1: the towpath downriver to Kestrel Lock stays on the bank beside the riverbank path', () => {
-    expect(bank.transitions.find((t) => t.id === 'towpath-down')?.scene.id).toBe('kestrel-lock');
+  it('AC-1: under the bridge no longer has a direct towpath to Kestrel Lock: the way down is the riverbank path', () => {
+    expect(bank.transitions.find((t) => t.id === 'towpath-down')).toBeUndefined();
+    expect(bank.spawns.find((s) => s.id === 'arrive-from-kestrel-lock')).toBeUndefined();
     expect(bank.transitions.find((t) => t.id === 'riverbank-down')?.scene.id).toBe(
       'briar-glen-river',
     );
   });
 
-  it('AC-2: under-the-bridge-quay, quay-millweir and sluice-walk list their transitions', () => {
+  it('AC-2: under-the-bridge-quay, quay-millweir, millweir-kestrel-lock and sluice-walk list their transitions', () => {
     const edge = (id: string) => worldMap?.edges.find((e) => e.id === id);
     expect(edge('under-the-bridge-quay')?.transitions).toEqual([
       'under-the-bridge/riverbank-down',
@@ -129,6 +134,11 @@ describe('the riverbank to the quay and the Millweir (mw-e25.24)', () => {
     ]);
     expect(edge('quay-millweir')?.transitions ?? []).toEqual([]);
     expect(edge('quay-millweir')?.notes).toMatch(/inside|walk inside/);
+    expect(edge('millweir-kestrel-lock')?.transitions).toEqual([
+      'briar-glen-river/towpath-gate',
+      'kestrel-lock/towpath-up',
+    ]);
+    expect(edge('riverbank-lock-link')).toBeUndefined();
     expect(edge('sluice-walk')?.transitions).toEqual([
       'briar-glen-river/far-bank-gate',
       'briarwood/millweir-gate',

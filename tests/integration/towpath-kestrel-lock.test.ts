@@ -34,6 +34,7 @@ const content = loadGameContent();
 const [world] = content.all('world');
 const lock = content.get('scene', 'kestrel-lock');
 const bank = content.get('scene', 'under-the-bridge');
+const river = content.get('scene', 'briar-glen-river');
 const harbour = content.get('scene', 'wendmouth-harbour');
 const lockQuery = new NavMeshQuery(new NavMesh(content.get('navmesh', 'kestrel-lock')));
 const harbourQuery = new NavMeshQuery(new NavMesh(content.get('navmesh', 'wendmouth-harbour')));
@@ -57,7 +58,7 @@ const walk = (query: NavMeshQuery, scene: typeof lock, from: string, to: string)
 describe('the towpath legs (mw-e25.14 AC-1, mw-e40.26 AC-1)', () => {
   it('AC-1: every towpath transition advances the clock by 6 hours (360 game minutes)', () => {
     const legs = [
-      bank.transitions.find((t) => t.id === 'towpath-down'),
+      river.transitions.find((t) => t.id === 'towpath-gate'),
       lock.transitions.find((t) => t.id === 'towpath-up'),
       lock.transitions.find((t) => t.id === 'towpath-down'),
       harbour.transitions.find((t) => t.id === 'towpath-gate'),
@@ -66,12 +67,12 @@ describe('the towpath legs (mw-e25.14 AC-1, mw-e40.26 AC-1)', () => {
   });
 
   it('AC-1: the lock is between the riverbank and the Stone Wharf, both ways, and every arrival spawn exists', () => {
-    expect(bank.transitions.find((t) => t.id === 'towpath-down')).toMatchObject({
+    expect(river.transitions.find((t) => t.id === 'towpath-gate')).toMatchObject({
       scene: { id: 'kestrel-lock' },
-      spawn: 'arrive-from-under-the-bridge-upriver',
+      spawn: 'arrive-from-briar-glen-river',
     });
     expect(lock.transitions.find((t) => t.id === 'towpath-up')).toMatchObject({
-      scene: { id: 'under-the-bridge' },
+      scene: { id: 'briar-glen-river' },
       spawn: 'arrive-from-kestrel-lock',
     });
     expect(lock.transitions.find((t) => t.id === 'towpath-down')).toMatchObject({
@@ -82,28 +83,19 @@ describe('the towpath legs (mw-e25.14 AC-1, mw-e40.26 AC-1)', () => {
       scene: { id: 'kestrel-lock' },
       spawn: 'arrive-from-wendmouth-harbour',
     });
-    for (const id of ['arrive-from-under-the-bridge-upriver', 'arrive-from-wendmouth-harbour'])
+    for (const id of ['arrive-from-briar-glen-river', 'arrive-from-wendmouth-harbour'])
       expect(lock.spawns.find((s) => s.id === id)).toBeDefined();
-    expect(bank.spawns.find((s) => s.id === 'arrive-from-kestrel-lock')).toBeDefined();
+    expect(river.spawns.find((s) => s.id === 'arrive-from-kestrel-lock')).toBeDefined();
+    expect(bank.transitions.find((t) => t.id === 'towpath-down')).toBeUndefined();
     expect(harbour.spawns.find((s) => s.id === 'arrive-from-kestrel-lock')).toBeDefined();
   });
 
   it('AC-1: a walker crosses Kestrel Lock along the towpath, and from the wharf gate reaches the wharf and the berth', () => {
     expect(
-      walk(
-        lockQuery,
-        lock,
-        'arrive-from-under-the-bridge-upriver',
-        'arrive-from-wendmouth-harbour',
-      ),
+      walk(lockQuery, lock, 'arrive-from-briar-glen-river', 'arrive-from-wendmouth-harbour'),
     ).toBe('found');
     expect(
-      walk(
-        lockQuery,
-        lock,
-        'arrive-from-wendmouth-harbour',
-        'arrive-from-under-the-bridge-upriver',
-      ),
+      walk(lockQuery, lock, 'arrive-from-wendmouth-harbour', 'arrive-from-briar-glen-river'),
     ).toBe('found');
     for (const id of ['player-start', 'barge-berth', 'exit-towpath']) {
       expect(walk(harbourQuery, harbour, 'arrive-from-kestrel-lock', id), id).toBe('found');
@@ -112,7 +104,7 @@ describe('the towpath legs (mw-e25.14 AC-1, mw-e40.26 AC-1)', () => {
 
   it('AC-1: the beam walks lead to the south landing and the cottage door to the keeper’s cot', () => {
     for (const id of ['barge-landing', 'reed-cot', 'keeper-cot', 'npc-reed']) {
-      expect(walk(lockQuery, lock, 'arrive-from-under-the-bridge-upriver', id), id).toBe('found');
+      expect(walk(lockQuery, lock, 'arrive-from-briar-glen-river', id), id).toBe('found');
     }
   });
 });
@@ -120,10 +112,11 @@ describe('the towpath legs (mw-e25.14 AC-1, mw-e40.26 AC-1)', () => {
 describe('the edges in the world map (mw-e40.26 AC-2, mw-0ml8 AC-2)', () => {
   it('AC-2: the stopgap riverbank-wharf-link is gone; the lock links list their transitions', () => {
     expect(world?.edges.find((e) => e.id === 'riverbank-wharf-link')).toBeUndefined();
-    expect(world?.edges.find((e) => e.id === 'riverbank-lock-link')).toMatchObject({
-      from: 'under-the-bridge',
+    expect(world?.edges.find((e) => e.id === 'riverbank-lock-link')).toBeUndefined();
+    expect(world?.edges.find((e) => e.id === 'millweir-kestrel-lock')).toMatchObject({
+      from: 'millweir',
       to: 'kestrel-lock',
-      transitions: ['under-the-bridge/towpath-down', 'kestrel-lock/towpath-up'],
+      transitions: ['briar-glen-river/towpath-gate', 'kestrel-lock/towpath-up'],
     });
     expect(world?.edges.find((e) => e.id === 'towpath-lock-wharf')).toMatchObject({
       from: 'kestrel-lock',
