@@ -568,6 +568,7 @@ check enforces this).
 
 ### Changed
 
+- Crossing into a new area keeps the game window and mouse capture, so you no longer click again after every crossing, the camera faces the way you arrive, and the swap is quicker. [mw-ju8.44]
 - Wendmouth harbour: the blue cargo blocks on the wharf now read as painted crates with ropes and kegs on top, and each net loft has a framed door, an awning, shuttered windows, a stone plinth and a corner of crates and barrels (mw-e40.34).
 
 ### Fixed
