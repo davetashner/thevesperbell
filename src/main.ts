@@ -539,6 +539,17 @@ type GameCommand =
 // import away, so none of them reaches any chunk (mw-e32.18). `dev` is undefined there.
 const dev = __DEBUG_CONSOLE__ ? await import('@tools/dev-kit') : undefined;
 
+// Declared before the boot below runs: startRenderer reads it during module evaluation, and a
+// `let` used before its line throws (a dev build is unbundled, so it did; mw-ju8.28 follow-up).
+// Content is parsed once per page: an in-place area swap (mw-ju8.28) boots the next area from it.
+let contentLoad: Promise<GameContent> | undefined;
+function gameContent(): Promise<GameContent> {
+  contentLoad ??= __DEBUG_CONSOLE__
+    ? import('@content/dev-content').then(({ loadDevContent }) => loadDevContent())
+    : Promise.resolve(loadGameContent());
+  return contentLoad;
+}
+
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
   app.dataset['layers'] = [...layers, 'tools'].join(' ');
@@ -569,15 +580,6 @@ function scopedSettings(store: SettingsStore, scope: PageScope): SettingsStore {
       };
     },
   });
-}
-
-// Content is parsed once per page: an in-place area swap (mw-ju8.28) boots the next area from it.
-let contentLoad: Promise<GameContent> | undefined;
-function gameContent(): Promise<GameContent> {
-  contentLoad ??= __DEBUG_CONSOLE__
-    ? import('@content/dev-content').then(({ loadDevContent }) => loadDevContent())
-    : Promise.resolve(loadGameContent());
-  return contentLoad;
 }
 
 // Opens save storage (mw-e30.2). If the browser blocks IndexedDB the game runs on in-memory saves,
