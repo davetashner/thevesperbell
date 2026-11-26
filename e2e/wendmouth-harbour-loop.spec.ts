@@ -13,9 +13,10 @@ import { collectProblems, W } from './helpers/slice';
 // player on and hands over the gangway tally, the gate opens to it, the player WALKS up the gangway
 // onto the Gilded Tern's deck (tern.boarded), climbs down the hatch ladder into the hold and back out.
 // Tereza's route to the same token is a second, shorter test. Built for a ~1 fps CI runner: every
-// wait polls published state with a 30 s timeout.
+// wait polls published state with a 90 s timeout, since a busy runner (two heavy 3D specs on one
+// shard) fits too few short holds into 30 s; the tests' own budgets are 600 s and 300 s.
 
-const POLL = { timeout: 30_000 };
+const POLL = { timeout: 90_000 };
 
 interface Dialogue {
   open: boolean;
@@ -200,7 +201,7 @@ test('mw-e40.35: sign on with Hesketh, open the gangway, walk aboard, climb into
   // south edge catches the player, who comes down to the hold floor (y -1.5).
   await standAt(page, [35, 2.05, 132.2], { x: 35, z: 128 });
   await expect
-    // 120 s: the descent takes many short holds, and a ~1 fps CI runner fits too few into 30 s
+    // 120 s: the descent takes many short holds, and a ~1 fps CI runner fit too few into 30 s
     // (it stopped at the same y on every retry: out of wall time, not stuck).
     .poll(async () => (await holdKey(page, W, 4, 1)).position.y, {
       timeout: 120_000,
