@@ -584,7 +584,9 @@ export function setupTestbedPlayer<TObject, TCommand>(
 
   // Remember the interpolated transform render sync last applied: the camera follows exactly what
   // is drawn.
-  let shown: Transform | undefined;
+  // Seeded from the sim, so the first camera placement faces the spawn yaw even when render sync has
+  // not yet drawn a frame (a slow frame after an in-place area swap, mw-ju8.44).
+  let shown: Transform | undefined = readPlayerTransform(world, entity);
   const inner = options.binding(options.object, readPlayerTransform);
   sync.bind(entity, {
     ...inner,

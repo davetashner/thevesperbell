@@ -57,6 +57,10 @@ test('AC-1: crossing valley-01’s north gate arrives in valley-02 at its named 
   // A marker only this page load can hold: a crossing swaps the area in place (mw-ju8.28).
   await page.evaluate(() => {
     (window as unknown as Record<string, unknown>)['__sameDocument'] = true;
+    // And a mark on the canvas: the same element must carry the next area (mw-ju8.44).
+    (document.querySelector('[data-testid="game-canvas"]') as unknown as Record<string, unknown>)[
+      '__firstCanvas'
+    ] = true;
   });
   // Two metres inside the north gate (x 4.5…7.5, z 51.5…53.5).
   await crossBy(page, 'tp 6 0 52.5', 'valley-02');
@@ -69,8 +73,31 @@ test('AC-1: crossing valley-01’s north gate arrives in valley-02 at its named 
   expect(
     await page.evaluate(() => (window as unknown as Record<string, unknown>)['__sameDocument']),
   ).toBe(true);
-  // arrive-from-valley-01 is at x 0, z 4.
   const arrived = await playerState(page);
+  // AC-1 (mw-ju8.44): the canvas (and with it the WebGL context and pointer lock) survived the
+  // swap. Headless Chromium has no real pointer lock, so the lock is the spec's stub, which holds
+  // the element it was granted to; that it still names the live, marked canvas shows the swap did
+  // not replace the element the lock sits on.
+  expect(
+    await page.evaluate(() => {
+      const canvases = document.querySelectorAll('[data-testid="game-canvas"]');
+      const canvas = canvases[0] as unknown as Record<string, unknown> | undefined;
+      return {
+        count: canvases.length,
+        marked: canvas?.['__firstCanvas'] === true,
+        locked: document.pointerLockElement === (canvas as unknown as Element),
+      };
+    }),
+  ).toEqual({ count: 1, marked: true, locked: true });
+  // The camera faces the arrival's look yaw (what the player state publishes), not the default.
+  const camera = JSON.parse((await app.getAttribute('data-camera')) ?? '{}') as {
+    quaternion: number[];
+  };
+  const [qx = 0, qy = 0, qz = 0, qw = 1] = camera.quaternion;
+  const cameraYaw = Math.atan2(2 * (qx * qz + qw * qy), 1 - 2 * (qx * qx + qy * qy));
+  const wrapped = Math.atan2(Math.sin(cameraYaw - arrived.yaw), Math.cos(cameraYaw - arrived.yaw));
+  expect(Math.abs(wrapped)).toBeLessThan(0.05);
+  // arrive-from-valley-01 is at x 0, z 4.
   expect(arrived.position.x).toBeCloseTo(0, 0);
   expect(arrived.position.z).toBeGreaterThan(3);
   expect(arrived.position.z).toBeLessThan(6);
