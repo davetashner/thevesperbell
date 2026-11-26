@@ -57,6 +57,7 @@ test('AC-1: crossing valley-01’s north gate arrives in valley-02 at its named 
     const counts = { created: 0, closed: 0 };
     (window as unknown as Record<string, unknown>)['__audioContexts'] = counts;
     const Original = window.AudioContext;
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- re-applied with the right `this` below
     const close = Original.prototype.close;
     Original.prototype.close = function (this: AudioContext) {
       counts.closed += 1;
