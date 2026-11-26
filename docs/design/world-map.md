@@ -444,8 +444,10 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
-| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-lock-link) |
+| `under-the-bridge` | `under-the-bridge` | `under-the-bridge/path-up` (riverbank-path), `under-the-bridge/towpath-down` (riverbank-lock-link), `under-the-bridge/riverbank-down` (under-the-bridge-quay) |
 | `kestrel-lock` | `kestrel-lock` | `kestrel-lock/towpath-up` (riverbank-lock-link), `kestrel-lock/towpath-down` (towpath-lock-wharf); its lock chamber, cottage and landing are walked inside the scene |
+| `briar-glen-river` | `briar-glen-quay` | `briar-glen-river/path-up` (under-the-bridge-quay), `briar-glen-river/stone-stair-climb` (stone-stair); the moored *Patient Ann*, block stacks and toll shed are on the quay |
+| `briar-glen-river` | `millweir` | `briar-glen-river/far-bank-gate` (sluice-walk); the sluice wheel drains the mill pond, the quay walk reaches it inside the scene, and the towpath-exit stub waits for millweir-kestrel-lock (mw-e25.31) |
 | `briarwood` | `briarwood-edge` | `briarwood/town-gate` (lane-briarwood-edge) |
 | `briarwood` | `briarwood-hub` | `briarwood/moorings-gate` (hub-moorings), `briarwood/ridge-gate` (moorings-priory-ridge); its other trails are walked inside the scene |
 | `briarwood` | `sleepers-path` | none (a marker spawn; its trails are walked inside the scene) |
@@ -471,7 +473,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `deepworks` | `mine-gate` | none (a marker spawn in the forecourt; the four ways in from outside are the gate wall's doorways, and mw-e25.10 writes deepworks.gate-open) |
 | `deepworks` | `winch-house` | none (a marker spawn; walked inside the scene, behind the gate wall) |
 | `deepworks` | `old-galleries` | none (a marker spawn; walked inside the scene; its west wall holds the supply tunnel collapse, mw-e25.9) |
-| `deepworks` | `rootcellar-camp` | none (a marker spawn; walked inside the scene) |
+| `deepworks` | `rootcellar-camp` | `deepworks/quay-gate` (stone-stair: the Stone Stair slide down to the quay); otherwise a marker spawn walked inside the scene |
 | `deepworks` | `silver-galleries` | none (a marker spawn one level down; the stair from the cutting hall and the cage lift lead to it) |
 | `deepworks` | `vane-sealed-gallery` | none (a marker spawn two levels down; mw-e26.4 builds its content and the seal) |
 | `deepworks` | `breach` | `deepworks/breach-door` (breach-outer-ring) |
