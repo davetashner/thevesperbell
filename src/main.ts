@@ -298,7 +298,7 @@ import {
   VfxSystem,
 } from '@game/vfx/index';
 import { createBolt, createGroundMarker, disposeBolt } from '@render/magic/index';
-import { createRenderBootstrap } from '@render/bootstrap/index';
+import { createGlSurface, createRenderBootstrap, type GlSurface } from '@render/bootstrap/index';
 import { createLeftover, disposeLeftover } from '@render/breakables/index';
 import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
 import { createThrowArc } from '@render/player/index';
@@ -553,6 +553,10 @@ function gameContent(): Promise<GameContent> {
   return contentLoad;
 }
 
+// The canvas and renderer of the page, made by the first area session and kept by every one after
+// it (mw-ju8.44); only a page reload ends them.
+let glSurface: GlSurface | undefined;
+
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
   app.dataset['layers'] = [...layers, 'tools'].join(' ');
@@ -641,8 +645,12 @@ function startRenderer(
   }
   let view;
   try {
+    // The canvas and WebGL context are made once and outlive each area session (mw-ju8.44): a swap
+    // builds the next scene on them, keeping pointer lock and the compiled shader programs.
+    glSurface ??= createGlSurface(root);
     view = createRenderBootstrap({
       container: root,
+      surface: glSurface,
       // The game loop below draws each frame after stepping the sim (mw-e00.20).
       animationLoop: false,
       // The greybox scene below replaces the mw-e00.19 placeholder (mw-e00.21).
@@ -658,6 +666,8 @@ function startRenderer(
     return;
   }
   const { camera } = view;
+  // Listeners the session puts on the surviving canvas end with the session, like the page's.
+  scope.watch(view.canvas);
   scope.onDispose(() => {
     view.dispose();
   });
