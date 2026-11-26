@@ -25,6 +25,9 @@ import {
 } from '@sim/index';
 import { createGameWorld } from '@tools/replay/testbed-player-scenario';
 import { markExercised } from '@content/testing';
+import { gameContentSources } from '@content/game-content';
+import { loadContent, type ContentSource } from '@content/loader';
+import { contentChecks, contentTypes } from '@content/registry';
 import { buildEnv, validateWorld } from '@tools/world/validate';
 
 const content = loadGameContent();
@@ -180,13 +183,58 @@ describe('Old Reed keeps the lock (mw-vau)', () => {
   });
 });
 
+// The chamber moves at 0.12 m/s and the gates swing in 8 s, which is right for the game and 20 s of sim a
+// level change for a test (about 2 ms a step, mostly the element field's burning lanterns, and several
+// times that under CI coverage). The mechanism tests run the same data at 20 times the sluice rate, with
+// quick gates and a short settle delay and no lanterns; the real rates are checked from the data below.
+const FAST_SLUICE = 20;
+let fastContentCache: ReturnType<typeof loadContent> | undefined;
+function fastContent() {
+  fastContentCache ??= loadContent(
+    contentTypes,
+    gameContentSources().map((source): ContentSource => {
+      const edit = (fn: (json: Record<string, unknown>) => void): ContentSource => {
+        const json = JSON.parse(source.text) as Record<string, unknown>;
+        fn(json);
+        return { ...source, text: JSON.stringify(json) };
+      };
+      if (source.path.endsWith('scene/kestrel-lock.json')) {
+        return edit((json) => {
+          const spawns = json['spawns'] as Record<string, unknown>[];
+          json['spawns'] = spawns.filter((sp) => {
+            const tags = (sp['tags'] ?? []) as string[];
+            return !tags.includes('lantern') && !tags.includes('brazier');
+          });
+          for (const sp of json['spawns'] as { liquid?: Record<string, { rate: number }> }[]) {
+            for (const key of ['drain', 'fill'] as const) {
+              const valve = sp.liquid?.[key];
+              if (valve !== undefined) valve.rate *= FAST_SLUICE;
+            }
+          }
+        });
+      }
+      if (source.path.endsWith('door/lock-gate.json'))
+        return edit((json) => (json['seconds'] = 0.5));
+      if (source.path.endsWith('signal-graph/kestrel-lock-gates.json')) {
+        return edit((json) => {
+          for (const node of json['nodes'] as { id: string; seconds?: number }[])
+            if (node.id === 'levels-settle') node.seconds = 1;
+        });
+      }
+      return source;
+    }),
+    contentChecks,
+  );
+  return fastContentCache;
+}
+
 function lockWorld() {
   const game = createGameWorld<unknown>(RAPIER, {
     seed: 1,
     hz: 60,
     scene: 'kestrel-lock',
     magic: true,
-    content,
+    content: fastContent(),
   });
   const sim = game.world as unknown as World<never>;
   const byId = new Map<string, EntityId>();
@@ -233,81 +281,75 @@ function lockWorld() {
 }
 
 describe('the lock chamber (mw-e25.14 AC-2, AC-3)', () => {
-  it(
-    'AC-2: opening the lower paddle drops the chamber to the lower level within 30 s, and the lower gate then opens (never before)',
-    { timeout: 120_000 },
-    () => {
-      const g = lockWorld();
-      g.steps(5);
-      expect(g.depth()).toBeCloseTo(2.25, 3);
-      expect(g.status('lower-lock-gate')).toBe('jammed');
-      g.pull('lower-paddle-lever');
-      g.steps(60 * 20);
-      expect(g.depth()).toBeLessThanOrEqual(0.15);
-      expect(g.status('lower-lock-gate')).toBe('closed');
-      g.operate('lower-lock-gate', 'open');
-      g.steps(510);
-      expect(g.status('lower-lock-gate')).toBe('open');
-      expect(g.status('upper-lock-gate')).toBe('jammed');
-    },
-  );
+  it('AC-2: at the real sluice rates the chamber crosses its 2.25 m in under 30 s, drain and fill', () => {
+    const chamber = lock.spawns.find((sp) => sp.id === 'chamber-water')?.liquid;
+    expect(chamber?.drain?.rate).toBeGreaterThan(0);
+    expect(chamber?.fill?.rate).toBeGreaterThan(0);
+    expect(chamber?.depth ?? 0).toBeCloseTo(chamber?.size[1] ?? 0, 5); // the brim is the upper level
+    for (const rate of [chamber?.drain?.rate ?? 0, chamber?.fill?.rate ?? 0])
+      expect((chamber?.depth ?? 0) / rate).toBeLessThan(30);
+    expect(content.get('door', 'lock-gate').seconds).toBeLessThan(30);
+  });
 
-  it(
-    'AC-2: with the tail shut and the head paddle open the chamber rises to the upper level within 30 s, and the upper gate opens only then',
-    { timeout: 120_000 },
-    () => {
-      const g = lockWorld();
-      g.steps(5);
-      g.pull('lower-paddle-lever');
-      g.steps(60 * 20);
-      expect(g.depth()).toBeLessThanOrEqual(0.15);
-      g.pull('lower-paddle-lever'); // tail shut
-      g.pull('upper-paddle-lever'); // head sluice open
-      g.steps(60 * 20);
-      expect(g.depth()).toBeGreaterThanOrEqual(2.2);
-      expect(g.status('upper-lock-gate')).toBe('closed');
-      g.operate('upper-lock-gate', 'open');
-      g.steps(510);
-      expect(g.status('upper-lock-gate')).toBe('open');
-      expect(g.status('lower-lock-gate')).toBe('jammed');
-    },
-  );
+  it('AC-2: opening the lower paddle drops the chamber to the lower level within 30 s (20x sluice, quick gates), and the lower gate then opens (never before)', () => {
+    const g = lockWorld();
+    g.steps(5);
+    expect(g.depth()).toBeCloseTo(2.25, 3);
+    expect(g.status('lower-lock-gate')).toBe('jammed');
+    g.pull('lower-paddle-lever');
+    g.steps(90);
+    expect(g.depth()).toBeLessThanOrEqual(0.15);
+    expect(g.status('lower-lock-gate')).toBe('closed');
+    g.operate('lower-lock-gate', 'open');
+    g.steps(45);
+    expect(g.status('lower-lock-gate')).toBe('open');
+    expect(g.status('upper-lock-gate')).toBe('jammed');
+  });
 
-  it(
-    'AC-3: trying a gate against unequal levels strains (mechanismJammed) and changes nothing',
-    { timeout: 120_000 },
-    () => {
-      const g = lockWorld();
-      g.steps(5);
-      const before = g.depth();
-      g.operate('lower-lock-gate', 'open');
-      g.steps(30);
-      expect(g.jams.filter((j) => j.entity === g.id('lower-lock-gate'))).not.toHaveLength(0);
-      expect(g.status('lower-lock-gate')).toBe('jammed');
-      expect(g.depth()).toBeCloseTo(before, 5);
-      // And the other way round once drained.
-      g.pull('lower-paddle-lever');
-      g.steps(60 * 20);
-      g.jams.length = 0;
-      g.operate('upper-lock-gate', 'open');
-      g.steps(30);
-      expect(g.jams.filter((j) => j.entity === g.id('upper-lock-gate'))).not.toHaveLength(0);
-      expect(g.status('upper-lock-gate')).toBe('jammed');
-    },
-  );
+  it('AC-2: with the tail shut and the head paddle open the chamber rises to the upper level within 30 s, and the upper gate opens only then', () => {
+    const g = lockWorld();
+    g.steps(5);
+    g.pull('lower-paddle-lever');
+    g.steps(90);
+    expect(g.depth()).toBeLessThanOrEqual(0.15);
+    g.pull('lower-paddle-lever'); // tail shut
+    g.pull('upper-paddle-lever'); // head sluice open
+    g.steps(90);
+    expect(g.depth()).toBeGreaterThanOrEqual(2.2);
+    expect(g.status('upper-lock-gate')).toBe('closed');
+    g.operate('upper-lock-gate', 'open');
+    g.steps(45);
+    expect(g.status('upper-lock-gate')).toBe('open');
+    expect(g.status('lower-lock-gate')).toBe('jammed');
+  });
 
-  it(
-    'the tail paddle writes kestrel-lock.gate-open once the chamber has settled',
-    { timeout: 120_000 },
-    () => {
-      const g = lockWorld();
-      g.steps(5);
-      expect(g.sim.facts.get('kestrel-lock.gate-open')).not.toBe(true);
-      g.pull('lower-paddle-lever');
-      g.steps(60 * 21);
-      expect(g.sim.facts.get('kestrel-lock.gate-open')).toBe(true);
-    },
-  );
+  it('AC-3: trying a gate against unequal levels strains (mechanismJammed) and changes nothing', () => {
+    const g = lockWorld();
+    g.steps(5);
+    const before = g.depth();
+    g.operate('lower-lock-gate', 'open');
+    g.steps(30);
+    expect(g.jams.filter((j) => j.entity === g.id('lower-lock-gate'))).not.toHaveLength(0);
+    expect(g.status('lower-lock-gate')).toBe('jammed');
+    expect(g.depth()).toBeCloseTo(before, 5);
+    // And the other way round once drained.
+    g.pull('lower-paddle-lever');
+    g.steps(90);
+    g.jams.length = 0;
+    g.operate('upper-lock-gate', 'open');
+    g.steps(30);
+    expect(g.jams.filter((j) => j.entity === g.id('upper-lock-gate'))).not.toHaveLength(0);
+    expect(g.status('upper-lock-gate')).toBe('jammed');
+  });
+
+  it('the tail paddle writes kestrel-lock.gate-open once the chamber has settled', () => {
+    const g = lockWorld();
+    g.steps(5);
+    expect(g.sim.facts.get('kestrel-lock.gate-open')).not.toBe(true);
+    g.pull('lower-paddle-lever');
+    g.steps(100);
+    expect(g.sim.facts.get('kestrel-lock.gate-open')).toBe(true);
+  });
 });
 
 describe('the lock’s approved prop models (mw-e25.14)', () => {
