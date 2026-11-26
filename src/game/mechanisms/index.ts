@@ -182,6 +182,8 @@ export interface DoorLeafLook {
   readonly size: Vec3;
   readonly centre: Vec3;
   readonly material: string;
+  /** Approved model that stands in for the grey leaf box, when the profile names one. */
+  readonly model?: string;
 }
 
 /** The leaf looks of a scene's doors (the material from its profile, `generic` without one). */
@@ -194,10 +196,15 @@ export function doorLeafLooks(
     const door = world.get(entity, DoorComponent);
     if (door === undefined) return [];
     const { size, centre } = leafPose(door, 0);
-    const material = content.has('door', door.profile)
-      ? content.get('door', door.profile).material.id
-      : 'generic';
-    return [{ entity, size, centre, material }];
+    const profile = content.has('door', door.profile)
+      ? content.get('door', door.profile)
+      : undefined;
+    const material = profile === undefined ? 'generic' : profile.material.id;
+    return [
+      profile?.model === undefined
+        ? { entity, size, centre, material }
+        : { entity, size, centre, material, model: profile.model },
+    ];
   });
 }
 
