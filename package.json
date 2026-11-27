@@ -23,6 +23,7 @@
     "bench": "vitest bench --run",
     "e2e": "playwright test",
     "e2e:shards": "node scripts/e2e-shards-cli.ts files",
+    "e2e:shards:check": "node scripts/e2e-shards-cli.ts check",
     "e2e:shards:regenerate": "node scripts/e2e-shards-cli.ts regenerate",
     "slice:record": "SLICE_RECORD=1 playwright test e2e/slice-record.spec.ts --project=chromium --retries=0",
     "perf": "playwright test -c playwright.perf.config.ts --project=ci",

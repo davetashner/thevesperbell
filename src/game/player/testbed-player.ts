@@ -67,6 +67,7 @@ import {
   PlayerLook,
   ViewAnchor,
   waterVolumes,
+  followLiquidLevels,
   breathFraction,
   CharacterBreath,
   DEFAULT_WATER_TUNING,
@@ -526,7 +527,10 @@ export function setupTestbedPlayer<TObject, TCommand>(
     ...(options.surfaces !== undefined && { surfaces: options.surfaces }),
     ...(options.statuses !== undefined && { statuses: options.statuses }),
     ...(options.water !== undefined && {
-      water: { volumes: waterVolumes(scene.layout.regions), ...options.water },
+      water: {
+        volumes: waterVolumes(scene.layout.regions, followLiquidLevels(world)),
+        ...options.water,
+      },
     }),
     ...(options.moves !== undefined && {
       combat: {
