@@ -22,6 +22,7 @@
     "test:coverage:merge": "vitest run --merge-reports --coverage",
     "bench": "vitest bench --run",
     "e2e": "playwright test",
+    "prechecks": "node scripts/pr-prechecks-cli.ts",
     "e2e:shards": "node scripts/e2e-shards-cli.ts files",
     "e2e:shards:check": "node scripts/e2e-shards-cli.ts check",
     "e2e:shards:regenerate": "node scripts/e2e-shards-cli.ts regenerate",
