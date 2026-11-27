@@ -167,3 +167,28 @@ describe('browserScopeHost', () => {
     expect(seen).toHaveBeenCalledOnce();
   });
 });
+
+describe('resetRoot and watch for a surviving canvas (mw-ju8.44)', () => {
+  it('AC-1: resetRoot keeps the game canvas in the DOM', () => {
+    const root = document.createElement('main');
+    const canvas = document.createElement('canvas');
+    canvas.dataset['testid'] = 'game-canvas';
+    const other = document.createElement('div');
+    root.append(canvas, other);
+    resetRoot(root);
+    expect([...root.children]).toEqual([canvas]);
+  });
+
+  it('AC-1: a scope takes down the listeners a session put on a watched canvas', () => {
+    const canvas = document.createElement('canvas');
+    const scope = new PageScope(browserScopeHost());
+    scope.begin();
+    scope.watch(canvas);
+    scope.watch(canvas);
+    const seen = vi.fn();
+    canvas.addEventListener('zz-canvas-test', seen);
+    scope.dispose();
+    canvas.dispatchEvent(new Event('zz-canvas-test'));
+    expect(seen).not.toHaveBeenCalled();
+  });
+});

@@ -1,0 +1,15 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "dot-drink",
+  "notes": "A drink for Dot at the Sleeping Ox (dot-sleeping-ox, option drink-buy): 2 crowns and a little warmth, +3 disposition. A small donation-style service that moves disposition. Moved to the service schema (mw-e20.9).",
+  "providerNpcId": "npc-dot",
+  "name": "A drink for Dot",
+  "price": 2,
+  "effects": [
+    {
+      "kind": "disposition",
+      "npc": "npc-dot",
+      "delta": 3
+    }
+  ]
+}

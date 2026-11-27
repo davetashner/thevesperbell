@@ -70,6 +70,8 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 1. Pick work from `bd ready`; claim it (`bd update <id> --claim`).
 2. Create a worktree from latest main: `git fetch origin main && git worktree add .claude/worktrees/<branch> -b <branch> origin/main`.
 3. Implement with tests that name the ACs (`it('AC-2: ...')`). Coverage rules in the contract §3 are enforced by CI; never lower coverage.
+   - Changing a content type in `src/content/types` means regenerating its schema and docs: `pnpm content:schemas && pnpm content:docs`, and commit the output. CI's content-docs test fails otherwise (PR #509).
+   - e2e specs must not wait on long stretches of sim time: the frame loop runs at most 5 sim ticks per frame, so a 20 s settle can take minutes on a slow CI runner (PR #509). Cover long sim processes in integration tests; in e2e, assert the player's action and its immediate effect.
 4. Commit with sign-off (`git commit -s`), reference the bead ID in the message.
 5. Open a PR to `main` with one `Closes mw-…` line per completed bead. Squash merge only.
 6. After merge: `bd close <id> --reason "Completed in PR #N"`, export (`bd export -o .beads/issues.jsonl`) in the next PR, remove the worktree.
@@ -99,6 +101,7 @@ The repo is developed on the owner's laptop (10 cores), which they use during th
 - **Scoped commands only.** Don't run the full suites locally; push and let CI run them:
   - lint: `pnpm lint:changed` (only files changed against `origin/main`), not `pnpm lint`
   - types: one `pnpm typecheck` before pushing
+  - formatting: `pnpm format:check` before pushing (cheap; CI's lint job runs it and `lint:changed` does not)
   - tests: `pnpm vitest run <the test files you touched>`, not `pnpm test` / `pnpm test:coverage`
   - e2e: `E2E_PORT=<free port> pnpm e2e <the specs you touched>`, never the whole suite
   - no `pnpm perf`, `pnpm bench`, `pnpm content:coverage` or repeated `pnpm build`; CI runs them
@@ -112,9 +115,22 @@ The repo is developed on the owner's laptop (10 cores), which they use during th
 
 **Leads:** put the current mode's rules in every worker brief. A worker that runs past 07:00 switches to day mode for its remaining commands.
 
+## Lead and merging
+
+One session is the lead (named in the `HANDOFF: thevesperbell` bead, mw-77x); only the lead merges and republishes the beads export. The owner's standing agreement: merge once CI is green, without asking.
+
+- **Review before merge.** A worker's report says what it meant to do. Read the PR diff (`gh pr diff <n>`) before merging, and spot-check any risky claim: shared state, three.js internals, anything that loosens a test.
+- **One merge at a time.** Before each merge, check `gh pr view <n> --json mergeStateStatus`. If the branch is `BEHIND`, merge main into it and wait for CI again. Conflicts are usually in `e2e/shards.json`, `CHANGELOG.md`, `connectivity.json`, scene lists and perf budgets; keep both sides.
+- **Wait, don't poll.** Run `gh pr checks <n> --watch` with `run_in_background` and act on the notification.
+- **Beads export.** After a merge, close its beads, then fold a fresh `bd export -o .beads/issues.jsonl` into the next PR the lead merges. Workers never touch the export. pr-lint rejects a `Closes` id that is missing from the PR's `.beads/issues.jsonl`, so a PR that closes a bead created since the last export needs a fresh export of its own (the lead adds it). A PR that only partly delivers a bead gets its own child bead to close.
+- **Worker briefs** name the files each concurrent worker owns, so the others stay out of them. Workers may push and open PRs, but they never merge or close beads. Briefs also remind workers of the CHANGELOG rule: CI's `changelog` check fails any PR that touches `src/{game,ui,render,audio,sim,content}/` or `src/main.ts` without a one-line player-facing note under Unreleased, or the `no-changelog` label.
+- **Dependabot PRs** are the lead's to triage. Merge main into the branch first, because stale shard weights make e2e shards time out. A typescript-eslint minor release can add rules to `strictTypeChecked`: fix the code, or turn a rule off in `eslint.config.js` with a comment saying why. Push the fix to the dependabot branch.
+
 ## Architecture Overview
 
 Deterministic, engine-agnostic game rules in `src/sim` (100% coverage, no DOM/renderer/wall clock/Math.random); data-driven content in `src/content`; renderer/audio/UI glue in `src/game`, `src/render`, `src/audio`, `src/ui`. World interactions are property-based (flammable, wet, conductive…) via a single stimulus API — never pairwise scripted. See contract §2.
+
+Area crossings swap the scene in place (`swapArea` in `src/main.ts`). The canvas and WebGLRenderer (`createGlSurface`, `src/render/bootstrap`) live for the whole page; each area brings its own scene, camera and physics. Area code must not assume it has a fresh canvas or renderer. Add canvas listeners through the session's `PageScope` (`watch(canvas)`), so the swap removes them. Never call `forceContextLoss` or replace the canvas. A swap frees GPU uploads through `surface.releaseUploads()`. Audio still restarts per area (mw-ju8.47).
 
 ## Assets
 
