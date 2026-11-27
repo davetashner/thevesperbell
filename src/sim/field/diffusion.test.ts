@@ -458,35 +458,59 @@ describe('convergence hysteresis (mw-e32.20)', () => {
     expect(stepField(field).activeChunks).toBe(1); // 16: refreshed, and still moving (a hot spot)
   });
 
-  it('AC-4: a write, a calm chunk, a neighbour that is not converged or asleep all prevent freezing', () => {
+  it('AC-4: a write, a calm chunk, a neighbour that is asleep or lacks the layer all prevent freezing', () => {
     const written = row(1, [{ converged: 5 }]);
     written.add('temperature', c(4, 4, 4), 1); // wake
     expect(must(written.chunkList()[0]).converged).toBe(0);
     expect(stepField(written).activeChunks).toBe(1);
     expect(stepField(row(1, [{ converged: 5, calm: 1 }])).activeChunks).toBe(1);
-    const mixed = row(2, [{ converged: 5 }, { converged: 0 }]);
-    expect(stepField(mixed).activeChunks).toBe(2);
     const asleepNeighbour = row(1, [{ converged: 5 }]);
     const sleeper = must(asleepNeighbour.allocate(1, 0, 0));
     sleeper.asleep = true;
     expect(stepField(asleepNeighbour).activeChunks).toBe(1);
+    // A neighbour that is still moving but does not hold the chunk's layer (smoke beside heat).
+    const lacking = row(1, [{ converged: 5 }]);
+    lacking.set('gas:smoke', c(12, 4, 4), 0.5);
+    must(lacking.chunkList()[0]).converged = 5;
+    expect(stepField(lacking).activeChunks).toBe(2);
   });
 
-  it('AC-5: an active chunk beside a frozen one reads its values; the frozen side is untouched', () => {
-    // b (not converged) - a (converged, blocked by b) - f (converged, only neighbour a): f is frozen.
-    const field = new ElementField();
-    field.set('temperature', c(-1, 0, 0), 20); // chunk b exists, no heat beyond ambient
-    field.set('temperature', c(7, 0, 0), 520); // a: hot cell on the face to f
-    field.set('temperature', c(15, 0, 0), 20); // f has a layer, at ambient
-    const [b, a, f] = field.chunkList() as [Chunk, Chunk, Chunk];
-    expect([b.cx, a.cx, f.cx]).toEqual([-1, 0, 1]);
-    a.converged = 5;
-    f.converged = 5;
-    const report = stepField(field);
-    expect(report.activeChunks).toBe(2); // b and a
-    expect(field.read('temperature', c(7, 0, 0))).toBeLessThan(520); // heat flowed out of a
-    expect(field.read('temperature', c(8, 0, 0))).toBe(20); // f did not receive it
+  it('AC-6: a converged chunk beside one still moving is frozen when its channels lose to ambient (mw-e32.21)', () => {
+    const field = row(2, [{ converged: 5 }, { converged: 0 }]);
+    const [f, n] = field.chunkList() as [Chunk, Chunk];
+    expect(stepField(field).activeChunks).toBe(1); // only n steps
     expect(f.converged).toBe(6);
+    expect(n.converged).toBeLessThanOrEqual(1);
+  });
+
+  it('AC-6: a lossless layer needs settled neighbours to freeze', () => {
+    const field = new ElementField();
+    field.set('moisture', c(4, 4, 4), 0.5);
+    field.set('moisture', c(12, 4, 4), 0.5);
+    const [f, n] = field.chunkList() as [Chunk, Chunk];
+    f.converged = 5;
+    n.converged = 0;
+    expect(stepField(field).activeChunks).toBe(2);
+  });
+
+  it('AC-5: an active chunk reads a frozen neighbour as a boundary that holds, and the flux is reported', () => {
+    // b (not converged) - a (converged, frozen beside b): a holds, b reads a's face cells.
+    const field = new ElementField();
+    field.set('temperature', c(-1, 0, 0), 20); // chunk b, at ambient
+    field.set('temperature', c(0, 0, 0), 520); // a: hot cell on the face to b
+    const [b, a] = field.chunkList() as [Chunk, Chunk];
+    expect([b.cx, a.cx]).toEqual([-1, 0]);
+    a.converged = 5;
+    const before = field.total('temperature');
+    const report = stepField(field);
+    expect(report.activeChunks).toBe(1); // b only
+    expect(field.read('temperature', c(0, 0, 0))).toBe(520); // a holds
+    expect(field.read('temperature', c(-1, 0, 0))).toBeGreaterThan(20); // b took heat from a
+    expect(a.converged).toBe(6);
+    // What b gained that a did not give up is reported (negative: created), so totals audit.
+    const lost = report.lost['temperature'] ?? 0;
+    expect(lost).toBeLessThan(0);
+    expect(field.total('temperature') - before).toBeCloseTo(-lost, 3); // initial = final + Σlost
   });
 
   it('AC-5: a frozen chunk with no layer for the channel reads as ambient', () => {
@@ -494,8 +518,7 @@ describe('convergence hysteresis (mw-e32.20)', () => {
     field.set('temperature', c(-1, 0, 0), 20);
     field.set('temperature', c(7, 0, 0), 520);
     const f = must(field.allocate(1, 0, 0));
-    must(field.chunkList()[1]).converged = 5;
-    f.converged = 5;
+    f.converged = 5; // frozen with no layer; the hot chunk beside it is still moving
     stepField(field);
     expect(field.read('temperature', c(8, 0, 0))).toBe(20);
     expect(field.read('temperature', c(7, 0, 0))).toBeLessThan(520);
