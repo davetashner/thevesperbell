@@ -328,8 +328,8 @@
           "showWhenLocked": true,
           "effects": [
             {
-              "kind": "gold",
-              "delta": -15
+              "kind": "purchaseService",
+              "service": "kettleback-carrying-fee"
             }
           ],
           "next": "cap-pay-1"
@@ -512,8 +512,8 @@
           "showWhenLocked": true,
           "effects": [
             {
-              "kind": "gold",
-              "delta": -20
+              "kind": "purchaseService",
+              "service": "kettleback-cartage-fee"
             }
           ],
           "next": "fee-pay-1"

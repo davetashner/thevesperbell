@@ -1,0 +1,8 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "kettleback-cartage-fee",
+  "notes": "Mother Kettleback's cartage for hauling a dead walker to somewhere flatter (kettleback-kitchen, option fee-pay): 20 crowns, a pure gold sink. Moved to the service schema (mw-e20.9).",
+  "providerNpcId": "npc-kettleback",
+  "name": "Cartage fee",
+  "price": 20
+}

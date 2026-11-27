@@ -110,6 +110,7 @@ export {
   Sinking,
   WATER_MATERIAL,
   WATER_TAG,
+  surfaceOfVolume,
   waterAt,
   waterDepthAt,
   WaterEntered,

@@ -7,6 +7,7 @@ import { gameContentSources, loadGameContent } from '@content/index';
 import { loadDevContent } from '@content/dev-content';
 import { World } from '@sim/core/world';
 import { MemoryLogicHost } from '@sim/logic';
+import { contentServices } from './service-host';
 import { DialogueRuntime, type CheckResolver, type DialogueView } from '@sim/dialogue/runtime';
 import type { DialogueDef } from '@content/types/dialogue';
 import { main } from '../../src/tools/dialogue/cli';
@@ -31,6 +32,7 @@ function session(
   const host = new MemoryLogicHost({
     ...init,
     facts: { ...DEFAULT_FACTS, ...init.facts },
+    services: contentServices(content),
   });
   const runtime = new DialogueRuntime({
     world,

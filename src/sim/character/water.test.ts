@@ -194,6 +194,26 @@ describe('water volumes', () => {
     expect(waterDepthAt(volumes, v(8, 5, 8))).toBe(0);
   });
 
+  it('AC-3: a live volume follows its surface, capped at the brim and floored at its floor', () => {
+    let level = 0;
+    const live = waterVolumes(
+      [{ id: 'pond', min: v(0, -4, 0), max: v(10, -1, 10), tags: ['water'] }],
+      () => () => level,
+    );
+    expect(waterDepthAt(live, v(5, -4, 5))).toBe(3); // above the brim: capped at -1
+    level = -2;
+    expect(waterDepthAt(live, v(5, -4, 5))).toBe(2);
+    expect(waterAt(live, v(5, -1.5, 5))).toBeUndefined(); // above the live surface
+    level = -9;
+    expect(waterAt(live, v(5, -4, 5))?.id).toBe('pond'); // empty: at its floor
+    expect(waterDepthAt(live, v(5, -4, 5))).toBe(0);
+  });
+
+  it('a region the follower declines stays a static box', () => {
+    const rows = [{ id: 'a', min: v(0, -4, 0), max: v(1, -1, 1), tags: ['water'] }];
+    expect(waterVolumes(rows, () => undefined)[0]?.surface).toBeUndefined();
+  });
+
   it('picks the mode by depth and armor load', () => {
     const w = DEFAULT_WATER_TUNING;
     expect(waterMode(0.49, 'light', w)).toBe('dry');

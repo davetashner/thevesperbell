@@ -52,6 +52,7 @@ export function contentReferences(content: GameContent): LogicRefChecker {
   return refCheckerFor({
     item: (id) => content.has('item', id),
     capability: (id) => content.has('capability', id),
+    service: (id) => content.has('service', id),
     class: (id) => content.has('class', id),
     quest: (id) => content.has('quest', id),
     npc: (id) => content.has('creature', id),

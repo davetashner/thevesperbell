@@ -28,6 +28,9 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm lint # includes the src/sim determinism and layer-import rules
       - run: pnpm format:check
+      # Every e2e spec needs an e2e/shards.json weight (and no stale ones): unlisted specs get the
+      # median weight, which piled area-walk specs into a few shards (mw-e41.26).
+      - run: pnpm e2e:shards:check
 
   typecheck:
     runs-on: ubuntu-latest

@@ -1,0 +1,15 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "reed-toll-coin",
+  "notes": "Old Reed's toll paid in coin, one crown (reed-kestrel-lock, option toll-coin): sets reed.toll-paid as the gossip toll does. Moved to the service schema (mw-e20.9).",
+  "providerNpcId": "npc-reed",
+  "name": "Lock toll",
+  "price": 1,
+  "effects": [
+    {
+      "kind": "setFact",
+      "fact": "reed.toll-paid",
+      "value": true
+    }
+  ]
+}
