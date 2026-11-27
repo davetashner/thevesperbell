@@ -3381,6 +3381,7 @@ function startRenderer(
       const controller = new TransitionController({
         world,
         player: hero,
+        sceneId: () => root.dataset['scene'] ?? '',
         registry: saveRegistry,
         areaName: (id) => content.get('scene', id).name,
         session: transitStore,

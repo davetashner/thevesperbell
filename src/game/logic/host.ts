@@ -24,6 +24,9 @@ import {
   type FactReader,
   type FactValue,
   gameClockOf,
+  HealthComponent,
+  restoreHealth,
+  travelRequested,
   classOf,
   hasCapability,
   inventoryCheckpoint,
@@ -219,6 +222,22 @@ export function createGameLogicHost(options: GameLogicHostOptions): LogicHost {
     },
     revealRumor: (rumor) => {
       world.events.emit(rumorRevealed, { rumor });
+    },
+    heal: (amount) => {
+      const id = options.player();
+      if (id === undefined) return;
+      const max = world.isRegistered(HealthComponent)
+        ? world.get(id, HealthComponent)?.max
+        : undefined;
+      restoreHealth(world, id, amount === 'full' ? (max ?? 0) : amount);
+    },
+    // The same path as resting and the towpath: the game clock's `advanceTime` fires day starts,
+    // phase changes, hours and scheduled events in order.
+    advanceTime: (minutes) => {
+      gameClockOf(world)?.advanceTime(minutes, 'service');
+    },
+    travelTo: (scene, spawn) => {
+      world.events.emit(travelRequested, { scene, spawn });
     },
   };
 }

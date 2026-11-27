@@ -59,6 +59,10 @@ export class MemoryLogicHost implements LogicHost {
   /** Events and rumors published by committed batches, in order. */
   readonly emitted: LogicEmittedEvent[] = [];
   readonly rumors: string[] = [];
+  /** Heals, clock jumps and travel requests of committed batches, in order. */
+  readonly healed: (number | 'full')[] = [];
+  readonly advanced: number[] = [];
+  readonly travels: { readonly scene: string; readonly spawn: string }[] = [];
   playerClassId: string | undefined;
   minute: number;
   readonly services: Readonly<Record<string, unknown>> | undefined;
@@ -198,5 +202,19 @@ export class MemoryLogicHost implements LogicHost {
 
   revealRumor(rumor: string): void {
     this.rumors.push(rumor);
+  }
+
+  heal(amount: number | 'full'): void {
+    this.healed.push(amount);
+  }
+
+  /** Moves `minute` (wrapping at midnight) so conditions on the time of day see the jump. */
+  advanceTime(minutes: number): void {
+    this.advanced.push(minutes);
+    this.minute = (this.minute + minutes) % 1440;
+  }
+
+  travelTo(scene: string, spawn: string): void {
+    this.travels.push({ scene, spawn });
   }
 }

@@ -12,6 +12,7 @@ import {
   installGameClock,
   PlayerClassComponent,
   registerPersistence,
+  travelRequested,
   World,
 } from '@sim/index';
 import { describe, expect, it, vi } from 'vitest';
@@ -137,6 +138,35 @@ describe('transit carry (mw-e01.11)', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('boom'));
     // Idle afterStep with nothing pending.
     controller.afterStep();
+  });
+
+  it('mw-e20.14: a travel request with no sceneId option hands off from an empty area id', () => {
+    const world = newWorld();
+    const player = world.spawn();
+    const stored = new Map<string, string>();
+    const navigate = vi.fn();
+    const controller = new TransitionController({
+      world,
+      player,
+      registry,
+      areaName: () => 'Wendmouth',
+      session: {
+        getItem: (key) => stored.get(key) ?? null,
+        setItem: (key, value) => void stored.set(key, value),
+        removeItem: (key) => void stored.delete(key),
+      },
+      now: () => 0,
+      navigate,
+      search: () => '',
+      overlayParent: {} as HTMLElement,
+    });
+    world.events.emit(travelRequested, { scene: 'wendmouth-harbour', spawn: 'barge-berth' });
+    world.step();
+    controller.afterStep();
+    expect(navigate).toHaveBeenCalledWith('scene=wendmouth-harbour');
+    const handOff = [...stored.values()].find((v) => v.includes('barge-berth'));
+    expect(handOff).toBeDefined();
+    expect(JSON.parse(handOff ?? '{}')).toMatchObject({ from: '' });
   });
 
   describe('a leg that takes game time (mw-e25.14)', () => {

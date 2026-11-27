@@ -49,6 +49,7 @@ import {
   lightComponents,
   type SceneMechanisms,
   type LoadedScene,
+  travelRequested,
 } from '@sim/index';
 import { describe, expect, it } from 'vitest';
 import { installFactRegistry } from '../facts';
@@ -207,6 +208,7 @@ function boot(content: GameContent, session: MemoryStorage, scene: string, spawn
   const controller = new TransitionController({
     world,
     player,
+    sceneId: () => scene,
     registry,
     areaName: (id) => content.get('scene', id).name,
     session,
@@ -294,6 +296,25 @@ describe('area transitions (mw-e01.11)', () => {
     // The page reloaded into the target scene, and the hand-off was consumed.
     expect(first.navigated).toEqual(['scene=valley-02']);
     expect(session.items.size).toBe(0);
+  });
+
+  it('mw-e20.14: a travelTo request (the barge) takes the same hand-off, with no volume', () => {
+    const session = new MemoryStorage();
+    const first = boot(baseContent, session, 'valley-01');
+    first.world.events.emit(travelRequested, {
+      scene: 'valley-02',
+      spawn: 'arrive-from-valley-03',
+    });
+    first.world.events.emit(travelRequested, { scene: 'valley-03', spawn: 'other' });
+    first.step();
+    expect(first.navigated).toEqual(['scene=valley-02']);
+    const second = boot(baseContent, session, 'valley-02');
+    expect(second.arrivedBy).toMatchObject({
+      from: 'valley-01',
+      to: 'valley-02',
+      spawn: 'arrive-from-valley-03',
+    });
+    expectAt(second, 'arrive-from-valley-03');
   });
 
   it('AC-1: the old area’s changes persist: a chest opened and emptied in valley-02 is still so on return', () => {

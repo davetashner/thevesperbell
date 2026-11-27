@@ -7,7 +7,10 @@ import {
   CapabilityRegistry,
   compileDispositionRules,
   Dispositions,
+  gameClockOf,
+  HealthComponent,
   hasCapability,
+  travelRequested,
   installFactions,
   installGameClock,
   itemAdded,
@@ -22,6 +25,9 @@ import {
 import { DEFAULT_CLOCK_CONFIG } from '@sim/gametime/config';
 import { buildFactionTable } from '@sim/factions/table';
 import { describe, expect, it } from 'vitest';
+import type { ServiceDef } from '@content/types/service';
+import { dialogueLogicRegistry } from '@sim/logic/dialogue-kinds';
+import { createServiceCatalog, SERVICES_SERVICE } from '@sim/services';
 import { installFactRegistry } from '../facts';
 import { createGameLogicHost, logicEmitted, rumorRevealed } from './host';
 
@@ -335,5 +341,107 @@ describe('game logic host events (mw-e22.16)', () => {
     host.giveItem('bellwort-root', 1);
     world.events.flush();
     expect(log).toEqual(['added:bellwort-root']);
+  });
+});
+
+describe('game logic host heal, advanceTime and travelTo (mw-e20.14)', () => {
+  const barge = (days: number): ServiceDef =>
+    ({
+      id: `barge-${String(days)}`,
+      notes: 'n',
+      name: 'Barge',
+      providerNpcId: { id: 'npc-juniper' },
+      price: 10,
+      conditions: [{ kind: 'timeOfDay', from: '06:00', to: '12:00' }],
+      showWhenLocked: false,
+      effects: [
+        { kind: 'advanceTime', days },
+        { kind: 'travelTo', scene: 'wendmouth-wharf', spawn: 'barge-landing' },
+      ],
+    }) as unknown as ServiceDef;
+  const registry = dialogueLogicRegistry();
+
+  function rig() {
+    const base = setup();
+    const { world, player } = base;
+    world.register(HealthComponent);
+    world.add(player, HealthComponent, { max: 20, current: 5 });
+    const catalog = createServiceCatalog([barge(1), barge(2)], registry);
+    const host = createGameLogicHost({
+      world,
+      player: () => player,
+      inventory,
+      capabilities,
+      services: { [SERVICES_SERVICE]: catalog },
+    });
+    const log: string[] = [];
+    const clock = gameClockOf(world);
+    clock?.subscribe('dayStarted', (e) => log.push(`day:${String(e.day)}`));
+    world.events.on(travelRequested, (e) => log.push(`travel:${e.scene}/${e.spawn}`));
+    return { ...base, host, log, clock };
+  }
+
+  it('AC-1: a downriver fare is paid, one day passes, then the arrival is requested', () => {
+    const { world, host, log, clock } = rig();
+    clock?.setTime({ day: 2, minute: 8 * 60 });
+    log.length = 0;
+    const r = applyLogicEffects([{ kind: 'purchaseService', service: 'barge-1' }], host, registry);
+    world.events.flush();
+    expect(r.ok).toBe(true);
+    expect(host.gold()).toBe(10);
+    expect(clock?.time()).toEqual({ day: 3, minute: 8 * 60 });
+    expect(log).toEqual(['day:3', 'travel:wendmouth-wharf/barge-landing']);
+  });
+
+  it('AC-2: upriver takes two days; scheduled events fire in order on the way', () => {
+    const { world, host, clock } = rig();
+    clock?.setTime({ day: 2, minute: 8 * 60 });
+    const fired: string[] = [];
+    clock?.subscribe('scheduled', (e) => fired.push(e.id));
+    clock?.schedule.at(clock.total() + 3000, 'late-event');
+    clock?.schedule.at(clock.total() + 100, 'early-event');
+    clock?.schedule.at(clock.total() + 6000, 'beyond');
+    applyLogicEffects([{ kind: 'purchaseService', service: 'barge-2' }], host, registry);
+    world.events.flush();
+    expect(clock?.time()).toEqual({ day: 4, minute: 8 * 60 });
+    expect(fired).toEqual(['early-event']);
+    clock?.advanceTime(1, 'x');
+    expect(fired).toEqual(['early-event']);
+  });
+
+  it('AC-3: at night it is refused: no time passes and nowhere is requested', () => {
+    const { world, host, log, clock } = rig();
+    clock?.setTime({ day: 2, minute: 23 * 60 });
+    log.length = 0;
+    const r = applyLogicEffects([{ kind: 'purchaseService', service: 'barge-1' }], host, registry);
+    world.events.flush();
+    expect(r).toMatchObject({ ok: false, reason: 'service-locked:barge-1' });
+    expect(host.gold()).toBe(20);
+    expect(clock?.time()).toEqual({ day: 2, minute: 23 * 60 });
+    expect(log).toEqual([]);
+  });
+
+  it('heals by an amount, to full, never past the maximum; no player is a no-op', () => {
+    const { world, player, host } = rig();
+    applyLogicEffects([{ kind: 'heal', amount: 4 }], host, registry);
+    expect(world.get(player, HealthComponent)?.current).toBe(9);
+    applyLogicEffects([{ kind: 'heal', full: true }], host, registry);
+    expect(world.get(player, HealthComponent)?.current).toBe(20);
+    applyLogicEffects([{ kind: 'heal', amount: 4 }], host, registry);
+    expect(world.get(player, HealthComponent)?.current).toBe(20);
+    const nobody = createGameLogicHost({ world, player: () => undefined, inventory, capabilities });
+    nobody.heal('full');
+    const bare = world.spawn();
+    const unhurt = createGameLogicHost({ world, player: () => bare, inventory, capabilities });
+    unhurt.heal('full');
+    const noHealth = new World<never>({ seed: 1 });
+    const e = noHealth.spawn();
+    createGameLogicHost({ world: noHealth, player: () => e, inventory, capabilities }).heal('full');
+    expect(world.get(player, HealthComponent)?.current).toBe(20);
+  });
+
+  it('without a clock advanceTime does nothing', () => {
+    const world = new World<never>({ seed: 1 });
+    createGameLogicHost({ world, player: () => undefined, inventory, capabilities }).advanceTime(5);
   });
 });
