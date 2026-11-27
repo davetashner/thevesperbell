@@ -1,0 +1,43 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "barge-wharf-quay",
+  "notes": "Mags Oakum's Patient Ann from the Wendmouth Stone Wharf to Briar Glen Quay (upriver, 2 game days; towed), mw-e25.15. Mornings only (05:00 to 12:00) and only from the morning after the first night (time.day 2 or later): at night she will not run, 'not with whatever's singing up there' (bible 3.6). Sold through mags-patient-ann. Four crowns, as her dialogue always quoted.",
+  "providerNpcId": "npc-mags",
+  "name": "Passage to Briar Glen Quay",
+  "price": 4,
+  "conditions": [
+    {
+      "kind": "timeOfDay",
+      "from": "05:00",
+      "to": "12:00"
+    },
+    {
+      "kind": "factCmp",
+      "fact": "time.day",
+      "op": "gte",
+      "value": 2
+    }
+  ],
+  "showWhenLocked": false,
+  "effects": [
+    {
+      "kind": "advanceTime",
+      "days": 2
+    },
+    {
+      "kind": "travelTo",
+      "scene": "briar-glen-river",
+      "spawn": "barge-arrival"
+    },
+    {
+      "kind": "setFact",
+      "fact": "barge.ride",
+      "value": "upriver"
+    },
+    {
+      "kind": "setFact",
+      "fact": "barge.stowaway-arrival",
+      "value": false
+    }
+  ]
+}

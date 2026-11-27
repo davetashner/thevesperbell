@@ -24,6 +24,7 @@ const CLASSES = ['knight', 'archer', 'sorcerer', 'thief'] as const;
 const MORNING = 8 * 60;
 const AFTERNOON = 15 * 60;
 const NIGHT = 23 * 60;
+const DAY_2 = { 'time.day': 2 };
 
 function session(init: ConstructorParameters<typeof MemoryLogicHost>[0] = {}) {
   const world = new World<never>({ seed: 1, hz: 60 });
@@ -139,6 +140,7 @@ describe('the four harbour dialogues', () => {
       s.settle();
       s.pick('ask-ride');
       expect(s.text()).toMatch(/Not in the dark/);
+      expect(s.text()).toMatch(/not with whatever's singing up there/i);
       expect(s.ids()).not.toContain('ride-pay');
       s.pick('leave');
       expect(s.host.emitted.some((e) => e.event === 'barge.ride-booked')).toBe(false);
@@ -146,7 +148,7 @@ describe('the four harbour dialogues', () => {
   });
 
   it('AC-3: in the morning she books the barge for a fare, or on a class deal, and emits the hook', () => {
-    const paid = session({ gold: 10, minuteOfDay: MORNING });
+    const paid = session({ facts: DAY_2, gold: 10, minuteOfDay: MORNING });
     paid.start('mags-patient-ann');
     paid.settle();
     paid.pick('ask-ride');
@@ -156,7 +158,7 @@ describe('the four harbour dialogues', () => {
     expect(paid.host.gold()).toBe(6);
     expect(paid.host.emitted.filter((e) => e.event === 'barge.ride-booked')).toHaveLength(1);
 
-    const deal = session({ playerClass: 'knight', minuteOfDay: MORNING });
+    const deal = session({ facts: DAY_2, playerClass: 'knight', minuteOfDay: MORNING });
     deal.start('mags-patient-ann');
     deal.settle();
     deal.pick('fare-knight');
@@ -165,7 +167,7 @@ describe('the four harbour dialogues', () => {
     deal.pick('ride-deal');
     expect(deal.host.emitted.some((e) => e.event === 'barge.ride-booked')).toBe(true);
 
-    const broke = session({ gold: 1, minuteOfDay: MORNING });
+    const broke = session({ facts: DAY_2, gold: 1, minuteOfDay: MORNING });
     broke.start('mags-patient-ann');
     broke.settle();
     broke.pick('ask-ride');
@@ -173,7 +175,7 @@ describe('the four harbour dialogues', () => {
     expect(broke.text()).toMatch(/not four promises/);
     expect(broke.host.emitted.some((e) => e.event === 'barge.ride-booked')).toBe(false);
 
-    const late = session({ gold: 10, minuteOfDay: AFTERNOON });
+    const late = session({ facts: DAY_2, gold: 10, minuteOfDay: AFTERNOON });
     late.start('mags-patient-ann');
     late.settle();
     late.pick('ask-ride');
@@ -210,7 +212,12 @@ describe('the four harbour dialogues', () => {
     expect(factOf(cold, 'mags.crates-confessed')).toBeUndefined();
     expect(cold.text()).toMatch(/Stone, love/);
 
-    const warm = session({ dispositions: { 'npc-mags': 8 }, gold: 10, minuteOfDay: MORNING });
+    const warm = session({
+      facts: DAY_2,
+      dispositions: { 'npc-mags': 8 },
+      gold: 10,
+      minuteOfDay: MORNING,
+    });
     warm.start('mags-patient-ann');
     warm.settle();
     warm.pick('ask-hum');

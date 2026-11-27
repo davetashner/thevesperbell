@@ -1128,7 +1128,17 @@
       "travel": "barge",
       "time": ["dawn", "day"],
       "bead": "mw-e40.26",
-      "notes": "The barge arrives at the Stone Wharf (bible 3.6)."
+      "notes": "The barge arrives at the Stone Wharf (bible 3.6). Built as a service, not a scene volume (mw-e25.15, mw-4l3z): Mags Oakum at Kestrel Lock sells barge-lock-wharf in the morning (one game day downriver; the way back upriver is the towpath or the quay ride); it stays listed as planned because no transition volume carries it."
+    },
+    {
+      "id": "barge-quay-wharf",
+      "from": "briar-glen-quay",
+      "to": "stone-wharf",
+      "kind": "path",
+      "travel": "barge",
+      "time": ["dawn", "day"],
+      "bead": "mw-e25.15",
+      "notes": "Mags Oakum's Patient Ann runs the whole river from Briar Glen Quay to the Stone Wharf in one narrated ride, mornings only from the morning after the first night (bible 3.6): downriver one game day (barge-quay-wharf, or barge-quay-wharf-stowaway for a thief), upriver two (barge-wharf-quay). A service in her dialogue (mw-e25.15), not a scene volume, so it is listed as planned."
     },
     {
       "id": "lock-gate-crossing",
