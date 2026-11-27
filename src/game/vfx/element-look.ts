@@ -22,6 +22,10 @@ export interface CombinedLook {
   readonly emissive: LookRgb;
   /** Roughness to take, or undefined to keep the material's own. */
   readonly roughness: number | undefined;
+  /** Metalness to take (a sheen bump), or undefined to keep the material's own. */
+  readonly metalness: number | undefined;
+  /** Environment reflection strength to take, or undefined to keep the material's own. */
+  readonly envMapIntensity: number | undefined;
   /** Glow pulses per second (0 = steady). */
   readonly pulseHz: number;
 }
@@ -40,6 +44,8 @@ export function combineLooks(looks: readonly ElementLookDef[]): CombinedLook | u
   let mixed: LookRgb = [0, 0, 0];
   let glow: LookRgb = [0, 0, 0];
   let roughness: number | undefined;
+  let metalness: number | undefined;
+  let envMapIntensity: number | undefined;
   let pulseHz = 0;
   for (const look of looks) {
     if (look.tint !== undefined && look.tintMix > 0) {
@@ -53,11 +59,13 @@ export function combineLooks(looks: readonly ElementLookDef[]): CombinedLook | u
       pulseHz = Math.max(pulseHz, look.pulseHz);
     }
     if (look.roughness !== undefined) roughness = look.roughness;
+    if (look.metalness !== undefined) metalness = look.metalness;
+    if (look.envMapIntensity !== undefined) envMapIntensity = look.envMapIntensity;
   }
   const tintMix = 1 - keep;
   const tint: LookRgb =
     tintMix > 0 ? [mixed[0] / tintMix, mixed[1] / tintMix, mixed[2] / tintMix] : [1, 1, 1];
-  return { tintMix, tint, emissive: glow, roughness, pulseHz };
+  return { tintMix, tint, emissive: glow, roughness, metalness, envMapIntensity, pulseHz };
 }
 
 /**

@@ -32,7 +32,15 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `states[].look.emissive` | string | — | Glow colour added to the surface (emissive). |
 | `states[].look.emissiveIntensity` | number 0–2 | `0` | Strength of the glow. |
 | `states[].look.roughness` | number 0–1 | — | Roughness the surface takes (low = a specular sheen, as wet or iced things have). |
+| `states[].look.metalness` | number 0–1 | — | Metalness the surface takes; a small bump makes a wet surface throw a sheen. |
+| `states[].look.envMapIntensity` | number 0–4 | — | How strongly the surface reflects its surroundings (> 1 = a stronger sheen). |
 | `states[].look.pulseHz` | number 0–3 | `0` | Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady. |
+| `states[].cue` | `"rising-flicker"` \| `"falling-drip"` \| `"faceted-rim"` \| `"jitter-arc"` | — | Non-colour cue the state is read by: rising-flicker (burning), falling-drip (wet), faceted-rim (frozen, still angular crystals) or jitter-arc (charged). The state’s effect must realise it. |
+| `states[].ground` | object | — | Decal laid on the ground under the entity while the state is on (wet puddle). |
+| `states[].ground.texture` | string | required | Decal texture id in the VFX texture manifest. |
+| `states[].ground.radiusScale` | number > 0 | required | Decal radius as a multiple of the entity bounding radius. |
+| `states[].ground.opacity` | number > 0 ≤ 1 | required | Peak decal opacity. |
+| `states[].ground.rippleHz` | number 0–3 | `0` | The decal swells and settles this many times a second (drip rings); 0 = still. Reduced motion holds it still. |
 | `states[].audioCue` | string | — | One-shot sound cue played where the entity is when it enters the state; only cues in the sound manifest play. Absent while no cue exists. |
 | `transitions` | list of object | — | One-shot effects when an entity moves between states (burning to wet: steam). |
 | `transitions[].from` | id | required | State id the entity leaves. |

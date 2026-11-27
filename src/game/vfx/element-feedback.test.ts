@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { SOUND_MANIFEST } from '@audio/sounds';
 import { compileElementFeedback, loadGameContent } from '@content/index';
+import { combineLooks } from './element-look.ts';
+import { vfxTextureManifest } from './texture-data.ts';
 import { markExercised } from '@content/testing';
 import {
   propertyChanged,
@@ -517,5 +519,82 @@ describe('element feedback bridge (mw-e03.28)', () => {
       return s.bridge.looks().get(e);
     });
     expect(looks[0]).toEqual(looks[1]);
+  });
+});
+
+describe('wet legibility and non-colour cues (mw-e03.53)', () => {
+  const state = (id: string) => table.states.find((s) => s.id === id);
+  const effects = (id: string) => {
+    const name = state(id)?.effect ?? '';
+    return content.get('vfx-effect', name).emitters;
+  };
+
+  it('AC-1: every state declares a non-colour cue and the four are distinct', () => {
+    const cues = ['burning', 'wet', 'frozen', 'charged'].map((id) => state(id)?.cue);
+    expect(cues).toEqual(['rising-flicker', 'falling-drip', 'faceted-rim', 'jitter-arc']);
+    expect(new Set(cues).size).toBe(4);
+  });
+
+  it('AC-2: each cue is realised by its effect (rise, fall, still shards, short streaks)', () => {
+    expect(effects('burning').some((e) => e.gravity < 0)).toBe(true);
+    expect(effects('wet').some((e) => e.gravity > 0 && e.speed.max < 1)).toBe(true);
+    const shards = effects('frozen').find((e) => e.texture === 'vfx-base-shard-01');
+    expect(shards?.speed.max).toBeLessThan(0.2);
+    const arcs = effects('charged').find((e) => e.texture === 'vfx-base-spark-streak-01');
+    expect(arcs?.lifetime.max).toBeLessThanOrEqual(0.2);
+  });
+
+  it('AC-3: wet has a strong sheen the combined look passes on', () => {
+    const wetLook = state('wet')?.look;
+    const wet = combineLooks(wetLook === undefined ? [] : [wetLook]);
+    expect(wet?.roughness).toBeLessThanOrEqual(0.1);
+    expect(wet?.metalness).toBeGreaterThan(0);
+    expect(wet?.envMapIntensity).toBeGreaterThan(1);
+  });
+
+  it('AC-5: wet drips are larger and more frequent than the first pass (30/s, 0.16 m)', () => {
+    const drops = effects('wet').find((e) => e.id === 'drops');
+    expect(drops?.rate).toBeGreaterThan(30);
+    const size = drops?.size as number | { v: number }[] | undefined;
+    const start = Array.isArray(size) ? (size[0]?.v ?? 0) : (size ?? 0);
+    expect(start).toBeGreaterThan(0.16);
+  });
+
+  it('AC-4: the wet decal texture is in the manifest; a wet entity gets a decal under its feet, a dry one none', () => {
+    const decal = state('wet')?.ground;
+    expect(vfxTextureManifest().some((t) => t.id === decal?.texture)).toBe(true);
+    const { bridge, thing, change, flush } = setup();
+    const crate = thing(5, 0.5);
+    bridge.update(CAMERA);
+    expect(bridge.grounds()).toHaveLength(0);
+    change(crate, 'wetness', 1);
+    flush();
+    bridge.update(CAMERA);
+    const [g, ...rest] = bridge.grounds();
+    expect(rest).toHaveLength(0);
+    expect(g).toMatchObject({ entity: crate, texture: 'vfx-decal-wet-01', x: 5, opacity: 0.9 });
+    expect(g?.radius).toBeCloseTo(0.5 * (decal?.radiusScale ?? 0));
+    expect(g?.rippleHz).toBe(1);
+    // Burning has no ground decal.
+    change(crate, 'burning', true);
+    flush();
+    expect(bridge.grounds()).toHaveLength(1);
+    change(crate, 'wetness', 0);
+    flush();
+    expect(bridge.grounds()).toHaveLength(0);
+  });
+
+  it('AC-4: reduced motion holds the ring still; tiny things still pool; unplaced things get none', () => {
+    const { bridge, thing, change, flush, places } = setup({ reduced: true });
+    const speck = thing(5, 0);
+    const ghost = thing(6, 0.3);
+    places.delete(ghost);
+    change(speck, 'wetness', 1);
+    change(ghost, 'wetness', 1);
+    flush();
+    const found = bridge.grounds();
+    expect(found).toHaveLength(1);
+    expect(found[0]?.rippleHz).toBe(0);
+    expect(found[0]?.radius).toBeGreaterThan(0);
   });
 });

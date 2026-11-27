@@ -13,6 +13,8 @@ check enforces this).
 
 ### Added
 
+- Wet things now read clearly: a glossy sheen, bigger and more frequent drips and a rippling puddle under them, and each element state (burning, wet, frozen, charged) has its own shape or motion cue beside its colour. [mw-e03.53]
+
 - Services can now heal you, move the clock on and carry you to another place: the building blocks for the barge ride, where the fare, the days that pass and the arrival happen together or not at all. [mw-e20.14]
 - The Millweir's mill pond is a real swim: turn the sluice wheel and the pond drains to a dry bed you can walk across, turn it back and it fills again to a deep pond you must swim (heavy armour sinks), and any pond that rises or falls now swims by its present depth. [mw-e25.29]
 - Gold now buys things from people, not just from shelves: a service system lets an NPC sell a favour, fee or bribe for a price that can ease with how much they like you (Mother Kettleback's carrying fees, Old Reed's toll, a drink for Dot), paid and applied together or not at all. [mw-e20.9]
