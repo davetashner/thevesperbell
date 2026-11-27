@@ -76,14 +76,29 @@ export const DEFAULT_WATER_TUNING: Frozen<WaterTuning> = Object.freeze({
   drowning: Object.freeze({ intervalMs: 1000, damage: 10 }),
 });
 
-/** A box of water: corners in metres; the surface is `max.y`. */
+/**
+ * A box of water: corners in metres; the surface is `max.y` unless the volume is `live`, when it is
+ * whatever `surface()` reads now (a liquid volume's level: a pond that fills and drains swims and
+ * wades by its present depth).
+ */
 export interface WaterVolume {
   readonly id: string;
   readonly min: Vec3;
   readonly max: Vec3;
+  /** The live surface height, m, capped at `max.y`; absent = the brim, always. */
+  readonly surface?: () => number;
 }
 
-/** The water volumes among a scene's regions (those tagged `water`), in scene order. */
+/** The height of the surface of `volume` now, m (an empty live volume is at its floor). */
+export function surfaceOfVolume(volume: WaterVolume): number {
+  if (volume.surface === undefined) return volume.max.y;
+  return Math.min(volume.max.y, Math.max(volume.min.y, volume.surface()));
+}
+
+/**
+ * The water volumes among a scene's regions (those tagged `water`), in scene order. `follow` may
+ * give a region a live surface (see `WaterVolume.surface`); absent or undefined = the static box.
+ */
 export function waterVolumes(
   regions: readonly {
     readonly id: string;
@@ -91,10 +106,14 @@ export function waterVolumes(
     readonly max: Vec3;
     readonly tags: readonly string[];
   }[],
+  follow?: (region: { readonly min: Vec3; readonly max: Vec3 }) => (() => number) | undefined,
 ): readonly WaterVolume[] {
   return regions
     .filter((region) => region.tags.includes(WATER_TAG))
-    .map(({ id, min, max }) => ({ id, min, max }));
+    .map(({ id, min, max }) => {
+      const surface = follow?.({ min, max });
+      return surface === undefined ? { id, min, max } : { id, min, max, surface };
+    });
 }
 
 /** The volume holding the point `p` (the highest surface when several do), or undefined. */
@@ -102,8 +121,9 @@ export function waterAt(volumes: readonly WaterVolume[], p: Vec3): WaterVolume |
   let found: WaterVolume | undefined;
   for (const v of volumes) {
     if (p.x < v.min.x || p.x > v.max.x || p.z < v.min.z || p.z > v.max.z) continue;
-    if (p.y < v.min.y || p.y > v.max.y) continue;
-    if (found === undefined || v.max.y > found.max.y) found = v;
+    const top = surfaceOfVolume(v);
+    if (p.y < v.min.y || p.y > top) continue;
+    if (found === undefined || top > surfaceOfVolume(found)) found = v;
   }
   return found;
 }
@@ -111,7 +131,7 @@ export function waterAt(volumes: readonly WaterVolume[], p: Vec3): WaterVolume |
 /** How deep the water is at `feet`: metres from the surface down to the feet; 0 when not in water. */
 export function waterDepthAt(volumes: readonly WaterVolume[], feet: Vec3): number {
   const volume = waterAt(volumes, feet);
-  return volume === undefined ? 0 : volume.max.y - feet.y;
+  return volume === undefined ? 0 : surfaceOfVolume(volume) - feet.y;
 }
 
 /** What a character in water does (see the file header). */
@@ -203,8 +223,10 @@ export function waterTraversal(options: WaterHookOptions): TraversalHook {
   const { volumes } = options;
   const loadOf = (entity: EntityId | undefined): LoadClass =>
     (entity === undefined ? undefined : options.loadClass?.(entity)) ?? 'light';
-  const surfaceOf = (state: CharacterState): number | undefined =>
-    waterAt(volumes, state.position)?.max.y;
+  const surfaceOf = (state: CharacterState): number | undefined => {
+    const volume = waterAt(volumes, state.position);
+    return volume === undefined ? undefined : surfaceOfVolume(volume);
+  };
   return {
     modes: ['swim'],
     shouldEnter(ctx) {
@@ -377,7 +399,7 @@ export function waterSystem<TInput>(options: WaterSystemOptions): System<TInput>
       world.query(CharacterController, CharacterBreath).forEach((entity, state, breath) => {
         const water = characterTuning(world, entity, options.tuning).water ?? DEFAULT_WATER_TUNING;
         const volume = waterAt(volumes, state.position);
-        const depth = volume === undefined ? 0 : volume.max.y - state.position.y;
+        const depth = volume === undefined ? 0 : surfaceOfVolume(volume) - state.position.y;
         const inWater = volume !== undefined && depth >= water.wadeDepth;
         const full = water.breathSeconds * clock.hz;
         const submerged = inWater && (depth > water.headHeight || state.swim?.diving === true);

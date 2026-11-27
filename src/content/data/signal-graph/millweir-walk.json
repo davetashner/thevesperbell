@@ -2,10 +2,18 @@
   "$schema": "../signal-graph.schema.json",
   "id": "millweir-walk",
   "name": "Millweir sluice walk",
-  "notes": "The Millweir in the scene briar-glen-river (mw-e25.12). The sluice wheel opens the drain of the mill pond (the pond falls to its low state and the stepping-stone path across it stands clear); turning it back shuts the drain. The far-bank volume is the Briarwood far bank: the first time the player stands on it, by the walk, the stones or the water, the latch writes world.millweir.sluice-walk-open = true and keeps it, so the world map's shortcut stays open for good.",
+  "notes": "The Millweir in the scene briar-glen-river (mw-e25.12). The sluice wheel opens the drain of the mill pond (the pond falls to its dry bed and can be walked across); turning it back shuts the drain and opens the head sluice (a fill key on the pond), so the pond rises again to a deep pond that must be swum. The far-bank volume is the Briarwood far bank: the first time the player stands on it, by the walk, the stones or the water, the latch writes world.millweir.sluice-walk-open = true and keeps it, so the world map's shortcut stays open for good.",
   "nodes": [
     { "id": "sluice-wheel", "kind": "lever", "entity": "sluice-wheel" },
     { "id": "drain", "kind": "receiver", "receiver": "mechanism", "entity": "mill-pond" },
+    { "id": "wheel-back", "kind": "not" },
+    {
+      "id": "refill",
+      "kind": "receiver",
+      "receiver": "mechanism",
+      "entity": "mill-pond",
+      "key": "fill"
+    },
     {
       "id": "far-bank",
       "kind": "volume",
@@ -26,6 +34,8 @@
   ],
   "wires": [
     { "from": "sluice-wheel", "to": "drain" },
+    { "from": "sluice-wheel", "to": "wheel-back" },
+    { "from": "wheel-back", "to": "refill" },
     { "from": "far-bank.enter", "to": "crossed.set" },
     { "from": "crossed", "to": "walk-open-fact" }
   ]
