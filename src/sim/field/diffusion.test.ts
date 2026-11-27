@@ -8,7 +8,13 @@ import {
   type FieldLod,
   type FieldStepReport,
 } from './diffusion';
-import { ElementField, type CellCoord } from './grid';
+import { ElementField, type CellCoord, type Chunk } from './grid';
+
+/** Narrows a lookup the test knows hits. */
+const must = <T>(item: T | undefined): T => {
+  if (item === undefined) throw new Error('expected a value');
+  return item;
+};
 
 const c = (x: number, y = 0, z = 0): CellCoord => ({ x, y, z });
 
@@ -362,5 +368,136 @@ describe('sim-rate level of detail (mw-e03.30)', () => {
       chunkSteps(field, chunk, { tick, anchor }),
     );
     expect(ticks).toHaveLength(2);
+  });
+});
+
+describe('convergence hysteresis (mw-e32.20)', () => {
+  const memo = <T>(make: () => T): (() => T) => {
+    let made: T | undefined;
+    return () => (made ??= make());
+  };
+
+  /** Three held 600 °C cells and a smoke source: a decorative fire, run `ticks` ticks. */
+  function burn(freeze: boolean, ticks: number) {
+    const field = new ElementField();
+    const reports: FieldStepReport[] = [];
+    for (let t = 0; t < ticks; t++) {
+      for (let x = 0; x < 3; x++)
+        for (let y = 0; y < 3; y++) field.set('temperature', c(x, y), 600);
+      field.addAt('gas:smoke', { x: 1, y: 1, z: 0.25 }, 1 / 60);
+      reports.push(stepField(field, undefined, { freeze }));
+    }
+    return { field, reports };
+  }
+
+  const both = memo(() => ({ frozen: burn(true, 600), full: burn(false, 600) }));
+
+  it(
+    'AC-1: settled chunks of a steady fire are frozen, so a tick steps fewer of them',
+    { timeout: 60_000 },
+    () => {
+      const frozen = must(both().frozen.reports.at(-1));
+      const full = must(both().full.reports.at(-1));
+      expect(frozen.activeChunks).toBeLessThan(full.activeChunks);
+      expect(frozen.cellsUpdated).toBeLessThan(full.cellsUpdated);
+    },
+  );
+
+  it(
+    'AC-2: the field stays within a fraction of a degree (and under smoke epsilon) of the full run',
+    { timeout: 60_000 },
+    () => {
+      const a = both().frozen.field;
+      const b = both().full.field;
+      let heat = 0;
+      let smoke = 0;
+      for (let x = -24; x < 24; x++) {
+        for (let y = -24; y < 24; y++) {
+          for (let z = -8; z < 8; z++) {
+            const cell = c(x, y, z);
+            heat = Math.max(
+              heat,
+              Math.abs(a.read('temperature', cell) - b.read('temperature', cell)),
+            );
+            smoke = Math.max(
+              smoke,
+              Math.abs(a.read('gas:smoke', cell) - b.read('gas:smoke', cell)),
+            );
+          }
+        }
+      }
+      expect(heat).toBeLessThan(0.25); // measured 0.10 °C against 1 °C epsilon
+      expect(smoke).toBeLessThan(0.01); // measured 0.006 against 0.01 epsilon
+    },
+  );
+
+  /** A field of one-cell chunks at chunk x = 0..n-1, each holding some heat, flags set by hand. */
+  function row(n: number, flags: { converged: number; calm?: number }[]) {
+    const field = new ElementField();
+    for (let i = 0; i < n; i++) field.set('temperature', c(i * 8 + 4, 4, 4), 100);
+    field.chunkList().forEach((chunk, i) => {
+      chunk.converged = must(flags[i]).converged;
+      chunk.calm = must(flags[i]).calm ?? 0;
+    });
+    return field;
+  }
+
+  it('AC-3: a converged chunk with converged neighbours is frozen and holds its values', () => {
+    const field = row(2, [{ converged: 5 }, { converged: 5 }]);
+    const before = dump(field, 10);
+    const report = stepField(field);
+    expect(report.activeChunks).toBe(0);
+    expect(dump(field, 10)).toEqual(before);
+    expect(field.chunkList().map((chunk) => chunk.converged)).toEqual([6, 6]);
+  });
+
+  it('AC-3: a frozen chunk is stepped anyway on every REFRESH_TICKS-th converged tick', () => {
+    const field = row(1, [{ converged: 14 }]);
+    expect(stepField(field).activeChunks).toBe(0); // age 14 -> 15
+    expect(stepField(field).activeChunks).toBe(0); // 15 -> 16
+    expect(stepField(field).activeChunks).toBe(1); // 16: refreshed, and still moving (a hot spot)
+  });
+
+  it('AC-4: a write, a calm chunk, a neighbour that is not converged or asleep all prevent freezing', () => {
+    const written = row(1, [{ converged: 5 }]);
+    written.add('temperature', c(4, 4, 4), 1); // wake
+    expect(must(written.chunkList()[0]).converged).toBe(0);
+    expect(stepField(written).activeChunks).toBe(1);
+    expect(stepField(row(1, [{ converged: 5, calm: 1 }])).activeChunks).toBe(1);
+    const mixed = row(2, [{ converged: 5 }, { converged: 0 }]);
+    expect(stepField(mixed).activeChunks).toBe(2);
+    const asleepNeighbour = row(1, [{ converged: 5 }]);
+    const sleeper = must(asleepNeighbour.allocate(1, 0, 0));
+    sleeper.asleep = true;
+    expect(stepField(asleepNeighbour).activeChunks).toBe(1);
+  });
+
+  it('AC-5: an active chunk beside a frozen one reads its values; the frozen side is untouched', () => {
+    // b (not converged) - a (converged, blocked by b) - f (converged, only neighbour a): f is frozen.
+    const field = new ElementField();
+    field.set('temperature', c(-1, 0, 0), 20); // chunk b exists, no heat beyond ambient
+    field.set('temperature', c(7, 0, 0), 520); // a: hot cell on the face to f
+    field.set('temperature', c(15, 0, 0), 20); // f has a layer, at ambient
+    const [b, a, f] = field.chunkList() as [Chunk, Chunk, Chunk];
+    expect([b.cx, a.cx, f.cx]).toEqual([-1, 0, 1]);
+    a.converged = 5;
+    f.converged = 5;
+    const report = stepField(field);
+    expect(report.activeChunks).toBe(2); // b and a
+    expect(field.read('temperature', c(7, 0, 0))).toBeLessThan(520); // heat flowed out of a
+    expect(field.read('temperature', c(8, 0, 0))).toBe(20); // f did not receive it
+    expect(f.converged).toBe(6);
+  });
+
+  it('AC-5: a frozen chunk with no layer for the channel reads as ambient', () => {
+    const field = new ElementField();
+    field.set('temperature', c(-1, 0, 0), 20);
+    field.set('temperature', c(7, 0, 0), 520);
+    const f = must(field.allocate(1, 0, 0));
+    must(field.chunkList()[1]).converged = 5;
+    f.converged = 5;
+    stepField(field);
+    expect(field.read('temperature', c(8, 0, 0))).toBe(20);
+    expect(field.read('temperature', c(7, 0, 0))).toBeLessThan(520);
   });
 });
