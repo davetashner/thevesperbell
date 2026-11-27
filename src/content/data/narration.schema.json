@@ -98,7 +98,7 @@
             "description": "The pages, in the order they are shown. For a class beat these are the generic text every class without its own variant sees."
           },
           "variants": {
-            "description": "Class beats only: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`.",
+            "description": "Class beats: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`. Barge rides: Mags's aside to that class, shown before the last page; a class left out hears none.",
             "type": "object",
             "properties": {
               "knight": {

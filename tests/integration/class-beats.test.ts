@@ -132,10 +132,17 @@ describe('class beats', () => {
     expect(
       issues({
         ...base,
+        kind: 'title',
+        sequences: [{ ...seq, variants: { knight: [{ text: 'K.' }] } }],
+      }),
+    ).toEqual(['only a class beat or a barge ride has class variants']);
+    expect(
+      issues({
+        ...base,
         kind: 'barge',
         sequences: [{ ...seq, variants: { knight: [{ text: 'K.' }] } }],
       }),
-    ).toEqual(['only a class beat has class variants']);
+    ).toEqual([]);
     expect(issues({ ...base, kind: 'class-beat', sequences: [{ ...seq, variants: {} }] })).toEqual([
       'needs at least one class',
     ]);

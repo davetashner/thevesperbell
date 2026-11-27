@@ -2,6 +2,7 @@
 // The barge ride card (mw-e25.15): a fare leaves `barge.ride`; the arrival plays the narration-barge
 // pages and resets it. Real narration content, the UI root and the glue.
 import { loadGameContent } from '@content/index';
+import { NARRATIVE_CLASSES } from '@content/narrative/class-variants';
 import { findSequence, type Narration } from '@content/types/narration';
 import { World } from '@sim/index';
 import { UiRoot } from '@ui/index';
@@ -137,5 +138,94 @@ describe('barge ride card (mw-e25.15)', () => {
     card.afterStep();
     expect(ui.top).toBeUndefined();
     expect(readings.at(-1)).toMatchObject({ open: false, shown: ['ferry'], ended: 'finished' });
+  });
+
+  it('the Kestrel Lock legs play their own sequences', () => {
+    for (const [ride, sequence] of [
+      ['quay-lock-downriver', 'downriver-to-kestrel-lock'],
+      ['wharf-lock-upriver', 'upriver-to-kestrel-lock'],
+    ] as const) {
+      document.body.innerHTML = '';
+      const t = setup();
+      t.world.facts.set(BARGE_RIDE_FACT, ride);
+      t.card.afterStep();
+      expect(bodyText()).toBe(pages(sequence)[0]);
+      expect(t.published.at(-1)).toMatchObject({ open: true, ride });
+    }
+  });
+
+  it.each([
+    ['downriver', 'downriver-to-wendmouth', 'AC-1'],
+    ['lock-downriver', 'downriver-to-wendmouth', 'AC-1'],
+    ['upriver', 'upriver-to-briar-glen', 'AC-1'],
+    ['quay-lock-downriver', 'downriver-to-kestrel-lock', 'AC-1'],
+    ['wharf-lock-upriver', 'upriver-to-kestrel-lock', 'AC-1'],
+  ])('%s: each class hears its own Mags aside before the last page (mw-e39.49)', (ride, id) => {
+    const sequence = findSequence(narrations, 'barge', id);
+    const skip = ride === 'lock-downriver' ? 1 : 0;
+    for (const playerClass of NARRATIVE_CLASSES) {
+      document.body.innerHTML = '';
+      const t = setup();
+      t.world.facts.set('player.class', playerClass);
+      t.world.facts.set(BARGE_RIDE_FACT, ride);
+      t.card.afterStep();
+      const plain = (sequence?.pages ?? []).slice(skip).map((p) => p.text);
+      const aside = sequence?.variants?.[playerClass]?.map((p) => p.text) ?? [];
+      expect(aside).toHaveLength(1);
+      const expected = [...plain.slice(0, -1), ...aside, ...plain.slice(-1)];
+      const seen = [bodyText()];
+      for (let i = 1; i < expected.length; i += 1) {
+        t.ui.intent('tabNext', 'keyboard');
+        seen.push(bodyText());
+      }
+      expect(seen).toEqual(expected);
+    }
+  });
+
+  it("every class has an aside on every ride, in Mags's voice", () => {
+    for (const id of [
+      'downriver-to-wendmouth',
+      'upriver-to-briar-glen',
+      'downriver-to-kestrel-lock',
+      'upriver-to-kestrel-lock',
+    ]) {
+      for (const playerClass of NARRATIVE_CLASSES) {
+        const text = findSequence(narrations, 'barge', id)?.variants?.[playerClass]?.[0]?.text;
+        expect(text, `${id} ${playerClass}`).toMatch(/Mags/);
+        expect(text, `${id} ${playerClass}`).toMatch(/love/);
+      }
+    }
+  });
+
+  it('a player with no class, or a sequence with no aside for the class, plays the plain pages', () => {
+    const plain = pages('downriver-to-wendmouth');
+    const first = setup();
+    first.world.facts.set(BARGE_RIDE_FACT, 'downriver');
+    first.card.afterStep();
+    const seen = [bodyText()];
+    for (let i = 1; i < plain.length; i += 1) {
+      first.ui.intent('tabNext', 'keyboard');
+      seen.push(bodyText());
+    }
+    expect(seen).toEqual(plain);
+    document.body.innerHTML = '';
+    const t = setup();
+    const bare: Narration = {
+      id: 'narration-barge',
+      kind: 'barge',
+      notes: 'N.',
+      sequences: [{ id: 'downriver-to-wendmouth', pages: [{ text: 'One.' }, { text: 'Two.' }] }],
+    };
+    const card = new BargeRideCard({
+      ui: t.ui,
+      world: t.world,
+      content: { all: () => [bare] } as never,
+    });
+    t.world.facts.set('player.class', 'knight');
+    t.world.facts.set(BARGE_RIDE_FACT, 'downriver');
+    card.afterStep();
+    expect(bodyText()).toBe('One.');
+    t.ui.intent('tabNext', 'keyboard');
+    expect(bodyText()).toBe('Two.');
   });
 });

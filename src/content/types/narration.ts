@@ -107,7 +107,7 @@ const sequenceSchema = z.strictObject({
   variants: classPagesSchema
     .optional()
     .describe(
-      'Class beats only: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`.',
+      "Class beats: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`. Barge rides: Mags's aside to that class, shown before the last page; a class left out hears none.",
     ),
 });
 export type NarrationSequence = z.output<typeof sequenceSchema>;
@@ -151,8 +151,8 @@ export const narrationSchema = z
       if (beat && sequence.variants === undefined) {
         issue(['sequences', s, 'variants'], 'a class beat has a variant for each class');
       }
-      if (!beat && sequence.variants !== undefined) {
-        issue(['sequences', s, 'variants'], 'only a class beat has class variants');
+      if (!beat && entry.kind !== 'barge' && sequence.variants !== undefined) {
+        issue(['sequences', s, 'variants'], 'only a class beat or a barge ride has class variants');
       }
       const limit = slides ? SLIDE_MAX_WORDS : PAGE_MAX_WORDS;
       sequence.pages.forEach((page, p) => {
