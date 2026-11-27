@@ -2,6 +2,7 @@
 // barge leg stays open under mw-4l3z) and mw-0ml8 (the stopgap edge riverbank-wharf-link is gone) on real
 // content, headless. The lock's two gates answer to the chamber's measured water: the paddles move the
 // level, never a script. The walk in a browser is e2e/kestrel-lock.spec.ts.
+import { existsSync } from 'node:fs';
 import * as RAPIER from '@dimforge/rapier3d-deterministic';
 import { describe, expect, it } from 'vitest';
 import {
@@ -173,6 +174,26 @@ describe('Old Reed keeps the lock (mw-vau)', () => {
 
   it('the sky dome and fog are set like the harbour’s', () => {
     expect(lock.environment?.dome).toBeDefined();
+  });
+
+  it('mw-e25.27 AC-1: the approved cottage model dresses the keeper’s cottage, hiding its grey walls but not its floor, and showing them again from inside', () => {
+    const cottage = lock.dressings.find((d) => d.model === 'model-prop-lock-cottage-01');
+    expect(cottage).toBeDefined();
+    // The cottage is x 2..16, z -20..-8 with 3 m walls: the model covers it (its roof and eaves a little more).
+    expect(cottage?.size[0]).toBeGreaterThanOrEqual(14);
+    expect(cottage?.size[2]).toBeGreaterThanOrEqual(12);
+    expect(cottage?.hides?.inside).toBe(true);
+    expect(cottage?.hides?.min[1]).toBeGreaterThan(0.1); // the floor (centre ~0) stays drawn
+    expect(cottage?.hides?.max[1]).toBeGreaterThanOrEqual(2.6); // up to the lintel of the doorway
+    expect(existsSync('public/assets/model/model-prop-lock-cottage-01.glb')).toBe(true);
+  });
+
+  it('mw-e25.27 AC-2: the lock gate profile names the approved gate model, which is drawn on each gate leaf and swings with it', () => {
+    const profile = content.get('door', 'lock-gate');
+    expect(profile.model).toBe('model-prop-lock-gate-01');
+    expect(existsSync(`public/assets/model/model-prop-lock-gate-01.glb`)).toBe(true);
+    const gates = lock.spawns.filter((s) => s.tags.includes('gate'));
+    expect(gates.map((g) => g.door?.profile.id)).toEqual(['lock-gate', 'lock-gate']);
   });
 });
 

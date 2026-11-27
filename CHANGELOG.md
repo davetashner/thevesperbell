@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Kestrel Lock looks the part: timber lock gates with balance beams swing with the paddles, and Old Reed's grey cottage is now a stone keeper's cottage with a mossy slate roof. [mw-e25.27]
 - The river is one walk: from the Millweir's east end the towpath leads on to Kestrel Lock (six hours pass) and from there to the Stone Wharf. The old direct path from under the bridge to the lock is gone: the way downriver now passes the quay and the Millweir. [mw-e25.31, mw-e25.24]
 - The Miners' Bridge now leads somewhere: a worn stone stair beside the Bridge Watch post drops off the bridge's town end onto the old miners' track, which runs to the boarded mine gate, and back up again. [mw-e25.23]
 - Walking from one area into the next no longer reloads the page: the new area swaps in place, carrying what you hold and arriving at the same spawn, in a fraction of the old wait. [mw-ju8.28]
@@ -568,6 +569,7 @@ check enforces this).
 ### Changed
 
 - Areas with burning lanterns and braziers run more smoothly. [mw-e32.20]
+- Crossing into a new area keeps the game window and mouse capture, so you no longer click again after every crossing, the camera faces the way you arrive, and the swap is quicker. [mw-ju8.44]
 - Wendmouth harbour: the blue cargo blocks on the wharf now read as painted crates with ropes and kegs on top, and each net loft has a framed door, an awning, shuttered windows, a stone plinth and a corner of crates and barrels (mw-e40.34).
 
 ### Fixed

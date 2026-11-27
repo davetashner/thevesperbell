@@ -14,7 +14,7 @@ Cropped from the approved sheet `assets/source/prop/prop-river-kestrel-lock-set-
 
 ## Processing
 
-`npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-prop-lock-gate-01/v1.glb public/assets/model/model-prop-lock-gate-01.glb --compress meshopt --texture-compress webp --texture-size 1024` → 129 KB (SHA-256 `514e60da3550fa5dd84956f544ff720792135659439ed32ed521ab0992b21759`). Scale it in the scene placement; not yet placed.
+`npx @gltf-transform/cli@4.5.1 optimize assets/_incoming/model-prop-lock-gate-01/v1.glb public/assets/model/model-prop-lock-gate-01.glb --compress meshopt --texture-compress webp --texture-size 1024` → 129 KB (SHA-256 `514e60da3550fa5dd84956f544ff720792135659439ed32ed521ab0992b21759`). Placed at Kestrel Lock (mw-e25.27): the gate as the lock-gate door profile's model, the cottage as the keeper-cottage dressing.
 
 ## Approval gate(s)
 
