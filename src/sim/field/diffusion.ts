@@ -18,8 +18,14 @@
 // epsilon / DRIFT_DIVISOR without loss: far below anything the game can see) and that is beyond epsilon somewhere (a calm chunk is left to the sleep rules) is
 // `converged`. A converged chunk whose neighbours are all converged is frozen: it holds its values,
 // is not stepped, and costs nothing. Active neighbours still read its values (flux across the face
-// is counted from the active side alone, with no epsilon spill rule). Any write, wake or
-// neighbour that is not converged brings it back the next tick. The error this admits is bounded
+// is counted from the active side alone, with no epsilon spill rule). A neighbour that is still
+// moving does not prevent freezing as long as it is awake, the chunk's every channel has ambient
+// loss and the neighbour holds the same layers (mw-e32.21): to it the frozen chunk is a fixed boundary, which is what a chunk held steady by a
+// source is, so the active side keeps losing flux across the face while the frozen side holds. The
+// steady-state flux across that face is what the frozen chunk's own ambient loss and flow inward
+// would have balanced; it is reported as lost, so totals still audit. A change in the neighbour
+// reaches the frozen chunk at its next refresh. Any
+// write or wake, or a neighbour that falls asleep, brings it back the next tick. The error this admits is bounded
 // by driftLimit / decay per cell (half an epsilon at worst), and a frozen chunk is stepped anyway
 // every REFRESH_TICKS-th tick so a slow drift cannot stick.
 //
@@ -144,6 +150,8 @@ const spare: Float64Array[] = [];
 /** Per-tick working state: every buffer, participating or receiving, by its values array. */
 class Tick {
   readonly buffers = new Map<Float64Array, Buffer>();
+  /** Per channel: net counts that flowed into frozen chunks across their faces (reported as lost). */
+  readonly absorbed = new Map<FieldChannel, number>();
 
   constructor(
     readonly field: ElementField,
@@ -233,6 +241,7 @@ function boundary(tick: Tick, source: Buffer, face: number, rate: number, epsilo
   const frozen = s.other !== undefined && tick.frozen.has(s.other); // read-only across this face
   const ownTable = chunk.conductivity;
   // Without walls on either side every pair has conductivity one, so the rate is the only factor.
+  let absorbed = 0;
   const gain = ownTable === undefined && s.other?.conductivity === undefined ? rate : undefined;
   for (let u = 0; u < CHUNK_SIZE; u++) {
     for (let v = 0; v < CHUNK_SIZE; v++) {
@@ -256,6 +265,7 @@ function boundary(tick: Tick, source: Buffer, face: number, rate: number, epsilo
       if (flux === 0) continue;
       if (frozen) {
         delta[index] = value(delta, index) - flux; // the frozen side holds its values
+        absorbed += flux;
         continue;
       }
       const target = s.target ?? receive(tick, chunk, face, s, channel);
@@ -264,6 +274,7 @@ function boundary(tick: Tick, source: Buffer, face: number, rate: number, epsilo
       target.delta[nIndex] = value(target.delta, nIndex) + flux;
     }
   }
+  if (absorbed !== 0) account(tick.absorbed, channel, absorbed);
 }
 
 /**
@@ -344,7 +355,7 @@ function diffuse(tick: Tick, source: Buffer, rate: number, epsilon: number): num
 }
 
 /** Adds `amount` counts to `lost[channel]`. */
-function account(lost: Map<string, number>, channel: FieldChannel, amount: number): void {
+function account(lost: Map<FieldChannel, number>, channel: FieldChannel, amount: number): void {
   lost.set(channel, (lost.get(channel) ?? 0) + amount);
 }
 
@@ -352,7 +363,7 @@ function account(lost: Map<string, number>, channel: FieldChannel, amount: numbe
  * Applies deltas and ambient loss to every buffer, zeroing each delta and handing it back to the
  * spare pool for the next tick.
  */
-function apply(tick: Tick, lost: Map<string, number>): void {
+function apply(tick: Tick, lost: Map<FieldChannel, number>): void {
   for (const buffer of tick.buffers.values()) {
     const { channel, values, delta } = buffer;
     const { decay, epsilon } = tick.field.channel(channel);
@@ -389,7 +400,7 @@ function apply(tick: Tick, lost: Map<string, number>): void {
 }
 
 /** Updates calm counts of awake chunks; settles and sleeps (or frees) the ones calm long enough. */
-function settle(tick: Tick, lost: Map<string, number>, skipped: ReadonlySet<Chunk>): void {
+function settle(tick: Tick, lost: Map<FieldChannel, number>, skipped: ReadonlySet<Chunk>): void {
   const { field } = tick;
   const { sleepTicks } = field.config;
   for (const chunk of [...field.chunkList()]) {
@@ -423,16 +434,25 @@ function settle(tick: Tick, lost: Map<string, number>, skipped: ReadonlySet<Chun
 }
 
 /**
- * Whether `chunk` is frozen this tick: converged and loud, every neighbour awake and converged, and
- * not due its refresh (every REFRESH_TICKS-th converged tick it is stepped anyway, so a slow drift
+ * Whether `chunk` is frozen this tick: converged and loud, every neighbour awake and
+ * (converged or holding its layers), and not due its refresh (every REFRESH_TICKS-th converged tick it is stepped anyway, so a slow drift
  * keeps moving, a cooling chunk still reaches ambient and sleeps, and nothing sticks).
  */
-function isFrozen(chunk: Chunk): boolean {
+function isFrozen(field: ElementField, chunk: Chunk): boolean {
   if (chunk.converged === 0 || chunk.calm > 0 || chunk.converged % REFRESH_TICKS === 0) {
     return false;
   }
+  // A neighbour that is still moving is fine when every layer of this chunk loses to ambient and
+  // the neighbour holds it too: it reads this chunk's values across the face as a fixed boundary
+  // (see the file header). A lossless layer's flux has nowhere to go, so it needs a settled
+  // neighbour.
+  const sink = [...chunk.layers.keys()].every((key) => field.channel(key).decay > 0);
   return chunk.links.every(
-    (other) => other === undefined || (other.converged > 0 && !other.asleep),
+    (other) =>
+      other === undefined ||
+      (!other.asleep &&
+        (other.converged > 0 ||
+          (sink && [...chunk.layers.keys()].every((key) => other.layers.has(key))))),
   );
 }
 
@@ -446,7 +466,9 @@ export function stepField(
   options: FieldStepOptions = {},
 ): FieldStepReport {
   const awake = field.chunkList().filter((chunk) => !chunk.asleep);
-  const frozen = new Set(options.freeze === false ? [] : awake.filter((chunk) => isFrozen(chunk)));
+  const frozen = new Set(
+    options.freeze === false ? [] : awake.filter((chunk) => isFrozen(field, chunk)),
+  );
   for (const chunk of frozen) chunk.converged++; // ages toward its refresh
   const tick = new Tick(field, frozen);
   // With `lod`, far chunks off their tick sit out: they hold their values (a neighbour's flux may
@@ -465,7 +487,7 @@ export function stepField(
     const { rate, epsilon } = field.channel(source.channel);
     if (rate > 0) cellsUpdated += diffuse(tick, source, rate, epsilon);
   }
-  const lost = new Map<string, number>();
+  const lost = new Map<FieldChannel, number>(tick.absorbed);
   apply(tick, lost);
   settle(tick, lost, skipped);
   const units = Object.fromEntries(
