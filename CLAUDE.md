@@ -130,7 +130,7 @@ One session is the lead (named in the `HANDOFF: thevesperbell` bead, mw-77x); on
 
 Deterministic, engine-agnostic game rules in `src/sim` (100% coverage, no DOM/renderer/wall clock/Math.random); data-driven content in `src/content`; renderer/audio/UI glue in `src/game`, `src/render`, `src/audio`, `src/ui`. World interactions are property-based (flammable, wet, conductive…) via a single stimulus API — never pairwise scripted. See contract §2.
 
-Area crossings swap the scene in place (`swapArea` in `src/main.ts`). The canvas and WebGLRenderer (`createGlSurface`, `src/render/bootstrap`) live for the whole page; each area brings its own scene, camera and physics. Area code must not assume it has a fresh canvas or renderer. Add canvas listeners through the session's `PageScope` (`watch(canvas)`), so the swap removes them. Never call `forceContextLoss` or replace the canvas. A swap frees GPU uploads through `surface.releaseUploads()`. Audio still restarts per area (mw-ju8.47).
+Area crossings swap the scene in place (`swapArea` in `src/main.ts`). The canvas and WebGLRenderer (`createGlSurface`, `src/render/bootstrap`) live for the whole page; each area brings its own scene, camera and physics. Area code must not assume it has a fresh canvas or renderer. Add canvas listeners through the session's `PageScope` (`watch(canvas)`), so the swap removes them. Never call `forceContextLoss` or replace the canvas. A swap frees GPU uploads through `surface.releaseUploads()`. Audio follows the same pattern: one AudioContext and decoded-buffer cache per page (`AudioPage`, `src/audio/page.ts`), and each area's engine disconnects only its own buses and voices on dispose.
 
 ## Assets
 
