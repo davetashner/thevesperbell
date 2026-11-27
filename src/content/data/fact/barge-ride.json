@@ -1,0 +1,23 @@
+{
+  "$schema": "../fact.schema.json",
+  "id": "barge-ride",
+  "name": "Barge ride facts",
+  "notes": "mw-e25.15: the facts the Patient Ann's ride runs on. Mags's dialogue sells the fares as services (barge-* in data/service) and needs to know where she is standing (the inScene condition, from the host, not a fact); the services leave the ride card and the stowaway flag behind for the arrival.",
+  "facts": [
+    {
+      "key": "barge.ride",
+      "type": "enum",
+      "values": ["none", "downriver", "lock-downriver", "upriver"],
+      "default": "none",
+      "description": "The ride the player has just taken and not yet seen: a barge fare sets it (downriver from the quay, lock-downriver from Kestrel Lock, upriver from Wendmouth), the narrated ride card plays on arrival (narration-barge) and resets it to none.",
+      "owner": "barge"
+    },
+    {
+      "key": "barge.stowaway-arrival",
+      "type": "bool",
+      "default": false,
+      "description": "The player came to Wendmouth hidden under the Patient Ann's tarpaulin (a thief's fee, or the tarpaulin deal), so the customs inspection of this one arrival is skipped. Every barge fare rewrites it, so it describes the latest ride only: true after a stowaway ride, false after any other. The customs inspection (e40-customs-house) reads it on arrival and must skip when true, then clear it.",
+      "owner": "barge"
+    }
+  ]
+}

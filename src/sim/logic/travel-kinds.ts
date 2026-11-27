@@ -1,4 +1,4 @@
-// Effect kinds that move the player through the world (mw-e20.14), for services such as a barge
+// Logic kinds that move the player through the world (mw-e20.14), for services such as a barge
 // fare (mw-e25.15) or an inn bed, registered through the DSL's extension registry:
 //   `heal`        { amount } or { full: true }: restores the player's health, never past the maximum.
 //   `advanceTime` { minutes?, hours?, days? }: jumps the game clock; they add up, at least a minute.
@@ -44,8 +44,20 @@ export function advanceMinutes(node: {
   return (node.minutes ?? 0) + (node.hours ?? 0) * 60 + (node.days ?? 0) * MINUTES_PER_DAY;
 }
 
-/** Registers `heal`, `advanceTime` and `travelTo` into `registry`. */
+/** Key of the host's `services` record that holds the id of the scene the player is in (a string). */
+export const SCENE_SERVICE = 'scene';
+
+/** Registers `inScene`, `heal`, `advanceTime` and `travelTo` into `registry`. */
 export function registerTravelKinds(registry: LogicRegistry): void {
+  // `inScene` { scene }: true while the player is in that scene. It reads the host's `scene` service
+  // rather than a fact, so one NPC that stands in several places (Mags Oakum) can offer what suits
+  // where she is without writing the place into saved world state.
+  registry.registerCondition({
+    kind: 'inScene',
+    schema: z.strictObject({ scene: id }),
+    evaluate: (node, context) => context.services?.[SCENE_SERVICE] === node.scene,
+    refs: (node) => [{ type: 'scene', id: node.scene }],
+  });
   registry.registerEffect({
     kind: 'heal',
     schema: z.union([
