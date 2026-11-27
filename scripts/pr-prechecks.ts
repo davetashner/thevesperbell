@@ -154,7 +154,7 @@ export function main(argv: readonly string[]): number {
   const mergeBase = base.out.trim();
   const failures: Failure[] = [];
 
-  const log = sh('git', ['log', '--format=%H%x00%B%x01', `${mergeBase}..HEAD`]).out;
+  const log = sh('git', ['log', '--no-merges', '--format=%H%x00%B%x01', `${mergeBase}..HEAD`]).out;
   const commits = log
     .split('\x01')
     .map((e) => e.trim())

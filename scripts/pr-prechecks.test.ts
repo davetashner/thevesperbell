@@ -167,6 +167,8 @@ describe('pr-prechecks main', () => {
     });
     expect(main([])).toBe(0);
     expect(out.join('\n')).toContain('prechecks passed (1 commit(s), 2 file(s))');
+    // mw-e41.31: merge commits are not DCO-checked, as in CI's dco-check (git log --no-merges).
+    expect(ran.some((c) => c.startsWith('git log --no-merges'))).toBe(true);
     expect(ran.some((c) => c.includes('content-'))).toBe(false);
     expect(ran.some((c) => c.includes('e2e-shards'))).toBe(false);
     expect(ran.some((c) => c.includes('prettier --check --ignore-unknown scripts/foo.ts'))).toBe(
