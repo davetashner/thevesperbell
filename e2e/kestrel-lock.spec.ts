@@ -137,3 +137,32 @@ test('mw-e25.14, mw-e25.31 AC-1: the towpath from the Millweir to Kestrel Lock t
   expect(await gameMinutes(page)).toBeGreaterThanOrEqual(atWharf + 360);
   expect(problems).toEqual([]);
 });
+
+test('mw-e25.27 AC-2: the lower paddle lever on the lockside is thrown by hand from the towpath', async ({
+  page,
+}) => {
+  // The 20 s levels-settle delay that writes kestrel-lock.gate-open is 1200 sim ticks: at the
+  // ~5 ticks per frame a 1 fps CI runner reaches, that is four minutes of wall time, which is what
+  // timed the old step out (180 s). The delay and fact write are covered by the integration test
+  // (tests/integration/towpath-kestrel-lock.test.ts); here the lever the player reaches is thrown.
+  test.setTimeout(240_000);
+  const problems = collectProblems(page);
+  await stubPointerLock(page);
+  await page.goto('/?scene=kestrel-lock&debug=1');
+  await ready(page, 'kestrel-lock');
+  const lever = (): Promise<number | undefined> =>
+    page
+      .locator('#app')
+      .getAttribute('data-mechanisms')
+      .then((json) => {
+        const read = JSON.parse(json ?? 'null') as { switches: Record<string, number> } | null;
+        return read?.switches['lower-paddle-lever'];
+      });
+  await expect.poll(lever, POLL).toBe(0);
+  await runConsole(page, 'tp 7.5 0 -5.5');
+  await face(page, { x: 7.5, z: -3.75 });
+  await holdKey(page, { code: 'KeyE', key: 'e' }, 3);
+  await expect.poll(lever, POLL).toBe(1);
+  // A starved software-GL frame drops sim steps and says so; that is the runner, not the game.
+  expect(problems.filter((p) => !p.includes('frame loop: '))).toEqual([]);
+});

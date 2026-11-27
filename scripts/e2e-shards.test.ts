@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   assignShards,
+  checkShardTable,
   averageDurations,
   durationsFromReport,
   fileIo,
@@ -265,5 +266,38 @@ describe('mw-e41.1 e2e shard CLI', () => {
       expect(process.exitCode).toBe(2);
       expect(error).toHaveBeenCalledWith(expect.stringContaining('usage:'));
     });
+  });
+});
+
+describe('mw-e41.26 e2e shard table guard', () => {
+  it('AC-2: flags a spec with no shards.json entry and an entry with no spec', () => {
+    expect(
+      checkShardTable(['a.spec.ts', 'b.spec.ts'], { 'a.spec.ts': 5, 'gone.spec.ts': 9 }),
+    ).toEqual({ missing: ['b.spec.ts'], stale: ['gone.spec.ts'] });
+    expect(checkShardTable(['a.spec.ts'], { 'a.spec.ts': 5 })).toEqual({ missing: [], stale: [] });
+  });
+
+  it('AC-2: the check command fails with an annotation naming how to fix each problem', () => {
+    const out: string[] = [];
+    const err: string[] = [];
+    const dir = mkdtempSync(join(tmpdir(), 'shards-check-'));
+    writeFileSync(join(dir, 'new.spec.ts'), '');
+    writeFileSync(join(dir, 'a.spec.ts'), '');
+    const shardsFile = join(dir, 'shards.json');
+    writeFileSync(shardsFile, JSON.stringify({ durations: { 'a.spec.ts': 3, 'old.spec.ts': 4 } }));
+    const io: ShardIo = {
+      ...fileIo,
+      e2eDir: dir,
+      shardsFile,
+      log: (line) => out.push(line),
+      error: (line) => err.push(line),
+    };
+    expect(main(['check'], io)).toBe(1);
+    expect(err).toHaveLength(2);
+    expect(err[0]).toMatch(/^::error .*new\.spec\.ts has no entry.*estimated seconds/);
+    expect(err[1]).toMatch(/^::error .*"old\.spec\.ts".*Remove/);
+    writeFileSync(shardsFile, JSON.stringify({ durations: { 'a.spec.ts': 3, 'new.spec.ts': 4 } }));
+    expect(main(['check'], io)).toBe(0);
+    expect(out[0]).toMatch(/covers every e2e spec/);
   });
 });

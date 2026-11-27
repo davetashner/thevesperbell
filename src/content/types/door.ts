@@ -50,6 +50,13 @@ export const doorSchema = z.strictObject({
       'Opens and closes by hand (Interact); false for a portcullis that only signals move.',
     ),
   material: ref('material').describe('What the leaf is made of: its world properties.'),
+  model: z
+    .string()
+    .regex(/^model-[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .optional()
+    .describe(
+      'Approved model drawn in place of the grey leaf box, fitted into the leaf and swinging with it (render only): public/assets/model/<id>.glb. Its long axis is z with the hinge-side beam at +z.',
+    ),
   blocks: z
     .strictObject({
       light: z.boolean().describe('Shuts out light when closed.'),

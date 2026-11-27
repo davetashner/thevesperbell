@@ -27,6 +27,7 @@ import {
   containsPoint,
   createRainZone,
   createVolume,
+  followLiquidLevels,
   installLiquids,
   layerSlabs,
   levelOf,
@@ -94,6 +95,39 @@ const steps = (world: World<never>, n: number): void => {
 };
 const seconds = (world: World<never>, s: number): number => Math.round(s * world.clock.hz);
 const wetness = (world: World<never>, e: EntityId): number => readProperty(world, e, 'wetness');
+
+describe('water regions following liquid levels (mw-e25.29)', () => {
+  const region = { min: { x: -2, y: 0, z: -2 }, max: { x: 2, y: 2, z: 2 } };
+
+  it('AC-3: a region reads the live level of the volume under it as it drains and fills', () => {
+    const { world } = liquidWorld();
+    const basin = createVolume(world, PRESETS, {
+      ...BASIN,
+      layers: [{ liquid: 'water', depth: 2 }],
+      drain: { rate: 1, open: false },
+      fill: { rate: 1, open: false, liquid: 'water' },
+    });
+    const surface = followLiquidLevels(world)(region);
+    expect(surface?.()).toBe(2);
+    setDrainOpen(world, basin, true);
+    steps(world, seconds(world, 1));
+    expect(surface?.()).toBeCloseTo(1, 1);
+    setDrainOpen(world, basin, false);
+    setFillOpen(world, basin, true);
+    steps(world, seconds(world, 3));
+    expect(surface?.()).toBe(2);
+  });
+
+  it('a region with no volume under it keeps its brim', () => {
+    const { world } = liquidWorld();
+    createVolume(world, PRESETS, {
+      min: { x: 10, y: 0, z: 10 },
+      max: { x: 12, y: 2, z: 12 },
+      layers: [{ liquid: 'water', depth: 1 }],
+    });
+    expect(followLiquidLevels(world)(region)?.()).toBe(2);
+  });
+});
 
 describe('water volumes, wetness and drying (mw-e03.6)', () => {
   it('AC-1: an entity fully inside a water volume becomes fully wet on a tick', () => {

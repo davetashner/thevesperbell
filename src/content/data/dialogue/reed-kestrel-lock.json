@@ -148,13 +148,8 @@
           "text": "A coin, then.",
           "effects": [
             {
-              "kind": "gold",
-              "delta": -1
-            },
-            {
-              "kind": "setFact",
-              "fact": "reed.toll-paid",
-              "value": true
+              "kind": "purchaseService",
+              "service": "reed-toll-coin"
             }
           ],
           "next": "toll-coin-1",

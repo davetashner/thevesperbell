@@ -1,0 +1,15 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "dot-proper-news",
+  "notes": "Paying Dot for the proper news (dot-sleeping-ox, option coin-pay): 10 crowns, +2 disposition. Moved to the service schema (mw-e20.9).",
+  "providerNpcId": "npc-dot",
+  "name": "The proper news",
+  "price": 10,
+  "effects": [
+    {
+      "kind": "disposition",
+      "npc": "npc-dot",
+      "delta": 2
+    }
+  ]
+}
