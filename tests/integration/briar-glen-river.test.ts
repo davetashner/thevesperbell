@@ -36,6 +36,9 @@ import {
   waterSystem,
   waterTraversal,
   waterVolumes,
+  waterDepthAt,
+  waterMode,
+  followLiquidLevels,
   World,
   type CharacterInput,
   type EntityId,
@@ -267,7 +270,7 @@ describe('the Millweir sluice walk (mw-e25.12)', { timeout: 120_000 }, () => {
     return { game, id, steps };
   };
   const stones = river.placements.filter(
-    (p) => p.piece.id === 'platform' && p.at[1] === -1 && p.scale[1] === 0.5,
+    (p) => p.piece.id === 'platform' && p.at[1] === -2.5 && p.scale[1] === 0.5,
   );
 
   it('AC-1: toggling the sluice wheel drops the mill pond to its low state within 20 s and the stones stand clear', ({
@@ -282,7 +285,7 @@ describe('the Millweir sluice walk (mw-e25.12)', { timeout: 120_000 }, () => {
       return levelOf(volume);
     };
     expect(stones.length).toBeGreaterThanOrEqual(10);
-    const stoneTop = -1 + 0.5; // bed -1, stones 0.5 m high
+    const stoneTop = -2.5 + 0.5; // bed -2.5, boulders 0.5 m high
     expect(surface()).toBeGreaterThan(stoneTop); // submerged while the gate holds the water
     steps(2 * HZ);
     expect(surface()).toBeCloseTo(-0.25, 5); // the gate is shut: nothing drains
@@ -293,9 +296,43 @@ describe('the Millweir sluice walk (mw-e25.12)', { timeout: 120_000 }, () => {
       affordance: 0,
     });
     steps(20 * HZ);
-    expect(surface()).toBeLessThan(-0.95); // the low state: the pond is down to its bed
-    expect(surface()).toBeLessThan(stoneTop); // the stepping stones are exposed
+    expect(surface()).toBeLessThan(-2.45); // the low state: the pond is down to its bed
+    expect(surface()).toBeLessThan(stoneTop); // the boulders on the bed are exposed
     expect(game.world.facts.get('world.millweir.sluice-walk-open') ?? false).toBe(false);
+  });
+
+  it('AC-1: turning the sluice wheel back refills the pond; AC-2: full it must be swum, drained it is walked; AC-3: the swim follows the live level', ({
+    task,
+  }) => {
+    markExercised(task, 'signal-graph', 'millweir-walk');
+    const { game, id, steps } = play();
+    const tuning =
+      controllerTuningFor(content.get('controller', PLAYER_CONTROLLER_ID)).water ??
+      DEFAULT_WATER_TUNING;
+    const layout = layoutScene(river, (kit) =>
+      content.has('kit', kit) ? content.get('kit', kit) : undefined,
+    );
+    const volumes = waterVolumes(layout.regions, followLiquidLevels(game.world));
+    const bed = { x: 120, y: -2.5, z: 15 };
+    const mode = (load: 'light' | 'heavy') => waterMode(waterDepthAt(volumes, bed), load, tuning);
+    const wheel = () => {
+      game.world.events.emit(interacted, {
+        actor: game.player,
+        target: id('sluice-wheel'),
+        verb: 'use',
+        affordance: 0,
+      });
+    };
+    steps(2 * HZ);
+    expect(mode('light')).toBe('swim'); // full: a swim barrier
+    expect(mode('heavy')).toBe('sink'); // armour still decides
+    wheel();
+    steps(22 * HZ);
+    expect(mode('light')).toBe('dry'); // drained: walk the bed
+    expect(mode('heavy')).toBe('dry');
+    wheel();
+    steps(22 * HZ);
+    expect(mode('light')).toBe('swim'); // refilled
   });
 
   it('AC-1: the mill pond has two states and the wheel can be remote actuated (Mage Hand)', () => {

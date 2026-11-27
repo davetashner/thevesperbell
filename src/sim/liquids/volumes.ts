@@ -107,6 +107,36 @@ export function liquidVolumes(world: World<never>): EntityId[] {
   return found;
 }
 
+/**
+ * Lets a water region (a box a character swims or wades in, `waterVolumes`) follow the liquid volume
+ * under it, so the swim depth is the volume's live level: a pond that fills must be swum, one that
+ * drains is walked. A region follows the volume whose floor is its floor (within `tolerance`, m)
+ * and whose footprint holds the region's footprint; a region with none stays a static box. Lookup
+ * is lazy and once per region (volumes are made with the scene); the level is read every call.
+ */
+export function followLiquidLevels(
+  world: World<never>,
+  tolerance = 0.05,
+): (region: { readonly min: Vec3; readonly max: Vec3 }) => (() => number) | undefined {
+  return (region) => {
+    let entity: EntityId | null | undefined;
+    return () => {
+      entity ??=
+        liquidVolumes(world).find((candidate) => {
+          const v = volumeOf(world, candidate);
+          return (
+            Math.abs(v.min.y - region.min.y) <= tolerance &&
+            v.min.x <= region.min.x + tolerance &&
+            v.max.x >= region.max.x - tolerance &&
+            v.min.z <= region.min.z + tolerance &&
+            v.max.z >= region.max.z - tolerance
+          );
+        }) ?? null;
+      return entity === null ? region.max.y : levelOf(volumeOf(world, entity));
+    };
+  };
+}
+
 /** The slab (floor and top, m) each layer of `volume` occupies, bottom to top. */
 export function layerSlabs(volume: LiquidVolume): { bottom: number; top: number }[] {
   let bottom = volume.min.y;
