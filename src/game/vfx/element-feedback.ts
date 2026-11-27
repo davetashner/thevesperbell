@@ -47,6 +47,20 @@ export interface ElementFeedbackOptions {
   readonly playCue?: (cue: string, entity: EntityId) => void;
 }
 
+/** A decal on the ground under an entity in a state (the wet puddle and drip ring). */
+export interface GroundDecal {
+  readonly entity: EntityId;
+  readonly texture: string;
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  /** Metres. */
+  readonly radius: number;
+  readonly opacity: number;
+  /** Ring swells per second; 0 when still (including under reduced motion). */
+  readonly rippleHz: number;
+}
+
 /** Counters for the scene probe and tests. */
 export interface ElementFeedbackStats {
   /** Entities in at least one state. */
@@ -62,6 +76,9 @@ export interface ElementFeedbackStats {
   /** Entity-states per state id. */
   readonly perState: Readonly<Record<string, number>>;
 }
+
+/** Smallest bounding radius a ground decal is sized from, metres (a point-like thing still pools). */
+const MIN_GROUND_RADIUS = 0.15;
 
 /** Camera movement, metres, that triggers a re-rank when more is wanted than the cap allows. */
 const RERANK_DISTANCE = 1;
@@ -88,6 +105,7 @@ export class ElementFeedbackBridge {
   readonly #left = new Set<number>();
   readonly #looks = new Map<EntityId, CombinedLook>();
   readonly #rules: ReadonlyMap<string, readonly number[]>;
+  readonly #grounds: GroundDecal[] = [];
   #dirty = false;
   #rankedAt: Vec3 | undefined;
   #culled = 0;
@@ -114,6 +132,35 @@ export class ElementFeedbackBridge {
   /** The combined mesh look of every entity in a look-bearing state. */
   looks(): ReadonlyMap<EntityId, CombinedLook> {
     return this.#looks;
+  }
+
+  /**
+   * Ground decals of every entity in a state that has one, at its current feet. Reuses one array
+   * (valid until the next call); entities without bounds get none.
+   */
+  grounds(): readonly GroundDecal[] {
+    const out = this.#grounds;
+    out.length = 0;
+    const reduced = this.#o.reducedMotion();
+    for (const [entity, set] of this.#active) {
+      for (const index of set) {
+        const ground = this.#rule(index).ground;
+        if (ground === undefined) continue;
+        const found = this.#o.boundsOf(entity);
+        if (found === undefined) continue;
+        out.push({
+          entity,
+          texture: ground.texture,
+          x: found.position.x,
+          y: found.position.y,
+          z: found.position.z,
+          radius: Math.max(found.radius, MIN_GROUND_RADIUS) * ground.radiusScale,
+          opacity: ground.opacity,
+          rippleHz: reduced ? 0 : ground.rippleHz,
+        });
+      }
+    }
+    return out;
   }
 
   stats(): ElementFeedbackStats {

@@ -17,6 +17,7 @@ interface Probe {
   perState: Record<string, number>;
   clouds: number;
   looks: number;
+  grounds: number;
   vfx: number;
   objects: { id: number; x: number; y: number; z: number }[];
 }
@@ -128,6 +129,8 @@ test('burning, wet, frozen and charged crates all show, side by side', async ({ 
   const seen = await probe(page);
   expect(seen.perState).toMatchObject({ frozen: 1, wet: 1, burning: 1 });
   expect(seen.looks).toBeGreaterThanOrEqual(3);
+  // mw-e03.53: the wet crate has its puddle decal on the ground.
+  expect(seen.grounds).toBe(1);
   expect(problems).toEqual([]);
 });
 

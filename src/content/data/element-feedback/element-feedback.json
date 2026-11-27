@@ -1,7 +1,7 @@
 {
   "$schema": "../element-feedback.schema.json",
   "id": "element-feedback",
-  "notes": "Grey-box element state feedback (mw-e03.28). Burning, wet, frozen and charged read by colour AND motion (style bible \u00a72.3, \u00a77): fire rises and flickers orange, wet drips downward with a darker glossy surface, frozen hangs still and pale with an icy sheen, charged throws short jagged yellow arcs and shimmers at 2 Hz (under the 3 Hz limit). Looks follow the bible: wet is about a quarter darker with a sheen. Effects scale to the entity's bounding radius over the reference radius. No sound cues exist yet for crackle, sizzle, freeze crack or zap (mw-e38), so audioCue is left off every state. Final art: mw-e29 asset beads; final SFX: mw-e38.",
+  "notes": "Grey-box element state feedback (mw-e03.28). Each state also declares a non-colour `cue` (mw-e03.53: rising flicker, falling drip, faceted rim, jitter arc). Burning, wet, frozen and charged read by colour AND motion (style bible \u00a72.3, \u00a77): fire rises and flickers orange, wet drips downward (big drops, a drip ring and puddle decal on the ground) with a darker, strongly glossy surface, frozen hangs still and pale with an icy sheen, charged throws short jagged yellow arcs and shimmers at 2 Hz (under the 3 Hz limit). Looks follow the bible: wet is about a quarter darker with a sheen. Effects scale to the entity's bounding radius over the reference radius. No sound cues exist yet for crackle, sizzle, freeze crack or zap (mw-e38), so audioCue is left off every state. Final art: mw-e29 asset beads; final SFX: mw-e38.",
   "handleCap": 64,
   "fullDetailCap": 16,
   "lowLodIntensity": 0.3,
@@ -25,6 +25,7 @@
         "is": true
       },
       "effect": "vfx-fire-burn-loop",
+      "cue": "rising-flicker",
       "referenceRadius": 0.25,
       "scale": {
         "min": 0.6,
@@ -45,6 +46,13 @@
         "atLeast": 0.35
       },
       "effect": "vfx-element-wet-drip",
+      "cue": "falling-drip",
+      "ground": {
+        "texture": "vfx-decal-wet-01",
+        "radiusScale": 2.5,
+        "opacity": 0.9,
+        "rippleHz": 1
+      },
       "referenceRadius": 0.25,
       "scale": {
         "min": 0.6,
@@ -53,7 +61,9 @@
       "look": {
         "tint": "#2B4A63",
         "tintMix": 0.5,
-        "roughness": 0.15
+        "roughness": 0.05,
+        "metalness": 0.2,
+        "envMapIntensity": 2.5
       }
     },
     {
@@ -64,6 +74,7 @@
         "is": true
       },
       "effect": "vfx-element-frost-glint",
+      "cue": "faceted-rim",
       "referenceRadius": 0.25,
       "scale": {
         "min": 0.6,
@@ -85,6 +96,7 @@
         "atLeast": 1
       },
       "effect": "vfx-element-charge-arc",
+      "cue": "jitter-arc",
       "referenceRadius": 0.25,
       "scale": {
         "min": 0.6,

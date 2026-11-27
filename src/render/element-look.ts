@@ -20,6 +20,8 @@ export interface LookParams {
   readonly tint: readonly [number, number, number];
   readonly emissive: readonly [number, number, number];
   readonly roughness: number | undefined;
+  readonly metalness: number | undefined;
+  readonly envMapIntensity: number | undefined;
 }
 
 interface Original {
@@ -122,4 +124,6 @@ function paint(material: MeshStandardMaterial, look: LookParams, glow: number): 
     material.emissiveIntensity = base.emissiveIntensity;
   }
   material.roughness = look.roughness ?? base.roughness;
+  material.metalness = look.metalness ?? base.metalness;
+  material.envMapIntensity = look.envMapIntensity ?? base.envMapIntensity;
 }

@@ -164,6 +164,18 @@
                 "minimum": 0,
                 "maximum": 1
               },
+              "metalness": {
+                "description": "Metalness the surface takes; a small bump makes a wet surface throw a sheen.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "envMapIntensity": {
+                "description": "How strongly the surface reflects its surroundings (> 1 = a stronger sheen).",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 4
+              },
               "pulseHz": {
                 "default": 0,
                 "description": "Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady.",
@@ -172,6 +184,51 @@
                 "maximum": 3
               }
             },
+            "additionalProperties": false
+          },
+          "cue": {
+            "description": "Non-colour cue the state is read by: rising-flicker (burning), falling-drip (wet), faceted-rim (frozen, still angular crystals) or jitter-arc (charged). The state’s effect must realise it.",
+            "type": "string",
+            "enum": [
+              "rising-flicker",
+              "falling-drip",
+              "faceted-rim",
+              "jitter-arc"
+            ]
+          },
+          "ground": {
+            "description": "Decal laid on the ground under the entity while the state is on (wet puddle).",
+            "type": "object",
+            "properties": {
+              "texture": {
+                "type": "string",
+                "pattern": "^vfx-[a-z0-9-]+$",
+                "description": "Decal texture id in the VFX texture manifest."
+              },
+              "radiusScale": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Decal radius as a multiple of the entity bounding radius."
+              },
+              "opacity": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "Peak decal opacity."
+              },
+              "rippleHz": {
+                "default": 0,
+                "description": "The decal swells and settles this many times a second (drip rings); 0 = still. Reduced motion holds it still.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3
+              }
+            },
+            "required": [
+              "texture",
+              "radiusScale",
+              "opacity"
+            ],
             "additionalProperties": false
           },
           "audioCue": {

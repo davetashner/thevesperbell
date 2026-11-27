@@ -353,6 +353,7 @@ import {
 import { anyHiddenByBody, CameraShake, liveLook, lookSettings } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
 import { ElementLooks } from '@render/element-look';
+import { ElementGrounds } from '@render/element-ground';
 import { DEATH_TINT, MagicDemo } from '@render/magic-materials/demo';
 import {
   parseFocusParam,
@@ -1257,6 +1258,10 @@ function startRenderer(
       reducedMotion: motionReduced,
     });
     const elementLooks = new ElementLooks();
+    const elementGrounds = new ElementGrounds(view.scene, {
+      textureUrl: vfxTextureUrls(vfxTextureManifest()),
+      objectOf: (entity) => sync.objectOf(entity) as Object3D | undefined,
+    });
     // The magical material library (mw-e29.7): dissolve, fresnel glow, heat haze, rune decals,
     // emissive pulse and soft particles in one look. Heat haze is High only; ?quality=low forces
     // Low, otherwise the Graphics quality setting decides. ?magic lays the materials out as a testbed.
@@ -1689,6 +1694,8 @@ function startRenderer(
         elementLooks.sync(looked, (look) =>
           pulseFactor((look as CombinedLook).pulseHz, timeMs / 1000, reducedLooks),
         );
+        const grounds = elements.grounds();
+        elementGrounds.draw(grounds, timeMs / 1000);
         // Creature corpses dissolve and are removed (mw-e29.7 AC-3); after the element looks have
         // settled, so the dissolve's material copies are the last thing on a dying body.
         corpseDissolves?.update(Math.max(0, elapsedMs) / 1000);
@@ -1716,6 +1723,7 @@ function startRenderer(
             ...elements.stats(),
             clouds: gasClouds.clouds,
             looks: elementLooks.size,
+            grounds: grounds.length,
             vfx: vfx.stats().effects,
             // Loose bodies the e2e can put into states, with where they sit.
             objects: world

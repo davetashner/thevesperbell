@@ -41,6 +41,18 @@ export const elementLookSchema = z.strictObject({
     .max(1)
     .optional()
     .describe('Roughness the surface takes (low = a specular sheen, as wet or iced things have).'),
+  metalness: z
+    .number()
+    .min(0)
+    .max(1)
+    .optional()
+    .describe('Metalness the surface takes; a small bump makes a wet surface throw a sheen.'),
+  envMapIntensity: z
+    .number()
+    .min(0)
+    .max(4)
+    .optional()
+    .describe('How strongly the surface reflects its surroundings (> 1 = a stronger sheen).'),
   pulseHz: z
     .number()
     .min(0)
@@ -48,6 +60,36 @@ export const elementLookSchema = z.strictObject({
     .default(0)
     .describe(
       'Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady.',
+    ),
+});
+
+/** Non-colour cues (shape or motion) a state can be read by (mw-e03.53, colour-blind safe). */
+export const ELEMENT_CUE_KINDS = [
+  'rising-flicker',
+  'falling-drip',
+  'faceted-rim',
+  'jitter-arc',
+] as const;
+export type ElementCueKind = (typeof ELEMENT_CUE_KINDS)[number];
+
+/** A puddle/ring decal laid on the ground under an entity in a state. */
+export const elementGroundSchema = z.strictObject({
+  texture: z
+    .string()
+    .regex(/^vfx-[a-z0-9-]+$/, 'must be a VFX texture id like "vfx-decal-wet-01"')
+    .describe('Decal texture id in the VFX texture manifest.'),
+  radiusScale: z
+    .number()
+    .positive()
+    .describe('Decal radius as a multiple of the entity bounding radius.'),
+  opacity: z.number().gt(0).max(1).describe('Peak decal opacity.'),
+  rippleHz: z
+    .number()
+    .min(0)
+    .max(3)
+    .default(0)
+    .describe(
+      'The decal swells and settles this many times a second (drip rings); 0 = still. Reduced motion holds it still.',
     ),
 });
 
@@ -91,6 +133,15 @@ export const elementStateSchema = z.strictObject({
     .default(1)
     .describe('Emission multiplier while reduced motion is on (strobing sparks use less).'),
   look: elementLookSchema.optional().describe('Material look of the entity’s mesh in this state.'),
+  cue: z
+    .enum(ELEMENT_CUE_KINDS)
+    .optional()
+    .describe(
+      'Non-colour cue the state is read by: rising-flicker (burning), falling-drip (wet), faceted-rim (frozen, still angular crystals) or jitter-arc (charged). The state’s effect must realise it.',
+    ),
+  ground: elementGroundSchema
+    .optional()
+    .describe('Decal laid on the ground under the entity while the state is on (wet puddle).'),
   audioCue: z
     .string()
     .regex(/^sfx-[a-z0-9-]+$/, 'must be a sound cue id like "sfx-element-zap"')
@@ -231,6 +282,9 @@ export interface ElementFieldRule {
   readonly referenceCell: number;
 }
 
+/** A ground decal as loaded. */
+export type ElementGroundDef = z.output<typeof elementGroundSchema>;
+
 /** A mesh look as loaded. */
 export type ElementLookDef = z.output<typeof elementLookSchema>;
 
@@ -256,6 +310,8 @@ export interface ElementStateRule {
   readonly scale: { readonly min: number; readonly max: number };
   readonly reducedIntensity: number;
   readonly look: ElementLookDef | undefined;
+  readonly cue: ElementCueKind | undefined;
+  readonly ground: ElementGroundDef | undefined;
   readonly audioCue: string | undefined;
 }
 
@@ -307,6 +363,8 @@ export function compileElementFeedback(entry: ElementFeedbackEntry): ElementFeed
           scale: state.scale,
           reducedIntensity: state.reducedIntensity,
           look: state.look,
+          cue: state.cue,
+          ground: state.ground,
           audioCue: state.audioCue,
         });
       }),
