@@ -156,14 +156,15 @@ class TestHost implements LogicHost {
   revealRumor(rumor: string): void {
     this.rumors.push(rumor);
   }
-  heal(): void {
-    // no health here
+  readonly world: string[] = [];
+  heal(amount: number | 'full'): void {
+    this.world.push(`heal:${String(amount)}`);
   }
-  advanceTime(): void {
-    // no clock here
+  advanceTime(minutes: number): void {
+    this.world.push(`time:${String(minutes)}`);
   }
-  travelTo(): void {
-    // nowhere to go
+  travelTo(scene: string, spawn: string): void {
+    this.world.push(`travel:${scene}/${spawn}`);
   }
 }
 
@@ -1034,6 +1035,10 @@ describe('quest runtime: installation and host', () => {
     expect(h.learnCapability('climb')).toBeUndefined();
     h.emit('ping', { a: 1 });
     h.revealRumor('r');
+    h.heal('full');
+    h.advanceTime(30);
+    h.travelTo('a-scene', 'a-spawn');
+    expect(s.host.world).toEqual(['heal:full', 'time:30', 'travel:a-scene/a-spawn']);
     expect(s.host.emitted).toEqual(['ping:{"a":1}']);
     expect(s.host.rumors).toEqual(['r']);
     expect(s.host.items.get('gem')).toBe(1);

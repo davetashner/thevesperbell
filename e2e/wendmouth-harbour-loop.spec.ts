@@ -17,6 +17,9 @@ import { collectProblems, W } from './helpers/slice';
 // shard) fits too few short holds into 30 s; the tests' own budgets are 600 s and 300 s.
 
 const POLL = { timeout: 90_000 };
+// The waits that advance the sim themselves with short holds (a hold per poll try) get longer: a
+// ~1 fps CI runner fits few holds into 90 s, and the sim is deterministic, so waiting longer is safe.
+const POLL_HOLDS = { timeout: 120_000 };
 
 interface Dialogue {
   open: boolean;
@@ -180,7 +183,7 @@ test('mw-e40.35: sign on with Hesketh, open the gangway, walk aboard, climb into
         await page.keyboard.press('KeyE');
       }
       return (await holdKey(page, W, 12, 2)).position.z > 99.5;
-    }, POLL)
+    }, POLL_HOLDS)
     .toBe(true);
 
   // 4. Walk up the gangway onto the deck: keys only, no teleport.
@@ -188,7 +191,7 @@ test('mw-e40.35: sign on with Hesketh, open the gangway, walk aboard, climb into
     .poll(async () => {
       const state = await holdKey(page, W, 24, 4);
       return state.position.y > 2 && state.position.z > 104;
-    }, POLL)
+    }, POLL_HOLDS)
     .toBe(true);
   const deck = (await playerState(page)).position;
   expect(deck.x).toBeGreaterThan(31);
@@ -215,7 +218,7 @@ test('mw-e40.35: sign on with Hesketh, open the gangway, walk aboard, climb into
   expect(hold.position.z).toBeLessThan(143.5);
   // Still on the ladder: pulling back lets go at the bottom and puts the player on the hold floor.
   await expect
-    .poll(async () => (await holdKey(page, { code: 'KeyS', key: 's' }, 6, 1)).grounded, POLL)
+    .poll(async () => (await holdKey(page, { code: 'KeyS', key: 's' }, 6, 1)).grounded, POLL_HOLDS)
     .toBe(true);
   expect((await playerState(page)).position.y).toBeLessThan(-1.3);
 
@@ -225,7 +228,7 @@ test('mw-e40.35: sign on with Hesketh, open the gangway, walk aboard, climb into
     .poll(async () => {
       const st = await holdKey(page, W, 12, 2);
       return st.position.y > 1.9 && st.grounded;
-    }, POLL)
+    }, POLL_HOLDS)
     .toBe(true);
   expect((await playerState(page)).position.z).toBeLessThan(129.6);
 

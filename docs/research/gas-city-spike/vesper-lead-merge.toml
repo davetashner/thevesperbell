@@ -1,0 +1,46 @@
+formula = "vesper-lead-merge"
+description = "DESIGN ONLY (never run in this spike): the CLAUDE.md 'Lead and merging' protocol as a gated graph for one PR. Merge/close/export steps are human-gated."
+
+[requires]
+formula_compiler = ">=2.0.0"
+
+[vars.pr]
+description = "PR number"
+required = true
+
+[[steps]]
+id = "review-diff"
+title = "Review gh pr diff {{pr}}"
+description = "Read the diff; spot-check risky claims (shared state, three.js internals, loosened tests). Judgement step: reviewer agent or the lead."
+metadata = { "gc.run_target" = "vesper/reviewer" }
+
+[[steps]]
+id = "up-to-date"
+title = "Merge main into the PR branch if BEHIND"
+needs = ["review-diff"]
+description = "gh pr view {{pr}} --json mergeStateStatus; if BEHIND, gh pr update-branch. Conflicts in e2e/shards.json, CHANGELOG.md, connectivity.json, scene lists, perf budgets: keep both sides."
+[steps.check]
+max_attempts = 4
+[steps.check.check]
+mode = "exec"
+path = "assets/scripts/check-not-behind.sh"
+timeout = "2m"
+
+[[steps]]
+id = "ci-green"
+title = "Wait for CI green (do not poll)"
+needs = ["up-to-date"]
+description = "No agent work: gate only. Exec check exits 75 while checks are pending (infra outcome, costs no attempt) and 1 on failure."
+[steps.check]
+max_attempts = 3
+[steps.check.check]
+mode = "exec"
+path = "assets/scripts/check-ci-green.sh"
+timeout = "45m"
+
+[[steps]]
+id = "merge-and-close"
+title = "HUMAN GATE: squash merge, bd close --reason, queue beads export"
+needs = ["ci-green"]
+description = "Intentionally not automated by the spike: merging, bd close and the beads export republish are owner/lead authority."
+metadata = { "gc.run_target" = "human" }

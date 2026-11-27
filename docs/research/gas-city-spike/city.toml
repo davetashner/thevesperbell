@@ -1,0 +1,39 @@
+[workspace]
+provider = "claude"
+
+[providers]
+[providers.claude]
+base = "builtin:claude"
+ready_delay_ms = 0
+
+# [mail]
+# retention_ttl controls how long read messages are retained before purge.
+# 0 disables retention; use "168h" for 7 days.
+# "7d" is not a valid Go duration.
+# It also sets how long a read mail bead stays open before the nudge-mail
+# sweep closes it: unset keeps that sweep's own 60m default, while "0"
+# disables the close phase too, leaving read mail beads open.
+# retention_ttl = "0"
+
+[[rigs]]
+name = "vesper"
+prefix = "gc"
+default_branch = "main"
+
+# Spike: at most ONE coding agent at a time on the laptop (day mode), Sonnet like today's workers.
+[[patches.agent]]
+dir = "vesper"
+name = "claude"
+max_active_sessions = 1
+min_active_sessions = 0
+wake_mode = "fresh"
+option_defaults = { model = "sonnet" }
+
+# Spike: no maintenance orders that wake LLM "dog" sessions or touch remotes/exports.
+[orders]
+skip = ["mol-dog-stale-db","mol-dog-backup","mol-dog-compactor","mol-dog-doctor","mol-dog-phantom-db","dolt-remotes-patrol","dolt-health","prune-branches","jsonl-export","notify-on-human-gate-creation","nudge-on-route","nudge-mail-sweep"]
+
+[[patches.agent]]
+name = "bd.dog"
+suspended = true
+max_active_sessions = 0
