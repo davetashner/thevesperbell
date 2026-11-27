@@ -1118,7 +1118,17 @@
       "travel": "barge",
       "time": ["dawn", "day"],
       "bead": "mw-e25.15",
-      "notes": "Mags Oakum's barge, mornings only (bible 3.6)."
+      "notes": "Mags Oakum's barge from Briar Glen Quay to Kestrel Lock, mornings only from the morning after the first night (bible 3.6): downriver 12 game hours, halfway to Wendmouth (barge-quay-lock). A service in her dialogue (barge-quay-lock, mw-e25.33), not a scene volume, so it is listed as planned."
+    },
+    {
+      "id": "barge-wharf-lock",
+      "from": "stone-wharf",
+      "to": "kestrel-lock",
+      "kind": "path",
+      "travel": "barge",
+      "time": ["dawn", "day"],
+      "bead": "mw-e25.33",
+      "notes": "Mags Oakum's barge from the Stone Wharf up to Kestrel Lock, mornings only from the morning after the first night (bible 3.6): upriver, towed, one game day, halfway to the quay (barge-wharf-lock). A service in her dialogue (mw-e25.33), not a scene volume, so it is listed as planned."
     },
     {
       "id": "barge-lock-wharf",

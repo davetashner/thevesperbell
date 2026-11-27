@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "mags-patient-ann",
-  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. She stands at Briar Glen Quay, Kestrel Lock and the Wendmouth Stone Wharf and sells the barge ride as services (data/service barge-*, mw-e25.15) through purchaseService: she offers what suits the scene she stands in (the inScene condition) (quay and lock go downriver to Wendmouth, one game day; the Wharf goes upriver to the quay, two days, towed; the lock is a downriver stop only), four crowns each. Mornings only (05:00-12:00) and only from the morning after night 1 (time.day 2 or later; the main quest's night-one stage falls through on the same fact): a night window 21:00-05:00 refuses with the bible line, before day 2 she asks the player to come back after a first night, mid-day and evening say come back at first light; nothing is paid and no time passes on a refusal. Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare: the same ride, free. A thief can also pay five crowns to lie under the tarpaulin (stowaway), as can the tarpaulin deal: both set barge.stowaway-arrival so the customs inspection of that one arrival is skipped. The ride card (narration-barge) plays on arrival. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4, quay only). Rumours 16 and 18 are told through emit rumor.told.",
+  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. She stands at Briar Glen Quay, Kestrel Lock and the Wendmouth Stone Wharf and sells the barge ride as services (data/service barge-*, mw-e25.15) through purchaseService: she offers what suits the scene she stands in (the inScene condition) (quay and lock go downriver to Wendmouth, one game day; the quay also goes down to Kestrel Lock, 12 game hours; the Wharf goes upriver to the quay, two days, towed, or to Kestrel Lock, one day, towed (mw-e25.33); the lock sells only the downriver run to Wendmouth), four crowns each. Mornings only (05:00-12:00) and only from the morning after night 1 (time.day 2 or later; the main quest's night-one stage falls through on the same fact): a night window 21:00-05:00 refuses with the bible line, before day 2 she asks the player to come back after a first night, mid-day and evening say come back at first light; nothing is paid and no time passes on a refusal. Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare: the same ride, free. A thief can also pay five crowns to lie under the tarpaulin (stowaway), as can the tarpaulin deal: both set barge.stowaway-arrival so the customs inspection of that one arrival is skipped. The ride card (narration-barge) plays on arrival. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4, quay only). Rumours 16 and 18 are told through emit rumor.told.",
   "speakers": [
     {
       "id": "mags",
@@ -472,6 +472,91 @@
           "onFail": "ride-broke"
         },
         {
+          "id": "ride-pay-kestrel",
+          "text": "Four coins, down to Kestrel Lock. Done.",
+          "effects": [
+            {
+              "kind": "purchaseService",
+              "service": "barge-quay-lock"
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-booked",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-deal-kestrel",
+          "text": "I'll work my passage down to the lock, as agreed.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tow-rope"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "herons"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "gust"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tarpaulin"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            },
+            {
+              "kind": "advanceTime",
+              "hours": 12
+            },
+            {
+              "kind": "travelTo",
+              "scene": "kestrel-lock",
+              "spawn": "barge-landing"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "quay-lock-downriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": false
+            }
+          ],
+          "next": "ride-booked-deal"
+        },
+        {
           "id": "ride-no",
           "text": "Not just yet.",
           "next": "hub"
@@ -714,6 +799,91 @@
               "kind": "setFact",
               "fact": "barge.ride",
               "value": "upriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": false
+            }
+          ],
+          "next": "ride-booked-deal"
+        },
+        {
+          "id": "ride-pay-wharf-lock",
+          "text": "Four coins, up to Kestrel Lock. Done.",
+          "effects": [
+            {
+              "kind": "purchaseService",
+              "service": "barge-wharf-lock"
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run-upriver",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-booked-up",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-deal-wharf-lock",
+          "text": "I'll work my passage up to the lock, as agreed.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tow-rope"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "herons"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "gust"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tarpaulin"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            },
+            {
+              "kind": "advanceTime",
+              "days": 1
+            },
+            {
+              "kind": "travelTo",
+              "scene": "kestrel-lock",
+              "spawn": "barge-landing"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "wharf-lock-upriver"
             },
             {
               "kind": "setFact",

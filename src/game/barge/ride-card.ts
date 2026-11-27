@@ -5,10 +5,12 @@
 // screen open the card plays the matching narration-barge sequence as pages on the narration window
 // (the epilogue slideshow, src/ui/epilogue-slideshow.ts), then the fact goes back to `none`. Boarding
 // at Kestrel Lock skips the page that casts off from Briar Glen Quay. Skipping the card (Esc) still
-// ends the ride. The sim is paused while it is open; nothing else changes game state.
+// ends the ride. Mags speaks one aside to the player's class (`variants` of the sequence, keyed by
+// `player.class`, mw-e39.49) before the last page; a class without one hears the plain pages. The sim is paused while it is open; nothing else changes game state.
 
 import type { GameContent } from '@content/index';
-import { findSequence, type Narration } from '@content/types/narration';
+import { NARRATIVE_CLASSES } from '@content/narrative/class-variants';
+import { findSequence, type Narration, type NarrationSequence } from '@content/types/narration';
 import type { World } from '@sim/index';
 import {
   openEpilogueSlideshow,
@@ -28,6 +30,8 @@ const RIDES: Readonly<Record<string, { readonly sequence: string; readonly skip:
   downriver: { sequence: 'downriver-to-wendmouth', skip: 0 },
   'lock-downriver': { sequence: 'downriver-to-wendmouth', skip: 1 },
   upriver: { sequence: 'upriver-to-briar-glen', skip: 0 },
+  'quay-lock-downriver': { sequence: 'downriver-to-kestrel-lock', skip: 0 },
+  'wharf-lock-upriver': { sequence: 'upriver-to-kestrel-lock', skip: 0 },
 };
 
 /** What the e2e reads of the card. */
@@ -82,11 +86,25 @@ export class BargeRideCard {
     if (found === undefined) return [];
     const narrations = this.#options.content.all('narration') as readonly Narration[];
     const sequence = findSequence(narrations, 'barge', found.sequence);
-    return (sequence?.pages ?? []).slice(found.skip).map((page, index) => ({
+    const texts = (sequence?.pages ?? []).slice(found.skip).map((page) => page.text);
+    const aside = this.#aside(sequence?.variants);
+    if (aside !== undefined) {
+      texts.splice(texts.length - 1, 0, ...aside.map((page) => page.text));
+    }
+    return texts.map((text, index) => ({
       id: `${found.sequence}-${String(index + found.skip)}`,
       title: index === 0 ? sequence?.title : undefined,
-      text: page.text,
+      text,
     }));
+  }
+
+  /** Mags's aside to the player's class, if the sequence has one. */
+  #aside(
+    variants: NarrationSequence['variants'],
+  ): readonly { readonly text: string }[] | undefined {
+    const playerClass = this.#options.world.facts.get('player.class');
+    const own = NARRATIVE_CLASSES.find((c) => c === playerClass);
+    return own === undefined ? undefined : variants?.[own];
   }
 
   #play(ride: string, slides: readonly EpilogueSlideModel[]): void {

@@ -2,7 +2,7 @@
   "$schema": "../narration.schema.json",
   "id": "narration-barge",
   "kind": "barge",
-  "notes": "The Patient Ann between Briar Glen Quay and Wendmouth (bible 3.6, 11.3: one day downriver, two up, towed). Mags is met at the quay, where she offers the ride; a ride on her barge is itself the introduction.",
+  "notes": "The Patient Ann between Briar Glen Quay and Wendmouth (bible 3.6, 11.3: one day downriver, two up, towed). Mags is met at the quay, where she offers the ride; a ride on her barge is itself the introduction. Barge sequences may carry `variants`: Mags's one-page aside to each class, played before the last page (mw-e39.49); a class with none hears only the plain pages. The Kestrel Lock legs are mw-e25.33.",
   "sequences": [
     {
       "id": "downriver-to-wendmouth",
@@ -18,7 +18,29 @@
         {
           "text": "By evening the river smells of salt. Wendmouth rises out of the dusk like a city that lost its way: columns, cranes and a hundred lamps, all of it built from the stone you came down with."
         }
-      ]
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "\"You've the back for it, love,\" Mags says, watching you coil the tow-rope without being asked. \"Thirty years I've waited for a passenger who learns the knots before the name of the boat.\""
+          }
+        ],
+        "archer": [
+          {
+            "text": "Mags nods at the grey shapes on the bank. \"Herons. They'll wait for you to put the bow down, love, then they'll have the fish. Keep it where they can see it. They're good at sums.\""
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "\"Easy with the fingers, love,\" Mags says, as the sail shivers on the mast. \"She's an old girl and she likes a breeze she's been introduced to. A small Gust, mind. Not a conversation.\""
+          }
+        ],
+        "thief": [
+          {
+            "text": "\"Down you stay,\" Mags murmurs, tapping the tarpaulin with her boot, \"and customs counts stone. I've never seen the Inspector look under a sheet he thought was empty. Thirty years, love, and not once.\""
+          }
+        ]
+      }
     },
     {
       "id": "upriver-to-briar-glen",
@@ -34,7 +56,99 @@
         {
           "text": "On the second evening the headframe comes up over the trees, and the smoke of Briar Glen. You find you are listening for the humming."
         }
-      ]
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "\"Dig your heels in on the towpath, love,\" Mags calls from the tiller, as the rope sings taut over your shoulder. \"The river's got all day. Luckily so have we. Pull when the horse does.\""
+          }
+        ],
+        "archer": [
+          {
+            "text": "\"Herons again,\" Mags says, without looking up. \"They follow the Ann upriver. I think they like the company. Don't you dare. I'd miss them, love, once you'd shot the lot.\""
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "\"You'll be wanting to Gust the sail,\" Mags says, \"and there's no wind to be had going up. Save it, love. The horse is cheaper, and doesn't singe.\""
+          }
+        ],
+        "thief": [
+          {
+            "text": "\"Plenty of lumps on the cargo, love,\" Mags says over her shoulder, \"and nobody counting them this side of the river. Stretch out. You've earned a dull day.\""
+          }
+        ]
+      }
+    },
+    {
+      "id": "downriver-to-kestrel-lock",
+      "title": "To Kestrel Lock",
+      "notes": "Played on the ride from Briar Glen Quay to Kestrel Lock (mw-e25.33): half a day downriver, the first half of the Wendmouth run.",
+      "pages": [
+        {
+          "text": "Mags Oakum casts off from Briar Glen Quay as the mist lifts, and the Patient Ann slides out below the Millweir with her head low and her cargo of dressed glenstone to the gunwales. Mags steers by the sound of the water."
+        },
+        {
+          "text": "The Wend widens into long green pools. A towpath horse sleeps on its feet. By evening the bank rises into the grey gates of Kestrel Lock, and Old Reed's smoke curls from his chimney. Mags brings the barge in against the landing as if she were putting a child to bed."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "\"Hold her, love, and don't let the lock gate eat your arm,\" Mags says, as you take the mooring rope. \"Reed's gates are older than he is, and he's a good deal older than the rest of us.\""
+          }
+        ],
+        "archer": [
+          {
+            "text": "Mags points at a heron on the lock beam. \"Reed leaves that one be, love. Says it's the only thing on the river he can't charge a toll to.\""
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "\"No, love,\" Mags says, as the lock water stirs against the hull, \"not a Gust at the gates. The paddles do the moving. Water gets awkward when it's been argued with.\""
+          }
+        ],
+        "thief": [
+          {
+            "text": "\"The toll board's got a bad habit of noticing things, love,\" Mags says, tying off. \"Walk past Reed like you've a good reason, and he'll let you think you do.\""
+          }
+        ]
+      }
+    },
+    {
+      "id": "upriver-to-kestrel-lock",
+      "title": "Upriver to the Lock",
+      "notes": "Played on the ride from the Wendmouth Stone Wharf to Kestrel Lock (mw-e25.33): one day upriver, towed, the first half of the way home.",
+      "pages": [
+        {
+          "text": "Going up takes longer than coming down. The Patient Ann is hitched to a patient horse on the towpath, and the salt leaves the air a mile at a time as the Wend leans against her all the way."
+        },
+        {
+          "text": "A night and a day of rope, reeds and slow bends. You sleep on the cargo and wake to the horse's bell. By the next morning Kestrel Lock stands over the water, its gates grey in the mist, and Mags hums the first notes of something and stops to listen."
+        }
+      ],
+      "variants": {
+        "knight": [
+          {
+            "text": "\"Take the rope, love, if you're itching,\" Mags says, \"and I'll take the tiller. The horse could use someone to walk beside who isn't me. I've told it all my stories.\""
+          }
+        ],
+        "archer": [
+          {
+            "text": "\"Sit up the front with that bow of yours, love,\" says Mags, \"and tell me when the heron's gone. I can hear the horse, I can hear the water, and I can't hear the heron. That's what worries me.\""
+          }
+        ],
+        "sorcerer": [
+          {
+            "text": "\"Keep your hands in your lap, love,\" Mags says, eyeing the stiff, wet air, \"until we're past the white water. A Gust against the current is a fine way to meet the bottom.\""
+          }
+        ],
+        "thief": [
+          {
+            "text": "\"Nobody's counting cargo this side of Wendmouth, love,\" Mags says, \"so you may sit up. Mind the blocks. They've never forgiven a thief that put a boot on them.\""
+          }
+        ]
+      }
     }
   ]
 }

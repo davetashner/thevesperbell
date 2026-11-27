@@ -385,6 +385,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `millweir-kestrel-lock` | `millweir` | `kestrel-lock` | path |  |  | `briar-glen-river/towpath-gate`, `kestrel-lock/towpath-up` |
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | `kestrel-lock/towpath-down`, `wendmouth-harbour/towpath-gate` |
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
+| `barge-wharf-lock` | `stone-wharf` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.33 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
 | `barge-quay-wharf` | `briar-glen-quay` | `stone-wharf` | path (barge) |  |  | planned: mw-e25.15 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
@@ -525,6 +526,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.13 | `quay-adit-mouth`, `weeping-adit` |
 | mw-e25.14 | `lock-gate-crossing` |
 | mw-e25.15 | `barge-quay-lock` |
+| mw-e25.33 | `barge-wharf-lock` |
 | mw-e25.22 | `lane-briarwood-edge` |
 | mw-e25.23 | `miners-bridge`, `mine-road-gate` |
 | mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
