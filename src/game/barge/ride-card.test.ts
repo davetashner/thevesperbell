@@ -11,6 +11,7 @@ import { installFactRegistry } from '../facts';
 import {
   BARGE_RIDE_FACT,
   BARGE_RIDE_SCREEN,
+  BargeRideCard,
   startBargeRideUi,
   type BargeRideReading,
 } from './ride-card';
@@ -107,5 +108,23 @@ describe('barge ride card (mw-e25.15)', () => {
     t.world.facts.set(BARGE_RIDE_FACT, 'none');
     t.card.afterStep();
     expect(t.ui.top).toBeUndefined();
+  });
+
+  it('a ride with no pages in the narration ends at once without opening a window', () => {
+    const t = setup();
+    const bare = new BargeRideCard({
+      ui: t.ui,
+      world: t.world,
+      content: { all: () => [] } as never,
+      onChange: (reading) => t.published.push(reading),
+    });
+    t.world.facts.set(BARGE_RIDE_FACT, 'upriver');
+    bare.afterStep();
+    expect(t.ui.top).toBeUndefined();
+    expect(t.published.at(-1)).toMatchObject({
+      open: false,
+      shown: ['upriver'],
+      ended: 'finished',
+    });
   });
 });
