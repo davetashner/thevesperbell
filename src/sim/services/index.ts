@@ -171,5 +171,10 @@ export function validateServiceLogic(
       problems.push(`effects[${String(i)}]: a service cannot use ${effect.kind}`);
     }
   });
+  const time = service.effects.findIndex((effect) => effect.kind === 'advanceTime');
+  const travel = service.effects.findIndex((effect) => effect.kind === 'travelTo');
+  if (time !== -1 && travel !== -1 && travel < time) {
+    problems.push(`effects[${String(travel)}]: travelTo must come after advanceTime`);
+  }
   return problems;
 }

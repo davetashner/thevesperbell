@@ -3,6 +3,7 @@ import {
   AUDIO_BASE_URL,
   browserFormat,
   createBrowserAudioEngine,
+  createBrowserAudioPage,
   fetchBytes,
   GESTURE_EVENTS,
   installGestureUnlock,
@@ -73,6 +74,19 @@ describe('browser wiring', () => {
     expect(urls).toEqual([`${AUDIO_BASE_URL}/sfx/sfx-ui-click-01.m4a`]);
     await engine.unlock();
     expect(handle?.state).toBe('playing');
+  });
+
+  it('mw-ju8.47: a page-level context is created lazily and shared by engines built on it', () => {
+    const { contexts } = stubBrowser('');
+    const page = createBrowserAudioPage(1024);
+    expect(contexts).toHaveLength(0);
+    const first = createBrowserAudioEngine({ registry: registry(), page });
+    const second = createBrowserAudioEngine({ registry: registry(), page });
+    first.play('sfx-ui-click');
+    second.play('sfx-ui-click');
+    expect(contexts).toHaveLength(1);
+    expect(contexts[0]?.options).toEqual({ latencyHint: 'interactive' });
+    expect(page.context).toBe(contexts[0]?.ctx);
   });
 
   it('fetches placeholder assets as WAVs from the placeholder pack (mw-e28.2)', async () => {

@@ -225,6 +225,16 @@ describe('contentReferences', () => {
     expect(check({ type: 'rumor', id: 'anything' })).toBeUndefined();
   });
 
+  it('mw-e20.14: resolves travelTo scenes and spawns against the shipped scenes', () => {
+    const shipped = contentReferences(loadGameContent());
+    expect(shipped({ type: 'scene', id: 'kestrel-lock' })).toBeUndefined();
+    expect(shipped({ type: 'scene', id: 'no-scene' })).toContain('no-scene');
+    expect(shipped({ type: 'spawn', id: 'kestrel-lock/ladder-w-5' })).toBeUndefined();
+    expect(shipped({ type: 'spawn', id: 'kestrel-lock/no-spawn' })).toContain('no-spawn');
+    expect(shipped({ type: 'spawn', id: 'no-scene/x' })).toContain('no-scene/x');
+    expect(shipped({ type: 'spawn', id: 'kestrel-lock' })).toContain('kestrel-lock');
+  });
+
   it('resolves objectives of real quests only', () => {
     const questContent = loadQuestFixtureContent();
     const checkQuest = contentReferences(questContent);

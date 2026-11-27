@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Services can now heal you, move the clock on and carry you to another place: the building blocks for the barge ride, where the fare, the days that pass and the arrival happen together or not at all. [mw-e20.14]
 - The Millweir's mill pond is a real swim: turn the sluice wheel and the pond drains to a dry bed you can walk across, turn it back and it fills again to a deep pond you must swim (heavy armour sinks), and any pond that rises or falls now swims by its present depth. [mw-e25.29]
 - Gold now buys things from people, not just from shelves: a service system lets an NPC sell a favour, fee or bribe for a price that can ease with how much they like you (Mother Kettleback's carrying fees, Old Reed's toll, a drink for Dot), paid and applied together or not at all. [mw-e20.9]
 - Kestrel Lock looks the part: timber lock gates with balance beams swing with the paddles, and Old Reed's grey cottage is now a stone keeper's cottage with a mossy slate roof. [mw-e25.27]
@@ -570,6 +571,8 @@ check enforces this).
 
 ### Changed
 
+- Sound no longer cuts out and restarts when you walk into the next area: one audio context and its loaded sounds carry across the crossing. [mw-ju8.47]
+- Areas with burning lanterns and braziers run more smoothly. [mw-e32.20]
 - Crossing into a new area keeps the game window and mouse capture, so you no longer click again after every crossing, the camera faces the way you arrive, and the swap is quicker. [mw-ju8.44]
 - Wendmouth harbour: the blue cargo blocks on the wharf now read as painted crates with ropes and kegs on top, and each net loft has a framed door, an awning, shuttered windows, a stone plinth and a corner of crates and barrels (mw-e40.34).
 

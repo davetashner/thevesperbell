@@ -14,6 +14,7 @@
 
 import {
   areaTransition,
+  travelRequested,
   gameClockOf,
   type AreaTransition,
   type EntityId,
@@ -47,6 +48,8 @@ export type TransitReadout =
 export interface TransitionControllerOptions {
   readonly world: World<never>;
   readonly player: EntityId;
+  /** The scene this page runs, named as `from` by a transition a `travelTo` effect asks for. */
+  readonly sceneId?: () => string;
   readonly registry: SaveRegistry;
   /** Display name of a scene, for the loading overlay. */
   readonly areaName: (scene: string) => string;
@@ -71,10 +74,27 @@ export class TransitionController {
   private readonly stop: () => void;
 
   constructor(private readonly options: TransitionControllerOptions) {
-    this.stop = options.world.events.on(areaTransition, (transition) => {
+    const { events } = options.world;
+    const stopCrossing = events.on(areaTransition, (transition) => {
       // The first crossing wins; a player who walks on while the page reloads crosses nothing more.
       this.pending ??= transition;
     });
+    // A service that carries the player (the barge, mw-e20.14) asks for the same hand-off without a volume.
+    const stopTravel = events.on(travelRequested, ({ scene, spawn }) => {
+      this.pending ??= {
+        tick: options.world.tick,
+        from: options.sceneId?.() ?? '',
+        transition: 'travel',
+        scene,
+        spawn,
+        follow: false,
+        entity: options.player,
+      };
+    });
+    this.stop = () => {
+      stopCrossing();
+      stopTravel();
+    };
   }
 
   /** Whether the player has crossed a volume and the area is being left. */

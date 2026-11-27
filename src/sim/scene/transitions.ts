@@ -37,6 +37,18 @@ export interface AreaTransition {
 /** Fired once as the player enters a transition volume (`scene.transition`; never renamed). */
 export const areaTransition = defineEvent<AreaTransition>('scene.transition');
 
+/** A request to move the player to `spawn` of `scene` without a volume (a barge ride, mw-e20.14). */
+export interface TravelToRequest {
+  readonly scene: string;
+  readonly spawn: string;
+}
+
+/**
+ * Raised by the `travelTo` logic effect after its batch committed (`scene.travel`). The game answers
+ * it like an `areaTransition`: the transition controller saves, carries and swaps the scene in place.
+ */
+export const travelRequested = defineEvent<TravelToRequest>('scene.travel');
+
 /** Whether the point lies in the transition's volume (edges inclusive). */
 export function inTransition(transition: SceneTransition, point: Vec3): boolean {
   const { min, max } = transition;

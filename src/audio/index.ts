@@ -19,11 +19,13 @@ export {
   type SoundHandle,
   type SoundHandleState,
 } from './engine.ts';
+export { AudioPage, type AudioPageOptions } from './page.ts';
 export {
   AUDIO_BASE_URL,
   GESTURE_EVENTS,
   browserFormat,
   createBrowserAudioEngine,
+  createBrowserAudioPage,
   documentVisibility,
   fetchBytes,
   installGestureUnlock,

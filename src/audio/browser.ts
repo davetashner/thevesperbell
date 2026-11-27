@@ -4,6 +4,7 @@
 // WebKit.
 import { AudioEngine, type AudioEngineOptions } from './engine.ts';
 import type { Visibility } from './mixer.ts';
+import { AudioPage } from './page.ts';
 import { pickFormat, registryAssetUrl, type AudioFormat } from './manifest.ts';
 
 /** Where runtime audio lives (audio bible §6: `public/assets/audio/<category>/<asset-id>.<ext>`). */
@@ -14,7 +15,7 @@ export const GESTURE_EVENTS = ['pointerdown', 'keydown', 'touchend'] as const;
 
 export type BrowserAudioOptions = Pick<
   AudioEngineOptions,
-  'registry' | 'entityPosition' | 'quality' | 'dev' | 'warn' | 'cacheBytes'
+  'registry' | 'entityPosition' | 'quality' | 'dev' | 'warn' | 'cacheBytes' | 'page'
 > & {
   /**
    * Override URL resolution (testbeds serving generated audio); default is the §6 layout, with
@@ -34,6 +35,14 @@ export async function fetchBytes(url: string): Promise<ArrayBuffer> {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`HTTP ${String(response.status)} for ${url}`);
   return response.arrayBuffer();
+}
+
+/** The page's one AudioContext and buffer cache, shared by every area session's engine (mw-ju8.47). */
+export function createBrowserAudioPage(cacheBytes?: number): AudioPage {
+  return new AudioPage({
+    createContext: () => new AudioContext({ latencyHint: 'interactive' }),
+    cacheBytes,
+  });
 }
 
 /** An engine wired to the page's Web Audio. The context is created on first use, not here. */
