@@ -1,0 +1,75 @@
+formula = "vesper-worker"
+description = "One Vesper Bell bead to an open PR: worktree, implement, CI-miss gate, push + gh pr create. Never merges, never closes the real bead."
+
+[requires]
+formula_compiler = ">=2.0.0"
+
+[vars.backlog_id]
+description = "The real backlog bead id (mw-...). Goes on the PR's Closes line. The formula never closes it."
+required = true
+
+[vars.branch]
+description = "Branch/worktree name under gc/ (e.g. docs-treasure-guide)."
+required = true
+
+[vars.task]
+description = "Full text of the backlog bead (title, description, ACs)."
+required = true
+
+[vars.owned_paths]
+description = "Files/dirs this worker owns; it must not edit anything else."
+required = true
+
+[[steps]]
+id = "prepare"
+title = "Create the worktree for {{branch}}"
+description = """
+In the rig repo (your cwd's git root), never in a main checkout:
+  git fetch origin main
+  git worktree add .claude/worktrees/gc/{{branch}} -b gc/{{branch}} origin/main
+Work only inside .claude/worktrees/gc/{{branch}}. Read its CLAUDE.md (workflow, laptop-load rules: day mode, scoped commands only, no full test suites).
+Hard rules for the whole run: never merge a PR, never push to main, never close a real mw-* bead, never run bd sync/push or touch refs/dolt/*, never commit secrets. It is DAY MODE: scoped commands only (no full pnpm test/lint/e2e/perf).
+Close this step when the worktree exists."""
+
+[[steps]]
+id = "implement"
+title = "Implement {{backlog_id}} in the worktree"
+needs = ["prepare"]
+description = """
+Task ({{backlog_id}}):
+{{task}}
+
+Own only: {{owned_paths}}. Do not touch .beads/, CHANGELOG.md unless the change is player-facing, or anything else.
+Commit with `git commit -s`, message ends with `[{{backlog_id}}]` and the line
+  Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Run prettier on files you changed. Do NOT push, open a PR, merge, or close any bead in this step.
+The exec check runs after you close this step; if it fails you are re-run with its output as feedback."""
+
+[steps.check]
+max_attempts = 3
+
+[steps.check.check]
+mode = "exec"
+path = "assets/scripts/pr-prechecks.sh"
+timeout = "3m"
+
+[[steps]]
+id = "open-pr"
+title = "Push the branch and open the PR (do not merge)"
+needs = ["implement"]
+description = """
+From the worktree:
+  git push -u origin gc/{{branch}}        # only this branch; never main
+  gh pr create --base main --head gc/{{branch}} --label no-changelog --title "<title> [{{backlog_id}}]" --body-file <file>
+Use the repo's PR template headings. The body must contain, on its own line, exactly:
+  Closes {{backlog_id}}
+and must end with: 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+Forbidden: gh pr merge, git push to main, bd close, bd sync, any push to refs/dolt/*.
+Finish by recording the PR URL: `gc bd update <your work bead> --set-metadata pr_url=<url>` and closing this step."""
+
+[[steps]]
+id = "report"
+title = "Report to the lead"
+needs = ["open-pr"]
+description = """
+Print a 5-line report: PR url, files changed, checks you ran locally, anything uncertain. Close this step and the work bead (the gc work bead only, not {{backlog_id}}), then `gc runtime drain-ack`."""
