@@ -2678,8 +2678,8 @@ function startRenderer(
         });
         const watch = new MechanismWatch(world, made);
         const leaves = doorLeafLooks(world, made, content).map(
-          ({ entity, size, centre, material }) => {
-            const object = createDoorLeaf(size, centre, material);
+          ({ entity, size, centre, material, model }) => {
+            const object = createDoorLeaf(size, centre, material, model);
             view.scene.add(object);
             sync.bind(entity, {
               ...object3DBinding(object, readDoorLeaf),

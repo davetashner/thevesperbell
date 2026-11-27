@@ -60,6 +60,7 @@ The repo is developed on the owner's laptop (10 cores), which they use during th
 - **Scoped commands only.** Don't run the full suites locally; push and let CI run them:
   - lint: `pnpm lint:changed` (only files changed against `origin/main`), not `pnpm lint`
   - types: one `pnpm typecheck` before pushing
+  - formatting: `pnpm format:check` before pushing (cheap; CI's lint job runs it and `lint:changed` does not)
   - tests: `pnpm vitest run <the test files you touched>`, not `pnpm test` / `pnpm test:coverage`
   - e2e: `E2E_PORT=<free port> pnpm e2e <the specs you touched>`, never the whole suite
   - no `pnpm perf`, `pnpm bench`, `pnpm content:coverage` or repeated `pnpm build`; CI runs them
@@ -72,6 +73,17 @@ The repo is developed on the owner's laptop (10 cores), which they use during th
 **Night mode, 01:00-07:00 local:** up to 5 implementation workers, and the full local gates (`pnpm lint`, `pnpm test:coverage`, `pnpm content:coverage`, the e2e suite) are fine. The one-heavy-command and no-duplicate-rerun rules still apply.
 
 **Leads:** put the current mode's rules in every worker brief. A worker that runs past 07:00 switches to day mode for its remaining commands.
+
+## Lead and merging
+
+One session is the lead (named in the `HANDOFF: thevesperbell` bead, mw-77x); only the lead merges and republishes the beads export. The owner's standing agreement: merge once CI is green, without asking.
+
+- **Review before merge.** A worker's report says what it meant to do. Read the PR diff (`gh pr diff <n>`) before merging, and spot-check any risky claim: shared state, three.js internals, anything that loosens a test.
+- **One merge at a time.** Before each merge, check `gh pr view <n> --json mergeStateStatus`. If the branch is `BEHIND`, merge main into it and wait for CI again. Conflicts are usually in `e2e/shards.json`, `CHANGELOG.md`, `connectivity.json`, scene lists and perf budgets; keep both sides.
+- **Wait, don't poll.** Run `gh pr checks <n> --watch` with `run_in_background` and act on the notification.
+- **Beads export.** After a merge, close its beads, then fold a fresh `bd export -o .beads/issues.jsonl` into the next PR the lead merges. Workers never touch the export. pr-lint rejects a `Closes` id that is missing from the PR's `.beads/issues.jsonl`, so a PR that closes a bead created since the last export needs a fresh export of its own (the lead adds it). A PR that only partly delivers a bead gets its own child bead to close.
+- **Worker briefs** name the files each concurrent worker owns, so the others stay out of them. Workers may push and open PRs, but they never merge or close beads. Briefs also remind workers of the CHANGELOG rule: CI's `changelog` check fails any PR that touches `src/{game,ui,render,audio,sim,content}/` or `src/main.ts` without a one-line player-facing note under Unreleased, or the `no-changelog` label.
+- **Dependabot PRs** are the lead's to triage. Merge main into the branch first, because stale shard weights make e2e shards time out. A typescript-eslint minor release can add rules to `strictTypeChecked`: fix the code, or turn a rule off in `eslint.config.js` with a comment saying why. Push the fix to the dependabot branch.
 
 ## Beads Issue Tracker
 

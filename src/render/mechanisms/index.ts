@@ -17,6 +17,7 @@ import {
   BoxGeometry,
   Color,
   Group,
+  Matrix4,
   Mesh,
   MeshStandardMaterial,
   MirroredRepeatWrapping,
@@ -25,6 +26,7 @@ import {
   type Object3D,
 } from 'three';
 import type { Vec3 } from '@sim/index';
+import { readGlbMesh } from '../models/glb';
 
 /** Leaf colours by material; anything else reads as the greybox interactive blue. */
 const LEAF_COLOURS: Readonly<Record<string, number>> = {
@@ -106,7 +108,12 @@ function facesFor(material: string, side: number): MeshStandardMaterial[] {
  * A door leaf of `size` metres whose box sits at `centre` from its pivot (the object's origin), in
  * the colour of `material` (with its painted front, for wood and iron).
  */
-export function createDoorLeaf(size: Vec3, centre: Vec3, material: string): Object3D {
+export function createDoorLeaf(
+  size: Vec3,
+  centre: Vec3,
+  material: string,
+  model?: string,
+): Object3D {
   box ??= new BoxGeometry(1, 1, 1);
   const leaf = new Mesh(box, facesFor(material, centre.x >= 0 ? 1 : -1));
   leaf.name = 'door-leaf';
@@ -117,8 +124,60 @@ export function createDoorLeaf(size: Vec3, centre: Vec3, material: string): Obje
   const pivot = new Group();
   pivot.name = 'door';
   pivot.add(leaf);
+  if (model !== undefined) void dressLeaf(pivot, leaf, size, centre, model);
   return pivot;
 }
+
+/**
+ * Swaps the grey box `leaf` for the approved `model` once it loads (until then, or if it never does,
+ * the box stays). The model's long axis is z with its beam end at +z; it is turned to run along the
+ * leaf's x, beam end at the pivot, fitted into the leaf's box and carried on the pivot so it swings
+ * with the leaf. `thickness` of the box is floored so a thin leaf collider still shows a gate's mass.
+ */
+async function dressLeaf(
+  pivot: Object3D,
+  leaf: Mesh,
+  size: Vec3,
+  centre: Vec3,
+  model: string,
+): Promise<void> {
+  try {
+    const glb = await readGlbMesh(`/assets/model/${model}.glb`);
+    const side = centre.x >= 0 ? 1 : -1;
+    const geometry = glb.geometry;
+    // +z (beam) to -x for a leaf that extends toward +x (beam at the pivot), +x for the mirror.
+    geometry.applyMatrix4(new Matrix4().makeRotationY((side > 0 ? -90 : 90) * (Math.PI / 180)));
+    geometry.computeBoundingBox();
+    const bounds = geometry.boundingBox;
+    if (bounds === null) return;
+    const [w, h, d] = [
+      bounds.max.x - bounds.min.x,
+      bounds.max.y - bounds.min.y,
+      bounds.max.z - bounds.min.z,
+    ];
+    if (w <= 0 || h <= 0 || d <= 0) return;
+    const thick = Math.max(size.z, MODEL_LEAF_THICKNESS);
+    geometry.translate(
+      -(bounds.min.x + bounds.max.x) / 2,
+      -(bounds.min.y + bounds.max.y) / 2,
+      -(bounds.min.z + bounds.max.z) / 2,
+    );
+    geometry.scale(size.x / w, size.y / h, thick / d);
+    geometry.translate(centre.x, centre.y, centre.z);
+    geometry.computeVertexNormals();
+    const mesh = new Mesh(geometry, glb.material);
+    mesh.name = 'door-leaf-model';
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    pivot.add(mesh);
+    leaf.visible = false;
+  } catch (error) {
+    console.warn(`The ${model} door model did not load; keeping the grey leaf.`, error);
+  }
+}
+
+/** Thickness (m) a model leaf is drawn at, at least. */
+const MODEL_LEAF_THICKNESS = 0.55;
 
 /** Takes a leaf out of the scene, keeping the shared geometry and materials. */
 export function disposeDoorLeaf(object: Object3D): void {

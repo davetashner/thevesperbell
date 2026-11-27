@@ -51,7 +51,12 @@ function outcome(pressTick: number) {
   return { world, started, damage, parries, freezes, parried };
 }
 
-/** 100 replays take a few seconds alone but far longer on a loaded CI runner (60 s timed out in Nov 2026): allow three minutes. */
+/**
+ * Each replay hashes the world on every tick (about 0.5 s, far more under coverage on a loaded CI
+ * runner: 100 replays timed out at 180 s in Nov 2026, mw-e41.29). Every PR replays 10 times; the
+ * slow-gates workflow (nightly) sets PARRY_REPLAY_RUNS=100 for the full AC-7 battery.
+ */
+const REPLAY_RUNS = Number(process.env['PARRY_REPLAY_RUNS'] ?? 10);
 const REPLAY_TIMEOUT_MS = 180_000;
 
 const variants = [
@@ -100,7 +105,7 @@ describe('parry timing replays (mw-e04.12)', () => {
   });
 
   it.each(variants)(
-    'AC-7: $file is recorded on every tick and replays 100 times to identical hashes',
+    'AC-7: $file is recorded on every tick and replays repeatedly to identical hashes (100 in slow-gates)',
     ({ file, scenario }) => {
       const replay = readReplay(join(GOLDEN_REPLAY_DIR, file));
       expect(replay.scenario).toBe(scenario.name);
@@ -108,7 +113,7 @@ describe('parry timing replays (mw-e04.12)', () => {
       expect(replay.checkpoints).toHaveLength(replay.ticks + 1);
       const contentHash = currentContentHash();
       const finals = new Set<string>();
-      for (let run = 0; run < 100; run++) {
+      for (let run = 0; run < REPLAY_RUNS; run++) {
         const result = playReplay(replay, scenario, { contentHash });
         expect(result.status).toBe('passed');
         if (result.status === 'passed') finals.add(result.finalHash);
