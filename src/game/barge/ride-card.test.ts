@@ -127,4 +127,15 @@ describe('barge ride card (mw-e25.15)', () => {
       ended: 'finished',
     });
   });
+
+  it('a ride value the card has no sequence for ends at once without a window', () => {
+    const world = new World<never>({ seed: 5 });
+    const ui = new UiRoot(document.body, { unstyled: true, focus: { rectOf: rectFromData } });
+    const readings: BargeRideReading[] = [];
+    const card = new BargeRideCard({ ui, world, content, onChange: (r) => readings.push(r) });
+    world.facts.set(BARGE_RIDE_FACT, 'ferry');
+    card.afterStep();
+    expect(ui.top).toBeUndefined();
+    expect(readings.at(-1)).toMatchObject({ open: false, shown: ['ferry'], ended: 'finished' });
+  });
 });
