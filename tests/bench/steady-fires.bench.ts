@@ -2,8 +2,9 @@
 // its flame cells at 600 °C and puffing smoke every tick as the fire rule does, run to a steady
 // state; the bench then times one tick (hold + stepField). Measured 2026-11-26 (laptop, noisy): ~3.1 ms
 // for ten fires before the convergence hysteresis, 14-25% less with it (302 of 385 chunks stepped
-// per tick): each held flame spreads heat over ~38 chunks that never go exactly stationary. The
-// assertion is a regression guard, not the AC-1 target.
+// per tick): each held flame spreads heat over ~38 chunks that never go exactly stationary. A
+// converged chunk beside one still moving now freezes too (mw-e32.21): ~107 chunks stepped per tick
+// and about half the step time. The assertion is a regression guard, not the AC-1 target.
 import { describe, expect, test } from 'vitest';
 import { ElementField, cellsInSphere, holdAtLeast, stepField } from '@sim/index';
 
