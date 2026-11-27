@@ -16,6 +16,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `crush` | number 0–1000000000 | `0` | Blunt hit, J, it delivers to something it closes on; what does not break wedges it (0: it just stops). |
 | `manual` | boolean | `true` | Opens and closes by hand (Interact); false for a portcullis that only signals move. |
 | `material` | ref → material | required | What the leaf is made of: its world properties. |
+| `model` | string | — | Approved model drawn in place of the grey leaf box, fitted into the leaf and swinging with it (render only): public/assets/model/<id>.glb. Its long axis is z with the hinge-side beam at +z. |
 | `blocks` | object | required | What it shuts out while closed; open or broken it shuts out nothing. |
 | `blocks.light` | boolean | required | Shuts out light when closed. |
 | `blocks.gas` | boolean | required | Shuts out gas and smoke when closed. |

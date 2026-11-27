@@ -97,6 +97,9 @@ import {
 } from '@game/conversation/index';
 import { speakerNameResolver, speakerPortraitResolver } from '@game/portraits';
 import type { DialogueDef } from '@content/types/dialogue';
+import { dialogueLogicRegistry } from '@sim/logic/dialogue-kinds';
+import { createServiceCatalog, SERVICES_SERVICE } from '@sim/services';
+import type { ServiceDef } from '@content/types/service';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
 import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
@@ -295,7 +298,7 @@ import {
   VfxSystem,
 } from '@game/vfx/index';
 import { createBolt, createGroundMarker, disposeBolt } from '@render/magic/index';
-import { createRenderBootstrap } from '@render/bootstrap/index';
+import { createGlSurface, createRenderBootstrap, type GlSurface } from '@render/bootstrap/index';
 import { createLeftover, disposeLeftover } from '@render/breakables/index';
 import { createWorldItemMesh, disposeWorldItemMesh } from '@render/items/index';
 import { createThrowArc } from '@render/player/index';
@@ -550,6 +553,10 @@ function gameContent(): Promise<GameContent> {
   return contentLoad;
 }
 
+// The canvas and renderer of the page, made by the first area session and kept by every one after
+// it (mw-ju8.44); only a page reload ends them.
+let glSurface: GlSurface | undefined;
+
 const app = document.querySelector<HTMLElement>('#app');
 if (app) {
   app.dataset['layers'] = [...layers, 'tools'].join(' ');
@@ -638,8 +645,12 @@ function startRenderer(
   }
   let view;
   try {
+    // The canvas and WebGL context are made once and outlive each area session (mw-ju8.44): a swap
+    // builds the next scene on them, keeping pointer lock and the compiled shader programs.
+    glSurface ??= createGlSurface(root);
     view = createRenderBootstrap({
       container: root,
+      surface: glSurface,
       // The game loop below draws each frame after stepping the sim (mw-e00.20).
       animationLoop: false,
       // The greybox scene below replaces the mw-e00.19 placeholder (mw-e00.21).
@@ -655,6 +666,8 @@ function startRenderer(
     return;
   }
   const { camera } = view;
+  // Listeners the session puts on the surviving canvas end with the session, like the page's.
+  scope.watch(view.canvas);
   scope.onDispose(() => {
     view.dispose();
   });
@@ -962,6 +975,12 @@ function startRenderer(
       capabilities,
       quests: questsOf(content),
       disposition: { dispositions, resolve: npcResolver(world) },
+      services: {
+        [SERVICES_SERVICE]: createServiceCatalog(
+          content.all('service') as unknown as ServiceDef[],
+          dialogueLogicRegistry(),
+        ),
+      },
     });
     root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
     // The knight's sword and shield (mw-e04.6): moves, socket tracks, the wood shield and the
@@ -2659,8 +2678,8 @@ function startRenderer(
         });
         const watch = new MechanismWatch(world, made);
         const leaves = doorLeafLooks(world, made, content).map(
-          ({ entity, size, centre, material }) => {
-            const object = createDoorLeaf(size, centre, material);
+          ({ entity, size, centre, material, model }) => {
+            const object = createDoorLeaf(size, centre, material, model);
             view.scene.add(object);
             sync.bind(entity, {
               ...object3DBinding(object, readDoorLeaf),

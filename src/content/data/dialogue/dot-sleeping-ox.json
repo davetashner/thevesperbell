@@ -657,13 +657,8 @@
           "once": true,
           "effects": [
             {
-              "kind": "gold",
-              "delta": -2
-            },
-            {
-              "kind": "disposition",
-              "npc": "npc-dot",
-              "delta": 3
+              "kind": "purchaseService",
+              "service": "dot-drink"
             }
           ],
           "next": "rumour-drink",
@@ -675,13 +670,8 @@
           "once": true,
           "effects": [
             {
-              "kind": "gold",
-              "delta": -10
-            },
-            {
-              "kind": "disposition",
-              "npc": "npc-dot",
-              "delta": 2
+              "kind": "purchaseService",
+              "service": "dot-proper-news"
             }
           ],
           "next": "rumour-coin",

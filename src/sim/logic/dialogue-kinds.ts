@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { compareNumbers, createLogicRegistry, LOGIC_COMPARISONS } from './builtins';
+import { registerServiceKinds } from '../services';
 import type { LogicRegistry } from './registry';
 import type { LogicContext } from './types';
 
@@ -45,6 +46,7 @@ export function registerDialogueKinds(registry: LogicRegistry): void {
       compareNumbers(node.op, visitCount(context, node.id, node.dialogue), node.value),
     refs: (node) => (node.dialogue === undefined ? [] : [{ type: 'dialogue', id: node.dialogue }]),
   });
+  registerServiceKinds(registry);
 }
 
 let shared: LogicRegistry | undefined;

@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique service id, e.g. \"kettleback-carrying-fee\". Stable once shipped."
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Who sells it, why this price, for owner review."
+    },
+    "providerNpcId": {
+      "description": "The NPC creature who provides the service.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "x-contentRef": "creature"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What a listing shows, e.g. \"Carrying fee\"."
+    },
+    "price": {
+      "description": "Fixed crowns. Give exactly one of `price` and `priceFormula`.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "priceFormula": {
+      "description": "A price that eases with the provider’s disposition toward the player.",
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "description": "Crowns at disposition 0 or below."
+        },
+        "floor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "description": "The least it ever costs."
+        },
+        "perDisposition": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "description": "Crowns knocked off per point of disposition above 0 (rounded down)."
+        }
+      },
+      "required": [
+        "base",
+        "floor",
+        "perDisposition"
+      ],
+      "additionalProperties": false
+    },
+    "conditions": {
+      "default": [],
+      "description": "Conditions (logic DSL) that must all hold to buy; none = always.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The logic kind, e.g. \"hasItem\"."
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "additionalProperties": {},
+        "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+      }
+    },
+    "showWhenLocked": {
+      "default": false,
+      "description": "Unmet conditions: `true` lists the service locked, `false` hides it.",
+      "type": "boolean"
+    },
+    "effects": {
+      "default": [],
+      "description": "Effects (logic DSL) applied with the payment, all or nothing. None = a pure fee. `purchaseService` is not allowed here.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The logic kind, e.g. \"hasItem\"."
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "additionalProperties": {},
+        "description": "A logic DSL node: an object with a `kind` and that kind’s fields."
+      }
+    }
+  },
+  "required": [
+    "id",
+    "notes",
+    "providerNpcId",
+    "name"
+  ],
+  "additionalProperties": false
+}

@@ -49,6 +49,8 @@ jobs:
           export ELEMENT_MATRIX_WORLDS=8000
           echo "seed $ELEMENT_MATRIX_SEED"
           pnpm exec vitest run tests/integration/element-matrix-run.test.ts
+      - name: Parry replays, 100 runs each (PRs run 10; mw-e41.29)
+        run: PARRY_REPLAY_RUNS=100 pnpm exec vitest run tests/integration/parry-replay.test.ts
 
   bench:
     if: inputs.bench

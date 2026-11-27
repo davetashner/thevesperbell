@@ -145,6 +145,13 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     const { world, made, spawn } = room(true);
     const looks = doorLeafLooks(world, made, content);
     expect(looks.map((l) => l.material)).toEqual(['iron', 'wood', 'iron', 'stone', 'wood']);
+    expect(looks.map((l) => l.model)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
     expect(looks[0]).toMatchObject({
       size: { x: 1.2, y: 2.2, z: 0.1 },
       centre: { x: 0, y: 1.1, z: 0 },
@@ -158,6 +165,15 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     expect(Object.keys(new MechanismWatch(world, made).readout().doors)).not.toContain(
       'north-gate',
     );
+    // A profile that names a model gets it on its look (mw-e25.27).
+    const modelled = {
+      ...content,
+      has: () => true,
+      get: () => ({ material: { id: 'iron' }, model: 'model-prop-lock-gate-01' }),
+    } as unknown as typeof content;
+    expect(
+      doorLeafLooks(world, { ...made, doors: [spawn('west-door')] }, modelled)[0],
+    ).toMatchObject({ material: 'iron', model: 'model-prop-lock-gate-01' });
     // Unknown profiles draw as generic; unnamed entities report by id.
     const odd = world.spawn();
     expect(

@@ -7,6 +7,7 @@
   "size": [6, 3.3, 0.3],
   "seconds": 8,
   "material": "iron",
+  "model": "model-prop-lock-gate-01",
   "blocks": { "light": false, "gas": false, "sound": false },
   "loudness": 60
 }

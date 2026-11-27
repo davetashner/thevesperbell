@@ -13,6 +13,7 @@ import type { QuestDef } from '@content/types/quest';
 import { DialogueRuntime, type CheckResolver } from '@sim/dialogue/runtime';
 import { declareFacts, QuestRuntime, validateQuestLogic, World } from '@sim/index';
 import { MemoryLogicHost, type LogicRefChecker } from '@sim/logic/index';
+import { contentServices } from './service-host';
 
 const BURGLAR = 'quest-bookshop-burglar';
 const BOOTS = 'quest-captains-boots';
@@ -66,7 +67,10 @@ function boot(options: { gold?: number; playerClass?: string; checks?: CheckReso
   const world = new World({ seed: 10 });
   declareFacts(world.facts, content.all('fact'), { mode: 'throw' });
   if (options.playerClass !== undefined) world.facts.set('player.class', options.playerClass);
-  const host = new WorldHost(world, { gold: options.gold ?? 0 });
+  const host = new WorldHost(world, {
+    gold: options.gold ?? 0,
+    services: contentServices(content),
+  });
   const runtime = new QuestRuntime({
     quests: content.all('quest') as never,
     facts: world.facts,
