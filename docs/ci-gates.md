@@ -18,6 +18,7 @@ one definition.
 
 | Job (workflow) | Tier | Reason |
 |---|---|---|
+| `changes` (ci.yml) | per-PR | Classifies the diff with `scripts/ci-changes.ts` (mw-e41.4) and outputs `unit` and `app`; not a required check. |
 | `lint` (ci.yml) | per-PR | Fast; includes the sim determinism and layer-import rules; required. |
 | `typecheck` (ci.yml) | per-PR | Fast; required. |
 | `unit` (ci.yml) | per-PR | Required context name. A no-op that points at `coverage-gate`; vitest bench left it for the nightly tier. |
@@ -25,7 +26,7 @@ one definition.
 | `coverage-gate` (ci.yml) | per-PR | Required aggregate: fails unless every shard passed, then `pnpm test:coverage:merge` (`vitest --merge-reports --coverage`) merges the blobs into one run, so the per-layer thresholds of contract §3 are enforced once on the merged coverage and `coverage/content-coverage.json` holds the union of every shard's exercised content; then `coverage:exclusions`, `content:coverage`, `content:loot` and the `coverage-summary` artifact the ratchet reads. |
 | `coverage-ratchet` (ci.yml) | per-PR | Coverage must not decrease versus `main`; seconds; required. |
 | `e2e-shard` 1 to 8 (ci.yml) | per-PR | Chromium e2e smoke in duration-weighted shards (`e2e/shards.json`); the behaviour gate for gameplay changes. Playwright stops itself at 15 min (`E2E_GLOBAL_TIMEOUT_MS`) so an overrunning shard still uploads its report and traces. |
-| `e2e-playthrough` (ci.yml) | per-PR | The slice playthrough replays a whole run; kept on every PR until path-aware selection lands (mw-e41.4). |
+| `e2e-playthrough` (ci.yml) | per-PR | The slice playthrough replays a whole run; skipped with the other app jobs when the change class is not `full` (see Change classes). |
 | `e2e-smoke` (ci.yml) | per-PR | Aggregates the e2e jobs under the required check name. |
 | `perf-budget` (ci.yml) | per-PR tier skipped; runs on push to `main` | Publishes the `perf-report` baseline artifact. Warn-only on GPU-less runners, ~510 s, so it is off every PR's critical path. |
 | `interaction-matrix` (ci.yml) | per-PR | 500 generated worlds x 300 ticks from a fixed seed keep every invariant (about 20 s), and the interaction matrix is regenerated, checked against the committed file and diffed into the job summary (mw-e03.26). |
@@ -50,6 +51,34 @@ one definition.
 | `dco` (pr-lint.yml) | per-PR | Every commit in the PR has a `Signed-off-by` line (`git commit -s`); seconds. Not yet a required check: adding it to branch protection is an owner-approved step (`docs/repo-settings.md`). |
 | `validate` (plan-check.yml) | per-PR | Backlog checks, path-filtered to `plan/`, `.beads/` and `scripts/`; seconds. |
 | `publish` (publish-site.yml) | per-PR | Republishes the backlog site on PR events and `main` pushes; no test signal. |
+
+## Change classes (mw-e41.4)
+
+Every merge to `main` makes the other open PRs merge it and re-run CI, so PRs that cannot affect the app should
+not pay for the whole pipeline. The `changes` job (`scripts/ci-changes.ts`) classifies the PR's changed paths
+(`git diff HEAD^1 HEAD` on the merge commit) and outputs two flags; heavy jobs carry a job-level
+`if: needs.changes.outputs.<flag> == 'true'`.
+
+| Class | Paths | `unit` | `app` |
+|---|---|---|---|
+| light | `.beads/**`, `plan/**`, `site/**`, `CHANGELOG.md` | no | no |
+| unit | `docs/**`, `scripts/**`, root `*.md` | yes | no |
+| full | everything else: `src/**`, `e2e/**`, `tests/**`, `package.json`, `pnpm-lock.yaml`, configs, `.github/**`, `public/**`, `assets/**`, unknown paths | yes | yes |
+
+A PR takes the highest class of any path; an empty diff is full. Pushes to `main` and `workflow_dispatch` are always
+full. `unit` gates `lint`, `typecheck`, `coverage-shard`, the coverage gate's merge steps, `coverage-ratchet`,
+`interaction-matrix`, `puzzle-validate`, `world-validate`, `dialogue-validate` and `narrative-lint`. `app` gates
+`e2e-shard`, `e2e-playthrough`, `build` and `size-budget`. Docs sit in the unit class because unit tests read them
+(generated docs, link checks, economy tables). Scripts-only PRs keep the coverage gate, so scripts' 100% threshold
+still applies. Always running: `unit` (a no-op), `beads-validate`, `secrets`, `audit`, `dependency-review`,
+`pr-lint`, `changelog`.
+
+Required checks never depend on a workflow path filter (a check that is never created blocks merging). A required job
+skipped by `if:` reports success; the two aggregates read their inputs explicitly: `coverage-gate` and `e2e-smoke`
+pass when their shards passed, or when all were skipped by design, and fail when a shard failed or was cancelled or
+when `changes` itself failed. If `changes` fails, `lint` and the others are skipped, but these two aggregates fail, so
+the PR cannot merge. Adding a path to a class is a change to `scripts/ci-changes.ts` and its test; when in doubt, leave
+it `full`.
 
 ## Playwright and Vitest projects
 
