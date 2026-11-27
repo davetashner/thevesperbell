@@ -106,6 +106,7 @@ import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
 import { ContestController } from '@game/contest/controller';
 import { startShanghaiUi } from '@game/shanghai/shanghai';
 import { contestsIn, installContests } from '@game/contest/install';
+import { startBargeRideUi } from '@game/barge/ride-card';
 import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
@@ -1842,6 +1843,8 @@ function startRenderer(
         },
       };
       if (transit !== undefined) applyCarriedWorld(world, transit.carry, carryOptions);
+      // Where the player is, for NPCs that stand in several scenes (Mags Oakum's barge fares, mw-e25.15).
+      world.facts.set('scene.current', scene.id);
       // Sky, fog and the painted backdrop of outdoor scenes (mw-ju8.1). The unapproved backdrop images
       // are not in production builds, so only dev loads them.
       environmentView?.dispose();
@@ -2570,6 +2573,18 @@ function startRenderer(
           classBeatUi = classBeats;
           afterStep.push(() => {
             classBeats.afterStep();
+          });
+          // The narrated barge ride (mw-e25.15): plays on arrival after a fare, then resets barge.ride.
+          const bargeRide = startBargeRideUi({
+            ui,
+            world,
+            content,
+            publish: (key, value) => {
+              root.dataset[key] = value;
+            },
+          });
+          afterStep.push(() => {
+            bargeRide.afterStep();
           });
         }
       }

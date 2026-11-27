@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "mags-patient-ann",
-  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. Barge booking is a hook: the ride option emits barge.ride-booked (morning 05:00-12:00 only; a night window 21:00-05:00 refuses outright, mid-day and evening say come back at first light; no event and no gold at night). Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4). Rumours 16 and 18 are told through emit rumor.told. The barge ride itself and travel are consumed elsewhere (follow-up bead).",
+  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. She stands at Briar Glen Quay, Kestrel Lock and the Wendmouth Stone Wharf and sells the barge ride as services (data/service barge-*, mw-e25.15) through purchaseService: she offers what suits the scene.current fact (quay and lock go downriver to Wendmouth, one game day; the Wharf goes upriver to the quay, two days, towed; the lock is a downriver stop only), four crowns each. Mornings only (05:00-12:00) and only from the morning after night 1 (time.day 2 or later; the main quest's night-one stage falls through on the same fact): a night window 21:00-05:00 refuses with the bible line, before day 2 she asks the player to come back after a first night, mid-day and evening say come back at first light; nothing is paid and no time passes on a refusal. Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare: the same ride, free. A thief can also pay five crowns to lie under the tarpaulin (stowaway), as can the tarpaulin deal: both set barge.stowaway-arrival so the customs inspection of that one arrival is skipped. The ride card (narration-barge) plays on arrival. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4, quay only). Rumours 16 and 18 are told through emit rumor.told.",
   "speakers": [
     {
       "id": "mags",
@@ -230,6 +230,15 @@
         },
         {
           "when": {
+            "kind": "factCmp",
+            "fact": "time.day",
+            "op": "lt",
+            "value": 2
+          },
+          "next": "ride-early"
+        },
+        {
+          "when": {
             "kind": "timeOfDay",
             "from": "05:00",
             "to": "12:00"
@@ -243,7 +252,14 @@
       "id": "ride-night",
       "kind": "line",
       "speaker": "mags",
-      "text": "Not in the dark, love. Not for gold, not for love, not for the Court itself. River's got teeth at night and I've the scars to show it. First light, and I'll take you gladly.",
+      "text": "Not in the dark, love. Not with whatever's singing up there, not for gold, not for love, not for the Court itself. River's got teeth at night and I've the scars to show it. First light, and I'll take you gladly.",
+      "next": "hub"
+    },
+    {
+      "id": "ride-early",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Not yet, love. I don't carry anyone who hasn't slept a night in Briar Glen and woken up the other side of it. Ask me again in the morning, when you've seen what the glen does after dark.",
       "next": "hub"
     },
     {
@@ -257,20 +273,45 @@
       "id": "ride-morning",
       "kind": "line",
       "speaker": "mags",
-      "text": "Morning tide, and a fair wind. Four coins to the Wendmouth stones, down by Kestrel Lock. Sit in the middle, don't touch the ropes. Well?",
-      "next": "ride-offer"
+      "text": "Morning tide, and a fair wind. Four coins, down the Wend or up it, and the upriver way takes twice as long, mind: the Ann is towed. Sit in the middle, don't touch the ropes. Well?",
+      "next": "ride-where"
     },
     {
-      "id": "ride-offer",
+      "id": "ride-where",
+      "kind": "branch",
+      "routes": [
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "scene.current",
+            "op": "eq",
+            "value": "kestrel-lock"
+          },
+          "next": "ride-offer-lock"
+        },
+        {
+          "when": {
+            "kind": "factCmp",
+            "fact": "scene.current",
+            "op": "eq",
+            "value": "wendmouth-harbour"
+          },
+          "next": "ride-offer-wharf"
+        }
+      ],
+      "else": "ride-offer-quay"
+    },
+    {
+      "id": "ride-offer-quay",
       "kind": "choice",
       "options": [
         {
           "id": "ride-pay",
-          "text": "Four coins. Done.",
+          "text": "Four coins, down to the Wendmouth Stone Wharf. Done.",
           "effects": [
             {
-              "kind": "gold",
-              "delta": -4
+              "kind": "purchaseService",
+              "service": "barge-quay-wharf"
             },
             {
               "kind": "emit",
@@ -286,8 +327,345 @@
           "onFail": "ride-broke"
         },
         {
+          "id": "ride-stowaway",
+          "text": "Five coins, and I'll lie under the tarpaulin.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "effects": [
+            {
+              "kind": "purchaseService",
+              "service": "barge-quay-wharf-stowaway"
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "stowaway"
+              }
+            }
+          ],
+          "next": "ride-stowaway-booked",
+          "onFail": "ride-broke-stowaway"
+        },
+        {
           "id": "ride-deal",
           "text": "I'll work my passage, as agreed.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tow-rope"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "herons"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "gust"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            },
+            {
+              "kind": "advanceTime",
+              "days": 1
+            },
+            {
+              "kind": "travelTo",
+              "scene": "wendmouth-harbour",
+              "spawn": "barge-berth"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "downriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": false
+            }
+          ],
+          "next": "ride-booked-deal"
+        },
+        {
+          "id": "ride-deal-tarpaulin",
+          "text": "I'll take the tarpaulin, as agreed.",
+          "when": {
+            "kind": "factCmp",
+            "fact": "mags.fare-deal",
+            "op": "eq",
+            "value": "tarpaulin"
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            },
+            {
+              "kind": "advanceTime",
+              "days": 1
+            },
+            {
+              "kind": "travelTo",
+              "scene": "wendmouth-harbour",
+              "spawn": "barge-berth"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "downriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": true
+            }
+          ],
+          "next": "ride-stowaway-booked"
+        },
+        {
+          "id": "ride-adit",
+          "text": "Take me up to the Weeping Adit.",
+          "when": {
+            "kind": "fact",
+            "fact": "mags.adit-open"
+          },
+          "effects": [
+            {
+              "kind": "gold",
+              "delta": -4
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "weeping-adit",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-adit-booked",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-no",
+          "text": "Not just yet.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "ride-offer-lock",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ride-pay-lock",
+          "text": "Four coins, down to the Wendmouth Stone Wharf. Done.",
+          "effects": [
+            {
+              "kind": "purchaseService",
+              "service": "barge-lock-wharf"
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-booked",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-stowaway-lock",
+          "text": "Five coins, and I'll lie under the tarpaulin.",
+          "when": {
+            "kind": "playerClass",
+            "class": "thief"
+          },
+          "effects": [
+            {
+              "kind": "purchaseService",
+              "service": "barge-lock-wharf-stowaway"
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "stowaway"
+              }
+            }
+          ],
+          "next": "ride-stowaway-booked",
+          "onFail": "ride-broke-stowaway"
+        },
+        {
+          "id": "ride-deal-lock",
+          "text": "I'll work my passage, as agreed.",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "tow-rope"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "herons"
+              },
+              {
+                "kind": "factCmp",
+                "fact": "mags.fare-deal",
+                "op": "eq",
+                "value": "gust"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            },
+            {
+              "kind": "advanceTime",
+              "days": 1
+            },
+            {
+              "kind": "travelTo",
+              "scene": "wendmouth-harbour",
+              "spawn": "barge-berth"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "lock-downriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": false
+            }
+          ],
+          "next": "ride-booked-deal"
+        },
+        {
+          "id": "ride-deal-tarpaulin-lock",
+          "text": "I'll take the tarpaulin, as agreed.",
+          "when": {
+            "kind": "factCmp",
+            "fact": "mags.fare-deal",
+            "op": "eq",
+            "value": "tarpaulin"
+          },
+          "effects": [
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run",
+                "fare": "deal"
+              }
+            },
+            {
+              "kind": "advanceTime",
+              "days": 1
+            },
+            {
+              "kind": "travelTo",
+              "scene": "wendmouth-harbour",
+              "spawn": "barge-berth"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "lock-downriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": true
+            }
+          ],
+          "next": "ride-stowaway-booked"
+        },
+        {
+          "id": "ride-no-lock",
+          "text": "Not just yet.",
+          "next": "hub"
+        }
+      ]
+    },
+    {
+      "id": "ride-offer-wharf",
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ride-pay-upriver",
+          "text": "Four coins, up to Briar Glen Quay. Done.",
+          "effects": [
+            {
+              "kind": "purchaseService",
+              "service": "barge-wharf-quay"
+            },
+            {
+              "kind": "emit",
+              "event": "barge.ride-booked",
+              "data": {
+                "skipper": "npc-mags",
+                "route": "river-run-upriver",
+                "fare": "gold"
+              }
+            }
+          ],
+          "next": "ride-booked-up",
+          "onFail": "ride-broke"
+        },
+        {
+          "id": "ride-deal-upriver",
+          "text": "I'll work my passage up to the quay, as agreed.",
           "when": {
             "kind": "any",
             "of": [
@@ -326,37 +704,31 @@
                 "route": "river-run",
                 "fare": "deal"
               }
+            },
+            {
+              "kind": "advanceTime",
+              "days": 2
+            },
+            {
+              "kind": "travelTo",
+              "scene": "briar-glen-river",
+              "spawn": "barge-arrival"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.ride",
+              "value": "upriver"
+            },
+            {
+              "kind": "setFact",
+              "fact": "barge.stowaway-arrival",
+              "value": false
             }
           ],
           "next": "ride-booked-deal"
         },
         {
-          "id": "ride-adit",
-          "text": "Take me up to the Weeping Adit.",
-          "when": {
-            "kind": "fact",
-            "fact": "mags.adit-open"
-          },
-          "effects": [
-            {
-              "kind": "gold",
-              "delta": -4
-            },
-            {
-              "kind": "emit",
-              "event": "barge.ride-booked",
-              "data": {
-                "skipper": "npc-mags",
-                "route": "weeping-adit",
-                "fare": "gold"
-              }
-            }
-          ],
-          "next": "ride-adit-booked",
-          "onFail": "ride-broke"
-        },
-        {
-          "id": "ride-no",
+          "id": "ride-no-wharf",
           "text": "Not just yet.",
           "next": "hub"
         }
@@ -367,6 +739,20 @@
       "kind": "line",
       "speaker": "mags",
       "text": "Done. Step aboard, mind your head on the boom, and for pity's sake don't touch the ropes.",
+      "end": true
+    },
+    {
+      "id": "ride-booked-up",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Done. Step aboard and find a coil to sit on. The horse is hitched, the river's against us, and it's two days of rope and reed. Don't touch the ropes.",
+      "end": true
+    },
+    {
+      "id": "ride-stowaway-booked",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Flat under the tarpaulin, love, and you're glenstone until I say otherwise. Customs counts stone, not lumps. You never heard me say any of it.",
       "end": true
     },
     {
@@ -388,6 +774,13 @@
       "kind": "line",
       "speaker": "mags",
       "text": "Four coins, love, not four promises. The river takes coin. Come back with some, or find a deal with me.",
+      "next": "hub"
+    },
+    {
+      "id": "ride-broke-stowaway",
+      "kind": "line",
+      "speaker": "mags",
+      "text": "Five coins, love. The tarpaulin's cheap, but it's not free. Come back with the fee and I'll tuck you in.",
       "next": "hub"
     },
     {
