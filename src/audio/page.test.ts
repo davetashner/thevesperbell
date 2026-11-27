@@ -124,4 +124,30 @@ describe('AudioPage across area sessions (mw-ju8.47)', () => {
     engine.dispose();
     expect(ctx.closeCalls).toBe(1);
   });
+
+  it('a load with no engine attached rejects', async () => {
+    const page = new AudioPage({ createContext: () => new FakeAudioContext(), cacheBytes: 10 });
+    expect(page.context).toBeUndefined();
+    await expect(page.runtime().cache.request('x')).rejects.toThrow(/no audio engine/);
+    expect(page.context).toBeDefined();
+  });
+
+  it('disposing before the context exists, and a failed load after dispose, are harmless', async () => {
+    const { createContext, session } = setup();
+    session().dispose();
+    expect(createContext).not.toHaveBeenCalled();
+    const failing = new AudioEngine({
+      registry: REGISTRY,
+      createContext: () => new FakeAudioContext(),
+      fetchBytes: () => Promise.reject(new Error('404')),
+      resolveUrl: (id, ext) => `/a/${id}.${ext}`,
+      format: 'ogg',
+      now: () => 0,
+      warn: () => undefined,
+    });
+    failing.play('sfx-ui-click');
+    failing.dispose();
+    await settle();
+    expect(failing.stats().voices).toBe(0);
+  });
 });
