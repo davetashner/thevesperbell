@@ -29,7 +29,7 @@ function room() {
   const tagsOf = new Map<string, readonly string[]>();
   for (const { entity, spawn } of game.scene.spawns) {
     byId.set(spawn.id, entity);
-    tagsOf.set(spawn.id, spawn.tags ?? []);
+    tagsOf.set(spawn.id, spawn.tags);
   }
   const id = (name: string): EntityId => {
     const entity = byId.get(name);
@@ -85,8 +85,8 @@ describe('the chaos room (mw-e03.54)', () => {
     const { sim, id, hit, steps } = room();
     hit('wet-crate-1', 'water', 5);
     steps(5);
-    expect(Number(readProperty(sim, id('wet-crate-1'), 'wetness'))).toBeGreaterThanOrEqual(0.35);
-    expect(Number(readProperty(sim, id('wet-crate-2'), 'wetness') ?? 0)).toBeLessThan(0.35);
+    expect(readProperty(sim, id('wet-crate-1'), 'wetness')).toBeGreaterThanOrEqual(0.35);
+    expect(readProperty(sim, id('wet-crate-2'), 'wetness')).toBeLessThan(0.35);
   });
 
   it('AC-4: cold on a soaked freeze-station crate freezes it, and the ice block starts frozen', () => {
@@ -104,6 +104,6 @@ describe('the chaos room (mw-e03.54)', () => {
     const { sim, id, hit, steps } = room();
     hit('charge-anvil', 'charge', 10);
     steps(2);
-    expect(Number(readProperty(sim, id('charge-anvil'), 'charge'))).toBeGreaterThanOrEqual(1);
+    expect(readProperty(sim, id('charge-anvil'), 'charge')).toBeGreaterThanOrEqual(1);
   });
 });
