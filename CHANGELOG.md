@@ -14,7 +14,6 @@ check enforces this).
 ### Added
 
 - Wet things now read clearly: a glossy sheen, bigger and more frequent drips and a rippling puddle under them, and each element state (burning, wet, frozen, charged) has its own shape or motion cue beside its colour. [mw-e03.53]
-
 - The Millweir sluice walk gap now has a hung plank bridge across it, and a climbing rope to tie at the far lip. [mw-e25.30.1]
 - Mags Oakum's barge runs: in the morning (from the morning after your first night) she takes you from Briar Glen Quay or Kestrel Lock down to the Wendmouth Stone Wharf in a day, and back up to the quay in two, for four crowns, with a narrated ride card. A thief can pay five to lie under the tarpaulin, and she won't sail at night. [mw-e25.15]
 - Services can now heal you, move the clock on and carry you to another place: the building blocks for the barge ride, where the fare, the days that pass and the arrival happen together or not at all. [mw-e20.14]
