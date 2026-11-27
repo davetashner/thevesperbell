@@ -13,7 +13,7 @@ check enforces this).
 
 ### Added
 
-- The Millweir sluice walk gap now has a hung plank bridge across it, a climbing rope to tie at the far lip, and a clear landing for a Blink. [mw-e25.30]
+- The Millweir sluice walk gap now has a hung plank bridge across it, and a climbing rope to tie at the far lip. [mw-e25.30.1]
 - Services can now heal you, move the clock on and carry you to another place: the building blocks for the barge ride, where the fare, the days that pass and the arrival happen together or not at all. [mw-e20.14]
 - The Millweir's mill pond is a real swim: turn the sluice wheel and the pond drains to a dry bed you can walk across, turn it back and it fills again to a deep pond you must swim (heavy armour sinks), and any pond that rises or falls now swims by its present depth. [mw-e25.29]
 - Gold now buys things from people, not just from shelves: a service system lets an NPC sell a favour, fee or bribe for a price that can ease with how much they like you (Mother Kettleback's carrying fees, Old Reed's toll, a drink for Dot), paid and applied together or not at all. [mw-e20.9]
