@@ -6,6 +6,7 @@ import { markExercised } from '@content/testing';
 import { gameContentSources, loadGameContent } from '@content/index';
 import { World } from '@sim/core/world';
 import { MemoryLogicHost } from '@sim/logic';
+import { contentServices } from './service-host';
 import { DialogueRuntime, type CheckResolver, type DialogueView } from '@sim/dialogue/runtime';
 import type { DialogueDef } from '@content/types/dialogue';
 import { main } from '../../src/tools/dialogue/cli';
@@ -26,7 +27,7 @@ function session(
   checks?: CheckResolver,
 ) {
   const world = new World<never>({ seed: 1, hz: 60 });
-  const host = new MemoryLogicHost(init);
+  const host = new MemoryLogicHost({ ...init, services: contentServices(content) });
   const runtime = new DialogueRuntime({
     world,
     host,
