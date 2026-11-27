@@ -169,6 +169,7 @@ flowchart LR
   under_the_bridge --- kestrel_lock
   briar_glen_quay ---|barge| kestrel_lock
   kestrel_lock ---|barge| stone_wharf
+  briar_glen_quay ---|barge| stone_wharf
   kestrel_lock -.-|shortcut| lockkeepers_cottage
   priory_road --- priory_gate
   priory_gate --- priory_nave
@@ -225,7 +226,7 @@ Land loops: forest ↔ watchtower ↔ priory; watchtower supply tunnel ↔ upper
 
 ## The barge and towpath to Wendmouth
 
-Briar Glen Quay → Millweir → Kestrel Lock → Stone Wharf is the **towpath** (`quay-millweir`, `millweir-kestrel-lock`, `towpath-lock-wharf`): foot, always open, a day's walk: each leg is a transition with `advanceMinutes: 360`, so crossing it advances the world clock by exactly 6 game hours (`advanceTime`, reason `travel`; the game clock doc, mw-e27.12). Kestrel Lock is built (mw-e25.14): the towpath reaches it from the Millweir by `millweir-kestrel-lock` (mw-e25.31: the towpath-gate at the east end of the river scene, arriving at the lock's `arrive-from-briar-glen-river`) and leaves it for the Stone Wharf by `towpath-lock-wharf`. The old direct riverbank-to-lock stand-in (`riverbank-lock-link`) is retired: the only way downriver on foot passes the quay and the Millweir. The **barge** (`barge-quay-lock`, `barge-lock-wharf`, `travel: barge`, `time: dawn, day`) is Mags Oakum's ride, a narrated journey or fast travel in the mornings only ("not with whatever's singing up there"). Wendmouth and Kestrel Lock are `optional`: the validator computes the main-quest critical path (waypoints in `mainQuest`, bible §4.1) over edges every class can take, on foot, avoiding optional nodes, and fails if it cannot (AC-5). Today's critical path is `bridge-post → mine gate → winch house → … → the Cradle → Sounding Shaft → belfry → Market Green`.
+Briar Glen Quay → Millweir → Kestrel Lock → Stone Wharf is the **towpath** (`quay-millweir`, `millweir-kestrel-lock`, `towpath-lock-wharf`): foot, always open, a day's walk: each leg is a transition with `advanceMinutes: 360`, so crossing it advances the world clock by exactly 6 game hours (`advanceTime`, reason `travel`; the game clock doc, mw-e27.12). Kestrel Lock is built (mw-e25.14): the towpath reaches it from the Millweir by `millweir-kestrel-lock` (mw-e25.31: the towpath-gate at the east end of the river scene, arriving at the lock's `arrive-from-briar-glen-river`) and leaves it for the Stone Wharf by `towpath-lock-wharf`. The old direct riverbank-to-lock stand-in (`riverbank-lock-link`) is retired: the only way downriver on foot passes the quay and the Millweir. The **barge** (`barge-quay-lock`, `barge-lock-wharf`, `travel: barge`, `time: dawn, day`) is Mags Oakum's ride (mw-e25.15), a narrated journey in the mornings only from the morning after the first night ("not with whatever's singing up there"). It is built as services she sells in her dialogue (`barge-quay-wharf`, `barge-lock-wharf`, `barge-wharf-quay`, and a thief's stowaway fares), so the edges stay listed as planned: no transition volume carries them. Quay to Wendmouth is `barge-quay-wharf` (one game day downriver; upriver two, towed), Kestrel Lock to Wendmouth is `barge-lock-wharf`. The edge `barge-quay-lock` is not built: she runs the whole river, not the first leg. Wendmouth and Kestrel Lock are `optional`: the validator computes the main-quest critical path (waypoints in `mainQuest`, bible §4.1) over edges every class can take, on foot, avoiding optional nodes, and fails if it cannot (AC-5). Today's critical path is `bridge-post → mine gate → winch house → … → the Cradle → Sounding Shaft → belfry → Market Green`.
 
 ## Ability-gated shortcuts per class
 
@@ -385,6 +386,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `towpath-lock-wharf` | `kestrel-lock` | `stone-wharf` | path |  |  | `kestrel-lock/towpath-down`, `wendmouth-harbour/towpath-gate` |
 | `barge-quay-lock` | `briar-glen-quay` | `kestrel-lock` | path (barge) |  |  | planned: mw-e25.15 |
 | `barge-lock-wharf` | `kestrel-lock` | `stone-wharf` | path (barge) |  |  | planned: mw-e40.26 |
+| `barge-quay-wharf` | `briar-glen-quay` | `stone-wharf` | path (barge) |  |  | planned: mw-e25.15 |
 | `lock-gate-crossing` | `kestrel-lock` | `lockkeepers-cottage` | shortcut | `{"fact":"kestrel-lock.gate-open"}` |  | planned: mw-e25.14 |
 | `priory-road-gate` | `priory-road` | `priory-gate` | path |  |  | `briarwood/priory-road-gate`, `bellwater-priory/road-gate` |
 | `priory-gate-nave` | `priory-gate` | `priory-nave` | path |  |  | planned: mw-e26.5 |

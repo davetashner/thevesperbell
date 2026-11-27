@@ -100,6 +100,7 @@ import { speakerNameResolver, speakerPortraitResolver } from '@game/portraits';
 import type { DialogueDef } from '@content/types/dialogue';
 import { dialogueLogicRegistry } from '@sim/logic/dialogue-kinds';
 import { createServiceCatalog, SERVICES_SERVICE } from '@sim/services';
+import { SCENE_SERVICE } from '@sim/logic/travel-kinds';
 import type { ServiceDef } from '@content/types/service';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
@@ -107,6 +108,7 @@ import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
 import { ContestController } from '@game/contest/controller';
 import { startShanghaiUi } from '@game/shanghai/shanghai';
 import { contestsIn, installContests } from '@game/contest/install';
+import { startBargeRideUi } from '@game/barge/ride-card';
 import { startClassBeatUi, type ClassBeatUi } from '@game/class-beats/class-beats';
 import { startEpilogueUi, type EpilogueUi } from '@game/epilogue/epilogue';
 import { startReaderUi } from '@game/reader/reader';
@@ -985,6 +987,10 @@ function startRenderer(
           content.all('service') as unknown as ServiceDef[],
           dialogueLogicRegistry(),
         ),
+        // The scene the player is in, for `inScene` (Mags Oakum's barge fares, mw-e25.15).
+        get [SCENE_SERVICE]() {
+          return root.dataset['scene'];
+        },
       },
     });
     root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
@@ -2584,6 +2590,18 @@ function startRenderer(
           classBeatUi = classBeats;
           afterStep.push(() => {
             classBeats.afterStep();
+          });
+          // The narrated barge ride (mw-e25.15): plays on arrival after a fare, then resets barge.ride.
+          const bargeRide = startBargeRideUi({
+            ui,
+            world,
+            content,
+            publish: (key, value) => {
+              root.dataset[key] = value;
+            },
+          });
+          afterStep.push(() => {
+            bargeRide.afterStep();
           });
         }
       }

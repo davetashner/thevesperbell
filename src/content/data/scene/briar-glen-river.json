@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "briar-glen-river",
   "name": "Briar Glen Quay and the Millweir",
-  "description": "Bead mw-e25.11, mw-e25.12, mw-e25.24: the river below Briar Glen as one walkable grey-box scene, about 220 x 60 m. From under the Miners' Bridge (path-up leads back, arrive-from-under-the-bridge arrives) the lit riverbank path runs east, downriver. Briar Glen Quay (x 30..100, bollards, six glenstone block stacks on timber cradles, a crane, the toll shed with its notice) fronts the quay basin, standing water you can swim, freeze into walkable ice or climb out of by two ladders; Mags Oakum's stone barge Patient Ann lies moored against the quay (static placeholder hull and barge-berth, the barge ride is mw-e25.15). Further east the Millweir: a sill and the mill pond (a deep pond you must swim; the sluice wheel drains it to a dry bed you can walk across by the ladders and the boulders on the bed, and turned back refills it; ladders lead out), a tall weir wall and the sluice walk, a catwalk hung on the downstream face with a 2.4 m gap mid-walk (jump, plank, Blink or rope anchor; a fall drops into the lower pool and never hurts, ladders lead out). The far end of the walk and the pond's far landing are the Briarwood far bank: reaching it by any route writes world.millweir.sluice-walk-open (graph millweir-walk), and the doorway in the far bank's south wall (far-bank-gate) leads on into the Briarwood (arrive-from-briarwood arrives). The towpath goes on east to a wall and the sign for Kestrel Lock: the towpath-gate transition to Kestrel Lock (arrive-from-briar-glen-river there, 6 game hours; arrive-from-kestrel-lock arrives back here). The Stone Stair slide from the Deepworks' cutting hall arrives at arrive-from-deepworks. Reach it with ?scene=briar-glen-river.",
+  "description": "Bead mw-e25.11, mw-e25.12, mw-e25.24: the river below Briar Glen as one walkable grey-box scene, about 220 x 60 m. From under the Miners' Bridge (path-up leads back, arrive-from-under-the-bridge arrives) the lit riverbank path runs east, downriver. Briar Glen Quay (x 30..100, bollards, six glenstone block stacks on timber cradles, a crane, the toll shed with its notice) fronts the quay basin, standing water you can swim, freeze into walkable ice or climb out of by two ladders; Mags Oakum's stone barge Patient Ann lies moored against the quay (static placeholder hull and barge-berth; Mags herself stands on the quay by the gangplank, sells the morning ride downriver to the Wendmouth Stone Wharf, and barge-arrival is where the barge from Wendmouth lands you, mw-e25.15). Further east the Millweir: a sill and the mill pond (a deep pond you must swim; the sluice wheel drains it to a dry bed you can walk across by the ladders and the boulders on the bed, and turned back refills it; ladders lead out), a tall weir wall and the sluice walk, a catwalk hung on the downstream face with a 2.4 m gap mid-walk (jump, plank, Blink or rope anchor; a fall drops into the lower pool and never hurts, ladders lead out). The far end of the walk and the pond's far landing are the Briarwood far bank: reaching it by any route writes world.millweir.sluice-walk-open (graph millweir-walk), and the doorway in the far bank's south wall (far-bank-gate) leads on into the Briarwood (arrive-from-briarwood arrives). The towpath goes on east to a wall and the sign for Kestrel Lock: the towpath-gate transition to Kestrel Lock (arrive-from-briar-glen-river there, 6 game hours; arrive-from-kestrel-lock arrives back here). The Stone Stair slide from the Deepworks' cutting hall arrives at arrive-from-deepworks. Reach it with ?scene=briar-glen-river.",
   "grid": 1,
   "camera": {
     "position": [-30, 40, -45],
@@ -674,6 +674,22 @@
       "tags": ["marker", "barge-departure"]
     },
     {
+      "id": "barge-arrival",
+      "at": [64.5, 0.0, -2.5],
+      "yaw": 90,
+      "tags": ["arrival", "barge"]
+    },
+    {
+      "id": "npc-mags",
+      "at": [68.0, 0.0, -2.5],
+      "yaw": 270,
+      "tags": ["npc", "barge"],
+      "creature": "npc-mags",
+      "leash": {
+        "radius": 1.5
+      }
+    },
+    {
       "id": "ann-hawser-coil",
       "at": [74.5, 0.25, 1.0],
       "tags": ["dock-prop", "barge"],
@@ -864,6 +880,50 @@
       "id": "sluice-walk-gap",
       "at": [150.75, 2.0, 15.25],
       "tags": ["marker", "gap", "plank-site"]
+    },
+    {
+      "id": "sluice-plank-bridge",
+      "at": [150.75, 2.25, 14.0],
+      "tags": ["bridge", "plank-bridge"],
+      "bridge": {
+        "to": [150.75, 2.25, 16.5],
+        "planks": 5,
+        "plank": "bridge-plank",
+        "width": 1.2,
+        "rating": 150,
+        "resistances": { "blunt": 1, "force": 1, "pierce": 0.3 }
+      }
+    },
+    {
+      "id": "sluice-gap-rope",
+      "at": [150.75, 2.25, 9.0],
+      "item": {
+        "id": "climbing-rope"
+      }
+    },
+    {
+      "id": "sluice-gap-hook",
+      "at": [150.75, 2.0, 16.25],
+      "tags": ["rope-anchor"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "climb",
+            "label": "Tie rope across the gap",
+            "requires": [
+              {
+                "item": "climbing-rope"
+              }
+            ],
+            "reason": "Needs a climbing rope"
+          },
+          {
+            "verb": "release",
+            "label": "Untie rope"
+          }
+        ],
+        "radius": 3
+      }
     },
     {
       "id": "far-landing",

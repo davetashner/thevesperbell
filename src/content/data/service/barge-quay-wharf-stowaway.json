@@ -1,0 +1,43 @@
+{
+  "$schema": "../service.schema.json",
+  "id": "barge-quay-wharf-stowaway",
+  "notes": "Mags Oakum's Patient Ann from Briar Glen Quay to the Wendmouth Stone Wharf (downriver, 1 game day), mw-e25.15. Mornings only (05:00 to 12:00) and only from the morning after the first night (time.day 2 or later): at night she will not run, 'not with whatever's singing up there' (bible 3.6). Sold through mags-patient-ann. The stowaway fare: a thief pays five crowns to lie under the tarpaulin, which sets barge.stowaway-arrival so the customs inspection of this one arrival is skipped.",
+  "providerNpcId": "npc-mags",
+  "name": "Stowaway under the tarpaulin: the Wendmouth Stone Wharf",
+  "price": 5,
+  "conditions": [
+    {
+      "kind": "timeOfDay",
+      "from": "05:00",
+      "to": "12:00"
+    },
+    {
+      "kind": "factCmp",
+      "fact": "time.day",
+      "op": "gte",
+      "value": 2
+    }
+  ],
+  "showWhenLocked": false,
+  "effects": [
+    {
+      "kind": "advanceTime",
+      "days": 1
+    },
+    {
+      "kind": "travelTo",
+      "scene": "wendmouth-harbour",
+      "spawn": "barge-berth"
+    },
+    {
+      "kind": "setFact",
+      "fact": "barge.ride",
+      "value": "downriver"
+    },
+    {
+      "kind": "setFact",
+      "fact": "barge.stowaway-arrival",
+      "value": true
+    }
+  ]
+}
