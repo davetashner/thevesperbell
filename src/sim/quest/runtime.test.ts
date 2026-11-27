@@ -156,6 +156,15 @@ class TestHost implements LogicHost {
   revealRumor(rumor: string): void {
     this.rumors.push(rumor);
   }
+  heal(): void {
+    // no health here
+  }
+  advanceTime(): void {
+    // no clock here
+  }
+  travelTo(): void {
+    // nowhere to go
+  }
 }
 
 interface Setup {

@@ -78,6 +78,12 @@ export interface LogicHost extends LogicContext {
   emit(event: string, data: Readonly<Record<string, LogicScalar>>): void;
   /** Reveals a rumor. Called only after the whole batch committed. */
   revealRumor(rumor: string): void;
+  /** Heals the player by `amount` points, or to full. Called only after the whole batch committed. */
+  heal(amount: number | 'full'): void;
+  /** Jumps the game clock forward `minutes` (whole, at least 1). Called only after the batch committed. */
+  advanceTime(minutes: number): void;
+  /** Asks the game to move the player to `spawn` of `scene`. Called only after the batch committed. */
+  travelTo(scene: string, spawn: string): void;
 }
 
 /** A reference from a node to content, for load-time checks: `{ type: 'item', id: 'key-a' }`. */
