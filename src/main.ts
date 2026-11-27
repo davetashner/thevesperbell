@@ -100,6 +100,7 @@ import { speakerNameResolver, speakerPortraitResolver } from '@game/portraits';
 import type { DialogueDef } from '@content/types/dialogue';
 import { dialogueLogicRegistry } from '@sim/logic/dialogue-kinds';
 import { createServiceCatalog, SERVICES_SERVICE } from '@sim/services';
+import { SCENE_SERVICE } from '@sim/logic/travel-kinds';
 import type { ServiceDef } from '@content/types/service';
 import type { QuestDef } from '@content/types/quest';
 import { startShopUi } from '@game/shop/shop-window';
@@ -985,6 +986,10 @@ function startRenderer(
           content.all('service') as unknown as ServiceDef[],
           dialogueLogicRegistry(),
         ),
+        // The scene the player is in, for `inScene` (Mags Oakum's barge fares, mw-e25.15).
+        get [SCENE_SERVICE]() {
+          return root.dataset['scene'];
+        },
       },
     });
     root.dataset['quests'] = String(gameLogic.quests?.ids().length ?? 0);
@@ -1849,8 +1854,6 @@ function startRenderer(
         },
       };
       if (transit !== undefined) applyCarriedWorld(world, transit.carry, carryOptions);
-      // Where the player is, for NPCs that stand in several scenes (Mags Oakum's barge fares, mw-e25.15).
-      world.facts.set('scene.current', scene.id);
       // Sky, fog and the painted backdrop of outdoor scenes (mw-ju8.1). The unapproved backdrop images
       // are not in production builds, so only dev loads them.
       environmentView?.dispose();

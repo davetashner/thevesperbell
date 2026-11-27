@@ -272,5 +272,16 @@ describe('services (mw-e20.9)', () => {
       ]);
       expect(validateServiceLogic(fare(1), registry)).toEqual([]);
     });
+
+    it('inScene holds only in the scene the host names, and names the scene it references', () => {
+      const cond = registry.condition('inScene');
+      const at = (scene?: string) =>
+        new MemoryLogicHost(scene === undefined ? {} : { services: { scene } });
+      const node = { kind: 'inScene', scene: 'kestrel-lock' };
+      expect(cond?.evaluate(node, at('kestrel-lock'))).toBe(true);
+      expect(cond?.evaluate(node, at('wendmouth-harbour'))).toBe(false);
+      expect(cond?.evaluate(node, at())).toBe(false);
+      expect(cond?.refs?.(node)).toEqual([{ type: 'scene', id: 'kestrel-lock' }]);
+    });
   });
 });

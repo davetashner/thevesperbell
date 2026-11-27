@@ -2,15 +2,8 @@
   "$schema": "../fact.schema.json",
   "id": "barge-ride",
   "name": "Barge ride facts",
-  "notes": "mw-e25.15: the facts the Patient Ann's ride runs on. Mags's dialogue sells the fares as services (barge-* in data/service) and needs to know where she is standing; the services leave the ride card and the stowaway flag behind for the arrival.",
+  "notes": "mw-e25.15: the facts the Patient Ann's ride runs on. Mags's dialogue sells the fares as services (barge-* in data/service) and needs to know where she is standing (the inScene condition, from the host, not a fact); the services leave the ride card and the stowaway flag behind for the arrival.",
   "facts": [
-    {
-      "key": "scene.current",
-      "type": "id",
-      "default": null,
-      "description": "The scene the player is in: the game writes it as each scene loads, so one NPC that stands in several places (Mags Oakum at the quay, the lock and the Stone Wharf) can offer what suits where she is. Read by mags-patient-ann.",
-      "owner": "scene"
-    },
     {
       "key": "barge.ride",
       "type": "enum",

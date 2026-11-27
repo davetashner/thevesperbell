@@ -30,10 +30,12 @@ function ride(init: Init) {
     ...(init.cls !== undefined && { playerClass: init.cls }),
     facts: {
       'time.day': init.day ?? 2,
-      ...(init.scene !== undefined && { 'scene.current': init.scene }),
       ...init.facts,
     },
-    services: contentServices(content),
+    services: {
+      ...contentServices(content),
+      ...(init.scene !== undefined && { scene: init.scene }),
+    },
   });
   const runtime = new DialogueRuntime({
     world,

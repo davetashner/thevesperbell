@@ -1,7 +1,7 @@
 {
   "$schema": "../dialogue.schema.json",
   "id": "mags-patient-ann",
-  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. She stands at Briar Glen Quay, Kestrel Lock and the Wendmouth Stone Wharf and sells the barge ride as services (data/service barge-*, mw-e25.15) through purchaseService: she offers what suits the scene.current fact (quay and lock go downriver to Wendmouth, one game day; the Wharf goes upriver to the quay, two days, towed; the lock is a downriver stop only), four crowns each. Mornings only (05:00-12:00) and only from the morning after night 1 (time.day 2 or later; the main quest's night-one stage falls through on the same fact): a night window 21:00-05:00 refuses with the bible line, before day 2 she asks the player to come back after a first night, mid-day and evening say come back at first light; nothing is paid and no time passes on a refusal. Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare: the same ride, free. A thief can also pay five crowns to lie under the tarpaulin (stowaway), as can the tarpaulin deal: both set barge.stowaway-arrival so the customs inspection of that one arrival is skipped. The ride card (narration-barge) plays on arrival. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4, quay only). Rumours 16 and 18 are told through emit rumor.told.",
+  "notes": "Mags Oakum (bible 5.13), skipper of the stone barge Patient Ann. Voice: warm, dry, river-wise; 'love'. She stands at Briar Glen Quay, Kestrel Lock and the Wendmouth Stone Wharf and sells the barge ride as services (data/service barge-*, mw-e25.15) through purchaseService: she offers what suits the scene she stands in (the inScene condition) (quay and lock go downriver to Wendmouth, one game day; the Wharf goes upriver to the quay, two days, towed; the lock is a downriver stop only), four crowns each. Mornings only (05:00-12:00) and only from the morning after night 1 (time.day 2 or later; the main quest's night-one stage falls through on the same fact): a night window 21:00-05:00 refuses with the bible line, before day 2 she asks the player to come back after a first night, mid-day and evening say come back at first light; nothing is paid and no time passes on a refusal. Class deals (knight tow-rope, archer herons, sorcerer Gust, thief tarpaulin) set mags.fare-deal and replace the fare: the same ride, free. A thief can also pay five crowns to lie under the tarpaulin (stowaway), as can the tarpaulin deal: both set barge.stowaway-arrival so the customs inspection of that one arrival is skipped. The ride card (narration-barge) plays on arrival. SECRETS behind disposition >= 8: Vane's crates (mags.crates-confessed) and the kept horn-coin (mags.coin-confessed); the Weeping Adit humming opens an extra route (disposition >= 4, quay only). Rumours 16 and 18 are told through emit rumor.told.",
   "speakers": [
     {
       "id": "mags",
@@ -282,19 +282,15 @@
       "routes": [
         {
           "when": {
-            "kind": "factCmp",
-            "fact": "scene.current",
-            "op": "eq",
-            "value": "kestrel-lock"
+            "kind": "inScene",
+            "scene": "kestrel-lock"
           },
           "next": "ride-offer-lock"
         },
         {
           "when": {
-            "kind": "factCmp",
-            "fact": "scene.current",
-            "op": "eq",
-            "value": "wendmouth-harbour"
+            "kind": "inScene",
+            "scene": "wendmouth-harbour"
           },
           "next": "ride-offer-wharf"
         }
