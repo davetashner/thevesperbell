@@ -134,6 +134,19 @@ describe('ElementField serialization', () => {
     expect(copy.conductivity(c(1))).toBe(0);
   });
 
+  it('mw-e32.20: a converged chunk keeps its count through serialize; others omit the key', () => {
+    const field = new ElementField();
+    field.set('temperature', { x: 0, y: 0, z: 0 }, 50);
+    expect(field.serialize().chunks[0]).not.toHaveProperty('converged');
+    const [only] = field.chunkList();
+    if (only === undefined) throw new Error('no chunk');
+    only.converged = 7;
+    const data = field.serialize();
+    expect(data.chunks[0]?.converged).toBe(7);
+    const copy = ElementField.deserialize(structuredClone(data));
+    expect(copy.chunkList()[0]?.converged).toBe(7);
+  });
+
   const good = () => new ElementField().serialize();
   const chunk = (over: Record<string, unknown>) => ({
     config: good().config,
@@ -151,6 +164,9 @@ describe('ElementField serialization', () => {
     ['bad calm', chunk({ calm: -1 })],
     ['non-integer calm', chunk({ calm: 'x' })],
     ['bad asleep', chunk({ asleep: 1 })],
+    ['zero converged', chunk({ converged: 0 })],
+    ['fractional converged', chunk({ converged: 1.5 })],
+    ['text converged', chunk({ converged: 'x' })],
     ['bad layers', chunk({ layers: {} })],
     ['odd conductivity', chunk({ conductivity: [1] })],
     ['missing conductivity', chunk({ conductivity: undefined })],
