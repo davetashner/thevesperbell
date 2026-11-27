@@ -193,4 +193,77 @@ describe('the Patient Ann (mw-e25.15)', () => {
     expect(r.host.facts.get('barge.stowaway-arrival')).toBeUndefined();
     expect(r.host.travels).toEqual([]);
   });
+
+  it('mw-e25.33: the quay sells a twelve-hour ride down to Kestrel Lock, landing at the barge landing', ({
+    task,
+  }) => {
+    markExercised(task, 'service', 'barge-quay-lock');
+    const r = ride({ scene: 'briar-glen-river' });
+    r.pick('ask-ride');
+    r.pick('ride-pay-kestrel');
+    expect(r.host.gold()).toBe(16);
+    expect(r.host.advanced).toEqual([720]);
+    expect(r.host.travels).toEqual([{ scene: 'kestrel-lock', spawn: 'barge-landing' }]);
+    expect(r.host.facts.get('barge.ride')).toBe('quay-lock-downriver');
+    expect(r.host.facts.get('barge.stowaway-arrival')).toBe(false);
+  });
+
+  it('mw-e25.33: the Stone Wharf sells a one-day towed ride up to Kestrel Lock', ({ task }) => {
+    markExercised(task, 'service', 'barge-wharf-lock');
+    const r = ride({ scene: 'wendmouth-harbour' });
+    r.pick('ask-ride');
+    r.pick('ride-pay-wharf-lock');
+    expect(r.host.gold()).toBe(16);
+    expect(r.host.advanced).toEqual([1440]);
+    expect(r.host.travels).toEqual([{ scene: 'kestrel-lock', spawn: 'barge-landing' }]);
+    expect(r.host.facts.get('barge.ride')).toBe('wharf-lock-upriver');
+  });
+
+  it('mw-e25.33: the lock itself offers no ride to the lock, and a thief cannot stow away on it', () => {
+    const lock = ride({ scene: 'kestrel-lock', cls: 'thief' });
+    lock.pick('ask-ride');
+    expect(lock.ids()).not.toContain('ride-pay-kestrel');
+    expect(lock.ids()).not.toContain('ride-pay-wharf-lock');
+    const quay = ride({ scene: 'briar-glen-river', cls: 'thief' });
+    quay.pick('ask-ride');
+    expect(quay.ids().filter((id) => id.includes('kestrel'))).toEqual(['ride-pay-kestrel']);
+  });
+
+  it('mw-e25.33: the lock rides refuse at night and for want of coin, and class deals ride them free', () => {
+    for (const [scene, pay] of [
+      ['briar-glen-river', 'ride-pay-kestrel'],
+      ['wendmouth-harbour', 'ride-pay-wharf-lock'],
+    ] as const) {
+      const night = ride({ scene, minute: 23 * 60 });
+      night.pick('ask-ride');
+      expect(night.ids()).not.toContain(pay);
+      const broke = ride({ scene, gold: 1 });
+      broke.pick('ask-ride');
+      broke.pick(pay);
+      expect(broke.host.travels).toEqual([]);
+      expect(broke.host.advanced).toEqual([]);
+    }
+    const down = ride({
+      scene: 'briar-glen-river',
+      cls: 'archer',
+      facts: { 'mags.fare-deal': 'herons' },
+    });
+    down.pick('ask-ride');
+    down.pick('ride-deal-kestrel');
+    expect(down.host.gold()).toBe(20);
+    expect(down.host.advanced).toEqual([720]);
+    expect(down.host.travels).toEqual([{ scene: 'kestrel-lock', spawn: 'barge-landing' }]);
+    expect(down.host.facts.get('barge.ride')).toBe('quay-lock-downriver');
+    const up = ride({
+      scene: 'wendmouth-harbour',
+      cls: 'thief',
+      facts: { 'mags.fare-deal': 'tarpaulin' },
+    });
+    up.pick('ask-ride');
+    up.pick('ride-deal-wharf-lock');
+    expect(up.host.gold()).toBe(20);
+    expect(up.host.advanced).toEqual([1440]);
+    expect(up.host.travels).toEqual([{ scene: 'kestrel-lock', spawn: 'barge-landing' }]);
+    expect(up.host.facts.get('barge.stowaway-arrival')).toBe(false);
+  });
 });

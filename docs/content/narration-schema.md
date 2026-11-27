@@ -19,7 +19,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `sequences[].pages` | list of object (at least 1) | required | The pages, in the order they are shown. For a class beat these are the generic text every class without its own variant sees. |
 | `sequences[].pages[].text` | string | required | The page as the player reads it. |
 | `sequences[].pages[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |
-| `sequences[].variants` | object | — | Class beats only: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`. |
+| `sequences[].variants` | object | — | Class beats: the pages of each class (knight, archer, sorcerer, thief); a class left out gets `pages`. Barge rides: Mags's aside to that class, shown before the last page; a class left out hears none. |
 | `sequences[].variants.knight` | list of object (at least 1) | — |  |
 | `sequences[].variants.knight[].text` | string | required | The page as the player reads it. |
 | `sequences[].variants.knight[].beat` | string | — | A named story beat this page lands (the first night ends on `horned-shadow`). |

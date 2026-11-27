@@ -882,6 +882,50 @@
       "tags": ["marker", "gap", "plank-site"]
     },
     {
+      "id": "sluice-plank-bridge",
+      "at": [150.75, 2.25, 14.0],
+      "tags": ["bridge", "plank-bridge"],
+      "bridge": {
+        "to": [150.75, 2.25, 16.5],
+        "planks": 5,
+        "plank": "bridge-plank",
+        "width": 1.2,
+        "rating": 150,
+        "resistances": { "blunt": 1, "force": 1, "pierce": 0.3 }
+      }
+    },
+    {
+      "id": "sluice-gap-rope",
+      "at": [150.75, 2.25, 9.0],
+      "item": {
+        "id": "climbing-rope"
+      }
+    },
+    {
+      "id": "sluice-gap-hook",
+      "at": [150.75, 2.0, 16.25],
+      "tags": ["rope-anchor"],
+      "interact": {
+        "affordances": [
+          {
+            "verb": "climb",
+            "label": "Tie rope across the gap",
+            "requires": [
+              {
+                "item": "climbing-rope"
+              }
+            ],
+            "reason": "Needs a climbing rope"
+          },
+          {
+            "verb": "release",
+            "label": "Untie rope"
+          }
+        ],
+        "radius": 3
+      }
+    },
+    {
       "id": "far-landing",
       "at": [137.0, 0.0, 32.0],
       "tags": ["marker", "far-bank"]

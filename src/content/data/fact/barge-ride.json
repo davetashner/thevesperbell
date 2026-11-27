@@ -7,9 +7,16 @@
     {
       "key": "barge.ride",
       "type": "enum",
-      "values": ["none", "downriver", "lock-downriver", "upriver"],
+      "values": [
+        "none",
+        "downriver",
+        "lock-downriver",
+        "upriver",
+        "quay-lock-downriver",
+        "wharf-lock-upriver"
+      ],
       "default": "none",
-      "description": "The ride the player has just taken and not yet seen: a barge fare sets it (downriver from the quay, lock-downriver from Kestrel Lock, upriver from Wendmouth), the narrated ride card plays on arrival (narration-barge) and resets it to none.",
+      "description": "The ride the player has just taken and not yet seen: a barge fare sets it (downriver from the quay, lock-downriver from Kestrel Lock, upriver from Wendmouth, quay-lock-downriver from the quay to Kestrel Lock, wharf-lock-upriver from Wendmouth to Kestrel Lock), the narrated ride card plays on arrival (narration-barge) and resets it to none.",
       "owner": "barge"
     },
     {
