@@ -56,5 +56,14 @@ export function questLogicHost(base: LogicHost, ops: QuestOps): LogicHost {
     revealRumor: (rumor) => {
       base.revealRumor(rumor);
     },
+    heal: (amount) => {
+      base.heal(amount);
+    },
+    advanceTime: (minutes) => {
+      base.advanceTime(minutes);
+    },
+    travelTo: (scene, spawn) => {
+      base.travelTo(scene, spawn);
+    },
   };
 }

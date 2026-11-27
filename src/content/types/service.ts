@@ -5,8 +5,8 @@
 // invokes it with the `purchaseService` effect; the gold is taken in the same atomic batch as the
 // effects, so a refusal anywhere changes nothing. Bribes and donations are services whose effects
 // are `disposition` / `setFact`; a translation is an item swap; a barge ride (mw-e25.15) is a service
-// with a fare, a `timeOfDay` condition for its schedule window and travel/time-advance effects
-// registered by that bead. Trainer techniques and merchant-window rooms stay in the merchant type
+// with a fare, a `timeOfDay` condition for its schedule window and the `advanceTime` and
+// `travelTo` effects (src/sim/logic/travel-kinds.ts; `heal` sits beside them). Trainer techniques and merchant-window rooms stay in the merchant type
 // (`services` there: `rest`, `train`). Kinds, fields and references of `conditions`/`effects` are
 // validated by src/sim/services (content may not import the sim at runtime).
 // The field reference in docs/content/service-schema.md is generated (`pnpm content:docs`).

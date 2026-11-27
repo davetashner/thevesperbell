@@ -54,6 +54,14 @@ export function contentReferences(content: GameContent): LogicRefChecker {
     capability: (id) => content.has('capability', id),
     service: (id) => content.has('service', id),
     class: (id) => content.has('class', id),
+    scene: (id) => content.has('scene', id),
+    spawn: (id) => {
+      const [scene = '', spawn = ''] = id.split('/');
+      return (
+        content.has('scene', scene) &&
+        content.get('scene', scene).spawns.some((s) => s.id === spawn)
+      );
+    },
     quest: (id) => content.has('quest', id),
     npc: (id) => content.has('creature', id),
     fact: (key) => lookupFact(facts, key) !== undefined,

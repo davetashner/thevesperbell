@@ -166,4 +166,111 @@ describe('services (mw-e20.9)', () => {
       'effects[0]: a service cannot use purchaseService',
     ]);
   });
+
+  describe('barge fare with heal, advanceTime and travelTo (mw-e20.14)', () => {
+    const fare = (days: number) =>
+      def({
+        id: `barge-${String(days)}`,
+        price: 12,
+        conditions: [{ kind: 'timeOfDay', from: '06:00', to: '12:00' }],
+        showWhenLocked: true,
+        effects: [
+          { kind: 'advanceTime', days },
+          { kind: 'travelTo', scene: 'wendmouth-wharf', spawn: 'barge-landing' },
+        ],
+      });
+    const morning = 8 * 60;
+
+    it('AC-1: the fare is taken, the arrival is requested and one day passes', () => {
+      const h = host([fare(1)], { gold: 20, minuteOfDay: morning });
+      expect(buy(h, 'barge-1')).toEqual({ ok: true, applied: 1 });
+      expect(h.gold()).toBe(8);
+      expect(h.advanced).toEqual([1440]);
+      expect(h.minuteOfDay()).toBe(morning);
+      expect(h.travels).toEqual([{ scene: 'wendmouth-wharf', spawn: 'barge-landing' }]);
+      expect(h.emitted.map((e) => e.event)).toEqual([SERVICE_PURCHASED_EVENT]);
+    });
+
+    it('AC-2: two days is 2880 minutes, advanced before the travel is requested', () => {
+      const h = host([fare(2)], { gold: 20, minuteOfDay: morning });
+      expect(buy(h, 'barge-2').ok).toBe(true);
+      expect(h.advanced).toEqual([2880]);
+    });
+
+    it('AC-3: at night it is refused, nothing is paid, no time passes, nowhere is requested', () => {
+      const h = host([fare(1)], { gold: 20, minuteOfDay: 23 * 60 });
+      expect(buy(h, 'barge-1')).toMatchObject({ ok: false, reason: 'service-locked:barge-1' });
+      expect(h.gold()).toBe(20);
+      expect(h.advanced).toEqual([]);
+      expect(h.travels).toEqual([]);
+    });
+
+    it('a later refusal leaves the clock, health and place alone', () => {
+      const h = host(
+        [
+          def({
+            id: 'bad',
+            effects: [
+              { kind: 'heal', full: true },
+              { kind: 'advanceTime', hours: 1 },
+              { kind: 'travelTo', scene: 'a-scene', spawn: 'a-spawn' },
+              { kind: 'takeItem', item: 'missing-thing', count: 1 },
+            ],
+          }),
+        ],
+        { gold: 90 },
+      );
+      expect(buy(h, 'bad')).toMatchObject({ ok: false });
+      expect(h.gold()).toBe(90);
+      expect([h.healed, h.advanced, h.travels]).toEqual([[], [], []]);
+    });
+
+    it('heals by an amount or fully, and durations add up', () => {
+      const h = host([], { gold: 0 });
+      const r = applyLogicEffects(
+        [
+          { kind: 'heal', amount: 5 },
+          { kind: 'heal', full: true },
+          { kind: 'advanceTime', days: 1, hours: 2, minutes: 3 },
+        ],
+        h,
+        registry,
+      );
+      expect(r.ok).toBe(true);
+      expect(h.healed).toEqual([5, 'full']);
+      expect(h.advanced).toEqual([1440 + 120 + 3]);
+      applyLogicEffects([{ kind: 'advanceTime', minutes: 30 }], h, registry);
+      applyLogicEffects([{ kind: 'advanceTime', hours: 2 }], h, registry);
+      expect(h.advanced.slice(1)).toEqual([30, 120]);
+    });
+
+    it('rejects bad fields and names the scene and spawn it references', () => {
+      const schema = (n: unknown) => registry.effect('advanceTime')?.schema.safeParse(n).success;
+      expect(schema({})).toBe(false);
+      expect(schema({ hours: 0 })).toBe(false);
+      expect(schema({ hours: 3 })).toBe(true);
+      expect(registry.effect('heal')?.schema.safeParse({ amount: 3, full: true }).success).toBe(
+        false,
+      );
+      expect(
+        registry.effect('travelTo')?.refs?.({ kind: 'travelTo', scene: 's-a', spawn: 'p-b' }),
+      ).toEqual([
+        { type: 'scene', id: 's-a' },
+        { type: 'spawn', id: 's-a/p-b' },
+      ]);
+    });
+
+    it('validation insists travelTo comes after advanceTime', () => {
+      const wrong = def({
+        effects: [
+          { kind: 'travelTo', scene: 's-a', spawn: 'p-b' },
+          { kind: 'advanceTime', hours: 1 },
+        ],
+      });
+      expect(validateServiceLogic(wrong, registry)).toEqual([
+        'effects[0]: travelTo must come after advanceTime',
+      ]);
+      expect(validateServiceLogic(fare(1), registry)).toEqual([]);
+    });
+  });
 });
