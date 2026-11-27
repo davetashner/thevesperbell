@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- A chaos room for testing element states (`?scene=chaos-room`): separate fire, water, freeze and charge stations and a row of six crates to set alight, soak, freeze or charge and tell apart at a glance. [mw-e03.54]
 - Mags Oakum's barge runs: in the morning (from the morning after your first night) she takes you from Briar Glen Quay or Kestrel Lock down to the Wendmouth Stone Wharf in a day, and back up to the quay in two, for four crowns, with a narrated ride card. A thief can pay five to lie under the tarpaulin, and she won't sail at night. [mw-e25.15]
 - Services can now heal you, move the clock on and carry you to another place: the building blocks for the barge ride, where the fare, the days that pass and the arrival happen together or not at all. [mw-e20.14]
 - The Millweir's mill pond is a real swim: turn the sluice wheel and the pond drains to a dry bed you can walk across, turn it back and it fills again to a deep pond you must swim (heavy armour sinks), and any pond that rises or falls now swims by its present depth. [mw-e25.29]
