@@ -54,6 +54,12 @@ export interface Chunk {
   /** Asleep chunks hold no layers and are skipped by diffusion until touched. */
   asleep: boolean;
   /**
+   * Convergence hysteresis (mw-e32.20): how many consecutive ticks the chunk has been converged
+   * (its last step moved no cell by more than the channel's `driftLimit`, and nothing has touched
+   * it since); 0 when it is not. Reset by `wake`.
+   */
+  converged: number;
+  /**
    * The allocated chunk across each face (+x, -x, +y, -y, +z, -z; face ^ 1 is the opposite one),
    * kept by `allocate` and `release`, so the diffusion kernel finds a neighbour without hashing.
    */
@@ -93,6 +99,8 @@ export interface ChunkData {
   readonly at: readonly [number, number, number];
   readonly calm: number;
   readonly asleep: boolean;
+  /** Present (positive) only for a converged chunk, so a field without one serializes as before. */
+  readonly converged?: number;
   /** Cells whose conductivity is not open air: [index, conductivity, …]. */
   readonly conductivity: readonly number[];
   /** [channel, [index, counts, …]] for every non-zero layer, channels sorted. */
@@ -325,6 +333,7 @@ export class ElementField {
       conductivity: undefined,
       calm: 0,
       asleep: false,
+      converged: 0,
       links: [undefined, undefined, undefined, undefined, undefined, undefined],
     };
     LINK_STEPS.forEach(([dx, dy, dz], face) => {
@@ -361,6 +370,7 @@ export class ElementField {
   wake(chunk: Chunk): void {
     chunk.asleep = false;
     chunk.calm = 0;
+    chunk.converged = 0;
   }
 
   private chunkOf(cell: CellCoord): Chunk | undefined {
@@ -389,6 +399,7 @@ export class ElementField {
           at: [chunk.cx, chunk.cy, chunk.cz],
           calm: chunk.calm,
           asleep: chunk.asleep,
+          ...(chunk.converged > 0 ? { converged: chunk.converged } : {}),
           conductivity:
             chunk.conductivity === undefined
               ? []
@@ -414,6 +425,7 @@ export class ElementField {
       at: coords,
       calm,
       asleep,
+      converged,
       conductivity,
       layers,
     } = (raw ?? {}) as Record<string, unknown>;
@@ -427,8 +439,12 @@ export class ElementField {
     if (!Array.isArray(layers)) invalid('chunk.layers must be an array');
     const chunk = this.allocate(cx, cy, cz);
     if (chunk === undefined) invalid('more chunks than maxChunks');
+    if (converged !== undefined && (!isInt(converged) || converged < 1)) {
+      invalid('chunk.converged must be a positive count');
+    }
     chunk.calm = calm;
     chunk.asleep = asleep;
+    chunk.converged = converged ?? 0;
     const table = new Uint16Array(CHUNK_CELLS).fill(CONDUCTIVITY_ONE);
     readSparse(conductivity, table, (c) => c >= 0 && c <= CONDUCTIVITY_ONE);
     if (table.some((c) => c !== CONDUCTIVITY_ONE)) chunk.conductivity = table;
