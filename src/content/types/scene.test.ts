@@ -1007,6 +1007,7 @@ describe('scene content', () => {
       'briarwood',
       'bridgeward-college',
       'chandelier-room',
+      'chaos-room',
       'chimes',
       'combat-sandbox',
       'dark-crossing',
