@@ -15,6 +15,8 @@ check enforces this).
 
 - Mags Oakum's barge also stops at Kestrel Lock: ride down from Briar Glen Quay in half a day, or up from the Wendmouth Stone Wharf in a day, for four crowns, each with its own narrated ride. [mw-e25.33]
 - Mags talks to you as you ride: the knight, archer, sorcerer and thief each hear their own remark from her on every barge journey. [mw-e39.49]
+- Wet things now read clearly: a glossy sheen, bigger and more frequent drips and a rippling puddle under them, and each element state (burning, wet, frozen, charged) has its own shape or motion cue beside its colour. [mw-e03.53]
+- The Millweir sluice walk gap now has a hung plank bridge across it, and a climbing rope to tie at the far lip. [mw-e25.30.1]
 - Mags Oakum's barge runs: in the morning (from the morning after your first night) she takes you from Briar Glen Quay or Kestrel Lock down to the Wendmouth Stone Wharf in a day, and back up to the quay in two, for four crowns, with a narrated ride card. A thief can pay five to lie under the tarpaulin, and she won't sail at night. [mw-e25.15]
 - Services can now heal you, move the clock on and carry you to another place: the building blocks for the barge ride, where the fare, the days that pass and the arrival happen together or not at all. [mw-e20.14]
 - The Millweir's mill pond is a real swim: turn the sluice wheel and the pond drains to a dry bed you can walk across, turn it back and it fills again to a deep pond you must swim (heavy armour sinks), and any pond that rises or falls now swims by its present depth. [mw-e25.29]
