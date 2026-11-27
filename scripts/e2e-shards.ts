@@ -136,6 +136,27 @@ export function averageDurations(
   );
 }
 
+export interface ShardTableProblems {
+  /** Specs the shards run that have no entry in shards.json (they would get the median weight). */
+  missing: string[];
+  /** shards.json entries whose spec file no longer exists (or is excluded from the shards). */
+  stale: string[];
+}
+
+/** Compares the spec files with the shard table (mw-e41.26). */
+export function checkShardTable(
+  specs: readonly string[],
+  durations: Durations,
+): ShardTableProblems {
+  const known = new Set(specs);
+  return {
+    missing: specs.filter((spec) => durations[spec] === undefined),
+    stale: Object.keys(durations)
+      .filter((spec) => !known.has(spec))
+      .sort(),
+  };
+}
+
 export interface ShardIo {
   e2eDir: string;
   shardsFile: string;
@@ -161,7 +182,8 @@ export const fileIo: ShardIo = {
   },
 };
 
-const USAGE = 'usage: e2e-shards-cli.ts files <shard> <count> | regenerate <report.json>...';
+const USAGE =
+  'usage: e2e-shards-cli.ts files <shard> <count> | regenerate <report.json>... | check';
 
 /**
  * CLI logic (see e2e-shards-cli.ts): `files <shard> <count>` prints the spec paths for one chromium
@@ -187,6 +209,23 @@ export function main(args: readonly string[], io: ShardIo = fileIo): number {
         .map((spec) => `${io.e2eDir}/${spec}`)
         .join(' '),
     );
+    return 0;
+  }
+  if (command === 'check') {
+    const stored = JSON.parse(io.readText(io.shardsFile)) as { durations: Durations };
+    const { missing, stale } = checkShardTable(listShardSpecs(io.e2eDir), stored.durations);
+    for (const spec of missing) {
+      io.error(
+        `::error file=${io.shardsFile}::${io.e2eDir}/${spec} has no entry in ${io.shardsFile}, so the shards give it the median weight. Add "${spec}": <estimated seconds> to "durations" (a similar spec's weight is fine; pnpm e2e:shards:regenerate <report.json>... refines it from CI reports).`,
+      );
+    }
+    for (const spec of stale) {
+      io.error(
+        `::error file=${io.shardsFile}::${io.shardsFile} lists "${spec}", which is not a shard spec in ${io.e2eDir}/. Remove that entry.`,
+      );
+    }
+    if (missing.length + stale.length > 0) return 1;
+    io.log(`${io.shardsFile} covers every e2e spec.`);
     return 0;
   }
   if (command === 'regenerate' && first !== undefined) {
