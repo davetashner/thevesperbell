@@ -1,0 +1,256 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "chaos-room",
+  "name": "Chaos room",
+  "description": "A greybox dev and test room for the element rules (mw-e03.54), reached with ?scene=chaos-room. A 24 m by 16 m hall with four spaced stations along the north side: fire (crates, a haystack, an oil barrel and an unlit brazier), wet (a water trough and two dry crates), freeze (an ice block, two crates and a puddle) and charge (an iron anvil, a crate and barrel and a puddle). Along the south wall six crates stand 3 m apart for the identification playtest (put each in a different state and ask what it is). The middle of the hall is left open for combo scenarios, with a pressure plate and a chandelier on a rope. Every object is spaced so fire in one cannot reach another.",
+  "grid": 1,
+  "camera": {
+    "position": [-14, 16, -14],
+    "target": [0, 0, 0]
+  },
+  "placements": [
+    {
+      "piece": "floor",
+      "at": [0, 0, 0],
+      "scale": [12, 1, 8]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, -8],
+      "scale": [12, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [0, 0, 8],
+      "scale": [12, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [-12, 0, 0],
+      "yaw": 90,
+      "scale": [8, 1, 1]
+    },
+    {
+      "piece": "wall",
+      "at": [12, 0, 0],
+      "yaw": 90,
+      "scale": [8, 1, 1]
+    }
+  ],
+  "spawns": [
+    {
+      "id": "player-start",
+      "at": [0, 0, -1],
+      "tags": ["player-start"]
+    },
+    {
+      "id": "fire-crate-1",
+      "at": [-10, 0, 3],
+      "prop": "crate",
+      "tags": ["station-fire", "flammable"]
+    },
+    {
+      "id": "fire-crate-2",
+      "at": [-8, 0, 3],
+      "prop": "crate",
+      "tags": ["station-fire", "flammable"]
+    },
+    {
+      "id": "fire-crate-3",
+      "at": [-9, 0, 5],
+      "prop": "crate",
+      "tags": ["station-fire", "flammable"]
+    },
+    {
+      "id": "fire-barrel",
+      "at": [-10.5, 0, 6.5],
+      "prop": "barrel-oil",
+      "tags": ["station-fire", "flammable"]
+    },
+    {
+      "id": "fire-haystack",
+      "at": [-7.5, 0, 6],
+      "prop": "crate",
+      "tags": ["station-fire", "flammable", "haystack"],
+      "properties": {
+        "material": "straw"
+      }
+    },
+    {
+      "id": "fire-brazier",
+      "at": [-9, 0.75, 1],
+      "tags": ["station-fire", "brazier"],
+      "lightSource": {
+        "variant": "brazier",
+        "unlit": true
+      }
+    },
+    {
+      "id": "wet-trough",
+      "at": [-3, 0, 5],
+      "tags": ["station-wet", "water"],
+      "liquid": {
+        "size": [2.5, 0.5, 1.5],
+        "liquid": "water",
+        "depth": 0.3
+      }
+    },
+    {
+      "id": "wet-crate-1",
+      "at": [-4.5, 0, 3],
+      "prop": "crate",
+      "tags": ["station-wet"]
+    },
+    {
+      "id": "wet-crate-2",
+      "at": [-1.5, 0, 3],
+      "prop": "crate",
+      "tags": ["station-wet"]
+    },
+    {
+      "id": "freeze-ice-block",
+      "at": [3, 0, 5],
+      "prop": "stone-block",
+      "tags": ["station-freeze", "ice"],
+      "properties": {
+        "material": "ice",
+        "frozen": true,
+        "weight": 60
+      }
+    },
+    {
+      "id": "freeze-crate-1",
+      "at": [2, 0, 3],
+      "prop": "crate",
+      "tags": ["station-freeze"]
+    },
+    {
+      "id": "freeze-crate-2",
+      "at": [4, 0, 3],
+      "prop": "crate",
+      "tags": ["station-freeze"]
+    },
+    {
+      "id": "freeze-puddle",
+      "at": [6, 0, 5.5],
+      "tags": ["station-freeze", "water"],
+      "liquid": {
+        "size": [1.5, 0.4, 1.5],
+        "liquid": "water",
+        "depth": 0.2
+      }
+    },
+    {
+      "id": "charge-anvil",
+      "at": [9, 0, 5],
+      "prop": "anvil",
+      "tags": ["station-charge", "conductive"]
+    },
+    {
+      "id": "charge-crate",
+      "at": [10.5, 0, 3],
+      "prop": "crate",
+      "tags": ["station-charge"]
+    },
+    {
+      "id": "charge-puddle",
+      "at": [8.5, 0, 2.5],
+      "tags": ["station-charge", "water"],
+      "liquid": {
+        "size": [1.5, 0.4, 1.5],
+        "liquid": "water",
+        "depth": 0.2
+      }
+    },
+    {
+      "id": "charge-barrel",
+      "at": [10, 0, 6.5],
+      "prop": "barrel",
+      "tags": ["station-charge"]
+    },
+    {
+      "id": "ident-1",
+      "at": [-7.5, 0, -6],
+      "prop": "crate",
+      "tags": ["ident"]
+    },
+    {
+      "id": "ident-2",
+      "at": [-4.5, 0, -6],
+      "prop": "crate",
+      "tags": ["ident"]
+    },
+    {
+      "id": "ident-3",
+      "at": [-1.5, 0, -6],
+      "prop": "crate",
+      "tags": ["ident"]
+    },
+    {
+      "id": "ident-4",
+      "at": [1.5, 0, -6],
+      "prop": "crate",
+      "tags": ["ident"]
+    },
+    {
+      "id": "ident-5",
+      "at": [4.5, 0, -6],
+      "prop": "crate",
+      "tags": ["ident"]
+    },
+    {
+      "id": "ident-6",
+      "at": [7.5, 0, -6],
+      "prop": "crate",
+      "tags": ["ident"]
+    },
+    {
+      "id": "combo-plate",
+      "at": [-4, 0, -2.5],
+      "tags": ["combo", "plate"],
+      "plate": {
+        "minWeight": 10,
+        "width": 1.5,
+        "depth": 1.5
+      }
+    },
+    {
+      "id": "combo-rope",
+      "at": [5, 9, -2],
+      "tags": ["combo", "rope", "chandelier"],
+      "rope": {
+        "length": 2,
+        "radius": 0.08,
+        "support": {
+          "resistances": {
+            "blunt": 1,
+            "force": 1,
+            "pierce": 0.3
+          }
+        }
+      },
+      "properties": {
+        "material": "rope",
+        "hp": 20
+      }
+    },
+    {
+      "id": "combo-chandelier",
+      "at": [5, 6.75, -2],
+      "tags": ["combo", "prop", "chandelier"],
+      "prop": "chandelier",
+      "suspendedFrom": "combo-rope"
+    }
+  ],
+  "light": {
+    "ambient": 0.5,
+    "directional": [
+      {
+        "id": "sun",
+        "direction": [-0.3, -1, 0.4],
+        "level": 0.5,
+        "reach": 60
+      }
+    ]
+  }
+}

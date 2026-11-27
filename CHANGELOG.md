@@ -14,6 +14,7 @@ check enforces this).
 ### Added
 
 - Wooden crates, straw, cloth, rope and paper now soak up water from rain, rivers and splashes, soaked wood freezes in the cold and will not catch fire, with no special set-up per crate. [mw-e03.59]
+- A chaos room for testing element states (`?scene=chaos-room`): separate fire, water, freeze and charge stations and a row of six crates to set alight, soak, freeze or charge and tell apart at a glance. [mw-e03.54]
 - Mags Oakum's barge also stops at Kestrel Lock: ride down from Briar Glen Quay in half a day, or up from the Wendmouth Stone Wharf in a day, for four crowns, each with its own narrated ride. [mw-e25.33]
 - Mags talks to you as you ride: the knight, archer, sorcerer and thief each hear their own remark from her on every barge journey. [mw-e39.49]
 - Wet things now read clearly: a glossy sheen, bigger and more frequent drips and a rippling puddle under them, and each element state (burning, wet, frozen, charged) has its own shape or motion cue beside its colour. [mw-e03.53]
