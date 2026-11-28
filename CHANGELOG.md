@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The priory road out of Market Green's east gate is open: it leads into the Briarwood's west side and on through the trees to the road up to Bellwater Priory. [mw-0qcf]
 - A scene can set its air temperature (`"air": { "temperature": -5 }`): ice stays frozen in a cold room and melts faster in a warm one, and the scales room is now a cold vault so its block of ice keeps its weight. [mw-e03.62]
 - Melting ice loses weight: an ice block on a pressure plate shrinks as it thaws and lets the plate up once too little is left, a free timer puzzle (a wet crate that is only iced over keeps its weight). The chaos room has an ice block on a plate to try. [mw-e03.60]
 - The chaos room has extra props for combos (an oil barrel and two crates in a row, a plate under the chandelier, a straw bale on a plate, an anvil beside a puddle and crates), and a catalogue of thirteen replayable emergent combos guards how fire, water, cold, charge, ropes and weight work together. [mw-e03.27.1]
