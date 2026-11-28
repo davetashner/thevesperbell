@@ -194,7 +194,7 @@ jobs:
       # Falls back to the committed coverage-baseline.json with a warning annotation.
       - run: node scripts/coverage-ratchet-cli.ts
 
-  # The chromium project runs in duration-weighted shards (mw-e41.1; eight since mw-e41.26: Actions minutes are free on this public repo, so shards are cheap, and the area-walk specs pushed six to the 20-minute limit): e2e/shards.json holds per-spec
+  # The chromium project runs in duration-weighted shards (mw-e41.1; ten since mw-e41.34, eight before that (mw-e41.26): Actions minutes are free on this public repo, so shards are cheap, and the area-walk specs pushed six to the 20-minute limit; see docs/ci-gates.md for the margin target): e2e/shards.json holds per-spec
   # seconds and scripts/e2e-shards-cli.ts hands each shard its spec files, so no shard is much slower
   # than the rest. Playwright's own --shard split left one shard at 600-810 s beside others at 330-670 s,
   # and the slowest shard sets the PR's wall clock. Regenerate the weights with
@@ -210,7 +210,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -235,7 +235,7 @@ jobs:
         env:
           E2E_GLOBAL_TIMEOUT_MS: '900000'
         run: |
-          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 8)
+          files=$(node scripts/e2e-shards-cli.ts files ${{ matrix.shard }} 10)
           # An empty list would make Playwright run every spec.
           if [ -z "$files" ]; then echo "Shard ${{ matrix.shard }} has no specs."; exit 0; fi
           pnpm e2e --project=chromium $files

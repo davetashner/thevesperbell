@@ -19,6 +19,13 @@
       "owner": "world"
     },
     {
+      "key": "well.tunnel.found",
+      "type": "bool",
+      "default": false,
+      "description": "The player has come through the Glen Well's tunnel into the cistern (mw-e24.10; resolves rumour 4). Written by the bellwater-cistern graph's well-end volume.",
+      "owner": "world"
+    },
+    {
       "key": "world.jail-drain.open",
       "type": "bool",
       "default": false,

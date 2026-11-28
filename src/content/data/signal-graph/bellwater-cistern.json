@@ -1,0 +1,25 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "bellwater-cistern",
+  "name": "Bellwater cistern, well end",
+  "notes": "The well end of the cistern in the scene bellwater-priory (mw-e24.10), where the tunnel from the Glen Well comes in. The player-filtered volume `glen-well-cistern` covers the chamber round arrive-from-briar-glen-green: the first time the player stands in it the latch writes well.tunnel.found = true and keeps it, and the rumour book resolves rumour 4 (place-glen-well's visit trigger is this volume).",
+  "nodes": [
+    {
+      "id": "glen-well-cistern",
+      "kind": "volume",
+      "observed": true,
+      "shape": {
+        "kind": "box",
+        "center": { "x": 7, "y": -1.75, "z": 42 },
+        "halfExtents": { "x": 5, "y": 1.25, "z": 4 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    { "id": "found", "kind": "latch" },
+    { "id": "found-fact", "kind": "receiver", "receiver": "fact", "key": "well.tunnel.found" }
+  ],
+  "wires": [
+    { "from": "glen-well-cistern.enter", "to": "found.set" },
+    { "from": "found", "to": "found-fact" }
+  ]
+}

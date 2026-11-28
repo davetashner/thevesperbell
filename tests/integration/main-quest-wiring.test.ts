@@ -22,6 +22,7 @@ import {
   loadScene,
   registerSceneComponents,
   registerWorldProperties,
+  installLiquids,
   installStimuli,
   lightComponents,
   stimulusSystem,
@@ -43,6 +44,7 @@ function play(scene: string, at: { x: number; y: number; z: number }) {
     registerWorldProperties(registerSceneComponents(new World<never>({ seed: 3 }))),
   );
   world.register(...INTERACTION_COMPONENTS, ...lightComponents);
+  installLiquids(world); // the priory's flooded cistern (mw-e24.10)
   world.addSystem(stimulusSystem());
   installFactRegistry(world.facts, content, false);
   const player = world.spawn();
