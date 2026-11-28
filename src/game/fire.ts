@@ -23,6 +23,7 @@ import {
   installActorElements,
   type ActorSpec,
   type DamageModel,
+  airFieldConfig,
   ElementRuleSet,
   elementFieldSystem,
   elementRulesSystem,
@@ -51,6 +52,13 @@ export function fireSettleOptions(content: Pick<GameContent, 'all'>): SettleOpti
   };
 }
 
+/** `installGameFire`'s `air` option for `scene`: its authored air temperature, if any (mw-e03.62). */
+export function sceneAirOption(scene: {
+  readonly air?: { readonly temperature: number } | undefined;
+}): { air?: number } {
+  return scene.air === undefined ? {} : { air: scene.air.temperature };
+}
+
 /**
  * Installs the element field and the fire rules from the game's material data, and makes creatures
  * and the player actors in them (mw-e03.24): they are wet, burning, frozen and charged by the same
@@ -64,11 +72,13 @@ export function installGameFire<TInput>(
     readonly damage?: DamageModel;
     /** The player's position: the field runs at a reduced rate far from it (mw-e03.30). */
     readonly focus?: () => Vec3 | undefined;
+    /** The scene's air temperature, °C: the field's ambient (absent: 20; mw-e03.62). */
+    readonly air?: number;
   } = {},
 ): void {
   const materials = content.all('material');
   const presets = materialPresets(materials);
-  installElementField(world);
+  installElementField(world, airFieldConfig(options.air));
   installLiquids(world);
   installIce(world);
   // Creatures by id, and the items that conduct when worn (their material's conductive).

@@ -2,7 +2,8 @@
   "$schema": "../scene.schema.json",
   "id": "scales-room",
   "name": "Scales room",
-  "description": "Greybox reference puzzle for weight (mw-e15.9): two pressure plates in a 10 m room must each carry between 20 and 100 kg for a second to raise the portcullis to the north. Nothing says what to put on them: crates (two weighted crate sets), limp bodies, a block of ice, or the player standing on one plate while Mage Hand sets the light crate (20 kg) on the other all work, because the puzzle reads weight, not what supplies it. A 120 kg stone block is too heavy for either plate (the window has a ceiling). Reach it with ?scene=scales-room.",
+  "description": "Greybox reference puzzle for weight (mw-e15.9): two pressure plates in a 10 m room must each carry between 20 and 100 kg for a second to raise the portcullis to the north. Nothing says what to put on them: crates (two weighted crate sets), limp bodies, a block of ice, or the player standing on one plate while Mage Hand sets the light crate (20 kg) on the other all work, because the puzzle reads weight, not what supplies it. A 120 kg stone block is too heavy for either plate (the window has a ceiling). The room is a cold stone vault (air at -5 °C), so the block of ice stays frozen and keeps its weight. Reach it with ?scene=scales-room.",
+  "air": { "temperature": -5 },
   "grid": 1,
   "camera": {
     "position": [-7, 8, -8],
@@ -135,7 +136,6 @@
       "properties": {
         "material": "ice",
         "frozen": true,
-        "freezePoint": 30,
         "weight": 60
       }
     },

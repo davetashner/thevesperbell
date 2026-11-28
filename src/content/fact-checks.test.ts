@@ -164,6 +164,7 @@ describe('fact checks', () => {
       'wendmouth.visited',
       'world.millweir.sluice-walk-open',
       'world.stone-stair.lowered',
+      'world.supply-tunnel.cleared',
     ]);
   });
 

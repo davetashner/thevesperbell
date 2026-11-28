@@ -49,6 +49,8 @@
     "asset:crop": "node scripts/assets/crop-cli.ts",
     "asset:turntable": "node scripts/assets/turntable-cli.ts",
     "assets:build": "node src/tools/assets/build/build-cli.ts",
+    "assets:approve": "node src/tools/assets/approvals/approve-cli.ts",
+    "assets:validate": "node src/tools/assets/approvals/validate-cli.ts",
     "audio:placeholders": "node scripts/audio/gen-placeholders-cli.ts",
     "audio:placeholder-report": "node scripts/audio/placeholder-report-cli.ts",
     "vfx:placeholders": "node scripts/vfx/gen-placeholders-cli.ts",
