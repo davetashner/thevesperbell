@@ -1,8 +1,10 @@
 // Scenario files on disk (mw-e03.27): one JSON file per scenario in tests/scenarios, read and validated
 // here, and the golden hash written back when a scenario is blessed.
 
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { format, resolveConfig } from 'prettier';
 import { scenarioSchema, type Scenario } from './schema';
 
 /** Where the scenarios live, relative to the repo root. */
@@ -38,12 +40,22 @@ export function loadScenarios(dir: string = SCENARIO_DIR): Scenario[] {
   });
 }
 
-/** Writes `finalHash` as the scenario's golden, in the file's own layout. */
-export function writeGolden(
+/**
+ * `text` as Prettier would lay out the file at `path`, using the repo's Prettier config, so a
+ * generated file passes `prettier --check` as written.
+ */
+export async function formatLikePrettier(path: string, text: string): Promise<string> {
+  const config = await resolveConfig(path);
+  return format(text, { ...config, filepath: path });
+}
+
+/** Writes `finalHash` as the scenario's golden, in the file's own layout (Prettier-formatted). */
+export async function writeGolden(
   scenario: Scenario,
   finalHash: string,
   dir: string = SCENARIO_DIR,
-): void {
+): Promise<void> {
   const next: Scenario = { ...scenario, golden: { finalHash } };
-  writeFileSync(join(dir, `${scenario.id}.json`), `${JSON.stringify(next, null, 2)}\n`);
+  const path = join(dir, `${scenario.id}.json`);
+  await writeFile(path, await formatLikePrettier(path, JSON.stringify(next, null, 2)));
 }
