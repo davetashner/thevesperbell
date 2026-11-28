@@ -2,6 +2,7 @@
   "$schema": "../creature.schema.json",
   "id": "forgotten-brute",
   "family": "forgotten",
+  "faction": "forgotten",
   "tags": ["undead", "forgotten", "brute"],
   "stats": {
     "health": 220,

@@ -20,7 +20,7 @@ import type { EntityId } from '../../core/component';
 import type { System, World } from '../../core/world';
 import { factionOf, relation } from '../../factions/runtime';
 import { isFriendlyStance } from '../../factions/stance';
-import type { FactionTable } from '../../factions/table';
+import { UNALIGNED_FACTION, type FactionTable } from '../../factions/table';
 import {
   at,
   boundPieces,
@@ -65,10 +65,15 @@ export type AllyRule = (world: World<never>, attacker: EntityId, target: EntityI
 /** Nobody is an ally: every hitbox strikes everyone (worlds without factions). */
 export const noAllies: AllyRule = () => false;
 
-/** Allies are members of the same faction (needs the faction components registered). */
+/**
+ * Allies are members of the same faction (needs the faction components registered). `unaligned`
+ * means no faction, not a shared one: two unaligned creatures are never allies.
+ */
 export const sameFaction: AllyRule = (world, attacker, target) => {
   const faction = factionOf(world, attacker);
-  return faction !== undefined && faction === factionOf(world, target);
+  return (
+    faction !== undefined && faction !== UNALIGNED_FACTION && faction === factionOf(world, target)
+  );
 };
 
 /** Allies are those the attacker regards as ally or friendly under `table` (live stances). */

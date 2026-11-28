@@ -2,6 +2,7 @@ import type { MoveTable, RuntimeAttack, RuntimeMove } from '@content/index';
 import { describe, expect, it } from 'vitest';
 import type { EntityId } from '../../core/component';
 import { World } from '../../core/world';
+import type { AllyRule } from '../hits/system';
 import { hashWorld } from '../../snapshot';
 import { PlacementComponent, placeEntity } from '../../stimulus/placement';
 import type { Vec3 } from '../../stimulus/shapes';
@@ -108,14 +109,18 @@ function makeAttack(
   };
 }
 
-function setup(attacks: readonly RuntimeAttack[]) {
+function setup(attacks: readonly RuntimeAttack[], isAlly?: AllyRule) {
   const world = new World<never>({ seed: 5 }).register(
     ...DAMAGE_COMPONENTS,
     ...ATTACK_COMPONENTS,
     PlacementComponent,
   );
   const damage = new DamageModel();
-  const off = installAttacks(world, { attacks: new Map(attacks.map((a) => [a.id, a])), damage });
+  const off = installAttacks(world, {
+    attacks: new Map(attacks.map((a) => [a.id, a])),
+    damage,
+    ...(isAlly !== undefined && { isAlly }),
+  });
   const log = {
     telegraph: [] as TelegraphInfo[],
     active: [] as AttackActiveInfo[],
@@ -692,5 +697,44 @@ describe('attack executor and i-frames (mw-e04.28)', () => {
     ]);
     const projectile = world.query(ProjectileComponent).ids()[0] ?? expect.fail('no projectile');
     expect(world.get(projectile, ProjectileComponent)?.dodged).toEqual([knight, nearer]);
+  });
+});
+
+describe('allies are passed through (mw-qfx)', () => {
+  const bolt = makeAttack('ally-bolt', [2, 2, 2], {
+    kind: 'projectile',
+    projectile: { speed: 60, maxRange: 5, origin: { x: 0, y: 0, z: 0.5 }, radius: 0.1 },
+  });
+
+  it('AC-3: a melee swing through an ally hurts only the stranger beside it', () => {
+    const ally = new Set<EntityId>();
+    const { world, attacker, target, steps, health } = setup(
+      [makeAttack('ally-strike')],
+      (_w, a, t) => ally.has(a) && ally.has(t),
+    );
+    const brute = attacker();
+    const friend = target({ x: 0, y: 0, z: 1 });
+    const stranger = target({ x: 0.2, y: 0, z: 1 });
+    ally.add(brute).add(friend);
+    startAttack(world, brute, makeAttack('ally-strike'), FORWARD);
+    steps(20);
+    expect(health(friend)).toBe(100);
+    expect(health(stranger)).toBeLessThan(100);
+  });
+
+  it('AC-4: a projectile flies through an ally and hits the stranger behind it', () => {
+    const ally = new Set<EntityId>();
+    const { world, attacker, target, steps, health } = setup(
+      [bolt],
+      (_w, a, t) => ally.has(a) && ally.has(t),
+    );
+    const archer = attacker();
+    const friend = target({ x: 0, y: 0, z: 2 });
+    const stranger = target({ x: 0, y: 0, z: 3.5 });
+    ally.add(archer).add(friend);
+    startAttack(world, archer, bolt, FORWARD);
+    steps(8);
+    expect(health(friend)).toBe(100);
+    expect(health(stranger)).toBe(90);
   });
 });

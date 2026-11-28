@@ -62,7 +62,9 @@ import type { Hurtbox } from '../hits/components';
 import { DodgedHit } from '../hits/events';
 import {
   hurtboxTargets,
+  noAllies,
   noInvulnerability,
+  type AllyRule,
   segmentHurtboxHits,
   type HurtboxTargets,
   type InvulnerabilityRule,
@@ -134,6 +136,12 @@ export interface ArrowSystemOptions {
    * `invulnerabilityRule(moves)` gives dodge and wake-up i-frames (run the timeline first).
    */
   readonly invulnerable?: InvulnerabilityRule;
+  /**
+   * Who counts as the shooter's ally: an arrow flies through them (a creature's arrow does not hurt
+   * its own kind; mw-qfx). Defaults to nobody. Arrows with no shooter never meet an ally, and the
+   * environment's damage (fire, falling objects) does not go through this rule.
+   */
+  readonly isAlly?: AllyRule;
   /** Which entity a level collider belongs to; defaults to `physicsSurfaceOf`. */
   readonly surfaceOf?: SurfaceRule;
   /** Overrides of DEFAULT_ARROW_RULES. */
@@ -308,6 +316,7 @@ const lerp = (a: Vec3, b: Vec3, t: number): Vec3 => ({
 export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput> {
   const rules: ArrowRules = { ...DEFAULT_ARROW_RULES, ...options.rules };
   const invulnerable = options.invulnerable ?? noInvulnerability;
+  const isAlly = options.isAlly ?? noAllies;
   const surfaceOf = options.surfaceOf ?? physicsSurfaceOf;
   const roll =
     options.roll ??
@@ -579,7 +588,10 @@ export function arrowSystem<TInput>(options: ArrowSystemOptions): System<TInput>
           hits = segmentHurtboxHits(
             targets,
             { from, to, radius: rules.radius },
-            (target) => (target === flight.shooter && selfImmune) || passed.includes(target),
+            (target) =>
+              (target === flight.shooter && selfImmune) ||
+              passed.includes(target) ||
+              (flight.shooter !== null && isAlly(w, flight.shooter, target)),
           );
         }
         const dodgedNow: EntityId[] = [];
