@@ -3,7 +3,7 @@
 // and the behaviour runtime (src/sim/ai) on the navmesh (src/sim/nav). src/main.ts and the headless
 // game world (src/tools/replay/testbed-player-scenario.ts) wire them the same way:
 //
-// - `startSceneNoise` (when a scene loads; it also makes every footstep and landing a noise, mw-e09.5): builds the scene's sound graph from its acoustics and the
+// - `startSceneNoise` (when a scene loads; it also makes every footstep and landing a noise, mw-e09.5): builds the scene's sound graph from its acoustics (and its echo volumes, mw-e24.10) and the
 //   loaded door spawns (`soundGraphFromScene`) and installs noise propagation with the shipped
 //   stealth noise tuning and each door profile's leaf material. A level change swaps the graph
 //   (`load`); `unload` leaves an empty graph (every noise falls off with distance alone).
@@ -46,6 +46,7 @@ import {
   installAwareness,
   installFootstepNoise,
   isFriendlyToPlayer,
+  installNoiseEcho,
   installNoisePropagation,
   LineOfSight,
   meshWithRopeLinks,
@@ -80,6 +81,7 @@ import {
   type World,
   StatusLedgerComponent,
   statusScaledNavigation,
+  type EchoVolume,
 } from '@sim/index';
 import { statusLookup } from '../magic/install';
 
@@ -94,6 +96,23 @@ export interface SceneNoise {
 
 const EMPTY_GRAPH = { rooms: [], portals: [] };
 
+/** The echo volumes of scene `id` (its acoustics' `echoes`, mw-e24.10), in metres. */
+export function sceneEchoes(content: GameContent, id: string): EchoVolume[] {
+  const { grid, acoustics } = content.get('scene', id);
+  const metres = ([x, y, z]: readonly [number, number, number]) => ({
+    x: x * grid,
+    y: y * grid,
+    z: z * grid,
+  });
+  return (acoustics?.echoes ?? []).map((echo) => ({
+    id: echo.id,
+    min: metres(echo.min),
+    max: metres(echo.max),
+    delay: echo.delay,
+    loss: echo.loss,
+  }));
+}
+
 /** Installs noise propagation for the loaded scene `loaded` (see the file header). */
 export function startSceneNoise<TInput>(
   world: World<TInput>,
@@ -107,6 +126,8 @@ export function startSceneNoise<TInput>(
   const mapOf = (scene: LoadedScene): SurfaceMap =>
     createSurfaceMap({ table: surfaces, regions: scene.layout.surfaces });
   let surfaceMap = mapOf(loaded);
+  // Echo volumes (mw-e24.10): a landing in the Glen Well's shaft is heard twice.
+  const echo = installNoiseEcho(world, sceneEchoes(content, loaded.id));
   const propagation = installNoisePropagation(world, {
     graph: graphOf(loaded),
     tuning: noise,
@@ -125,10 +146,12 @@ export function startSceneNoise<TInput>(
     load(scene) {
       propagation.setGraph(graphOf(scene));
       surfaceMap = mapOf(scene);
+      echo.setVolumes(sceneEchoes(content, scene.id));
     },
     unload() {
       propagation.setGraph(buildSoundGraph(EMPTY_GRAPH));
       surfaceMap = createSurfaceMap({ table: surfaces });
+      echo.setVolumes([]);
     },
   };
 }

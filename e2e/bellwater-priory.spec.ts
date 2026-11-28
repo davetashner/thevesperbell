@@ -99,3 +99,39 @@ test('AC-1: the Briarwood’s priory road leads to Bellwater Priory, the nave op
   expect(back.position.z).toBeLessThan(247);
   expect(problems).toEqual([]);
 });
+
+// mw-e24.10: the Glen Well route. From the old tunnel at the foot of the Glen Well's shaft (past the
+// grate the loose rung raises), the player walks west into the cistern under the priory and back.
+test('mw-e24.10: the tunnel under the Glen Well crosses to the priory cistern and back', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  const problems = collectProblems(page);
+  await stubPointerLock(page);
+  await page.goto('/?scene=briar-glen-green&class=knight&debug=1');
+  await ready(page, 'briar-glen-green');
+  const app = page.locator('#app');
+  await takeControl(page);
+
+  await runConsole(page, 'tp 10 -7.9 48');
+  await walkThrough(page, { x: -20, z: 48 }, 150, 'bellwater-priory');
+  await expect(app).toHaveAttribute(
+    'data-transit',
+    /"kind":"arrived".*"to":"bellwater-priory".*"spawn":"arrive-from-briar-glen-green"/,
+    { timeout: 30_000 },
+  );
+  const below = await playerState(page);
+  expect(below.position.y).toBeLessThan(-2);
+  expect(below.position.x).toBeLessThan(8);
+
+  await takeControl(page);
+  await walkThrough(page, { x: -20, z: 42 }, 150, 'briar-glen-green');
+  await expect(app).toHaveAttribute(
+    'data-transit',
+    /"kind":"arrived".*"to":"briar-glen-green".*"spawn":"arrive-from-bellwater-priory"/,
+    { timeout: 30_000 },
+  );
+  const back = await playerState(page);
+  expect(back.position.y).toBeLessThan(-6);
+  expect(problems).toEqual([]);
+});

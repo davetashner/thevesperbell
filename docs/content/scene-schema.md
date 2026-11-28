@@ -368,6 +368,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `acoustics.partitions` | list of object | `[]` | Materials of partitions between touching rooms; the rest use the tuning default. |
 | `acoustics.partitions[].rooms` | list of any (at least 2) | required | The two touching rooms. |
 | `acoustics.partitions[].material` | id | required | Material id of what separates them; its wall or floor gain comes from the stealth tuning. |
+| `acoustics.echoes` | list of object | `[]` | Places that repeat a landing a moment later (mw-e24.10): a well shaft. |
+| `acoustics.echoes[].id` | id | required | Name of the echo, unique in the scene, e.g. glen-well-shaft. |
+| `acoustics.echoes[].min` | list of any (at least 3) | required | Lower corner, grid cells. |
+| `acoustics.echoes[].max` | list of any (at least 3) | required | Upper corner, grid cells; above min on every axis. |
+| `acoustics.echoes[].delay` | number > 0 ≤ 5 | required | Seconds from a landing to its echo. |
+| `acoustics.echoes[].loss` | number ≥ 0 | `6` | How much quieter the echo is, dB. |
 | `environment` | object | — | Outdoor look: sky colour, distance fog and a painted backdrop (mw-ju8.1). |
 | `environment.sky` | string | — | Flat sky colour behind everything, #RRGGBB. |
 | `environment.fog` | object | — | Distance fog that blends the level into the backdrop. |

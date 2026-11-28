@@ -301,7 +301,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `belfry` | The belfry | priory | e26 | `bellwater-priory` | The cracked Vesper Bell (bible 3.5, mw-e26.8). Built (mw-e26.5): a 9 m tower with an interior stair, a free-climb and rope anchors; the Sounding Shaft top is its deck; the bell and the sour-bell consequence are mw-e26.8. |
 | `priory-crypt-stair` | The crypt stair | priory | e26 | `bellwater-priory` | The stair down from the nave to the sealed crypt door; the Sunbeam puzzle's place (mw-e26.1, docs/design/dungeon.md). PROPOSAL: the bible gives the crypt but no stair. Built (mw-e26.5): a 3 m stair down east of the nave to a landing; the Sunbeam puzzle is mw-e26.15. |
 | `priory-crypt` | The priory crypt | priory | e26 | `bellwater-priory` | Sealed from below (bible 4.1 beat 9). Built (mw-e26.5) as a sealed vestibule behind a tier-3 locked door: no walking route from the priory side until world.priory-crypt.unsealed (mw-e26.20). |
-| `cistern` | The cistern | priory | e26 | `bellwater-priory` | Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as the stub the Glen Well route joins: a sealed vestibule behind the nave west wall door; glen-well-cistern (mw-e24.10) and nave-cistern (mw-e26.20) open it. |
+| `cistern` | The cistern | priory | e26 | `bellwater-priory` | Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as a sealed vestibule behind the nave west wall door; mw-e24.10 adds the cistern under the garden: the well end (arrive-from-briar-glen-green, writes well.tunnel.found), the flooded chamber (wade the stepped ends, swim or walk the 1.9 m middle, or freeze it to ice), stub junctions to the jail drain and Snig's goblin tunnels, and a stair up into the vestibule. The nave door stays barred until nave-cistern (mw-e26.20). |
 | `knot-outer-ring` | The Outer Ring | knot | e26 | `knot-outer` | Hornfolk runes, loom spiders (bible 3.5, mw-e26.9). Built (mw-e26.9): the breach landing and a looping ring corridor round the Scales room, with rune-band and spider-nest markers; the Scales gate and a crawl vent lead north to the Ossuary. |
 | `ossuary-galleries` | The Ossuary Galleries | knot | e26 | `knot-outer` | The Forgotten; Clatter (bible 3.5). Built (mw-e26.9): an entry hall with bone niches, the sunk Dark Crossing room, Clatter's mushroom garden and an east gallery. |
 | `chapel-of-echoes` | The Chapel of Echoes | knot | e26 | `knot-outer` | Where sound misbehaves; portcullis trap (bible 3.5, mw-e26.14). Built (mw-e26.9): a 9 m nave with colonnades, four chime markers and the counterweight-hung portcullis in the north doorway; the Chimes puzzle and the trap's story are mw-e26.14. |
@@ -398,7 +398,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `nave-crypt-stair` | `priory-nave` | `priory-crypt-stair` | door |  |  | planned: mw-e26.5 |
 | `crypt-stair-crypt` | `priory-crypt-stair` | `priory-crypt` | door | `{"fact":"world.priory-crypt.unsealed"}` |  | planned: mw-e26.5 |
 | `nave-cistern` | `priory-nave` | `cistern` | door |  |  | planned: mw-e26.20 |
-| `glen-well-cistern` | `glen-well` | `cistern` | shortcut | `{"fact":"world.glen-well.rung-pulled"}` | `verb.climb.ledge` | planned: mw-e24.10 |
+| `glen-well-cistern` | `glen-well` | `cistern` | shortcut | `{"fact":"world.glen-well.rung-pulled"}` | `verb.climb.ledge` | `briar-glen-green/well-tunnel`, `bellwater-priory/well-tunnel` |
 | `jail-drain` | `jail-cell` | `cistern` | secret | `{"fact":"world.jail-drain.open"}` | `tool.lockpick`, `technique.shoulder-barge` | planned: mw-e24.8 |
 | `breach-outer-ring` | `breach` | `knot-outer-ring` | door |  |  | `deepworks/breach-door`, `knot-outer/breach-door` |
 | `outer-ring-ossuary` | `knot-outer-ring` | `ossuary-galleries` | path |  |  | planned: mw-e26.9 |
@@ -442,7 +442,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briar-glen-green` | `vane-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `briar-glen-green` | `schoolhouse` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `briar-glen-green` | `cemetery` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
-| `briar-glen-green` | `glen-well` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
+| `briar-glen-green` | `glen-well` | `briar-glen-green/well-tunnel` (glen-well-cistern): down the shaft and through the grate the loose rung raises |
 | `marsh-store` | `marsh-store` | `marsh-store/street-exit` (marsh-door) |
 | `sleeping-ox` | `sleeping-ox` | `sleeping-ox/street-exit` (ox-door) |
 | `bridgeward-college` | `bridgeward-college` | `bridgeward-college/street-exit` (college-door) |
@@ -470,7 +470,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `bellwater-priory` | `belfry` | none (a marker spawn at the tower foot; the doorway is walked in and the stair climbed inside the scene) |
 | `bellwater-priory` | `priory-crypt-stair` | none (a marker spawn at the foot of the crypt stair, inside the scene) |
 | `bellwater-priory` | `priory-crypt` | none (a tier-3 locked door stub over a sealed vestibule; opens with world.priory-crypt.unsealed, mw-e26.20) |
-| `bellwater-priory` | `cistern` | none (a barred door stub over a sealed vestibule; mw-e24.10 and mw-e26.20 open it) |
+| `bellwater-priory` | `cistern` | `bellwater-priory/well-tunnel` (glen-well-cistern); the nave door stays barred until mw-e26.20 |
 | `deepworks` | `mine-road` | `deepworks/road-gate` (green-mine-road) |
 | `deepworks` | `mine-gate` | none (a marker spawn in the forecourt; the four ways in from outside are the gate wall's doorways, and mw-e25.10 writes deepworks.gate-open) |
 | `deepworks` | `winch-house` | none (a marker spawn; walked inside the scene, behind the gate wall) |
@@ -510,7 +510,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e24.7 | `lane-forge`, `lane-fletchery`, `lane-bakery` |
 | mw-e24.8 | `green-watch-house`, `watch-house-cell`, `jail-drain` |
 | mw-e24.9 | `green-vane-house` |
-| mw-e24.10 | `green-glen-well`, `glen-well-cistern` |
+| mw-e24.10 | `green-glen-well` |
 | mw-e24.11 | `green-schoolhouse`, `green-cemetery` |
 | mw-e24.12 | `lane-rooftops`, `rooftop-vane-house` |
 | mw-e25.1 | `edge-hub`, `hub-woodcutters-hut`, `hub-far-bank` |

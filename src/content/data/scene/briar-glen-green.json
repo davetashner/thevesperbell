@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "briar-glen-green",
   "name": "Briar Glen: Market Green",
-  "description": "Bead mw-e24.2: the rest of Briar Glen, a grey-box town square about 180 x 140 m behind the shop lane (briar-glen-lane stays the lane district; this scene is its second district, reached by the lane-gate transition from the lane's north end, the green-gate stub beside the woodside path; arrive-from-briar-glen-lane stands inside the west gate). Market Green is the open square in the middle (notice-board, the Glen Well with its loose-rung marker, stalls and street lanterns). Round it: the Lamplit Stacks on the west side, three storeys that visibly lean to the west onto the brands-forge-yard annex (the Forge's rear smithy, whose counter and front are in the lane); the Watch House on the north side; the schoolhouse on the east side; the lychgate cemetery south-east; and Vane House on a four metre rise in the north-east, reached by a broad stair, its 40 m tower the tallest thing in town so it can be seen from everywhere (the power geography). Brand's Forge, Fenn's Fletchery & Simples, Pell's Bakery, Marsh's General Store, the Sleeping Ox and the Bridgeward College are in the lane scene. Building shells are solid masses with a doorway and a vestibule; the interiors are later beads, so each door is a locked wooden door (lock town-closed) with the hint 'Closed'. The mine road (south wall, exit-mine-road) is an open doorway with a signpost and the mine-road-gate transition into the Deepworks (arrive-from-deepworks stands inside the wall; mw-e26.2). The priory road (east wall, exit-priory-road) is still a planned edge stub: a doorway with a locked door (lock road-not-open) and a signpost, tagged planned:<bead>; the way into the Briarwood is the lane's woodside path. A new scene load (?scene=briar-glen-green) starts the player in Market Green (player-start, the perf budget's viewpoint).",
+  "description": "Bead mw-e24.2: the rest of Briar Glen, a grey-box town square about 180 x 140 m behind the shop lane (briar-glen-lane stays the lane district; this scene is its second district, reached by the lane-gate transition from the lane's north end, the green-gate stub beside the woodside path; arrive-from-briar-glen-lane stands inside the west gate). Market Green is the open square in the middle (notice-board, the Glen Well, whose 8 m shaft (mw-e24.10: a ladder, an echo, the loose rung at its foot raising a grate) leads to the old tunnel and the well-tunnel crossing to the priory cistern, stalls and street lanterns). Round it: the Lamplit Stacks on the west side, three storeys that visibly lean to the west onto the brands-forge-yard annex (the Forge's rear smithy, whose counter and front are in the lane); the Watch House on the north side; the schoolhouse on the east side; the lychgate cemetery south-east; and Vane House on a four metre rise in the north-east, reached by a broad stair, its 40 m tower the tallest thing in town so it can be seen from everywhere (the power geography). Brand's Forge, Fenn's Fletchery & Simples, Pell's Bakery, Marsh's General Store, the Sleeping Ox and the Bridgeward College are in the lane scene. Building shells are solid masses with a doorway and a vestibule; the interiors are later beads, so each door is a locked wooden door (lock town-closed) with the hint 'Closed'. The mine road (south wall, exit-mine-road) is an open doorway with a signpost and the mine-road-gate transition into the Deepworks (arrive-from-deepworks stands inside the wall; mw-e26.2). The priory road (east wall, exit-priory-road) is still a planned edge stub: a doorway with a locked door (lock road-not-open) and a signpost, tagged planned:<bead>; the way into the Briarwood is the lane's woodside path. A new scene load (?scene=briar-glen-green) starts the player in Market Green (player-start, the perf budget's viewpoint).",
   "grid": 1,
   "camera": {
     "position": [-60, 60, -30],
@@ -11,8 +11,23 @@
   "placements": [
     {
       "piece": "floor",
-      "at": [0.0, 0.0, 70.0],
-      "scale": [90, 1, 70]
+      "at": [-38.5, 0.0, 70.0],
+      "scale": [51.5, 1, 70]
+    },
+    {
+      "piece": "floor",
+      "at": [52.5, 0.0, 70.0],
+      "scale": [37.5, 1, 70]
+    },
+    {
+      "piece": "floor",
+      "at": [14.0, 0.0, 23.5],
+      "scale": [1, 1, 23.5]
+    },
+    {
+      "piece": "floor",
+      "at": [14.0, 0.0, 94.5],
+      "scale": [1, 1, 45.5]
     },
     {
       "piece": "wall",
@@ -613,6 +628,73 @@
       "piece": "pillar",
       "at": [-74.75, 0.0, 66.0],
       "scale": [0.8, 1.6, 0.8]
+    },
+    {
+      "piece": "platform",
+      "at": [14.0, -8.0, 49.0],
+      "scale": [1.25, 8, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [14.0, -8.0, 47.0],
+      "scale": [1.25, 8, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [15.0, -8.0, 48.0],
+      "scale": [0.25, 8, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [13.0, -5.75, 48.0],
+      "scale": [0.25, 5.75, 0.75],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [14.0, -8.0, 48.0],
+      "scale": [1.25, 1, 1.25]
+    },
+    {
+      "piece": "platform",
+      "at": [14.5, -8.0, 48.0],
+      "scale": [0.25, 9, 0.25],
+      "purpose": "climbable",
+      "properties": {
+        "climbable": "ladder"
+      }
+    },
+    {
+      "piece": "floor",
+      "at": [10.0, -8.0, 48.0],
+      "scale": [3.0, 1, 1.0]
+    },
+    {
+      "piece": "platform",
+      "at": [10.0, -8.0, 49.25],
+      "scale": [3.0, 2.25, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [10.0, -8.0, 46.75],
+      "scale": [3.0, 2.25, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [10.0, -5.75, 48.0],
+      "scale": [3.0, 0.25, 1.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [6.75, -8.0, 48.0],
+      "scale": [0.25, 2.25, 1.5],
+      "purpose": "blocking"
     }
   ],
   "spawns": [
@@ -723,8 +805,45 @@
     },
     {
       "id": "glen-well-rung",
-      "at": [14.0, 0.5, 47.0],
-      "tags": ["prop", "well-rung"]
+      "at": [14.25, -7.0, 48.0],
+      "tags": ["prop", "well-rung"],
+      "switch": {
+        "kind": "lever"
+      },
+      "interact": {
+        "affordances": [
+          {
+            "verb": "use",
+            "label": "Pull the loose rung"
+          }
+        ],
+        "radius": 1.5
+      }
+    },
+    {
+      "id": "glen-well-grate",
+      "at": [13.0, -8.0, 48.0],
+      "yaw": 90,
+      "tags": ["grate"],
+      "door": {
+        "profile": "portcullis"
+      }
+    },
+    {
+      "id": "glen-well-shaft-foot",
+      "at": [14.0, -8.0, 48.0],
+      "tags": ["well-shaft"]
+    },
+    {
+      "id": "arrive-from-bellwater-priory",
+      "at": [9.5, -8.0, 48.0],
+      "yaw": 90,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "well-tunnel",
+      "at": [7.5, -8.0, 48.0],
+      "tags": ["transition"]
     },
     {
       "id": "read-ink-prints-well",
@@ -1345,6 +1464,9 @@
   "signals": [
     {
       "graph": "briar-glen-green-areas"
+    },
+    {
+      "graph": "glen-well-shaft"
     }
   ],
   "light": {
@@ -1413,6 +1535,17 @@
       "seed": 2
     }
   },
+  "acoustics": {
+    "echoes": [
+      {
+        "id": "glen-well-shaft",
+        "min": [13.25, -8.5, 47.25],
+        "max": [14.75, 1.5, 48.75],
+        "delay": 0.4,
+        "loss": 6
+      }
+    ]
+  },
   "transitions": [
     {
       "id": "lane-gate",
@@ -1426,6 +1559,13 @@
       "min": [58.5, -1, -0.5],
       "max": [61.5, 3, 1.5],
       "scene": "deepworks",
+      "spawn": "arrive-from-briar-glen-green"
+    },
+    {
+      "id": "well-tunnel",
+      "min": [7.0, -9, 47],
+      "max": [7.75, -5.75, 49],
+      "scene": "bellwater-priory",
       "spawn": "arrive-from-briar-glen-green"
     }
   ]

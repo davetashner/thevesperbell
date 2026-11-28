@@ -501,6 +501,7 @@ describe('scene acoustics (mw-e09.3)', () => {
       rooms: [],
       portals: [],
       partitions: [],
+      echoes: [],
     });
     expect(sceneSchema.parse(room).acoustics).toBeUndefined();
   });
@@ -533,6 +534,29 @@ describe('scene acoustics (mw-e09.3)', () => {
       'acoustics.partitions.0.rooms.1: names room "yard", which this scene does not have',
       'acoustics.partitions.1.rooms.0: names room "yard", which this scene does not have',
       'acoustics.partitions.1.rooms: this partition is listed twice',
+    ]);
+  });
+
+  it('mw-e24.10: takes echo volumes with a delay and a default 6 dB loss, and rejects bad ones', () => {
+    const shaft = { id: 'shaft', min: [0, -8, 0], max: [1, 1, 1], delay: 0.4 };
+    const scene = sceneSchema.parse({ ...room, acoustics: { echoes: [shaft] } });
+    expect(scene.acoustics?.echoes).toEqual([{ ...shaft, loss: 6 }]);
+    expect(
+      problems({
+        ...room,
+        acoustics: {
+          echoes: [
+            shaft,
+            shaft,
+            { ...shaft, id: 'flat', max: [1, -8, 1] },
+            { ...shaft, id: 'z', delay: 0 },
+          ],
+        },
+      }),
+    ).toEqual([
+      'acoustics.echoes.2.max: max must be above min on every axis',
+      'acoustics.echoes.3.delay: Too small: expected number to be >0',
+      'acoustics.echoes.1.id: echo id "shaft" is used twice',
     ]);
   });
 });

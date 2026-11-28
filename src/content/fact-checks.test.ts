@@ -161,7 +161,9 @@ describe('fact checks', () => {
       'kestrel-lock.gate-open',
       'slice.complete',
       'tern.boarded',
+      'well.tunnel.found',
       'wendmouth.visited',
+      'world.glen-well.rung-pulled',
       'world.millweir.sluice-walk-open',
       'world.stone-stair.lowered',
     ]);

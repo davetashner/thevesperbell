@@ -1,0 +1,22 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "glen-well-shaft",
+  "name": "Glen Well shaft",
+  "notes": "The Glen Well in the scene briar-glen-green (mw-e24.10). At the foot of the shaft, one rung of the ladder is loose: pulling it (a lever bound to glen-well-rung) raises the old grate (a portcullis, glen-well-grate) into the cistern tunnel for good, and the latch writes world.glen-well.rung-pulled = true, the unlock of the world map's glen-well-cistern shortcut. Pulling the rung back does nothing: the latch keeps the grate up.",
+  "nodes": [
+    { "id": "loose-rung", "kind": "lever", "entity": "glen-well-rung" },
+    { "id": "pulled", "kind": "latch" },
+    { "id": "grate", "kind": "receiver", "receiver": "door", "entity": "glen-well-grate" },
+    {
+      "id": "rung-pulled-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "world.glen-well.rung-pulled"
+    }
+  ],
+  "wires": [
+    { "from": "loose-rung", "to": "pulled.set" },
+    { "from": "pulled", "to": "grate" },
+    { "from": "pulled", "to": "rung-pulled-fact" }
+  ]
+}

@@ -2915,6 +2915,76 @@
             ],
             "additionalProperties": false
           }
+        },
+        "echoes": {
+          "default": [],
+          "description": "Places that repeat a landing a moment later (mw-e24.10): a well shaft.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Name of the echo, unique in the scene, e.g. glen-well-shaft."
+              },
+              "min": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Lower corner, grid cells."
+              },
+              "max": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Upper corner, grid cells; above min on every axis."
+              },
+              "delay": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 5,
+                "description": "Seconds from a landing to its echo."
+              },
+              "loss": {
+                "default": 6,
+                "description": "How much quieter the echo is, dB.",
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "id",
+              "min",
+              "max",
+              "delay"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false
