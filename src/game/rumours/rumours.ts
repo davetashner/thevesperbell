@@ -60,7 +60,8 @@ export const VISIT_TRIGGERS: Readonly<Record<string, readonly VisitTrigger[]>> =
   'place-briarwood': [{ area: 'briarwood' }],
   'place-standing-horn': [{ area: 'standing-horn' }],
   'place-mooring-watch': [{ area: 'mooring-watch' }],
-  'place-glen-well': [{ area: 'glen-well' }],
+  // The well pays off below it: the rumour resolves in the cistern the loose rung opens (mw-e24.10).
+  'place-glen-well': [{ area: 'glen-well-cistern' }],
   'place-lamplit-stacks': [{ area: 'lamplit-stacks' }],
   'place-weeping-adit': [{ area: 'weeping-adit' }],
   'place-breakwater': [{ area: 'breakwater' }],
