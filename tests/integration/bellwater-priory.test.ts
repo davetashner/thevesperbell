@@ -104,10 +104,12 @@ describe('Bellwater Priory named nodes (mw-e26.5 AC-1)', () => {
   });
 
   it('AC-1: the scene is the bellwater-priory region, the belfry its own, and the respawn rule names the scene', () => {
+    // magic: liquids and the element field, as the game has them (the cistern is flooded, mw-e24.10).
     const { regions } = createGameWorld<never>(RAPIER, {
       seed: 1,
       hz: 60,
       scene: 'bellwater-priory',
+      magic: true,
     }).scene.layout;
     expect(regionsAt(regions, at('belfry-view'))).toEqual(['bellwater-priory', 'belfry']);
     expect(regionsAt(regions, at('priory-nave'))).toEqual(['bellwater-priory']);
@@ -119,7 +121,12 @@ describe('Bellwater Priory named nodes (mw-e26.5 AC-1)', () => {
   });
 
   it('the sealed doors are real doors in the game world, each locked with no key', () => {
-    const game = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'bellwater-priory' });
+    const game = createGameWorld<never>(RAPIER, {
+      seed: 1,
+      hz: 60,
+      scene: 'bellwater-priory',
+      magic: true,
+    });
     const doors = game.scene.spawns.filter((s) => s.spawn.door !== undefined);
     expect(doors.map((d) => d.spawn.id).sort()).toEqual([
       'choir-hidden-door',

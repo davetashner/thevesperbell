@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "bellwater-priory",
   "name": "Bellwater Priory",
-  "description": "Bead mw-e26.5 (with the priory legs of mw-e25.25): the ruined Vesperine monastery on the hill, a 120 x 130 m greybox. From the south edge (road-gate, back to the Briarwood's priory-road-gate; arrive-from-briarwood) the priory road runs north between a few trees to the precinct gate wall (priory-gate), past a forecourt into the roofless nave (priory-nave; walls and a colonnade, six metres tall, open to the sky). West of the nave: the garden with the dead pear tree (priory-garden, a dead end) and a sealed vestibule behind a locked door, the priory end of the cistern (cistern, cistern-door; the Glen Well route joins here in mw-e24.10 and mw-e26.20). North: the choir (priory-choir) with four singing-monk statue stubs and the altar for the Watchers puzzle (mw-e26.6) and, in its east wall, the hidden choir door (choir-hidden-door, locked, lock choir-door-hidden) to the scriptorium (scriptorium: shelves, book mimic, tallow ooze and abbot letter stubs, mw-e26.7). East: the belfry, a 9 m tower whose open doorway in the nave's east wall (belfry-stair-door, where mw-e26.8 fits the jammed door) leads up three stair flights to the deck, with the Sounding Shaft's mouth in the deck (sounding-shaft-top, vesper-bell above it), a rough-stone free-climb up the south face (belfry-climb-foot, grade 2) and two rope anchors on the south parapet (belfry-anchor-a/b); belfry-view is the perf viewpoint. East of the nave a stair descends 3 m to the crypt stair landing (priory-crypt-stair, the Sunbeam puzzle's place) and a locked tier-3 door (crypt-door, lock crypt-sealed) over the sealed crypt vestibule (priory-crypt): no route this side until world.priory-crypt.unsealed (mw-e26.20). The whole scene is the bellwater-priory region; the belfry volume is its own region.",
+  "description": "Bead mw-e26.5 (with the priory legs of mw-e25.25): the ruined Vesperine monastery on the hill, a 120 x 130 m greybox. From the south edge (road-gate, back to the Briarwood's priory-road-gate; arrive-from-briarwood) the priory road runs north between a few trees to the precinct gate wall (priory-gate), past a forecourt into the roofless nave (priory-nave; walls and a colonnade, six metres tall, open to the sky). West of the nave: the garden with the dead pear tree (priory-garden, a dead end) and a sealed vestibule behind a locked door, the priory end of the cistern (cistern, cistern-door, barred until mw-e26.20). Under the garden, 3 m down, the cistern itself (mw-e24.10): the well end where the tunnel from the Glen Well arrives (arrive-from-briar-glen-green; well-tunnel leads back), stub junctions to the jail drain and Snig's goblin tunnels, the flooded chamber (cistern-flood, stepped at both ends, 1.9 m deep in the middle: wade, swim or freeze it) and a stair up into the vestibule. North: the choir (priory-choir) with four singing-monk statue stubs and the altar for the Watchers puzzle (mw-e26.6) and, in its east wall, the hidden choir door (choir-hidden-door, locked, lock choir-door-hidden) to the scriptorium (scriptorium: shelves, book mimic, tallow ooze and abbot letter stubs, mw-e26.7). East: the belfry, a 9 m tower whose open doorway in the nave's east wall (belfry-stair-door, where mw-e26.8 fits the jammed door) leads up three stair flights to the deck, with the Sounding Shaft's mouth in the deck (sounding-shaft-top, vesper-bell above it), a rough-stone free-climb up the south face (belfry-climb-foot, grade 2) and two rope anchors on the south parapet (belfry-anchor-a/b); belfry-view is the perf viewpoint. East of the nave a stair descends 3 m to the crypt stair landing (priory-crypt-stair, the Sunbeam puzzle's place) and a locked tier-3 door (crypt-door, lock crypt-sealed) over the sealed crypt vestibule (priory-crypt): no route this side until world.priory-crypt.unsealed (mw-e26.20). The whole scene is the bellwater-priory region; the belfry volume is its own region.",
   "grid": 1,
   "camera": {
     "position": [20, 16, 4],
@@ -21,8 +21,23 @@
     },
     {
       "piece": "floor",
-      "at": [40.5, 0, 44],
-      "scale": [40.5, 1, 6]
+      "at": [14, 0, 44],
+      "scale": [14, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [57.5, 0, 44],
+      "scale": [23.5, 1, 6]
+    },
+    {
+      "piece": "floor",
+      "at": [31, 0, 39.5],
+      "scale": [3, 1, 1.5]
+    },
+    {
+      "piece": "floor",
+      "at": [31, 0, 47.5],
+      "scale": [3, 1, 2.5]
     },
     {
       "piece": "floor",
@@ -688,6 +703,110 @@
       "properties": {
         "climbable": "rough"
       }
+    },
+    {
+      "piece": "platform",
+      "at": [15, -5, 37.75],
+      "scale": [13, 4.8, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [15, -5, 46.25],
+      "scale": [13, 4.8, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [1.75, -3, 42],
+      "scale": [0.25, 2.8, 4],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [28.25, -3, 39.5],
+      "scale": [0.25, 2.8, 1.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [28.25, -3, 45.5],
+      "scale": [0.25, 2.8, 0.5],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "floor",
+      "at": [7, -3, 42],
+      "scale": [5, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [25, -3, 42],
+      "scale": [3, 1, 4]
+    },
+    {
+      "piece": "floor",
+      "at": [17, -5, 42],
+      "scale": [5, 1, 4]
+    },
+    {
+      "piece": "stairs",
+      "at": [13, -4, 42],
+      "yaw": 270,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [15, -5, 42],
+      "yaw": 270,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [19, -5, 42],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [21, -4, 42],
+      "yaw": 90,
+      "scale": [4, 1, 1]
+    },
+    {
+      "piece": "floor",
+      "at": [31, -3, 43],
+      "scale": [3, 1, 2]
+    },
+    {
+      "piece": "platform",
+      "at": [31, -3, 40.75],
+      "scale": [3, 3, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "platform",
+      "at": [31, -3, 45.25],
+      "scale": [3, 3, 0.25],
+      "purpose": "blocking"
+    },
+    {
+      "piece": "stairs",
+      "at": [29, -3, 43],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [31, -2, 43],
+      "yaw": 90,
+      "scale": [2, 1, 1]
+    },
+    {
+      "piece": "stairs",
+      "at": [33, -1, 43],
+      "yaw": 90,
+      "scale": [2, 1, 1]
     }
   ],
   "spawns": [
@@ -937,6 +1056,47 @@
         "profile": "iron-door",
         "lock": "cistern-sealed"
       }
+    },
+    {
+      "id": "arrive-from-briar-glen-green",
+      "at": [4.5, -3, 42],
+      "yaw": 90,
+      "tags": ["arrival"]
+    },
+    {
+      "id": "well-tunnel",
+      "at": [2.5, -3, 42],
+      "tags": ["transition"]
+    },
+    {
+      "id": "cistern-well-end",
+      "at": [7, -3, 42],
+      "tags": ["cistern", "well-end"]
+    },
+    {
+      "id": "cistern-flood",
+      "at": [17, -5, 42],
+      "tags": ["pool", "standing-water", "cistern-water"],
+      "liquid": {
+        "size": [10, 1.9, 8],
+        "liquid": "water",
+        "depth": 1.9
+      }
+    },
+    {
+      "id": "cistern-jail-drain",
+      "at": [6, -3, 45.5],
+      "tags": ["junction", "stub", "jail-drain"]
+    },
+    {
+      "id": "cistern-goblin-tunnels",
+      "at": [9, -3, 38.5],
+      "tags": ["junction", "stub", "goblin-tunnels"]
+    },
+    {
+      "id": "cistern-stair-foot",
+      "at": [26, -3, 43],
+      "tags": ["cistern", "stair-foot"]
     }
   ],
   "light": {
@@ -977,11 +1137,20 @@
       "min": [79.9, -2, 67.9],
       "max": [92.1, 14, 82.1],
       "tags": ["region", "tower"]
+    },
+    {
+      "id": "cistern-flood",
+      "min": [12, -5, 38],
+      "max": [22, -3.1, 46],
+      "tags": ["water"]
     }
   ],
   "signals": [
     {
       "graph": "belfry-deck"
+    },
+    {
+      "graph": "bellwater-cistern"
     }
   ],
   "transitions": [
@@ -990,6 +1159,13 @@
       "min": [57.25, -1, 0.25],
       "max": [62.75, 3, 1.75],
       "scene": "briarwood",
+      "spawn": "arrive-from-bellwater-priory"
+    },
+    {
+      "id": "well-tunnel",
+      "min": [2, -4, 40],
+      "max": [2.75, -0.5, 44],
+      "scene": "briar-glen-green",
       "spawn": "arrive-from-bellwater-priory"
     }
   ]

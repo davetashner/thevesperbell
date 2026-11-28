@@ -228,7 +228,8 @@ describe('AC-2: shortcut unlock facts', () => {
     const produced = producedFacts(content);
     expect(produced.has('slice.complete')).toBe(true);
     expect(produced.has(content.all('puzzle')[0]!.outputs.solvedFact)).toBe(true);
-    expect(produced.has('world.glen-well.rung-pulled')).toBe(false);
+    expect(produced.has('world.glen-well.rung-pulled')).toBe(true);
+    expect(produced.has('world.jail-drain.open')).toBe(false);
     const sceneId = content.all('scene')[0]!.id;
     const spawn = content.all('scene')[0]!.spawns[0]!.id;
     expect(isProduced(`entity:${sceneId}/${spawn}.opened`, new Set(), content)).toBe(true);
