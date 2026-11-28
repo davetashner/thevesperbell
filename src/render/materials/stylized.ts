@@ -74,14 +74,12 @@ function identityLut(): DataTexture {
 /** Uniforms every stylized material shares: the preset, the palette limits and the grading hook. */
 const shared = {
   vbShadowTint: { value: new Color() },
-  /** The tint scaled to its brightest channel, and the tint times the lift: per-frame, not per-pixel, maths. */
-  vbShadowHueDir: { value: new Color() },
+  /** The shadow hue gain (tint scaled to its brightest channel, less one, times the hue) and the tint times the lift: per-frame, not per-pixel, maths. */
+  vbShadowHueGain: { value: new Color() },
   vbShadowFloor: { value: new Color() },
-  vbShadowHue: { value: 0 },
   vbShadowLift: { value: 0 },
   vbRimColour: { value: new Color() },
   vbRimStrength: { value: 0 },
-  vbRimPower: { value: 1 },
   vbBandEdges: { value: [0, 0] as number[] },
   vbBandSoftness: { value: 0 },
   vbBandLevels: { value: [0, 0, 0] as number[] },
@@ -101,17 +99,19 @@ let lutTexture: DataTexture | undefined;
 function applyParams(params: StylizedParams): void {
   const tint = shared.vbShadowTint.value.setHex(params.shadowTint);
   const peak = Math.max(tint.r, tint.g, tint.b, 1e-4);
-  shared.vbShadowHueDir.value.setRGB(tint.r / peak, tint.g / peak, tint.b / peak);
+  shared.vbShadowHueGain.value.setRGB(
+    (tint.r / peak - 1) * params.shadowHue,
+    (tint.g / peak - 1) * params.shadowHue,
+    (tint.b / peak - 1) * params.shadowHue,
+  );
   shared.vbShadowFloor.value.setRGB(
     tint.r * params.shadowLift,
     tint.g * params.shadowLift,
     tint.b * params.shadowLift,
   );
-  shared.vbShadowHue.value = params.shadowHue;
   shared.vbShadowLift.value = params.shadowLift;
   shared.vbRimColour.value.setHex(params.rimColour);
   shared.vbRimStrength.value = params.rimStrength;
-  shared.vbRimPower.value = params.rimPower;
   shared.vbBandEdges.value = [...params.bandEdges];
   shared.vbBandSoftness.value = params.bandSoftness;
   shared.vbBandLevels.value = [...params.bandLevels];
@@ -180,13 +180,11 @@ export interface StylizedMaterialParameters extends MeshStandardMaterialParamete
 /** Fragment declarations: the ramp and the stylized direct-light equation that replaces the physical one. */
 const FRAGMENT_PARS = /* glsl */ `
 uniform vec3 vbShadowTint;
-uniform vec3 vbShadowHueDir;
+uniform vec3 vbShadowHueGain;
 uniform vec3 vbShadowFloor;
-uniform float vbShadowHue;
 uniform float vbShadowLift;
 uniform vec3 vbRimColour;
 uniform float vbRimStrength;
-uniform float vbRimPower;
 uniform vec2 vbBandEdges;
 uniform float vbBandSoftness;
 uniform vec3 vbBandLevels;
@@ -276,10 +274,12 @@ const FINISH = /* glsl */ `
   float vbUp = dot( normal, vec3( viewMatrix[ 0 ][ 1 ], viewMatrix[ 1 ][ 1 ], viewMatrix[ 2 ][ 1 ] ) );
   if ( vbRimStrength * vbLit > 0.0 && vbUp < 0.8 ) {
     float vbNdv = saturate( dot( normal, geometryViewDir ) );
-    float vbRim = pow( 1.0 - vbNdv, vbRimPower ) * vbRimStrength * vbLit * ( 1.0 - smoothstep( 0.4, 0.8, vbUp ) );
+    // A cubed falloff (a pow costs two transcendentals per pixel in software GL).
+    float vbEdge = 1.0 - vbNdv;
+    float vbRim = vbEdge * vbEdge * vbEdge * vbRimStrength * vbLit * ( 1.0 - smoothstep( 0.4, 0.8, vbUp ) );
     vbSurface += vbRimColour * vbRim * mix( vec3( 1.0 ), diffuseColor.rgb, 0.5 );
   }
-  vbSurface = mix( vbSurface, vbSurface * vbShadowHueDir, vbShade * vbShadowHue );
+  vbSurface *= 1.0 + vbShade * vbShadowHueGain;
   // A soft floor: black rises to the tint, brighter texels keep their contrast (a smooth max).
   vec3 vbFloor = vbShadowFloor * ( vbAmbient * vbShade );
   vbSurface = sqrt( vbSurface * vbSurface + vbFloor * vbFloor );

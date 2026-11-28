@@ -41,8 +41,6 @@ export interface StylizedParams {
   readonly rimColour: number;
   /** Rim light strength (0 turns it off). */
   readonly rimStrength: number;
-  /** Rim falloff exponent: higher is a thinner rim. */
-  readonly rimPower: number;
   /** The ramp's two band edges in N·L (−1…1), low then high. */
   readonly bandEdges: readonly [number, number];
   /** Half-width of the soft step at each band edge, in N·L. */
@@ -57,7 +55,6 @@ const base: StylizedParams = {
   shadowLift: 1,
   rimColour: PALETTE.hearth,
   rimStrength: 0.35,
-  rimPower: 3,
   bandEdges: [0.02, 0.45],
   bandSoftness: 0.08,
   bandLevels: [0, 0.5, 1],
