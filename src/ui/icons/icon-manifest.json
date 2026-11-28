@@ -280,6 +280,10 @@
     "placeholder": true
   },
   {
+    "id": "icon-item-blink-01",
+    "placeholder": true
+  },
+  {
     "id": "icon-item-mage-hand-01",
     "placeholder": true
   },
@@ -465,6 +469,10 @@
   },
   {
     "id": "icon-item-yew-staff-01",
+    "placeholder": true
+  },
+  {
+    "id": "icon-spell-blink",
     "placeholder": true
   },
   {

@@ -12,14 +12,19 @@ import {
   teleportCommand,
   ClimbRopeComponent,
   CharacterController,
+  Displaced,
+  learnSpell,
+  manaOf,
+  SpellFizzled,
   ropeVolume,
+  type CastCommand,
   type EntityId,
 } from '@sim/index';
 import { createGameWorld } from '@tools/replay/testbed-player-scenario';
 
 const content = loadGameContent();
 const river = content.get('scene', 'briar-glen-river');
-type Input = ReturnType<typeof teleportCommand>;
+type Input = ReturnType<typeof teleportCommand> | CastCommand;
 
 /** The gap runs z 14..16.5 along the walk (x 150..151.5); the decks' tops are at y 2.2. */
 const GAP = { near: 14, far: 16.5, deckTop: 2.2 };
@@ -146,5 +151,34 @@ describe('the sluice walk gap (mw-e25.30)', { timeout: 120_000 }, () => {
     game.world.step();
     const body = game.world.get(player, CharacterController);
     expect(body?.position.z).toBeGreaterThan(far.min[2]);
+  });
+
+  it('AC-4: a real Blink cast from the near deck lands on the far deck', ({ task }) => {
+    markExercised(task, 'scene', 'briar-glen-river');
+    markExercised(task, 'spell', 'blink');
+    const { game } = play();
+    const { world, player } = game;
+    const sim = world as unknown as Parameters<typeof learnSpell>[0];
+    learnSpell(sim, player, 'blink');
+    const x = 150.75;
+    const deck = river.surfaces.find((surface) => surface.id === 'sluice-walk-far')?.max[1] ?? NaN;
+    world.step([teleportCommand(player, { x, y: deck, z: GAP.near - 0.3 })]);
+    for (let i = 0; i < 30; i++) world.step(); // settle onto the deck
+    const stood = world.get(player, CharacterController)?.position.y ?? NaN;
+    const moved: boolean[] = [];
+    const fizzled: string[] = [];
+    world.events.on(Displaced, (e) => moved.push(e.falling));
+    world.events.on(SpellFizzled, (e) => fizzled.push(e.reason));
+    const before = manaOf(sim, player)?.current ?? 0;
+    // Aim at the far deck 0.5 m past its near lip; the cast has a 0.3 s wind-up.
+    const aim = { x, y: deck, z: GAP.far + 0.5 };
+    world.step([{ type: 'cast', caster: player, spell: 'blink', aim }]);
+    for (let i = 0; i < 40; i++) world.step();
+    expect(fizzled).toEqual([]);
+    expect(moved).toEqual([false]);
+    const body = world.get(player, CharacterController);
+    expect(body?.position.z).toBeGreaterThan(GAP.far);
+    expect(Math.abs((body?.position.y ?? NaN) - stood)).toBeLessThan(0.1);
+    expect(manaOf(sim, player)?.current ?? 0).toBeLessThan(before);
   });
 });

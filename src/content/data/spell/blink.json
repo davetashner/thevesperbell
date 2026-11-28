@@ -1,0 +1,23 @@
+{
+  "$schema": "../spell.schema.json",
+  "id": "blink",
+  "name": "Blink",
+  "school": "arcane",
+  "tier": 2,
+  "next": [],
+  "cost": { "mana": 20 },
+  "castTime": 0.3,
+  "cooldown": 4,
+  "delivery": { "kind": "summonPoint", "range": 6, "lineOfSight": true },
+  "effects": [
+    { "op": "displace", "mode": "teleport", "distance": 6, "lineOfSight": true },
+    { "op": "light", "intensity": 30, "radius": 3, "duration": 0, "attach": "point" },
+    { "op": "noise", "phase": "release", "loudness": 25 },
+    { "op": "noise", "phase": "impact", "loudness": 25 }
+  ],
+  "tags": ["arcane", "teleport", "traversal", "utility"],
+  "vfxCue": "vfx-spell-blink-depart",
+  "sfxCue": "sfx-spell-blink-depart",
+  "bookId": "blink",
+  "flags": { "tooUseful": true, "castWhileMoving": false, "allowOvercast": false }
+}
