@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { FieldConfigInput } from './config';
 import {
+  calmJitter,
   chunkSteps,
   LOD_RADIUS,
   LOD_STRIDE,
@@ -522,5 +523,77 @@ describe('convergence hysteresis (mw-e32.20)', () => {
     stepField(field);
     expect(field.read('temperature', c(8, 0, 0))).toBe(20);
     expect(field.read('temperature', c(7, 0, 0))).toBeLessThan(520);
+  });
+
+  it('AC-7: dust within epsilon may jitter a few counts and the chunk still converges (mw-e32.23)', () => {
+    const field = new ElementField();
+    field.set('gas:smoke', c(4, 4, 4), 20 / 65536); // 20 counts, far below smoke's epsilon
+    const chunk = must(field.chunkList()[0]);
+    stepField(field);
+    // The spike gave 1 count to each of 6 neighbours: a move of 6, within calmJitter(epsilon).
+    expect(calmJitter(655)).toBe(10);
+    expect(chunk.converged).toBe(1);
+  });
+
+  it('AC-7: loud smoke that decays never converges, so it never freezes', () => {
+    const field = new ElementField();
+    const chunk = (): Chunk => must(field.chunkList()[0]);
+    for (let x = 0; x < 8; x++)
+      for (let y = 0; y < 8; y++)
+        for (let z = 0; z < 8; z++) field.set('gas:smoke', c(x, y, z), 0.3);
+    chunk().converged = 0;
+    let last = field.read('gas:smoke', c(4, 4, 4));
+    for (let tick = 0; tick < 60; tick++) {
+      expect(stepField(field).activeChunks).toBeGreaterThan(0);
+      expect(chunk().converged).toBe(0); // each tick moved a loud cell by its decay
+      const now = field.read('gas:smoke', c(4, 4, 4));
+      expect(now).toBeLessThan(last);
+      last = now;
+    }
+  });
+
+  it('AC-8: a calm converged chunk beside a loud one is frozen instead of cycling (mw-e32.23)', () => {
+    const field = row(2, [{ converged: 5 }, { converged: 5, calm: 3 }]);
+    const [, calm] = field.chunkList() as [Chunk, Chunk];
+    field.set('temperature', c(12, 4, 4), 20.5); // within 1 °C of ambient: calm
+    calm.converged = 5;
+    calm.calm = 3;
+    const before = dump(field, 10);
+    expect(stepField(field).activeChunks).toBe(0);
+    expect(dump(field, 10)).toEqual(before);
+    expect(calm.calm).toBe(3); // holds: it did not age toward sleep
+  });
+
+  it('AC-8: a calm chunk with no loud awake neighbour is stepped, so it can sleep', () => {
+    const alone = row(1, [{ converged: 5, calm: 1 }]);
+    expect(stepField(alone).activeChunks).toBe(1);
+    const beside = row(2, [
+      { converged: 5, calm: 1 },
+      { converged: 5, calm: 1 },
+    ]);
+    expect(stepField(beside).activeChunks).toBe(2);
+    const sleeping = row(1, [{ converged: 5, calm: 1 }]);
+    must(sleeping.allocate(1, 0, 0)).asleep = true;
+    expect(stepField(sleeping).activeChunks).toBe(1);
+    // A layer that does not lose to ambient has nowhere to put the flux, so it keeps stepping.
+    const lossless = row(2, [{ converged: 5 }, { converged: 5, calm: 1 }]);
+    const [, quiet] = lossless.chunkList() as [Chunk, Chunk];
+    lossless.set('moisture', c(12, 4, 4), 0.0005);
+    quiet.converged = 5;
+    quiet.calm = 1;
+    expect(stepField(lossless).activeChunks).toBeGreaterThan(0);
+    expect(quiet.converged).not.toBe(6);
+  });
+
+  it('AC-8: a write wakes a frozen calm chunk', () => {
+    const field = row(2, [{ converged: 5 }, { converged: 5, calm: 3 }]);
+    const [, calm] = field.chunkList() as [Chunk, Chunk];
+    field.set('temperature', c(12, 4, 4), 20.5);
+    calm.converged = 5;
+    calm.calm = 3;
+    expect(stepField(field).activeChunks).toBe(0);
+    field.add('temperature', c(12, 4, 4), 0.25);
+    expect(calm.converged).toBe(0);
+    expect(stepField(field).activeChunks).toBeGreaterThan(0);
   });
 });

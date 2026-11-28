@@ -580,6 +580,7 @@ check enforces this).
 - Sound no longer cuts out and restarts when you walk into the next area: one audio context and its loaded sounds carry across the crossing. [mw-ju8.47]
 - Areas with burning lanterns and braziers run more smoothly. [mw-e32.20]
 - Fires and lanterns cost less to simulate. [mw-e32.21]
+- Smoke and calm air around steady fires cost far less, so areas full of braziers hold a smoother frame rate. [mw-e32.23]
 - Crossing into a new area keeps the game window and mouse capture, so you no longer click again after every crossing, the camera faces the way you arrive, and the swap is quicker. [mw-ju8.44]
 - Wendmouth harbour: the blue cargo blocks on the wharf now read as painted crates with ropes and kegs on top, and each net loft has a framed door, an awning, shuttered windows, a stone plinth and a corner of crates and barrels (mw-e40.34).
 

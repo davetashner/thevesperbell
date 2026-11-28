@@ -4,7 +4,8 @@
 // for ten fires before the convergence hysteresis, 14-25% less with it (302 of 385 chunks stepped
 // per tick): each held flame spreads heat over ~38 chunks that never go exactly stationary. A
 // converged chunk beside one still moving now freezes too (mw-e32.21): ~107 chunks stepped per tick
-// and about half the step time. The assertion is a regression guard, not the AC-1 target.
+// and about half the step time. Smoke dust that only jitters and calm chunks beside a loud one freeze
+// too (mw-e32.23): kestrel-lock steps ~21 of ~150 chunks at idle, not ~50. The assertion is a regression guard, not the AC-1 target.
 import { describe, expect, test } from 'vitest';
 import { ElementField, cellsInSphere, holdAtLeast, stepField } from '@sim/index';
 
