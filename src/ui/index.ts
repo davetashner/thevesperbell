@@ -34,6 +34,7 @@ export * from './pickup-toasts';
 export * from './quick-slots';
 export * from './epilogue-slideshow';
 export * from './reader-window';
+export * from './book-reader';
 export * from './reticle';
 export * from './spell-hotbar';
 export * from './spell-wheel';

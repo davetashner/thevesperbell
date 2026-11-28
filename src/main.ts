@@ -132,6 +132,7 @@ import {
 import { hintReadout, PuzzleWatch, sceneHost, startPuzzles } from '@game/puzzles/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
+import { BookReaderController } from '@game/items/book-reader';
 import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
 import {
   applyClass,
@@ -2406,6 +2407,29 @@ function startRenderer(
         magic === undefined
           ? undefined
           : createScrollRules(content, magic.pipeline, consumables.items.inventory);
+      // Opening a book from the pack (mw-e07.9): the two-page reader with a Study button, over the pack.
+      // #app[data-book-reader] (open/closed) is the e2e's readout.
+      const bookReader =
+        player === undefined
+          ? undefined
+          : new BookReaderController({
+              ui,
+              world,
+              player: player.entity,
+              content,
+              study,
+              submit: (command) => {
+                commands.push(command);
+              },
+              matchMedia: (q) => globalThis.matchMedia(q),
+              onChange: (open) => {
+                root.dataset['bookReader'] = open ? 'open' : 'closed';
+              },
+            });
+      root.dataset['bookReader'] = 'closed';
+      afterStep.push(() => {
+        bookReader?.afterStep();
+      });
       inventoryUi = startInventoryUi({
         ui,
         world,
@@ -2415,6 +2439,11 @@ function startRenderer(
         ...(scrolls !== undefined && { scrolls }),
         giver: { inventory: consumables.items.inventory, known: (id) => itemIds.has(id) },
         scrollAim: (id) => scrollAim?.(id),
+        ...(bookReader !== undefined && {
+          openBook: (instanceId) => {
+            bookReader.open(instanceId);
+          },
+        }),
         player: player?.entity,
         submit: (command) => {
           commands.push(command);
