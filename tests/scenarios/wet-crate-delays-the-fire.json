@@ -1,0 +1,87 @@
+{
+  "id": "wet-crate-delays-the-fire",
+  "title": "A soaked crate holds the fire back for a while",
+  "description": "You soak the first crate beside the oil barrel before lighting the barrel. The fire has to dry the crate out before it can catch, so it spreads far more slowly than it would to a dry crate, but the heat gets there in the end.",
+  "tags": ["fire", "water", "spread", "wetness", "timing"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The oil barrel and two crates in a row on the west side.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "water",
+        "at": "chain-crate-a",
+        "radius": 0.5,
+        "intensity": 5
+      }
+    },
+    {
+      "tick": 40,
+      "stimulus": {
+        "element": "heat",
+        "at": "chain-barrel",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 100,
+      "target": {
+        "spawn": "chain-barrel"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The barrel is burning."
+    },
+    {
+      "tick": 100,
+      "target": {
+        "spawn": "chain-crate-a"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The soaked crate is only steaming."
+    },
+    {
+      "tick": 100,
+      "target": {
+        "spawn": "chain-crate-b"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The far crate has not caught yet."
+    },
+    {
+      "tick": 600,
+      "target": {
+        "spawn": "chain-crate-a"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The crate has dried out and caught."
+    },
+    {
+      "tick": 600,
+      "target": {
+        "spawn": "chain-crate-b"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The fire has reached the far crate."
+    }
+  ],
+  "ticks": 601,
+  "golden": {
+    "finalHash": "9562b635"
+  }
+}

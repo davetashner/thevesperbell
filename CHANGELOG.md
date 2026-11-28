@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The chaos room has extra props for combos (an oil barrel and two crates in a row, a plate under the chandelier, a straw bale on a plate, an anvil beside a puddle and crates), and a catalogue of thirteen replayable emergent combos guards how fire, water, cold, charge, ropes and weight work together. [mw-e03.27]
 - Wooden crates, straw, cloth, rope and paper now soak up water from rain, rivers and splashes, soaked wood freezes in the cold and will not catch fire, with no special set-up per crate. [mw-e03.59]
 - A chaos room for testing element states (`?scene=chaos-room`): separate fire, water, freeze and charge stations and a row of six crates to set alight, soak, freeze or charge and tell apart at a glance. [mw-e03.54]
 - Mags Oakum's barge also stops at Kestrel Lock: ride down from Briar Glen Quay in half a day, or up from the Wendmouth Stone Wharf in a day, for four crowns, each with its own narrated ride. [mw-e25.33]

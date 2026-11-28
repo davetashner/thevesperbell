@@ -1,0 +1,79 @@
+{
+  "id": "oil-barrel-chain-ignition",
+  "title": "Light the oil barrel and the fire runs down the row",
+  "description": "A barrel of oil stands beside two crates. You light the barrel; its flames heat the nearest crate until it ignites, and that one lights the next. The identification crates across the room are far enough to stay cold.",
+  "tags": ["fire", "oil", "spread"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The oil barrel and two crates in a row on the west side, with the identification line well away.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "chain-barrel",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 300,
+      "target": {
+        "spawn": "chain-barrel"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The barrel burns."
+    },
+    {
+      "tick": 90,
+      "target": {
+        "spawn": "chain-crate-a"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The first crate catches from the barrel within a second or two."
+    },
+    {
+      "tick": 300,
+      "target": {
+        "spawn": "chain-crate-a"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The first crate keeps burning."
+    },
+    {
+      "tick": 300,
+      "target": {
+        "spawn": "chain-crate-b"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The second crate catches from the first."
+    },
+    {
+      "tick": 300,
+      "target": {
+        "tag": "ident",
+        "which": "all"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The crates on the far wall are untouched."
+    }
+  ],
+  "ticks": 301,
+  "golden": {
+    "finalHash": "520d271f"
+  }
+}

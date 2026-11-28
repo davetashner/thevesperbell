@@ -1,0 +1,67 @@
+{
+  "id": "water-douses-burning-crate",
+  "title": "Water puts a burning crate out",
+  "description": "A crate is burning. You throw water on it and the flames die, leaving the crate wet.",
+  "tags": ["fire", "water", "extinguish"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "A crate on the fire station.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "fire-crate-3",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    },
+    {
+      "tick": 70,
+      "stimulus": {
+        "element": "water",
+        "at": "fire-crate-3",
+        "radius": 1,
+        "intensity": 5
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "fire-crate-3"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The crate is burning."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "fire-crate-3"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The flames are out."
+    },
+    {
+      "tick": 80,
+      "target": {
+        "spawn": "fire-crate-3"
+      },
+      "reading": "wetness",
+      "op": "gt",
+      "value": 0.1,
+      "sees": "The crate is wet."
+    }
+  ],
+  "ticks": 121,
+  "golden": {
+    "finalHash": "f8f5d50e"
+  }
+}

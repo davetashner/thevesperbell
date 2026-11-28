@@ -240,6 +240,82 @@
       "tags": ["combo", "prop", "chandelier"],
       "prop": "chandelier",
       "suspendedFrom": "combo-rope"
+    },
+    {
+      "id": "chain-barrel",
+      "at": [-10, 0, -3],
+      "prop": "barrel-oil",
+      "tags": ["combo", "chain", "flammable"]
+    },
+    {
+      "id": "chain-crate-a",
+      "at": [-8.75, 0, -3],
+      "prop": "crate",
+      "tags": ["combo", "chain", "flammable"]
+    },
+    {
+      "id": "chain-crate-b",
+      "at": [-7.75, 0, -3],
+      "prop": "crate",
+      "tags": ["combo", "chain", "flammable"]
+    },
+    {
+      "id": "combo-plate-chandelier",
+      "at": [5, 0, -2],
+      "tags": ["combo", "plate-chandelier"],
+      "plate": {
+        "minWeight": 10,
+        "width": 2,
+        "depth": 2
+      }
+    },
+    {
+      "id": "combo-plate-burden",
+      "at": [9, 0, -3],
+      "tags": ["combo", "plate-burden"],
+      "plate": {
+        "minWeight": 5,
+        "width": 1.5,
+        "depth": 1.5
+      }
+    },
+    {
+      "id": "combo-burden-crate",
+      "at": [9, 0, -3],
+      "prop": "crate",
+      "tags": ["combo", "burden"],
+      "properties": {
+        "material": "straw",
+        "fuel": 3
+      }
+    },
+    {
+      "id": "combo-anvil",
+      "at": [6.75, 0, 0],
+      "prop": "anvil",
+      "tags": ["combo", "conduction", "conductive"]
+    },
+    {
+      "id": "combo-puddle",
+      "at": [8, 0, 0],
+      "tags": ["combo", "conduction", "water"],
+      "liquid": {
+        "size": [2, 0.4, 2],
+        "liquid": "water",
+        "depth": 0.2
+      }
+    },
+    {
+      "id": "combo-wet-crate",
+      "at": [9.25, 0, 0],
+      "prop": "crate",
+      "tags": ["combo", "conduction"]
+    },
+    {
+      "id": "combo-dry-crate",
+      "at": [8, 0, -1.25],
+      "prop": "crate",
+      "tags": ["combo", "conduction"]
     }
   ],
   "light": {

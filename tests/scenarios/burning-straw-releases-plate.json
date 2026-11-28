@@ -1,0 +1,78 @@
+{
+  "id": "burning-straw-releases-plate",
+  "title": "A burning load burns away and the plate releases",
+  "description": "A straw bale sits on a pressure plate and holds it down. You set the bale alight. The plate stays down while it burns, and clicks back up only once the bale has burnt to nothing.",
+  "tags": ["fire", "weight", "plate", "timing"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "A plate with a straw bale (a crate of straw with a short fuel) resting on it.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 30,
+      "stimulus": {
+        "element": "heat",
+        "at": "combo-burden-crate",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 20,
+      "target": {
+        "spawn": "combo-plate-burden"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": true,
+      "sees": "The plate is held down by the bale."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "combo-burden-crate"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The bale is burning."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "combo-plate-burden"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": true,
+      "sees": "The plate is still down while the bale burns."
+    },
+    {
+      "tick": 400,
+      "target": {
+        "spawn": "combo-burden-crate"
+      },
+      "reading": "alive",
+      "op": "eq",
+      "value": false,
+      "sees": "The bale has burnt away."
+    },
+    {
+      "tick": 400,
+      "target": {
+        "spawn": "combo-plate-burden"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": false,
+      "sees": "The plate has released."
+    }
+  ],
+  "ticks": 401,
+  "golden": {
+    "finalHash": "e1a1b248"
+  }
+}
