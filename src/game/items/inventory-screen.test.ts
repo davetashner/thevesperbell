@@ -99,6 +99,7 @@ function game(
     player?: boolean;
     closeKeys?: readonly string[];
     study?: StudyRules;
+    openBook?: (instanceId: number) => void;
     scrolls?: ScrollRules;
     scrollAim?: (spellId: string | undefined) => ScrollAim | undefined;
     giver?: ItemGiver;
@@ -128,6 +129,7 @@ function game(
     content,
     consumables,
     ...(options.study !== undefined && { study: options.study }),
+    ...(options.openBook !== undefined && { openBook: options.openBook }),
     ...(options.scrolls !== undefined && { scrolls: options.scrolls }),
     ...(options.scrollAim !== undefined && { scrollAim: options.scrollAim }),
     ...(options.giver !== undefined && { giver: options.giver }),
@@ -485,7 +487,7 @@ describe('inventory view models', () => {
     );
     const [key, primer] = views.model(world, hero).items;
     expect(key?.actions).not.toContain('study');
-    expect(primer?.actions).toEqual(['study', 'drop', 'throw']);
+    expect(primer?.actions).toEqual(['open', 'study', 'drop', 'throw']);
     inventoryUi.toggle();
     ui.top?.element.querySelector<HTMLElement>(`[data-item="${String(primer?.id)}"]`)?.click();
     ui.top?.element.querySelector<HTMLElement>('[data-action="study"]')?.click();
@@ -515,6 +517,23 @@ describe('inventory view models', () => {
     world.events.emit(SpellLearned, { tick: 0, actor: other, spellId: 'x', source: 'y' });
     step();
     expect(status()).toBe('You already know what A Primer of Bolts teaches.');
+  });
+
+  it('Open on a book hands its stack to the book reader (mw-e07.9)', () => {
+    const opened: number[] = [];
+    const { give, ui, inventoryUi } = game({ openBook: (id) => opened.push(id) });
+    give('fixture-primer');
+    inventoryUi.toggle();
+    ui.top?.element.querySelector<HTMLElement>('[data-item]')?.click();
+    ui.top?.element.querySelector<HTMLElement>('[data-action="open"]')?.click();
+    expect(opened).toHaveLength(1);
+    // Without a reader wired, Open does nothing and nothing is submitted.
+    const bare = game();
+    bare.give('fixture-primer');
+    bare.inventoryUi.toggle();
+    bare.ui.top?.element.querySelector<HTMLElement>('[data-item]')?.click();
+    bare.ui.top?.element.querySelector<HTMLElement>('[data-action="open"]')?.click();
+    expect(bare.queue).toEqual([]);
   });
 
   describe('Read on a spell scroll (mw-ju8.17)', () => {

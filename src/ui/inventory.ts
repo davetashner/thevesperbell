@@ -47,11 +47,21 @@ export type InventoryTabId = (typeof INVENTORY_TABS)[number]['id'];
 
 /** What can be done to an item from its context menu. */
 export type InventoryActionId =
-  'use' | 'study' | 'read' | 'assign' | 'unassign' | 'equip' | 'unequip' | 'drop' | 'throw';
+  | 'use'
+  | 'open'
+  | 'study'
+  | 'read'
+  | 'assign'
+  | 'unassign'
+  | 'equip'
+  | 'unequip'
+  | 'drop'
+  | 'throw';
 
 /** Each action's menu label. */
 export const INVENTORY_ACTION_LABELS: Readonly<Record<InventoryActionId, string>> = Object.freeze({
   use: 'Use',
+  open: 'Open',
   study: 'Study',
   read: 'Read',
   assign: 'Assign to quick slot',
@@ -110,9 +120,10 @@ export interface InventoryModel {
 /** An action the player chose. */
 export type InventoryRequest =
   | {
-      readonly action: Exclude<InventoryActionId, 'assign' | 'unassign'>;
+      readonly action: Exclude<InventoryActionId, 'assign' | 'unassign' | 'open'>;
       readonly itemId: number;
     }
+  | { readonly action: 'open'; readonly itemId: number }
   | { readonly action: 'assign' | 'unassign'; readonly itemId: number; readonly slot: number };
 
 export interface InventoryOptions {

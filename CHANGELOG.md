@@ -14,6 +14,7 @@ check enforces this).
 
 ### Added
 
+- Books open into a two-page reader from the pack's new Open action: pages turn in pairs with the arrow keys, Q or the buttons, a torn-out page shows "Pages missing", a book in an unknown tongue reads as runes, and a Study button shows the time left and says why it is blocked when danger is near [mw-e07.9]
 - The Glen Well hides a way down: climb (or drop) down the shaft, pull the loose rung and follow the old tunnel to a flooded cistern under Bellwater Priory. A stone dropped down the well lands twice. [mw-e24.10]
 - The supply tunnel under Mooring's Watch is open: past its collapse it leads into the Deepworks' old galleries. Batter the rubble down, burn or shoot out the rotten prop to drop a step to climb from, or climb the rough face; once past, the shortcut stays open.
 - The priory road out of Market Green's east gate is open: it leads into the Briarwood's west side and on through the trees to the road up to Bellwater Priory. [mw-0qcf]

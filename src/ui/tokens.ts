@@ -840,6 +840,21 @@ ${tokens}
 .vb-reader-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .vb-reader-hint { font-size: ${size(0.875)}; }
 .vb-reader-actions { flex-wrap: wrap; }
+.vb-panel.vb-book { width: min(52em, 100%); }
+.vb-book-spread { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--ui-color-border, currentColor); border-radius: var(--ui-radius); background: var(--ui-color-panel-raised, transparent); transform-origin: center; }
+.vb-book-page { min-height: 12em; max-height: 50vh; overflow-y: auto; padding: 0.75em 1em; line-height: 1.5; }
+.vb-book-page + .vb-book-page { border-left: 1px solid var(--ui-color-border, currentColor); }
+.vb-book-page p { margin: 0 0 0.75em; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vb-book-torn { display: flex; align-items: center; justify-content: center; border-style: dashed; text-align: center; font-style: italic; color: var(--ui-color-text-muted); }
+.vb-book-warning { margin: 0; padding: 0.5em 0.75em; border-left: 4px solid var(--ui-color-warning, currentColor); overflow-wrap: anywhere; }
+.vb-book-warning[hidden], .vb-book-study[hidden], .vb-book-reason[hidden] { display: none; }
+.vb-book-reason, .vb-book-status { margin: 0; overflow-wrap: anywhere; }
+.vb-book-status:empty { display: none; }
+.vb-book-spread[data-turn='next'] { animation: vb-book-turn-next calc(350ms * var(--ui-motion-scale)) ease-out; }
+.vb-book-spread[data-turn='prev'] { animation: vb-book-turn-prev calc(350ms * var(--ui-motion-scale)) ease-out; }
+@keyframes vb-book-turn-next { from { transform: perspective(60em) rotateY(-12deg); opacity: 0.5; } to { transform: none; opacity: 1; } }
+@keyframes vb-book-turn-prev { from { transform: perspective(60em) rotateY(12deg); opacity: 0.5; } to { transform: none; opacity: 1; } }
+@media (max-width: 40em) { .vb-book-spread { grid-template-columns: 1fr; } .vb-book-page + .vb-book-page { border-left: 0; border-top: 1px solid var(--ui-color-border, currentColor); } }
 .vb-panel.vb-journal { width: min(40em, 100%); }
 .vb-journal h1, .vb-journal h2 { overflow-wrap: anywhere; margin: 0; }
 .vb-journal-panel { max-height: 55vh; overflow-y: auto; }

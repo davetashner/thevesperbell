@@ -19,7 +19,15 @@ import {
   type UnlockBook,
 } from '@sim/index';
 import { SCHOOL_LEGALITY, type SpellEntry } from '@content/index';
-import type { GameContent } from '@content/index';
+import type { GameContent, ItemEntry } from '@content/index';
+
+/** A book item. */
+export type BookItem = Extract<ItemEntry, { category: 'book' }>;
+
+/** Whether `item` is a book the reader can open (a scroll is read aloud, not opened). */
+export function isOpenableBook(item: ItemEntry): item is BookItem {
+  return item.category === 'book' && item.book.kind !== 'scroll';
+}
 
 /** The one class that learns every spellbook. */
 export const BOOK_CLASS = 'sorcerer';
