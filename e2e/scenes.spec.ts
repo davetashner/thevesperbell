@@ -1,75 +1,15 @@
-import { readdirSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
-import { attachFrame, captureFrame, distinct } from './helpers/canvas';
+import { expect, test } from '@playwright/test';
+import {
+  SCENES,
+  cameraData,
+  canonical,
+  collectProblems,
+  distinctColours,
+  nextFrames,
+} from './helpers/scenes';
 
 // mw-e00.21: greybox scenes, the ?scene= picker and the debug fly camera, against the production
-// build (Chromium).
-
-// Driver performance notices from the GPU process are not our errors (see e2e/render-boot.spec.ts).
-const DRIVER_PERF_NOTICE = /^\[\.WebGL-[^\]]+\]GL Driver Message \([^)]*\bPerformance\b/;
-
-/**
- * Every scene id in the content (one JSON file per scene): the game's, plus the dev-only scenes a
- * debug build adds (mw-e12.4; the e2e build has the debug console built in).
- */
-const SCENES = ['src/content/data/scene', 'src/content/fixtures/dev/scene']
-  .flatMap((dir) => readdirSync(dir))
-  .filter((file) => file.endsWith('.json'))
-  .map((file) => file.slice(0, -'.json'.length))
-  .sort();
-
-/** Console errors/warnings and uncaught exceptions raised by our own code. */
-function collectProblems(page: Page): string[] {
-  const problems: string[] = [];
-  page.on('console', (msg) => {
-    if (msg.type() !== 'error' && msg.type() !== 'warning') return;
-    if (DRIVER_PERF_NOTICE.test(msg.text())) return;
-    problems.push(`${msg.type()}: ${msg.text()}`);
-  });
-  page.on('pageerror', (err) => problems.push(`pageerror: ${err.message}`));
-  return problems;
-}
-
-/** Resolves after the page has rendered two more animation frames. */
-async function nextFrames(page: Page): Promise<void> {
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-      }),
-  );
-}
-
-interface CameraData {
-  position: number[];
-  quaternion: number[];
-}
-
-/**
- * q and -q are the same rotation: flip the sign so the first non-zero of w, x, y, z is positive, so
- * equal rotations compare equal.
- */
-function canonical(q: number[]): number[] {
-  const [x = 0, y = 0, z = 0, w = 0] = q;
-  const lead = [w, x, y, z].find((n) => n !== 0) ?? 0;
-  return lead < 0 ? q.map((n) => (n === 0 ? 0 : -n)) : q;
-}
-
-async function cameraData(page: Page): Promise<CameraData> {
-  const json = await page.locator('#app').getAttribute('data-camera');
-  return JSON.parse(json ?? 'null') as CameraData;
-}
-
-/** Number of distinct colours on a coarse grid of the canvas; the frame is attached as `name`. */
-async function distinctColours(page: Page, name: string): Promise<number> {
-  const frame = await captureFrame(page, { png: true });
-  await attachFrame(test.info(), name, frame);
-  return distinct(frame);
-}
+// build (Chromium). The per-scene load tests are in scenes-load-a/b.spec.ts.
 
 test('AC-1: ?scene=testbed renders the room → corridor → arena with zero console errors', async ({
   page,
@@ -128,18 +68,6 @@ test('?scene=testbed still boots the testbed, with no title', async ({ page }) =
   await expect(page.locator('#app')).toHaveAttribute('data-scene', 'testbed', { timeout: 30_000 });
   await expect(page.locator('[data-screen]')).toHaveCount(0);
 });
-
-for (const scene of SCENES) {
-  test(`scene "${scene}" loads and renders with zero console errors`, async ({ page }) => {
-    const problems = collectProblems(page);
-    await page.goto(`/?scene=${scene}`);
-    await expect(page.locator('#app')).toHaveAttribute('data-scene', scene, { timeout: 30_000 });
-    await expect(page.getByTestId('scene-label')).toContainText(`(${scene}) · build `);
-    await expect(page.getByTestId('scene-error')).toHaveCount(0);
-    expect(await distinctColours(page, scene)).toBeGreaterThan(8);
-    expect(problems).toEqual([]);
-  });
-}
 
 test('AC-4: ?scene=does-not-exist shows an error listing the available scenes and keeps running', async ({
   page,
