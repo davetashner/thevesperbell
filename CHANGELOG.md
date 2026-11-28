@@ -590,6 +590,7 @@ check enforces this).
 
 ### Fixed
 
+- The Millweir sluice gate now faces the mill pond with its planked gate between stone piers, instead of showing a stone side on to the river. [mw-e25.30]
 - The knight raises his shield into a guard when you block: the shield comes up in front of his chest and holds there, then drops when you let go (it stayed at his side before). [mw-t4s]
 - The knight's backhand (second light swing) now cuts at hip height as it crosses in front of him, so the whole light combo connects with short creatures like hounds. [mw-e04.40]
 - The knight's first light swing is now a diving diagonal slash that ends low, so it connects with short creatures like hounds as well as tall ones. [mw-e04.38]
