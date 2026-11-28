@@ -74,6 +74,9 @@ function identityLut(): DataTexture {
 /** Uniforms every stylized material shares: the preset, the palette limits and the grading hook. */
 const shared = {
   vbShadowTint: { value: new Color() },
+  /** The tint scaled to its brightest channel, and the tint times the lift: per-frame, not per-pixel, maths. */
+  vbShadowHueDir: { value: new Color() },
+  vbShadowFloor: { value: new Color() },
   vbShadowHue: { value: 0 },
   vbShadowLift: { value: 0 },
   vbRimColour: { value: new Color() },
@@ -96,7 +99,14 @@ let lutTexture: DataTexture | undefined;
 
 /** Puts `params` into the shared uniforms; every stylized material shows it on its next draw. */
 function applyParams(params: StylizedParams): void {
-  shared.vbShadowTint.value.setHex(params.shadowTint);
+  const tint = shared.vbShadowTint.value.setHex(params.shadowTint);
+  const peak = Math.max(tint.r, tint.g, tint.b, 1e-4);
+  shared.vbShadowHueDir.value.setRGB(tint.r / peak, tint.g / peak, tint.b / peak);
+  shared.vbShadowFloor.value.setRGB(
+    tint.r * params.shadowLift,
+    tint.g * params.shadowLift,
+    tint.b * params.shadowLift,
+  );
   shared.vbShadowHue.value = params.shadowHue;
   shared.vbShadowLift.value = params.shadowLift;
   shared.vbRimColour.value.setHex(params.rimColour);
@@ -110,6 +120,7 @@ applyParams(STYLIZED_PRESETS[currentPreset]);
 
 /** Lights every stylized material by `preset` (style bible §3). No recompile. */
 export function useStylizedPreset(preset: LightingPreset): void {
+  if (preset === currentPreset) return;
   currentPreset = preset;
   applyParams(STYLIZED_PRESETS[preset]);
 }
@@ -169,6 +180,8 @@ export interface StylizedMaterialParameters extends MeshStandardMaterialParamete
 /** Fragment declarations: the ramp and the stylized direct-light equation that replaces the physical one. */
 const FRAGMENT_PARS = /* glsl */ `
 uniform vec3 vbShadowTint;
+uniform vec3 vbShadowHueDir;
+uniform vec3 vbShadowFloor;
 uniform float vbShadowHue;
 uniform float vbShadowLift;
 uniform vec3 vbRimColour;
@@ -200,12 +213,21 @@ void RE_Direct_Stylized( const in IncidentLight directLight, const in vec3 geome
   // The ramp shapes the key (sun or moon). Point and spot lights keep Lambert: they are gameplay
   // light, and their pools must fall off on screen as the sim's light level does (style bible §3).
   float ndl = dot( geometryNormal, directLight.direction );
-  float ramp = mix( vbRamp( ndl ), saturate( ndl ), vbPunctual );
+  float ramp = vbPunctual > 0.5 ? saturate( ndl ) : vbRamp( ndl );
   reflectedLight.directDiffuse += ramp * directLight.color * BRDF_Lambert( material.diffuseColor );
   vbLit = min( 1.0, vbLit + ramp * min( 1.0, vbLuma( directLight.color ) ) );
-  vec3 halfDir = normalize( directLight.direction + geometryViewDir );
-  float spec = pow( saturate( dot( geometryNormal, halfDir ) ), 48.0 );
-  reflectedLight.directSpecular += directLight.color * smoothstep( 0.3, 0.6, spec ) * ramp * vbWetSheen * vbWet;
+  // The wet sheen is the only specular, so dry surfaces (nearly all of them) skip it. The
+  // exponent is 48, as squarings: software GL pays for every pow.
+  if ( vbWet > 0.0 ) {
+    vec3 halfDir = normalize( directLight.direction + geometryViewDir );
+    float nh = saturate( dot( geometryNormal, halfDir ) );
+    float nh2 = nh * nh;
+    float nh8 = nh2 * nh2;
+    nh8 *= nh8;
+    float nh16 = nh8 * nh8;
+    float spec = nh16 * nh16 * nh16;
+    reflectedLight.directSpecular += directLight.color * smoothstep( 0.3, 0.6, spec ) * ramp * vbWetSheen * vbWet;
+  }
 }
 #undef RE_Direct
 #define RE_Direct RE_Direct_Stylized
@@ -248,16 +270,18 @@ const FINISH = /* glsl */ `
   float vbShade = 1.0 - vbLit;
   // The fill's irradiance against a daylit fill of 0.25: full lift in daylight, little in a dark room.
   float vbAmbient = min( 1.0, PI * vbLuma( reflectedLight.indirectDiffuse ) / max( vbLuma( diffuseColor.rgb ), 1e-4 ) / 0.25 );
-  float vbNdv = saturate( dot( normal, geometryViewDir ) );
   // The rim picks out silhouettes where light falls (never on floors, never in the dark), so it
   // never makes an unlit place look lit (style bible §3, gameplay-true lighting).
-  float vbUp = ( vec4( normal, 0.0 ) * viewMatrix ).y;
-  float vbRim = pow( 1.0 - vbNdv, vbRimPower ) * vbRimStrength * vbLit * ( 1.0 - smoothstep( 0.4, 0.8, vbUp ) );
-  vbSurface += vbRimColour * vbRim * mix( vec3( 1.0 ), diffuseColor.rgb, 0.5 );
-  vec3 vbHue = vbShadowTint / max( max3( vbShadowTint ), 1e-4 );
-  vbSurface = mix( vbSurface, vbSurface * vbHue, vbShade * vbShadowHue );
+  // Up-facing surfaces (floors: most of the screen) get no rim, so they skip the work too.
+  float vbUp = dot( normal, vec3( viewMatrix[ 0 ][ 1 ], viewMatrix[ 1 ][ 1 ], viewMatrix[ 2 ][ 1 ] ) );
+  if ( vbRimStrength * vbLit > 0.0 && vbUp < 0.8 ) {
+    float vbNdv = saturate( dot( normal, geometryViewDir ) );
+    float vbRim = pow( 1.0 - vbNdv, vbRimPower ) * vbRimStrength * vbLit * ( 1.0 - smoothstep( 0.4, 0.8, vbUp ) );
+    vbSurface += vbRimColour * vbRim * mix( vec3( 1.0 ), diffuseColor.rgb, 0.5 );
+  }
+  vbSurface = mix( vbSurface, vbSurface * vbShadowHueDir, vbShade * vbShadowHue );
   // A soft floor: black rises to the tint, brighter texels keep their contrast (a smooth max).
-  vec3 vbFloor = vbShadowTint * vbShadowLift * vbAmbient * vbShade;
+  vec3 vbFloor = vbShadowFloor * ( vbAmbient * vbShade );
   vbSurface = sqrt( vbSurface * vbSurface + vbFloor * vbFloor );
   vbSurface = min( vbSurface, vbAlbedoMax );
   outgoingLight = vbSurface + totalEmissiveRadiance;
