@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-// mw-e27.13: resting, headless as the game wires it. The testbed's unlit campfire is loaded with the
+// mw-e27.13: resting, headless as the game wires it. The rest room's unlit campfire is loaded with the
 // real scene, content, fire rules and facts: it refuses a rest until the `light` verb's heat
 // ignites it, a night by it passes the clock and heals, and the game's autosave writes exactly one
 // save after `rest.completed`. The rules are src/sim/rest/rules.test.ts, the glue
@@ -41,7 +41,7 @@ function camp() {
   const game = createGameWorld<unknown>(RAPIER, {
     seed: 1,
     hz: 60,
-    scene: 'testbed',
+    scene: 'rest-room',
     magic: true,
     minute: 22 * 60,
   });
@@ -50,7 +50,7 @@ function camp() {
   const fire = world
     .query(SceneSpawnComponent)
     .ids()
-    .find((entity) => world.get(entity, SceneSpawnComponent)?.id === 'testbed-campfire')!;
+    .find((entity) => world.get(entity, SceneSpawnComponent)?.id === 'rest-campfire')!;
   const rules = new RestRules(restKindSpecs(content), { pools: DEFAULT_REST_POOLS });
   const rested: RestCompleted[] = [];
   sim.events.on(restCompleted, (e) => rested.push(e));
@@ -60,11 +60,11 @@ function camp() {
   return { game, world, sim, player, fire, rules, rested, step };
 }
 
-describe('resting at the testbed campfire, headless (mw-e27.13)', () => {
+describe('resting at the rest room campfire, headless (mw-e27.13)', () => {
   it('AC-1: the unlit campfire refuses a rest; the light verb heats it until it burns; then the rest goes through', ({
     task,
   }) => {
-    markExercised(task, 'scene', 'testbed');
+    markExercised(task, 'scene', 'rest-room');
     markExercised(task, 'rest-point', 'campfire');
     const t = camp();
     t.step(2);
@@ -90,7 +90,7 @@ describe('resting at the testbed campfire, headless (mw-e27.13)', () => {
     expect(t.sim.get(t.player, HealthComponent)?.current).toBe(health?.max);
     t.sim.events.flush();
     expect(t.rested).toHaveLength(1);
-    expect(t.rested[0]).toMatchObject({ kind: 'campfire', point: 'testbed-campfire', hours: 8 });
+    expect(t.rested[0]).toMatchObject({ kind: 'campfire', point: 'rest-campfire', hours: 8 });
   });
 
   it('AC-6: a completed rest writes exactly one autosave, after rest.completed', async () => {
@@ -105,7 +105,7 @@ describe('resting at the testbed campfire, headless (mw-e27.13)', () => {
     const autosave = new GameAutosave({
       world: t.sim,
       slots,
-      describe: () => ({ characterName: 'Knight', classId: 'knight', areaId: 'testbed' }),
+      describe: () => ({ characterName: 'Knight', classId: 'knight', areaId: 'rest-room' }),
       timing: { minGapSeconds: 0 },
       publish: (event) => events.push(`${event.type}:${event.trigger.kind}`),
     });

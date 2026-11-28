@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { runConsole, stubPointerLock, takeControl, turnTo } from './helpers/player';
 
-// mw-e27.13: resting at the greybox testbed's unlit campfire against the production build (Chromium).
+// mw-e27.13: resting at the greybox rest room's unlit campfire (?scene=rest-room) against the production build (Chromium).
 // The player lights it with Interact (the `light` verb is heat on its fuel, so the fire rules burn it),
 // opens the rest menu with Interact again (the verb is greyed "The fire is out" until it burns), and
 // rests 8 hours: the HUD clock moves on 8 h, health is full, the game writes its `rest` autosave, and
@@ -45,16 +45,16 @@ test('AC-7: the player lights the campfire and rests 8 h: the clock reads +8 h, 
   test.setTimeout(150_000);
   const problems = collectProblems(page);
   await stubPointerLock(page);
-  await page.goto('/?scene=testbed&debug=1');
+  await page.goto('/?scene=rest-room&debug=1');
   const app = page.locator('#app');
-  await expect(app).toHaveAttribute('data-scene', 'testbed', { timeout: 10_000 });
+  await expect(app).toHaveAttribute('data-scene', 'rest-room', { timeout: 10_000 });
   await expect(app).toHaveAttribute('data-player', /"grounded":true/, { timeout: 10_000 });
   await takeControl(page);
 
-  // Beside the campfire (2, -2), facing it. It starts unlit: the prompt offers to light it, and the
+  // South of the campfire (0, 1), facing it. It starts unlit: the prompt offers to light it, and the
   // game clock reads its start, day 1 06:00.
-  await runConsole(page, 'tp 1 0 -2');
-  await turnTo(page, { x: 2, z: -2 });
+  await runConsole(page, 'tp 0 0 -0.5');
+  await turnTo(page, { x: 0, z: 1 });
   await expect(page.getByTestId('interact-prompt')).toContainText('Light the campfire');
   const start = await data<Clock>(page, 'clock');
   expect(start).toMatchObject({ day: 1, minute: 360 });
@@ -70,7 +70,7 @@ test('AC-7: the player lights the campfire and rests 8 h: the clock reads +8 h, 
   // Rest 8 hours. Frame-paced click checks never settle at a frame a second: dispatch the click.
   await page.locator('[data-screen="rest"] [data-action="rest:hours-8"]').dispatchEvent('click');
   await expect(app).toHaveAttribute('data-rest-ui', /"open":false.*"ok":true,"hours":8/);
-  await expect(app).toHaveAttribute('data-rest', /"kind":"campfire".*"point":"testbed-campfire"/);
+  await expect(app).toHaveAttribute('data-rest', /"kind":"campfire".*"point":"rest-campfire"/);
   const woke = await data<Clock>(page, 'clock');
   expect(woke).toMatchObject({ day: 1, minute: 360 + 8 * 60 });
   await expect(page.getByTestId('clock-hud')).toHaveText(woke?.text ?? '');

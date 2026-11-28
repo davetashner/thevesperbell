@@ -92,7 +92,14 @@ export class RestController {
   readonly #options: RestControllerOptions;
   readonly #offs: (() => void)[];
   #pending: EntityId | undefined;
-  #session: { readonly point: EntityId; readonly window: RestWindow } | undefined;
+  #session:
+    | {
+        readonly point: EntityId;
+        readonly window: RestWindow;
+        readonly id: string;
+        readonly kind: string;
+      }
+    | undefined;
   #last: RestReading['last'] = null;
 
   constructor(options: RestControllerOptions) {
@@ -102,8 +109,8 @@ export class RestController {
       world.events.on(interacted, ({ actor, target, verb }) => {
         if (actor === player && verb === 'rest') this.#pending = target;
       }),
-      addAffordanceGate(world, (_world, actor, target, affordance) =>
-        affordance.verb === 'rest' && actor === player
+      addAffordanceGate(world, (_world, _actor, target, affordance) =>
+        affordance.verb === 'rest'
           ? rules.blocked(world, target, this.#safetyFor(target))?.detail
           : undefined,
       ),
@@ -124,7 +131,7 @@ export class RestController {
     const window = openRestWindow(ui, {
       model: this.#model(point),
       onRest: (id) => {
-        this.#rest(point, id);
+        this.#rest(point, id, window);
       },
       onAction: (id) => {
         const result = rules.invoke(world, player, id);
@@ -137,7 +144,12 @@ export class RestController {
         this.#report();
       },
     });
-    this.#session = { point, window };
+    this.#session = {
+      point,
+      window,
+      id: restPointOf(world, point)!.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      kind: kind.id,
+    };
     this.#report();
     return true;
   }
@@ -178,14 +190,14 @@ export class RestController {
     return { title: kind.name, durations, actions };
   }
 
-  #rest(point: EntityId, id: string): void {
+  #rest(point: EntityId, id: string, window: RestWindow): void {
     const { world, player, rules, toast } = this.#options;
     const kind = rules.kindOf(world, point)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const duration = kind.durations.find((own) => durationId(own) === id)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const outcome = rules.rest(world, player, { point, duration }, this.#safetyFor(point));
     this.#last = lastOf(outcome);
     const text = outcomeText(outcome);
-    if (this.#session !== undefined) this.#session.window.say(text);
+    window.say(text);
     if (outcome.ok) {
       toast?.(text);
       this.close();
@@ -195,12 +207,11 @@ export class RestController {
   }
 
   #report(): void {
-    const { world, rules, onChange } = this.#options;
-    const point = this.#session?.point;
-    onChange?.({
-      open: this.#session !== undefined,
-      point: point === undefined ? null : (restPointOf(world, point)?.id ?? null),
-      kind: point === undefined ? null : (rules.kindOf(world, point)?.id ?? null),
+    const session = this.#session;
+    this.#options.onChange?.({
+      open: session !== undefined,
+      point: session?.id ?? null,
+      kind: session?.kind ?? null,
       last: this.#last,
     });
   }

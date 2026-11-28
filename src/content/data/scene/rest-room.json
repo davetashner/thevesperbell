@@ -1,0 +1,41 @@
+{
+  "$schema": "../scene.schema.json",
+  "id": "rest-room",
+  "name": "Rest room",
+  "description": "A greybox 10 m room with an unlit campfire, the testbed for resting (mw-e27.13): light the campfire with Interact, then rest by it for a few hours or until dawn or dusk. Reach it with ?scene=rest-room.",
+  "grid": 1,
+  "camera": {
+    "position": [-9, 10, -9],
+    "target": [0, 0, 1]
+  },
+  "placements": [
+    { "piece": "floor", "at": [0, 0, 0], "scale": [5, 1, 5] },
+    { "piece": "wall", "at": [0, 0, -5], "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [-5, 0, 0], "yaw": 90, "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [5, 0, 0], "yaw": 90, "scale": [5, 1, 1] },
+    { "piece": "wall", "at": [0, 0, 5], "scale": [5, 1, 1] }
+  ],
+  "spawns": [
+    { "id": "player-start", "at": [0, 0, -2], "tags": ["player-start"] },
+    {
+      "id": "rest-campfire",
+      "at": [0, 0, 1],
+      "lightSource": { "variant": "campfire", "unlit": true },
+      "restPoint": { "kind": "campfire" },
+      "interact": {
+        "affordances": [
+          { "verb": "light", "label": "Light the campfire" },
+          { "verb": "rest", "label": "Rest by the fire" },
+          { "verb": "extinguish", "label": "Snuff", "hold": 1 }
+        ],
+        "range": 2.8,
+        "anchor": [0, 0.8, 0],
+        "radius": 0.7
+      }
+    }
+  ],
+  "light": {
+    "ambient": 0.3,
+    "directional": [{ "id": "sun", "direction": [-0.45, -1, 0.3], "level": 0.5, "reach": 60 }]
+  }
+}

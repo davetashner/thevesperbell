@@ -93,6 +93,7 @@ export function hasMechanisms(layout: SceneLayout): boolean {
         spawn.switch !== undefined ||
         spawn.rope !== undefined ||
         spawn.impactSwitch !== undefined ||
+        spawn.restPoint !== undefined ||
         spawn.properties?.shootable !== undefined ||
         spawn.container?.lock !== undefined,
     )

@@ -114,6 +114,13 @@ describe('mechanisms in the game (mw-e03.18)', () => {
     });
     expect(hasMechanisms(chest('testbed-closet'))).toBe(true);
     expect(hasMechanisms(chest())).toBe(false);
+    // A rest point (mw-e27.13) is made by the mechanisms start, so it needs it.
+    expect(
+      hasMechanisms({
+        ...testbed.layout,
+        spawns: [{ ...testbed.layout.spawns[0], restPoint: { kind: 'campfire' } } as never],
+      }),
+    ).toBe(true);
   });
 
   it('starts the room: doors of every kind, its switches, and the lever raises the portcullis', () => {

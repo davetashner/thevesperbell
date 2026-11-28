@@ -1044,6 +1044,7 @@ describe('scene content', () => {
       'perf-baseline',
       'prefab-gallery',
       'recoil-corridor',
+      'rest-room',
       'scales-room',
       'skeleton-pen',
       'sleeping-ox',

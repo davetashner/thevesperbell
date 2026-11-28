@@ -17,6 +17,8 @@ import {
   initialCharacterState,
   installGameClock,
   installInteraction,
+  InteractableComponent,
+  interactableOf,
   interactionPrompt,
   interacted,
   makeRestPoint,
@@ -76,7 +78,10 @@ function setup(
   addInteractable(
     sim,
     point,
-    { affordances: [{ verb: 'rest', label: 'Rest by the fire' }], range: 2.8 },
+    {
+      affordances: [{ verb: 'rest', label: 'Rest by the fire' }],
+      range: 2.8,
+    },
     { x: 0, y: 1, z: -1.5 },
   );
   makeRestPoint(sim, point, 'campfire', 'camp-1');
@@ -164,6 +169,14 @@ describe('resting in the game (mw-e27.13)', () => {
     setProperty(t.sim, t.point, 'burning', true);
     t.step();
     expect(interactionPrompt(t.sim, t.player)).toMatchObject({ verb: 'rest', available: true });
+    // Other verbs are not the rest rules' business.
+    t.sim.set(
+      t.point,
+      InteractableComponent,
+      interactableOf({ affordances: [{ verb: 'pull' }], range: 2.8 }),
+    );
+    t.step();
+    expect(interactionPrompt(t.sim, t.player)).toMatchObject({ verb: 'pull', available: true });
   });
 
   it('AC-2: an objecting autosave veto greys the verb and every duration, with its reason', () => {
