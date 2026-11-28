@@ -48,6 +48,7 @@
     "asset:texture": "node scripts/assets/texture-cli.ts",
     "asset:crop": "node scripts/assets/crop-cli.ts",
     "asset:turntable": "node scripts/assets/turntable-cli.ts",
+    "asset:gen-image": "node scripts/assets/gen-image-cli.ts",
     "audio:placeholders": "node scripts/audio/gen-placeholders-cli.ts",
     "audio:placeholder-report": "node scripts/audio/placeholder-report-cli.ts",
     "vfx:placeholders": "node scripts/vfx/gen-placeholders-cli.ts",
