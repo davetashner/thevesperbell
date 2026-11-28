@@ -1014,6 +1014,23 @@ export const scenePartitionSchema = z.strictObject({
 });
 
 /**
+ * A box that gives landings back (mw-e24.10): every impact, splash or character landing inside it is
+ * heard again `delay` seconds later and `loss` dB quieter (a deep well shaft, a cistern vault).
+ */
+export const sceneEchoSchema = z
+  .strictObject({
+    id: contentId.describe('Name of the echo, unique in the scene, e.g. glen-well-shaft.'),
+    min: vec3Schema.describe('Lower corner, grid cells.'),
+    max: vec3Schema.describe('Upper corner, grid cells; above min on every axis.'),
+    delay: z.number().positive().max(5).describe('Seconds from a landing to its echo.'),
+    loss: z.number().min(0).default(6).describe('How much quieter the echo is, dB.'),
+  })
+  .refine(({ min, max }) => max[0] > min[0] && max[1] > min[1] && max[2] > min[2], {
+    message: 'max must be above min on every axis',
+    path: ['max'],
+  });
+
+/**
  * The scene's rooms and portals for sound propagation (mw-e09.3). Rooms that touch (side by side:
  * a wall; stacked: a floor) transmit through their partition; everything else goes through portals.
  */
@@ -1024,6 +1041,10 @@ export const sceneAcousticsSchema = z.strictObject({
     .array(scenePartitionSchema)
     .default([])
     .describe('Materials of partitions between touching rooms; the rest use the tuning default.'),
+  echoes: z
+    .array(sceneEchoSchema)
+    .default([])
+    .describe('Places that repeat a landing a moment later (mw-e24.10): a well shaft.'),
 });
 
 const cameraSchema = z.strictObject({
@@ -1635,6 +1656,11 @@ function checkAcoustics(
     const key = [...partition.rooms].sort().join('|');
     if (pairs.has(key)) issue(['partitions', i, 'rooms'], 'this partition is listed twice');
     pairs.add(key);
+  });
+  const echoIds = new Set<string>();
+  acoustics.echoes.forEach((echo, i) => {
+    if (echoIds.has(echo.id)) issue(['echoes', i, 'id'], `echo id "${echo.id}" is used twice`);
+    echoIds.add(echo.id);
   });
 }
 

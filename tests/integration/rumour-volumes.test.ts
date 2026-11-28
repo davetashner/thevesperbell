@@ -76,7 +76,7 @@ const PLACES: readonly [scene: string, spawn: string, place: string, area: strin
   ['briarwood', 'town-gate', 'place-briarwood', 'briarwood'],
   ['briarwood', 'standing-horn', 'place-standing-horn', 'standing-horn'],
   ['moorings-watch', 'moorings-courtyard', 'place-mooring-watch', 'mooring-watch'],
-  ['briar-glen-green', 'glen-well', 'place-glen-well', 'glen-well'],
+  ['bellwater-priory', 'cistern-well-end', 'place-glen-well', 'glen-well-cistern'],
   ['briar-glen-green', 'lamplit-stacks', 'place-lamplit-stacks', 'lamplit-stacks'],
   ['deepworks', 'adit-arrival', 'place-weeping-adit', 'weeping-adit'],
   ['wendmouth-harbour', 'breakwater', 'place-breakwater', 'breakwater'],
