@@ -2,7 +2,7 @@
   "$schema": "../anim-clip.schema.json",
   "id": "anim-knight-sword-light-1",
   "rig": "greybox-humanoid",
-  "notes": "Grey-box placeholder for move sword-light-1 (12/4/18 ticks): the sword is raised on the right (torso leaning back, turning right), held a beat at the top, then cut down across the body, the hit marker on the first active tick, and followed through low on the left. Torso: spine, chest and head point up, so a positive x tilts them BACK and a positive y turns the right shoulder FORWARD (left); arms and legs hang down, so a positive x swings them forward. ",
+  "notes": "Grey-box placeholder for move sword-light-1 (12/4/18 ticks): the sword is raised on the right (torso leaning back, turning right), held a beat at the top, then cut down across the body, the hit marker on the first active tick, and followed through low on the left, the torso leaning into a diving cut that finishes below the waist (mw-e04.38). Torso: spine, chest and head point up, so a positive x tilts them BACK and a positive y turns the right shoulder FORWARD (left); arms and legs hang down, so a positive x swings them forward. ",
   "duration": 0.5667,
   "markers": [
     {
@@ -26,11 +26,11 @@
       },
       {
         "t": 0.2,
-        "rot": [-5.0, 8.0, 0.0]
+        "rot": [-11.0, 8.0, 0.0]
       },
       {
         "t": 0.32,
-        "rot": [-7.0, 14.0, 0.0]
+        "rot": [-14.0, 14.0, 0.0]
       },
       {
         "t": 0.5667,
@@ -52,11 +52,11 @@
       },
       {
         "t": 0.2,
-        "rot": [-8.0, 20.0, 0.0]
+        "rot": [-16.0, 20.0, 0.0]
       },
       {
         "t": 0.32,
-        "rot": [-10.0, 30.0, 0.0]
+        "rot": [-20.0, 30.0, 0.0]
       },
       {
         "t": 0.5667,
@@ -82,11 +82,11 @@
       },
       {
         "t": 0.2,
-        "rot": [82.0, -12.0, 6.0]
+        "rot": [70.0, -12.0, 6.0]
       },
       {
         "t": 0.32,
-        "rot": [35.0, -10.0, 2.0]
+        "rot": [20.0, -10.0, 2.0]
       },
       {
         "t": 0.5667,

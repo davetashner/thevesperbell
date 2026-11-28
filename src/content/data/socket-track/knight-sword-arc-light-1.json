@@ -1,7 +1,7 @@
 {
   "$schema": "../socket-track.schema.json",
   "id": "knight-sword-arc-light-1",
-  "notes": "Sword light 1 (move sword-light-1, 4 active ticks): a descending diagonal slash from upper right to lower left about the chest pivot (0, 1.5, 0), yaw +55° → −55° while the blade drops from 25° raised to 12° lowered, matching the clip anim-knight-sword-light-1 (chest twists right → left as the right arm comes down). Key 0 is the pose before the first active tick.",
+  "notes": "Sword light 1 (move sword-light-1, 4 active ticks): a descending diagonal slash from upper right to lower left about the chest pivot (0, 1.5, 0), yaw +55\u00b0 \u2192 \u221255\u00b0 while the blade dives from 25\u00b0 raised to 52\u00b0 lowered (5\u00b0 and 28\u00b0 lowered at the first two active ticks), so the blade crosses the centre line already low (about 0.7 m above the ground at 1.2 m range) and finishes at about 0.4 m: it connects with a 0.9 m creature such as the fixture hound (mw-e04.38) as well as a 1.8 m guard, with no auto-aim. Matches the clip anim-knight-sword-light-1 (chest twists right \u2192 left as the right arm comes down). Key 0 is the pose before the first active tick.",
   "keys": [
     {
       "position": {
@@ -18,54 +18,54 @@
     },
     {
       "position": {
-        "x": 0.1793,
-        "y": 0.0511,
-        "z": 0.3444
+        "x": -0.0604,
+        "y": 0.0057,
+        "z": -0.116
       },
       "rotation": {
-        "x": -0.126786,
-        "y": 0.235652,
-        "z": 0.031024,
-        "w": 0.963032
+        "x": 0.042369,
+        "y": 0.23746,
+        "z": -0.010368,
+        "w": 0.970418
       }
     },
     {
       "position": {
         "x": 0.0,
-        "y": 0.0057,
-        "z": 0.1307
+        "y": 0.1756,
+        "z": -0.7042
       },
       "rotation": {
-        "x": -0.043619,
+        "x": 0.241922,
         "y": 0.0,
         "z": 0.0,
-        "w": 0.999048
+        "w": 0.970296
       }
     },
     {
       "position": {
-        "x": 0.0483,
-        "y": 0.0037,
-        "z": -0.0928
+        "x": 0.4898,
+        "y": 0.4393,
+        "z": -0.9408
       },
       "rotation": {
-        "x": 0.033899,
-        "y": -0.237541,
-        "z": 0.008295,
-        "w": 0.97075
+        "x": 0.371717,
+        "y": -0.219593,
+        "z": 0.090958,
+        "w": 0.897403
       }
     },
     {
       "position": {
-        "x": 0.2555,
-        "y": 0.0328,
-        "z": -0.1789
+        "x": 0.9683,
+        "y": 0.5765,
+        "z": -0.678
       },
       "rotation": {
-        "x": 0.092718,
-        "y": -0.459219,
-        "z": 0.048266,
-        "w": 0.882152
+        "x": 0.38884,
+        "y": -0.415017,
+        "z": 0.202417,
+        "w": 0.79724
       }
     }
   ]
