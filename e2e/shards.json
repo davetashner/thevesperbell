@@ -5,6 +5,7 @@
     "animation.spec.ts": 23.6,
     "arrow-retrieval.spec.ts": 16.3,
     "arrow-vfx.spec.ts": 131.6,
+    "asset-build.spec.ts": 3,
     "audio.spec.ts": 1.5,
     "awareness.spec.ts": 65,
     "backlog.spec.ts": 0.9,

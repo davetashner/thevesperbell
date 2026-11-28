@@ -13,6 +13,8 @@ src/content/data/navmesh/
 # Written by pnpm audio:placeholders; checked by scripts/audio/gen-placeholders.test.ts.
 src/audio/data/sound-manifest.json
 public/assets/audio/
+# Written by pnpm assets:build (mw-e37.8).
+public/assets/model/manifest.json
 # Written by pnpm replay:record / replay:rebless in a line-per-checkpoint layout that keeps re-bless diffs
 # reviewable (src/sim/replay/format.ts serializeReplay).
 tests/replays/*.json
