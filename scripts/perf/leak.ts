@@ -14,7 +14,7 @@ export interface LeakVerdict {
   detail: string;
 }
 
-function median(values: readonly number[]): number {
+export function median(values: readonly number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   const high = sorted[mid] ?? 0;

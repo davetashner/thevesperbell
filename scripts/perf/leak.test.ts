@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countsReturn, heapGrowth } from './leak';
+import { countsReturn, heapGrowth, median } from './leak';
 
 // mw-e32.12 AC-3: the detector fails on a deliberately leaking fixture, so the e2e spec that uses
 // it can be trusted to catch a leak, and passes on a steady one.
@@ -51,5 +51,13 @@ describe('countsReturn', () => {
 
   it('refuses too few cycles', () => {
     expect(() => countsReturn('textures', [1, 2])).toThrow(/at least 3/);
+  });
+});
+
+describe('median', () => {
+  it('takes the middle sample, the mean of the middle two, and 0 for no samples', () => {
+    expect(median([3, 1, 2])).toBe(2);
+    expect(median([4, 1, 3, 2])).toBe(2.5);
+    expect(median([])).toBe(0);
   });
 });
