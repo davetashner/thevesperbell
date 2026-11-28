@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor hint only; ignored by the loader."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "The kind of rest point, e.g. `campfire`."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Shown on the rest menu."
+    },
+    "needsFire": {
+      "default": false,
+      "description": "Rest is refused unless the point is burning (the `burning` world property).",
+      "type": "boolean"
+    },
+    "fullRestHours": {
+      "default": 8,
+      "description": "A rest this long gives the whole `restores` table; a shorter one a pro-rata share.",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 24
+    },
+    "restores": {
+      "default": {
+        "health": 1,
+        "stamina": 1,
+        "mana": 1
+      },
+      "description": "Fraction of each pool’s maximum a full rest restores.",
+      "type": "object",
+      "properties": {
+        "health": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "stamina": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mana": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "durations": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "dawn"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "dusk"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "hours"
+              },
+              "hours": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 24,
+                "description": "Whole hours."
+              }
+            },
+            "required": [
+              "kind",
+              "hours"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "description": "The durations the menu offers: until dawn, until dusk or a number of hours."
+    },
+    "interrupts": {
+      "default": [],
+      "description": "What can break a rest off early, rolled by chance per hour.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Names the interruption; the `rest.interrupted` event carries it."
+          },
+          "chancePerHour": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Chance, rolled on the seeded `rest` stream once per game hour of the rest."
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the player is told when it happens."
+          }
+        },
+        "required": [
+          "id",
+          "chancePerHour",
+          "message"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "durations"
+  ],
+  "additionalProperties": false
+}

@@ -32,6 +32,8 @@ export function installRestPolicies(
   onReset?: (resets: RestResets) => void,
 ): () => void {
   return world.events.on(restCompleted, () => {
-    onReset?.(applyRestPolicies(world));
+    // Apply first: `onReset?.(applyRestPolicies(world))` would skip the reset when there is no callback.
+    const resets = applyRestPolicies(world);
+    onReset?.(resets);
   });
 }

@@ -96,7 +96,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].tags` | list of string | `[]` | Free-form tags for systems and tools. |
 | `spawns[].interact` | object | — | Makes the spawned entity interactable: its affordances (mw-e02.5). |
 | `spawns[].interact.affordances` | list of object (at least 1) | required | In priority order: Interact uses the first one the actor can. |
-| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"stash"` \| `"hide"` \| `"leave"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` | required | What Interact does. |
+| `spawns[].interact.affordances[].verb` | `"use"` \| `"open"` \| `"close"` \| `"pull"` \| `"press"` \| `"pick-up"` \| `"read"` \| `"search"` \| `"stash"` \| `"hide"` \| `"leave"` \| `"climb"` \| `"talk"` \| `"push"` \| `"release"` \| `"rotate"` \| `"unlock"` \| `"pick-lock"` \| `"light"` \| `"extinguish"` \| `"rest"` | required | What Interact does. |
 | `spawns[].interact.affordances[].label` | string | — | Prompt text; defaults to the verb (e.g. "Pull"). |
 | `spawns[].interact.affordances[].hold` | number 0–10 | — | Seconds Interact must be held; 0 or omitted fires on press. |
 | `spawns[].interact.affordances[].requires` | list of object | — | Every one must hold for the actor to use it (else shown greyed with the reason). |
@@ -249,10 +249,12 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `spawns[].bridge.width` | number > 0 | required | Distance between the two ropes, metres: the plank prop’s width. |
 | `spawns[].suspendedFrom` | string | — | Spawn id of the rope this movable prop hangs from (mw-e05.13): it is held in place until the rope is cut or burnt, then falls. |
 | `spawns[].lightSource` | object | — | Makes the spawned entity a light source that can be put out and relit (mw-e03.16). |
-| `spawns[].lightSource.variant` | `"candle"` \| `"torch"` \| `"sconce"` \| `"brazier"` \| `"lantern"` \| `"fireplace"` | required | Prefab: its fuel, light, ignition point and how much wind it takes to blow it out. |
+| `spawns[].lightSource.variant` | `"candle"` \| `"torch"` \| `"sconce"` \| `"brazier"` \| `"lantern"` \| `"fireplace"` \| `"campfire"` | required | Prefab: its fuel, light, ignition point and how much wind it takes to blow it out. |
 | `spawns[].lightSource.unlit` | boolean | — | Starts dark; heat lights it (default false). |
 | `spawns[].lightSource.infiniteFuel` | boolean | — | Never runs out of fuel while lit (default false). |
 | `spawns[].lightSource.tint` | list of any (at least 3) | — | Colour of its rendered light, [r, g, b] 0–1 (mw-ju8.43); the prefab default (flame or lamp) when absent. Looks only: the sim light level is unchanged. |
+| `spawns[].restPoint` | object | — | Makes the spawned entity a rest point (mw-e27.13). Its `interact` must offer the `rest` verb; a kind that needs fire only works while the spawn burns (give it a `lightSource`). |
+| `spawns[].restPoint.kind` | ref → rest-point | required | The kind of rest point: its rules are that content entry. |
 | `spawns[].impactSwitch` | object | — | Makes the spawned entity an impact switch that distant hits and spells trigger (mw-e03.20). |
 | `spawns[].impactSwitch.variant` | `"bullseye"` \| `"bell"` \| `"crystal"` \| `"counterweight"` \| `"target"` | required | Prefab: bullseye (pierce, small zone), bell (any impact, rings), crystal (charge or light), counterweight (slash, or released by its rope), target (any projectile at or above the spawn’s `shootable` impulse, latching). |
 | `spawns[].impactSwitch.minEnergy` | number ≥ 0 | — | Least energy that counts, J (the delivered amount for an element). |

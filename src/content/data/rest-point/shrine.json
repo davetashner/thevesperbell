@@ -1,0 +1,14 @@
+{
+  "$schema": "../rest-point.schema.json",
+  "id": "shrine",
+  "name": "Shrine",
+  "needsFire": false,
+  "fullRestHours": 4,
+  "restores": { "health": 1, "stamina": 1, "mana": 1 },
+  "durations": [
+    { "kind": "hours", "hours": 1 },
+    { "kind": "hours", "hours": 4 },
+    { "kind": "dawn" }
+  ],
+  "interrupts": []
+}

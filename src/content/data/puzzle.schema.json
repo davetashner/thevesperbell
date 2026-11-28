@@ -414,7 +414,8 @@
                         "unlock",
                         "pick-lock",
                         "light",
-                        "extinguish"
+                        "extinguish",
+                        "rest"
                       ],
                       "description": "Affordance verb used on it, e.g. \"pull\"."
                     },

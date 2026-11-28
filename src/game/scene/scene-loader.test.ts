@@ -112,6 +112,7 @@ describe('scene loader glue (mw-e00.21)', () => {
       'perf-baseline',
       'prefab-gallery',
       'recoil-corridor',
+      'rest-room',
       'scales-room',
       'skeleton-pen',
       'sleeping-ox',
@@ -199,7 +200,7 @@ describe('scene loader glue (mw-e00.21)', () => {
     const current = loader.load('testbed');
     expect(() => loader.load('does-not-exist')).toThrow(UnknownSceneError);
     expect(() => loader.load('does-not-exist')).toThrow(
-      'unknown scene "does-not-exist"; available scenes: bellwater-priory, brazier-hall, briar-glen-green, briar-glen-lane, briar-glen-river, briarwood, bridgeward-college, chandelier-room, chaos-room, chimes, combat-sandbox, dark-crossing, deepworks, frozen-channel, hiding-room, kestrel-lock, kit-gallery, knot-inner, knot-outer, lighting-room, marsh-store, mechanism-room, moorings-watch, perf-baseline, prefab-gallery, recoil-corridor, scales-room, skeleton-pen, sleeping-ox, slice, sunbeam-hall, testbed, under-the-bridge, valley-01, valley-02, valley-03, variant-room, vertical-hall, watchers, weak-wall-room, wendmouth-harbour',
+      'unknown scene "does-not-exist"; available scenes: bellwater-priory, brazier-hall, briar-glen-green, briar-glen-lane, briar-glen-river, briarwood, bridgeward-college, chandelier-room, chaos-room, chimes, combat-sandbox, dark-crossing, deepworks, frozen-channel, hiding-room, kestrel-lock, kit-gallery, knot-inner, knot-outer, lighting-room, marsh-store, mechanism-room, moorings-watch, perf-baseline, prefab-gallery, recoil-corridor, rest-room, scales-room, skeleton-pen, sleeping-ox, slice, sunbeam-hall, testbed, under-the-bridge, valley-01, valley-02, valley-03, variant-room, vertical-hall, watchers, weak-wall-room, wendmouth-harbour',
     );
     expect(loader.current).toBe(current);
   });

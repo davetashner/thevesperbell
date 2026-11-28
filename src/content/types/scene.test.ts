@@ -66,6 +66,25 @@ describe('scene mechanisms (mw-e03.18)', () => {
     ]);
   });
 
+  it('mw-e27.13: a rest point must offer the rest verb', () => {
+    const point = spawn('camp', { restPoint: { kind: 'campfire' } });
+    expect(problems({ ...room, spawns: [point] })).toEqual([
+      'spawns.0.restPoint: spawn "camp" is a rest point: its `interact` must offer the `rest` verb',
+    ]);
+    expect(
+      problems({
+        ...room,
+        spawns: [{ ...point, interact: { affordances: [{ verb: 'light' }] } }],
+      }),
+    ).toHaveLength(1);
+    expect(
+      problems({
+        ...room,
+        spawns: [{ ...point, interact: { affordances: [{ verb: 'light' }, { verb: 'rest' }] } }],
+      }),
+    ).toEqual([]);
+  });
+
   it('rejects positions on a lever or button, and a start outside the positions', () => {
     expect(
       problems({
@@ -1049,6 +1068,7 @@ describe('scene content', () => {
       'perf-baseline',
       'prefab-gallery',
       'recoil-corridor',
+      'rest-room',
       'scales-room',
       'skeleton-pen',
       'sleeping-ox',

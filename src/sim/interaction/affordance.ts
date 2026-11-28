@@ -35,6 +35,7 @@ export const AFFORDANCE_VERBS = [
   'pick-lock',
   'light',
   'extinguish',
+  'rest',
 ] as const;
 
 export type AffordanceVerb = (typeof AFFORDANCE_VERBS)[number];
@@ -61,6 +62,7 @@ export const AFFORDANCE_LABELS: Readonly<Record<AffordanceVerb, string>> = Objec
   'pick-lock': 'Pick lock',
   light: 'Light',
   extinguish: 'Extinguish',
+  rest: 'Rest',
 });
 
 /** A condition on the actor: a capability it has (class, skill) or an item it carries (ids). */

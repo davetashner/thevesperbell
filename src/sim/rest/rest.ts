@@ -8,8 +8,8 @@
 // game layer (src/game/save/autosave/vetoes.ts). The autosave after a rest is requested by the game
 // when it hears `rest.completed`.
 //
-// Out of scope until mw-e27.13: campfire and shrine rest, durations other than "until morning",
-// interrupts and prorated restoration, the rest-action registry.
+// Campfire and shrine rest, other durations, interrupts, prorated restoration and the rest-action
+// registry are mw-e27.13 (./rules.ts).
 
 import type { EntityId } from '../core/component';
 import { defineEvent } from '../core/events';
@@ -24,8 +24,8 @@ import {
   type TimeOfDay,
 } from './day-clock';
 
-/** Kinds of rest point. Only `inn` exists in the slice; mw-e27.13 adds `campfire` and `shrine`. */
-export type RestKind = 'inn';
+/** Kinds of rest point: the ids of the `rest-point` content (`inn`, `campfire`, `shrine`). */
+export type RestKind = string;
 
 /** An actor finished resting. */
 export interface RestCompleted {
@@ -38,6 +38,8 @@ export interface RestCompleted {
   readonly point: string;
   /** The time on waking. */
   readonly wakes: TimeOfDay;
+  /** The id of the interruption that cut the rest short (mw-e27.13); absent for a full rest. */
+  readonly interrupted?: string;
 }
 
 export const restCompleted = defineEvent<RestCompleted>('rest.completed');

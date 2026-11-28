@@ -41,6 +41,7 @@ import {
   lightChanged,
   normalizedLoudness,
   installLightSources,
+  makeLightSource,
   spawnLightSource,
   type LightChange,
 } from './sources';
@@ -111,9 +112,9 @@ const gust = (w: World<never>, intensity: number, extra: object = {}) =>
   });
 
 describe('light sources (mw-e03.16)', () => {
-  it('prefabs: six variants, flammable fuel with a light that shines only while it burns', () => {
+  it('prefabs: seven variants, flammable fuel with a light that shines only while it burns', () => {
     const { world, field } = lightWorld();
-    expect(LIGHT_SOURCE_VARIANTS).toHaveLength(6);
+    expect(LIGHT_SOURCE_VARIANTS).toHaveLength(7);
     const entities = LIGHT_SOURCE_VARIANTS.map((v, i) => spawnLightSource(world, v, at(i - 3, 0)));
     run(world, 2);
     for (const [i, entity] of entities.entries()) {
@@ -150,7 +151,9 @@ describe('light sources (mw-e03.16)', () => {
       expect(burning(world, entity)).toBe(false);
       expect(field.levelAt(at(i - 3))).toBeLessThan(before[i]!);
     }
-    expect(changes.filter((c) => !c.lit && c.cause === 'water')).toHaveLength(6);
+    expect(changes.filter((c) => !c.lit && c.cause === 'water')).toHaveLength(
+      LIGHT_SOURCE_VARIANTS.length,
+    );
   });
 
   it('AC-2: the same force puts out a candle but not a brazier', () => {
@@ -267,6 +270,20 @@ describe('light sources (mw-e03.16)', () => {
         source: arsonist,
       },
     ]);
+  });
+
+  it('mw-e27.13: the light verb strikes heat into an unlit source, crediting the actor; a burning one is left alone', () => {
+    const { world, changes } = lightWorld();
+    const actor = world.spawn();
+    const camp = spawnLightSource(world, 'campfire', at(0), { unlit: true });
+    run(world, 2);
+    world.events.emit(interacted, { actor, target: camp, verb: 'light', affordance: 0 });
+    run(world, 3);
+    expect(burning(world, camp)).toBe(true);
+    expect(changes).toMatchObject([{ entity: camp, lit: true, cause: 'heat', source: actor }]);
+    world.events.emit(interacted, { actor, target: camp, verb: 'light', affordance: 0 });
+    run(world, 2);
+    expect(changes).toHaveLength(1);
   });
 
   it('AC-4: the heat source is the attribution of the relight', () => {
@@ -477,6 +494,47 @@ describe('smothering by hand (mw-e03.16)', () => {
     world.events.emit(interacted, { actor, target: torch, verb: 'extinguish', affordance: 0 });
     world.step([IDLE]);
     expect(noises).toHaveLength(1);
+  });
+
+  it('mw-e27.13: the prompt offers the light verb on an unlit source and refuses it once it burns', () => {
+    const { world, w, actor } = handsWorld();
+    const camp = spawnLightSource(w, 'campfire', { x: 0, y: 1, z: -1.5 }, { unlit: true });
+    addInteractable(
+      w,
+      camp,
+      { affordances: [{ verb: 'light' }, { verb: 'extinguish' }], range: SNUFF_REACH },
+      { x: 0, y: 1, z: -1.5 },
+    );
+    world.step([IDLE]);
+    expect(interactionPrompt(world, actor)?.options.map((o) => [o.verb, o.available])).toEqual([
+      ['light', true],
+      ['extinguish', false],
+    ]);
+    setProperty(w, camp, 'burning', true);
+    world.step([IDLE]);
+    expect(interactionPrompt(world, actor)?.options[0]).toMatchObject({
+      verb: 'light',
+      available: false,
+      reason: 'Already burning',
+    });
+  });
+
+  it('mw-e27.13: a source that already has affordances (a scene’s campfire) keeps them instead of the bare snuff', () => {
+    const { w } = handsWorld();
+    const camp = w.spawn();
+    addInteractable(
+      w,
+      camp,
+      { affordances: [{ verb: 'light' }, { verb: 'rest' }, { verb: 'extinguish' }], range: 2.8 },
+      { x: 0, y: 0, z: -1 },
+    );
+    makeLightSource(w, camp, 'campfire', { x: 0, y: 0, z: -1 });
+    expect(w.get(camp, InteractableComponent)?.affordances.map((a) => a.verb)).toEqual([
+      'light',
+      'rest',
+      'extinguish',
+    ]);
+    expect(w.get(camp, InteractableComponent)?.range).toBe(2.8);
   });
 
   it('needs reach: a torch just beyond the snuff reach is not focused, one within it is', () => {

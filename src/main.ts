@@ -103,6 +103,7 @@ import { createServiceCatalog, SERVICES_SERVICE } from '@sim/services';
 import { SCENE_SERVICE } from '@sim/logic/travel-kinds';
 import type { ServiceDef } from '@content/types/service';
 import type { QuestDef } from '@content/types/quest';
+import { startRestUi } from '@game/rest/rest';
 import { startShopUi } from '@game/shop/shop-window';
 import { DUEL_BEHAVIOUR, startDuelUi } from '@game/duel/duel';
 import { ContestController } from '@game/contest/controller';
@@ -2516,6 +2517,26 @@ function startRenderer(
         });
         afterStep.push(() => {
           shop.afterStep();
+        });
+        // Resting (mw-e27.13): a rest point's `rest` verb opens the rest menu (durations plus the rest
+        // actions other systems register); the HUD shows the game clock. Refused while an autosave
+        // safety veto objects or something hostile is near. #app[data-rest-ui] and #app[data-clock]
+        // are the e2e's readouts.
+        const restUi = startRestUi({
+          ui,
+          world,
+          content,
+          player: player.entity,
+          safety: () => safety.active()[0]?.reason ?? null,
+          toast: (text) => {
+            shop.toast(text);
+          },
+          publish: (key, value) => {
+            root.dataset[key] = value;
+          },
+        });
+        afterStep.push(() => {
+          restUi.afterStep();
         });
         // First-blood duels (mw-e39.35): Tereza's dialogue asks for one, the first hit either side lands
         // ends it (nobody is hurt), and the result facts her dialogue reads are written.

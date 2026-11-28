@@ -298,6 +298,23 @@ describe('declaration policies', () => {
     expect(levels.rest(world).live).toBe(0);
   });
 
+  it('mw-e27.13: rest policies apply with no callback to hear about them (the game installs it bare)', () => {
+    const world = newWorld();
+    world.facts.declare('camp.lit', { type: 'bool', default: false, persistence: 'reset-on-rest' });
+    world.facts.set('camp.lit', true);
+    installRestPolicies(world);
+    world.events.emit(restCompleted, {
+      tick: 0,
+      actor: world.spawn(),
+      kind: 'inn',
+      hours: 8,
+      point: 'sleeping-ox',
+      wakes: { day: 2, minute: 360 },
+    });
+    world.events.flush();
+    expect(world.facts.get('camp.lit')).toBe(false);
+  });
+
   it('rests apply to facts and levels together, on rest.completed only', () => {
     const { world, plant, authored } = meadow();
     world.facts.declare('camp.lit', { type: 'bool', default: false, persistence: 'reset-on-rest' });

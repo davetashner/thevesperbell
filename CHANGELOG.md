@@ -14,6 +14,7 @@ check enforces this).
 
 ### Added
 
+- Rest at campfires, shrines and inn beds: light a campfire, pick how long to rest (until dawn, until dusk or a few hours), and the clock on the HUD moves on, you heal and the world resets what resets on rest; wolves or other trouble can wake you early with part of the healing. Rest is refused while enemies hunt you or the fire is out. [mw-e27.13]
 - Books open into a two-page reader from the pack's new Open action: pages turn in pairs with the arrow keys, Q or the buttons, a torn-out page shows "Pages missing", a book in an unknown tongue reads as runes, and a Study button shows the time left and says why it is blocked when danger is near [mw-e07.9]
 - The Glen Well hides a way down: climb (or drop) down the shaft, pull the loose rung and follow the old tunnel to a flooded cistern under Bellwater Priory. A stone dropped down the well lands twice. [mw-e24.10]
 - The supply tunnel under Mooring's Watch is open: past its collapse it leads into the Deepworks' old galleries. Batter the rubble down, burn or shoot out the rotten prop to drop a step to climb from, or climb the rough face; once past, the shortcut stays open.

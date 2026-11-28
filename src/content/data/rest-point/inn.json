@@ -1,0 +1,10 @@
+{
+  "$schema": "../rest-point.schema.json",
+  "id": "inn",
+  "name": "Inn bed",
+  "needsFire": false,
+  "fullRestHours": 8,
+  "restores": { "health": 1, "stamina": 1, "mana": 1 },
+  "durations": [{ "kind": "dawn" }],
+  "interrupts": []
+}

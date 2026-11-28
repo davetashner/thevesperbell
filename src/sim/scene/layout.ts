@@ -519,6 +519,8 @@ export interface SceneSpawnSpec {
   readonly liquid?: SceneLiquidSpec | undefined;
   /** Makes the spawned entity a light source (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec | undefined;
+  /** Makes the spawned entity a rest point of this kind (mw-e27.13). */
+  readonly restPoint?: { readonly kind: { readonly id: string } } | undefined;
   /** Makes the spawned entity an impact switch (mw-e03.20). */
   readonly impactSwitch?: SceneImpactSwitchSpec | undefined;
   /** Makes the spawned entity a light beam emitter (mw-e03.17). */
@@ -728,6 +730,8 @@ export interface SceneSpawnPlacement {
   };
   /** Its light source data, when it is one (mw-e03.16). */
   readonly lightSource?: SceneLightSourceSpec;
+  /** The kind of rest point it is, when it is one (mw-e27.13). */
+  readonly restPoint?: { readonly kind: string };
   /** Its impact switch data, when it is one (mw-e03.20). */
   readonly impactSwitch?: SceneImpactSwitchSpec;
   /** Its beam emitter, optic and receiver data (mw-e03.17). */
@@ -1249,6 +1253,9 @@ export function layoutScene(scene: SceneSpec, kit: KitLookup): SceneLayout {
         ...(spawn.liquid !== undefined && { liquid: liquidOf(spawn.liquid) }),
         ...(spawn.lightSource !== undefined && {
           lightSource: Object.freeze({ ...spawn.lightSource }),
+        }),
+        ...(spawn.restPoint !== undefined && {
+          restPoint: Object.freeze({ kind: spawn.restPoint.kind.id }),
         }),
         ...(spawn.impactSwitch !== undefined && {
           impactSwitch: impactSwitchOf(spawn.impactSwitch),

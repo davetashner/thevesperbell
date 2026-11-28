@@ -1,0 +1,21 @@
+{
+  "$schema": "../rest-point.schema.json",
+  "id": "campfire",
+  "name": "Campfire",
+  "needsFire": true,
+  "fullRestHours": 8,
+  "restores": { "health": 1, "stamina": 1, "mana": 1 },
+  "durations": [
+    { "kind": "dawn" },
+    { "kind": "dusk" },
+    { "kind": "hours", "hours": 2 },
+    { "kind": "hours", "hours": 8 }
+  ],
+  "interrupts": [
+    {
+      "id": "prowler",
+      "chancePerHour": 0.03,
+      "message": "Something moves at the edge of the firelight. You are awake before you know why."
+    }
+  ]
+}
