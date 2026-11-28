@@ -122,7 +122,7 @@ flowchart LR
   shop_lane --- market_green
   market_green --- mine_road
   mine_road --- mine_gate
-  market_green -.-|planned| priory_road
+  market_green --- priory_road
   market_green ---|door| lamplit_stacks
   shop_lane ---|door| brands_forge
   shop_lane ---|door| fenns_fletchery
@@ -149,7 +149,7 @@ flowchart LR
   briarwood_hub --- millweir_far_bank
   moorings_courtyard ---|door| moorings_tower
   moorings_courtyard ---|door| supply_tunnel
-  supply_tunnel -.-|shortcut knight/sorcerer| old_galleries
+  supply_tunnel -.-|shortcut knight/sorcerer/thief| old_galleries
   bridge_post --- mine_gate
   mine_gate ---|door archer/knight/sorcerer/thief| winch_house
   winch_house --- old_galleries
@@ -234,12 +234,13 @@ Class capabilities are the MVP profiles in src/content/data/class (`mvpCapabilit
 
 | Class | Shortcut | Edge | Capability | Opens |
 | --- | --- | --- | --- | --- |
-| knight | The collapse: a knight shoulder-barges the rotten shoring, a sorcerer burns it away; the long way in for anyone via the gate. | `supply-tunnel-collapse` | `technique.shoulder-barge`, `spell.firebolt` | The supply tunnel (watchtower end) ↔ The old glenstone galleries |
+| knight | The collapse: a knight batters the rubble fall down, a sorcerer burns the rotten prop (an archer shoots it) so the roof section drops into a step, a thief climbs the rough face; the long way in for anyone via the gate. | `supply-tunnel-collapse` | `technique.shield-bash`, `spell.firebolt`, `verb.climb.rough` | The supply tunnel (watchtower end) ↔ The old glenstone galleries |
 | knight | The cell drain leads out to the cistern: a thief picks the grate padlock, a knight shoulder-barges the rotten grate. | `jail-drain` | `tool.lockpick`, `technique.shoulder-barge` | The jail cell ↔ The cistern |
 | archer | Trampled ferns lead to the mine gate; visible at night or to a tracker. CANON GAP: bible does not say where the path ends. | `sleepers-path-mine-gate` | `sense.tracking` | The Sleepers' Path ↔ The boarded mine gate |
 | archer | The sluice walk across the weir: an archer ropes the rail, a sorcerer lifts the sluice with Mage Hand. | `sluice-walk` | `arrow.rope`, `spell.mage-hand` | The Millweir ↔ The Briarwood far bank |
-| sorcerer | The collapse: a knight shoulder-barges the rotten shoring, a sorcerer burns it away; the long way in for anyone via the gate. | `supply-tunnel-collapse` | `technique.shoulder-barge`, `spell.firebolt` | The supply tunnel (watchtower end) ↔ The old glenstone galleries |
+| sorcerer | The collapse: a knight batters the rubble fall down, a sorcerer burns the rotten prop (an archer shoots it) so the roof section drops into a step, a thief climbs the rough face; the long way in for anyone via the gate. | `supply-tunnel-collapse` | `technique.shield-bash`, `spell.firebolt`, `verb.climb.rough` | The supply tunnel (watchtower end) ↔ The old glenstone galleries |
 | sorcerer | The sluice walk across the weir: an archer ropes the rail, a sorcerer lifts the sluice with Mage Hand. | `sluice-walk` | `arrow.rope`, `spell.mage-hand` | The Millweir ↔ The Briarwood far bank |
+| thief | The collapse: a knight batters the rubble fall down, a sorcerer burns the rotten prop (an archer shoots it) so the roof section drops into a step, a thief climbs the rough face; the long way in for anyone via the gate. | `supply-tunnel-collapse` | `technique.shield-bash`, `spell.firebolt`, `verb.climb.rough` | The supply tunnel (watchtower end) ↔ The old glenstone galleries |
 | thief | Thieves climb the rough stonework of Vane House onto its roof; others take the front path. | `rooftop-vane-house` | `verb.climb.rough` | The town rooftops ↔ Vane House |
 | thief | The cell drain leads out to the cistern: a thief picks the grate padlock, a knight shoulder-barges the rotten grate. | `jail-drain` | `tool.lockpick`, `technique.shoulder-barge` | The jail cell ↔ The cistern |
 | thief | Rooftop route from the net lofts onto the Customs House roof; thieves only. | `net-lofts-customs-roof` | `verb.climb.rough` | The Net Lofts and rooftops ↔ The Customs House |
@@ -283,7 +284,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `millweir-far-bank` | The Briarwood far bank | briarwood | e25 | `briarwood` | Far bank of the Wend, reached over the Millweir sluice walk (bible 3.1). Built as a named marker spawn of the briarwood scene (greybox mw-e25.1); the content on it is a later bead. |
 | `moorings-courtyard` | Mooring's Watch courtyard | moorings-watch | e25 | `moorings-watch` | Goblin lookout below (bible 3.5, mw-e25.6). Built as the spur trail, goblin lookout camp and walled courtyard of moorings-watch; the Briarwood reaches it by `hub-moorings`. |
 | `moorings-tower` | Mooring's Watch tower and roof | moorings-watch | e25 | `moorings-watch` | Hollow Sentinels above; keeper's log; signal mirror on the roof (bible 3.5). Built in moorings-watch (mw-e25.6): four floors, an interior stair and two exterior climbs to the roof; Sentinels and the mirror puzzle are later beads. |
-| `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | `moorings-watch` | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). Built as a locked cellar door over a sealed vestibule in the courtyard wall (mw-e25.6); the tunnel itself is mw-e26, the way through the collapse mw-e25.9. |
+| `supply-tunnel` | The supply tunnel (watchtower end) | moorings-watch | e25 | `moorings-watch` | Old supply tunnel up to the collapse (bible 3.5; mine side is E26). The cellar door in the courtyard wall (mw-e25.6) opens on the tunnel; the collapse and the way into the Deepworks are mw-e25.9. |
 | `mine-road` | The mine road | deepworks | e25 | `deepworks` | The road from Briar Glen's Market Green to the boarded mine gate (bible 3.5). Planned: the town side is a signposted gate stub in briar-glen-green (exit-mine-road, mw-e24.2); the road itself is mw-e25.23. Built (mw-e26.2) as the road strip at the south end of the deepworks scene, entered from the green by the mine-road-gate transition. |
 | `mine-gate` | The boarded mine gate | deepworks | e25 | `deepworks` | Boarded main gate with the Bell Line rule carved above (bible 3.5, mw-e25.10); E25 owns the exterior. Built (mw-e26.2) as the forecourt and gate wall of the deepworks scene, with the four ways in from outside; the gate puzzle that sets deepworks.gate-open is mw-e25.10. |
 | `winch-house` | The winch house | deepworks | e26 | `deepworks` | First interior space inside the gate (bible 3.5, mw-e26.2). Built (mw-e26.2): the first hall inside the gate wall, with the winch lever and the cage lift gate. |
@@ -347,7 +348,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `green-vane-house` | `market-green` | `vane-house` | path |  |  | planned: mw-e24.9 |
 | `green-mine-road` | `market-green` | `mine-road` | path |  |  | `briar-glen-green/mine-road-gate`, `deepworks/road-gate` |
 | `mine-road-gate` | `mine-road` | `mine-gate` | path |  |  | planned: mw-e25.23 |
-| `green-priory-road` | `market-green` | `priory-road` | path |  |  | planned: mw-e25.25 |
+| `green-priory-road` | `market-green` | `priory-road` | path |  |  | `briar-glen-green/priory-road-gate`, `briarwood/town-road-gate` |
 | `green-schoolhouse` | `market-green` | `schoolhouse` | door |  |  | planned: mw-e24.11 |
 | `green-cemetery` | `market-green` | `cemetery` | path |  |  | planned: mw-e24.11 |
 | `green-glen-well` | `market-green` | `glen-well` | path |  |  | planned: mw-e24.10 |
@@ -367,7 +368,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `hub-far-bank` | `briarwood-hub` | `millweir-far-bank` | path |  |  | planned: mw-e25.1 |
 | `courtyard-tower` | `moorings-courtyard` | `moorings-tower` | door |  |  | planned: mw-e25.6 |
 | `courtyard-supply-tunnel` | `moorings-courtyard` | `supply-tunnel` | door |  |  | planned: mw-e25.6 |
-| `supply-tunnel-collapse` | `supply-tunnel` | `old-galleries` | shortcut | `{"fact":"world.supply-tunnel.cleared"}` | `technique.shoulder-barge`, `spell.firebolt` | planned: mw-e25.9 |
+| `supply-tunnel-collapse` | `supply-tunnel` | `old-galleries` | shortcut | `{"fact":"world.supply-tunnel.cleared"}` | `technique.shield-bash`, `spell.firebolt`, `verb.climb.rough` | `moorings-watch/supply-tunnel-gate`, `deepworks/supply-tunnel-gate` |
 | `miners-bridge` | `bridge-post` | `mine-gate` | path |  |  | `briar-glen-lane/miners-stair`, `deepworks/miners-track-gate` |
 | `mine-gate-winch` | `mine-gate` | `winch-house` | door | `{"fact":"deepworks.gate-open"}` | `technique.shoulder-barge`, `arrow.pinning-shot`, `spell.mage-hand`, `tool.lockpick` | planned: mw-e25.10 |
 | `winch-galleries` | `winch-house` | `old-galleries` | path |  |  | planned: mw-e26.2 |
@@ -436,7 +437,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briar-glen-lane` | `brands-forge` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
 | `briar-glen-lane` | `fenns-fletchery` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
 | `briar-glen-lane` | `pells-bakery` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
-| `briar-glen-green` | `market-green` | `briar-glen-green/lane-gate` (lane-market-green) |
+| `briar-glen-green` | `market-green` | `briar-glen-green/lane-gate` (lane-market-green), `briar-glen-green/mine-road-gate` (green-mine-road), `briar-glen-green/priory-road-gate` (green-priory-road) |
 | `briar-glen-green` | `lamplit-stacks` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `briar-glen-green` | `watch-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `briar-glen-green` | `vane-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
@@ -457,11 +458,11 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briarwood` | `wolf-den` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `woodcutters-hut` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `millpond` | none (a marker spawn; its trails are walked inside the scene) |
-| `briarwood` | `priory-road` | `briarwood/priory-road-gate` (priory-road-gate) |
+| `briarwood` | `priory-road` | `briarwood/priory-road-gate` (priory-road-gate), `briarwood/town-road-gate` (green-priory-road: the town road from Market Green comes in at a gap in the west wall and runs east to the mine road junction) |
 | `briarwood` | `millweir-far-bank` | none (a marker spawn; its trails are walked inside the scene) |
 | `moorings-watch` | `moorings-courtyard` | `moorings-watch/spur-gate` (hub-moorings), `moorings-watch/ridge-gate` (moorings-priory-ridge) |
 | `moorings-watch` | `moorings-tower` | none (a marker spawn inside the tower; the door is walked in and the stair climbed inside the scene) |
-| `moorings-watch` | `supply-tunnel` | none (a locked door stub over a sealed vestibule; mw-e25.9 replaces it with a transition) |
+| `moorings-watch` | `supply-tunnel` | `moorings-watch/supply-tunnel-gate` (supply-tunnel-collapse), at the far end of the tunnel past the collapse |
 | `bellwater-priory` | `priory-gate` | `bellwater-priory/road-gate` (priory-road-gate) |
 | `bellwater-priory` | `priory-nave` | none (a marker spawn; the nave is walked inside the scene) |
 | `bellwater-priory` | `priory-choir` | none (a marker spawn; walked inside the scene) |
@@ -474,7 +475,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `deepworks` | `mine-road` | `deepworks/road-gate` (green-mine-road) |
 | `deepworks` | `mine-gate` | none (a marker spawn in the forecourt; the four ways in from outside are the gate wall's doorways, and mw-e25.10 writes deepworks.gate-open) |
 | `deepworks` | `winch-house` | none (a marker spawn; walked inside the scene, behind the gate wall) |
-| `deepworks` | `old-galleries` | none (a marker spawn; walked inside the scene; its west wall holds the supply tunnel collapse, mw-e25.9) |
+| `deepworks` | `old-galleries` | `deepworks/supply-tunnel-gate` (supply-tunnel-collapse), at the end of the tunnel stub behind the boarded cribbing in its west wall |
 | `deepworks` | `rootcellar-camp` | `deepworks/quay-gate` (stone-stair: the Stone Stair slide down to the quay); otherwise a marker spawn walked inside the scene |
 | `deepworks` | `silver-galleries` | none (a marker spawn one level down; the stair from the cutting hall and the cage lift lead to it) |
 | `deepworks` | `vane-sealed-gallery` | none (a marker spawn two levels down; mw-e26.4 builds its content and the seal) |
@@ -503,6 +504,8 @@ Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `bra
 
 Every edge below has no scene transition yet. The first group needed new beads filed with this map; the rest belong to existing level beads.
 
+Most of these edges are already walkable even though no transition volume carries them: an edge whose two nodes are marker spawns of the same scene is walked inside that scene (the town, the Briarwood, the Deepworks, the priory, the Knot and the harbour), and the four `barge-*` edges are rides sold by Mags Oakum's dialogue (mw-e25.15, mw-e25.33, mw-4l3z). The audit of 2026-11-27 (mw-0qcf) found one edge between two different built scenes with a closed bead and no transition, `green-priory-road`, and wired it. The cross-scene edges still waiting are behind open beads or need a scene that does not exist yet: `sleepers-path-mine-gate` (mw-e25.2), `supply-tunnel-collapse` (mw-e25.9), `glen-well-cistern` (mw-e24.10), `sounding-shaft` (mw-e26.18), `ossuary-crypt` (mw-e26.20), and the edges to the jail cell (mw-e24.8), the rooftops (mw-e24.12), the Weeping Adit mouth (mw-e25.13) and the lockkeeper's cottage (mw-e25.14).
+
 | Bead | Edges |
 | --- | --- |
 | mw-e24.2 | `lane-bridge-post` |
@@ -521,16 +524,13 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.6 | `courtyard-tower`, `courtyard-supply-tunnel` |
 | mw-e25.9 | `supply-tunnel-collapse` |
 | mw-e25.10 | `mine-gate-winch` |
-| mw-e25.11 | `stone-stair` |
-| mw-e25.12 | `sluice-walk` |
 | mw-e25.13 | `quay-adit-mouth`, `weeping-adit` |
 | mw-e25.14 | `lock-gate-crossing` |
 | mw-e25.15 | `barge-quay-lock` |
 | mw-e25.33 | `barge-wharf-lock` |
-| mw-e25.22 | `lane-briarwood-edge` |
-| mw-e25.23 | `miners-bridge`, `mine-road-gate` |
-| mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
-| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge` |
+| mw-e25.23 | `mine-road-gate` |
+| mw-e25.24 | `quay-millweir` |
+| mw-e25.25 | `hub-priory-road` |
 | mw-e26.2 | `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` |
 | mw-e26.4 | `silver-vane-gallery`, `vane-gallery-breach` |
 | mw-e26.5 | `priory-gate-nave`, `nave-choir`, `nave-garden`, `nave-crypt-stair`, `crypt-stair-crypt` |
@@ -549,7 +549,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e40.13 | `wharf-net-lofts`, `net-lofts-customs-roof` |
 | mw-e40.14 | `wharf-gilded-tern` |
 | mw-e40.15 | `wharf-breakwater` |
-| mw-e40.26 | `towpath-lock-wharf`, `barge-lock-wharf` |
+| mw-e40.26 | `barge-lock-wharf` |
 
 New beads from this map: mw-e25.22 (Briarwood link), mw-e25.23 (Miners' Bridge to the mine gate), mw-e25.24 (riverbank to the quay and towpath), mw-e25.25 (forest loop), mw-e40.26 (towpath and barge to Wendmouth).
 

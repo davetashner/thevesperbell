@@ -1316,3 +1316,15 @@ describe('scene supports and rope bridges (mw-e03.13)', () => {
     expect(scene.spawns.find((s) => s.item?.id.id === 'climbing-rope')).toBeDefined();
   });
 });
+
+describe('scene air (mw-e03.62)', () => {
+  it('AC-6: air is optional, takes a temperature in range and nothing else', () => {
+    expect(sceneSchema.parse(room).air).toBeUndefined();
+    expect(sceneSchema.parse({ ...room, air: { temperature: -5 } }).air).toEqual({
+      temperature: -5,
+    });
+    expect(problems({ ...room, air: { temperature: 200 } })).toHaveLength(1);
+    expect(problems({ ...room, air: {} })).toHaveLength(1);
+    expect(problems({ ...room, air: { temperature: 10, humidity: 1 } })).toHaveLength(1);
+  });
+});

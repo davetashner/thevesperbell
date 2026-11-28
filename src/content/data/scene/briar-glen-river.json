@@ -1819,7 +1819,7 @@
       "id": "weir-sluice-gate",
       "model": "model-prop-weir-sluice-gate-01",
       "at": [147.75, -0.25, 15.5],
-      "turn": 90,
+      "turn": 0,
       "size": [0.8, 4.5, 5],
       "fit": "box"
     },

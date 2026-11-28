@@ -76,8 +76,8 @@ describe("Mooring's Watch named entities (mw-e25.6 AC-1)", () => {
     }
     const door = scene.spawns.find((s) => s.id === 'supply-tunnel-door');
     expect(door?.door?.profile.id).toBe('iron-door');
-    expect(door?.door?.lock?.id).toBe('tunnel-collapsed');
-    expect(content.get('lock', 'tunnel-collapsed').hint).toMatch(/stuck/i);
+    // mw-e25.9: the door opens on the tunnel now; the collapse beyond it is the gate.
+    expect(door?.door?.lock).toBeUndefined();
   });
 
   it('AC-1: the bible places the lookout camp, four armour stands, keeper’s log and signal mirror', () => {
@@ -140,7 +140,7 @@ describe("Mooring's Watch named entities (mw-e25.6 AC-1)", () => {
     }
   });
 
-  it('the supply tunnel door is a real door in the game world, locked with no key', () => {
+  it('the supply tunnel door is a real door in the game world', () => {
     const game = createGameWorld<never>(RAPIER, { seed: 1, hz: 60, scene: 'moorings-watch' });
     const doors = game.scene.spawns.filter((s) => s.spawn.door !== undefined);
     expect(doors.map((d) => d.spawn.id)).toEqual(['supply-tunnel-door']);

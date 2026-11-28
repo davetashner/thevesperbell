@@ -69,15 +69,15 @@ The front of the Deepworks, sealed by Vane's order. Four class routes through th
 
 ### `supply-tunnel`: The collapsed supply tunnel
 
-The 'long way' round the gate (bible §4.1 beat 5). The edge lists only knight and sorcerer; the archer and thief routes are proposed edge additions (Open questions). Node `supply-tunnel`, edge `supply-tunnel-collapse`. Beat: §4.1 beat 5.
+The 'long way' round the gate (bible §4.1 beat 5), built in mw-e25.9: a rubble fall (breakable, profile `rubble-fall`) across the tunnel under a hanging section of roof held up by one rotten prop. Getting past the fall by any route writes `world.supply-tunnel.cleared` (graph `supply-tunnel-collapse`). The edge lists the knight, sorcerer and thief routes; the archer's shot needs no capability an archer starts with, so the archer is not in its `classesHint`. Node `supply-tunnel`, edge `supply-tunnel-collapse`. Beat: §4.1 beat 5.
 
 | Class | Capabilities | Route | Source | Status |
 | --- | --- | --- | --- | --- |
-| knight | `technique.shoulder-barge` | Clear the collapse by hand: barge the rotted cribbing and heave the rubble. | §4.3 knight | edge |
-| archer | `arrow.rope` | Loose a rope arrow into the roof timber above the fall and climb over through the gap. | proposal | proposal |
-| sorcerer | `spell.firebolt` | Burn the timber cribbing that holds the fall (the edge uses Firebolt). | world-map edge | edge |
-| thief | `verb.climb.rough` | Squeeze up the cracked wall and through the gap over the fall. | proposal | proposal |
-| any | none (fallback) | Dig it out with the miners' picks left in the tunnel: slow and loud (game-time cost, noise event). | proposal | proposal |
+| knight | `technique.shield-bash` | Batter the rubble fall down: the shield bash and the heavy overhead break it in a few blows (rubble resists blunt 40%, force 20%). | §4.3 knight | edge |
+| archer | `arrow.severing-shot` | Shoot out the rotten prop (any arrow cuts it; the severing shot is the trick it teaches): the roof section drops into a step, then climb over the fall. Standing under it means a crush. | mw-e25.9 | proposal |
+| sorcerer | `spell.firebolt` | Burn the rotten prop from range: the roof section drops into a step against the fall, and a jump from it reaches the top of the rubble. | world-map edge | edge |
+| thief | `verb.climb.rough` | Climb the rough stone face of the fall and through the gap under the roof. | world-map edge | edge |
+| any | none (fallback) | Hack the rotten prop through at close range (and step out from under the roof section before it lands), or chip the rubble down with a blunt weapon: slow and loud. | mw-e25.9 | proposal |
 
 ### `weeping-adit`: The Weeping Adit
 
@@ -295,12 +295,12 @@ Capabilities named by a route that the registry does not yet contain. Each has a
 
 ## Proposals
 
-Every route with status `proposal` is a suggestion where the bible is silent, not canon. In summary: the class routes at `outer-ring-gate`, `ossuary-crossing` and `belfry` (the bible places the puzzles and the gate but names no class answers); the archer and thief routes at `supply-tunnel` (so the edge lists four classes rather than two); the archer, thief and knight routes at `weeping-adit`; the knight, sorcerer and thief routes at `chapel-of-echoes`; the thief and sorcerer routes at `sounding-shaft`; and most Wendmouth class routes beyond the canon ones in §4.3.
+Every route with status `proposal` is a suggestion where the bible is silent, not canon. In summary: the class routes at `outer-ring-gate`, `ossuary-crossing` and `belfry` (the bible places the puzzles and the gate but names no class answers); the archer route and the any-class fallback at `supply-tunnel`; the archer, thief and knight routes at `weeping-adit`; the knight, sorcerer and thief routes at `chapel-of-echoes`; the thief and sorcerer routes at `sounding-shaft`; and most Wendmouth class routes beyond the canon ones in §4.3.
 
 ## Open questions for the owner
 
 1. **Proposed class routes (see Proposals).** Accept, change or strike them. Accepted ones become edge `routes` in `connectivity.json` (mw-e26.1); the `classesHint` check then enforces them.
-2. **Supply tunnel edge.** Add `arrow.rope` and `verb.climb.rough` to the `supply-tunnel-collapse` edge so four classes, not two, can open the Mooring's Watch shortcut?
+2. **Supply tunnel edge.** Resolved in mw-e25.9: the edge lists `technique.shield-bash`, `spell.firebolt` and `verb.climb.rough`; the archer shoots out the prop with any arrow.
 3. **Gap fixes.** Approve the secret edge into Vane House's cellar and the locked back-room door at the Lamplit Stacks, or choose other fixes.
 4. **New capabilities.** Are `spell.frostglass`, `spell.mirror-self`, `spell.dispel` (mw-e08), `technique.old-words` (mw-e04) and `verb.swim` (mw-e02) the right ids and owners? The sorcerer's Horn and Cradle routes (Mirror Self) depend on mw-e08 delivering it; until then the sorcerer can still fight Horn and join the `any` routes.
 5. **Archer at the mine gate.** The bible says "shoot the winch pulley"; the existing edge models it with `arrow.pinning-shot`. Keep that, or use `arrow.severing-shot` (cut the pulley strap)?

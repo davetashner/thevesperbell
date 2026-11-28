@@ -293,7 +293,7 @@
       "area": "moorings-watch",
       "epic": "e25",
       "scene": "moorings-watch",
-      "notes": "Old supply tunnel up to the collapse (bible 3.5; mine side is E26). Built as the cellar door (supply-tunnel-door, locked, tunnel-collapsed) over a sealed vestibule in the courtyard's north wall (mw-e25.6); the tunnel beyond is mw-e26 and the way through it mw-e25.9."
+      "notes": "Old supply tunnel up to the collapse (bible 3.5; mine side is E26). The cellar door (supply-tunnel-door) in the courtyard's north wall (mw-e25.6) opens on the tunnel, which runs north to the collapse and on to the transition into the Deepworks (mw-e25.9)."
     },
     {
       "id": "mine-road",
@@ -776,7 +776,8 @@
       "to": "priory-road",
       "kind": "path",
       "bead": "mw-e25.25",
-      "notes": "East wall gate of the green: the priory road. A planned edge stub (briar-glen-green exit-priory-road: signpost and shut gate) until mw-e25.25 builds the way."
+      "notes": "East wall gate of the green: the priory road (mw-e25.25, wired by mw-0qcf). briar-glen-green/priory-road-gate leads through the green's east doorway into a gap in the Briarwood's west wall; the town road runs east through the trees to the mine road junction and the priory road. briarwood/town-road-gate leads back.",
+      "transitions": ["briar-glen-green/priory-road-gate", "briarwood/town-road-gate"]
     },
     {
       "id": "green-schoolhouse",
@@ -950,10 +951,11 @@
       "unlock": {
         "fact": "world.supply-tunnel.cleared"
       },
-      "routes": ["technique.shoulder-barge", "spell.firebolt"],
-      "classesHint": ["knight", "sorcerer"],
+      "routes": ["technique.shield-bash", "spell.firebolt", "verb.climb.rough"],
+      "classesHint": ["knight", "sorcerer", "thief"],
       "bead": "mw-e25.9",
-      "notes": "The collapse: a knight shoulder-barges the rotten shoring, a sorcerer burns it away; the long way in for anyone via the gate."
+      "notes": "The collapse (mw-e25.9), a rubble fall under a hanging section of roof held up by one rotten prop: a knight batters the rubble down (shield bash, heavy overhead), a sorcerer burns the prop and an archer shoots it out so the roof section drops into a step to climb over the fall from, a thief climbs the rough rubble face; anyone can hack the prop through at close range (and risk the fall) or chip the rubble down with a blunt weapon. From the mine side the fall is a scree slope. Getting past it writes the fact (graph supply-tunnel-collapse). moorings-watch/supply-tunnel-gate leads into the mine, deepworks/supply-tunnel-gate back.",
+      "transitions": ["moorings-watch/supply-tunnel-gate", "deepworks/supply-tunnel-gate"]
     },
     {
       "id": "miners-bridge",

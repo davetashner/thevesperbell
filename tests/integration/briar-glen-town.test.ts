@@ -86,7 +86,7 @@ describe('Briar Glen town nodes (mw-e24.2 AC-1)', () => {
     }
   });
 
-  it('AC-1: the lane and the green are joined both ways, and the mine road is built and the priory road is a marked planned stub', () => {
+  it('AC-1: the lane and the green are joined both ways, and the mine road and the priory road are built', () => {
     const edge = world?.edges.find((e) => e.id === 'lane-market-green');
     expect(edge?.transitions).toEqual(['briar-glen-lane/green-gate', 'briar-glen-green/lane-gate']);
     expect(lane.transitions.find((t) => t.id === 'green-gate')).toMatchObject({
@@ -105,19 +105,22 @@ describe('Briar Glen town nodes (mw-e24.2 AC-1)', () => {
       scene: { id: 'deepworks' },
       spawn: 'arrive-from-briar-glen-green',
     });
-    // The priory road is still a planned stub.
-    expect(green.spawns.find((s) => s.id === 'exit-priory-road')?.tags).toContain(
-      'planned:mw-e25.25',
-    );
-    expect(green.spawns.find((s) => s.id === 'door-exit-priory-road')?.door?.lock?.id).toBe(
-      'road-not-open',
-    );
+    // The priory road is built too (mw-e25.25, wired by mw-0qcf): an open doorway into the Briarwood's west wall.
+    expect(green.spawns.find((s) => s.id === 'exit-priory-road')?.tags).toContain('priory-road');
+    expect(green.spawns.find((s) => s.id === 'door-exit-priory-road')).toBeUndefined();
     expect(green.spawns.find((s) => s.id === 'sign-exit-priory-road')?.interact).toBeDefined();
+    expect(green.transitions.find((t) => t.id === 'priory-road-gate')).toMatchObject({
+      scene: { id: 'briarwood' },
+      spawn: 'arrive-from-briar-glen-green',
+    });
     expect(world?.edges.find((e) => e.id === 'green-mine-road')?.transitions).toEqual([
       'briar-glen-green/mine-road-gate',
       'deepworks/road-gate',
     ]);
-    expect(world?.edges.find((e) => e.id === 'green-priory-road')?.bead).toBe('mw-e25.25');
+    expect(world?.edges.find((e) => e.id === 'green-priory-road')?.transitions).toEqual([
+      'briar-glen-green/priory-road-gate',
+      'briarwood/town-road-gate',
+    ]);
   });
 });
 
@@ -135,7 +138,7 @@ describe('Briar Glen town navigation (mw-e24.2 AC-2)', () => {
       (s) =>
         s.tags.includes('door-front') || s.tags.includes('exit-stub') || s.tags.includes('node'),
     );
-    expect(fronts.length).toBeGreaterThanOrEqual(11); // the mine road signpost is no longer an exit stub (mw-e26.2)
+    expect(fronts.length).toBeGreaterThanOrEqual(10); // neither road signpost is an exit stub any more (mw-e26.2, mw-0qcf)
     const metres = reach(
       'briar-glen-green',
       'arrive-from-briar-glen-lane',

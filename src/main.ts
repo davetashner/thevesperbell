@@ -169,7 +169,7 @@ import {
 } from '@game/loop/index';
 import { installFactRegistry } from '@game/facts';
 import { installGameLogic, questsOf } from '@game/logic/index';
-import { fireSettleOptions, installGameFire } from '@game/fire';
+import { fireSettleOptions, installGameFire, sceneAirOption } from '@game/fire';
 import {
   attachSpellBar,
   attachSpellHud,
@@ -1059,6 +1059,15 @@ function startRenderer(
     // near the player never get forced to sleep. Budget warnings go to the console and to the
     // `data-physics-budget` debug attribute.
     const focus = playerFocus(world);
+    // The scene's air is the element field's ambient (mw-e03.62), so the scene is looked up before
+    // the field is installed (the loader below resolves the same request).
+    const bootScene = resolveSceneRequest(
+      location.search,
+      content.all('scene').map((scene) => scene.id),
+      content.get('game', GAME_CONFIG_ID).startScene.id,
+    );
+    const bootAir =
+      bootScene.kind === 'scene' ? sceneAirOption(content.get('scene', bootScene.id)) : {};
     // The light field (mw-e03.37): level geometry goes into physics and the field's occluders through
     // one sink, so a piece that burns away stops blocking both.
     const light = createGameLight(physics);
@@ -1076,7 +1085,11 @@ function startRenderer(
       // Spells (mw-e06.15): the pipeline and its systems, before the stimulus system so a spell's
       // heat and light resolve in the tick it is cast.
       afterStimuli: (sim) => {
-        installGameFire(sim, content, { damage: combat.damage, focus: focus.read });
+        installGameFire(sim, content, {
+          damage: combat.damage,
+          focus: focus.read,
+          ...bootAir,
+        });
       },
       beforeStimuli: (sim) => {
         magic = installGameMagic(sim, {

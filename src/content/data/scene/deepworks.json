@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "deepworks",
   "name": "The Deepworks",
-  "description": "Bead mw-e26.2: the Deepworks, the glenstone and silver mine under Briar Glen, as one connected greybox (about 220 x 335 m, three levels). From Market Green's south gate (road-gate, back to briar-glen-green's mine-road-gate; arrive-from-briar-glen-green) the mine road (mine-road) runs north between cutting walls to the boarded forecourt (mine-gate) and the six-metre gate wall, which has the four ways in from outside: the front gate (front-gate-door, locked, lock mine-gate-padlock), the rotted side boarding (side-boarding, a breakable barricade), the winch cage bay (cage-bay-gate, opened by shooting the winch-pulley, hung on the wall beside the bay) and the inner bar (inner-bar-door, a portcullis raised by the remotely actuable inner-bar-lever). Inside is the winch house (winch-house; winch-lever, and the cage-gate onto the cage lift's shaft, a stair run of six metres down to the silver level), then the old glenstone galleries (old-galleries: pillared halls, half-cut blocks in the walls, mine-cart rails), whose west wall holds the supply tunnel collapse (supply-collapse, a breakable barricade over the arrival of the Mooring's Watch tunnel, supply-tunnel-arrival), then the old cutting hall (rootcellar-camp, the goblin camp, with the stone-stair-head and a stub landing for mw-e25.11) and, down a 6 m stair at its north end, the silver galleries one level below (silver-galleries: narrow galleries that run back to the cage landing, so the cage lift is a loop and a shortcut), the stair down to Vane's sealed gallery under the Bell Line (vane-sealed-gallery) and the breach beyond it (breach, breach-threshold: the stub for mw-e26.9's Outer Ring), and east of the silver landing a stair down to the flooded lower gallery (lower-deepworks) whose channel (frozen-channel-near-pad, frozen-channel-far-pad) separates the arrival of the Weeping Adit (adit-arrival) from the rest. The winch lever or the shot pulley latches the cage down: cage-gate and cage-bay-gate open. Puzzles, goblin and Forgotten populations, the breach seal and the Stone Stair quay link are markers only (mw-e26.3, mw-e26.4, mw-e26.15, mw-e25.11). Bead mw-e25.23: the forecourt's west wall opens (z 60 to 64) on the old miners' track, a short lantern-lit stub running up from the river bank; its end is the miners-track-gate transition up the Miners' Stair to briar-glen-lane (arrive-from-deepworks), and arrive-from-briar-glen-lane brings the player in facing east, toward the boarded gate.",
+  "description": "Bead mw-e26.2: the Deepworks, the glenstone and silver mine under Briar Glen, as one connected greybox (about 220 x 335 m, three levels). From Market Green's south gate (road-gate, back to briar-glen-green's mine-road-gate; arrive-from-briar-glen-green) the mine road (mine-road) runs north between cutting walls to the boarded forecourt (mine-gate) and the six-metre gate wall, which has the four ways in from outside: the front gate (front-gate-door, locked, lock mine-gate-padlock), the rotted side boarding (side-boarding, a breakable barricade), the winch cage bay (cage-bay-gate, opened by shooting the winch-pulley, hung on the wall beside the bay) and the inner bar (inner-bar-door, a portcullis raised by the remotely actuable inner-bar-lever). Inside is the winch house (winch-house; winch-lever, and the cage-gate onto the cage lift's shaft, a stair run of six metres down to the silver level), then the old glenstone galleries (old-galleries: pillared halls, half-cut blocks in the walls, mine-cart rails), whose west wall holds the supply tunnel collapse (supply-collapse, a breakable barricade over the arrival of the Mooring's Watch tunnel, supply-tunnel-arrival; mw-e25.9: at the stub's west end supply-tunnel-gate leads up the tunnel to Mooring's Watch, arrive-from-deepworks; arrive-from-moorings-watch arrives facing the cribbing), then the old cutting hall (rootcellar-camp, the goblin camp, with the stone-stair-head and a stub landing for mw-e25.11) and, down a 6 m stair at its north end, the silver galleries one level below (silver-galleries: narrow galleries that run back to the cage landing, so the cage lift is a loop and a shortcut), the stair down to Vane's sealed gallery under the Bell Line (vane-sealed-gallery) and the breach beyond it (breach, breach-threshold: the stub for mw-e26.9's Outer Ring), and east of the silver landing a stair down to the flooded lower gallery (lower-deepworks) whose channel (frozen-channel-near-pad, frozen-channel-far-pad) separates the arrival of the Weeping Adit (adit-arrival) from the rest. The winch lever or the shot pulley latches the cage down: cage-gate and cage-bay-gate open. Puzzles, goblin and Forgotten populations, the breach seal and the Stone Stair quay link are markers only (mw-e26.3, mw-e26.4, mw-e26.15, mw-e25.11). Bead mw-e25.23: the forecourt's west wall opens (z 60 to 64) on the old miners' track, a short lantern-lit stub running up from the river bank; its end is the miners-track-gate transition up the Miners' Stair to briar-glen-lane (arrive-from-deepworks), and arrive-from-briar-glen-lane brings the player in facing east, toward the boarded gate.",
   "grid": 1,
   "camera": {
     "position": [0, 40, -30],
@@ -1294,6 +1294,17 @@
       }
     },
     {
+      "id": "supply-tunnel-gate",
+      "at": [27, 0, 155],
+      "tags": ["transition", "entry:supply-tunnel"]
+    },
+    {
+      "id": "arrive-from-moorings-watch",
+      "at": [30.5, 0, 155],
+      "yaw": 90,
+      "tags": ["arrival"]
+    },
+    {
       "id": "supply-tunnel-arrival",
       "at": [30, 0, 155],
       "yaw": 270,
@@ -1662,6 +1673,13 @@
       "min": [31.2, -1, 60.25],
       "max": [33.0, 3, 63.75],
       "scene": "briar-glen-lane",
+      "spawn": "arrive-from-deepworks"
+    },
+    {
+      "id": "supply-tunnel-gate",
+      "min": [26.25, -1, 153.5],
+      "max": [27.75, 3, 156.5],
+      "scene": "moorings-watch",
       "spawn": "arrive-from-deepworks"
     },
     {
