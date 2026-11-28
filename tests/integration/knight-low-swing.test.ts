@@ -25,7 +25,7 @@ const content = loadDevContent();
 const FACING_YAW = Math.PI / 2;
 
 /** Spawns `creature` `ahead` m in front of the knight, swings once with `button`, returns the hits. */
-function swing(creature: string, ahead: number, button: string, ticks = 60) {
+function swing(creature: string, ahead: number, button: string, ticks = 60, aside = 0) {
   const game = createGameWorld<unknown>(RAPIER, { seed: 1, hz: 60, content, magic: true });
   const { world, player } = game;
   const look = world.get(player, PlayerLook) ?? expect.fail('no look');
@@ -46,7 +46,7 @@ function swing(creature: string, ahead: number, button: string, ticks = 60) {
   const feet = world.get(player, CharacterController)?.position ?? expect.fail('no player');
   const spawner =
     game.creatures.spawners.get(creature) ?? expect.fail(`no spawner for ${creature}`);
-  const target: EntityId = spawner(world, { x: feet.x - ahead, y: feet.y, z: feet.z }, {});
+  const target: EntityId = spawner(world, { x: feet.x - ahead, y: feet.y, z: feet.z + aside }, {});
   for (let i = 0; i < 10; i++) step();
   step([button]);
   for (let i = 0; i < ticks; i++) step();
@@ -72,6 +72,11 @@ describe('the knight’s light swing against low creatures (mw-e04.38)', () => {
     const result = swing('fixture-guard', 1.2, LIGHT);
     expect(result.started[0]).toBe('sword-light-1');
     expect(result.hit).toBe(true);
+  });
+
+  it('AC-2: a guard 1.2 m ahead and 0.55 m to either side is still hit (the blade keeps its reach)', () => {
+    expect(swing('fixture-guard', 1.2, LIGHT, 60, 0.55).hit).toBe(true);
+    expect(swing('fixture-guard', 1.2, LIGHT, 60, -0.55).hit).toBe(true);
   });
 
   it('AC-3: a target outside the swing’s reach is still missed, low or tall', () => {

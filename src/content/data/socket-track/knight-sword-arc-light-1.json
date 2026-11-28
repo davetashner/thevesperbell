@@ -1,7 +1,7 @@
 {
   "$schema": "../socket-track.schema.json",
   "id": "knight-sword-arc-light-1",
-  "notes": "Sword light 1 (move sword-light-1, 4 active ticks): a descending diagonal slash from upper right to lower left about the chest pivot (0, 1.5, 0), yaw +55\u00b0 \u2192 \u221255\u00b0. The first three keys are the original arc (blade from 25\u00b0 raised to level, about chest height), so it hits standing targets exactly as before; then it dives to 45\u00b0 and 52\u00b0 lowered over the last two active ticks, passing about 0.4 m above the ground at 1.2 m range, so a 0.9 m creature such as the fixture hound (mw-e04.38) is hit too, with no auto-aim. Matches the clip anim-knight-sword-light-1. Key 0 is the pose before the first active tick.",
+  "notes": "Sword light 1 (move sword-light-1, 4 active ticks): a descending diagonal slash from upper right to lower left about the chest pivot (0, 1.5, 0), yaw +55\u00b0 \u2192 \u221255\u00b0. The first three keys are the original arc (blade level at chest height), so it hits standing targets exactly as before. The last two keys keep the original rotations, and so the blade's full reach, but lower the whole blade by 0.7 and 0.8 m: the cut drops through the waist to about 0.4 m above the ground at 1.2 m range, so a 0.9 m creature such as the fixture hound (mw-e04.38) is hit too, with no auto-aim. Pitching the blade down instead shortened its reach and missed a guard off to the side. Key 0 is the pose before the first active tick.",
   "keys": [
     {
       "position": {
@@ -44,28 +44,28 @@
     },
     {
       "position": {
-        "x": 0.4898,
-        "y": 0.4393,
-        "z": -0.9408
+        "x": 0.0483,
+        "y": -0.6963,
+        "z": -0.0928
       },
       "rotation": {
-        "x": 0.371717,
-        "y": -0.219593,
-        "z": 0.090958,
-        "w": 0.897403
+        "x": 0.033899,
+        "y": -0.237541,
+        "z": 0.008295,
+        "w": 0.97075
       }
     },
     {
       "position": {
-        "x": 0.9683,
-        "y": 0.5765,
-        "z": -0.678
+        "x": 0.2555,
+        "y": -0.7672,
+        "z": -0.1789
       },
       "rotation": {
-        "x": 0.38884,
-        "y": -0.415017,
-        "z": 0.202417,
-        "w": 0.79724
+        "x": 0.092718,
+        "y": -0.459219,
+        "z": 0.048266,
+        "w": 0.882152
       }
     }
   ]
