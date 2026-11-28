@@ -79,3 +79,11 @@ describe('countsReturn', () => {
     expect(() => countsReturn('textures', [1, 2])).toThrow(/at least 10/);
   });
 });
+
+describe('median', () => {
+  it('takes the middle sample, the mean of the middle two, and 0 for no samples', () => {
+    expect(median([3, 1, 2])).toBe(2);
+    expect(median([4, 1, 3, 2])).toBe(2.5);
+    expect(median([])).toBe(0);
+  });
+});
