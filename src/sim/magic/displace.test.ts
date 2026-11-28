@@ -369,6 +369,25 @@ describe('teleport placement (mw-e06.12)', () => {
     expect(s.feet(caster).z).toBeCloseTo(-5, 3);
   });
 
+  it('backs off in steps until the capsule fits (a clear path with a blocked far end)', () => {
+    const collision = {
+      sweepCapsule: () => undefined,
+      raycast: () => undefined,
+      overlapCapsule: (_c: unknown, feet: Vec3) => feet.z < -3.1,
+    };
+    const plan = planTeleport(
+      { collision },
+      {
+        capsule: DISPLACE_DEFAULT_CAPSULE,
+        from: v(0, 0, 0),
+        to: v(0, 0, -5),
+        distance: 8,
+        lineOfSight: false,
+      },
+    );
+    expect(plan).toEqual({ ok: true, landing: v(0, 0, -3), falling: true });
+  });
+
   it('the fit helper', () => {
     const collision = new FakeCollisionWorld([FLOOR, box(v(1, 0, -1), v(2, 2, 1))]);
     expect(fitsAt({ collision }, DISPLACE_DEFAULT_CAPSULE, v(0, 0, 0))).toBe(true);

@@ -211,6 +211,7 @@ type Plan =
         readonly entity: EntityId;
         readonly from: Vec3;
         readonly to: Vec3;
+        readonly radius: number;
         readonly falling: boolean;
       }[];
     }
@@ -276,8 +277,8 @@ export function installSpellDisplace(
       return {
         ok: true,
         moves: [
-          { entity: caster, from: start, to: other, falling: false },
-          { entity: target, from: other, to: start, falling: false },
+          { entity: caster, from: start, to: other, radius: here.radius, falling: false },
+          { entity: target, from: other, to: start, radius: there.radius, falling: false },
         ],
       };
     }
@@ -308,18 +309,23 @@ export function installSpellDisplace(
     return planned.ok
       ? {
           ok: true,
-          moves: [{ entity: caster, from: start, to: planned.landing, falling: planned.falling }],
+          moves: [
+            {
+              entity: caster,
+              from: start,
+              to: planned.landing,
+              radius: here.radius,
+              falling: planned.falling,
+            },
+          ],
         }
       : { ok: false, reason: planned.reason };
   };
 
   /** Puts `entity` at rest on `to` (placement follows at once; the controller does its own next tick). */
-  const move = (entity: EntityId, to: Vec3): void => {
+  const move = (entity: EntityId, to: Vec3, radius: number): void => {
     world.set(entity, CharacterController, initialCharacterState(to));
-    const at = placementOf(world, entity);
-    if (at !== undefined && world.has(entity, PlacementComponent)) {
-      world.set(entity, PlacementComponent, { ...to, radius: at.radius });
-    }
+    world.set(entity, PlacementComponent, { ...to, radius });
   };
 
   pipeline.ops.register('displace', (ctx: OpContext, op: DisplaceOp) => {
@@ -335,7 +341,7 @@ export function installSpellDisplace(
     }
     const falling = planned.moves.some((m) => m.falling);
     for (const m of planned.moves) {
-      move(m.entity, m.to);
+      move(m.entity, m.to, m.radius);
       world.events.emit(Displaced, {
         tick: world.tick,
         caster: ctx.caster,
