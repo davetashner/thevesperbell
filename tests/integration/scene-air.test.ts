@@ -55,9 +55,12 @@ describe('scene air temperature (mw-e03.62)', () => {
     expect(elementFieldOf(open(undefined).sim).config.temperature.ambient).toBe(20);
   }, 30_000);
 
-  it('AC-2: air at -5 °C keeps the ice block frozen through ten idle minutes', () => {
+  it('AC-2: air at -5 °C keeps the ice block frozen through three idle minutes', () => {
+    // Three minutes is long past the ~1 minute 20 °C air takes to melt it. The full ten idle minutes
+    // run once, in reference-puzzles.test.ts (scales-room AC-2); doing them twice timed out the
+    // coverage shard (PR #538).
     const { sim, ice } = open(-5);
-    for (let tick = 0; tick < 600 * HZ; tick++) sim.step();
+    for (let tick = 0; tick < 180 * HZ; tick++) sim.step();
     expect(readProperty(sim, ice, 'weight')).toBe(60);
     expect(readProperty(sim, ice, 'frozen')).toBe(true);
   }, 60_000);
