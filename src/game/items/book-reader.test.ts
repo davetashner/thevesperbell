@@ -219,7 +219,8 @@ describe('the Study button state from the sim (mw-e07.9)', () => {
     world.step();
     const view = studyView(world, player, primer, rules, fakeContent());
     expect(view).toEqual({ minutes: 20 });
-    // It is the figure `start` itself reports.
+    // It is the sim's own figure, which `start` reports too.
+    expect(view?.minutes).toBe(rules.minutesLeft(world, player, primer.id));
     const started = rules.start(world, player, primer.id);
     expect(started).toEqual({ status: 'started', minutesLeft: view?.minutes });
   });
