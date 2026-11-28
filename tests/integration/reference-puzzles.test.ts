@@ -386,9 +386,9 @@ describe('the scales room: weight (mw-e15.9)', { timeout: 120_000 }, () => {
     );
   });
 
-  it('AC-2: the ice block holds its 60 kg through ten idle minutes in the room air, and the ice solution still works', () => {
-    // A frozen block melts away in warm air (mw-e03.60), so the room's ice is authored to stay solid
-    // at room temperature (freezePoint 30): the puzzle must not be a timer the player cannot see.
+  it('AC-2: the ice block holds its 60 kg through ten idle minutes in the cold room air, and the ice solution still works', () => {
+    // A frozen block melts away in warm air (mw-e03.60), so the room is a cold vault (air -5 °C,
+    // mw-e03.62): the puzzle must not be a timer the player cannot see.
     const room = open('scales-room', []);
     const ice = room.id('ice-block');
     for (let tick = 0; tick < seconds(600); tick++) room.sim.step();

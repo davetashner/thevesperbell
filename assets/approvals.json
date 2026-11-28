@@ -1,0 +1,60 @@
+{
+  "$comment": "Owner approval gates (mw-e37.3, style bible §16–17). Append with pnpm assets:approve; never hand-edit a record. pnpm assets:validate fails a non-placeholder runtime asset without a matching approved record.",
+  "records": [
+    {
+      "assetId": "music-marsh-general-store",
+      "gate": "music-take",
+      "version": "v1",
+      "sha256": "b1606c1d7363c3ca4a1e8393e1ae4372d0b9b4cdfe8976ea4e3155a5a6857d22",
+      "decision": "approved",
+      "approver": "owner",
+      "date": "2026-11-28T03:24:09.584Z",
+      "file": "public/assets/audio/music/music-marsh-general-store.ogg",
+      "note": "Take picked by the owner in Suno (Suno Pro, CREDITS row dated 2026-10-04); picking the take is the music gate (audio bible §9). Recorded retroactively by mw-e37.3; the source take is not in the repo, so the hash covers the committed Ogg encode."
+    },
+    {
+      "assetId": "music-ottilie-hum",
+      "gate": "music-take",
+      "version": "v1",
+      "sha256": "c542a2a8cc59fb5d7141fc45eda38016a6048be90aab891e52c2f0fd3021da57",
+      "decision": "approved",
+      "approver": "owner",
+      "date": "2026-11-28T03:24:09.680Z",
+      "file": "public/assets/audio/music/music-ottilie-hum.ogg",
+      "note": "Take picked by the owner in Suno (Suno Pro, CREDITS row dated 2026-11-07); picking the take is the music gate (audio bible §9). Recorded retroactively by mw-e37.3; the source take is not in the repo, so the hash covers the committed Ogg encode."
+    },
+    {
+      "assetId": "music-stinger-marsh-farewell",
+      "gate": "music-take",
+      "version": "v1",
+      "sha256": "fa349b79431d62e31120f5a817b45fbabd2ad4619586ad2ca4588676700ae7ab",
+      "decision": "approved",
+      "approver": "owner",
+      "date": "2026-11-28T03:24:09.773Z",
+      "file": "public/assets/audio/music/music-stinger-marsh-farewell.ogg",
+      "note": "Take picked by the owner in Suno (Suno Pro, CREDITS row dated 2026-11-07); picking the take is the music gate (audio bible §9). Recorded retroactively by mw-e37.3; the source take is not in the repo, so the hash covers the committed Ogg encode."
+    },
+    {
+      "assetId": "music-stinger-marsh-greeting",
+      "gate": "music-take",
+      "version": "v1",
+      "sha256": "e78da31a6a6a41f08ef7473eb57dcdf2b988ab86009915cda42acd6a7a0ba2bf",
+      "decision": "approved",
+      "approver": "owner",
+      "date": "2026-11-28T03:24:09.867Z",
+      "file": "public/assets/audio/music/music-stinger-marsh-greeting.ogg",
+      "note": "Take picked by the owner in Suno (Suno Pro, CREDITS row dated 2026-11-07); picking the take is the music gate (audio bible §9). Recorded retroactively by mw-e37.3; the source take is not in the repo, so the hash covers the committed Ogg encode."
+    },
+    {
+      "assetId": "music-stinger-marsh-sale",
+      "gate": "music-take",
+      "version": "v1",
+      "sha256": "1ab25a6302225664cc7e2e8a3007467b50c893affa11baeb35ca47e638cdd764",
+      "decision": "approved",
+      "approver": "owner",
+      "date": "2026-11-28T03:24:09.963Z",
+      "file": "public/assets/audio/music/music-stinger-marsh-sale.ogg",
+      "note": "Take picked by the owner in Suno (Suno Pro, CREDITS row dated 2026-11-07); picking the take is the music gate (audio bible §9). Recorded retroactively by mw-e37.3; the source take is not in the repo, so the hash covers the committed Ogg encode."
+    }
+  ]
+}

@@ -166,6 +166,7 @@ describe('fact checks', () => {
       'world.glen-well.rung-pulled',
       'world.millweir.sluice-walk-open',
       'world.stone-stair.lowered',
+      'world.supply-tunnel.cleared',
     ]);
   });
 

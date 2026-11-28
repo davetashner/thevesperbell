@@ -41,13 +41,50 @@ through Playwright's Chromium (no image library needed).
 
 | Step | Command | What it does |
 |---|---|---|
+| Prompt → candidates (local) | `pnpm asset:gen-image <prompt file>… [--model flux2-klein-4b\|qwen-image\|z-image-turbo] [--seed N] [--count N] [--size WxH] [--steps N] [--list PATH] [--no-tile]` | Checks every prompt file's filled block opens with the §14 preamble verbatim (before any GPU time), then generates on this Mac with mflux into `assets/_incoming/<id>/vN.png` + `vN.json` (prompt path and hash, model, weights revision, licence, seed, steps, size, seconds, date). Never overwrites. A tileable texture also goes through `asset:texture` (`vN.tile.webp`, `vN.seams.jpg`); trims (`*trim*`) tile left to right at 1536×512. |
 | Texture → runtime | `pnpm asset:texture <src> public/assets/texture/<id>.webp [--mode both\|x\|alpha] [--size WxH] [--preview check.jpg]` | Overlap-blends the edges so it tiles (both ways, or left to right for trims); `alpha` first crops a cut-out (a net) to whole pattern repeats; resizes and writes WebP; the preview repeats the tile to check the seams. |
+| Model → runtime | `pnpm assets:build [--candidate assets/_incoming/<id>/vN.glb]` | Every `assets/source/<category>/<id>/<id>.glb\|.gltf` → `public/assets/model/<id>.glb` (High) and `low/<id>.glb` (Low, half-size textures): dedup, prune, weld, optional simplify (`build.json` `simplifyRatio`), LOD0 triangle budget (fails the build), WebP textures resized to the tier, meshopt. Writes `public/assets/model/manifest.json`; unchanged models are skipped. `--candidate` builds an unapproved candidate beside itself for the turntable gate. |
 | Sheet → image-to-3D input | `pnpm asset:crop <sheet> <out.png> --box x0,y0,x1,y1 [--keep-all]` | Crops one prop or character, keeps only the largest shape (blanking neighbours that crept in), erases thin scale lines, pads square on the sheet's parchment. Check the result by eye before spending credits. |
 | Turntable gate | `pnpm asset:turntable <out dir> <model.glb>…` | Renders each GLB from four sides on parchment and writes `stats.json` (triangles, materials, texture sizes, bounds) for the prompt file and the §13.2 budget check. |
+| Record a gate | `pnpm assets:approve <asset-id> <gate> <version> [--reject] [--note …] [--promote <category>]` | Hashes `assets/_incoming/<asset-id>/<version>.<ext>` and appends the decision to `assets/approvals.json` (gates: `image`, `turntable`, `music-take`, `sfx-batch`; approver defaults to the standing pre-approval, `owner` for music takes); `--promote` copies the approved file to `assets/source/<category>/<asset-id>/`. |
+| Approval check | `pnpm assets:validate` | CI fails a non-placeholder runtime asset without an approved record per gate its CREDITS type requires (`src/tools/assets/approvals/required-gates.json`), or whose committed file no longer matches the approved hash. |
 
-Generation itself (Higgsfield `gpt_image_2_6`, Tripo through Higgsfield) runs in Claude's session through
-the Higgsfield tools; meshes are optimised with `npx @gltf-transform/cli@4.5.1 optimize … --compress
-meshopt --texture-compress webp --texture-size 512`.
+Generation runs locally with `asset:gen-image` (below) or in Claude's session through the Higgsfield tools
+(`gpt_image_2_6`, Tripo through Higgsfield) when a prompt needs reference images; meshes are optimised with
+`pnpm assets:build` (the same steps as `npx @gltf-transform/cli@4.5.1 optimize … --compress
+meshopt --texture-compress webp --texture-size 512`, with per-class texture sizes and budgets).
+
+### Local image generation (Mac Studio, mflux)
+
+`asset:gen-image` runs open-weight models on Apple silicon through [mflux](https://github.com/filipstrand/mflux)
+(MLX). No API key, no quota. Setup, once per machine (everything lives outside the repo):
+
+```bash
+UV_TOOL_DIR=~/llm/imagegen/uv-tools uv tool install mflux   # executables land in ~/.local/bin
+export HF_HOME=~/llm/imagegen/hf                            # weights cache; the runner defaults to this
+# The first run of each model downloads its weights (FLUX.2-klein-4b ~15 GB, Qwen-Image ~54 GB,
+# Z-Image-Turbo ~31 GB). mflux pins each repo to a commit; vN.json records it.
+pnpm asset:gen-image assets/prompts/texture/<id>.md --count 8
+```
+
+`MFLUX_BIN_DIR` overrides where the executables are (default `~/.local/bin`). Never commit weights or venvs.
+Run one generation at a time: the GPU is shared with the 3D runner.
+
+| `--model` | Weights (HF repo) | Licence (HF card, 2026-11-27) | Use |
+|---|---|---|---|
+| `flux2-klein-4b` | `black-forest-labs/FLUX.2-klein-4B`, 4 steps, 8-bit | Apache-2.0, not gated (the 9B klein is non-commercial: do not add it) | **Default for tileable textures and trims.** ~4 s an image: generate many seeds. |
+| `qwen-image` | `Qwen/Qwen-Image-2512` (mflux's `qwen-image`), 25 steps, 8-bit | Apache-2.0, not gated | **Default for every other category.** Follows long, many-part briefs; 1.5–2.5 min an image. |
+| `z-image-turbo` | `Tongyi-MAI/Z-Image-Turbo`, 9 steps, 8-bit | Apache-2.0, not gated | Not a default: reads only the first 512 tokens, which cuts our briefs. |
+
+Only Apache-2.0 (or MIT) weights go in the runner, since their outputs carry no use restriction (style bible §16).
+Re-check the card before adding a model. Local models take no reference images, so the runner drops a block's
+`REFERENCE IMAGES:` line (and records that in `vN.json`); series consistency comes from the preamble and palette.
+
+**CREDITS:** a shipped local image records source `generated:mflux/<model>@<revision>` (for example
+`generated:mflux/z-image-turbo@f332072`), licence class `GEN-OWNED`, and the model's HF card URL as the terms link.
+The iteration-log Tool column reads `mflux <version> / <model> / local`.
+
+The bake-off behind the defaults is `docs/art/local-image-bakeoff.md`.
 
 ## Lifecycle
 

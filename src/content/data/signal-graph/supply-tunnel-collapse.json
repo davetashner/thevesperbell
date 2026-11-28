@@ -1,0 +1,29 @@
+{
+  "$schema": "../signal-graph.schema.json",
+  "id": "supply-tunnel-collapse",
+  "name": "Mooring's Watch supply tunnel collapse",
+  "notes": "The collapse in the supply tunnel of the scene moorings-watch (mw-e25.9). The volume `past-the-fall` covers the top of the rubble fall and the tunnel beyond it, the mine side (z 82.5 to 90). The first time the player stands in it, by whatever route (the rubble battered down, a climb over it from the dropped roof section, a rough-stone climb up its face, or up the scree slope from the mine side), the latch writes world.supply-tunnel.cleared = true and keeps it, so the world map's shortcut stays open for good. The arrival from the Deepworks (z 90.75) lies outside the volume: arriving is not clearing.",
+  "nodes": [
+    {
+      "id": "past-the-fall",
+      "kind": "volume",
+      "shape": {
+        "kind": "box",
+        "center": { "x": 78, "y": 3, "z": 86.25 },
+        "halfExtents": { "x": 2, "y": 3, "z": 3.75 }
+      },
+      "filter": [{ "test": "tag", "tag": "player" }]
+    },
+    { "id": "crossed", "kind": "latch" },
+    {
+      "id": "cleared-fact",
+      "kind": "receiver",
+      "receiver": "fact",
+      "key": "world.supply-tunnel.cleared"
+    }
+  ],
+  "wires": [
+    { "from": "past-the-fall.enter", "to": "crossed.set" },
+    { "from": "crossed", "to": "cleared-fact" }
+  ]
+}

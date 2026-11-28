@@ -24,6 +24,21 @@ import { ITEM_STACK_GUARD } from './item.ts';
 import { KIT_PURPOSES, vec3Schema } from './kit.ts';
 import { FOOTSTEP_SURFACES } from './material.ts';
 
+/** Coldest and warmest scene air, °C (a frozen cave to a forge-hot kitchen; the field's ambient). */
+export const SCENE_AIR_MIN = -60;
+export const SCENE_AIR_MAX = 60;
+
+/** A scene's air (mw-e03.62): the temperature the element field relaxes toward. */
+export const sceneAirSchema = z.strictObject({
+  temperature: z
+    .number()
+    .min(SCENE_AIR_MIN)
+    .max(SCENE_AIR_MAX)
+    .describe(
+      'Ambient air temperature in °C (default 20): below 0 keeps ice frozen and chills the wet; a warm room melts and dries faster.',
+    ),
+});
+
 /** Placements snap to this fraction of a grid cell. */
 export const SCENE_SNAP_STEP = 0.25;
 
@@ -1342,6 +1357,9 @@ export const sceneSchema = z
       .array(sceneRouteSchema)
       .default([])
       .describe('Patrol routes and guard posts over the waypoints (mw-e11.9).'),
+    air: sceneAirSchema
+      .optional()
+      .describe('Air of the scene: its ambient temperature; omit for 20 °C (mw-e03.62).'),
     light: sceneLightSchema
       .optional()
       .describe('Static lighting: ambient level, ambient zones, directional lights (mw-e03.37).'),
