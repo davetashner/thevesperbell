@@ -1,5 +1,5 @@
 // Leak detector for repeated area swaps (mw-e32.12). Pure arithmetic over samples the e2e spec
-// (e2e/leak.spec.ts) takes after each cycle; kept apart so a test can feed it a leaking fixture and
+// (e2e/perf/leak.perf.ts) takes after each cycle; kept apart so a test can feed it a leaking fixture and
 // prove it fails (AC-3).
 
 /** Heap growth allowed from the early cycles to the last ones (AC-1: 5%). */

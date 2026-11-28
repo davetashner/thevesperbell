@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import { countsReturn, heapGrowth } from '../scripts/perf/leak';
-import { runConsole, stubPointerLock } from './helpers/player';
+import { countsReturn, heapGrowth } from '../../scripts/perf/leak';
+import { runConsole, stubPointerLock } from '../helpers/player';
 
 // mw-e32.12: repeated in-place area swaps (mw-ju8.28) do not leak, against the production build
 // (Chromium). Each cycle saves, walks out of valley-01 by its north gate into valley-02 and back

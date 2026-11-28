@@ -41,6 +41,7 @@ one definition.
 | `bench` (slow-gates.yml) | nightly, release | Vitest benchmark budgets (sim `step()` mean, mw-e00.15 AC-6); timing-sensitive and slow-moving. |
 | `e2e-audio` (slow-gates.yml) | nightly, release | Firefox and WebKit Web Audio testbed with PulseAudio; engine differences change with browser releases, not with our PRs. |
 | `perf-budget` (slow-gates.yml) | nightly, release | The perf budget suite including the wall-clock load budgets (mw-e41.8); noisy on shared runners. |
+| `perf-budget` leak project (`e2e/perf/leak.perf.ts`) | nightly, release, push to main | 20 save and area-swap cycles; heap and renderer resource counts return to a post-warm-up baseline (mw-e32.12). Several minutes on software GL, so not in the per-PR shards (mw-e32.24). |
 | `gates` (nightly.yml) | nightly | Calls `slow-gates.yml`. |
 | `report` (nightly.yml) | nightly | Opens or updates the single `nightly-failure` issue; closes it when green. |
 | `secrets` (security.yml) | per-PR | Secret scanning; required. Also runs nightly on its own schedule. |
