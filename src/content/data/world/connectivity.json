@@ -776,7 +776,8 @@
       "to": "priory-road",
       "kind": "path",
       "bead": "mw-e25.25",
-      "notes": "East wall gate of the green: the priory road. A planned edge stub (briar-glen-green exit-priory-road: signpost and shut gate) until mw-e25.25 builds the way."
+      "notes": "East wall gate of the green: the priory road (mw-e25.25, wired by mw-0qcf). briar-glen-green/priory-road-gate leads through the green's east doorway into a gap in the Briarwood's west wall; the town road runs east through the trees to the mine road junction and the priory road. briarwood/town-road-gate leads back.",
+      "transitions": ["briar-glen-green/priory-road-gate", "briarwood/town-road-gate"]
     },
     {
       "id": "green-schoolhouse",
