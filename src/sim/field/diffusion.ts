@@ -29,6 +29,13 @@
 // by driftLimit / decay per cell (half an epsilon at worst), and a frozen chunk is stepped anyway
 // every REFRESH_TICKS-th tick so a slow drift cannot stick.
 //
+// Two refinements keep a steady fire's surroundings cheap (mw-e32.23). A cell within epsilon of ambient
+// before and after a move may jitter by `calmJitter` counts and still count as still: the truncation
+// of dust-level fluxes never settles, and the dust is below anything visible (a loud cell, such as
+// decaying smoke, keeps its exact limit, so a decaying plume never freezes). And a calm chunk (left
+// to the sleep rules) is also frozen when it has a loud, awake neighbour and every layer of it loses
+// to ambient: it would sleep, be woken by that neighbour's spill, and cycle, stepped on every tick.
+//
 // After applying deltas, each channel loses `decay` of its deviation (ambient loss). A chunk whose
 // every value is within epsilon of ambient for `sleepTicks` ticks in a row settles to exact ambient
 // and sleeps: it costs nothing until a write or a neighbour's flux touches it. Sleeping chunks with
@@ -118,6 +125,13 @@ export const REFRESH_TICKS = 16;
  */
 export const driftLimit = (decay: number, epsilon: number): number =>
   Math.floor(decay === 0 ? epsilon / DRIFT_DIVISOR : (epsilon * decay) / RATE_ONE / 2);
+/**
+ * Counts a cell may move in a tick and still count as converged while it stays within epsilon of
+ * ambient before and after (mw-e32.23). Such a cell is below anything the game can see, and the
+ * truncation of its fluxes jitters it by several counts a tick forever, so a chunk of smoke dust
+ * beside a plume never went still; a loud cell keeps the stricter `driftLimit`.
+ */
+export const calmJitter = (epsilon: number): number => Math.floor(epsilon / DRIFT_DIVISOR);
 const LAST = CHUNK_SIZE - 1;
 
 interface Buffer {
@@ -368,6 +382,7 @@ function apply(tick: Tick, lost: Map<FieldChannel, number>): void {
     const { channel, values, delta } = buffer;
     const { decay, epsilon } = tick.field.channel(channel);
     const limit = driftLimit(decay, epsilon);
+    const jitter = Math.max(limit, calmJitter(epsilon));
     const keep = decay / RATE_ONE; // exact: RATE_ONE is a power of two
     let removed = 0;
     // The settle pass reads these three instead of scanning the values again.
@@ -385,7 +400,13 @@ function apply(tick: Tick, lost: Map<FieldChannel, number>): void {
         removed += loss;
       }
       values[i] = kept;
-      if (kept - before > limit || before - kept > limit) still = false;
+      const move = kept - before;
+      if (move > limit || move < -limit) {
+        // Dust within epsilon on both sides of the move may jitter (see `calmJitter`).
+        const calmly =
+          before <= epsilon && before >= -epsilon && kept <= epsilon && kept >= -epsilon;
+        if (!calmly || move > jitter || move < -jitter) still = false;
+      }
       if (kept !== 0) {
         empty = false;
         if (kept > epsilon || kept < -epsilon) loud = true;
@@ -439,14 +460,25 @@ function settle(tick: Tick, lost: Map<FieldChannel, number>, skipped: ReadonlySe
  * keeps moving, a cooling chunk still reaches ambient and sleeps, and nothing sticks).
  */
 function isFrozen(field: ElementField, chunk: Chunk): boolean {
-  if (chunk.converged === 0 || chunk.calm > 0 || chunk.converged % REFRESH_TICKS === 0) {
-    return false;
-  }
+  if (chunk.converged === 0 || chunk.converged % REFRESH_TICKS === 0) return false;
   // A neighbour that is still moving is fine when every layer of this chunk loses to ambient and
   // the neighbour holds it too: it reads this chunk's values across the face as a fixed boundary
   // (see the file header). A lossless layer's flux has nowhere to go, so it needs a settled
   // neighbour.
   const sink = [...chunk.layers.keys()].every((key) => field.channel(key).decay > 0);
+  // A calm chunk is left to the sleep rules, unless a loud neighbour would only wake it again
+  // (mw-e32.23): then it sleeps and wakes in a cycle beside the fire and holding it is what it
+  // would settle to anyway.
+  if (
+    chunk.calm > 0 &&
+    !(
+      sink &&
+      chunk.layers.size > 0 &&
+      chunk.links.some((other) => other !== undefined && !other.asleep && other.calm === 0)
+    )
+  ) {
+    return false;
+  }
   return chunk.links.every(
     (other) =>
       other === undefined ||
