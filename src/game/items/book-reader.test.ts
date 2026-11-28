@@ -136,7 +136,13 @@ interface Rig {
 }
 
 function rig(
-  options: { klass?: string; placed?: boolean; content?: BookReaderContent; give?: string } = {},
+  options: {
+    klass?: string | null;
+    matchMedia?: boolean;
+    placed?: boolean;
+    content?: BookReaderContent;
+    give?: string;
+  } = {},
 ): Rig {
   const registry = createCapabilityRegistry(base, true);
   const rules = createStudyRules(base, registry, createUnlockBook(base, registry));
@@ -147,7 +153,9 @@ function rig(
   const player = world.spawn();
   addInventory(world, player);
   addStudent(world, player);
-  world.add(player, PlayerClassComponent, { classId: options.klass ?? 'sorcerer' });
+  if (options.klass !== null) {
+    world.add(player, PlayerClassComponent, { classId: options.klass ?? 'sorcerer' });
+  }
   if (options.placed !== false) placeEntity(world, player, { x: 0, y: 0, z: 0 }, 0.4);
   world.step();
   const added = new InventoryRules(base.all('item')).add(
@@ -169,6 +177,7 @@ function rig(
     content: options.content ?? fakeContent(),
     study: rules,
     submit: (command) => queue.push(command),
+    ...(options.matchMedia === true && { matchMedia: () => ({ matches: true }) }),
     onChange: (open) => changes.push(open),
   });
   const instanceId = inventoryOf(world, player)?.items[0]?.instanceId ?? -1;
@@ -257,6 +266,14 @@ describe('the Study button state from the sim (mw-e07.9)', () => {
     });
   });
 
+  it('blocks a reader with no class from a book only a class may learn', () => {
+    const { world, player, rules } = rig({ klass: null });
+    const content = fakeContent({ tier: 2 });
+    expect(studyView(world, player, primer, rules, content)?.blocked).toBe(
+      BOOK_READER_REASONS.class,
+    );
+  });
+
   it('says a book is already known once its spell is learned, and shows nothing for lore', () => {
     const { world, player, rules, step } = rig();
     rules.start(world, player, primer.id);
@@ -289,6 +306,11 @@ describe('the book reader controller (mw-e07.9)', () => {
     ui.intent('back', 'keyboard');
     expect(controller.isOpen).toBe(false);
     expect(changes).toEqual([true, false]);
+  });
+
+  it('hands the OS reduced-motion query to the reader when it has one', () => {
+    const { controller, instanceId } = rig({ matchMedia: true });
+    expect(controller.open(instanceId)).toBe(true);
   });
 
   it('refuses a stack that is not in the pack or is not a book', () => {
@@ -356,6 +378,8 @@ describe('the book reader controller (mw-e07.9)', () => {
     expect(status()).toMatch(/where you left off/);
     ended('known');
     expect(status()).toBe('You already know what this book teaches.');
+    ended('interrupted');
+    expect(status()).toBe('You stop studying.');
     ended('interrupted', 'no-such-reason');
     expect(status()).toBe('You stop studying.');
     world.events.emit(SpellLearned, { tick: 0, actor: player + 99, spellId: 'x', source: 'y' });

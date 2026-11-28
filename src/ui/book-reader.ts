@@ -105,9 +105,8 @@ const RUNES = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚ�
 
 /** Text as runes: each letter or digit becomes a rune chosen by the character, spaces and punctuation stay. */
 export function garble(text: string): string {
-  return text.replace(
-    /[\p{L}\p{N}]/gu,
-    (letter) => RUNES[(letter.codePointAt(0) ?? 0) % RUNES.length] ?? '',
+  return text.replace(/[\p{L}\p{N}]/gu, (letter) =>
+    RUNES.charAt(letter.charCodeAt(0) % RUNES.length),
   );
 }
 
