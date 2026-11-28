@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, it } from 'vitest';
 import { DAMAGE_COMPONENTS, giveCombatant, HealthComponent } from '../combat/damage/components';
 import { giveStamina, StaminaComponent } from '../combat/stamina';
@@ -199,7 +200,7 @@ describe('rest points (mw-e27.13)', () => {
     const mana = manaOf(s.world, s.actor);
     s.world.set(s.actor, ManaComponent, { ...mana!, current: 0 });
     s.rules.rest(s.world, s.actor, { point: bed, duration: { kind: 'dawn' } });
-    expect(manaOf(s.world, s.actor)?.current).toBeCloseTo(mana!.profile.max / 2, 3);
+    expect(manaOf(s.world, s.actor)?.current).toBeCloseTo((mana?.profile.max ?? 0) / 2, 3);
     expect(s.world.get(s.actor, HealthComponent)?.current).toBe(100);
   });
 
@@ -350,8 +351,12 @@ describe('rest points (mw-e27.13)', () => {
   it('restPointOf is undefined in a world with no rest points, and a rest point needs a kind and an id', () => {
     const world = new World<never>({ seed: 1 });
     expect(restPointOf(world, world.spawn())).toBeUndefined();
-    expect(() => makeRestPoint(world, world.spawn(), '', 'x')).toThrow(RangeError);
-    expect(() => makeRestPoint(world, world.spawn(), 'x', '')).toThrow(RangeError);
+    expect(() => {
+      makeRestPoint(world, world.spawn(), '', 'x');
+    }).toThrow(RangeError);
+    expect(() => {
+      makeRestPoint(world, world.spawn(), 'x', '');
+    }).toThrow(RangeError);
     expect(world.isRegistered(RestPointComponent)).toBe(false);
   });
 

@@ -239,8 +239,9 @@ export class RestRules {
     request: RestRequest,
     safety?: () => string | null,
   ): RestOutcome {
-    const spec = this.kindOf(world, request.point);
-    if (spec === undefined) {
+    const point = restPointOf(world, request.point);
+    const spec = point === undefined ? undefined : this.#kinds.get(point.kind);
+    if (point === undefined || spec === undefined) {
       return { ok: false, reason: 'not-a-rest-point', detail: 'Nowhere to rest' };
     }
     if (!spec.durations.some((offered) => sameDuration(offered, request.duration))) {
@@ -253,7 +254,6 @@ export class RestRules {
     const blocked = this.blocked(world, request.point, safety);
     if (blocked !== null) return { ok: false, ...blocked };
 
-    const point = restPointOf(world, request.point) as NonNullable<ReturnType<typeof restPointOf>>;
     const game = gameClockOf(world);
     const clock: DayClock = game === undefined ? factDayClock(world.facts) : gameDayClock(game);
     const start = clock.now();

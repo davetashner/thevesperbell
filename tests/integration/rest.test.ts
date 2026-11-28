@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 // mw-e27.13: resting, headless as the game wires it. The testbed's unlit campfire is loaded with the
 // real scene, content, fire rules and facts: it refuses a rest until the `light` verb's heat
 // ignites it, a night by it passes the clock and heals, and the game's autosave writes exactly one
@@ -24,7 +25,6 @@ import {
   restCompleted,
   RestRules,
   SceneSpawnComponent,
-  type EntityId,
   type RestCompleted,
   type World,
 } from '@sim/index';
@@ -50,9 +50,7 @@ function camp() {
   const fire = world
     .query(SceneSpawnComponent)
     .ids()
-    .find(
-      (entity) => world.get(entity, SceneSpawnComponent)?.id === 'testbed-campfire',
-    ) as EntityId;
+    .find((entity) => world.get(entity, SceneSpawnComponent)?.id === 'testbed-campfire')!;
   const rules = new RestRules(restKindSpecs(content), { pools: DEFAULT_REST_POOLS });
   const rested: RestCompleted[] = [];
   sim.events.on(restCompleted, (e) => rested.push(e));

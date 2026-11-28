@@ -36,7 +36,7 @@ export function restHostility(
     if (
       at !== undefined &&
       there !== undefined &&
-      Math.hypot(there.x - at.x, there.y - at.y, there.z - at.z) <= radius
+      (there.x - at.x) ** 2 + (there.y - at.y) ** 2 + (there.z - at.z) ** 2 <= radius * radius
     ) {
       reason = 'Something hostile is too close';
     }

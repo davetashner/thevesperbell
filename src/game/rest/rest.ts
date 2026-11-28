@@ -165,7 +165,7 @@ export class RestController {
 
   #model(point: EntityId): RestWindowModel {
     const { world, rules } = this.#options;
-    const kind = rules.kindOf(world, point) as RestKindSpec;
+    const kind = rules.kindOf(world, point)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const blocked = rules.blocked(world, point, this.#safetyFor(point))?.detail ?? '';
     const durations: RestChoice[] = kind.durations.map((duration) => ({
       id: durationId(duration),
@@ -180,8 +180,8 @@ export class RestController {
 
   #rest(point: EntityId, id: string): void {
     const { world, player, rules, toast } = this.#options;
-    const kind = rules.kindOf(world, point) as RestKindSpec;
-    const duration = kind.durations.find((own) => durationId(own) === id) as RestDuration;
+    const kind = rules.kindOf(world, point)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    const duration = kind.durations.find((own) => durationId(own) === id)!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const outcome = rules.rest(world, player, { point, duration }, this.#safetyFor(point));
     this.#last = lastOf(outcome);
     const text = outcomeText(outcome);
