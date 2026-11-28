@@ -1,0 +1,12 @@
+{
+  "$schema": "../testprop.schema.json",
+  "id": "tunnel-roof-slab",
+  "name": "Hanging section of tunnel roof",
+  "mass": 70,
+  "flammable": false,
+  "tags": ["hanging"],
+  "body": {
+    "size": [1.5, 1, 1.25],
+    "material": "stone"
+  }
+}

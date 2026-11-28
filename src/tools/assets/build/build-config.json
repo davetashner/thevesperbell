@@ -1,0 +1,12 @@
+{
+  "$comment": "pnpm assets:build settings (mw-e37.8, style bible §13.2). textureSize is the High tier's longest texture side; Low is High × lowScale. maxTriangles is the LOD0 budget the build refuses to exceed. A model's assets/source/<category>/<id>/build.json may override textureSize, maxTriangles and simplifyRatio (vertices kept, 0–1; the only decimation the build does). Bump pipelineVersion when the pipeline changes so every model rebuilds.",
+  "pipelineVersion": 1,
+  "lowScale": 0.5,
+  "classes": [
+    { "prefix": "model-char-", "textureSize": 1024, "maxTriangles": 12000 },
+    { "prefix": "model-npc-", "textureSize": 1024, "maxTriangles": 7000 },
+    { "prefix": "model-creature-", "textureSize": 512, "maxTriangles": 6000 },
+    { "prefix": "model-prop-", "textureSize": 512, "maxTriangles": 5000 }
+  ],
+  "default": { "textureSize": 512, "maxTriangles": 5000 }
+}
