@@ -43,10 +43,10 @@ describe('the emergent combo catalogue (mw-e03.27)', () => {
   });
 
   describe.each(scenarios.map((s) => [s.id, s] as const))('%s', (_id, scenario) => {
-    it('AC-1: the outcomes hold and the replay ends on the golden state hash', ({ task }) => {
+    it('AC-1: the outcomes hold and the replay ends on the golden state hash', async ({ task }) => {
       markExercised(task, 'scene', 'chaos-room');
       const run = runScenario(RAPIER, scenario, { contentHash, bless });
-      if (bless) writeGolden(scenario, run.finalHash);
+      if (bless) await writeGolden(scenario, run.finalHash);
       expect(run.finalHash).toBe(run.replay.checkpoints.at(-1)?.hash);
     });
   });
