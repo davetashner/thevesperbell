@@ -36,6 +36,7 @@ describe('content test harness', () => {
       'statue',
       'stone-block',
       'tiller',
+      'tunnel-roof-slab',
     ]);
   });
 
