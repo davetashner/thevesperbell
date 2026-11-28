@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readStyleRules, type ParsedPrompt } from './gen-image-prompt';
 import {
+  defaultModelFor,
   generate,
   mfluxArgs,
   MODELS,
@@ -151,6 +152,12 @@ describe('helpers', () => {
     expect(size(null)).toEqual([1024, 1024]);
   });
 
+  it('defaults tileable textures to FLUX.2-klein-4b and everything else to Qwen-Image', () => {
+    expect(defaultModelFor('Tileable texture').id).toBe('flux2-klein-4b');
+    expect(defaultModelFor('Prop sheet').id).toBe('qwen-image');
+    expect(defaultModelFor(null).id).toBe('qwen-image');
+  });
+
   it('maps asset ids to texture modes', () => {
     expect(textureMode('tex-net-cargo-alpha-01')).toBe('alpha');
     expect(textureMode('tex-rope-hawser-trim-01')).toBe('x');
@@ -241,8 +248,10 @@ describe('gen-image-cli', () => {
     expect(calls[0]?.command).toBe('/bin/mflux/mflux-generate-qwen');
     expect(calls[3]?.args.join(' ')).toContain('--seed 6 --steps 4 --width 512 --height 512');
     expect(d.lines).toContain(`${plain}: no §14.1 category add-on after the preamble`);
-    // Default seed is random but recorded.
-    await expect(cli.main([plain, '--incoming', dir], d)).resolves.toBe(0);
+    // Without --model or --seed: the model follows the category, and the random seed is recorded.
+    await expect(cli.main([plain, tileFile(dir), '--incoming', dir, '--no-tile'], d)).resolves.toBe(0);
+    expect(calls[4]?.command).toBe('/bin/mflux/mflux-generate-qwen');
+    expect(calls[5]?.command).toBe('/bin/mflux/mflux-generate-flux2');
     const sidecar = JSON.parse(readFileSync(join(dir, 'misc-a-01', 'v3.json'), 'utf8')) as { seed: number };
     expect(Number.isInteger(sidecar.seed)).toBe(true);
   });

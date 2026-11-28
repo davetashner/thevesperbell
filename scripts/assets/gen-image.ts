@@ -24,37 +24,50 @@ export interface ModelSpec {
   readonly licence: string;
 }
 
-export const MODELS: Readonly<Record<string, ModelSpec>> = {
-  'z-image-turbo': {
-    id: 'z-image-turbo',
-    command: 'mflux-generate-z-image-turbo',
-    mfluxModel: 'z-image-turbo',
-    repo: 'Tongyi-MAI/Z-Image-Turbo',
-    steps: 9,
-    quantize: 8,
-    licence: 'Apache-2.0',
-  },
-  'qwen-image': {
-    id: 'qwen-image',
-    command: 'mflux-generate-qwen',
-    mfluxModel: 'qwen-image',
-    repo: 'Qwen/Qwen-Image-2512',
-    steps: 25,
-    quantize: 8,
-    licence: 'Apache-2.0',
-  },
-  'flux2-klein-4b': {
-    id: 'flux2-klein-4b',
-    command: 'mflux-generate-flux2',
-    mfluxModel: 'flux2-klein-4b',
-    repo: 'black-forest-labs/FLUX.2-klein-4B',
-    steps: 4,
-    quantize: 8,
-    licence: 'Apache-2.0',
-  },
+const Z_IMAGE_TURBO: ModelSpec = {
+  id: 'z-image-turbo',
+  command: 'mflux-generate-z-image-turbo',
+  mfluxModel: 'z-image-turbo',
+  repo: 'Tongyi-MAI/Z-Image-Turbo',
+  steps: 9,
+  quantize: 8,
+  licence: 'Apache-2.0',
 };
 
-export const DEFAULT_MODEL = 'z-image-turbo';
+const QWEN_IMAGE: ModelSpec = {
+  id: 'qwen-image',
+  command: 'mflux-generate-qwen',
+  mfluxModel: 'qwen-image',
+  repo: 'Qwen/Qwen-Image-2512',
+  steps: 25,
+  quantize: 8,
+  licence: 'Apache-2.0',
+};
+
+const FLUX2_KLEIN_4B: ModelSpec = {
+  id: 'flux2-klein-4b',
+  command: 'mflux-generate-flux2',
+  mfluxModel: 'flux2-klein-4b',
+  repo: 'black-forest-labs/FLUX.2-klein-4B',
+  steps: 4,
+  quantize: 8,
+  licence: 'Apache-2.0',
+};
+
+export const MODELS: Readonly<Record<string, ModelSpec>> = {
+  'z-image-turbo': Z_IMAGE_TURBO,
+  'qwen-image': QWEN_IMAGE,
+  'flux2-klein-4b': FLUX2_KLEIN_4B,
+};
+
+/**
+ * The model a prompt gets without --model (docs/art/local-image-bakeoff.md): FLUX.2-klein-4b draws
+ * flat material for tileable textures; Qwen-Image follows long, many-part prompts (prop sheets,
+ * concepts) best. Z-Image-Turbo stays available but truncates our prompts at 512 tokens.
+ */
+export function defaultModelFor(category: string | null): ModelSpec {
+  return category === 'Tileable texture' ? FLUX2_KLEIN_4B : QWEN_IMAGE;
+}
 
 /** What a spawned process left behind: its exit code and the tail of its output. */
 export interface SpawnResult {

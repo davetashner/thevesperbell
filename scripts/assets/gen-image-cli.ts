@@ -3,7 +3,8 @@
 // Generates image candidates on this machine with mflux (assets/prompts/README.md, Tooling).
 // Each prompt file's filled block must open with the style bible §14 preamble verbatim; the
 // candidates land in assets/_incoming/<asset id>/vN.png with a vN.json provenance sidecar.
-//   --model ID     z-image-turbo (default), qwen-image or flux2-klein-4b
+//   --model ID     flux2-klein-4b, qwen-image or z-image-turbo (default: klein for tileable
+//                  textures, qwen-image for everything else; docs/art/local-image-bakeoff.md)
 //   --seed N       first seed (default random); --count N candidates use N, N+1, …
 //   --count N      candidates per prompt file (default 1)
 //   --size WxH     generation size (default from the §14.1 category)
@@ -18,7 +19,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { parsePrompt, readStyleRules } from './gen-image-prompt.ts';
-import { DEFAULT_MODEL, generate, MODELS, parseSize, spawnProcess, type Deps } from './gen-image.ts';
+import { defaultModelFor, generate, MODELS, parseSize, spawnProcess, type Deps } from './gen-image.ts';
 
 const USAGE =
   'usage: gen-image-cli.ts <prompt file>… [--model ID] [--seed N] [--count N] [--size WxH] [--steps N] [--list PATH] [--no-tile]';
@@ -43,7 +44,7 @@ export async function main(argv: readonly string[], deps: Deps = defaultDeps()):
     args: [...argv],
     allowPositionals: true,
     options: {
-      model: { type: 'string', default: DEFAULT_MODEL },
+      model: { type: 'string' },
       seed: { type: 'string' },
       count: { type: 'string', default: '1' },
       size: { type: 'string' },
@@ -58,9 +59,9 @@ export async function main(argv: readonly string[], deps: Deps = defaultDeps()):
   if (values.list !== undefined) {
     files.push(...readFileSync(values.list, 'utf8').split('\n').map((l) => l.trim()).filter((l) => l !== '' && !l.startsWith('#')));
   }
-  const model = MODELS[values.model];
+  const model = values.model === undefined ? null : MODELS[values.model];
   if (files.length === 0 || model === undefined) {
-    console.error(model === undefined ? `unknown --model ${values.model}; one of ${Object.keys(MODELS).join(', ')}` : USAGE);
+    console.error(model === undefined ? `unknown --model ${String(values.model)}; one of ${Object.keys(MODELS).join(', ')}` : USAGE);
     return 2;
   }
   try {
@@ -75,7 +76,7 @@ export async function main(argv: readonly string[], deps: Deps = defaultDeps()):
           promptPath: file,
           prompt,
           incoming: values.incoming,
-          model,
+          model: model ?? defaultModelFor(prompt.category),
           seed: values.seed === undefined ? randomInt(2 ** 31) : Number(values.seed),
           count: Number(values.count),
           size,
