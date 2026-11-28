@@ -113,6 +113,11 @@ export interface FreezeState {
   readonly friction: number;
   /** Heat spent melting so far, °C. */
   readonly absorbed: number;
+  /**
+   * Weight, kg, this melt started from when the thing is ice all the way through (its weight then
+   * falls as it melts); -1 when its ice is only a surface skin (it keeps its weight).
+   */
+  readonly mass: number;
 }
 
 export const FreezeStateComponent = defineComponent<FreezeState>('freeze.state');

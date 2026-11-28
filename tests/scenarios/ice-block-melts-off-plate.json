@@ -1,0 +1,138 @@
+{
+  "id": "ice-block-melts-off-plate",
+  "title": "A melting ice block lets the plate up",
+  "description": "A block of ice sits on a pressure plate and holds it down. You hold a flame to it. The block stays frozen but shrinks as it melts, and the plate clicks back up while the ice is still there, once too little of it is left to press.",
+  "tags": ["fire", "ice", "weight", "plate", "timing"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "A plate (it needs 20 kg) with a 60 kg ice block resting on it.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 30,
+      "stimulus": {
+        "element": "heat",
+        "at": "combo-ice-slab",
+        "radius": 1,
+        "intensity": 200
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 20,
+      "target": {
+        "spawn": "combo-plate-ice"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": true,
+      "sees": "The plate is held down by the ice."
+    },
+    {
+      "tick": 20,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": true,
+      "sees": "The block is still ice."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "weight",
+      "op": "lt",
+      "value": 50,
+      "sees": "The block has shrunk as it melts."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "weight",
+      "op": "gt",
+      "value": 20,
+      "sees": "There is still plenty of ice on the plate."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "combo-plate-ice"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": true,
+      "sees": "The plate is still down while enough ice is left."
+    },
+    {
+      "tick": 250,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": true,
+      "sees": "The block is still ice, only smaller."
+    },
+    {
+      "tick": 250,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "weight",
+      "op": "lt",
+      "value": 20,
+      "sees": "Too little ice is left to press the plate."
+    },
+    {
+      "tick": 250,
+      "target": {
+        "spawn": "combo-plate-ice"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": false,
+      "sees": "The plate has clicked back up, with the ice still there."
+    },
+    {
+      "tick": 450,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": false,
+      "sees": "The block has melted through."
+    },
+    {
+      "tick": 450,
+      "target": {
+        "spawn": "combo-ice-slab"
+      },
+      "reading": "weight",
+      "op": "eq",
+      "value": 0,
+      "sees": "Nothing is left to weigh on the plate."
+    },
+    {
+      "tick": 450,
+      "target": {
+        "spawn": "combo-plate-ice"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": false,
+      "sees": "The plate stays up."
+    }
+  ],
+  "ticks": 451,
+  "golden": {
+    "finalHash": "4afdf563"
+  }
+}

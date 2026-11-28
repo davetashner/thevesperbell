@@ -583,6 +583,112 @@ describe('freezing and thawing things (mw-e03.7)', () => {
   });
 });
 
+describe('melting ice loses weight (mw-e03.60)', () => {
+  const SPOT = { kind: 'sphere', center: { x: 20, y: 0, z: 20 }, radius: 1 } as const;
+  const block = (world: World<never>, init: WorldPropertyInit = {}): EntityId =>
+    thing(
+      world,
+      { x: 20, y: 0, z: 20, radius: 0.2 },
+      { frozen: true, temperature: -5, weight: 60, ...init },
+    );
+
+  it('AC-1: the weight of an ice block falls monotonically as heat melts it, and stays above 0 while frozen', () => {
+    const { world } = iceWorld({ physics: false });
+    const ice = block(world);
+    steps(world, 2);
+    expect(readProperty(world, ice, 'weight')).toBe(60);
+    const seen: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      heat(world, 50, SPOT);
+      steps(world, 3);
+      expect(readProperty(world, ice, 'frozen')).toBe(true);
+      seen.push(readProperty(world, ice, 'weight'));
+    }
+    expect(seen[0]).toBeLessThan(60);
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeLessThan(seen[i - 1] ?? 0);
+    expect(seen.at(-1)).toBeGreaterThan(0);
+  });
+
+  it('AC-2: a fully melted block weighs nothing and has thawed', () => {
+    const { world } = iceWorld({ physics: false });
+    const ice = block(world);
+    steps(world, 2);
+    heat(world, 3000, SPOT);
+    steps(world, 4);
+    expect(readProperty(world, ice, 'frozen')).toBe(false);
+    expect(readProperty(world, ice, 'weight')).toBe(0);
+  });
+
+  it('AC-3: chilling a half-melted block again does not give back the lost weight', () => {
+    const { world } = iceWorld({ physics: false });
+    const ice = block(world);
+    steps(world, 2);
+    heat(world, 300, SPOT);
+    steps(world, 3);
+    const half = readProperty(world, ice, 'weight');
+    expect(half).toBeLessThan(60);
+    cold(world, 100, SPOT);
+    steps(world, 3);
+    expect(readProperty(world, ice, 'weight')).toBe(half);
+    expect(world.get(ice, FreezeStateComponent)?.absorbed).toBe(0);
+    // The next melt starts from what is left: it never weighs more than before.
+    heat(world, 150, SPOT);
+    steps(world, 3);
+    expect(readProperty(world, ice, 'weight')).toBeLessThan(half);
+    heat(world, 3000, SPOT);
+    steps(world, 4);
+    expect(readProperty(world, ice, 'weight')).toBe(0);
+  });
+
+  it('AC-4: a wet crate with surface ice keeps its own weight through freeze and thaw', () => {
+    const { world } = iceWorld({ physics: false });
+    const crate = thing(
+      world,
+      { x: 20, y: 0, z: 20, radius: 0.2 },
+      { wetness: 1, weight: 15, temperature: -5 },
+    );
+    steps(world, 3);
+    expect(readProperty(world, crate, 'frozen')).toBe(true);
+    heat(world, 600, SPOT);
+    steps(world, 3);
+    expect(readProperty(world, crate, 'frozen')).toBe(true);
+    expect(readProperty(world, crate, 'weight')).toBe(15);
+    cold(world, 100, SPOT);
+    steps(world, 3);
+    heat(world, 5000, SPOT);
+    steps(world, 4);
+    expect(readProperty(world, crate, 'frozen')).toBe(false);
+    expect(readProperty(world, crate, 'weight')).toBe(15);
+  });
+
+  it('AC-4: an authored frozen wet thing without a state keeps its weight as it thaws', () => {
+    const { world } = iceWorld({ physics: false });
+    const crate = block(world, { wetness: 1, weight: 15 });
+    steps(world, 2);
+    heat(world, 300, SPOT);
+    steps(world, 3);
+    expect(readProperty(world, crate, 'frozen')).toBe(true);
+    expect(readProperty(world, crate, 'weight')).toBe(15);
+  });
+
+  it('AC-5: the body of a melting block follows its weight', () => {
+    const { world, rapier } = iceWorld();
+    const ice = block(world);
+    addPhysicsObject(world, ice, {
+      shape: { kind: 'box', halfExtents: { x: 0.5, y: 0.5, z: 0.5 } },
+      position: { x: 20, y: 0.5, z: 20 },
+    });
+    const port = must(rapier) as unknown as RigidBodyPort;
+    const mass = (): number =>
+      port.motionOf(must(world.get(ice, PhysicsObjectComponent)).body as ColliderHandle).mass;
+    expect(mass()).toBeCloseTo(60, 3);
+    steps(world, 2);
+    heat(world, 300, SPOT);
+    steps(world, 3);
+    expect(mass()).toBeLessThan(60);
+  });
+});
+
 describe('authored ice (mw-e03.7)', () => {
   it('an authored frozen thing that is cold stays frozen, and one hit by a great heat thaws at once', () => {
     const { world } = iceWorld({ physics: false });
