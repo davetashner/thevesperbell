@@ -14,6 +14,7 @@ check enforces this).
 
 ### Added
 
+- The Glen Well hides a way down: climb (or drop) down the shaft, pull the loose rung and follow the old tunnel to a flooded cistern under Bellwater Priory. A stone dropped down the well lands twice. [mw-e24.10]
 - The supply tunnel under Mooring's Watch is open: past its collapse it leads into the Deepworks' old galleries. Batter the rubble down, burn or shoot out the rotten prop to drop a step to climb from, or climb the rough face; once past, the shortcut stays open.
 - The priory road out of Market Green's east gate is open: it leads into the Briarwood's west side and on through the trees to the road up to Bellwater Priory. [mw-0qcf]
 - A scene can set its air temperature (`"air": { "temperature": -5 }`): ice stays frozen in a cold room and melts faster in a warm one, and the scales room is now a cold vault so its block of ice keeps its weight. [mw-e03.62]
