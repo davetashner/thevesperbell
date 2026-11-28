@@ -436,7 +436,7 @@
       "name": "The cistern",
       "area": "priory",
       "epic": "e26",
-      "notes": "Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as the stub the Glen Well route joins: a sealed vestibule behind the nave west wall door; glen-well-cistern (mw-e24.10) and nave-cistern (mw-e26.20) open it.",
+      "notes": "Old cistern under the Glen Well, joining the priory (bible 3.1, 3.5). Built (mw-e26.5) as a sealed vestibule behind the nave west wall door; mw-e24.10 adds the cistern under the garden: the well end (arrive-from-briar-glen-green, writes well.tunnel.found), the flooded chamber (wade the stepped ends, swim or walk the 1.9 m middle, or freeze it to ice), stub junctions to the jail drain and Snig's goblin tunnels, and a stair up into the vestibule. The nave door stays barred until nave-cistern (mw-e26.20).",
       "scene": "bellwater-priory"
     },
     {
@@ -1252,7 +1252,8 @@
       "routes": ["verb.climb.ledge"],
       "classesHint": ["archer", "knight", "sorcerer", "thief"],
       "bead": "mw-e24.10",
-      "notes": "The loose ladder-rung under the Glen Well; any class can climb down."
+      "notes": "The loose ladder-rung under the Glen Well; any class can climb down. Built (mw-e24.10): the ladder (or an 8 m drop, which hurts but never kills) goes down the shaft to its foot, where pulling the loose rung raises the grate into the old tunnel west (glen-well-shaft graph, world.glen-well.rung-pulled); the tunnel's end crosses to the cistern's well end under the priory garden, and the well-end tunnel there crosses back.",
+      "transitions": ["briar-glen-green/well-tunnel", "bellwater-priory/well-tunnel"]
     },
     {
       "id": "jail-drain",

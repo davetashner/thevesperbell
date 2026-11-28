@@ -15,7 +15,6 @@ const briarwood = content.get('scene', 'briarwood');
 /** Cross-scene edges with no transition volume, and why (checked against bd on 2026-11-27). */
 const UNWIRED: Readonly<Record<string, string>> = {
   'sleepers-path-mine-gate': 'mw-e25.2 (open)',
-  'glen-well-cistern': 'mw-e24.10 (open)',
   'sounding-shaft': 'mw-e26.18 (open)',
   'ossuary-crypt': 'mw-e26.20 (open)',
   'barge-quay-lock': 'barge ride service (mw-e25.33)',
