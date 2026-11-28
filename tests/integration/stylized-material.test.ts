@@ -68,8 +68,17 @@ describe('stylized material (mw-e37.13)', () => {
     expect(fs).toMatch(/directSpecular \+=.*vbWetSheen \* vbWet;/);
     // The physical direct light is replaced by the ramp, before the lights loop uses it.
     expect(fs.indexOf('#define RE_Direct RE_Direct_Stylized')).toBeLessThan(
-      fs.indexOf('#include <lights_fragment_begin>'),
+      fs.indexOf('vbPunctual = 1.0;'),
     );
+    // Point and spot lights stay Lambertian (gameplay light); the key light takes the ramp.
+    const point = fs.indexOf('vbPunctual = 1.0;');
+    const directional = fs.indexOf('vbPunctual = 0.0;', point);
+    const section = (lights: string): number =>
+      fs.indexOf(`NUM_${lights}_LIGHTS > 0 ) && defined( RE_Direct )`, point);
+    expect(point).toBeGreaterThan(0);
+    expect(section('POINT')).toBeGreaterThan(point);
+    expect(section('SPOT')).toBeLessThan(directional);
+    expect(section('DIR')).toBeGreaterThan(directional);
     // The finish runs before the output is written, the highlight clamp leaving emission out.
     expect(fs.indexOf('vbSurface = min( vbSurface, vbAlbedoMax )')).toBeLessThan(
       fs.indexOf('#include <opaque_fragment>'),

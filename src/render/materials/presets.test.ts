@@ -7,6 +7,7 @@ import {
   clampAlbedo,
   hexToLinear,
   isLightingPreset,
+  presetForKeyLight,
   rampLevel,
   srgbToLinear,
   wetAlbedoFactor,
@@ -67,5 +68,11 @@ describe('stylized material parameters (mw-e37.13)', () => {
     expect(srgbToLinear(1)).toBeCloseTo(1);
     expect(isLightingPreset('golden-hour')).toBe(true);
     expect(isLightingPreset('noon')).toBe(false);
+  });
+
+  it('picks interior without a key light, night under moonlight and day under the sun', () => {
+    expect(presetForKeyLight(null)).toBe('interior');
+    expect(presetForKeyLight(0.08)).toBe('night');
+    expect(presetForKeyLight(0.9)).toBe('day');
   });
 });

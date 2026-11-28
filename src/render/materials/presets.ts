@@ -60,8 +60,7 @@ const base: StylizedParams = {
   rimPower: 3,
   bandEdges: [0.02, 0.45],
   bandSoftness: 0.08,
-  // About Lambert's energy on average, so swapping the material in does not brighten a scene.
-  bandLevels: [0, 0.45, 0.8],
+  bandLevels: [0, 0.5, 1],
 };
 
 /**
@@ -126,6 +125,18 @@ export function clampAlbedo(linear: readonly [number, number, number]): [number,
     number,
     number,
   ];
+}
+
+/** Below this key-light level (a sim light level, 0–1) the key is moonlight, not sun. */
+export const NIGHT_KEY_LEVEL = 0.2;
+
+/**
+ * The preset for a scene lit by a key light of `level` (null: no key light, so torchlit), until scenes
+ * name their own: interior without a key, night under a dim one, day otherwise.
+ */
+export function presetForKeyLight(level: number | null): LightingPreset {
+  if (level === null) return 'interior';
+  return level < NIGHT_KEY_LEVEL ? 'night' : 'day';
 }
 
 /** Whether `value` names a lighting preset. */

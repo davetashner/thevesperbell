@@ -25,6 +25,7 @@ import {
   LinearFilter,
   MeshStandardMaterial,
   RGBAFormat,
+  ShaderChunk,
   type Material,
   type MeshStandardMaterialParameters,
   type Texture,
@@ -187,6 +188,7 @@ uniform float vbGradeAmount;
   uniform sampler2D vbMaskMap;
 #endif
 float vbLit = 0.0;
+float vbPunctual = 0.0;
 float vbWet = 0.0;
 float vbLuma( vec3 c ) { return dot( c, vec3( 0.2126, 0.7152, 0.0722 ) ); }
 float vbRamp( float ndl ) {
@@ -195,7 +197,10 @@ float vbRamp( float ndl ) {
   return mix( vbBandLevels.x, mix( vbBandLevels.y, vbBandLevels.z, b ), a );
 }
 void RE_Direct_Stylized( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
-  float ramp = vbRamp( dot( geometryNormal, directLight.direction ) );
+  // The ramp shapes the key (sun or moon). Point and spot lights keep Lambert: they are gameplay
+  // light, and their pools must fall off on screen as the sim's light level does (style bible §3).
+  float ndl = dot( geometryNormal, directLight.direction );
+  float ramp = mix( vbRamp( ndl ), saturate( ndl ), vbPunctual );
   reflectedLight.directDiffuse += ramp * directLight.color * BRDF_Lambert( material.diffuseColor );
   vbLit = min( 1.0, vbLit + ramp * min( 1.0, vbLuma( directLight.color ) ) );
   vec3 halfDir = normalize( directLight.direction + geometryViewDir );
@@ -244,7 +249,10 @@ const FINISH = /* glsl */ `
   // The fill's irradiance against a daylit fill of 0.25: full lift in daylight, little in a dark room.
   float vbAmbient = min( 1.0, PI * vbLuma( reflectedLight.indirectDiffuse ) / max( vbLuma( diffuseColor.rgb ), 1e-4 ) / 0.25 );
   float vbNdv = saturate( dot( normal, geometryViewDir ) );
-  float vbRim = pow( 1.0 - vbNdv, vbRimPower ) * vbRimStrength * ( 0.3 + 0.7 * vbLit ) * max( vbAmbient, vbLit );
+  // The rim picks out silhouettes where light falls (never on floors, never in the dark), so it
+  // never makes an unlit place look lit (style bible §3, gameplay-true lighting).
+  float vbUp = ( vec4( normal, 0.0 ) * viewMatrix ).y;
+  float vbRim = pow( 1.0 - vbNdv, vbRimPower ) * vbRimStrength * vbLit * ( 1.0 - smoothstep( 0.4, 0.8, vbUp ) );
   vbSurface += vbRimColour * vbRim * mix( vec3( 1.0 ), diffuseColor.rgb, 0.5 );
   vec3 vbHue = vbShadowTint / max( max3( vbShadowTint ), 1e-4 );
   vbSurface = mix( vbSurface, vbSurface * vbHue, vbShade * vbShadowHue );
@@ -256,6 +264,19 @@ const FINISH = /* glsl */ `
   if ( vbGradeAmount > 0.0 ) outgoingLight = mix( outgoingLight, vbGrade( outgoingLight ), vbGradeAmount );
 }
 `;
+
+/** Three's light loops, marking the point and spot lights so the ramp leaves them Lambertian. */
+function lightsBegin(): string {
+  const chunk = ShaderChunk.lights_fragment_begin;
+  const point = '#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )';
+  const directional = '#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )';
+  if (!chunk.includes(point) || !chunk.includes(directional)) {
+    throw new Error('stylized material: the light loops have changed shape');
+  }
+  return chunk
+    .replace(point, `vbPunctual = 1.0;\n${point}`)
+    .replace(directional, `vbPunctual = 0.0;\n${directional}`);
+}
 
 /** Replaces `include` in `source` with itself followed (or preceded) by `code`; throws if it is missing. */
 function inject(source: string, include: string, code: string, before = false): string {
@@ -272,6 +293,7 @@ export function patchStylizedShader(shader: { fragmentShader: string }): void {
   fs = inject(fs, 'emissivemap_fragment', EMISSIVE);
   fs = inject(fs, 'aomap_fragment', OCCLUSION);
   fs = inject(fs, 'opaque_fragment', FINISH, true);
+  fs = fs.replace('#include <lights_fragment_begin>', lightsBegin());
   shader.fragmentShader = fs;
 }
 

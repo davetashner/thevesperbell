@@ -74,7 +74,7 @@ import {
   type WebGLRenderer,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { StylizedMaterial, useStylizedPreset } from '../materials/index.ts';
+import { StylizedMaterial, presetForKeyLight, useStylizedPreset } from '../materials/index.ts';
 
 /** Greybox colour code by purpose (sRGB). */
 export const PURPOSE_COLOURS: Readonly<Record<KitPurpose, number>> = {
@@ -918,7 +918,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           : renderIntensity(key.level, sun.color) / Math.max(0.2, Math.abs(key.direction.y));
       sun.castShadow = key !== null;
       // The stylized material's rim and shadow tint (mw-e37.13): torchlit when there is no sun.
-      useStylizedPreset(key === null ? 'interior' : 'day');
+      useStylizedPreset(presetForKeyLight(key?.level ?? null));
       if (key !== null) {
         const { x, y, z } = key.direction;
         sunDirection.set(-x, -y, -z).normalize();
