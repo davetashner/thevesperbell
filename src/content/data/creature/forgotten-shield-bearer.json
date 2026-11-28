@@ -2,6 +2,7 @@
   "$schema": "../creature.schema.json",
   "id": "forgotten-shield-bearer",
   "family": "forgotten",
+  "faction": "forgotten",
   "tags": ["undead", "forgotten", "shield-bearer"],
   "stats": {
     "health": 90,

@@ -261,12 +261,15 @@ describe('the Briar Glen shop lane, headless (mw-ju8.5)', () => {
     markExercised(task, 'faction', 'bridge-watch');
     markExercised(task, 'faction', 'townsfolk');
     markExercised(task, 'faction', 'unaligned');
+    markExercised(task, 'faction', 'forgotten');
     const table = buildFactionTable(content.all('faction').map(factionSpecFromDef));
-    // The Forgotten name no faction, so they are unaligned: the Watch is hostile to them (and
-    // they to it), and friendly to the player and the townsfolk.
+    // The Forgotten are their own faction (mw-qfx): the Watch is hostile to them and they to it,
+    // as it still is to the unaligned, and friendly to the player and the townsfolk.
     for (const id of ['forgotten-miner', 'forgotten-brute', 'forgotten-archer']) {
-      expect(content.get('creature', id).faction).toBeUndefined();
+      expect(content.get('creature', id).faction?.id).toBe('forgotten');
     }
+    expect(table.base('bridge-watch', 'forgotten')).toBe('hostile');
+    expect(table.base('forgotten', 'bridge-watch')).toBe('hostile');
     expect(table.base('bridge-watch', 'unaligned')).toBe('hostile');
     expect(table.base('unaligned', 'bridge-watch')).toBe('hostile');
     expect(table.base('bridge-watch', 'townsfolk')).toBe('ally');

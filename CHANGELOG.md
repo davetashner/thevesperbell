@@ -588,6 +588,7 @@ check enforces this).
 
 ### Fixed
 
+- Skeletons no longer cut or shoot each other down: the Forgotten are one faction now, so their swings and arrows pass through their own kind, while fire, falling objects and your own attacks still hurt them. [mw-qfx]
 - The development build starts again: since areas began swapping in place it stopped on its title screen with a script error, and a dev server run from an agent worktree now picks up code changes. [mw-ju8.46]
 - The Gilded Tern no longer looks like a boat inside a crate: the plank-textured box around the hull, the block over the stern, the green climb pillars and the plates sticking out past the bow and stern are gone, so you see only the ship. The boarding ladder down to the pool and the ladder out of the hold are now real ladders, the figurehead sits against the bow, and the hold still looks enclosed from inside. [mw-e40.36]
 - The Gilded Tern's rope looks like rope: the lumpy braided shrouds are replaced by thin shrouds with evenly spaced ratlines down to deadeyes on the bulwarks, stays between the masts and a rope ladder up the mainmast's climb, the hold grating is a slatted hatch, and the hull's deck lumps and the mast's crude foot are cleaned away (mw-e40.27).
