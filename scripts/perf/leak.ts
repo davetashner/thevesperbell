@@ -1,5 +1,5 @@
 // Leak detector for repeated area swaps (mw-e32.12). Pure arithmetic over samples the e2e spec
-// (e2e/leak.spec.ts) takes after each cycle; kept apart so a test can feed it a leaking fixture and
+// (e2e/perf/leak.perf.ts) takes after each cycle; kept apart so a test can feed it a leaking fixture and
 // prove it fails (AC-3).
 
 /** Heap growth allowed from the early cycles to the last ones (AC-1: 5%). */
@@ -7,7 +7,6 @@ export const HEAP_GROWTH_LIMIT = 0.05;
 /** GPU resources (geometries or textures) allowed over the baseline cycle (AC-2: ±2). */
 export const GPU_COUNT_TOLERANCE = 2;
 
-/** Samples are one per cycle: index 1 is cycle 2, the baseline both checks compare against. */
 export interface LeakVerdict {
   ok: boolean;
   /** One line for the failure message. */
@@ -50,19 +49,29 @@ export function heapGrowth(
   };
 }
 
-/** A GPU resource count after each cycle returns to the baseline (cycle 2) within `tolerance`. */
+/**
+ * A GPU resource count (geometries or textures) after each cycle stays at its steady state within
+ * `tolerance`. The renderer uploads a mesh or texture the first time a frame draws it, and the
+ * area's props near the arrival point are drawn a few frames after the swap, so a count read at
+ * "ready" can sit 3 geometries and 5 textures under the settled one (a slow runner reads the settled
+ * value, a fast one the early one: mw-e06.12 saw 44 -> 47 on main's own code). The spec therefore
+ * waits for each sample to settle, and the first cycles are warm-up (the page's first swaps still
+ * carry load-time content, 55 geometries against the settled 47). Like the heap check, the start is
+ * the median of the three cycles after `HEAP_WARMUP_CYCLES` and the end the median of the last
+ * three. A leak grows every cycle, so it clears the tolerance whatever the warm-up.
+ */
 export function countsReturn(
   name: string,
   counts: readonly number[],
   tolerance: number = GPU_COUNT_TOLERANCE,
 ): LeakVerdict {
-  const baseline = counts[1];
-  const last = counts.at(-1);
-  if (baseline === undefined || last === undefined || counts.length < 3) {
-    throw new Error('countsReturn needs at least 3 cycles');
+  if (counts.length < HEAP_WARMUP_CYCLES + 6) {
+    throw new Error(`countsReturn needs at least ${String(HEAP_WARMUP_CYCLES + 6)} cycles`);
   }
+  const baseline = median(counts.slice(HEAP_WARMUP_CYCLES, HEAP_WARMUP_CYCLES + 3));
+  const last = median(counts.slice(-3));
   return {
-    ok: last - baseline <= tolerance && baseline - last <= tolerance,
+    ok: Math.abs(last - baseline) <= tolerance,
     detail: `${name} ${String(baseline)} -> ${String(last)} (tolerance ±${String(tolerance)})`,
   };
 }

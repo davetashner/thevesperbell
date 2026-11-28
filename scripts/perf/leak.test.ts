@@ -44,13 +44,39 @@ describe('countsReturn', () => {
   });
 
   it('passes counts that wobble within the tolerance, up or down', () => {
-    expect(countsReturn('textures', [50, 40, 41, 40, 42]).ok).toBe(true);
-    expect(countsReturn('textures', [50, 40, 41, 40, 38]).ok).toBe(true);
-    expect(countsReturn('textures', [50, 40, 41, 40, 37]).ok).toBe(false);
+    const series = (first: number, last: number): number[] => [
+      60,
+      55,
+      50,
+      47,
+      first,
+      first,
+      first,
+      47,
+      47,
+      47,
+      47,
+      47,
+      47,
+      47,
+      47,
+      last,
+      last,
+      last,
+    ];
+    expect(countsReturn('textures', series(40, 42)).ok).toBe(true);
+    expect(countsReturn('textures', series(40, 38)).ok).toBe(true);
+    expect(countsReturn('textures', series(40, 37)).ok).toBe(false);
+  });
+
+  it('ignores warm-up cycles and a single unsettled sample', () => {
+    // mw-e06.12: cycle 2 read 44 before the arrival props uploaded, the settled count is 47.
+    const counts = [56, 44, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 50];
+    expect(countsReturn('geometries', counts).ok).toBe(true);
   });
 
   it('refuses too few cycles', () => {
-    expect(() => countsReturn('textures', [1, 2])).toThrow(/at least 3/);
+    expect(() => countsReturn('textures', [1, 2])).toThrow(/at least 10/);
   });
 });
 

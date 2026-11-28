@@ -10,6 +10,7 @@ under Unreleased, or carries the `no-changelog` label if nothing visible changes
 check enforces this).
 
 ## [Unreleased]
+- Blink, a new arcane spell: step up to 6 m to a point in sight, never into a wall, and fall if there is no floor there; the tome "Blink: A Step Between" teaches it. [mw-e06.12]
 
 ### Added
 

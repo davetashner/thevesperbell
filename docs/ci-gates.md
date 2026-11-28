@@ -89,6 +89,7 @@ it `full`.
 | `firefox` (playwright.config.ts) | nightly, release | Audio testbed only; run by `e2e-audio`. |
 | `webkit` (playwright.config.ts) | nightly, release | Audio testbed only; run by `e2e-audio`. |
 | `ci` (playwright.perf.config.ts) | nightly, release (and `main` pushes for the baseline) | Perf budget suite in CI mode, including the wall-clock load budgets. |
+| `leak` (playwright.perf.config.ts) | nightly, release (and `main` pushes, with `ci`) | Area-swap leak check (`e2e/perf/leak.perf.ts`, mw-e32.12): 20 save and area-swap cycles; heap and renderer resource counts return to a post-warm-up baseline. Several minutes on software GL, so not in the per-PR e2e shards (mw-e32.24). |
 | `reference` (playwright.perf.config.ts) | manual | Absolute frame-time budgets on the reference machine; not runnable on CI hardware. |
 | `latency` (playwright.perf.config.ts) | manual (`pnpm perf:ref`, `pnpm perf:latency`) | Input-to-motion latency (≤ 100 ms p95 High, ≤ 133 ms Low at 30 fps) and controller (≤ 0.3 ms/tick) and camera (≤ 0.2 ms/frame) cost on the reference machine, headed Chrome with vsync on (mw-e02.8); not runnable on CI hardware. |
 | vitest unit and integration (`vite.config.ts`) | per-PR | Run once, sharded across `coverage-shard`, merged in `coverage-gate`. Locally `pnpm test:coverage` is still the whole run in one process. |
