@@ -25,7 +25,7 @@ one definition.
 | `coverage-shard` 1 to 6 (ci.yml) | per-PR | The only unit and integration test run, split into 6 parallel `vitest --shard=i/6` jobs that each upload a blob report and enforce no thresholds (`VESPER_COVERAGE_SHARD=1`); a failing test fails its shard (mw-txg). Not a required context itself; `coverage-gate` fails when any shard does. |
 | `coverage-gate` (ci.yml) | per-PR | Required aggregate: fails unless every shard passed, then `pnpm test:coverage:merge` (`vitest --merge-reports --coverage`) merges the blobs into one run, so the per-layer thresholds of contract §3 are enforced once on the merged coverage and `coverage/content-coverage.json` holds the union of every shard's exercised content; then `coverage:exclusions`, `content:coverage`, `content:loot` and the `coverage-summary` artifact the ratchet reads. |
 | `coverage-ratchet` (ci.yml) | per-PR | Coverage must not decrease versus `main`; seconds; required. |
-| `e2e-shard` 1 to 8 (ci.yml) | per-PR | Chromium e2e smoke in duration-weighted shards (`e2e/shards.json`); the behaviour gate for gameplay changes. Playwright stops itself at 15 min (`E2E_GLOBAL_TIMEOUT_MS`) so an overrunning shard still uploads its report and traces. |
+| `e2e-shard` 1 to 10 (ci.yml) | per-PR | Chromium e2e smoke in duration-weighted shards (`e2e/shards.json`); the behaviour gate for gameplay changes. Playwright stops itself at 15 min (`E2E_GLOBAL_TIMEOUT_MS`) so an overrunning shard still uploads its report and traces. |
 | `e2e-playthrough` (ci.yml) | per-PR | The slice playthrough replays a whole run; skipped with the other app jobs when the change class is not `full` (see Change classes). |
 | `e2e-smoke` (ci.yml) | per-PR | Aggregates the e2e jobs under the required check name. |
 | `perf-budget` (ci.yml) | per-PR tier skipped; runs on push to `main` | Publishes the `perf-report` baseline artifact. Warn-only on GPU-less runners, ~510 s, so it is off every PR's critical path. |
@@ -101,3 +101,25 @@ it `full`.
 - A gate moves to nightly only if it is slow or noisy and catches slowly-changing problems. Correctness
   gates for code a PR touches stay per-PR.
 - A nightly failure is triaged from the `nightly-failure` issue; fixing it is a normal bead.
+
+## e2e shard margin
+
+`e2e-shard` runs under Playwright's 900 s global timeout (`E2E_GLOBAL_TIMEOUT_MS` in ci.yml). **Target: every shard's
+Playwright wall time (`stats.duration` in its `e2e-report-<n>` artifact) stays at or under 675 s, a 25% margin.**
+Software GL frame time moves a few percent with a heavier material or a slow runner, and a shard at 14m43s of 15
+min failed four shards at once (mw-e41.34).
+
+Measured on the green main runs of PRs #544 and #546: the shard weights in `e2e/shards.json` sum about 1,100 s per
+shard on 8 shards, and wall time ran at 0.50 to 0.58 of that (specs overlap inside a shard), 495 to 822 s. At 10
+shards the planned load is about 860 to 920 weighted seconds, so a shard lands near 550 s at the worst ratio (0.60):
+a margin of about 39%, enough for the next few specs. Ten rather than nine keeps headroom as specs are added.
+
+To rebalance after adding specs or when a shard creeps past 600 s:
+
+1. Download the `e2e-report-1..N` artifacts of one or two recent green `main` runs (`gh run download <id> -p 'e2e-report-*'`).
+2. `pnpm e2e:shards:regenerate <every e2e-report.json>`, then commit `e2e/shards.json`.
+3. If the heaviest planned shard times about 0.6 still exceeds 675 s, raise the shard count in both places in
+   the `e2e-shard` job (the matrix and the `files <shard> <count>` argument) and in the table above. Don't raise
+   the global or per-test timeouts.
+4. A single spec that dominates a shard (`scenes.spec.ts` and `wendmouth-harbour-loop.spec.ts` at the time of
+   writing) can't be balanced away: split it into several spec files.
