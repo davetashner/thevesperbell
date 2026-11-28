@@ -25,7 +25,15 @@ const content = loadDevContent();
 const FACING_YAW = Math.PI / 2;
 
 /** Spawns `creature` `ahead` m in front of the knight, swings once with `button`, returns the hits. */
-function swing(creature: string, ahead: number, button: string, ticks = 60, aside = 0) {
+function swing(
+  creature: string,
+  ahead: number,
+  button: string,
+  ticks = 60,
+  aside = 0,
+  /** Which swing of the light chain to test: earlier ones are thrown at nothing, then the creature spawns. */
+  nth = 1,
+) {
   const game = createGameWorld<unknown>(RAPIER, { seed: 1, hz: 60, content, magic: true });
   const { world, player } = game;
   const look = world.get(player, PlayerLook) ?? expect.fail('no look');
@@ -46,9 +54,21 @@ function swing(creature: string, ahead: number, button: string, ticks = 60, asid
   const feet = world.get(player, CharacterController)?.position ?? expect.fail('no player');
   const spawner =
     game.creatures.spawners.get(creature) ?? expect.fail(`no spawner for ${creature}`);
-  const target: EntityId = spawner(world, { x: feet.x - ahead, y: feet.y, z: feet.z + aside }, {});
-  for (let i = 0; i < 10; i++) step();
-  step([button]);
+  const spawn = () => spawner(world, { x: feet.x - ahead, y: feet.y, z: feet.z + aside }, {});
+  let target: EntityId | undefined;
+  if (nth === 1) {
+    target = spawn();
+    for (let i = 0; i < 10; i++) step();
+    step([button]);
+  } else {
+    // Chain through the earlier swings with nothing to hit (34-tick swings, buffered presses).
+    step([button]);
+    for (let i = 1; i < nth; i++) {
+      for (let t = 0; t < (i === 1 ? 29 : 34); t++) step();
+      step([button]); // buffered into the next swing
+    }
+    target = spawn();
+  }
   for (let i = 0; i < ticks; i++) step();
   return { started: started.map((e) => e.move), hit: hits.some((h) => h.target === target) };
 }
@@ -89,4 +109,35 @@ describe('the knight’s light swing against low creatures (mw-e04.38)', () => {
     expect(swing('fixture-hound', 1.2, HEAVY, 90).hit).toBe(true);
     expect(swing('fixture-guard', 1.2, HEAVY, 90).hit).toBe(true);
   });
+});
+
+describe('the knight’s light-2 and light-3 swings against low creatures (mw-e04.40)', () => {
+  const swings = [
+    { nth: 2, move: 'sword-light-2' },
+    { nth: 3, move: 'sword-light-3' },
+  ];
+  for (const { nth, move } of swings) {
+    it(`AC-1: ${move} hits a 0.9 m fixture-hound 1.2 m in front of the knight`, ({ task }) => {
+      markExercised(task, 'move', move);
+      markExercised(task, 'creature', 'fixture-hound');
+      const result = swing('fixture-hound', 1.2, LIGHT, 60, 0, nth);
+      expect(result.started[nth - 1]).toBe(move);
+      expect(result.hit).toBe(true);
+    });
+
+    it(`AC-2: ${move} still hits a 1.8 m guard dead ahead and 0.55 m to the side at 1.2 m`, ({
+      task,
+    }) => {
+      markExercised(task, 'creature', 'fixture-guard');
+      expect(swing('fixture-guard', 1.2, LIGHT, 60, 0, nth).hit).toBe(true);
+      expect(swing('fixture-guard', 1.2, LIGHT, 60, 0.55, nth).hit).toBe(true);
+      // The overhead chop swings about the right shoulder and never covered the far left side.
+      if (nth === 2) expect(swing('fixture-guard', 1.2, LIGHT, 60, -0.55, nth).hit).toBe(true);
+    });
+
+    it(`AC-3: ${move} still misses a target 2.6 m away, low or tall`, () => {
+      expect(swing('fixture-hound', 2.6, LIGHT, 60, 0, nth).hit).toBe(false);
+      expect(swing('fixture-guard', 2.6, LIGHT, 60, 0, nth).hit).toBe(false);
+    });
+  }
 });
