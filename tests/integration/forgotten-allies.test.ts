@@ -8,7 +8,11 @@ import {
   CreatureComponent,
   DamageApplied,
   DamageModel,
+  buildFactionTable,
   factionOf,
+  factionSpecFromDef,
+  installFactions,
+  joinFaction,
   healthOf,
   type EntityId,
   World,
@@ -66,4 +70,23 @@ describe('the Forgotten are allies (mw-qfx)', () => {
     for (let i = 0; i < 60 * 180; i++) world.step();
     expect(friendly).toEqual([]);
   }, 120_000);
+
+  it('AC-7: unaligned creatures are no faction: not allies of each other, nor of a Forgotten', () => {
+    const table = buildFactionTable(content.all('faction').map(factionSpecFromDef));
+    const world = installFactions(new World<never>({ seed: 1 }));
+    const [a, b, skeleton, skeleton2] = [
+      world.spawn(),
+      world.spawn(),
+      world.spawn(),
+      world.spawn(),
+    ];
+    joinFaction(world, table, a, 'unaligned');
+    joinFaction(world, table, b, 'unaligned');
+    joinFaction(world, table, skeleton, 'forgotten');
+    joinFaction(world, table, skeleton2, 'forgotten');
+    expect(alliedByFaction(world, a, b)).toBe(false);
+    expect(alliedByFaction(world, skeleton, a)).toBe(false);
+    expect(alliedByFaction(world, a, skeleton)).toBe(false);
+    expect(alliedByFaction(world, skeleton, skeleton2)).toBe(true);
+  });
 });
