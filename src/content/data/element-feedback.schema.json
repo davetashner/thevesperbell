@@ -176,6 +176,13 @@
                 "minimum": 0,
                 "maximum": 4
               },
+              "wetness": {
+                "default": 0,
+                "description": "How wet the shared stylized material shows the surface, 0 = dry … 1 = soaked: albedo 25 % darker and a sheen. A stylized surface takes this instead of this look’s tint, roughness, metalness and reflection; other materials ignore it.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
               "pulseHz": {
                 "default": 0,
                 "description": "Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady.",

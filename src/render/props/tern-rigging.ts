@@ -8,7 +8,8 @@
 // ladder's place is the grey-box climb board's, checked against the scene in
 // tests/integration/tern-rigging.test.ts.
 
-import { Mesh, MeshStandardMaterial } from 'three';
+import { Mesh } from 'three';
+import { StylizedMaterial } from '../materials/index.ts';
 import type { SceneDressing } from '@sim/index';
 import { fadeNearCamera } from './dressing';
 import { ratlines, ropeGeometry, type Point, type Segment } from './rope';
@@ -178,7 +179,7 @@ export function loadRigging(dressings: readonly SceneDressing[]): Mesh[] {
   const rope = (name: string, segments: readonly Segment[]): Mesh => {
     const mesh = new Mesh(
       ropeGeometry(segments),
-      new MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }),
+      new StylizedMaterial({ vertexColors: true, roughness: 1, flatShading: true }),
     );
     mesh.name = `rigging:${name}`;
     mesh.castShadow = true;

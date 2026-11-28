@@ -97,13 +97,14 @@ export default defineConfig({
     // three.js alone is ~530 kB minified (~130 kB gz) in one chunk; warn only above that (mw-e00.19).
     chunkSizeWarningLimit: 600,
     rolldownOptions: {
-      // The game, plus dev testbed pages (mw-e28.1 audio, mw-e00.19 render) that e2e drives against
+      // The game, plus dev testbed pages (mw-e28.1 audio, mw-e00.19 render, mw-e37.13 materials) that e2e drives against
       // the real build.
       input: {
         main: 'index.html',
         'testbed-audio': 'testbed/audio.html',
         'testbed-render': 'testbed/render.html',
         'testbed-ui': 'testbed/ui.html',
+        'testbed-materials': 'testbed/materials.html',
       },
     },
   },

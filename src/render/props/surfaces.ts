@@ -11,7 +11,6 @@ import {
   BoxGeometry,
   Color,
   Matrix4,
-  MeshStandardMaterial,
   PlaneGeometry,
   Quaternion,
   RepeatWrapping,
@@ -21,6 +20,7 @@ import {
   type BufferGeometry,
 } from 'three';
 import type { ScenePart } from '@sim/index';
+import { StylizedMaterial } from '../materials/index.ts';
 
 /** The paintings (public/assets/surface). */
 export const PILLAR_URL = '/assets/surface/pillar-glenstone-01.webp';
@@ -96,13 +96,9 @@ export const PILLAR_TILE = 1.2;
 /** Metres one tile of the ivy covers: about a hand-span per leaf. */
 export const IVY_TILE = 1;
 
-/** A material showing the painting at `url` (tiling when `repeat`), in `fallback` colour until it loads. */
-export function paintedMaterial(
-  url: string,
-  fallback: number,
-  repeat: boolean,
-): MeshStandardMaterial {
-  const material = new MeshStandardMaterial({ color: new Color(fallback), roughness: 0.85 });
+/** A stylized material (mw-e37.13) showing the painting at `url` (tiling when `repeat`), in `fallback` colour until it loads. */
+export function paintedMaterial(url: string, fallback: number, repeat: boolean): StylizedMaterial {
+  const material = new StylizedMaterial({ color: new Color(fallback), roughness: 0.85 });
   new TextureLoader().load(
     url,
     (texture) => {

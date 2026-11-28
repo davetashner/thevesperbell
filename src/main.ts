@@ -353,6 +353,7 @@ import {
 import { anyHiddenByBody, CameraShake, liveLook, lookSettings } from '@game/camera/index';
 import { createVfxRenderer } from '@render/vfx/index';
 import { ElementLooks } from '@render/element-look';
+import { setStylizedQuality } from '@render/materials/index';
 import { ElementGrounds } from '@render/element-ground';
 import { DEATH_TINT, MagicDemo } from '@render/magic-materials/demo';
 import {
@@ -1283,8 +1284,12 @@ function startRenderer(
       tier: parseQualityParam(location.search) ?? settings.get('display.quality'),
       reducedMotion: motionReduced,
     });
+    // The stylized material (mw-e37.13) drops normal maps on Low.
+    setStylizedQuality(parseQualityParam(location.search) ?? settings.get('display.quality'));
     settings.on('display.quality', (tier) => {
-      if (parseQualityParam(location.search) === undefined) magicLooks.setTier(tier);
+      if (parseQualityParam(location.search) !== undefined) return;
+      magicLooks.setTier(tier);
+      setStylizedQuality(tier);
     });
     const magicMode = parseMagicParam(location.search);
     let magicDemo: MagicDemo | undefined;

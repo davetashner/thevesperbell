@@ -34,6 +34,7 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `states[].look.roughness` | number 0–1 | — | Roughness the surface takes (low = a specular sheen, as wet or iced things have). |
 | `states[].look.metalness` | number 0–1 | — | Metalness the surface takes; a small bump makes a wet surface throw a sheen. |
 | `states[].look.envMapIntensity` | number 0–4 | — | How strongly the surface reflects its surroundings (> 1 = a stronger sheen). |
+| `states[].look.wetness` | number 0–1 | `0` | How wet the shared stylized material shows the surface, 0 = dry … 1 = soaked: albedo 25 % darker and a sheen. A stylized surface takes this instead of this look’s tint, roughness, metalness and reflection; other materials ignore it. |
 | `states[].look.pulseHz` | number 0–3 | `0` | Glow pulses this many times a second, at most 3 (photosensitivity, style bible §7); 0 = steady. Reduced motion holds it steady. |
 | `states[].cue` | `"rising-flicker"` \| `"falling-drip"` \| `"faceted-rim"` \| `"jitter-arc"` | — | Non-colour cue the state is read by: rising-flicker (burning), falling-drip (wet), faceted-rim (frozen, still angular crystals) or jitter-arc (charged). The state’s effect must realise it. |
 | `states[].ground` | object | — | Decal laid on the ground under the entity while the state is on (wet puddle). |

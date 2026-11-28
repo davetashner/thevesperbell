@@ -28,6 +28,11 @@ export interface CombinedLook {
   readonly envMapIntensity: number | undefined;
   /** Glow pulses per second (0 = steady). */
   readonly pulseHz: number;
+  /** Wet mask for the stylized material (0 = dry … 1 = soaked): the strongest look's wetness. */
+  readonly wetness: number;
+  /** The tint of the looks that carry no wetness: a stylized surface shows wetness in their place. */
+  readonly dryTintMix: number;
+  readonly dryTint: LookRgb;
 }
 
 /** `a` moved `t` of the way to `b`. */
@@ -47,11 +52,20 @@ export function combineLooks(looks: readonly ElementLookDef[]): CombinedLook | u
   let metalness: number | undefined;
   let envMapIntensity: number | undefined;
   let pulseHz = 0;
+  let wetness = 0;
+  let dryKeep = 1;
+  let dryMixed: LookRgb = [0, 0, 0];
   for (const look of looks) {
     if (look.tint !== undefined && look.tintMix > 0) {
-      mixed = mixRgb(mixed, parseHexColour(look.tint), look.tintMix);
+      const tint = parseHexColour(look.tint);
+      mixed = mixRgb(mixed, tint, look.tintMix);
       keep *= 1 - look.tintMix;
+      if (look.wetness <= 0) {
+        dryMixed = mixRgb(dryMixed, tint, look.tintMix);
+        dryKeep *= 1 - look.tintMix;
+      }
     }
+    wetness = Math.max(wetness, look.wetness);
     if (look.emissive !== undefined && look.emissiveIntensity > 0) {
       const colour = parseHexColour(look.emissive);
       const k = look.emissiveIntensity;
@@ -65,7 +79,23 @@ export function combineLooks(looks: readonly ElementLookDef[]): CombinedLook | u
   const tintMix = 1 - keep;
   const tint: LookRgb =
     tintMix > 0 ? [mixed[0] / tintMix, mixed[1] / tintMix, mixed[2] / tintMix] : [1, 1, 1];
-  return { tintMix, tint, emissive: glow, roughness, metalness, envMapIntensity, pulseHz };
+  const dryTintMix = 1 - dryKeep;
+  const dryTint: LookRgb =
+    dryTintMix > 0
+      ? [dryMixed[0] / dryTintMix, dryMixed[1] / dryTintMix, dryMixed[2] / dryTintMix]
+      : [1, 1, 1];
+  return {
+    tintMix,
+    tint,
+    emissive: glow,
+    roughness,
+    metalness,
+    envMapIntensity,
+    pulseHz,
+    wetness,
+    dryTintMix,
+    dryTint,
+  };
 }
 
 /**
