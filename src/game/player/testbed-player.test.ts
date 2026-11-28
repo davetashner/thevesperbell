@@ -840,6 +840,75 @@ function animatedBody() {
   return { animation, poses, drops, probes, last };
 }
 
+describe('testbed player shield guard animation (mw-t4s)', () => {
+  /** A knight with sword and shield on a body, blocking or not; the guard layer's state per frame. */
+  function guardRun(animated: boolean, block: boolean) {
+    const combat = prepareTestbedCombat(content);
+    const physics = new RapierPhysics(RAPIER);
+    const world = registerSceneComponents(new World<ActionFrame>({ seed: 1, physics })).register(
+      ...HIT_VOLUME_COMPONENTS,
+      ...DAMAGE_COMPONENTS,
+      PlacementComponent,
+    );
+    const sync = new RenderSync(world);
+    const loader = new SceneLoader({
+      world,
+      sync,
+      colliders: physics,
+      content,
+      objects: { staticGeometry: () => ({}), spawn: () => ({}) },
+      binding: (object: Box) => binding(object, readSceneTransform),
+    });
+    const scene = loader.load('testbed');
+    const body = animatedBody();
+    const player = setupTestbedPlayer({
+      world,
+      scene,
+      sync,
+      tuning,
+      cameraTuning,
+      collision: new RapierCollisionWorld(physics),
+      object: {},
+      binding,
+      camera: fakeCamera(),
+      moves: combat.moves,
+      melee: combat.melee,
+      ...(animated && { animation: body.animation }),
+    });
+    startTestbedCombat(world, combat, scene.layout.spawns);
+    const sampler = new ActionSampler();
+    if (block) sampler.down('Mouse2');
+    const blockingAt: boolean[] = [];
+    const guardStates: (string | undefined)[] = [];
+    for (let i = 0; i < 60; i++) {
+      world.step(sampler.sampleCommands(world.tick));
+      player.onStep();
+      player.frame({ alpha: 1, timeMs: (i + 1) * (1000 / 60) });
+      blockingAt.push(player.readout()?.combat?.blocking === true);
+      guardStates.push(body.last()?.layers.find((l) => l.id === 'guard')?.state);
+    }
+    return { blockingAt, guardStates, hash: hashWorld(world) };
+  }
+
+  it('AC-1: holding block raises the shield on the guard layer, then holds it', () => {
+    const { guardStates } = guardRun(true, true);
+    expect(guardStates).toContain('raise');
+    expect(guardStates.at(-1)).toBe('hold');
+  });
+
+  it('AC-1: a knight that is not blocking keeps the guard layer down', () => {
+    expect(new Set(guardRun(true, false).guardStates)).toEqual(new Set(['none']));
+  });
+
+  it('AC-3: the block comes up on the same tick, and the sim hash is the same, with or without a body', () => {
+    const plain = guardRun(false, true);
+    const animated = guardRun(true, true);
+    expect(animated.blockingAt).toEqual(plain.blockingAt);
+    expect(animated.blockingAt.indexOf(true)).toBeGreaterThanOrEqual(0);
+    expect(animated.hash).toBe(plain.hash);
+  });
+});
+
 describe('testbed player animation (mw-e02.6)', () => {
   const moves = compileMoves(content.all('move'));
 
