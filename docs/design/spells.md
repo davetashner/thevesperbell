@@ -67,3 +67,21 @@ Too useful, on purpose (`tooUseful`): there are no per-object exceptions. A held
 body each tick, so it carries no speed and cannot be used as a weapon (throwing is `mw-e08.11`). A held crate
 set down on a pressure plate weighs on it like any crate.
 
+## Blink (arcane, tier 2)
+
+A short teleport (`mw-e06.12`, CONSTITUTION: "teleport several meters"): the `displace` op in `teleport` mode over a
+`summonPoint` delivery. `swap` (trade places with a creature) and `dash` modes share the same placement code
+(`src/sim/magic/displace.ts`). These are deliberately conservative first numbers; tune with playtesting.
+
+| Field | Value | Why |
+|---|---|---|
+| Mana | 20 | A fifth of a sorcerer's pool: a route-opener, not a spammable dodge |
+| Cast time / cooldown | 0.3 s / 4 s | Quick to cast, slow to repeat; balance is mana, cast time and cooldown only |
+| Range | 6 m, line of sight | Clears a 2.5 m gap with room to spare; `mw-e08.12` may raise it to its 8 m |
+| Placement | Capsule swept 0.5 m above the feet, fits back from the wall in 0.25 m steps, floor within 1 m | Never inside geometry; knee-high clutter (a plank bridge) is flown over |
+| No floor within 1 m | Arrives at the point and falls | Failure creates stories (`mw-e06.12` AC-4) |
+| Refused | `no-line-of-sight`, `no-space`, `out-of-reach` | A refusal is a gate failure: nothing is spent |
+| Noise / light | 25 dB at each end, a small flash at the arrival | Stealth hears and sees a Blink |
+
+Too useful, on purpose (`tooUseful`): no pairwise exceptions. Taught by the tome `blink` (`item/blink.json`); the
+class starts do not include it.

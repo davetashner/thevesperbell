@@ -5,6 +5,11 @@
   "notes": "Capabilities granted by knowing a spell (CONSTITUTION §4). Seeded with what the example puzzle needs and ADR-0004's fire chain, whose unlocks are src/content/data/unlock/sorcerer-fire.json (mw-e19.3).",
   "capabilities": [
     {
+      "id": "spell.blink",
+      "name": "Blink",
+      "description": "Step through open space to a point in sight, several metres away: cross a gap, reach a ledge, slip a grapple (CONSTITUTION §4)."
+    },
+    {
       "id": "spell.mage-hand",
       "name": "Mage Hand",
       "description": "Manipulate distant objects: pull a lever, lift a key or drag a crate from range (CONSTITUTION §4)."

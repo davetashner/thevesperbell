@@ -10,10 +10,12 @@ under Unreleased, or carries the `no-changelog` label if nothing visible changes
 check enforces this).
 
 ## [Unreleased]
+- Blink, a new arcane spell: step up to 6 m to a point in sight, never into a wall, and fall if there is no floor there; the tome "Blink: A Step Between" teaches it. [mw-e06.12]
 
 ### Added
 
 - Rest at campfires, shrines and inn beds: light a campfire, pick how long to rest (until dawn, until dusk or a few hours), and the clock on the HUD moves on, you heal and the world resets what resets on rest; wolves or other trouble can wake you early with part of the healing. Rest is refused while enemies hunt you or the fire is out. [mw-e27.13]
+- Books open into a two-page reader from the pack's new Open action: pages turn in pairs with the arrow keys, Q or the buttons, a torn-out page shows "Pages missing", a book in an unknown tongue reads as runes, and a Study button shows the time left and says why it is blocked when danger is near [mw-e07.9]
 - The Glen Well hides a way down: climb (or drop) down the shaft, pull the loose rung and follow the old tunnel to a flooded cistern under Bellwater Priory. A stone dropped down the well lands twice. [mw-e24.10]
 - The supply tunnel under Mooring's Watch is open: past its collapse it leads into the Deepworks' old galleries. Batter the rubble down, burn or shoot out the rotten prop to drop a step to climb from, or climb the rough face; once past, the shortcut stays open.
 - The priory road out of Market Green's east gate is open: it leads into the Briarwood's west side and on through the trees to the road up to Bellwater Priory. [mw-0qcf]
@@ -594,6 +596,7 @@ check enforces this).
 
 ### Fixed
 
+- Walking between areas no longer piles up memory in debug builds: each crossing used to keep the area you left alive, which cost about 4.6 MB a crossing. [mw-e32.12]
 - The Millweir sluice gate now faces the mill pond with its planked gate between stone piers, instead of showing a stone side on to the river. [mw-e25.30]
 - The knight raises his shield into a guard when you block: the shield comes up in front of his chest and holds there, then drops when you let go (it stayed at his side before). [mw-t4s]
 - The knight's backhand (second light swing) now cuts at hip height as it crosses in front of him, so the whole light combo connects with short creatures like hounds. [mw-e04.40]

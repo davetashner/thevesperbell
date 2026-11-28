@@ -55,6 +55,7 @@ import {
   type UiRoot,
 } from '@ui/index';
 import { itemLabel } from '../classes';
+import { isOpenableBook } from './book-study';
 import type { ScrollAim } from './scroll-read';
 
 /** The content an inventory view reads. */
@@ -190,7 +191,9 @@ export function itemVerbs(item: ItemEntry, names: VerbNames): string[] {
 }
 
 /** The sim action a screen request asks for. */
-export function requestAction(request: InventoryRequest): InventoryAction {
+export function requestAction(
+  request: Exclude<InventoryRequest, { readonly action: 'open' }>,
+): InventoryAction {
   switch (request.action) {
     case 'assign':
       return { op: 'assign', instanceId: request.itemId, slot: request.slot };
@@ -316,6 +319,7 @@ export class InventoryViews {
         (('equip' in item && item.equip !== undefined) || item.category === 'ammo');
       const actions: InventoryActionId[] = [];
       if (usable) actions.push('use', 'assign');
+      if (isOpenableBook(item)) actions.push('open');
       if (item.category === 'book' && item.book.teaches.kind === 'spell') actions.push('study');
       if (
         item.category === 'book' &&
@@ -376,6 +380,8 @@ export interface InventoryScreenOptions {
   readonly onChange?: (open: boolean) => void;
   /** Aims a scroll's spell from the current view (mw-ju8.17); without it a scroll cannot be read. */
   readonly scrollAim?: (spellId: string | undefined) => ScrollAim | undefined;
+  /** Opens the book reader (mw-e07.9) on the pack's book `instanceId`; without it Open does nothing. */
+  readonly openBook?: (instanceId: number) => void;
 }
 
 /**
@@ -455,6 +461,10 @@ export class InventoryScreenController {
     this.#screen = openInventory(ui, {
       model,
       onAction: (request) => {
+        if (request.action === 'open') {
+          this.#options.openBook?.(request.itemId);
+          return;
+        }
         const action = requestAction(request);
         if (action.op === 'read') {
           const read = this.#aimRead(action);
@@ -528,6 +538,8 @@ export interface InventoryUiOptions<T> {
   readonly giver?: ItemGiver;
   /** Aims a scroll's spell from the current view; without it a scroll cannot be read. */
   readonly scrollAim?: (spellId: string | undefined) => ScrollAim | undefined;
+  /** Opens the book reader (mw-e07.9) on the pack's book `instanceId`. */
+  readonly openBook?: (instanceId: number) => void;
   /** The player; without one only the action system is installed. */
   readonly player: EntityId | undefined;
   /** Queues a sim command for the next step. */
@@ -594,6 +606,7 @@ export function startInventoryUi<T>(options: InventoryUiOptions<T>): InventoryUi
     views,
     submit,
     ...(options.scrollAim !== undefined && { scrollAim: options.scrollAim }),
+    ...(options.openBook !== undefined && { openBook: options.openBook }),
     onChange: (open) => publish?.('inventory', open ? 'open' : 'closed'),
   });
   const hud = new QuickSlotHud({ scale: options.hudScale });

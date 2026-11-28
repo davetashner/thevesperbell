@@ -133,6 +133,7 @@ import {
 import { hintReadout, PuzzleWatch, sceneHost, startPuzzles } from '@game/puzzles/index';
 import { createCapabilityRegistry, createUnlockBook } from '@game/capabilities';
 import { createStudyRules } from '@game/items/book-study';
+import { BookReaderController } from '@game/items/book-reader';
 import { aimScroll, createScrollRules, type ScrollAim } from '@game/items/scroll-read';
 import {
   applyClass,
@@ -1564,7 +1565,7 @@ function startRenderer(
     let publishedProbe = '';
     // The AI debug overlay (mw-e11.17): loaded with the debug console (below), so release builds
     // never have it. `ai.freeze` holds the sim through simPaused; it draws before each render.
-    let aiDebug: { held(): boolean; frame(): void } | undefined;
+    let aiDebug: { held(): boolean; frame(): void; dispose(): void } | undefined;
     // The field debug overlay (mw-e03.29): loaded with the console too; undefined in release builds.
     let fieldDebug: { frame(): void } | undefined;
     let worldState: { frame(): void } | undefined;
@@ -1608,6 +1609,11 @@ function startRenderer(
         dialogueFrame?.(timeMs);
         const elapsedMs = timeMs - (lastFrameMs ?? timeMs);
         if (debugCamera?.update(elapsedMs) || publishLiveCamera) writeCameraData();
+        // The renderer's live GPU resources, every frame on ?debug=1 pages (mw-e32.12).
+        if (publishLiveCamera) {
+          const { geometries, textures } = view.renderer.info.memory;
+          root.dataset['rendererMemory'] = JSON.stringify({ geometries, textures });
+        }
         lastFrameMs = timeMs;
         deathBeat?.frame(frame.alpha);
         if (!replayPlaying()) sliceCard?.frame();
@@ -2407,6 +2413,29 @@ function startRenderer(
         magic === undefined
           ? undefined
           : createScrollRules(content, magic.pipeline, consumables.items.inventory);
+      // Opening a book from the pack (mw-e07.9): the two-page reader with a Study button, over the pack.
+      // #app[data-book-reader] (open/closed) is the e2e's readout.
+      const bookReader =
+        player === undefined
+          ? undefined
+          : new BookReaderController({
+              ui,
+              world,
+              player: player.entity,
+              content,
+              study,
+              submit: (command) => {
+                commands.push(command);
+              },
+              matchMedia: (q) => globalThis.matchMedia(q),
+              onChange: (open) => {
+                root.dataset['bookReader'] = open ? 'open' : 'closed';
+              },
+            });
+      root.dataset['bookReader'] = 'closed';
+      afterStep.push(() => {
+        bookReader?.afterStep();
+      });
       inventoryUi = startInventoryUi({
         ui,
         world,
@@ -2416,6 +2445,11 @@ function startRenderer(
         ...(scrolls !== undefined && { scrolls }),
         giver: { inventory: consumables.items.inventory, known: (id) => itemIds.has(id) },
         scrollAim: (id) => scrollAim?.(id),
+        ...(bookReader !== undefined && {
+          openBook: (instanceId) => {
+            bookReader.open(instanceId);
+          },
+        }),
         player: player?.entity,
         submit: (command) => {
           commands.push(command);
@@ -3815,6 +3849,11 @@ function startRenderer(
               root.dataset['aiDebug'] = json;
             },
           });
+          // Its click listener sits on #app, which outlives the session (mw-e32.12): a swap that
+          // left it would keep every earlier area's world reachable from the root.
+          scope.onDispose(() => {
+            aiDebug?.dispose();
+          });
           // fields / inspect / stim (mw-e03.29): element-field and light heatmaps, the property
           // inspector and the stimulus timeline. Off until a command turns it on; it only reads.
           fieldDebug = startFieldDebug({
@@ -3876,7 +3915,7 @@ function startRenderer(
     // Debug attribute (mw-e03.35 AC-4): colliders registered in the physics world.
     root.dataset['colliders'] = String(physics.count());
     // Debug attribute (mw-e32.12): the renderer's live GPU resources, so a test can see repeated
-    // in-place area swaps (mw-ju8.28) not growing them.
+    // in-place area swaps (mw-ju8.28) not growing them. Refreshed every frame by the draw callback.
     const { geometries, textures } = view.renderer.info.memory;
     root.dataset['rendererMemory'] = JSON.stringify({ geometries, textures });
     // Debug attribute (mw-e03.39): the physics objects the scene spawned.

@@ -36,6 +36,7 @@ export * from './epilogue-slideshow';
 export * from './clock-hud';
 export * from './reader-window';
 export * from './rest-window';
+export * from './book-reader';
 export * from './reticle';
 export * from './spell-hotbar';
 export * from './spell-wheel';

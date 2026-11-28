@@ -1,0 +1,28 @@
+{
+  "$schema": "../item.schema.json",
+  "id": "blink",
+  "category": "book",
+  "name": "Blink: A Step Between",
+  "description": "A thin folio with a doorway drawn on the cover and no door in it. The first exercise is to step across a puddle without crossing it.",
+  "notes": "The tome that teaches the Blink spell (mw-e06.12). Item id equals the spell id so the cover art id is ui-book-cover-blink. Licensed arcane magic, uncommon. Study time is 60 minutes. Base value 220 sits above the first-step tomes: it is a tier 2 spell and tooUseful (constitution section 4).",
+  "icon": "icon-item-blink-01",
+  "value": 220,
+  "weightClass": "light",
+  "book": {
+    "title": "Blink: A Step Between",
+    "author": "A. Pell",
+    "kind": "tome",
+    "school": "arcane",
+    "teaches": { "kind": "spell", "spell": "blink" },
+    "pages": [
+      { "textKey": "book.blink.page-1" },
+      { "textKey": "book.blink.page-2" },
+      { "textKey": "book.blink.page-3" }
+    ],
+    "language": "common",
+    "comprehensionDifficulty": 0.35,
+    "studyMinutes": 60,
+    "legality": "licensed",
+    "rarity": "uncommon"
+  }
+}

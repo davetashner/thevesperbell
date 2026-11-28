@@ -46,6 +46,7 @@ const NOT_FOR_SALE = new Set([
   'dented-iron-cap',
   'ember',
   'mage-hand',
+  'blink', // mw-e06.12: the Blink tome; world placement is E24-E26
 ]);
 
 /** The owner's shop list, as predicates over an item id and its definition. */

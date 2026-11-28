@@ -36,6 +36,14 @@ export default defineConfig({
       },
     },
     {
+      // Area-swap leak check (mw-e32.12, e2e/perf/leak.perf.ts): 20 save and area-swap cycles, heap
+      // and renderer resource counts. Several minutes on a software-GL runner, so it lives in this
+      // tier (nightly and push to main) rather than in the per-PR e2e shards (mw-e32.24).
+      name: 'leak',
+      testMatch: 'leak.perf.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       // Input-to-motion latency and controller cost (mw-e02.8, e2e/perf/latency.perf.ts): the
       // reference machine's headed Chrome with vsync ON, the page's frames paced to 60 or 30 fps.
       // Run with the reference project by `pnpm perf:ref`; reference mode, same machine.
