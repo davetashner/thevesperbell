@@ -6,7 +6,8 @@
 // caller installs this from `installGamePhysics`'s `beforeStimuli` hook):
 //   spells (the pipeline and its `cast` command) → learning → hotbar (mw-e06.16) → mana → casting (cast phase, cooldowns,
 //   `cancel-cast`) → projectiles → volumes → emission (light and noise; after projectiles so a light
-//   reads this tick's position) → tether (Mage Hand, mw-e08.10).
+//   reads this tick's position) → tether (Mage Hand, mw-e08.10). Displacement (Blink, mw-e06.12) installs
+//   after volumes; it only registers an op, a delivery and a gate.
 //
 // Spells are the game content's (`spell`), looked up by id. The player gets a mana pool and nothing
 // else: what it can cast is what it has learned (`learn-spell`, from the console until books and
@@ -28,6 +29,7 @@ import {
   installSpellProjectiles,
   installSpells,
   installRemoteHold,
+  installSpellDisplace,
   installSpellForces,
   installSpellTether,
   installSpellVolumes,
@@ -103,6 +105,10 @@ export function installGameMagic<TInput>(
     ...(options.water !== undefined && { water: options.water }),
   });
   installSpellVolumes(world, pipeline);
+  installSpellDisplace(world, pipeline, {
+    collision: options.collision,
+    ...(options.sight !== undefined && { sight: options.sight }),
+  });
   installSpellForces(world);
   installRemoteHold(world);
   installSpellEmission(world, pipeline);
