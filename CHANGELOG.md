@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- The supply tunnel under Mooring's Watch is open: past its collapse it leads into the Deepworks' old galleries. Batter the rubble down, burn or shoot out the rotten prop to drop a step to climb from, or climb the rough face; once past, the shortcut stays open.
 - The priory road out of Market Green's east gate is open: it leads into the Briarwood's west side and on through the trees to the road up to Bellwater Priory. [mw-0qcf]
 - A scene can set its air temperature (`"air": { "temperature": -5 }`): ice stays frozen in a cold room and melts faster in a warm one, and the scales room is now a cold vault so its block of ice keeps its weight. [mw-e03.62]
 - Melting ice loses weight: an ice block on a pressure plate shrinks as it thaws and lets the plate up once too little is left, a free timer puzzle (a wet crate that is only iced over keeps its weight). The chaos room has an ice block on a plate to try. [mw-e03.60]

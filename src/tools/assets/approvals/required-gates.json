@@ -1,0 +1,20 @@
+{
+  "$comment": "Owner gates each asset type (assets/CREDITS.md Type column) must pass before it ships as a final asset (mw-e37.3, style bible §17, audio bible §9). Placeholders need none. Bulk kits are covered by the style-consistency review.",
+  "concept": ["image"],
+  "texture": ["image"],
+  "ui": ["image"],
+  "icon": ["image"],
+  "portrait": ["image"],
+  "book": ["image"],
+  "vfx": ["image"],
+  "sky": ["image"],
+  "keyart": ["image"],
+  "character": ["image"],
+  "model": ["image", "turntable"],
+  "anim": ["turntable"],
+  "music": ["music-take"],
+  "sfx": ["sfx-batch"],
+  "amb": ["sfx-batch"],
+  "font": [],
+  "kit": []
+}

@@ -21,6 +21,11 @@
       "thresholds": { "lines": 100, "branches": 100, "functions": 100, "statements": 100 },
       "perFile": true
     },
+    "asset-tools": {
+      "globs": ["src/tools/assets/**"],
+      "thresholds": { "lines": 100, "branches": 100, "functions": 100, "statements": 100 },
+      "perFile": true
+    },
     "game": { "globs": ["src/game/**"], "thresholds": { "lines": 90, "branches": 90 } },
     "ui": { "globs": ["src/ui/**"], "thresholds": { "lines": 90, "branches": 90 } },
     "audio": { "globs": ["src/audio/**"], "thresholds": { "lines": 90, "branches": 90 } },
