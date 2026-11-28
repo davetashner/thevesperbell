@@ -6,6 +6,7 @@ const look = (partial: Partial<ElementLookDef>): ElementLookDef => ({
   tintMix: 0,
   emissiveIntensity: 0,
   pulseHz: 0,
+  wetness: 0,
   ...partial,
 });
 
@@ -35,6 +36,20 @@ describe('element looks (mw-e03.28)', () => {
     expect(combined?.emissive[1]).toBe(0);
     expect(combined?.roughness).toBe(0.6);
     expect(combined?.pulseHz).toBe(1);
+  });
+
+  it('mw-e37.13 AC-3: the strongest wetness wins, and the dry tint leaves out the wet looks', () => {
+    const combined = combineLooks([
+      look({ tint: '#000000', tintMix: 0.5, wetness: 0.6 }),
+      look({ tint: '#FF0000', tintMix: 0.5 }),
+      look({ wetness: 1 }),
+    ]);
+    expect(combined?.wetness).toBe(1);
+    expect(combined?.tintMix).toBeCloseTo(0.75);
+    expect(combined?.dryTintMix).toBeCloseTo(0.5);
+    expect(combined?.dryTint).toEqual([1, 0, 0]);
+    const dry = combineLooks([look({ roughness: 0.3 })]);
+    expect(dry).toMatchObject({ wetness: 0, dryTintMix: 0, dryTint: [1, 1, 1] });
   });
 
   it('a look with no tint keeps the albedo and a first roughness stands', () => {

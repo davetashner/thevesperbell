@@ -15,6 +15,7 @@
 import { Box3, Matrix4, Mesh } from 'three';
 import type { SceneDressing } from '@sim/index';
 import { readGlbMesh } from '../models/glb';
+import { stylizeMaterial } from '../materials/index.ts';
 import { MODEL_STRIPS, stripTriangles } from './model-strips';
 
 const turnMatrix = (degrees: number): Matrix4 =>
@@ -26,7 +27,7 @@ export async function loadDressing(d: SceneDressing): Promise<Mesh> {
   const model = await readGlbMesh(url);
   const strips = MODEL_STRIPS[d.model];
   const geometry = strips === undefined ? model.geometry : stripTriangles(model.geometry, strips);
-  const material = model.material;
+  const material = stylizeMaterial(model.material);
   geometry.applyMatrix4(turnMatrix(d.turn + d.yaw));
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;

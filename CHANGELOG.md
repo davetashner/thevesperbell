@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- One shared painterly material now lights the greybox kit and the textured props: soft banded light, shadows that lean dusk-violet instead of grey or black, a warm rim on silhouettes, and wet things that darken and shine.
 - Melting ice loses weight: an ice block on a pressure plate shrinks as it thaws and lets the plate up once too little is left, a free timer puzzle (a wet crate that is only iced over keeps its weight). The chaos room has an ice block on a plate to try. [mw-e03.60]
 - The chaos room has extra props for combos (an oil barrel and two crates in a row, a plate under the chandelier, a straw bale on a plate, an anvil beside a puddle and crates), and a catalogue of thirteen replayable emergent combos guards how fire, water, cold, charge, ropes and weight work together. [mw-e03.27.1]
 - Wooden crates, straw, cloth, rope and paper now soak up water from rain, rivers and splashes, soaked wood freezes in the cold and will not catch fire, with no special set-up per crate. [mw-e03.59]

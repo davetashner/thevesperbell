@@ -9,6 +9,7 @@
 // Playwright light and slice e2e specs.
 
 import { placeGeometry, readGlbMesh, type GlbModel, type Placement } from '../models/glb';
+import { stylizeMaterial } from '../materials/index.ts';
 
 export const TORCH_URL = '/assets/model/model-prop-wall-torch-01.glb';
 export const BRAZIER_URL = '/assets/model/model-prop-brazier-floor-01.glb';
@@ -58,7 +59,7 @@ function loadPlaced(key: string, url: string, placement: Placement): Promise<Glb
   const pending = readGlbMesh(url)
     .then((model) => {
       placeGeometry(model.geometry, placement, url);
-      return model;
+      return { geometry: model.geometry, material: stylizeMaterial(model.material) };
     })
     .catch((error: unknown) => {
       loading.delete(key);

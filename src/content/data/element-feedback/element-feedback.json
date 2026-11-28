@@ -63,7 +63,8 @@
         "tintMix": 0.5,
         "roughness": 0.05,
         "metalness": 0.2,
-        "envMapIntensity": 2.5
+        "envMapIntensity": 2.5,
+        "wetness": 1
       }
     },
     {

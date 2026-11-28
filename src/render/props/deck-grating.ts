@@ -3,13 +3,8 @@
 // dark hold, and two bearers under them. 1.3 m by 1.0 m and 0.3 m high, standing on its spawn point
 // like the model it replaces (dock-props.ts, PROP_MODELS['deck-grating']).
 
-import {
-  BoxGeometry,
-  Color,
-  Float32BufferAttribute,
-  MeshStandardMaterial,
-  type BufferGeometry,
-} from 'three';
+import { BoxGeometry, Color, Float32BufferAttribute, type BufferGeometry } from 'three';
+import { StylizedMaterial } from '../materials/index.ts';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { GlbModel } from '../models/glb';
 
@@ -71,6 +66,6 @@ export function buildDeckGrating(): GlbModel {
   geometry.computeBoundingSphere();
   return {
     geometry,
-    material: new MeshStandardMaterial({ vertexColors: true, roughness: 0.95, flatShading: true }),
+    material: new StylizedMaterial({ vertexColors: true, roughness: 0.95, flatShading: true }),
   };
 }

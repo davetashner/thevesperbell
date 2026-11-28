@@ -61,7 +61,6 @@ import {
   HemisphereLight,
   Matrix4,
   Mesh,
-  MeshStandardMaterial,
   PCFShadowMap,
   Quaternion,
   RepeatWrapping,
@@ -71,9 +70,11 @@ import {
   type Object3D,
   type Scene,
   type Texture,
+  type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { StylizedMaterial, useStylizedPreset } from '../materials/index.ts';
 
 /** Greybox colour code by purpose (sRGB). */
 export const PURPOSE_COLOURS: Readonly<Record<KitPurpose, number>> = {
@@ -136,13 +137,12 @@ interface StoneLoad {
   readonly amount: { value: number };
 }
 
-/** A standard material with a 1 m world-space grid drawn over it, and optionally the stone painting. */
+/** A stylized material with a 1 m world-space grid drawn over it, and optionally the stone painting. */
 function gridMaterial(
   colour: number,
   stone?: { surface: StoneSurface; load: StoneLoad },
-): MeshStandardMaterial {
-  const material = new MeshStandardMaterial({ color: new Color(colour), roughness: 0.9 });
-  material.onBeforeCompile = (shader) => {
+): StylizedMaterial {
+  const patch = (shader: WebGLProgramParametersWithUniforms): void => {
     if (stone !== undefined) {
       shader.uniforms['vbStoneMap'] = { value: stone.load.map };
       shader.uniforms['vbStoneAmount'] = stone.load.amount;
@@ -197,11 +197,11 @@ function gridMaterial(
         ['#include <color_fragment>', ...stoneColour, ...gridLines].join('\n'),
       );
   };
-  material.customProgramCacheKey = () =>
+  const key =
     stone === undefined
       ? 'greybox-grid'
       : `greybox-grid-stone-${stone.surface.faces}-${stone.surface.grid ? 'grid' : 'plain'}`;
-  return material;
+  return new StylizedMaterial({ color: new Color(colour), extension: { key, patch } });
 }
 
 /** A wedge (ramp) of `size` centred on the origin, rising towards +z; flat-shaded. */
@@ -263,10 +263,10 @@ function crateGeometry(part: ScenePart): BufferGeometry {
   return geometry;
 }
 
-const paintedMaterialCache = new Map<PaintedKind, MeshStandardMaterial>();
+const paintedMaterialCache = new Map<PaintedKind, StylizedMaterial>();
 
 /** The shared tiling material of a painted kind. */
-function paintedMaterials(kind: PaintedKind): MeshStandardMaterial {
+function paintedMaterials(kind: PaintedKind): StylizedMaterial {
   let material = paintedMaterialCache.get(kind);
   if (material === undefined) {
     material = paintedMaterial(PAINTED[kind].url, PAINTED[kind].fallback, true);
@@ -276,8 +276,8 @@ function paintedMaterials(kind: PaintedKind): MeshStandardMaterial {
 }
 
 /** The crate's painted face, on all six faces of its box (mw-va0); shared by every crate. */
-let crateMaterial: MeshStandardMaterial | undefined;
-function crateFaces(): MeshStandardMaterial {
+let crateMaterial: StylizedMaterial | undefined;
+function crateFaces(): StylizedMaterial {
   crateMaterial ??= paintedMaterial(CRATE_URL, PURPOSE_COLOURS.interactive, false);
   return crateMaterial;
 }
@@ -683,7 +683,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         const width = Math.max(MIN_ROPE_WIDTH, (rope.radius ?? 0.05) * 2) / 2;
         mesh = new Mesh(
           new CylinderGeometry(width, width, along.length(), 6),
-          new MeshStandardMaterial({
+          new StylizedMaterial({
             color: new Color(rope.support?.resistances.pierce === 1 ? CHAIN_COLOUR : ROPE_COLOUR),
             // A little glow, so a thin rope still reads across a dim room.
             emissive: new Color(
@@ -703,7 +703,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         // its light come from the light rig, which mirrors the sim (src/render/light).
         mesh = new Mesh(
           new BoxGeometry(0.1, 0.35, 0.1).translate(0, -0.25, 0),
-          new MeshStandardMaterial({ color: new Color(BRACKET_COLOUR), roughness: 0.8 }),
+          new StylizedMaterial({ color: new Color(BRACKET_COLOUR), roughness: 0.8 }),
         );
       } else if (
         spawn.prop === undefined &&
@@ -719,12 +719,14 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         const painting = liquidPaintingFor(spawn.tags);
         const material =
           painting === undefined
-            ? new MeshStandardMaterial({ color: new Color(colour) })
+            ? new StylizedMaterial({ color: new Color(colour) })
             : paintedMaterial(painting.url, colour, true);
         material.transparent = true;
         material.opacity = liquid === 'oil' ? 0.9 : painting === undefined ? 0.72 : 0.85;
         material.depthWrite = false;
         material.roughness = liquid === 'oil' ? 0.2 : 0.35;
+        // The stylized material's only specular is the wet sheen: a liquid is wet through.
+        material.wetness = 1;
         mesh = new Mesh(
           painting === undefined
             ? new PlaneGeometry(size.x, size.z).rotateX(-Math.PI / 2)
@@ -738,14 +740,14 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         // cone floating in the air.
         mesh = new Mesh(
           new BoxGeometry(SIGN_BOARD[0], SIGN_BOARD[1], SIGN_BOARD[2]),
-          new MeshStandardMaterial({ color: new Color(SIGN_COLOUR), roughness: 0.8 }),
+          new StylizedMaterial({ color: new Color(SIGN_COLOUR), roughness: 0.8 }),
         );
       } else if (spawn.prop === undefined && MARKER_CONE_TAGS.some((t) => spawn.tags.includes(t))) {
         // An arrival or the start point: a flat cone lying down, pointing the way the spawn faces
         // (+z at yaw 0). It stands on the ground, so it cannot mislead.
         mesh = new Mesh(
           new ConeGeometry(0.3, 0.8, 12),
-          new MeshStandardMaterial({ color: new Color(MARKER_COLOUR), roughness: 0.6 }),
+          new StylizedMaterial({ color: new Color(MARKER_COLOUR), roughness: 0.6 }),
         );
         mesh.rotation.x = Math.PI / 2;
         mesh.position.y = 0.3;
@@ -754,7 +756,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         // read as a thing in the world (mw-ju8.42).
         mesh = new Mesh(
           new CylinderGeometry(0.15, 0.15, 0.02, 12),
-          new MeshStandardMaterial({ color: new Color(MARKER_COLOUR), roughness: 0.6 }),
+          new StylizedMaterial({ color: new Color(MARKER_COLOUR), roughness: 0.6 }),
         );
       } else {
         mesh = new Mesh(
@@ -891,7 +893,7 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
         if (lines.length > 0) {
           const cracks = new Mesh(
             mergeGeometries(lines),
-            new MeshStandardMaterial({ color: new Color(CRACK_COLOUR), roughness: 1 }),
+            new StylizedMaterial({ color: new Color(CRACK_COLOUR), roughness: 1 }),
           );
           for (const line of lines) line.dispose();
           cracks.name = 'cracks';
@@ -915,6 +917,8 @@ export function createGreyboxView(renderer: WebGLRenderer, scene: Scene): Greybo
           ? 0
           : renderIntensity(key.level, sun.color) / Math.max(0.2, Math.abs(key.direction.y));
       sun.castShadow = key !== null;
+      // The stylized material's rim and shadow tint (mw-e37.13): torchlit when there is no sun.
+      useStylizedPreset(key === null ? 'interior' : 'day');
       if (key !== null) {
         const { x, y, z } = key.direction;
         sunDirection.set(-x, -y, -z).normalize();

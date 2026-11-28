@@ -53,6 +53,14 @@ export const elementLookSchema = z.strictObject({
     .max(4)
     .optional()
     .describe('How strongly the surface reflects its surroundings (> 1 = a stronger sheen).'),
+  wetness: z
+    .number()
+    .min(0)
+    .max(1)
+    .default(0)
+    .describe(
+      'How wet the shared stylized material shows the surface, 0 = dry … 1 = soaked: albedo 25 % darker and a sheen. A stylized surface takes this instead of this look’s tint, roughness, metalness and reflection; other materials ignore it.',
+    ),
   pulseHz: z
     .number()
     .min(0)

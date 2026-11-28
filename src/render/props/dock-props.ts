@@ -15,6 +15,7 @@
 // the drawing by the Playwright harbour spec.
 
 import { placeGeometry, readGlbMesh, type GlbModel, type Placement } from '../models/glb';
+import { stylizeMaterial } from '../materials/index.ts';
 import { buildDeckGrating } from './deck-grating';
 
 /** Where model `id` is served from. */
@@ -126,7 +127,7 @@ function load(key: string, dock: DockModel, placement: Placement): Promise<GlbMo
   const pending = readGlbMesh(url)
     .then((model) => {
       placeGeometry(model.geometry, placement, url);
-      return model;
+      return { geometry: model.geometry, material: stylizeMaterial(model.material) };
     })
     .catch((error: unknown) => {
       loading.delete(key);

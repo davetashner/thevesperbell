@@ -13,6 +13,7 @@ import {
   type Material,
   type Object3D,
 } from 'three';
+import { isStylized } from './materials/index.ts';
 
 /** What the renderer needs of a combined look (src/game/vfx's LookParams satisfies it). */
 export interface LookParams {
@@ -22,6 +23,10 @@ export interface LookParams {
   readonly roughness: number | undefined;
   readonly metalness: number | undefined;
   readonly envMapIntensity: number | undefined;
+  /** The stylized material's wet mask, and the tint it takes in place of the full one (mw-e37.13). */
+  readonly wetness: number;
+  readonly dryTintMix: number;
+  readonly dryTint: readonly [number, number, number];
 }
 
 interface Original {
@@ -111,9 +116,13 @@ function paint(material: MeshStandardMaterial, look: LookParams, glow: number): 
     material.needsUpdate = true;
   }
   material.color.copy(base.color);
-  if (look.tintMix > 0) {
-    material.color.lerp(scratch.setRGB(...look.tint, SRGBColorSpace), look.tintMix);
-  }
+  // A stylized surface (mw-e37.13) shows wetness through its own wet mask (darker albedo and a
+  // sheen), so it takes only the tint of the looks that are not wet, and no PBR sheen.
+  const stylized = isStylized(material);
+  const [tint, tintMix] = stylized ? [look.dryTint, look.dryTintMix] : [look.tint, look.tintMix];
+  if (tintMix > 0) material.color.lerp(scratch.setRGB(...tint, SRGBColorSpace), tintMix);
+  if (stylized)
+    material.wetness = isStylized(base) ? Math.max(base.wetness, look.wetness) : look.wetness;
   const [r, g, b] = look.emissive;
   const peak = Math.max(r, g, b);
   if (peak > 0) {
@@ -123,6 +132,7 @@ function paint(material: MeshStandardMaterial, look: LookParams, glow: number): 
     material.emissive.copy(base.emissive);
     material.emissiveIntensity = base.emissiveIntensity;
   }
+  if (stylized) return;
   material.roughness = look.roughness ?? base.roughness;
   material.metalness = look.metalness ?? base.metalness;
   material.envMapIntensity = look.envMapIntensity ?? base.envMapIntensity;
