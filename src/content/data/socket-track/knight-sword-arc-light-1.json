@@ -1,7 +1,7 @@
 {
   "$schema": "../socket-track.schema.json",
   "id": "knight-sword-arc-light-1",
-  "notes": "Sword light 1 (move sword-light-1, 4 active ticks): a descending diagonal slash from upper right to lower left about the chest pivot (0, 1.5, 0), yaw +55° → −55° while the blade drops from 25° raised to 12° lowered, matching the clip anim-knight-sword-light-1 (chest twists right → left as the right arm comes down). Key 0 is the pose before the first active tick.",
+  "notes": "Sword light 1 (move sword-light-1, 4 active ticks): a descending diagonal slash from upper right to lower left about the chest pivot (0, 1.5, 0), yaw +55\u00b0 \u2192 \u221255\u00b0. The first three keys are the original arc (blade level at chest height), so it hits standing targets exactly as before. The last two keys keep the original rotations, and so the blade's full reach, but lower the whole blade by 0.7 and 0.8 m: the cut drops through the waist to about 0.4 m above the ground at 1.2 m range, so a 0.9 m creature such as the fixture hound (mw-e04.38) is hit too, with no auto-aim. Pitching the blade down instead shortened its reach and missed a guard off to the side. Key 0 is the pose before the first active tick.",
   "keys": [
     {
       "position": {
@@ -45,7 +45,7 @@
     {
       "position": {
         "x": 0.0483,
-        "y": 0.0037,
+        "y": -0.6963,
         "z": -0.0928
       },
       "rotation": {
@@ -58,7 +58,7 @@
     {
       "position": {
         "x": 0.2555,
-        "y": 0.0328,
+        "y": -0.7672,
         "z": -0.1789
       },
       "rotation": {
