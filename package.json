@@ -48,6 +48,7 @@
     "asset:texture": "node scripts/assets/texture-cli.ts",
     "asset:crop": "node scripts/assets/crop-cli.ts",
     "asset:turntable": "node scripts/assets/turntable-cli.ts",
+    "asset:gen-image": "node scripts/assets/gen-image-cli.ts",
     "assets:build": "node src/tools/assets/build/build-cli.ts",
     "assets:approve": "node src/tools/assets/approvals/approve-cli.ts",
     "assets:validate": "node src/tools/assets/approvals/validate-cli.ts",
