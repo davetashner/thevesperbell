@@ -119,7 +119,54 @@ describe('the emergent combo catalogue (mw-e03.27)', () => {
     // Held down for a second or more of burning, and let go only when the bale was gone.
     expect(burningTicks).toBeGreaterThan(60);
     expect(releasedWhileAlive).toBe(false);
-    expect(changes.map((c) => c.active)).toEqual([true, false]);
+    expect(changes.filter((c) => c.entity === plate).map((c) => c.active)).toEqual([true, false]);
+  });
+
+  it('AC-4: the plate under an ice block deactivates only after the ice melts below the weight threshold', ({
+    task,
+  }) => {
+    markExercised(task, 'scene', 'chaos-room');
+    const game = createGameWorld<unknown>(RAPIER, {
+      seed: 1,
+      hz: 60,
+      scene: 'chaos-room',
+      magic: true,
+    });
+    const sim = game.world as unknown as World<never>;
+    const byId = new Map(game.scene.spawns.map(({ entity, spawn }) => [spawn.id, entity]));
+    const id = (name: string): EntityId => {
+      const found = byId.get(name);
+      if (found === undefined) throw new Error(`no spawn ${name}`);
+      return found;
+    };
+    const plate = id('combo-plate-ice');
+    const slab = id('combo-ice-slab');
+    for (let i = 0; i < 20; i++) sim.step();
+    const threshold = sim.get(plate, PlateComponent)?.minWeight ?? 0;
+    expect(sim.get(plate, PlateComponent)?.active).toBe(true);
+    applyStimulus(sim, {
+      shape: { kind: 'contact', target: slab },
+      element: 'heat',
+      intensity: 200,
+    });
+    let released: { tick: number; weight: number; frozen: boolean } | undefined;
+    let lastHeldWeight = Infinity;
+    for (let tick = 21; tick < 600 && released === undefined; tick++) {
+      sim.step();
+      const weight = readProperty(sim, slab, 'weight');
+      if (sim.get(plate, PlateComponent)?.active === false) {
+        released = { tick, weight, frozen: readProperty(sim, slab, 'frozen') };
+      } else {
+        // Still down: the ice weighs at least the threshold, and less and less as it melts.
+        expect(weight).toBeGreaterThanOrEqual(threshold - 1);
+        expect(weight).toBeLessThanOrEqual(lastHeldWeight);
+        lastHeldWeight = weight;
+      }
+    }
+    expect(released).toBeDefined();
+    expect(released?.tick).toBeGreaterThan(21);
+    expect(released?.weight).toBeLessThan(threshold);
+    expect(released?.frozen).toBe(true); // released while the ice is still there
   });
 
   it("AC-5: the chaos room's rope is the spawn before its chandelier (the e2e finds the rope by id)", ({

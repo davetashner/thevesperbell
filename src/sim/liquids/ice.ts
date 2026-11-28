@@ -12,6 +12,11 @@
 //   (FROZEN_FRAGILITY), jam their mechanisms and slick (friction drops to ice) through the rules
 //   that already read `frozen`. A frozen object above its freeze point stays at it while it spends
 //   the excess heat melting, `fusionHeat` °C per unit of wetness (like evaporation), then thaws.
+// - ice bulk (mw-e03.60): a frozen thing that is not wet (wetness < `wetThreshold`) is ice all the way
+//   through, so its `weight` falls with the share it has melted (absorbed heat over the heat it needs)
+//   and is 0 when it thaws: a block on a pressure plate releases it as it goes. A wet frozen thing
+//   (a soaked crate) only wears ice on its surface, so it keeps its weight. The weight lost is gone for
+//   good: a block that chills again starts a new melt from what is left (never from the old mass).
 // Dry objects never freeze: the cold only chills them.
 //
 // Nothing here names a liquid or an object kind.
@@ -389,25 +394,35 @@ function thingsRule(config: FreezeConfig): ElementRule {
         const slick = friction > config.iceFriction;
         assignProperty(world, entity, 'frozen', true);
         if (slick) assignProperty(world, entity, 'friction', config.iceFriction);
-        remember(world, entity, { friction: slick ? friction : -1, absorbed: 0 });
+        remember(world, entity, { friction: slick ? friction : -1, absorbed: 0, mass: -1 });
       }
       for (const entity of warm) {
         const temperature = readProperty(world, entity, 'temperature');
         const freezePoint = readProperty(world, entity, 'freezePoint');
-        const state = world.get(entity, FreezeStateComponent) ?? { friction: -1, absorbed: 0 };
+        const wetness = readProperty(world, entity, 'wetness');
+        const weight = readProperty(world, entity, 'weight');
+        const state = world.get(entity, FreezeStateComponent) ?? {
+          friction: -1,
+          absorbed: 0,
+          mass: wetness < config.wetThreshold ? weight : -1,
+        };
         if (temperature <= freezePoint) {
-          // It chilled again before it melted: the melt starts over.
-          remember(world, entity, { ...state, absorbed: 0 });
+          // It chilled again before it melted: the melt starts over, from the bulk that is left.
+          remember(world, entity, { ...state, absorbed: 0, mass: state.mass < 0 ? -1 : weight });
           continue;
         }
         const absorbed = state.absorbed + (temperature - freezePoint);
-        const need =
-          config.fusionHeat * Math.max(readProperty(world, entity, 'wetness'), config.wetThreshold);
+        const need = config.fusionHeat * Math.max(wetness, config.wetThreshold);
         if (absorbed < need) {
           setProperty(world, entity, 'temperature', freezePoint);
+          if (state.mass >= 0) {
+            const left = Math.round(state.mass * (1 - absorbed / need) * 1000) / 1000;
+            assignProperty(world, entity, 'weight', left);
+          }
           remember(world, entity, { ...state, absorbed });
           continue;
         }
+        if (state.mass >= 0) assignProperty(world, entity, 'weight', 0);
         setProperty(world, entity, 'frozen', false);
         setProperty(world, entity, 'temperature', clampTemperature(freezePoint + absorbed - need));
         if (state.friction >= 0) assignProperty(world, entity, 'friction', state.friction);

@@ -290,6 +290,27 @@
       }
     },
     {
+      "id": "combo-plate-ice",
+      "at": [-5, 0, 0.5],
+      "tags": ["combo", "plate-ice"],
+      "plate": {
+        "minWeight": 20,
+        "width": 1.5,
+        "depth": 1.5
+      }
+    },
+    {
+      "id": "combo-ice-slab",
+      "at": [-5, 0, 0.5],
+      "prop": "stone-block",
+      "tags": ["combo", "ice", "melting"],
+      "properties": {
+        "material": "ice",
+        "frozen": true,
+        "weight": 60
+      }
+    },
+    {
       "id": "combo-anvil",
       "at": [6.75, 0, 0],
       "prop": "anvil",

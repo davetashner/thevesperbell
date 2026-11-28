@@ -10,7 +10,7 @@ state hash with a golden; a broken combo names its scenario and what the player 
 New combos found in playtests are added as a file in `tests/scenarios/`; `pnpm scenarios:bless`
 records the golden hash and `pnpm scenarios:docs` regenerates this page.
 
-13 scenarios.
+14 scenarios.
 
 | Scenario | Id | Elements and mechanisms |
 | --- | --- | --- |
@@ -18,6 +18,7 @@ records the golden hash and `pnpm scenarios:docs` regenerates this page.
 | [A burning load burns away and the plate releases](#burning-straw-releases-plate) | `burning-straw-releases-plate` | fire, weight, plate, timing |
 | [A dropped chandelier trips the plate beneath it](#chandelier-trips-plate) | `chandelier-trips-plate` | fire, rope, weight, plate |
 | [A flame thaws a frozen crate, but the wet wood will not light](#flame-thaws-frozen-crate-but-wet-wood-wont-burn) | `flame-thaws-frozen-crate-but-wet-wood-wont-burn` | fire, ice, water, thaw, wetness |
+| [A melting ice block lets the plate up](#ice-block-melts-off-plate) | `ice-block-melts-off-plate` | fire, ice, weight, plate, timing |
 | [Heat melts the ice block](#ice-block-thaws-when-heated) | `ice-block-thaws-when-heated` | fire, ice, thaw, timing |
 | [Light the oil barrel and the fire runs down the row](#oil-barrel-chain-ignition) | `oil-barrel-chain-ignition` | fire, oil, spread |
 | [Cold freezes the wet crate and leaves the dry one](#only-wet-things-freeze) | `only-wet-things-freeze` | ice, water, cold, wetness |
@@ -96,6 +97,30 @@ Outcomes:
 - tick 60: The crate is frozen solid. (`frozen` of freeze-crate-1 eq true)
 - tick 1300: The ice has melted. (`frozen` of freeze-crate-1 eq false)
 - tick 1300: The wet crate never caught fire. (`burning` of freeze-crate-1 ne true)
+
+## A melting ice block lets the plate up
+
+<a id="ice-block-melts-off-plate"></a>
+
+A block of ice sits on a pressure plate and holds it down. You hold a flame to it. The block stays frozen but shrinks as it melts, and the plate clicks back up while the ice is still there, once too little of it is left to press.
+
+Setup: A plate (it needs 20 kg) with a 60 kg ice block resting on it.
+
+Inputs:
+- tick 30: heat stimulus of 200 at combo-ice-slab (radius 1 m)
+
+Outcomes:
+- tick 20: The plate is held down by the ice. (`plate.active` of combo-plate-ice eq true)
+- tick 20: The block is still ice. (`frozen` of combo-ice-slab eq true)
+- tick 120: The block has shrunk as it melts. (`weight` of combo-ice-slab lt 50)
+- tick 120: There is still plenty of ice on the plate. (`weight` of combo-ice-slab gt 20)
+- tick 120: The plate is still down while enough ice is left. (`plate.active` of combo-plate-ice eq true)
+- tick 250: The block is still ice, only smaller. (`frozen` of combo-ice-slab eq true)
+- tick 250: Too little ice is left to press the plate. (`weight` of combo-ice-slab lt 20)
+- tick 250: The plate has clicked back up, with the ice still there. (`plate.active` of combo-plate-ice eq false)
+- tick 450: The block has melted through. (`frozen` of combo-ice-slab eq false)
+- tick 450: Nothing is left to weigh on the plate. (`weight` of combo-ice-slab eq 0)
+- tick 450: The plate stays up. (`plate.active` of combo-plate-ice eq false)
 
 ## Heat melts the ice block
 

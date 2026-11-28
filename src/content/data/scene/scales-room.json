@@ -135,6 +135,7 @@
       "properties": {
         "material": "ice",
         "frozen": true,
+        "freezePoint": 30,
         "weight": 60
       }
     },
