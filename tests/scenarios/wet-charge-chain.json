@@ -1,0 +1,57 @@
+{
+  "id": "wet-charge-chain",
+  "title": "Charge runs through a puddle into a soaked crate",
+  "description": "An iron anvil, a puddle and two crates touch one another. You soak one crate, then shock the anvil. The charge runs through the puddle into the soaked crate. The dry crate beside the puddle takes none.",
+  "tags": ["charge", "water", "wetness", "conduction"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The anvil, puddle and two crates in the east pocket, all touching the puddle.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "water",
+        "at": "combo-wet-crate",
+        "radius": 1,
+        "intensity": 5
+      }
+    },
+    {
+      "tick": 40,
+      "stimulus": {
+        "element": "charge",
+        "at": "combo-anvil",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 42,
+      "target": {
+        "spawn": "combo-wet-crate"
+      },
+      "reading": "charge",
+      "op": "gt",
+      "value": 10,
+      "sees": "The soaked crate crackles with charge."
+    },
+    {
+      "tick": 42,
+      "target": {
+        "spawn": "combo-dry-crate"
+      },
+      "reading": "charge",
+      "op": "eq",
+      "value": 0,
+      "sees": "The dry crate stays quiet."
+    }
+  ],
+  "ticks": 43,
+  "golden": {
+    "finalHash": "c7aa65c3"
+  }
+}

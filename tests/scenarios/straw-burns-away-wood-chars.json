@@ -1,0 +1,93 @@
+{
+  "id": "straw-burns-away-wood-chars",
+  "title": "Straw burns away; wood leaves charcoal",
+  "description": "You light a haystack and a wooden crate with the same flame and let them burn out. The straw is gone without a trace; the crate remains as charred wood.",
+  "tags": ["fire", "material", "fuel"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "A haystack and a crate on the fire station, with short fuel so they burn out quickly.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "set": {
+        "target": "fire-haystack",
+        "property": "fuel",
+        "value": 5
+      }
+    },
+    {
+      "tick": 10,
+      "set": {
+        "target": "fire-crate-2",
+        "property": "fuel",
+        "value": 5
+      }
+    },
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "fire-haystack",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    },
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "fire-crate-2",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "fire-crate-2"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The crate is burning."
+    },
+    {
+      "tick": 900,
+      "target": {
+        "spawn": "fire-haystack"
+      },
+      "reading": "alive",
+      "op": "eq",
+      "value": false,
+      "sees": "The haystack has burnt away entirely."
+    },
+    {
+      "tick": 900,
+      "target": {
+        "spawn": "fire-crate-2"
+      },
+      "reading": "alive",
+      "op": "eq",
+      "value": true,
+      "sees": "The crate is still there."
+    },
+    {
+      "tick": 900,
+      "target": {
+        "spawn": "fire-crate-2"
+      },
+      "reading": "material",
+      "op": "eq",
+      "value": "charred",
+      "sees": "The crate is blackened, charred wood."
+    }
+  ],
+  "ticks": 901,
+  "golden": {
+    "finalHash": "1e7ae750"
+  }
+}

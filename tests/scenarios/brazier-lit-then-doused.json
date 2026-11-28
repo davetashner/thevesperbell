@@ -1,0 +1,57 @@
+{
+  "id": "brazier-lit-then-doused",
+  "title": "Light the brazier, then douse it",
+  "description": "You set a flame to an unlit brazier and it flares up. A splash of water puts it out again.",
+  "tags": ["fire", "water", "light", "extinguish"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The unlit brazier on the fire station.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "fire-brazier",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    },
+    {
+      "tick": 70,
+      "stimulus": {
+        "element": "water",
+        "at": "fire-brazier",
+        "radius": 1,
+        "intensity": 5
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "fire-brazier"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The brazier is lit."
+    },
+    {
+      "tick": 120,
+      "target": {
+        "spawn": "fire-brazier"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The brazier is out."
+    }
+  ],
+  "ticks": 121,
+  "golden": {
+    "finalHash": "62364ec4"
+  }
+}

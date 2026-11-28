@@ -1,0 +1,76 @@
+{
+  "id": "soaked-crate-refuses-to-burn",
+  "title": "A soaked crate will not burn",
+  "description": "You douse one crate with water, then hold the same flame to it and to a dry crate beside it. The dry one burns; the soaked one only steams.",
+  "tags": ["fire", "water", "wetness"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "Two crates on the fire station, one soaked first.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "water",
+        "at": "fire-crate-1",
+        "radius": 1,
+        "intensity": 5
+      }
+    },
+    {
+      "tick": 20,
+      "stimulus": {
+        "element": "heat",
+        "at": "fire-crate-1",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    },
+    {
+      "tick": 20,
+      "stimulus": {
+        "element": "heat",
+        "at": "fire-crate-2",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 300,
+      "target": {
+        "spawn": "fire-crate-2"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The dry crate burns."
+    },
+    {
+      "tick": 300,
+      "target": {
+        "spawn": "fire-crate-1"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The soaked crate does not catch."
+    },
+    {
+      "tick": 15,
+      "target": {
+        "spawn": "fire-crate-1"
+      },
+      "reading": "wetness",
+      "op": "gte",
+      "value": 0.5,
+      "sees": "The crate is soaked through."
+    }
+  ],
+  "ticks": 301,
+  "golden": {
+    "finalHash": "8bc2dc72"
+  }
+}

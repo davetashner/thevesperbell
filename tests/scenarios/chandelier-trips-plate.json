@@ -1,0 +1,66 @@
+{
+  "id": "chandelier-trips-plate",
+  "title": "A dropped chandelier trips the plate beneath it",
+  "description": "A pressure plate sits on the floor under the chandelier. You burn the rope; when the chandelier lands, the plate clicks down under its weight.",
+  "tags": ["fire", "rope", "weight", "plate"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The chandelier's rope plus the plate directly under it.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "set": {
+        "target": "combo-rope",
+        "property": "fuel",
+        "value": 2
+      }
+    },
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "combo-rope",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "combo-plate-chandelier"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": false,
+      "sees": "The plate is up while the chandelier hangs above it."
+    },
+    {
+      "tick": 600,
+      "target": {
+        "spawn": "combo-plate-chandelier"
+      },
+      "reading": "plate.active",
+      "op": "eq",
+      "value": true,
+      "sees": "The plate is pressed down by the fallen chandelier."
+    },
+    {
+      "tick": 600,
+      "target": {
+        "spawn": "combo-plate-chandelier"
+      },
+      "reading": "plate.weight",
+      "op": "gte",
+      "value": 10,
+      "sees": "The plate carries the chandelier's weight."
+    }
+  ],
+  "ticks": 601,
+  "golden": {
+    "finalHash": "819dc248"
+  }
+}

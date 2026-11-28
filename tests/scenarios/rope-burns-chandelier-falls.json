@@ -1,0 +1,76 @@
+{
+  "id": "rope-burns-chandelier-falls",
+  "title": "Burn the rope, the chandelier falls",
+  "description": "You set a flame to the rope that holds the chandelier. The hemp burns through and the chandelier drops to the floor.",
+  "tags": ["fire", "rope", "support"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The rope and chandelier hanging in the open centre of the room.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "set": {
+        "target": "combo-rope",
+        "property": "fuel",
+        "value": 2
+      }
+    },
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "combo-rope",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "combo-rope"
+      },
+      "reading": "burning",
+      "op": "eq",
+      "value": true,
+      "sees": "The rope is on fire."
+    },
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "combo-chandelier"
+      },
+      "reading": "suspended",
+      "op": "eq",
+      "value": true,
+      "sees": "The chandelier still hangs while the rope burns."
+    },
+    {
+      "tick": 600,
+      "target": {
+        "spawn": "combo-chandelier"
+      },
+      "reading": "suspended",
+      "op": "eq",
+      "value": false,
+      "sees": "The chandelier has come loose from the burnt rope."
+    },
+    {
+      "tick": 600,
+      "target": {
+        "spawn": "combo-chandelier"
+      },
+      "reading": "position.y",
+      "op": "lt",
+      "value": 1.5,
+      "sees": "The chandelier lies on the floor."
+    }
+  ],
+  "ticks": 601,
+  "golden": {
+    "finalHash": "819dc248"
+  }
+}

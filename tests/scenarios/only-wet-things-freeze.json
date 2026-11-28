@@ -1,0 +1,76 @@
+{
+  "id": "only-wet-things-freeze",
+  "title": "Cold freezes the wet crate and leaves the dry one",
+  "description": "You soak one crate and chill both it and a dry crate beside it. The wet crate freezes solid; the dry one just gets cold.",
+  "tags": ["ice", "water", "cold", "wetness"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "Two crates on the freeze station, one soaked first.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "water",
+        "at": "freeze-crate-1",
+        "radius": 0.5,
+        "intensity": 1
+      }
+    },
+    {
+      "tick": 20,
+      "stimulus": {
+        "element": "cold",
+        "at": "freeze-crate-1",
+        "radius": 0.5,
+        "intensity": 60
+      }
+    },
+    {
+      "tick": 20,
+      "stimulus": {
+        "element": "cold",
+        "at": "freeze-crate-2",
+        "radius": 0.5,
+        "intensity": 60
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "freeze-crate-1"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": true,
+      "sees": "The wet crate is frozen solid."
+    },
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "freeze-crate-2"
+      },
+      "reading": "frozen",
+      "op": "ne",
+      "value": true,
+      "sees": "The dry crate is not frozen."
+    },
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "freeze-crate-2"
+      },
+      "reading": "temperature",
+      "op": "lt",
+      "value": 15,
+      "sees": "The dry crate has only chilled."
+    }
+  ],
+  "ticks": 61,
+  "golden": {
+    "finalHash": "56be1ade"
+  }
+}

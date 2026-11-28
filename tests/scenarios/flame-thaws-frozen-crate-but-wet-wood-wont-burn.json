@@ -1,0 +1,76 @@
+{
+  "id": "flame-thaws-frozen-crate-but-wet-wood-wont-burn",
+  "title": "A flame thaws a frozen crate, but the wet wood will not light",
+  "description": "You soak a crate and freeze it solid, then play a flame over it. The ice melts away, but the crate is still so wet it never catches fire.",
+  "tags": ["fire", "ice", "water", "thaw", "wetness"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "A crate on the freeze station.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "water",
+        "at": "freeze-crate-1",
+        "radius": 0.5,
+        "intensity": 1
+      }
+    },
+    {
+      "tick": 20,
+      "stimulus": {
+        "element": "cold",
+        "at": "freeze-crate-1",
+        "radius": 0.5,
+        "intensity": 60
+      }
+    },
+    {
+      "tick": 70,
+      "stimulus": {
+        "element": "heat",
+        "at": "freeze-crate-1",
+        "radius": 0.5,
+        "intensity": 600
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 60,
+      "target": {
+        "spawn": "freeze-crate-1"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": true,
+      "sees": "The crate is frozen solid."
+    },
+    {
+      "tick": 1300,
+      "target": {
+        "spawn": "freeze-crate-1"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": false,
+      "sees": "The ice has melted."
+    },
+    {
+      "tick": 1300,
+      "target": {
+        "spawn": "freeze-crate-1"
+      },
+      "reading": "burning",
+      "op": "ne",
+      "value": true,
+      "sees": "The wet crate never caught fire."
+    }
+  ],
+  "ticks": 1301,
+  "golden": {
+    "finalHash": "fc843f77"
+  }
+}

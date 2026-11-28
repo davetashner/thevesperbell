@@ -1,0 +1,48 @@
+{
+  "id": "ice-block-thaws-when-heated",
+  "title": "Heat melts the ice block",
+  "description": "A block of ice stands on the freeze station. You hold a flame to it. It stays frozen a while, soaking up the heat, then melts through.",
+  "tags": ["fire", "ice", "thaw", "timing"],
+  "scene": "chaos-room",
+  "setup": {
+    "props": "The ice block on the freeze station.",
+    "properties": []
+  },
+  "inputs": [
+    {
+      "tick": 10,
+      "stimulus": {
+        "element": "heat",
+        "at": "freeze-ice-block",
+        "radius": 1,
+        "intensity": 200
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "tick": 20,
+      "target": {
+        "spawn": "freeze-ice-block"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": true,
+      "sees": "The block is still ice."
+    },
+    {
+      "tick": 700,
+      "target": {
+        "spawn": "freeze-ice-block"
+      },
+      "reading": "frozen",
+      "op": "eq",
+      "value": false,
+      "sees": "The block has thawed."
+    }
+  ],
+  "ticks": 701,
+  "golden": {
+    "finalHash": "d8b362ea"
+  }
+}
