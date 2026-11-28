@@ -128,6 +128,15 @@ function checkChannel(what: string, spec: ChannelSpec): ChannelSpec {
   return { ambient, min, max, diffusion, decay, epsilon };
 }
 
+/**
+ * The field config for a scene whose air is `temperature` °C (mw-e03.62): the temperature channel's
+ * ambient, which cells relax toward, calm is measured against and sleeping chunks settle to. With no
+ * temperature (an unauthored scene) it is the empty input, so the field is the default 20 °C one.
+ */
+export function airFieldConfig(temperature?: number): FieldConfigInput {
+  return temperature === undefined ? {} : { temperature: { ambient: temperature } };
+}
+
 function checkCount(what: string, value: number): number {
   if (!Number.isSafeInteger(value) || value < 1) fail(what, 'must be a positive integer');
   return value;

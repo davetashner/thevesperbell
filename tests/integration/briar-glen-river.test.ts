@@ -172,6 +172,13 @@ describe('Briar Glen Quay and the Stone Stair (mw-e25.11)', { timeout: 120_000 }
     expect(river.dressings.map((d) => d.model)).toContain('model-prop-wharf-crane-01');
   });
 
+  it('the weir sluice gate model is unturned, so its front (planks between stone piers) faces the pond across the flow (mw-e25.30)', () => {
+    const gate = river.dressings.find((d) => d.id === 'weir-sluice-gate');
+    expect(gate?.turn).toBe(0);
+    // The model is 1.79 wide (z) and 1.02 deep (x): unturned it spans the channel along z.
+    expect(gate?.size[2]).toBeGreaterThan(gate?.size[0] ?? Infinity);
+  });
+
   it('AC-1: the slide from the cutting hall lands at the quay within 10 s and sets the stair fact', ({
     task,
   }) => {
