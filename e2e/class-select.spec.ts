@@ -181,13 +181,18 @@ test('?class=thief applies the thief at boot, and the default boot has no class'
   expect(problems).toEqual([]);
 });
 
-test('AC-5: a new game offers only the Knight; locked cards cannot be confirmed and the run starts as the knight', async ({
+// AC-5 is split in three, each with its own page load: one test doing all of it ran about 32 s on CI's
+// software-GL runners against the 30 s limit, since every action waits on a frame (mw-e37.13.1).
+async function openSelect(page: Page) {
+  await page.goto('/?scene=testbed&newgame');
+  await expect(page.locator('[data-screen="class-select"]')).toBeVisible({ timeout: 10_000 });
+}
+
+test('AC-5: a new game offers only the Knight, with the other three locked and accessible', async ({
   page,
 }) => {
   const problems = collectProblems(page);
-  await page.goto('/?scene=testbed&newgame');
-  await expect(page.locator('[data-screen="class-select"]')).toBeVisible({ timeout: 10_000 });
-
+  await openSelect(page);
   // AC-1 in the browser: four cards, Knight focused, the other three locked with a badge and the
   // reason as their accessible description.
   const opened = await selectState(page);
@@ -201,7 +206,14 @@ test('AC-5: a new game offers only the Knight; locked cards cannot be confirmed 
   ]);
   expect(opened.focused).toBe('knight');
   expect(await seriousAxeViolations(page)).toEqual([]);
+  expect(problems).toEqual([]);
+});
 
+test('AC-5: a locked card takes focus, but neither Enter nor a click picks it', async ({
+  page,
+}) => {
+  const problems = collectProblems(page);
+  await openSelect(page);
   // AC-2: a locked card takes focus, but neither Enter nor a mouse click picks it, and Confirm is
   // disabled with the same reason.
   await page.keyboard.press('ArrowRight');
@@ -220,9 +232,14 @@ test('AC-5: a new game offers only the Knight; locked cards cannot be confirmed 
   expect(clicked.confirmDisabled).toBe(true);
   expect(clicked.confirmDescription).toBe(REASON);
   expect(clicked.playerClass).toBe('');
+  expect(problems).toEqual([]);
+});
 
+test('AC-5: the Knight card starts the run as the knight', async ({ page }) => {
+  const problems = collectProblems(page);
+  await openSelect(page);
   // The Knight: a click highlights it and moves focus to Confirm; Enter starts the run.
-  const knight = cardOf(clicked, 'knight');
+  const knight = cardOf(await selectState(page), 'knight');
   await page.mouse.click(knight.x, knight.y);
   await page.keyboard.press('Enter');
   const entered = await selectState(page);
