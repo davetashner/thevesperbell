@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "chaos-room",
   "name": "Chaos room",
-  "description": "A greybox dev and test room for the element rules (mw-e03.54), reached with ?scene=chaos-room. A 24 m by 16 m hall with four spaced stations along the north side: fire (crates, a haystack, an oil barrel and an unlit brazier), wet (a water trough and two dry crates), freeze (an ice block, two crates and a puddle) and charge (an iron anvil, a crate and barrel and a puddle). Along the south wall six crates stand 3 m apart for the identification playtest (put each in a different state and ask what it is). The middle of the hall is left open for combo scenarios, with a pressure plate and a chandelier on a rope. Every object is spaced so fire in one cannot reach another. The crates in every station but fire can be soaked and freeze below 0 C (wetness, absorbency and freezePoint set on the spawn), because a plain wooden crate has no wetness to raise and no freezing point.",
+  "description": "A greybox dev and test room for the element rules (mw-e03.54), reached with ?scene=chaos-room. A 24 m by 16 m hall with four spaced stations along the north side: fire (crates, a haystack, an oil barrel and an unlit brazier), wet (a water trough and two dry crates), freeze (an ice block, two crates and a puddle) and charge (an iron anvil, a crate and barrel and a puddle). Along the south wall six crates stand 3 m apart for the identification playtest (put each in a different state and ask what it is). The middle of the hall is left open for combo scenarios, with a pressure plate and a chandelier on a rope. Every object is spaced so fire in one cannot reach another.",
   "grid": 1,
   "camera": {
     "position": [-14, 16, -14],
@@ -99,23 +99,13 @@
       "id": "wet-crate-1",
       "at": [-4.5, 0, 3],
       "prop": "crate",
-      "tags": ["station-wet"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["station-wet"]
     },
     {
       "id": "wet-crate-2",
       "at": [-1.5, 0, 3],
       "prop": "crate",
-      "tags": ["station-wet"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["station-wet"]
     },
     {
       "id": "freeze-ice-block",
@@ -132,23 +122,13 @@
       "id": "freeze-crate-1",
       "at": [2, 0, 3],
       "prop": "crate",
-      "tags": ["station-freeze"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["station-freeze"]
     },
     {
       "id": "freeze-crate-2",
       "at": [4, 0, 3],
       "prop": "crate",
-      "tags": ["station-freeze"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["station-freeze"]
     },
     {
       "id": "freeze-puddle",
@@ -170,12 +150,7 @@
       "id": "charge-crate",
       "at": [10.5, 0, 3],
       "prop": "crate",
-      "tags": ["station-charge"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["station-charge"]
     },
     {
       "id": "charge-puddle",
@@ -197,67 +172,37 @@
       "id": "ident-1",
       "at": [-7.5, 0, -6],
       "prop": "crate",
-      "tags": ["ident"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["ident"]
     },
     {
       "id": "ident-2",
       "at": [-4.5, 0, -6],
       "prop": "crate",
-      "tags": ["ident"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["ident"]
     },
     {
       "id": "ident-3",
       "at": [-1.5, 0, -6],
       "prop": "crate",
-      "tags": ["ident"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["ident"]
     },
     {
       "id": "ident-4",
       "at": [1.5, 0, -6],
       "prop": "crate",
-      "tags": ["ident"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["ident"]
     },
     {
       "id": "ident-5",
       "at": [4.5, 0, -6],
       "prop": "crate",
-      "tags": ["ident"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["ident"]
     },
     {
       "id": "ident-6",
       "at": [7.5, 0, -6],
       "prop": "crate",
-      "tags": ["ident"],
-      "properties": {
-        "absorbency": 1,
-        "freezePoint": 0,
-        "wetness": 0
-      }
+      "tags": ["ident"]
     },
     {
       "id": "combo-plate",
