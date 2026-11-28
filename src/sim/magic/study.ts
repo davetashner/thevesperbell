@@ -270,11 +270,24 @@ export class StudyRules {
       book: bookId,
       progress: this.progressOf(world, actor, bookId),
     });
-    const left = def.studyMinutes * STUDY_MILLI - (state.progress[bookId] ?? 0);
-    return {
-      status: 'started',
-      minutesLeft: Math.ceil(left / this.#bonusMilli(world, actor)),
-    };
+    return { status: 'started', minutesLeft: this.minutesLeft(world, actor, bookId) };
+  }
+
+  /**
+   * Game minutes an uninterrupted study of `bookId` would still take `actor` now: the desk bonus
+   * counts, and so does progress already made. 0 for a book that teaches no spell. `start` reports
+   * this same number, and the UI asks it rather than working it out again.
+   */
+  minutesLeft(world: World<never>, actor: EntityId, bookId: string): number {
+    const def = this.#options.books(bookId);
+    if (def === undefined) return 0;
+    const left = def.studyMinutes * STUDY_MILLI - (studyOf(world, actor)?.progress[bookId] ?? 0);
+    return Math.ceil(left / this.#bonusMilli(world, actor));
+  }
+
+  /** Whether an Alerted or fighting creature is near enough that `start` would refuse as `unsafe`. */
+  unsafe(world: World<never>, actor: EntityId): boolean {
+    return this.#threatNear(world, actor);
   }
 
   /** Stops `actor`'s session, keeping its progress. Returns whether one was running. */

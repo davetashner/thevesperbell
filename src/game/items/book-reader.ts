@@ -13,18 +13,13 @@
 //   study events and its estimate follows the world after every step.
 
 import {
-  BrainComponent,
   classOf,
   inventoryActionCommand,
   inventoryOf,
   knowsSpell,
-  PlacementComponent,
   SpellLearned,
   StudyEnded,
   StudyStarted,
-  studyOf,
-  STUDY_MILLI,
-  TagsComponent,
   type EntityId,
   type InventoryActionCommand,
   type StudyRules,
@@ -56,12 +51,6 @@ export const READABLE_LANGUAGES: readonly string[] = ['common'];
 /** The content the reader reads. */
 export type BookReaderContent = Pick<GameContent, 'all' | 'get'>;
 
-const within = (
-  a: { readonly x: number; readonly y: number; readonly z: number },
-  b: { readonly x: number; readonly y: number; readonly z: number },
-  metres: number,
-): boolean => (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 <= metres * metres;
-
 /** The Study button's state for `book`, or undefined when it teaches no spell. */
 export function studyView(
   world: World<never>,
@@ -73,19 +62,7 @@ export function studyView(
   const { teaches } = book.book;
   if (teaches.kind !== 'spell') return undefined;
   const spell = teaches.spell.id;
-  const { config } = rules;
-  const here = world.get(actor, PlacementComponent);
-  // The minutes left at the speed `StudyRules.start` would study at: the desk bonus counts.
-  let bonus = STUDY_MILLI;
-  if (here !== undefined && world.isRegistered(TagsComponent)) {
-    world.query(TagsComponent, PlacementComponent).forEach((_id, tags, at) => {
-      if (tags.includes(config.deskTag) && within(here, at, config.deskRangeM)) {
-        bonus = config.deskBonusMilli;
-      }
-    });
-  }
-  const effort = studyOf(world, actor)?.progress[book.id] ?? 0;
-  const minutes = Math.ceil((book.book.studyMinutes * STUDY_MILLI - effort) / bonus);
+  const minutes = rules.minutesLeft(world, actor, book.id);
   if (rules.isKnownBook(world, actor, book.id) || knowsSpell(world, actor, spell)) {
     return { minutes, known: true };
   }
@@ -95,19 +72,7 @@ export function studyView(
   }
   if (rules.studying(world, actor) !== undefined)
     return { minutes, blocked: BOOK_READER_REASONS.busy };
-  const found = { threat: false };
-  if (here !== undefined && world.isRegistered(BrainComponent)) {
-    world.query(BrainComponent, PlacementComponent).forEach((id, brain, at) => {
-      if (
-        id !== actor &&
-        config.threatStates.includes(brain.state) &&
-        within(here, at, config.threatRangeM)
-      ) {
-        found.threat = true;
-      }
-    });
-  }
-  if (found.threat) return { minutes, blocked: BOOK_READER_REASONS.unsafe };
+  if (rules.unsafe(world, actor)) return { minutes, blocked: BOOK_READER_REASONS.unsafe };
   return { minutes };
 }
 

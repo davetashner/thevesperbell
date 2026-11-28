@@ -186,6 +186,41 @@ describe('studying a book (mw-e07.2)', () => {
     expect(r.ended[0]?.progress).toBe(1);
   });
 
+  it('AC-1: minutesLeft counts the desk and prior progress, matches start, and is 0 for an unknown book', () => {
+    const r = rig();
+    expect(r.rules.minutesLeft(r.world, r.player, SORCERER_BOOK.id)).toBe(60);
+    expect(r.rules.minutesLeft(r.world, r.player, 'no-such-book')).toBe(0);
+    const desk = r.world.spawn();
+    placeEntity(r.world, desk, { x: 1, y: 0, z: 0 }, 0.5);
+    tagEntity(r.world, desk, 'desk');
+    r.world.step();
+    const left = r.rules.minutesLeft(r.world, r.player, SORCERER_BOOK.id);
+    expect(left).toBe(40);
+    expect(r.rules.start(r.world, r.player, SORCERER_BOOK.id)).toEqual({
+      status: 'started',
+      minutesLeft: left,
+    });
+    r.step(slices(2));
+    r.rules.cancel(r.world, r.player);
+    expect(r.rules.minutesLeft(r.world, r.player, SORCERER_BOOK.id)).toBeLessThan(left);
+  });
+
+  it('AC-1: minutesLeft of a non-student is the whole book', () => {
+    const r = rig({ student: false });
+    expect(r.rules.minutesLeft(r.world, r.player, SORCERER_BOOK.id)).toBe(60);
+  });
+
+  it('AC-2: unsafe is true only with an alerted or fighting creature in range, as start refuses', () => {
+    const r = rig();
+    expect(r.rules.unsafe(r.world, r.player)).toBe(false);
+    creature(r.world, 'idle', 3);
+    creature(r.world, 'alerted', 50);
+    expect(r.rules.unsafe(r.world, r.player)).toBe(false);
+    creature(r.world, 'combat', 5);
+    expect(r.rules.unsafe(r.world, r.player)).toBe(true);
+    expect(r.rules.start(r.world, r.player, SORCERER_BOOK.id)).toMatchObject({ reason: 'unsafe' });
+  });
+
   it('a desk out of reach, or a tagged thing that is not a desk, gives no bonus', () => {
     const r = rig();
     const far = r.world.spawn();
