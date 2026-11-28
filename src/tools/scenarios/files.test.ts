@@ -2,7 +2,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { loadScenarios, writeGolden } from './files';
+import { format, resolveConfig } from 'prettier';
+import { formatLikePrettier, loadScenarios, writeGolden } from './files';
 import { MIN_SCENARIOS, scenarioSchema } from './schema';
 
 describe('scenario files (mw-e03.27)', () => {
@@ -39,10 +40,20 @@ describe('scenario files (mw-e03.27)', () => {
     expect(() => loadScenarios(dir)).toThrow(/bad\.json: id "other" must match the file name/);
   });
 
-  it('writes a golden back in the file layout', () => {
-    writeGolden(first, 'abcdef01', dir);
+  it('AC-1: a written scenario is exactly what Prettier makes of it, short arrays inline', async () => {
+    await writeGolden(first, 'abcdef01', dir);
+    const path = join(dir, `${first.id}.json`);
+    const text = readFileSync(path, 'utf8');
+    const expanded = JSON.stringify({ ...first, golden: { finalHash: 'abcdef01' } }, null, 2);
+    expect(text).not.toBe(`${expanded}\n`);
+    expect(text).toBe(await format(expanded, { ...(await resolveConfig(path)), filepath: path }));
+    expect(await formatLikePrettier(path, text)).toBe(text);
+  });
+
+  it('AC-2: a written golden reads back as the same scenario with the new hash', async () => {
+    await writeGolden(first, 'abcdef01', dir);
     const written = JSON.parse(readFileSync(join(dir, `${first.id}.json`), 'utf8')) as unknown;
-    expect(scenarioSchema.parse(written).golden.finalHash).toBe('abcdef01');
+    expect(scenarioSchema.parse(written)).toEqual({ ...first, golden: { finalHash: 'abcdef01' } });
   });
 
   it('rejects an outcome or input at or after the last tick and an unknown property', () => {
