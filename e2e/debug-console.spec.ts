@@ -129,6 +129,9 @@ test('AC-6: typing spa + Tab completes to spawn, and a spawn runs', async ({ pag
 test('AC-5: without ?debug=1 a production build opens nothing and never loads the console module', async ({
   page,
 }) => {
+  // Two full page loads plus a fetch of every script the first one ran: about 20 s on a busy CI
+  // runner, too close to the 30 s default (mw-e41.34).
+  test.setTimeout(60_000);
   const problems = collectProblems(page);
   const scripts: string[] = [];
   page.on('response', (response) => {
