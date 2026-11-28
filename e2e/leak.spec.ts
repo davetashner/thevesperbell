@@ -8,7 +8,7 @@ import { runConsole, stubPointerLock } from './helpers/player';
 // heap after a forced GC (CDP HeapProfiler.collectGarbage + Runtime.getHeapUsage) and the renderer's
 // geometry and texture counts (#app[data-renderer-memory], from renderer.info.memory). Cycle 1 is
 // warm-up; the detector (scripts/perf/leak.ts, proven against a leaking fixture in leak.test.ts)
-// compares the last cycles with the ones after a four-cycle warm-up (JIT code, lazy chunks). Chromium only: CDP is a Chromium feature.
+// compares the last cycles with the ones after a four-cycle warm-up (JIT code, lazy chunks, first-swap content), sampling the GPU counts once they settle. Chromium only: CDP is a Chromium feature.
 //
 // A load from a save reloads the page (location.assign), which resets the renderer by construction,
 // so the repeated "load" is the area swap that rebuilds the world on the surviving renderer.
@@ -30,6 +30,23 @@ async function crossBy(page: Page, line: string, scene: string): Promise<void> {
   });
   await page.waitForURL(new RegExp(`scene=${scene}(&|$)`), { timeout: 90_000 });
   await ready(page, scene);
+}
+
+/**
+ * The renderer's counts once they stop moving: a mesh or texture uploads on the first frame that
+ * draws it, a few frames after the swap, so a read at "ready" is early (mw-e06.12). Settled means
+ * the same value on 10 reads 100 ms apart.
+ */
+async function settledMemory(page: Page): Promise<{ geometries: number; textures: number }> {
+  let last = await rendererMemory(page);
+  let steady = 0;
+  for (let reads = 0; steady < 10 && reads < 300; reads += 1) {
+    await page.waitForTimeout(100);
+    const now = await rendererMemory(page);
+    steady = now.geometries === last.geometries && now.textures === last.textures ? steady + 1 : 0;
+    last = now;
+  }
+  return last;
 }
 
 async function rendererMemory(page: Page): Promise<{ geometries: number; textures: number }> {
@@ -65,7 +82,7 @@ test('AC-1, AC-2: 20 save and area-swap cycles keep the heap and the renderer’
     await crossBy(page, 'tp 0 0 1', 'valley-01');
     await cdp.send('HeapProfiler.collectGarbage');
     heap.push((await cdp.send('Runtime.getHeapUsage')).usedSize);
-    const memory = await rendererMemory(page);
+    const memory = await settledMemory(page);
     geometries.push(memory.geometries);
     textures.push(memory.textures);
   }
@@ -87,7 +104,7 @@ test('AC-1, AC-2: 20 save and area-swap cycles keep the heap and the renderer’
   ).toBe(true);
   // AC-1: heap growth from cycle 2 to cycle 20 stays within the limit.
   expect.soft(verdicts.heap.ok, verdicts.heap.detail).toBe(true);
-  // AC-2: geometry and texture counts return to the cycle-2 value (±2).
+  // AC-2: geometry and texture counts return to the settled post-warm-up value (±2).
   expect.soft(verdicts.geometries.ok, verdicts.geometries.detail).toBe(true);
   expect.soft(verdicts.textures.ok, verdicts.textures.detail).toBe(true);
   expect(problems).toEqual([]);
