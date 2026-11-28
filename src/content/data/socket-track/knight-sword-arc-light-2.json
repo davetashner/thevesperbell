@@ -1,7 +1,7 @@
 {
   "$schema": "../socket-track.schema.json",
   "id": "knight-sword-arc-light-2",
-  "notes": "Sword light 2 (move sword-light-2, 4 active ticks): the backhand return, a flat slash from left to right about the chest pivot (0, 1.5, 0), yaw −55° → +55°, rising slightly (5° lowered → 5° raised).",
+  "notes": "Sword light 2 (move sword-light-2, 4 active ticks): the backhand return, a flat slash from left to right about the chest pivot (0, 1.5, 0), yaw −55° → +55°, rising slightly (5° lowered → 5° raised). The first two keys are the original arc; the last three keep their original rotations (so the blade keeps its reach) but lower the whole blade by 0.5, 0.7 and 0.8 m, so the backhand crosses the centre line at about hip height and a 0.9 m creature such as the fixture hound is hit too (mw-e04.40), with no auto-aim.",
   "keys": [
     {
       "position": {
@@ -32,7 +32,7 @@
     {
       "position": {
         "x": 0.0,
-        "y": 0.0,
+        "y": -0.5,
         "z": 0.0
       },
       "rotation": {
@@ -45,7 +45,7 @@
     {
       "position": {
         "x": 0.0302,
-        "y": 0.0014,
+        "y": -0.6986,
         "z": 0.058
       },
       "rotation": {
@@ -58,7 +58,7 @@
     {
       "position": {
         "x": 0.1071,
-        "y": 0.0057,
+        "y": -0.7943,
         "z": 0.075
       },
       "rotation": {
