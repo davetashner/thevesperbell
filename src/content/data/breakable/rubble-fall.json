@@ -1,0 +1,10 @@
+{
+  "$schema": "../breakable.schema.json",
+  "id": "rubble-fall",
+  "name": "Rubble fall",
+  "notes": "A roof fall packed across a tunnel (mw-e25.9, the Mooring's Watch supply tunnel). Loose stone that heavy blows and shoves bring down: blunt resisted 40%, force 20% (the knight's shield bash and heavy overhead clear it in a few blows; a mace or other blunt weapon chips it down slowly), a blade barely scratches it (95% of slash resisted) and arrows do nothing (pierce immune). Stone does not burn. Hit points come from the placement (300). Eight 0.35 m stone chunks; the fall coming down is loud, 90 dB at 1 m. Cracks telegraph it.",
+  "resistances": { "blunt": 0.4, "slash": 0.95, "pierce": 1, "force": 0.2 },
+  "debris": { "count": 8, "size": 0.35 },
+  "breakLoudness": 90,
+  "crack": true
+}
