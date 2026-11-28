@@ -86,7 +86,9 @@ function play(scene: string) {
   return { game, sim, id, steps, teleport, player };
 }
 
-describe('the Glen Well shaft (mw-e24.10)', () => {
+// Each case builds the whole Market Green scene (createGameWorld); under coverage that runs close to
+// the 30 s default, so these whole-scene suites take the 60 s used elsewhere (knot-outer, mw-e41.33).
+describe('the Glen Well shaft (mw-e24.10)', { timeout: 60_000 }, () => {
   it('AC-1: any object dropped into the well lands twice, the echo about 0.4 s after the landing', ({
     task,
   }) => {
@@ -236,7 +238,9 @@ describe('the Glen Well shaft (mw-e24.10)', () => {
   });
 });
 
-describe('the cistern under the priory (mw-e24.10)', () => {
+// Each case builds the whole Market Green scene (createGameWorld); under coverage that runs close to
+// the 30 s default, so these whole-scene suites take the 60 s used elsewhere (knot-outer, mw-e41.33).
+describe('the cistern under the priory (mw-e24.10)', { timeout: 60_000 }, () => {
   const humanoid = deriveNavAgent(
     resolveLocomotion(content.get('locomotion', 'humanoid'), content),
   );
