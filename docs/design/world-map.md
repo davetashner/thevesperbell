@@ -122,7 +122,7 @@ flowchart LR
   shop_lane --- market_green
   market_green --- mine_road
   mine_road --- mine_gate
-  market_green -.-|planned| priory_road
+  market_green --- priory_road
   market_green ---|door| lamplit_stacks
   shop_lane ---|door| brands_forge
   shop_lane ---|door| fenns_fletchery
@@ -348,7 +348,7 @@ Edges open to all four classes (the boarded mine gate, the ledge climb to the ro
 | `green-vane-house` | `market-green` | `vane-house` | path |  |  | planned: mw-e24.9 |
 | `green-mine-road` | `market-green` | `mine-road` | path |  |  | `briar-glen-green/mine-road-gate`, `deepworks/road-gate` |
 | `mine-road-gate` | `mine-road` | `mine-gate` | path |  |  | planned: mw-e25.23 |
-| `green-priory-road` | `market-green` | `priory-road` | path |  |  | planned: mw-e25.25 |
+| `green-priory-road` | `market-green` | `priory-road` | path |  |  | `briar-glen-green/priory-road-gate`, `briarwood/town-road-gate` |
 | `green-schoolhouse` | `market-green` | `schoolhouse` | door |  |  | planned: mw-e24.11 |
 | `green-cemetery` | `market-green` | `cemetery` | path |  |  | planned: mw-e24.11 |
 | `green-glen-well` | `market-green` | `glen-well` | path |  |  | planned: mw-e24.10 |
@@ -437,7 +437,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briar-glen-lane` | `brands-forge` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
 | `briar-glen-lane` | `fenns-fletchery` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
 | `briar-glen-lane` | `pells-bakery` | `briar-glen-lane/bridge-gate` (road-bridge), `briar-glen-lane/marsh-store-door` (marsh-door), `briar-glen-lane/sleeping-ox-door` (ox-door), `briar-glen-lane/bridgeward-college-door` (college-door), `briar-glen-lane/riverbank-path` (riverbank-path), `briar-glen-lane/green-gate` (lane-market-green), `briar-glen-lane/woodside-path` (lane-briarwood-edge) |
-| `briar-glen-green` | `market-green` | `briar-glen-green/lane-gate` (lane-market-green) |
+| `briar-glen-green` | `market-green` | `briar-glen-green/lane-gate` (lane-market-green), `briar-glen-green/mine-road-gate` (green-mine-road), `briar-glen-green/priory-road-gate` (green-priory-road) |
 | `briar-glen-green` | `lamplit-stacks` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `briar-glen-green` | `watch-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
 | `briar-glen-green` | `vane-house` | none (a marker spawn and a shut door or interactable; the interior bead replaces it) |
@@ -458,7 +458,7 @@ The scenes in src/content/data/scene that are part of the world today, and the n
 | `briarwood` | `wolf-den` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `woodcutters-hut` | none (a marker spawn; its trails are walked inside the scene) |
 | `briarwood` | `millpond` | none (a marker spawn; its trails are walked inside the scene) |
-| `briarwood` | `priory-road` | `briarwood/priory-road-gate` (priory-road-gate) |
+| `briarwood` | `priory-road` | `briarwood/priory-road-gate` (priory-road-gate), `briarwood/town-road-gate` (green-priory-road: the town road from Market Green comes in at a gap in the west wall and runs east to the mine road junction) |
 | `briarwood` | `millweir-far-bank` | none (a marker spawn; its trails are walked inside the scene) |
 | `moorings-watch` | `moorings-courtyard` | `moorings-watch/spur-gate` (hub-moorings), `moorings-watch/ridge-gate` (moorings-priory-ridge) |
 | `moorings-watch` | `moorings-tower` | none (a marker spawn inside the tower; the door is walked in and the stair climbed inside the scene) |
@@ -504,6 +504,8 @@ Test and gallery scenes (`testbed`, `kit-gallery`, the puzzle rooms such as `bra
 
 Every edge below has no scene transition yet. The first group needed new beads filed with this map; the rest belong to existing level beads.
 
+Most of these edges are already walkable even though no transition volume carries them: an edge whose two nodes are marker spawns of the same scene is walked inside that scene (the town, the Briarwood, the Deepworks, the priory, the Knot and the harbour), and the four `barge-*` edges are rides sold by Mags Oakum's dialogue (mw-e25.15, mw-e25.33, mw-4l3z). The audit of 2026-11-27 (mw-0qcf) found one edge between two different built scenes with a closed bead and no transition, `green-priory-road`, and wired it. The cross-scene edges still waiting are behind open beads or need a scene that does not exist yet: `sleepers-path-mine-gate` (mw-e25.2), `supply-tunnel-collapse` (mw-e25.9), `glen-well-cistern` (mw-e24.10), `sounding-shaft` (mw-e26.18), `ossuary-crypt` (mw-e26.20), and the edges to the jail cell (mw-e24.8), the rooftops (mw-e24.12), the Weeping Adit mouth (mw-e25.13) and the lockkeeper's cottage (mw-e25.14).
+
 | Bead | Edges |
 | --- | --- |
 | mw-e24.2 | `lane-bridge-post` |
@@ -522,16 +524,13 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e25.6 | `courtyard-tower`, `courtyard-supply-tunnel` |
 | mw-e25.9 | `supply-tunnel-collapse` |
 | mw-e25.10 | `mine-gate-winch` |
-| mw-e25.11 | `stone-stair` |
-| mw-e25.12 | `sluice-walk` |
 | mw-e25.13 | `quay-adit-mouth`, `weeping-adit` |
 | mw-e25.14 | `lock-gate-crossing` |
 | mw-e25.15 | `barge-quay-lock` |
 | mw-e25.33 | `barge-wharf-lock` |
-| mw-e25.22 | `lane-briarwood-edge` |
-| mw-e25.23 | `miners-bridge`, `mine-road-gate` |
-| mw-e25.24 | `under-the-bridge-quay`, `quay-millweir`, `millweir-kestrel-lock` |
-| mw-e25.25 | `green-priory-road`, `hub-priory-road`, `hub-moorings`, `moorings-priory-ridge` |
+| mw-e25.23 | `mine-road-gate` |
+| mw-e25.24 | `quay-millweir` |
+| mw-e25.25 | `hub-priory-road` |
 | mw-e26.2 | `winch-galleries`, `galleries-rootcellar`, `rootcellar-silver`, `silver-lower` |
 | mw-e26.4 | `silver-vane-gallery`, `vane-gallery-breach` |
 | mw-e26.5 | `priory-gate-nave`, `nave-choir`, `nave-garden`, `nave-crypt-stair`, `crypt-stair-crypt` |
@@ -550,7 +549,7 @@ Every edge below has no scene transition yet. The first group needed new beads f
 | mw-e40.13 | `wharf-net-lofts`, `net-lofts-customs-roof` |
 | mw-e40.14 | `wharf-gilded-tern` |
 | mw-e40.15 | `wharf-breakwater` |
-| mw-e40.26 | `towpath-lock-wharf`, `barge-lock-wharf` |
+| mw-e40.26 | `barge-lock-wharf` |
 
 New beads from this map: mw-e25.22 (Briarwood link), mw-e25.23 (Miners' Bridge to the mine gate), mw-e25.24 (riverbank to the quay and towpath), mw-e25.25 (forest loop), mw-e40.26 (towpath and barge to Wendmouth).
 

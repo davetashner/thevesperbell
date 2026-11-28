@@ -57,7 +57,7 @@ import { hasMechanisms, startMechanisms } from '@game/mechanisms/index';
 import { sceneHost, startPuzzles } from '@game/puzzles/index';
 import { RenderSync, type SceneBinding } from '@game/loop/index';
 import { createGameLight, installGameLight, type GameLight } from '@game/light/index';
-import { installGameFire } from '@game/fire';
+import { installGameFire, sceneAirOption } from '@game/fire';
 import {
   debugSpellLearner,
   givePlayerMagic,
@@ -316,7 +316,11 @@ export function createGameWorld<TInput>(
         });
       },
       afterStimuli: (sim: World<never>) => {
-        installGameFire(sim, content, { damage: combat.damage, focus: focus.read });
+        installGameFire(sim, content, {
+          damage: combat.damage,
+          focus: focus.read,
+          ...sceneAirOption(content.get('scene', sceneId)),
+        });
       },
     }),
   });

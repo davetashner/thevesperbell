@@ -2538,6 +2538,22 @@
         "additionalProperties": false
       }
     },
+    "air": {
+      "description": "Air of the scene: its ambient temperature; omit for 20 °C (mw-e03.62).",
+      "type": "object",
+      "properties": {
+        "temperature": {
+          "type": "number",
+          "minimum": -60,
+          "maximum": 60,
+          "description": "Ambient air temperature in °C (default 20): below 0 keeps ice frozen and chills the wet; a warm room melts and dries faster."
+        }
+      },
+      "required": [
+        "temperature"
+      ],
+      "additionalProperties": false
+    },
     "light": {
       "description": "Static lighting: ambient level, ambient zones, directional lights (mw-e03.37).",
       "type": "object",

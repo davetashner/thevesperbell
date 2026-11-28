@@ -462,6 +462,9 @@ function animatedBody(
       timeline: moves !== undefined,
       // The knight always holds its sword (mw-a6t): low and clear of the legs, not hanging.
       carry: true,
+      // The shield rises, holds and lowers with the guard component (mw-t4s); a knight with no
+      // shield has no guard component and reads none.
+      guard: true,
     }),
     apply: animation.apply,
   });
