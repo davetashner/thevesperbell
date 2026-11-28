@@ -1,0 +1,9 @@
+{
+  "$schema": "../faction.schema.json",
+  "id": "forgotten",
+  "name": "The Forgotten",
+  "notes": "The lost Vesperines: skeletons of monks and miners who walked into the song (story bible §3.4, §8). They are allies of each other, so a swing or an arrow from one never hurts another (mw-qfx); fire, falling objects and other world damage still do. Toward the player they start hostile, as the unaligned default did before they had a faction, so their behaviour toward the player is unchanged. Neutral to every other faction except the Bridge Watch, which turns them away (see bridge-watch). The wider story relations are authored by mw-e13.17 and mw-e40.18.",
+  "towardPlayer": "hostile",
+  "towardMembers": "ally",
+  "towardOthers": "neutral"
+}

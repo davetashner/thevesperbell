@@ -407,6 +407,13 @@ describe('hit volumes (mw-e04.2)', () => {
         towardOthers: 'neutral',
         relations: [],
       },
+      {
+        id: 'unaligned',
+        towardPlayer: 'hostile',
+        towardMembers: 'neutral',
+        towardOthers: 'neutral',
+        relations: [],
+      },
     ]);
     const world = installFactions(new World<never>({ seed: 1 }));
     const [wolf, wolf2, crow, loner] = [world.spawn(), world.spawn(), world.spawn(), world.spawn()];
@@ -416,6 +423,11 @@ describe('hit volumes (mw-e04.2)', () => {
     expect(sameFaction(world, wolf, wolf2)).toBe(true);
     expect(sameFaction(world, wolf, crow)).toBe(false);
     expect(sameFaction(world, loner, wolf)).toBe(false);
+    // `unaligned` is no faction: two unaligned creatures are not allies.
+    const [a, b] = [world.spawn(), world.spawn()];
+    joinFaction(world, table, a, 'unaligned');
+    joinFaction(world, table, b, 'unaligned');
+    expect(sameFaction(world, a, b)).toBe(false);
     const byStance = alliesByStance(table);
     expect(byStance(world, wolf, crow)).toBe(true);
     expect(byStance(world, wolf, loner)).toBe(false);

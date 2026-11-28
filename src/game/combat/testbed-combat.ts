@@ -103,7 +103,8 @@ import {
   makePushable,
   MELEE_COMPONENTS,
   type MaterialPresets,
-  noAllies,
+  sameFaction,
+  FactionMemberComponent,
   playerViewRule,
   PhysicsObjectComponent,
   PlacementComponent,
@@ -321,6 +322,19 @@ export interface TestbedCombatants {
 }
 
 /**
+ * Melee blows and creature arrows pass through the attacker's own faction (the Forgotten do not cut
+ * each other down; mw-qfx). Worlds without factions installed have no allies. Fire, explosions and
+ * falling objects do not ask this rule, so they still hurt everyone. The player belongs to no faction.
+ */
+export function alliedByFaction(
+  world: World<never>,
+  attacker: EntityId,
+  target: EntityId,
+): boolean {
+  return world.isRegistered(FactionMemberComponent) && sameFaction(world, attacker, target);
+}
+
+/**
  * Adds the hit-volume system, the melee strikes, hit reactions and arrows to `world`, arms `player`
  * (when given) and spawns the scene's dummies (see the file header, step 2). Arrows hit the level in
  * `collision` (RapierCollisionWorld in the game); without it they meet only hurtboxes. Call
@@ -338,7 +352,7 @@ export function startTestbedCombat<TInput>(
   ensureRegistered(world, [PlacementComponent, HitReactionComponent, HitStopComponent]);
   ensureRegistered(world, [CreatureComponent]);
   world.addSystem(
-    hitVolumeSystem({ isAlly: noAllies, invulnerable: invulnerabilityRule(combat.moves) }),
+    hitVolumeSystem({ isAlly: alliedByFaction, invulnerable: invulnerabilityRule(combat.moves) }),
   );
   // The player's horizontal medium and long swings clang off the level (mw-e04.15); without a level
   // to probe, or without a player, nothing recoils.
@@ -379,6 +393,7 @@ export function startTestbedCombat<TInput>(
       arrows: combat.bow.arrows,
       damage: combat.damage,
       invulnerable: invulnerabilityRule(combat.moves),
+      isAlly: alliedByFaction,
       ...(collision !== undefined && { collision }),
     });
     // Arrows stay where they land and can be taken back (mw-e05.7). What counts as in view for the

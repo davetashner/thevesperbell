@@ -46,6 +46,7 @@ import {
   installAttacks,
   installTargetSharing,
   installFactions,
+  sameFaction,
   invulnerabilityRule,
   PlacementComponent,
   registerCreatureComponents,
@@ -135,6 +136,7 @@ export function startCreatures<TInput>(
     attacks: creatures.attacks,
     damage: combat.damage,
     invulnerable: invulnerabilityRule(combat.moves),
+    isAlly: sameFaction,
   });
   // A creature that keeps to some phases of the day is spawned only in those (mw-ju8.14).
   const phase = world.facts.get(PHASE_FACT);

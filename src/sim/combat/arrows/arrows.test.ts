@@ -24,7 +24,7 @@ import { DamageApplied, Deflected, type DamageResult, type DeflectInfo } from '.
 import { DamageModel } from '../damage/model';
 import { giveHurtboxes, HIT_VOLUME_COMPONENTS, type Hurtbox } from '../hits/components';
 import { DodgedHit, type HitboxHitInfo } from '../hits/events';
-import type { InvulnerabilityRule } from '../hits/system';
+import type { AllyRule, InvulnerabilityRule } from '../hits/system';
 import {
   damageFactor,
   DEFAULT_ARROW_RULES,
@@ -106,6 +106,7 @@ interface Setup {
   readonly stimuli?: boolean;
   readonly collision?: CollisionWorld | null;
   readonly invulnerable?: InvulnerabilityRule;
+  readonly isAlly?: AllyRule;
   readonly rules?: Partial<ArrowRules>;
 }
 
@@ -123,6 +124,7 @@ function setup(options: Setup = {}) {
     damage: new DamageModel(),
     ...(collision !== undefined && { collision }),
     ...(options.invulnerable !== undefined && { invulnerable: options.invulnerable }),
+    ...(options.isAlly !== undefined && { isAlly: options.isAlly }),
     ...(options.rules !== undefined && { rules: options.rules }),
   });
   if (options.stimuli === true) world.addSystem(stimulusSystem());
@@ -824,5 +826,25 @@ describe('rules', () => {
     t.fire('standard', ZERO, v3(0, 0, 10));
     t.run(60);
     expect(t.expired).toHaveLength(1);
+  });
+
+  it("mw-qfx AC-4: an arrow flies through its shooter's ally and hits the stranger behind; unshot arrows meet no ally", () => {
+    const allies = new Set<EntityId>();
+    const t = setup({
+      collision: null,
+      isAlly: (_world, attacker, target) => allies.has(attacker) && allies.has(target),
+    });
+    const archer = creature(t.world, v3(0, 1, 0));
+    const friend = creature(t.world, v3(5, 1, 0));
+    const stranger = creature(t.world, v3(10, 1, 0));
+    allies.add(archer);
+    allies.add(friend);
+    t.land(t.fire('no-drag', v3(1, 1, 0), v3(50, 0, 0), archer));
+    expect(healthOf(t.world, friend)?.current).toBe(100);
+    expect(healthOf(t.world, stranger)?.current).toBeLessThan(100);
+    // No shooter: the rule is not asked, the first creature in the way is hit.
+    const bare = t.fire('no-drag', v3(1, 1, 0), v3(50, 0, 0));
+    t.land(bare);
+    expect(healthOf(t.world, friend)?.current).toBeLessThan(100);
   });
 });

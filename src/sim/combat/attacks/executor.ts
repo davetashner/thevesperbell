@@ -60,7 +60,9 @@ import { HitboxComponent, HurtboxComponent } from '../hits/components';
 import { DodgedHit } from '../hits/events';
 import {
   hurtboxTargets,
+  noAllies,
   noInvulnerability,
+  type AllyRule,
   segmentHurtboxHits,
   type InvulnerabilityRule,
 } from '../hits/system';
@@ -101,6 +103,12 @@ export interface AttackExecutorOptions {
    * `invulnerabilityRule(moves)` gives dodge and wake-up i-frames (run the timeline first).
    */
   readonly invulnerable?: InvulnerabilityRule;
+  /**
+   * Who counts as the attacker's ally: its swings and projectiles pass through them without a hit
+   * (the Forgotten do not cut each other down; mw-qfx). Defaults to nobody. World damage (fire,
+   * falling objects) never goes through this rule.
+   */
+  readonly isAlly?: AllyRule;
 }
 
 /** A phase of an attack. */
@@ -411,9 +419,12 @@ function runActive(
   }
   const shape = shapeToWorld(attack.hitbox.shape, placement, current.aim);
   world.events.emit(AttackActive, { ...base, attackTick, shape });
+  const isAlly = options.isAlly ?? noAllies;
   const targets = hurtboxes(world, entity).filter(
     ({ entity: target, at }) =>
-      !current.hit.includes(target) && shapeFalloff(shape, 'none', at, at.radius) !== undefined,
+      !current.hit.includes(target) &&
+      !isAlly(world, entity, target) &&
+      shapeFalloff(shape, 'none', at, at.radius) !== undefined,
   );
   const invulnerable = options.invulnerable ?? noInvulnerability;
   for (const { entity: target } of targets) {
@@ -635,6 +646,7 @@ export function projectileSystem<TInput>(options: AttackExecutorOptions): System
     run: ({ world, clock }) => {
       const w: World<never> = world;
       const invulnerable = options.invulnerable ?? noInvulnerability;
+      const isAlly = options.isAlly ?? noAllies;
       w.query(ProjectileComponent).forEach((entity, projectile) => {
         const attack = lookup(options.attacks, projectile.attack);
         const flight = attack.projectile;
@@ -655,6 +667,7 @@ export function projectileSystem<TInput>(options: AttackExecutorOptions): System
         });
         const dodgedNow: EntityId[] = [];
         for (const target of along) {
+          if (isAlly(w, projectile.attacker, target)) continue;
           const hit = {
             attacker: projectile.attacker,
             source: entity,
