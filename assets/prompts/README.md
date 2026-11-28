@@ -43,12 +43,16 @@ through Playwright's Chromium (no image library needed).
 |---|---|---|
 | Prompt → candidates (local) | `pnpm asset:gen-image <prompt file>… [--model flux2-klein-4b\|qwen-image\|z-image-turbo] [--seed N] [--count N] [--size WxH] [--steps N] [--list PATH] [--no-tile]` | Checks every prompt file's filled block opens with the §14 preamble verbatim (before any GPU time), then generates on this Mac with mflux into `assets/_incoming/<id>/vN.png` + `vN.json` (prompt path and hash, model, weights revision, licence, seed, steps, size, seconds, date). Never overwrites. A tileable texture also goes through `asset:texture` (`vN.tile.webp`, `vN.seams.jpg`); trims (`*trim*`) tile left to right at 1536×512. |
 | Texture → runtime | `pnpm asset:texture <src> public/assets/texture/<id>.webp [--mode both\|x\|alpha] [--size WxH] [--preview check.jpg]` | Overlap-blends the edges so it tiles (both ways, or left to right for trims); `alpha` first crops a cut-out (a net) to whole pattern repeats; resizes and writes WebP; the preview repeats the tile to check the seams. |
+| Model → runtime | `pnpm assets:build [--candidate assets/_incoming/<id>/vN.glb]` | Every `assets/source/<category>/<id>/<id>.glb\|.gltf` → `public/assets/model/<id>.glb` (High) and `low/<id>.glb` (Low, half-size textures): dedup, prune, weld, optional simplify (`build.json` `simplifyRatio`), LOD0 triangle budget (fails the build), WebP textures resized to the tier, meshopt. Writes `public/assets/model/manifest.json`; unchanged models are skipped. `--candidate` builds an unapproved candidate beside itself for the turntable gate. |
 | Sheet → image-to-3D input | `pnpm asset:crop <sheet> <out.png> --box x0,y0,x1,y1 [--keep-all]` | Crops one prop or character, keeps only the largest shape (blanking neighbours that crept in), erases thin scale lines, pads square on the sheet's parchment. Check the result by eye before spending credits. |
 | Turntable gate | `pnpm asset:turntable <out dir> <model.glb>…` | Renders each GLB from four sides on parchment and writes `stats.json` (triangles, materials, texture sizes, bounds) for the prompt file and the §13.2 budget check. |
+| Record a gate | `pnpm assets:approve <asset-id> <gate> <version> [--reject] [--note …] [--promote <category>]` | Hashes `assets/_incoming/<asset-id>/<version>.<ext>` and appends the decision to `assets/approvals.json` (gates: `image`, `turntable`, `music-take`, `sfx-batch`; approver defaults to the standing pre-approval, `owner` for music takes); `--promote` copies the approved file to `assets/source/<category>/<asset-id>/`. |
+| Approval check | `pnpm assets:validate` | CI fails a non-placeholder runtime asset without an approved record per gate its CREDITS type requires (`src/tools/assets/approvals/required-gates.json`), or whose committed file no longer matches the approved hash. |
 
 Generation runs locally with `asset:gen-image` (below) or in Claude's session through the Higgsfield tools
-(`gpt_image_2_6`, Tripo through Higgsfield) when a prompt needs reference images; meshes are optimised with `npx @gltf-transform/cli@4.5.1 optimize … --compress
-meshopt --texture-compress webp --texture-size 512`.
+(`gpt_image_2_6`, Tripo through Higgsfield) when a prompt needs reference images; meshes are optimised with
+`pnpm assets:build` (the same steps as `npx @gltf-transform/cli@4.5.1 optimize … --compress
+meshopt --texture-compress webp --texture-size 512`, with per-class texture sizes and budgets).
 
 ### Local image generation (Mac Studio, mflux)
 

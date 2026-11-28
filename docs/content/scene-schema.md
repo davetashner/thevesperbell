@@ -333,6 +333,8 @@ every other field takes the default shown when omitted ("—" = stays absent).
 | `routes[].links[].from` | id | required | Waypoint it leaves. |
 | `routes[].links[].to` | id | required | Waypoint it goes to. |
 | `routes[].links[].weight` | integer ≥ 1 | `1` | Relative chance of taking this way; default 1. |
+| `air` | object | — | Air of the scene: its ambient temperature; omit for 20 °C (mw-e03.62). |
+| `air.temperature` | number -60–60 | required | Ambient air temperature in °C (default 20): below 0 keeps ice frozen and chills the wet; a warm room melts and dries faster. |
 | `light` | object | — | Static lighting: ambient level, ambient zones, directional lights (mw-e03.37). |
 | `light.ambient` | number 0–1 | — | Ambient level wherever no ambient zone applies, 0–1. |
 | `light.ambientZones` | list of object | `[]` | Boxes with their own ambient level; later zones win where they overlap. |

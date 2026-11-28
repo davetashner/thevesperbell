@@ -105,15 +105,15 @@
       "tier": "mandatory",
       "area": "moorings-watch",
       "node": "supply-tunnel",
-      "beat": "\u00a74.1 beat 5",
-      "summary": "The 'long way' round the gate (bible \u00a74.1 beat 5). The edge lists only knight and sorcerer; the archer and thief routes are proposed edge additions (Open questions).",
+      "beat": "§4.1 beat 5",
+      "summary": "The 'long way' round the gate (bible §4.1 beat 5), built in mw-e25.9: a rubble fall (breakable, profile rubble-fall) across the tunnel under a hanging section of roof (supply-tunnel-slab) held up by one rotten prop (supply-tunnel-prop). Getting past the fall by any route writes world.supply-tunnel.cleared (graph supply-tunnel-collapse).",
       "routes": [
         {
           "classes": ["knight"],
           "kind": "capability",
-          "capabilities": ["technique.shoulder-barge"],
-          "how": "Clear the collapse by hand: barge the rotted cribbing and heave the rubble.",
-          "source": "\u00a74.3 knight",
+          "capabilities": ["technique.shield-bash"],
+          "how": "Batter the rubble fall down: the shield bash and the heavy overhead break it in a few blows (rubble resists blunt 40%, force 20%).",
+          "source": "§4.3 knight",
           "status": "edge",
           "entry": "supply-tunnel"
         },
@@ -121,7 +121,7 @@
           "classes": ["sorcerer"],
           "kind": "capability",
           "capabilities": ["spell.firebolt"],
-          "how": "Burn the timber cribbing that holds the fall (the edge uses Firebolt).",
+          "how": "Burn the rotten prop from range: the roof section drops into a step against the fall, and a jump from it reaches the top of the rubble.",
           "source": "world-map edge",
           "status": "edge",
           "entry": "supply-tunnel"
@@ -129,9 +129,9 @@
         {
           "classes": ["archer"],
           "kind": "capability",
-          "capabilities": ["arrow.rope"],
-          "how": "Loose a rope arrow into the roof timber above the fall and climb over through the gap.",
-          "source": "proposal",
+          "capabilities": ["arrow.severing-shot"],
+          "how": "Shoot out the rotten prop (any arrow cuts it; the severing shot is the trick it teaches): the roof section drops into a step, then climb over the fall. Standing under it means a crush.",
+          "source": "mw-e25.9",
           "status": "proposal",
           "entry": "supply-tunnel"
         },
@@ -139,17 +139,17 @@
           "classes": ["thief"],
           "kind": "capability",
           "capabilities": ["verb.climb.rough"],
-          "how": "Squeeze up the cracked wall and through the gap over the fall.",
-          "source": "proposal",
-          "status": "proposal",
+          "how": "Climb the rough stone face of the fall and through the gap under the roof.",
+          "source": "world-map edge",
+          "status": "edge",
           "entry": "supply-tunnel"
         },
         {
           "classes": ["any"],
           "kind": "fallback",
           "capabilities": [],
-          "how": "Dig it out with the miners' picks left in the tunnel: slow and loud (game-time cost, noise event).",
-          "source": "proposal",
+          "how": "Hack the rotten prop through at close range (and step out from under the roof section before it lands), or chip the rubble down with a blunt weapon: slow and loud.",
+          "source": "mw-e25.9",
           "status": "proposal",
           "entry": "supply-tunnel"
         }

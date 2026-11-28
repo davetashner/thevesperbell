@@ -12,7 +12,7 @@ import { collectProblems } from './helpers/slice';
 
 // mw-e24.2 AC-3: the Briar Glen town tour. From a new game in the shop lane the player walks the
 // woodside pocket's green-gate into Market Green, visits every landmark of the green (teleporting
-// inside the scene to save the walk; one page evaluation each), reaches the two planned road stubs
+// inside the scene to save the walk; one page evaluation each), reaches the two road gates
 // (the mine road and the priory road), walks back out through the lane gate, and takes the woodside
 // path into the Briarwood. Scenes are crossed only by walking into transition volumes. Built for a
 // ~1 fps CI runner: state polls with 30 s timeouts, no wall-clock assertions, and nothing aimed at a
@@ -116,7 +116,7 @@ test('AC-3: the town tour visits every landmark and exits to Briarwood, the mine
   // Every landmark, the two road stubs included.
   for (const id of LANDMARKS) await visit(page, id);
   expect(spawn('exit-mine-road').tags).toContain('mine-road');
-  expect(spawn('exit-priory-road').tags).toContain('planned:mw-e25.25');
+  expect(spawn('exit-priory-road').tags).toContain('priory-road');
   await expect(app).toHaveAttribute('data-scene', 'briar-glen-green');
 
   // Back out of the lane gate.
@@ -140,5 +140,44 @@ test('AC-3: the town tour visits every landmark and exits to Briarwood, the mine
     /"kind":"arrived".*"to":"briarwood".*"spawn":"arrive-from-briar-glen-lane"/,
     { timeout: 30_000 },
   );
+  expect(problems).toEqual([]);
+});
+
+// mw-0qcf AC-2: the priory road gate (green-priory-road) is walked both ways: out of Market Green's
+// east doorway into the Briarwood's west wall, and back. Only the swap and the arrival spot are
+// asserted, no long sim time.
+test('AC-2: the priory road gate leads from Market Green into the Briarwood and back', async ({
+  page,
+}) => {
+  test.setTimeout(240_000);
+  const problems = collectProblems(page);
+  await stubPointerLock(page);
+  await page.goto('/?scene=briar-glen-green&class=knight&debug=1');
+  await ready(page, 'briar-glen-green');
+  const app = page.locator('#app');
+  await takeControl(page);
+
+  await runConsole(page, 'tp 86 0 100');
+  await walkThrough(page, { x: 120, z: 100 }, 100, 'briarwood');
+  await expect(app).toHaveAttribute(
+    'data-transit',
+    /"kind":"arrived".*"to":"briarwood".*"spawn":"arrive-from-briar-glen-green"/,
+    { timeout: 30_000 },
+  );
+  const wood = await playerState(page);
+  expect(wood.position.x).toBeLessThan(-130);
+  expect(Math.abs(wood.position.z - 195)).toBeLessThan(5);
+
+  await takeControl(page);
+  await runConsole(page, 'tp -146 0 195');
+  await walkThrough(page, { x: -180, z: 195 }, 100, 'briar-glen-green');
+  await expect(app).toHaveAttribute(
+    'data-transit',
+    /"kind":"arrived".*"to":"briar-glen-green".*"spawn":"arrive-from-briarwood"/,
+    { timeout: 30_000 },
+  );
+  const town = await playerState(page);
+  expect(town.position.x).toBeGreaterThan(75);
+  expect(Math.abs(town.position.z - 100)).toBeLessThan(5);
   expect(problems).toEqual([]);
 });
