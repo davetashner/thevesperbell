@@ -10,6 +10,8 @@ import type { FactSpec, FactStore } from '../facts/store';
 export const MINUTES_PER_DAY = 24 * 60;
 /** The minute of the day a rested player wakes: 06:00. */
 export const MORNING_MINUTE = 6 * 60;
+/** The minute of the day dusk is waited for: 18:00 (the game clock's dusk phase starts at 18:00). */
+export const EVENING_MINUTE = 18 * 60;
 /** The minute of the day a new world starts: 06:00 (the game clock's default start). */
 export const START_MINUTE = 6 * 60;
 
@@ -77,7 +79,15 @@ export function addMinutes(time: TimeOfDay, minutes: number): TimeOfDay {
  * it, tomorrow's, so it is always between 1 and 1440.
  */
 export function minutesUntilMorning(time: TimeOfDay): number {
-  const wait = (MORNING_MINUTE - time.minute + MINUTES_PER_DAY) % MINUTES_PER_DAY;
+  return minutesUntil(time, MORNING_MINUTE);
+}
+
+/**
+ * Minutes from `time` to the next time the clock reads `minute` of the day: always between 1 and
+ * 1440 (at that minute exactly, a whole day).
+ */
+export function minutesUntil(time: TimeOfDay, minute: number): number {
+  const wait = (minute - time.minute + MINUTES_PER_DAY) % MINUTES_PER_DAY;
   return wait === 0 ? MINUTES_PER_DAY : wait;
 }
 

@@ -2,7 +2,7 @@
   "$schema": "../scene.schema.json",
   "id": "testbed",
   "name": "Greybox testbed",
-  "description": "The default scene: a room with an ivy-covered climbing wall up to a ledge, a wooden target board on the back wall for arrows and a locked closet in the east wall whose key lies nearby, a supply chest to loot, a narrow corridor with pillars and a hazard strip, and an arena with pillars, a ramp, platforms and three training dummies to lock on to.",
+  "description": "The default scene: a room with an ivy-covered climbing wall up to a ledge, a wooden target board on the back wall for arrows and a locked closet in the east wall whose key lies nearby, a supply chest to loot, a narrow corridor with pillars and a hazard strip, and an arena with pillars, a ramp, platforms and three training dummies to lock on to. An unlit campfire stands by the start: the player can light it and rest at it (mw-e27.13).",
   "grid": 1,
   "camera": {
     "position": [-14, 20, -14],
@@ -321,6 +321,22 @@
       "at": [-4.25, 0, 2.5],
       "prop": "barrel",
       "properties": { "liftable": true }
+    },
+    {
+      "id": "testbed-campfire",
+      "at": [2, 0, -2],
+      "lightSource": { "variant": "campfire", "unlit": true },
+      "restPoint": { "kind": "campfire" },
+      "interact": {
+        "affordances": [
+          { "verb": "light", "label": "Light the campfire" },
+          { "verb": "rest", "label": "Rest by the fire" },
+          { "verb": "extinguish", "label": "Snuff", "hold": 1 }
+        ],
+        "range": 2.8,
+        "anchor": [0, 0.3, 0],
+        "radius": 0.5
+      }
     }
   ],
   "light": {

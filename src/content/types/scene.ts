@@ -294,7 +294,7 @@ const colourSchema = z
  */
 export const sceneLightSourceSchema = z.strictObject({
   variant: z
-    .enum(['candle', 'torch', 'sconce', 'brazier', 'lantern', 'fireplace'])
+    .enum(['candle', 'torch', 'sconce', 'brazier', 'lantern', 'fireplace', 'campfire'])
     .describe('Prefab: its fuel, light, ignition point and how much wind it takes to blow it out.'),
   unlit: z.boolean().optional().describe('Starts dark; heat lights it (default false).'),
   infiniteFuel: z
@@ -852,6 +852,14 @@ export const sceneSpawnSchema = z.strictObject({
   lightSource: sceneLightSourceSchema
     .optional()
     .describe('Makes the spawned entity a light source that can be put out and relit (mw-e03.16).'),
+  restPoint: z
+    .strictObject({
+      kind: ref('rest-point').describe('The kind of rest point: its rules are that content entry.'),
+    })
+    .optional()
+    .describe(
+      'Makes the spawned entity a rest point (mw-e27.13). Its `interact` must offer the `rest` verb; a kind that needs fire only works while the spawn burns (give it a `lightSource`).',
+    ),
   impactSwitch: sceneImpactSwitchSchema
     .optional()
     .describe(
@@ -1647,6 +1655,12 @@ function checkMechanism(spawn: SpawnDef, index: number, ctx: z.RefinementCtx): v
     }
     if (door.locked === true && door.lock === undefined)
       issue('door', 'starts locked but has no lock');
+  }
+  if (
+    spawn.restPoint !== undefined &&
+    !(spawn.interact?.affordances.some((own) => own.verb === 'rest') ?? false)
+  ) {
+    issue('restPoint', 'is a rest point: its `interact` must offer the `rest` verb');
   }
   const { container } = spawn;
   if (container !== undefined) {

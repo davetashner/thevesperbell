@@ -381,6 +381,12 @@ export {
   type RespawnRulesEntry,
   type RespawnRulesInput,
 } from './types/respawn-rules.ts';
+export {
+  MAX_REST_HOURS,
+  restPointSchema,
+  type RestDurationDef,
+  type RestPointDef,
+} from './types/rest-point.ts';
 export { checkLootTables, lootTableProblems, type LootProblems } from './loot-checks.ts';
 export {
   checkCreatureAttacks,

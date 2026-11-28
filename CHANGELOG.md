@@ -13,6 +13,7 @@ check enforces this).
 
 ### Added
 
+- Rest at campfires, shrines and inn beds: light a campfire, pick how long to rest (until dawn, until dusk or a few hours), and the clock on the HUD moves on, you heal and the world resets what resets on rest; wolves or other trouble can wake you early with part of the healing. Rest is refused while enemies hunt you or the fire is out. [mw-e27.13]
 - The priory road out of Market Green's east gate is open: it leads into the Briarwood's west side and on through the trees to the road up to Bellwater Priory. [mw-0qcf]
 - A scene can set its air temperature (`"air": { "temperature": -5 }`): ice stays frozen in a cold room and melts faster in a warm one, and the scales room is now a cold vault so its block of ice keeps its weight. [mw-e03.62]
 - Melting ice loses weight: an ice block on a pressure plate shrinks as it thaws and lets the plate up once too little is left, a free timer puzzle (a wet crate that is only iced over keeps its weight). The chaos room has an ice block on a plate to try. [mw-e03.60]

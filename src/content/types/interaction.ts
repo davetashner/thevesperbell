@@ -30,6 +30,7 @@ const VERBS: Readonly<Record<AffordanceVerb, true>> = {
   'pick-lock': true,
   light: true,
   extinguish: true,
+  rest: true,
 };
 
 /** Every verb data may use. */

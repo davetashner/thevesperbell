@@ -637,7 +637,8 @@
                         "unlock",
                         "pick-lock",
                         "light",
-                        "extinguish"
+                        "extinguish",
+                        "rest"
                       ],
                       "description": "What Interact does."
                     },
@@ -1719,7 +1720,8 @@
                   "sconce",
                   "brazier",
                   "lantern",
-                  "fireplace"
+                  "fireplace",
+                  "campfire"
                 ],
                 "description": "Prefab: its fuel, light, ignition point and how much wind it takes to blow it out."
               },
@@ -1758,6 +1760,22 @@
             },
             "required": [
               "variant"
+            ],
+            "additionalProperties": false
+          },
+          "restPoint": {
+            "description": "Makes the spawned entity a rest point (mw-e27.13). Its `interact` must offer the `rest` verb; a kind that needs fire only works while the spawn burns (give it a `lightSource`).",
+            "type": "object",
+            "properties": {
+              "kind": {
+                "description": "The kind of rest point: its rules are that content entry.",
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "x-contentRef": "rest-point"
+              }
+            },
+            "required": [
+              "kind"
             ],
             "additionalProperties": false
           },

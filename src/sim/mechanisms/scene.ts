@@ -31,6 +31,7 @@ import { makeBeamEmitter, makeLightReceiver, makeOptic } from '../light/beams';
 import { syncLightReceiverNodes } from './receivers';
 import { makeDoor, makeSwitch, refreshAffordances, syncSwitchNodes } from './system';
 import { makeInterlock } from './interlocks';
+import { makeRestPoint } from '../rest/points';
 
 /** What `addSceneMechanisms` reads: profiles, locks and graphs by id. */
 export interface SceneMechanismsOptions {
@@ -187,6 +188,7 @@ export function addSceneMechanisms<T>(
       });
       lights.push(entity);
     }
+    if (spawn.restPoint !== undefined) makeRestPoint(sim, entity, spawn.restPoint.kind, spawn.id);
     const { beamEmitter: beam, optic, lightReceiver: receiver } = spawn;
     const [px, py, pz] = [spawn.position.x, spawn.position.y, spawn.position.z];
     const at = { x: px, y: py, z: pz };

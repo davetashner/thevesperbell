@@ -44,7 +44,7 @@ import {
 } from '../properties/components';
 import { placeEntity, PlacementComponent, placementOf } from '../stimulus/placement';
 import { shapeFalloff, type Vec3 } from '../stimulus/shapes';
-import { stimulusResolved } from '../stimulus/stimulus';
+import { applyStimulus, stimulusResolved } from '../stimulus/stimulus';
 import { LightSourceComponent } from './components';
 
 /** The light source prefabs. */
@@ -55,6 +55,7 @@ export const LIGHT_SOURCE_VARIANTS = [
   'brazier',
   'lantern',
   'fireplace',
+  'campfire',
 ] as const;
 export type LightSourceVariant = (typeof LIGHT_SOURCE_VARIANTS)[number];
 
@@ -141,8 +142,21 @@ export const LIGHT_SOURCE_PREFABS: Readonly<Record<LightSourceVariant, LightSour
       size: 0.6,
       flameRadius: 0.6,
     }),
+    // An open fire in the wild (mw-e27.13): a rest point while it burns. Wind does not take it
+    // lightly, but a spell of force or a downpour puts it out.
+    campfire: prefab({
+      fuel: 3600,
+      ignitionPoint: 250,
+      windResistance: 20,
+      intensity: 110,
+      radius: 9,
+      size: 0.5,
+      flameRadius: 0.45,
+    }),
   });
 
+/** Heat a hand-lit flame gives the fuel, °C: well past any prefab's ignition point (mw-e27.13). */
+export const STRIKE_HEAT = 600;
 /** Seconds Interact is held to smother a flame by hand. */
 export const SNUFF_SECONDS = 1.0;
 /** How close an actor must be to smother a flame, metres. */
@@ -238,7 +252,10 @@ export function makeLightSource(
     carrier: options.carrier ?? null,
     offset: options.offset ?? SOURCE_AT_HAND,
   });
-  if (world.isRegistered(InteractableComponent)) {
+  const interactive = world.isRegistered(InteractableComponent);
+  if (interactive && world.has(entity, InteractableComponent)) {
+    // The scene already gave it affordances (a campfire that also lights and offers rest): keep them.
+  } else if (interactive) {
     addInteractable(
       world,
       entity,
@@ -386,12 +403,27 @@ export function installLightSources<TInput>(world: World<TInput>): () => void {
         source: actor,
       });
     }),
+    // Lighting by hand (mw-e27.13): the `light` verb is a heat stimulus on the fuel, so whatever
+    // keeps a fire from catching (wet fuel, frozen) refuses it as it would any other spark.
+    world.events.on(interacted, ({ actor, target, verb }) => {
+      if (verb !== 'light' || !isSource(target) || readProperty(w, target, 'burning')) return;
+      applyStimulus(w, {
+        shape: { kind: 'contact', target },
+        element: 'heat',
+        intensity: STRIKE_HEAT,
+        source: actor,
+      });
+    }),
     addAffordanceGate(world, (gateWorld, _actor, target, affordance) =>
       affordance.verb === 'extinguish' &&
       isSource(target) &&
       !readProperty(gateWorld, target, 'burning')
         ? 'Already out'
-        : undefined,
+        : affordance.verb === 'light' &&
+            isSource(target) &&
+            readProperty(gateWorld, target, 'burning')
+          ? 'Already burning'
+          : undefined,
     ),
   ];
   return () => {

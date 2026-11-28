@@ -74,6 +74,7 @@ import { checkNavmeshes, navmeshSchema } from './types/navmesh.ts';
 import { puzzleSchema } from './types/puzzle.ts';
 import { questSchema } from './types/quest.ts';
 import { checkRespawnRules, respawnRulesSchema } from './types/respawn-rules.ts';
+import { restPointSchema } from './types/rest-point.ts';
 import { serviceSchema } from './types/service.ts';
 import { sandboxSchema } from './types/sandbox.ts';
 import { prefabSchema } from './types/prefab.ts';
@@ -146,6 +147,7 @@ export const contentTypes = {
   'reach-class': reachClassSchema,
   rumor: rumorSchema,
   'respawn-rules': respawnRulesSchema,
+  'rest-point': restPointSchema,
   sandbox: sandboxSchema,
   scene: sceneSchema,
   service: serviceSchema,
